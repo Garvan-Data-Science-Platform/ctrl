@@ -1,0 +1,13 @@
+{
+  "name": "ctrl-next",
+  "version": "0.0.1",
+  "description": "Dynamic consent application",
+  "main": "index.js",
+  "repository": "git@github.com:Garvan-Data-Science-Platform/ctrl-next.git",
+  "author": "ignatiusm <ignatius.menzies@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "application/*"
+  ]
+}

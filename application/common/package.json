@@ -1,0 +1,13 @@
+{
+  "name": "common",
+  "version": "0.0.1",
+  "description": "Shared types for dynamic consent application",
+  "main": "./src/index.js",
+  "license": "MIT",
+  "scripts": {
+    "type-check": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}

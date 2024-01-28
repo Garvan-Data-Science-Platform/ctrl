@@ -1,0 +1,7 @@
+{
+  "name": "frontend",
+  "version": "0.0.1",
+  "description": "Frontend for dynamic consent application",
+  "main": "index.js",
+  "license": "MIT"
+}
