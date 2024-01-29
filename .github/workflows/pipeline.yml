@@ -9,4 +9,5 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-      - run: docker build .
+      - run: docker build -t ctrl-next:latest -f Dockerfile .
+      - run: docker run ctrl-next:latest yarn type-check
