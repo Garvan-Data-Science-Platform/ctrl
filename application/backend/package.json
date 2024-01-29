@@ -2,7 +2,7 @@
   "name": "backend",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "exbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --external:express --external:cors",
+    "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --external:express --external:cors",
     "start": "node dist/index.js",
     "type-check": "tsc"
   },
