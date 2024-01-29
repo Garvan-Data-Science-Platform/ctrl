@@ -1,5 +1,7 @@
 {
   "name": "common",
+  "main": "./src/index.ts",
+  "common": "./src/index.ts",
   "packageManager": "yarn@4.0.2",
   "scripts": {
     "type-check": "tsc"
