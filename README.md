@@ -19,13 +19,6 @@ Install nvm (link to [nvm installation instructions](https://github.com/nvm-sh/n
 # Enable corepack to use yarn
 corepack enable
 
-# Initialise a new yarn project
-`yarn init -2`
-
-Then install project dependencies with the following command:
-
-`yarn install`
-
 ### Run servers
 
 Run the backend and frontend servers in development mode (with hot reload):
