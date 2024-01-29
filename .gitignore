@@ -10,3 +10,4 @@
 
 # Dependency directories
 node_modules/
+application/*/dist/
