@@ -17,16 +17,29 @@ Install nvm (link to [nvm installation instructions](https://github.com/nvm-sh/n
 `nvm use`
 
 # Enable corepack to use yarn
-corepack enable
+
+`corepack enable`
+
+Then install project dependencies with the following command:
+
+`yarn install`
 
 ### Run servers
 
 Run the backend and frontend servers in development mode (with hot reload):
 
-`cd application/backend && yarn dev`
-
-and in a different terminal window run:
-
-`cd application/frontend && yarn dev`
+`yarn dev`
 
 Open http://localhost:3000 with your browser to see the local frontend.
+
+## Running type checks locally via docker
+
+Type checks run in CI. To run them locally, you can do:
+
+```
+# Build the environment, which contains yarn and installed dependencies
+docker build -t ctrl-next:latest -f Dockerfile .
+
+# Invoke the type checks via yarn in docker
+docker run ctrl-next:latest yarn type-check
+```

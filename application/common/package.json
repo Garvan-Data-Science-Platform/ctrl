@@ -4,7 +4,9 @@
   "common": "./src/index.ts",
   "packageManager": "yarn@4.0.2",
   "scripts": {
-    "type-check": "tsc"
+    "type-check": "tsc",
+    "build": "true",
+    "dev": "true"
   },
   "devDependencies": {
     "typescript": "^5.3.3"
