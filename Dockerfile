@@ -1,5 +1,11 @@
 FROM ubuntu:22.04
 
+ENV FRONTEND_HOST=apphostname
+ENV FRONTEND_PORT=3000
+
+ENV BACKEND_HOST=apphostname
+ENV BACKEND_PORT=5000
+
 ENV NVM_DIR /usr/local/nvm
 
 SHELL ["/bin/bash", "-lc"]
@@ -21,4 +27,6 @@ RUN : \
   && nvm use \
   && corepack enable \
   && yarn install \
-  && yarn build
+  && yarn build \
+  && ( cd application/frontend && yarn playwright install ) \
+  && ( cd application/frontend && yarn playwright install-deps )

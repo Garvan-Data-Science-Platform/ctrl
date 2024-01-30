@@ -4,9 +4,16 @@ import express from 'express'
 import { Workspace } from 'common'
 
 const app = express()
-const port = 5000
 
-app.use(cors({ origin: 'http://localhost:3000' }))
+const backendPort  = parseInt(process.env.BACKEND_PORT  ?? 5000);
+const frontendPort = parseInt(process.env.FRONTEND_PORT ?? 3000);
+
+const backendHost  = process.env.BACKEND_HOST  ?? '127.0.0.1';
+const frontendHost = process.env.FRONTEND_HOST ?? '127.0.0.1';
+
+app.use(cors({
+  origin: `http://${frontendHost}:${frontendPort}`
+}));
 
 app.get('/workspaces', (_, reponse) => {
   const workspaces: Workspace[] = [
@@ -17,6 +24,9 @@ app.get('/workspaces', (_, reponse) => {
   reponse.json({ data: workspaces })
 })
 
-app.listen(port, () => console.log(`Listening on http://localhost:${port}`))
+app.listen(
+  backendPort,
+  () => console.log(`Listening on http://${backendHost}:${backendPort}`)
+)
 
 export { app };

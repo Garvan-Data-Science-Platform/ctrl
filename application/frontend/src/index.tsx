@@ -3,11 +3,16 @@ import { createRoot } from 'react-dom/client'
 
 import { Workspace } from 'common'
 
+const backendPort  = parseInt(process.env.BACKEND_PORT  ?? 5000);
+const backendHost  = process.env.BACKEND_HOST  ?? '127.0.0.1';
+
+const backendBaseUrl = `http://${backendHost}:${backendPort}`;
+
 const App = () => {
   const [data, setData] = useState<Workspace[]>([])
 
   useEffect(() => {
-    fetch('http://localhost:5000/workspaces')
+    fetch(`${backendBaseUrl}/workspaces`)
       .then((response) => response.json())
       .then(({ data }) => setData(data))
   }, [])

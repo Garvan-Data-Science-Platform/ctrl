@@ -5,7 +5,7 @@
     "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --external:express --external:cors",
     "start": "node dist/index.js",
     "type-check": "tsc",
-    "test": "vitest"
+    "test": "vitest --run"
   },
   "packageManager": "yarn@4.0.2",
   "dependencies": {

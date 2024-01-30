@@ -3,8 +3,8 @@
   "packageManager": "yarn@4.0.2",
   "scripts": {
     "build": "yarn workspaces foreach --all run build",
-    "start": "yarn workspaces foreach --all --parallel --interlaced run start",
-    "dev": "yarn workspaces foreach --all --parallel --interlaced run dev",
+    "start": "yarn workspaces foreach --all --parallel --interlaced --jobs unlimited run start",
+    "dev": "yarn workspaces foreach --all --parallel --interlaced --jobs unlimited run dev",
     "type-check": "yarn workspaces foreach --all run type-check",
     "test": "yarn workspaces foreach --all run test"
   },
