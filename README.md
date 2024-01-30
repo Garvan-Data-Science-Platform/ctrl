@@ -31,3 +31,15 @@ Run the backend and frontend servers in development mode (with hot reload):
 `yarn dev`
 
 Open http://localhost:3000 with your browser to see the local frontend.
+
+## Running type checks locally via docker
+
+Type checks run in CI. To run them locally, you can do:
+
+```
+# Build the environment, which contains yarn and installed dependencies
+docker build -t ctrl-next:latest -f Dockerfile .
+
+# Invoke the type checks via yarn in docker
+docker run ctrl-next:latest yarn type-check
+```
