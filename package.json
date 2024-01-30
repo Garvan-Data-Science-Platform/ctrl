@@ -5,7 +5,8 @@
     "build": "yarn workspaces foreach --all run build",
     "start": "yarn workspaces foreach --all --parallel --interlaced run start",
     "dev": "yarn workspaces foreach --all --parallel --interlaced run dev",
-    "type-check": "yarn workspaces foreach --all run type-check"
+    "type-check": "yarn workspaces foreach --all run type-check",
+    "test": "yarn workspaces foreach --all run test"
   },
   "workspaces": [
     "application/*"

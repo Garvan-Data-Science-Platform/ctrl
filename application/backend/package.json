@@ -4,7 +4,8 @@
     "dev": "tsx watch src/index.ts",
     "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --external:express --external:cors",
     "start": "node dist/index.js",
-    "type-check": "tsc"
+    "type-check": "tsc",
+    "test": "vitest"
   },
   "packageManager": "yarn@4.0.2",
   "dependencies": {
@@ -14,9 +15,12 @@
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
+    "@types/supertest": "^6.0.2",
     "common": "workspace:^",
     "esbuild": "^0.20.0",
+    "supertest": "^6.3.4",
     "tsx": "^4.7.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.2"
   }
 }

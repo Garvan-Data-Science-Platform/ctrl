@@ -18,3 +18,5 @@ app.get('/workspaces', (_, reponse) => {
 })
 
 app.listen(port, () => console.log(`Listening on http://localhost:${port}`))
+
+export { app };

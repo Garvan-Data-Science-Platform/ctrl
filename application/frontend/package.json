@@ -4,7 +4,8 @@
     "dev": "vite dev --port 3000",
     "build": "vite build",
     "start": "vite preview",
-    "type-check": "tsc"
+    "type-check": "tsc",
+    "test": "true"
   },
   "packageManager": "yarn@4.0.2",
   "devDependencies": {

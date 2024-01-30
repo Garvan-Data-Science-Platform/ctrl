@@ -6,7 +6,8 @@
   "scripts": {
     "type-check": "tsc",
     "build": "true",
-    "dev": "true"
+    "dev": "true",
+    "test": "true"
   },
   "devDependencies": {
     "typescript": "^5.3.3"
