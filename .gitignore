@@ -11,3 +11,4 @@
 # Dependency directories
 node_modules/
 application/*/dist/
+application/frontend/test-results

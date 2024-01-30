@@ -1,6 +1,6 @@
 import { defineConfig } from '@playwright/test';
 
-
+// TODO: Get this from the common module, perhaps
 const frontendPort = parseInt(process.env.FRONTEND_PORT ?? 3000);
 const frontendHost = process.env.FRONTEND_HOST ?? '127.0.0.1';
 

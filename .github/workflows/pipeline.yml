@@ -10,7 +10,4 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4
       - run: docker build -t ctrl-next:latest -f Dockerfile .
-      - run: echo the host name is...
-      - run: docker run -h=apphostname ctrl-next:latest hostname
-      - run: docker run -h=apphostname ctrl-next:latest '( cd application/frontend && yarn test )'
       - run: docker run -h=apphostname ctrl-next:latest 'yarn test'
