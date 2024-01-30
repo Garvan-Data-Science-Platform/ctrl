@@ -5,9 +5,22 @@
     "build": "yarn workspaces foreach --all run build",
     "start": "yarn workspaces foreach --all --parallel --interlaced run start",
     "dev": "yarn workspaces foreach --all --parallel --interlaced run dev",
-    "type-check": "yarn workspaces foreach --all run type-check"
+    "type-check": "yarn workspaces foreach --all run type-check",
+    "format": "yarn run prettier --write './application/**/*.(js|ts|jsx|tsx)'",
+    "lint": "eslint ."
   },
   "workspaces": [
     "application/*"
+  ],
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.20.0",
+    "@typescript-eslint/parser": "^6.20.0",
+    "eslint": "^8.56.0",
+    "pre-commit": "^1.2.2",
+    "prettier": "^3.2.4"
+  },
+  "pre-commit": [
+    "format",
+    "lint"
   ]
 }
