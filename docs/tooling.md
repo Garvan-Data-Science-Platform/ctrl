@@ -37,11 +37,7 @@ The main application is written in TypeScript, a strongly typed version of JavaS
 
 The code in the repo is formatted by [Prettier](https://prettier.io/) and validated (via static analysis) by [ESLint](https://eslint.org/).
 Formatting and linting checks are run during pre-commit checks (and also in CI).
-In addition, the staged code is scanned for private-keys.
-
-You will need to [install pre-commit](https://pre-commit.com/#install) on your system, then run `pre-commit install` once within the repo to initialise the git hook.
-You can then run `pre-commit run` within the repo to run the checks.
-The pre-commit checks will also run each time you run `git commit`.
+The pre-commit checks will run each time you run `git commit`.
 
 ### CI/CD
 
