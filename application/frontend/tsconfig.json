@@ -16,5 +16,8 @@
     "jsx": "preserve",
     "types": ["vite/client"]
   },
-  "include": ["./src"]
+  "include": [
+    "./src",
+    "globals.d.ts"
+  ]
 }

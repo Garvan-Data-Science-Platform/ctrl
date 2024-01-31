@@ -1,19 +1,19 @@
-import { defineConfig } from '@playwright/test';
+import { defineConfig } from "@playwright/test";
 
 // TODO: Get this from the common module, perhaps
 const frontendPort = parseInt(process.env.FRONTEND_PORT ?? 3000);
-const frontendHost = process.env.FRONTEND_HOST ?? '127.0.0.1';
+const frontendHost = process.env.FRONTEND_HOST ?? "127.0.0.1";
 
 const frontendUrl = `http://${frontendHost}:${frontendPort}`;
 
 export default defineConfig({
   // Run your local dev server before starting the tests
   webServer: {
-    command: 'cd .. && yarn build && yarn start',
+    command: "cd .. && yarn build && yarn start",
     url: frontendUrl,
     reuseExistingServer: !process.env.CI,
-    stdout: 'pipe',
-    stderr: 'pipe',
+    stdout: "pipe",
+    stderr: "pipe",
   },
   use: {
     baseURL: frontendUrl,

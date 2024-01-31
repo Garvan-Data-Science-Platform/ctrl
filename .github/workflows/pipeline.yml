@@ -4,10 +4,13 @@ on:
 
 jobs:
   build:
-    name: build
+    name: build and lint
     runs-on: ubuntu-22.04
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
       - run: docker build -t ctrl-next:latest -f Dockerfile .
+      - run: docker run ctrl-next:latest 'yarn type-check'
+      - run: docker run ctrl-next:latest 'yarn format'
+      - run: docker run ctrl-next:latest 'yarn lint'
       - run: docker run -h=apphostname ctrl-next:latest 'yarn test'
