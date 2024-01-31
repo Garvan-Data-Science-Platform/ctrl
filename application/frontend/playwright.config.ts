@@ -9,7 +9,7 @@ const frontendUrl = `http://${frontendHost}:${frontendPort}`;
 export default defineConfig({
   // Run your local dev server before starting the tests
   webServer: {
-    command: 'cd .. && yarn dev',
+    command: 'cd .. && yarn build && yarn start',
     url: frontendUrl,
     reuseExistingServer: !process.env.CI,
     stdout: 'pipe',
