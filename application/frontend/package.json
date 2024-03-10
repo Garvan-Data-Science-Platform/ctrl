@@ -3,7 +3,7 @@
   "scripts": {
     "dev": "vite dev --port 3000",
     "build": "vite build",
-    "start": "vite preview",
+    "start": "vite preview --host --port 3000",
     "type-check": "tsc"
   },
   "packageManager": "yarn@4.0.2",
