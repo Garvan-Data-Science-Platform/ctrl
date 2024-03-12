@@ -9,6 +9,7 @@ help:
 	@echo "- help - print this help message."
 	@echo "- docker-build - build/tag the ctrl-next:latest Docker image."
 	@echo "- docker-run - run ctrl-next and its DB from docker images."
+	@echo "- docker-stop - stop the ctrl-next and DB docker containers"
 	@echo "- docker-run-db - run the DB from its docker image"
 
 docker-build:
