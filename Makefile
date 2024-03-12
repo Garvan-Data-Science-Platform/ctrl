@@ -17,5 +17,8 @@ docker-build:
 docker-run:
 	docker-compose up
 
+docker-stop:
+	docker-compose down
+
 docker-run-db:
 	docker-compose up db
