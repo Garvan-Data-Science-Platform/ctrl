@@ -75,7 +75,7 @@ docker build \
 
 **Note**: an [alternative Dockerfile](Dockerfile_with_nvm) is provided, that install Node.js through `nvm`. 
 
-To run `ctrl-next` once the image has been built and its Postgres DB a [docker-compose](docker-compose.yml) file is provided. The following commands are supported:
+To run `ctrl-next` once the image has been built and its Postgres DB a [docker-compose.yml](docker-compose.yml) file is provided. The following commands are supported:
 
 ```bash
 # Run ctrl-next and DB from docker images.

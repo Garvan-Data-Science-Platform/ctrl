@@ -16,10 +16,10 @@ docker-build:
 	docker build --build-arg="NODE_VERSION=$(NODE_VERSION)" -t ctrl-next:latest .
 
 docker-run:
-	docker-compose up
+	docker compose up
 
 docker-stop:
-	docker-compose down
+	docker compose down
 
 docker-run-db:
-	docker-compose up db
+	docker compose up db
