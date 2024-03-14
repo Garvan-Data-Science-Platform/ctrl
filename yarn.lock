@@ -1681,6 +1681,7 @@ __metadata:
     eslint: "npm:^8.56.0"
     pre-commit: "npm:^1.2.2"
     prettier: "npm:^3.2.4"
+    typescript: "npm:^5.3.3"
   languageName: unknown
   linkType: soft
 
