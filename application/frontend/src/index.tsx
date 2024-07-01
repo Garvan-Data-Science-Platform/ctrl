@@ -1,13 +1,13 @@
 import { StrictMode, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 
-import { Workspace } from "common";
+import { backendPort, Workspace } from "common";
 
 const App = () => {
   const [data, setData] = useState<Workspace[]>([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/workspaces")
+    fetch(`http://localhost:${backendPort}/workspaces`)
       .then((response) => response.json())
       .then(({ data }) => setData(data));
   }, []);
