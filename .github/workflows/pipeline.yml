@@ -1,18 +1,21 @@
 name: Build checks
 
-on:
-  push:
-  pull_request:
+on: [push]
 
 jobs:
-  build:
-    name: build and lint
-    runs-on: ubuntu-22.04
+  build-checks:
+    name: build checks
+    runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-      - run: make docker-build
-      - run: docker run ctrl-next:latest yarn type-check
-      - run: docker run ctrl-next:latest yarn format
-      - run: docker run ctrl-next:latest yarn lint
-      - run: docker run ctrl-next:latest yarn test
+      - name: Build Image
+        run: make docker-build
+      - name: Check Types
+        run: docker run ctrl-next:latest yarn type-check
+      - name: Format Code
+        run: docker run ctrl-next:latest yarn format
+      - name: Lint Code
+        run: docker run ctrl-next:latest yarn lint
+      - name: Run Unit Testing
+        run: docker run ctrl-next:latest yarn test
