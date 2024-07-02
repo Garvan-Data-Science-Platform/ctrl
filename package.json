@@ -7,6 +7,7 @@
     "dev": "yarn workspaces foreach --all --parallel --interlaced run dev",
     "type-check": "yarn workspaces foreach --all run type-check",
     "format": "yarn run prettier --write './application/**/*.(js|ts|jsx|tsx)'",
+    "test": "yarn workspaces foreach --all --parallel run test",
     "lint": "eslint ."
   },
   "workspaces": [
@@ -22,6 +23,7 @@
   },
   "pre-commit": [
     "format",
-    "lint"
+    "lint",
+    "test"
   ]
 }
