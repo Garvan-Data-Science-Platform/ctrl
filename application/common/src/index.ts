@@ -3,4 +3,4 @@ export type Workspace = {
   version: string;
 };
 
-export const backendPort = 5001;
+export const backendPort = 5000;
