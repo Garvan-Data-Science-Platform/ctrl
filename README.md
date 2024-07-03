@@ -50,6 +50,9 @@ yarn format
 # Run eslint to lint the code.
 yarn lint
 
+# Run jest to test the code.
+yarn test
+
 # Perform a full project build.
 yarn build
 
