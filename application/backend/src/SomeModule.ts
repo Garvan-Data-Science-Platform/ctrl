@@ -6,8 +6,8 @@
  * @returns {number} The sum of the two numbers.
  */
 export const add = (a: number, b: number): number => {
-    return a + b;
-}
+  return a + b;
+};
 
 /**
  * Subtracts two numbers and returns their difference.
@@ -17,5 +17,5 @@ export const add = (a: number, b: number): number => {
  * @returns {number} The difference between the two numbers.
  */
 export const subtract = (a: number, b: number): number => {
-    return a - b;
-}
+  return a - b;
+};

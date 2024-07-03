@@ -1,4 +1,4 @@
 node_modules
 
 application/*/dist
-application/*/babel.config.js
+application/*/jest.config.js

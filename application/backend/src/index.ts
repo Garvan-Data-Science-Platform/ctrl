@@ -16,4 +16,6 @@ app.get("/workspaces", (_, response) => {
   response.json({ data: workspaces });
 });
 
-app.listen(backendPort, () => console.log(`Listening on http://localhost:${backendPort}`));
+app.listen(backendPort, () =>
+  console.log(`Listening on http://localhost:${backendPort}`),
+);
