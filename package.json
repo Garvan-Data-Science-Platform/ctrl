@@ -8,8 +8,7 @@
     "type-check": "yarn workspaces foreach --all run type-check",
     "format": "yarn run prettier --write './application/**/*.(js|ts|jsx|tsx)'",
     "test": "yarn workspaces foreach --all --parallel run test",
-    "lint": "eslint .",
-    "prepare": "husky install"
+    "lint": "eslint ."
   },
   "workspaces": [
     "application/*"
@@ -18,15 +17,7 @@
     "@typescript-eslint/eslint-plugin": "^6.20.0",
     "@typescript-eslint/parser": "^6.20.0",
     "eslint": "^8.56.0",
-    "husky": "^8.0.0",
-    "lint-staged": "^15.2.7",
     "prettier": "^3.2.4",
     "typescript": "^5.3.3"
-  },
-  "lint-staged": {
-    "*.{ts,js}": "eslint --cache --fix",
-    "*.{ts,js,css,md}": "prettier --write",
-    "*.js": "eslint --cache --fix",
-    "*.{js,css,md}": "prettier --write"
   }
 }
