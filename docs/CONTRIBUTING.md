@@ -5,6 +5,17 @@
 Thank you for being interested in contributing to this project!
 Please see the information below for guidance on how to get set up with a suitable development environment, and how to collaborate with the project team via GitHub.
 
+## Development Tooling
+This project uses [pre-commit](https://pre-commit.com/) to ensure code quality is up to scratch. Please see [installation steps](https://pre-commit.com/#install).
+
+```bash
+# You can also install through Homebrew (MacOS)
+brew install pre-commit
+
+# Once installed, setup pre-commit in the project by running
+pre-commit install
+```
+
 ## Git + GitHub
 
 Please create issues, and develop work in branches named using the pattern: `feature/issue-##-short-description`.
