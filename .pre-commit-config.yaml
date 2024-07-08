@@ -18,7 +18,7 @@ repos:
       language: system
       types_or: [javascript, jsx, ts, tsx]
     - id: test
-      name: test
+      name: Jest
       entry: yarn test
       language: system
       types_or: [javascript, jsx, ts, tsx]
