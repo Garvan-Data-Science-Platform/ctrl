@@ -1,0 +1,24 @@
+repos:
+  - repo: local
+    hooks:
+    - id: format
+      name: Prettier
+      entry: yarn format
+      language: system
+      types_or: [javascript, jsx, ts, tsx]
+    - id: type-check
+      name: Type Check
+      entry: yarn type-check
+      language: system
+      types_or: [javascript, jsx, ts, tsx]
+      pass_filenames: false
+    - id: lint
+      name: ES Lint
+      entry: yarn lint
+      language: system
+      types_or: [javascript, jsx, ts, tsx]
+    - id: test
+      name: Jest
+      entry: yarn test
+      language: system
+      types_or: [javascript, jsx, ts, tsx]
