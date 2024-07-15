@@ -10,7 +10,6 @@ const workspaces: Workspace[] = [
 export const WorkspacesRouter = (): Router => {
   const router: Router = Router()
   router.get('/', async (_, res) => {
-    console.log(workspaces)
     res.status(200).json({ data: workspaces })
   })
 
