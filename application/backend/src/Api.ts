@@ -1,3 +1,4 @@
+import cors from 'cors'
 import { backendPort } from '../../common/src/index'
 import express, { type Application, type Router } from 'express'
 import { type Server } from 'http'
@@ -11,6 +12,7 @@ export class Api {
     // App config
     this.app = express()
     this.app.use(express.json())
+    this.app.use(cors())
 
     // Routers
     this.app.use('/workspaces', WorkspacesRouter)
