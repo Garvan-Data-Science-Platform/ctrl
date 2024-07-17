@@ -1,5 +1,3 @@
-// src/entities/User.test.ts
-
 import { User } from './User'
 
 describe('User', () => {
