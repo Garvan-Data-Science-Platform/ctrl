@@ -12,7 +12,8 @@ describe('User', () => {
     expect(user.name).toBe('John Doe')
     expect(user.email).toBe('john.doe@example.com')
     expect(user.role).toBe('admin')
-    expect(user.organisations).toBe(['Garvan'])
+    expect(user.organisations).toContain('Garvan')
+    expect(user.organisations.length).toBe(1)
     expect(user.createdAt).toBeInstanceOf(Date)
     expect(user.updatedAt).toBeInstanceOf(Date)
   })
@@ -40,8 +41,10 @@ describe('User', () => {
 
   test('should update the organisations and updatedAt fields', () => {
     const originalUpdatedAt = user.updatedAt
-    user.updateOrganisations('user')
-    expect(user.organisations).toBe('user')
+    user.updateOrganisations('Some Other Organisation')
+    expect(user.organisations.length).toBe(2)
+    expect(user.organisations).toContain('Garvan')
+    expect(user.organisations).toContain('Some Other Organisation')
     expect(user.updatedAt).not.toBe(originalUpdatedAt)
   })
 
