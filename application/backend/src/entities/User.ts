@@ -3,14 +3,16 @@ export class User {
   name: string
   email: string
   role: string
+  organisations: string[] // TODO: Change type to Organisation once implemented
   createdAt: Date
   updatedAt: Date
 
-  constructor(id: number, name: string, email: string, role: string) {
+  constructor(id: number, name: string, email: string, role: string, organisations: string[]) {
     this.id = id
     this.name = name
     this.email = email
     this.role = role
+    this.organisations = organisations
     this.createdAt = new Date()
     this.updatedAt = new Date()
   }
@@ -45,6 +47,17 @@ export class User {
    */
   updateRole(newRole: string): void {
     this.role = newRole
+    this.updatedAt = new Date()
+  }
+
+  /**
+   * Updates the user's organisations by adding a new organisation.
+   *
+   * @param newOrganisation - The new organisation to add to the user's list of organisations.
+   *                          It should be a non-empty string.
+   */
+  updateOrganisations(newOrganisations: string): void {
+    this.organisations.push(newOrganisations)
     this.updatedAt = new Date()
   }
 }
