@@ -1,5 +1,5 @@
 import { Request, Response, Router } from 'express'
-import { User } from 'src/entities/User'
+import { User } from '../entities/User'
 
 /* TODO: Remove when implementing DB
  ** - need to remove the refs to users list in each endpoint
