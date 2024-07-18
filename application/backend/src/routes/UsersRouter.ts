@@ -48,13 +48,35 @@ export const UsersRouter = (): Router => {
     res.status(200).json({ data: newUser })
   })
 
-  // TODO: Update User details
+  router.put('/:id', async (req: Request, res: Response) => {
+    const userID = req.params.id
+    const { name, email, role, organisations } = req.body
+
+    const user = users.find((user) => user.id === parseInt(userID, 10))
+    if (!user) {
+      // No user found
+      const error = { msg: `User w/ ID: ${userID} not found` }
+      console.log(error)
+      res.status(404).json({ error })
+      return
+    }
+
+    user.updateName(name)
+    user.updateEmail(email)
+    user.updateRole(role)
+    user.updateOrganisations(organisations)
+
+    console.log({ msg: `Update user w/ ID: ${userID}`, user })
+    // TODO: Update user in the database instead of the in-memory array
+    res.status(200).json({ data: user })
+  })
 
   router.delete('/:id', async (req: Request, res: Response) => {
-    const updatedUsers = users.filter((user) => user.id !== parseInt(req.params.id, 10))
+    const userID = req.params.id
+    const updatedUsers = users.filter((user) => user.id !== parseInt(userID, 10))
     if (updatedUsers.length === users.length) {
       // Nothing has been filtered out
-      const error = { msg: `User w/ ID: ${req.params.id} not found` }
+      const error = { msg: `User w/ ID: ${userID} not found` }
       console.log(error)
       res.status(404).json({ error })
       return
@@ -65,7 +87,7 @@ export const UsersRouter = (): Router => {
     users.length = 0
     users.push(...updatedUsers)
 
-    console.log({ msg: `Delete user w/ ID: ${req.params.id}`, updatedUsers })
+    console.log({ msg: `Delete user w/ ID: ${userID}`, updatedUsers })
     res.status(200).json({ data: updatedUsers })
   })
 
