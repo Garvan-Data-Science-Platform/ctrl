@@ -50,7 +50,7 @@ export const UsersRouter = (): Router => {
 
   router.put('/:id', async (req: Request, res: Response) => {
     const userID = req.params.id
-    const { name, email, role, organisations } = req.body
+    const { name, email, role, organisation } = req.body
 
     const user = users.find((user) => user.id === parseInt(userID, 10))
     if (!user) {
@@ -64,7 +64,7 @@ export const UsersRouter = (): Router => {
     user.updateName(name)
     user.updateEmail(email)
     user.updateRole(role)
-    user.updateOrganisations(organisations)
+    user.updateOrganisations(organisation)
 
     console.log({ msg: `Update user w/ ID: ${userID}`, user })
     // TODO: Update user in the database instead of the in-memory array

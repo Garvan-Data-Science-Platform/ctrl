@@ -56,8 +56,8 @@ export class User {
    * @param newOrganisation - The new organisation to add to the user's list of organisations.
    *                          It should be a non-empty string.
    */
-  updateOrganisations(newOrganisations: string): void {
-    this.organisations.push(newOrganisations)
+  updateOrganisations(newOrganisation: string): void {
+    this.organisations.push(newOrganisation)
     this.updatedAt = new Date()
   }
 }

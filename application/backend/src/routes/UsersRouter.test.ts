@@ -103,7 +103,57 @@ describe('UsersRouter', () => {
     })
   })
 
-  // TODO: Update User details testing
+  describe('PUT /users/:id', () => {
+    beforeEach(() => {
+      users.push(
+        new User(1, 'John Smith', 'jsmith@email.com', 'Data Scientist', ['Garvan Institute']),
+      )
+    })
+
+    it('should return an error if the user does not exist status 404', async () => {
+      const testingUserID = 2
+      const updatedUser = {
+        name: 'Jane Doe',
+        email: 'jdoe@email.com',
+        role: 'Software Engineer',
+        organisation: 'ABC Corp',
+      }
+      const response = await request(app).put(`/users/${testingUserID}`).send(updatedUser)
+      expect(response.status).toBe(404)
+      expect(response.body).toEqual({ error: { msg: `User w/ ID: ${testingUserID} not found` } })
+    })
+
+    it('should update the user with the given id status 200', async () => {
+      expect(users[0].name).toEqual('John Smith')
+      expect(users[0].email).toEqual('jsmith@email.com')
+      expect(users[0].role).toEqual('Data Scientist')
+      expect(users[0].organisations).toEqual(['Garvan Institute'])
+
+      const testingUserID = 1
+      const updatedUser = {
+        name: 'Jane Doe',
+        email: 'jdoe@email.com',
+        role: 'Software Engineer',
+        organisation: 'ABC Corp',
+      }
+
+      const response = await request(app).put(`/users/${testingUserID}`).send(updatedUser)
+      expect(response.status).toBe(200)
+      expect(response.body).toEqual({
+        data: {
+          id: testingUserID,
+          name: 'Jane Doe',
+          email: 'jdoe@email.com',
+          role: 'Software Engineer',
+          organisations: ['Garvan Institute', 'ABC Corp'],
+          createdAt: expect.anything(), // TODO: Should check this properly
+          updatedAt: expect.anything(), // TODO: Should check this properly
+        },
+      })
+      expect(users[0].name).toEqual('Jane Doe')
+      expect(users[0].email).toEqual('jdoe@email.com')
+    })
+  })
 
   describe('DELETE /users/:id', () => {
     beforeEach(() => {
