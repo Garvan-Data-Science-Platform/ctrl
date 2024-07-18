@@ -18,25 +18,53 @@ export const UsersRouter = (): Router => {
 
   router.get('/:id', async (req: Request, res: Response) => {
     const user = users.find((user) => user.id === parseInt(req.params.id, 10))
+    if (!user) {
+      // No user found
+      const error = { msg: `User w/ ID: ${req.params.id} not found` }
+      console.log(error)
+      res.status(404).json({ error })
+      return
+    }
+
     console.log({ msg: `Get user w/ ID: ${req.params.id}`, user })
     res.status(200).json({ data: user })
   })
 
   router.post('/', async (req: Request, res: Response) => {
-    const newUser = new User(
-      nextId++,
-      req.body.name,
-      req.body.email,
-      req.body.role,
-      req.body.organisations,
-    )
+    const { name, email, role, organisations } = req.body
+
+    // Validation check
+    if (!name || !email || !role || !organisations) {
+      const error = { msg: 'Missing required fields: name, email, role, organisations' }
+      console.log(error)
+      res.status(400).json({ error })
+      return
+    }
+
+    const newUser = new User(nextId++, name, email, role, organisations)
     console.log({ msg: `Creates user`, newUser })
+    // TODO: Add user to the database instead of the in-memory array
     users.push(newUser)
     res.status(200).json({ data: newUser })
   })
 
+  // TODO: Update User details
+
   router.delete('/:id', async (req: Request, res: Response) => {
     const updatedUsers = users.filter((user) => user.id !== parseInt(req.params.id, 10))
+    if (updatedUsers.length === users.length) {
+      // Nothing has been filtered out
+      const error = { msg: `User w/ ID: ${req.params.id} not found` }
+      console.log(error)
+      res.status(404).json({ error })
+      return
+    }
+
+    // Update the users list to reflect the deletion
+    // TODO: Delete user from database instead
+    users.length = 0
+    users.push(...updatedUsers)
+
     console.log({ msg: `Delete user w/ ID: ${req.params.id}`, updatedUsers })
     res.status(200).json({ data: updatedUsers })
   })
