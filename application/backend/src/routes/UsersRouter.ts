@@ -3,8 +3,9 @@ import { User } from '../entities/User'
 
 /* TODO: Remove when implementing DB
  ** - need to remove the refs to users list in each endpoint
+ ** - exporting for testing purposes (when db is implemented we should mock this in tests)
  */
-const users: User[] = []
+export const users: User[] = []
 let nextId = 1
 
 export const UsersRouter = (): Router => {
