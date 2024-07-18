@@ -152,6 +152,36 @@ describe('UsersRouter', () => {
       })
       expect(users[0].name).toEqual('Jane Doe')
       expect(users[0].email).toEqual('jdoe@email.com')
+      expect(users[0].role).toEqual('Software Engineer')
+      expect(users[0].organisations).toEqual(['Garvan Institute', 'ABC Corp'])
+    })
+
+    it('should only update the values that were given in the body status 200', async () => {
+      expect(users[0].name).toEqual('John Smith')
+      expect(users[0].email).toEqual('jsmith@email.com')
+      expect(users[0].role).toEqual('Data Scientist')
+      expect(users[0].organisations).toEqual(['Garvan Institute'])
+
+      const testingUserID = 1
+      const updatedUser = {
+        name: 'Jane Doe',
+        role: 'Software Engineer',
+        email: 'jdoe@email.com',
+      }
+
+      const response = await request(app).put(`/users/${testingUserID}`).send(updatedUser)
+      expect(response.status).toBe(200)
+      expect(response.body).toEqual({
+        data: {
+          id: testingUserID,
+          name: 'Jane Doe',
+          email: 'jdoe@email.com',
+          role: 'Software Engineer',
+          organisations: ['Garvan Institute'],
+          createdAt: expect.anything(), // TODO: Should check this properly
+          updatedAt: expect.anything(), // TODO: Should check this properly
+        },
+      })
     })
   })
 
