@@ -61,10 +61,10 @@ export const UsersRouter = (): Router => {
       return
     }
 
-    user.updateName(name)
-    user.updateEmail(email)
-    user.updateRole(role)
-    user.updateOrganisations(organisation)
+    if (name) user.updateName(name)
+    if (email) user.updateEmail(email)
+    if (role) user.updateRole(role)
+    if (organisation) user.updateOrganisations(organisation)
 
     console.log({ msg: `Update user w/ ID: ${userID}`, user })
     // TODO: Update user in the database instead of the in-memory array
