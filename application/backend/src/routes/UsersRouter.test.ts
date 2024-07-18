@@ -27,15 +27,16 @@ describe('UsersRouter', () => {
       )
       const response = await request(app).get('/users')
       expect(response.status).toBe(200)
+      expect(response.body.data.length).toEqual(1)
 
-      const responseUsers = response.body.data
-      expect(responseUsers.length).toEqual(1)
-      expect(parseInt(responseUsers[0].id, 10)).toEqual(1)
-      expect(responseUsers[0].name).toEqual('John Smith')
-      expect(responseUsers[0].email).toEqual('jsmith@email.com')
-      expect(responseUsers[0].role).toEqual('Data Scientist')
-      expect(responseUsers[0].organisations).toEqual(['Garvan Institute'])
-      // TODO: Need to check createdAt and updatedAt (think about using unix timestamp)
+      const responseUser = response.body.data[0]
+      expect(parseInt(responseUser.id, 10)).toEqual(1)
+      expect(responseUser.name).toEqual('John Smith')
+      expect(responseUser.email).toEqual('jsmith@email.com')
+      expect(responseUser.role).toEqual('Data Scientist')
+      expect(responseUser.organisations).toEqual(['Garvan Institute'])
+      expect(responseUser).toHaveProperty('createdAt')
+      expect(responseUser).toHaveProperty('updatedAt')
     })
   })
 
@@ -64,7 +65,8 @@ describe('UsersRouter', () => {
       expect(responseUser.email).toEqual('jsmith@email.com')
       expect(responseUser.role).toEqual('Data Scientist')
       expect(responseUser.organisations).toEqual(['Garvan Institute'])
-      // TODO: Need to check createdAt and updatedAt (think about using unix timestamp)
+      expect(responseUser).toHaveProperty('createdAt')
+      expect(responseUser).toHaveProperty('updatedAt')
     })
   })
 
@@ -96,10 +98,15 @@ describe('UsersRouter', () => {
           email: 'jdoe@email.com',
           role: 'Software Engineer',
           organisations: ['ABC Corp'],
-          createdAt: expect.anything(), // TODO: Should check this properly
-          updatedAt: expect.anything(), // TODO: Should check this properly
+          createdAt: expect.anything(),
+          updatedAt: expect.anything(),
         },
       })
+
+      // Check if createdAt and updatedAt are valid dates
+      const { createdAt, updatedAt } = response.body.data
+      expect(new Date(createdAt).toString()).not.toBe('Invalid Date')
+      expect(new Date(updatedAt).toString()).not.toBe('Invalid Date')
     })
   })
 
@@ -128,6 +135,8 @@ describe('UsersRouter', () => {
       expect(users[0].email).toEqual('jsmith@email.com')
       expect(users[0].role).toEqual('Data Scientist')
       expect(users[0].organisations).toEqual(['Garvan Institute'])
+      expect(new Date(users[0].createdAt).toString()).not.toBe('Invalid Date')
+      expect(new Date(users[0].updatedAt).toString()).not.toBe('Invalid Date')
 
       const testingUserID = 1
       const updatedUser = {
@@ -146,14 +155,23 @@ describe('UsersRouter', () => {
           email: 'jdoe@email.com',
           role: 'Software Engineer',
           organisations: ['Garvan Institute', 'ABC Corp'],
-          createdAt: expect.anything(), // TODO: Should check this properly
-          updatedAt: expect.anything(), // TODO: Should check this properly
+          createdAt: expect.anything(),
+          updatedAt: expect.anything(),
         },
       })
+
+      // Check if createdAt and updatedAt are valid dates
+      const { createdAt, updatedAt } = response.body.data
+      expect(new Date(createdAt).toString()).not.toBe('Invalid Date')
+      expect(new Date(updatedAt).toString()).not.toBe('Invalid Date')
+
+      // Check if the updated user is in the users array
       expect(users[0].name).toEqual('Jane Doe')
       expect(users[0].email).toEqual('jdoe@email.com')
       expect(users[0].role).toEqual('Software Engineer')
       expect(users[0].organisations).toEqual(['Garvan Institute', 'ABC Corp'])
+      expect(new Date(users[0].createdAt).toString()).not.toBe('Invalid Date')
+      expect(new Date(users[0].updatedAt).toString()).not.toBe('Invalid Date')
     })
 
     it('should only update the values that were given in the body status 200', async () => {
@@ -161,6 +179,8 @@ describe('UsersRouter', () => {
       expect(users[0].email).toEqual('jsmith@email.com')
       expect(users[0].role).toEqual('Data Scientist')
       expect(users[0].organisations).toEqual(['Garvan Institute'])
+      expect(new Date(users[0].createdAt).toString()).not.toBe('Invalid Date')
+      expect(new Date(users[0].updatedAt).toString()).not.toBe('Invalid Date')
 
       const testingUserID = 1
       const updatedUser = {
@@ -178,10 +198,14 @@ describe('UsersRouter', () => {
           email: 'jdoe@email.com',
           role: 'Software Engineer',
           organisations: ['Garvan Institute'],
-          createdAt: expect.anything(), // TODO: Should check this properly
-          updatedAt: expect.anything(), // TODO: Should check this properly
+          createdAt: expect.anything(),
+          updatedAt: expect.anything(),
         },
       })
+
+      const { createdAt, updatedAt } = response.body.data
+      expect(new Date(createdAt).toString()).not.toBe('Invalid Date')
+      expect(new Date(updatedAt).toString()).not.toBe('Invalid Date')
     })
   })
 
