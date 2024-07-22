@@ -8,7 +8,7 @@ export class Api {
   private server?: Server
   public port: number = backendPort
 
-  constructor(WorkspacesRouter: Router, SomeModuleRouter: Router) {
+  constructor(WorkspacesRouter: Router, SomeModuleRouter: Router, UsersRouter: Router) {
     // App config
     this.app = express()
     this.app.use(express.json())
@@ -17,6 +17,7 @@ export class Api {
     // Routers
     this.app.use('/workspaces', WorkspacesRouter)
     this.app.use('/somemodule', SomeModuleRouter)
+    this.app.use('/users', UsersRouter)
   }
 
   run(): void {
