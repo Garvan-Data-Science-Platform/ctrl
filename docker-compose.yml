@@ -1,23 +1,26 @@
 version: '3'
 services:
-
   db:
     image: postgres:16-alpine
     ports:
-      - "5432:5432"
+      - '5432:5432'
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_USER: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_DB: ctrl
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 1s
       timeout: 1s
       retries: 60
+    volumes:
+      - ./application/backend/database:/docker-entrypoint-initdb.d
 
   app:
-    image: "ctrl-next:latest"
+    image: 'ctrl-next:latest'
+    environment:
+      DATABASE_URL: postgres://postgres:password@db:5432/ctrl
 
     ports:
-      - "3000:3000"
-      - "5000:5000"
+      - '3000:3000'
+      - '5003:5003'
