@@ -4,12 +4,11 @@ describe('User', () => {
   let user: User
 
   beforeEach(() => {
-    user = new User(1, 'John Doe', 'john.doe@example.com', 'admin', ['Garvan'])
+    user = new User('John', 'john.doe@example.com', 'admin', ['Garvan'])
   })
 
   test('should create a user with the correct properties', () => {
-    expect(user.id).toBe(1)
-    expect(user.name).toBe('John Doe')
+    expect(user.firstName).toBe('John')
     expect(user.email).toBe('john.doe@example.com')
     expect(user.role).toBe('admin')
     expect(user.organisations).toContain('Garvan')
@@ -18,10 +17,10 @@ describe('User', () => {
     expect(user.updatedAt).toBeInstanceOf(Date)
   })
 
-  test('should update the name and updatedAt fields', () => {
+  test('should update the firstName and updatedAt fields', () => {
     const originalUpdatedAt = user.updatedAt
-    user.updateName('Jane Doe')
-    expect(user.name).toBe('Jane Doe')
+    user.updateFirstName('Jane')
+    expect(user.firstName).toBe('Jane')
     expect(user.updatedAt).not.toBe(originalUpdatedAt)
   })
 
@@ -49,7 +48,7 @@ describe('User', () => {
   })
 
   test('should differentiate between two users', () => {
-    const anotherUser = new User(2, 'Jane Doe', 'jane.doe@example.com', 'user', ['Kinghorn'])
+    const anotherUser = new User('Jane', 'jane.doe@example.com', 'user', ['Kinghorn'])
     expect(user).not.toBe(anotherUser)
   })
 })
