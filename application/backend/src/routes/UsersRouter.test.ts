@@ -34,11 +34,11 @@ describe('UsersRouter', () => {
 
       const response = await request(app).get('/users')
       expect(response.status).toBe(200)
-      expect(response.body).toEqual({ data: [] })
+      expect(response.body).toEqual({ data: { msg: 'Got all users', users: [] } })
     })
 
     it('should return the created users full information status 200', async () => {
-      const mockUser = {
+      const mockUser1 = {
         id: 1,
         firstName: 'John',
         email: 'jsmith@email.com',
@@ -48,20 +48,39 @@ describe('UsersRouter', () => {
         updatedAt: new Date().toISOString(),
       }
 
-      mockQuery.mockResolvedValueOnce({ rows: [mockUser] })
+      const mockUser2 = {
+        id: 1,
+        firstName: 'Joe',
+        email: 'jdoe@email.com',
+        role: 'Data Analyst',
+        organisations: ['ABC. Corp'],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+
+      mockQuery.mockResolvedValueOnce({ rows: [mockUser1, mockUser2] })
 
       const response = await request(app).get('/users')
       expect(response.status).toBe(200)
-      expect(response.body.data.length).toEqual(1)
 
-      const responseUser = response.body.data[0]
-      expect(responseUser.id).toEqual(mockUser.id)
-      expect(responseUser.firstName).toEqual(mockUser.firstName)
-      expect(responseUser.email).toEqual(mockUser.email)
-      expect(responseUser.role).toEqual(mockUser.role)
-      expect(responseUser.organisations).toEqual(mockUser.organisations)
-      expect(responseUser).toHaveProperty('createdAt')
-      expect(responseUser).toHaveProperty('updatedAt')
+      const responseUsers = response.body.data.users
+      expect(responseUsers).toHaveLength(2)
+
+      expect(responseUsers[0].id).toEqual(mockUser1.id)
+      expect(responseUsers[0].firstName).toEqual(mockUser1.firstName)
+      expect(responseUsers[0].email).toEqual(mockUser1.email)
+      expect(responseUsers[0].role).toEqual(mockUser1.role)
+      expect(responseUsers[0].organisations).toEqual(mockUser1.organisations)
+      expect(responseUsers[0]).toHaveProperty('createdAt')
+      expect(responseUsers[0]).toHaveProperty('updatedAt')
+
+      expect(responseUsers[1].id).toEqual(mockUser2.id)
+      expect(responseUsers[1].firstName).toEqual(mockUser2.firstName)
+      expect(responseUsers[1].email).toEqual(mockUser2.email)
+      expect(responseUsers[1].role).toEqual(mockUser2.role)
+      expect(responseUsers[1].organisations).toEqual(mockUser2.organisations)
+      expect(responseUsers[1]).toHaveProperty('createdAt')
+      expect(responseUsers[1]).toHaveProperty('updatedAt')
     })
   })
 
@@ -92,7 +111,7 @@ describe('UsersRouter', () => {
       const response = await request(app).get(`/users/${testingUserID}`)
       expect(response.status).toBe(200)
 
-      const responseUser = response.body.data
+      const responseUser = response.body.data.user
       expect(responseUser.id).toEqual(mockUser.id)
       expect(responseUser.firstName).toEqual(mockUser.firstName)
       expect(responseUser.email).toEqual(mockUser.email)
@@ -138,14 +157,17 @@ describe('UsersRouter', () => {
       expect(response.status).toBe(200)
       expect(response.body).toEqual({
         data: {
-          id: 1,
-          ...newUser,
-          createdAt: expect.anything(),
-          updatedAt: expect.anything(),
+          msg: 'Created user w/ ID: undefined',
+          newUser: {
+            id: 1,
+            ...newUser,
+            createdAt: expect.anything(),
+            updatedAt: expect.anything(),
+          },
         },
       })
 
-      const { createdAt, updatedAt } = response.body.data
+      const { createdAt, updatedAt } = response.body.data.newUser
       expect(new Date(createdAt).toString()).not.toBe('Invalid Date')
       expect(new Date(updatedAt).toString()).not.toBe('Invalid Date')
     })
@@ -200,6 +222,7 @@ describe('UsersRouter', () => {
       expect(response.status).toBe(200)
       expect(response.body).toEqual({
         data: {
+          msg: `Update user w/ ID: ${testingUserID}`,
           updatedUser: {
             id: testingUserID,
             firstName: updateUser.firstName,
@@ -249,6 +272,7 @@ describe('UsersRouter', () => {
       expect(response.status).toBe(200)
       expect(response.body).toEqual({
         data: {
+          msg: `Update user w/ ID: ${testingUserID}`,
           updatedUser: {
             id: testingUserID,
             firstName: updatedUser.firstName,
@@ -278,8 +302,9 @@ describe('UsersRouter', () => {
     })
 
     it('should delete the user with the given id status 200', async () => {
+      const testingUserID = 1
       const mockUser = {
-        id: 1,
+        id: testingUserID,
         firstName: 'John',
         email: 'jsmith@email.com',
         role: 'Data Scientist',
@@ -291,11 +316,24 @@ describe('UsersRouter', () => {
       mockQuery.mockResolvedValueOnce({ rows: [mockUser] })
       mockQuery.mockResolvedValueOnce({ rows: [] })
 
-      const response = await request(app).delete('/users/1')
+      const response = await request(app).delete(`/users/${testingUserID}`)
+
+      const expectedResponse = {
+        data: {
+          msg: `Deleted user w/ ID: ${testingUserID}`,
+          deletedUser: {
+            id: mockUser.id,
+            firstName: mockUser.firstName,
+            email: mockUser.email,
+            role: mockUser.role,
+            organisations: mockUser.organisations,
+            createdAt: expect.anything(),
+            updatedAt: expect.anything(),
+          },
+        },
+      }
       expect(response.status).toBe(200)
-      expect(response.body).toEqual({
-        data: {},
-      })
+      expect(response.body).toEqual(expectedResponse)
     })
   })
 })

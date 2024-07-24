@@ -9,8 +9,9 @@ export const UsersRouter = (): Router => {
 
   router.get('/', async (req: Request, res: Response) => {
     const result: QueryResult<User[]> = await db.query('SELECT * FROM users')
-    console.log({ msg: 'Get all users', result: result.rows })
-    res.status(200).json({ data: result.rows })
+    const responseData = { msg: 'Got all users', users: result.rows }
+    console.log(responseData)
+    res.status(200).json({ data: responseData })
   })
 
   router.get('/:id', async (req: Request, res: Response) => {
@@ -27,8 +28,9 @@ export const UsersRouter = (): Router => {
       res.status(404).json({ error })
       return
     }
-    console.log({ msg: `Get user w/ ID: ${req.params.id}`, user })
-    res.status(200).json({ data: user })
+    const responseData = { msg: `Get user w/ ID: ${req.params.id}`, user }
+    console.log(responseData)
+    res.status(200).json({ data: responseData })
   })
 
   router.post('/', async (req: Request, res: Response) => {
@@ -42,15 +44,20 @@ export const UsersRouter = (): Router => {
       return
     }
 
-    const newUser = new User(firstName, email, role, organisations)
-    console.log({ msg: `Creates user`, newUser })
     try {
       const result = await db.query(
         'INSERT INTO users (first_name, email, user_role, organisations) VALUES ($1, $2, $3, $4) RETURNING *',
         [firstName, email, role, organisations],
       )
       const insertedUser = result.rows[0]
-      res.status(200).json({ data: insertedUser })
+      const responseData = {
+        msg: `Created user w/ ID: ${insertedUser.user_id}`,
+        newUser: insertedUser,
+      }
+      console.log(responseData)
+      res.status(200).json({
+        data: responseData,
+      })
     } catch (err) {
       const error = { msg: 'Error creating user', error: err }
       console.error(error)
@@ -105,8 +112,9 @@ export const UsersRouter = (): Router => {
       return
     }
 
-    console.log({ msg: `Update user w/ ID: ${userID}`, updatedUser: updatedResult.rows[0] })
-    res.status(200).json({ data: { updatedUser: updatedResult.rows[0] } })
+    const responseData = { msg: `Update user w/ ID: ${userID}`, updatedUser: updatedResult.rows[0] }
+    console.log(responseData)
+    res.status(200).json({ data: responseData })
   })
 
   router.delete('/:id', async (req: Request, res: Response) => {
@@ -127,8 +135,9 @@ export const UsersRouter = (): Router => {
     // Delete the user from the database
     await db.query(`DELETE FROM users WHERE user_id = ${userID}`)
 
-    console.log({ msg: `Deleted user w/ ID: ${userID}` })
-    res.status(200).json({ data: {} })
+    const responseData = { msg: `Deleted user w/ ID: ${userID}`, deletedUser: result.rows[0] }
+    console.log(responseData)
+    res.status(200).json({ data: responseData })
   })
   return router
 }
