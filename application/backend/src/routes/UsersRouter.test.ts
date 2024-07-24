@@ -3,8 +3,8 @@ import express from 'express'
 import { UsersRouter } from './UsersRouter'
 import Database from '../Database'
 
-jest.mock('../database', () => {
-  const originalModule = jest.requireActual('../database')
+jest.mock('../Database', () => {
+  const originalModule = jest.requireActual('../Database')
   return {
     __esModule: true,
     ...originalModule,
@@ -180,39 +180,39 @@ describe('UsersRouter', () => {
       }
 
       const testingUserID = 1
-      const updatedUser = {
+      const updateUser = {
         firstName: 'Jane',
         email: 'jdoe@email.com',
         role: 'Software Engineer',
-        organisations: ['ABC Corp'],
       }
 
-      mockQuery.mockResolvedValueOnce({
+      mockQuery.mockResolvedValue({
         rows: [
           {
             ...mockUser,
-            ...updatedUser,
-            organisations: [...mockUser.organisations, ...updatedUser.organisations],
+            ...updateUser,
             updatedAt: new Date().toISOString(),
           },
         ],
       })
 
-      const response = await request(app).put(`/users/${testingUserID}`).send(updatedUser)
+      const response = await request(app).put(`/users/${testingUserID}`).send(updateUser)
       expect(response.status).toBe(200)
       expect(response.body).toEqual({
         data: {
-          id: testingUserID,
-          firstName: updatedUser.firstName,
-          email: updatedUser.email,
-          role: updatedUser.role,
-          organisations: ['Garvan Institute', 'ABC Corp'],
-          createdAt: expect.anything(),
-          updatedAt: expect.anything(),
+          updatedUser: {
+            id: testingUserID,
+            firstName: updateUser.firstName,
+            email: updateUser.email,
+            role: updateUser.role,
+            organisations: mockUser.organisations,
+            createdAt: expect.anything(),
+            updatedAt: expect.anything(),
+          },
         },
       })
 
-      const { createdAt, updatedAt } = response.body.data
+      const { createdAt, updatedAt } = response.body.data.updatedUser
       expect(new Date(createdAt).toString()).not.toBe('Invalid Date')
       expect(new Date(updatedAt).toString()).not.toBe('Invalid Date')
     })
@@ -249,17 +249,19 @@ describe('UsersRouter', () => {
       expect(response.status).toBe(200)
       expect(response.body).toEqual({
         data: {
-          id: testingUserID,
-          firstName: updatedUser.firstName,
-          email: updatedUser.email,
-          role: updatedUser.role,
-          organisations: mockUser.organisations,
-          createdAt: expect.anything(),
-          updatedAt: expect.anything(),
+          updatedUser: {
+            id: testingUserID,
+            firstName: updatedUser.firstName,
+            email: updatedUser.email,
+            role: updatedUser.role,
+            organisations: mockUser.organisations,
+            createdAt: expect.anything(),
+            updatedAt: expect.anything(),
+          },
         },
       })
 
-      const { createdAt, updatedAt } = response.body.data
+      const { createdAt, updatedAt } = response.body.data.updatedUser
       expect(new Date(createdAt).toString()).not.toBe('Invalid Date')
       expect(new Date(updatedAt).toString()).not.toBe('Invalid Date')
     })
@@ -271,7 +273,6 @@ describe('UsersRouter', () => {
       mockQuery.mockResolvedValueOnce({ rows: [] })
 
       const response = await request(app).delete(`/users/${testingUserID}`)
-      console.log(response.body)
       expect(response.status).toBe(404)
       expect(response.body).toEqual({ error: { msg: `User w/ ID: ${testingUserID} not found` } })
     })

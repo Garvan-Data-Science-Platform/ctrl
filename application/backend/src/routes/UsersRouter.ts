@@ -84,18 +84,29 @@ export const UsersRouter = (): Router => {
       WHERE user_id = $5
       RETURNING *
     `
+    try {
+      await db.query(updateQuery, [firstName, email, role, organisation, userID])
+    } catch (err) {
+      const error = { msg: 'Error updating user', error: err }
+      console.error(error)
+      res.status(500).json(error)
+      return
+    }
 
-    const updatedUserResult: QueryResult<User> = await db.query(updateQuery, [
-      firstName,
-      email,
-      role,
-      organisation,
-      userID,
-    ])
+    const updatedResult: QueryResult<User> = await db.query(
+      `SELECT * FROM users WHERE user_id = ${userID}`,
+    )
 
-    const updatedUser = updatedUserResult.rows[0]
-    console.log({ msg: `Update user w/ ID: ${userID}`, updatedUser })
-    res.status(200).json({ data: updatedUser })
+    if (updatedResult.rows.length !== 1) {
+      // No user found
+      const error = { msg: `User w/ ID: ${userID} not found` }
+      console.error(error)
+      res.status(404).json({ error })
+      return
+    }
+
+    console.log({ msg: `Update user w/ ID: ${userID}`, updatedUser: updatedResult.rows[0] })
+    res.status(200).json({ data: { updatedUser: updatedResult.rows[0] } })
   })
 
   router.delete('/:id', async (req: Request, res: Response) => {
