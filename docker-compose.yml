@@ -20,7 +20,7 @@ services:
   app:
     image: 'ctrl-next:latest'
     environment:
-      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_DB}
+      DATABASE_URL: ${DATABASE_URL}
 
     ports:
       - '3000:3000'
