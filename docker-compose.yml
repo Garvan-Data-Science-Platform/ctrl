@@ -19,8 +19,6 @@ services:
 
   app:
     image: 'ctrl-next:latest'
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
 
     ports:
       - '3000:3000'
