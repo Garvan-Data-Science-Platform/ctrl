@@ -19,6 +19,8 @@ services:
 
   app:
     image: 'ctrl-next:latest'
+    environment:
+      POSTGRES_HOST: db
 
     ports:
       - '3000:3000'
