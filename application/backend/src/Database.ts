@@ -14,7 +14,7 @@ class Database {
     }
 
     const databaseUrl: string = `postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}`
-    console.log(databaseUrl)
+
     this.pool = new Pool({
       connectionString: databaseUrl,
     })
