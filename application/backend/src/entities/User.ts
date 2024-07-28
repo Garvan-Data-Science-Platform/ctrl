@@ -1,15 +1,13 @@
 export class User {
-  id: number
-  name: string
+  firstName: string
   email: string
   role: string
   organisations: string[] // TODO: Change type to Organisation once implemented
   createdAt: Date
   updatedAt: Date
 
-  constructor(id: number, name: string, email: string, role: string, organisations: string[]) {
-    this.id = id
-    this.name = name
+  constructor(firstName: string, email: string, role: string, organisations: string[]) {
+    this.firstName = firstName
     this.email = email
     this.role = role
     this.organisations = organisations
@@ -18,13 +16,13 @@ export class User {
   }
 
   /**
-   * Updates the user's name.
+   * Updates the user's firstName.
    *
-   * @param newName - The new name to assign to the user. It should be a non-empty string.
+   * @param newFirstName - The new firstName to assign to the user. It should be a non-empty string.
    *
    */
-  updateName(newName: string): void {
-    this.name = newName
+  updateFirstName(newFirstName: string): void {
+    this.firstName = newFirstName
     this.updatedAt = new Date()
   }
 

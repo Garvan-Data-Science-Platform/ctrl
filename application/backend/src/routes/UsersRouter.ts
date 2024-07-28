@@ -1,95 +1,143 @@
 import { Request, Response, Router } from 'express'
 import { User } from '../entities/User'
-
-/* TODO: Remove when implementing DB
- ** - need to remove the refs to users list in each endpoint
- ** - exporting for testing purposes (when db is implemented we should mock this in tests)
- */
-export const users: User[] = []
-let nextId = 1
+import Database from '../Database'
+import { QueryResult } from 'pg'
 
 export const UsersRouter = (): Router => {
   const router: Router = Router()
+  const db: Database = Database.getInstance()
 
   router.get('/', async (req: Request, res: Response) => {
-    console.log({ msg: 'Get all users', users })
-    res.status(200).json({ data: users })
+    const result: QueryResult<User[]> = await db.query('SELECT * FROM users')
+    const responseData = { msg: 'Got all users', users: result.rows }
+    console.log(responseData)
+    res.status(200).json({ data: responseData })
   })
 
   router.get('/:id', async (req: Request, res: Response) => {
-    const user = users.find((user) => user.id === parseInt(req.params.id, 10))
-    if (!user) {
+    const userID = parseInt(req.params.id, 10)
+    const result: QueryResult<User> = await db.query(
+      `SELECT * FROM users WHERE user_id = ${userID}`,
+    )
+    const user = result.rows[0]
+
+    if (result.rows.length !== 1) {
       // No user found
       const error = { msg: `User w/ ID: ${req.params.id} not found` }
-      console.log(error)
+      console.error(error)
       res.status(404).json({ error })
       return
     }
-
-    console.log({ msg: `Get user w/ ID: ${req.params.id}`, user })
-    res.status(200).json({ data: user })
+    const responseData = { msg: `Get user w/ ID: ${req.params.id}`, user }
+    console.log(responseData)
+    res.status(200).json({ data: responseData })
   })
 
   router.post('/', async (req: Request, res: Response) => {
-    const { name, email, role, organisations } = req.body
+    const { firstName, email, role, organisations } = req.body
 
     // Validation check
-    if (!name || !email || !role || !organisations) {
-      const error = { msg: 'Missing required fields: name, email, role, organisations' }
-      console.log(error)
+    if (!firstName || !email || !role || !organisations) {
+      const error = { msg: 'Missing required fields: first_name, email, role, organisations' }
+      console.error(error)
       res.status(400).json({ error })
       return
     }
 
-    const newUser = new User(nextId++, name, email, role, organisations)
-    console.log({ msg: `Creates user`, newUser })
-    // TODO: Add user to the database instead of the in-memory array
-    users.push(newUser)
-    res.status(200).json({ data: newUser })
+    try {
+      const result = await db.query(
+        'INSERT INTO users (first_name, email, user_role, organisations) VALUES ($1, $2, $3, $4) RETURNING *',
+        [firstName, email, role, organisations],
+      )
+      const insertedUser = result.rows[0]
+      const responseData = {
+        msg: `Created user w/ ID: ${insertedUser.user_id}`,
+        newUser: insertedUser,
+      }
+      console.log(responseData)
+      res.status(200).json({
+        data: responseData,
+      })
+    } catch (err) {
+      const error = { msg: 'Error creating user', error: err }
+      console.error(error)
+      res.status(500).json(error)
+    }
   })
 
   router.put('/:id', async (req: Request, res: Response) => {
-    const userID = req.params.id
-    const { name, email, role, organisation } = req.body
+    const userID = parseInt(req.params.id, 10)
+    const { firstName, email, role, organisation } = req.body
 
-    const user = users.find((user) => user.id === parseInt(userID, 10))
-    if (!user) {
+    // Check if the user exists in the database
+    const result: QueryResult<User> = await db.query(
+      `SELECT * FROM users WHERE user_id = ${userID}`,
+    )
+
+    if (result.rows.length !== 1) {
       // No user found
       const error = { msg: `User w/ ID: ${userID} not found` }
-      console.log(error)
+      console.error(error)
       res.status(404).json({ error })
       return
     }
 
-    if (name) user.updateName(name)
-    if (email) user.updateEmail(email)
-    if (role) user.updateRole(role)
-    if (organisation) user.updateOrganisations(organisation)
+    const updateQuery = `
+      UPDATE users
+      SET first_name = COALESCE($1, first_name),
+          email = COALESCE($2, email),
+          user_role = COALESCE($3, user_role),
+          organisations = array_append(COALESCE(organisations, '{}'), $4)
+      WHERE user_id = $5
+      RETURNING *
+    `
+    try {
+      await db.query(updateQuery, [firstName, email, role, organisation, userID])
+    } catch (err) {
+      const error = { msg: 'Error updating user', error: err }
+      console.error(error)
+      res.status(500).json(error)
+      return
+    }
 
-    console.log({ msg: `Update user w/ ID: ${userID}`, user })
-    // TODO: Update user in the database instead of the in-memory array
-    res.status(200).json({ data: user })
+    const updatedResult: QueryResult<User> = await db.query(
+      `SELECT * FROM users WHERE user_id = ${userID}`,
+    )
+
+    if (updatedResult.rows.length !== 1) {
+      // No user found
+      const error = { msg: `User w/ ID: ${userID} not found` }
+      console.error(error)
+      res.status(404).json({ error })
+      return
+    }
+
+    const responseData = { msg: `Update user w/ ID: ${userID}`, updatedUser: updatedResult.rows[0] }
+    console.log(responseData)
+    res.status(200).json({ data: responseData })
   })
 
   router.delete('/:id', async (req: Request, res: Response) => {
-    const userID = req.params.id
-    const updatedUsers = users.filter((user) => user.id !== parseInt(userID, 10))
-    if (updatedUsers.length === users.length) {
-      // Nothing has been filtered out
+    const userID = parseInt(req.params.id, 10)
+
+    // Check if the user exists in the database
+    const result: QueryResult<User> = await db.query(
+      `SELECT * FROM users WHERE user_id = ${userID}`,
+    )
+
+    if (result.rows.length !== 1) {
+      // No user found
       const error = { msg: `User w/ ID: ${userID} not found` }
-      console.log(error)
+      console.error(error)
       res.status(404).json({ error })
       return
     }
+    // Delete the user from the database
+    await db.query(`DELETE FROM users WHERE user_id = ${userID}`)
 
-    // Update the users list to reflect the deletion
-    // TODO: Delete user from database instead
-    users.length = 0
-    users.push(...updatedUsers)
-
-    console.log({ msg: `Delete user w/ ID: ${userID}`, updatedUsers })
-    res.status(200).json({ data: updatedUsers })
+    const responseData = { msg: `Deleted user w/ ID: ${userID}`, deletedUser: result.rows[0] }
+    console.log(responseData)
+    res.status(200).json({ data: responseData })
   })
-
   return router
 }
