@@ -1672,7 +1672,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/express@npm:^4.17.21":
+"@types/express@npm:*, @types/express@npm:^4.17.21":
   version: 4.17.21
   resolution: "@types/express@npm:4.17.21"
   dependencies:
@@ -1884,6 +1884,16 @@ __metadata:
     "@types/methods": "npm:^1.1.4"
     "@types/superagent": "npm:^8.1.0"
   checksum: 44a28f9b35b65800f4c7bcc23748e71c925098aa74ea504d14c98385c36d00de2a4f5aca15d7dc4514bc80533e0af21f985a4ab9f5f317c7266e9e75836aef39
+  languageName: node
+  linkType: hard
+
+"@types/swagger-ui-express@npm:^4.1.6":
+  version: 4.1.6
+  resolution: "@types/swagger-ui-express@npm:4.1.6"
+  dependencies:
+    "@types/express": "npm:*"
+    "@types/serve-static": "npm:*"
+  checksum: b7d10d04e70a4e35b0b98bed9ecebb51c0c9bddcb56f7132022b6022c58d643b05a7fe97e792cd6dc8d2c5d952ef173922db56137642a74b464d704fc3c8962b
   languageName: node
   linkType: hard
 
@@ -2309,6 +2319,7 @@ __metadata:
     "@types/jest": "npm:^29.5.12"
     "@types/pg": "npm:^8.11.6"
     "@types/supertest": "npm:^6.0.2"
+    "@types/swagger-ui-express": "npm:^4.1.6"
     common: "workspace:^"
     cors: "npm:^2.8.5"
     dotenv: "npm:^16.4.5"
@@ -2317,9 +2328,11 @@ __metadata:
     jest: "npm:^29.7.0"
     pg: "npm:^8.12.0"
     supertest: "npm:^7.0.0"
+    swagger-ui-express: "npm:^5.0.1"
     ts-jest: "npm:^29.1.5"
     tsx: "npm:^4.7.0"
     typescript: "npm:^5.3.3"
+    yaml: "npm:^2.5.0"
   languageName: unknown
   linkType: soft
 
@@ -6284,6 +6297,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"swagger-ui-dist@npm:>=5.0.0":
+  version: 5.17.14
+  resolution: "swagger-ui-dist@npm:5.17.14"
+  checksum: cb61bba39e76d7d0d83da605a55e9504c1a5b421f9f13cced06d3e222f0a291594d417ec57b30a38aabe30d8a7e257c4977b8f0bba0e865d60f92b0a8ef4dfc1
+  languageName: node
+  linkType: hard
+
+"swagger-ui-express@npm:^5.0.1":
+  version: 5.0.1
+  resolution: "swagger-ui-express@npm:5.0.1"
+  dependencies:
+    swagger-ui-dist: "npm:>=5.0.0"
+  peerDependencies:
+    express: ">=4.0.0 || >=5.0.0-beta"
+  checksum: dbe9830caef7fe455241e44e74958bac62642997e4341c1b0f38a3d684d19a4a81b431217c656792d99f046a1b5f261abf7783ede0afe41098cd4450401f6fd1
+  languageName: node
+  linkType: hard
+
 "tar@npm:^6.1.11, tar@npm:^6.1.2":
   version: 6.2.0
   resolution: "tar@npm:6.2.0"
@@ -6682,6 +6713,15 @@ __metadata:
   version: 4.0.0
   resolution: "yallist@npm:4.0.0"
   checksum: 2286b5e8dbfe22204ab66e2ef5cc9bbb1e55dfc873bbe0d568aa943eb255d131890dfd5bf243637273d31119b870f49c18fcde2c6ffbb7a7a092b870dc90625a
+  languageName: node
+  linkType: hard
+
+"yaml@npm:^2.5.0":
+  version: 2.5.0
+  resolution: "yaml@npm:2.5.0"
+  bin:
+    yaml: bin.mjs
+  checksum: 771a1df083c8217cf04ef49f87244ae2dd7d7457094425e793b8f056159f167602ce172aa32d6bca21f787d24ec724aee3cecde938f6643564117bd151452631
   languageName: node
   linkType: hard
 
