@@ -1,0 +1,243 @@
+openapi: 3.0.3
+info:
+  title: CTRL
+  description: The following swagger document contains various endpoints to test and
+    and interact with the CTRL API, which is a dynamic consent platform developed
+    by Australian Genomics and the Garvan Institute of Medical Research. Each module
+    contains several endpoints for different operations, ensuring comprehensive testing
+    of the application's capabilities.
+  version: 1.0.0
+  contact:
+    email: dspsofteng@garvan.org.au
+
+tags:
+  - name: SomeModule
+    description: This module is designed to be a basic module stub to ensure future
+      developers can imitate the programming style and structure
+  - name: Workspaces
+    description: This module contains basic information about application versioning
+  - name: User
+    description: This module contains functionality to manage users including creation, updating, retrieval and deletion
+
+paths:
+  '/somemodule':
+    get:
+      tags:
+        - SomeModule
+      summary: Health Check
+      description: Performs a health check on the SomeModule service.
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Returns an empty body
+  '/somemodule/add':
+    post:
+      tags:
+        - SomeModule
+      summary: Add
+      description: Add two numbers together
+      operationId: add
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                num1:
+                  type: number
+                  example: 1
+                num2:
+                  type: number
+                  example: 2
+            examples:
+              Add:
+                value:
+                  num1: 1
+                  num2: 2
+      responses:
+        '200':
+          description: Returns an object containing result attribute with the addition
+            answer
+  '/somemodule/subtract':
+    post:
+      tags:
+        - SomeModule
+      summary: Subtract
+      description: Subtract two numbers
+      operationId: subtract
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                num1:
+                  type: number
+                  example: 5
+                num2:
+                  type: number
+                  example: 2
+            examples:
+              Subtract:
+                value:
+                  num1: 5
+                  num2: 2
+      responses:
+        '200':
+          description: Returns an object containing result attribute with the subtracted
+            answer
+  '/workspaces':
+    get:
+      tags:
+        - Workspaces
+      summary: Health Check
+      description: |-
+        ## Get Workspaces
+        This endpoint retrieves a list of the workspaces.
+
+        ### Response
+        The response will contain a data object containing a list of the workspaces with their versions.
+      operationId: healthCheck1
+      responses:
+        '200':
+          description: Returns a data object containing a list of the workspaces with
+            their versions
+  '/users':
+    post:
+      tags:
+        - User
+      summary: New User
+      description: This endpoint allows the creation of a new user.
+      operationId: newUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Returns a data object with the user object that was just created
+        '500':
+          description: Internal Server Error
+    get:
+      tags:
+        - User
+      summary: Get all Users
+      description: This endpoints allows retrieval of a list of all users.
+      operationId: getAllUsers
+      responses:
+        '200':
+          description: Returns a data object containing an array of all users information
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+  '/users/{userID}':
+    get:
+      tags:
+        - User
+      summary: Get Specific User
+      description: Given a userID, this endpoint allows retrieval of that specific users information.
+      operationId: getSpecificUser
+      parameters:
+        - name: userID
+          in: query
+          description: The specific users ID\#
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Returns a data object containing specific users information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+        '500':
+          description: Internal Server Error
+
+    put:
+      tags:
+        - User
+      summary: Update User
+      description: Given a userID, this endpoint allows updating a that specific users information.
+      operationId: updateUser
+      parameters:
+        - name: userID
+          in: query
+          description: The specific users ID\#
+          required: true
+          schema:
+            type: number
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Returns a data object containing the updated users new information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+        '500':
+          description: Internal Server Error
+    delete:
+      tags:
+        - User
+      summary: Delete Specific User
+      description: Given a userID, this endpoint allows deleting a that specific users information.
+      operationId: deleteSpecificUser
+      parameters:
+        - name: userID
+          in: query
+          description: The specific users ID\#
+          required: true
+          schema:
+            type: number
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Returns a data object containing the deleted users information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+        '500':
+          description: Internal Server Error
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        firstName:
+          type: string
+          example: John
+        email:
+          type: string
+          example: john.smith@example.com
+        role:
+          type: string
+          example: Data Administrator
+        organisations:
+          type: array
+          items:
+            type: string
+            example: Garvan Institute
