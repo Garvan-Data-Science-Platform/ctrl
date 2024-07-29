@@ -31,6 +31,7 @@ export class Api {
   run(): void {
     this.server = this.app.listen(this.port, () => {})
     console.log(`Listening on http://localhost:${backendPort}`)
+    console.log(`Documentation at http://localhost:${backendPort}/docs`)
   }
 
   stop(): void {
