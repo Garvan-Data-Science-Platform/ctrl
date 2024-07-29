@@ -113,10 +113,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/NewUser'
       responses:
         '200':
           description: Returns a data object with the user object that was just created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
         '500':
           description: Internal Server Error
     get:
@@ -143,7 +149,7 @@ paths:
       operationId: getSpecificUser
       parameters:
         - name: userID
-          in: query
+          in: path
           description: The specific users ID\#
           required: true
           schema:
@@ -154,7 +160,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
         '404':
           description: User not found
         '500':
@@ -168,7 +177,7 @@ paths:
       operationId: updateUser
       parameters:
         - name: userID
-          in: query
+          in: path
           description: The specific users ID\#
           required: true
           schema:
@@ -184,7 +193,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
         '404':
           description: User not found
         '500':
@@ -197,7 +209,7 @@ paths:
       operationId: deleteSpecificUser
       parameters:
         - name: userID
-          in: query
+          in: path
           description: The specific users ID\#
           required: true
           schema:
@@ -213,7 +225,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
         '404':
           description: User not found
         '500':
@@ -221,12 +236,9 @@ paths:
 
 components:
   schemas:
-    User:
+    NewUser:
       type: object
       properties:
-        id:
-          type: string
-          example: 1
         firstName:
           type: string
           example: John
@@ -241,3 +253,10 @@ components:
           items:
             type: string
             example: Garvan Institute
+    User:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+        - $ref: '#/components/schemas/NewUser'
