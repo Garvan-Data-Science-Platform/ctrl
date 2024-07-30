@@ -1,7 +1,4 @@
-import { WorkspacesRouter } from './routes/WorkspacesRouter'
 import { Api } from './Api'
-import { SomeModuleRouter } from './routes/SomeModuleRouter'
-import { UsersRouter } from './routes/UsersRouter'
 import Database from './Database'
 import dotenv from 'dotenv'
 
@@ -12,7 +9,7 @@ const main = async (): Promise<void> => {
   Database.init()
 
   // Setup and run Api
-  const api = new Api(WorkspacesRouter(), SomeModuleRouter(), UsersRouter())
+  const api = new Api()
   api.run()
 }
 
