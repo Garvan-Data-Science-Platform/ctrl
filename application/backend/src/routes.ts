@@ -28,7 +28,18 @@ const models: TsoaRoute.Models = {
       firstName: { dataType: 'string', required: true },
       email: { dataType: 'string', required: true },
       role: { dataType: 'string', required: true },
-      organisations: { dataType: 'string', required: true },
+      organisations: { dataType: 'array', array: { dataType: 'string' }, required: true },
+    },
+    additionalProperties: false,
+  },
+  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+  UserUpdateRequest: {
+    dataType: 'refObject',
+    properties: {
+      firstName: { dataType: 'string' },
+      email: { dataType: 'string' },
+      role: { dataType: 'string' },
+      organisation: { dataType: 'string' },
     },
     additionalProperties: false,
   },
@@ -82,7 +93,7 @@ export function RegisterRoutes(app: Router) {
   )
   // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
   app.get(
-    '/users/:userId',
+    '/users/:userID',
     ...fetchMiddlewares<RequestHandler>(UsersController),
     ...fetchMiddlewares<RequestHandler>(UsersController.prototype.getUserById),
 
@@ -92,7 +103,7 @@ export function RegisterRoutes(app: Router) {
       next: any,
     ) {
       const args: Record<string, TsoaRoute.ParameterSchema> = {
-        userId: { in: 'path', name: 'userId', required: true, dataType: 'double' },
+        userID: { in: 'path', name: 'userID', required: true, dataType: 'double' },
       }
 
       // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -147,6 +158,71 @@ export function RegisterRoutes(app: Router) {
           next,
           validatedArgs,
           successStatus: 201,
+        })
+      } catch (err) {
+        return next(err)
+      }
+    },
+  )
+  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+  app.put(
+    '/users/:userID',
+    ...fetchMiddlewares<RequestHandler>(UsersController),
+    ...fetchMiddlewares<RequestHandler>(UsersController.prototype.updateUser),
+
+    async function UsersController_updateUser(request: ExRequest, response: ExResponse, next: any) {
+      const args: Record<string, TsoaRoute.ParameterSchema> = {
+        userID: { in: 'path', name: 'userID', required: true, dataType: 'double' },
+        bodyRequest: { in: 'body', name: 'bodyRequest', required: true, ref: 'UserUpdateRequest' },
+      }
+
+      // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+      let validatedArgs: any[] = []
+      try {
+        validatedArgs = templateService.getValidatedArgs({ args, request, response })
+
+        const controller = new UsersController()
+
+        await templateService.apiHandler({
+          methodName: 'updateUser',
+          controller,
+          response,
+          next,
+          validatedArgs,
+          successStatus: 200,
+        })
+      } catch (err) {
+        return next(err)
+      }
+    },
+  )
+  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+  app.delete(
+    '/users/:userID',
+    ...fetchMiddlewares<RequestHandler>(UsersController),
+    ...fetchMiddlewares<RequestHandler>(UsersController.prototype.deleteUser),
+
+    async function UsersController_deleteUser(request: ExRequest, response: ExResponse, next: any) {
+      const args: Record<string, TsoaRoute.ParameterSchema> = {
+        userID: { in: 'path', name: 'userID', required: true, dataType: 'double' },
+      }
+
+      // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+      let validatedArgs: any[] = []
+      try {
+        validatedArgs = templateService.getValidatedArgs({ args, request, response })
+
+        const controller = new UsersController()
+
+        await templateService.apiHandler({
+          methodName: 'deleteUser',
+          controller,
+          response,
+          next,
+          validatedArgs,
+          successStatus: 200,
         })
       } catch (err) {
         return next(err)
