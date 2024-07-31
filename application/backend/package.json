@@ -8,7 +8,7 @@
     "test": "jest --detectOpenHandles",
     "tsoa:spec": "tsoa spec",
     "tsoa:routes": "tsoa routes",
-    "tsoa:build": "yarn run tsoa:routes && yarn run tsoa:spec"
+    "docs": "yarn run tsoa:routes && yarn run tsoa:spec"
   },
   "packageManager": "yarn@4.0.2",
   "dependencies": {
