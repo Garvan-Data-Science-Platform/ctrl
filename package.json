@@ -9,7 +9,7 @@
     "format": "yarn run prettier --write './application/**/*.(js|ts|jsx|tsx)'",
     "test": "yarn workspaces foreach --all --parallel run test",
     "lint": "eslint .",
-    "build-docs": "yarn workspaces foreach --all run docs"
+    "build-docs": "yarn workspaces foreach --all run build-docs"
   },
   "workspaces": [
     "application/*"
