@@ -337,6 +337,155 @@
 					}
 				]
 			}
+		},
+		"/somemodule/add": {
+			"post": {
+				"operationId": "AddNumbers",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {}
+									},
+									"required": [
+										"result"
+									],
+									"type": "object"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error"
+					}
+				},
+				"description": "Adds two numbers together and returns the result",
+				"summary": "Add two numbers",
+				"tags": [
+					"SomeModule"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"b": {
+										"type": "number",
+										"format": "double"
+									},
+									"a": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"required": [
+									"b",
+									"a"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/somemodule/subtract": {
+			"post": {
+				"operationId": "SubtractNumbers",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {}
+									},
+									"required": [
+										"result"
+									],
+									"type": "object"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error"
+					}
+				},
+				"description": "Subtracts two numbers and returns the result",
+				"summary": "Subtract two numbers",
+				"tags": [
+					"SomeModule"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"b": {
+										"type": "number",
+										"format": "double"
+									},
+									"a": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"required": [
+									"b",
+									"a"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/somemodule": {
+			"get": {
+				"operationId": "HealthCheck",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error"
+					}
+				},
+				"description": "Health check to ensure server is up and running",
+				"summary": "Health Check",
+				"tags": [
+					"SomeModule"
+				],
+				"security": [],
+				"parameters": []
+			}
 		}
 	},
 	"servers": [
