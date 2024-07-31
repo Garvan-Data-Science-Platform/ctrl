@@ -51,10 +51,15 @@ _**NOTE**: Replace {port} with the port number your server is running on (typica
 
 ### Editing Swagger Documentation
 
-To update or add new endpoints to the API documentation, follow these guidelines:
+This project uses [tsoa](https://tsoa-community.github.io/docs/) to automatically get accurate, complete, correct and up-to-date OpenAPI Specifications from code, and so to update or add new endpoints to the API documentation, follow these guidelines:
 
 1. **Define Endpoints in Code:** Ensure your API routes are properly documented in your code.
 
-2. **Update the Swagger Configuration:** If you need to make adjustments to the Swagger configuration, locate the Swagger configuration file `./application/backend/swagger.yaml` in the project. Make the necessary updates to reflect the new or updated endpoints.
+2. **Update Swagger docs:** After making API changes, please update the routes and specs by running the following:
 
-3. **Test the Documentation:** After making changes, restart your server and check the Swagger UI to ensure the documentation displays correctly and the new endpoints are accessible.
+   ```bash
+   # Updates tsoa routes and specs
+   yarn build-docs
+   ```
+
+3. **Test the Documentation:** Restart your server and check the Swagger UI to ensure the documentation displays correctly and the new endpoints are accessible.
