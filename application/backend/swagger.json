@@ -7,6 +7,21 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
+			"Workspace": {
+				"properties": {
+					"version": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"version",
+					"name"
+				],
+				"type": "object"
+			},
 			"User": {
 				"properties": {
 					"firstName": {
@@ -97,6 +112,36 @@
 		"contact": {}
 	},
 	"paths": {
+		"/workspaces": {
+			"get": {
+				"operationId": "GetAllWorkspaces",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Workspace"
+									},
+									"type": "array"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error"
+					}
+				},
+				"description": "Get all Workspaces",
+				"summary": "Get all Workspaces",
+				"tags": [
+					"Workspaces"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
 		"/users": {
 			"get": {
 				"operationId": "GetAllUsers",
