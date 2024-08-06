@@ -1,8 +1,9 @@
 import { Api } from './Api'
 import Database from './Database'
 import dotenv from 'dotenv'
+import logger from 'common/src/logger'
 
-dotenv.config({ path: '../../.env' })
+dotenv.config()
 
 const main = async (): Promise<void> => {
   // Setup Database
@@ -16,5 +17,5 @@ const main = async (): Promise<void> => {
 main()
   .then(() => {})
   .catch((err) => {
-    console.error({ error: err })
+    logger.error({ error: err })
   })
