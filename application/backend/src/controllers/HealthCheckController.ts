@@ -30,7 +30,7 @@ export class HealthCheckController extends Controller {
   @Get('/workspaces')
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
-  public async getAllWorkspaces(): Promise<Workspace[]> {
-    return workspaces
+  public async getAllWorkspaces(): Promise<{ data: Workspace[] }> {
+    return { data: workspaces }
   }
 }
