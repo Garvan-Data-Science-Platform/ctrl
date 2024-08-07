@@ -7,7 +7,7 @@ const App = () => {
   const [data, setData] = useState<Workspace[]>([])
 
   useEffect(() => {
-    fetch(`http://localhost:${backendPort}/workspaces`)
+    fetch(`http://localhost:${backendPort}/healthcheck/workspaces`)
       .then((response) => response.json())
       .then(({ data }) => setData(data))
   }, [])
