@@ -82,8 +82,11 @@
 					"role": {
 						"type": "string"
 					},
-					"organisation": {
-						"type": "string"
+					"organisations": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
 					}
 				},
 				"type": "object",
@@ -397,10 +400,18 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/Workspace"
+									"properties": {
+										"data": {
+											"items": {
+												"$ref": "#/components/schemas/Workspace"
+											},
+											"type": "array"
+										}
 									},
-									"type": "array"
+									"required": [
+										"data"
+									],
+									"type": "object"
 								}
 							}
 						}

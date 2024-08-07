@@ -43,7 +43,7 @@ const models: TsoaRoute.Models = {
             "firstName": {"dataType":"string"},
             "email": {"dataType":"string"},
             "role": {"dataType":"string"},
-            "organisation": {"dataType":"string"},
+            "organisations": {"dataType":"array","array":{"dataType":"string"}},
         },
         "additionalProperties": false,
     },
