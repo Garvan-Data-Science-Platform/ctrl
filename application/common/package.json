@@ -9,6 +9,7 @@
     "dev": "true"
   },
   "devDependencies": {
+    "@types/winston": "^2.4.4",
     "typescript": "^5.3.3"
   },
   "dependencies": {

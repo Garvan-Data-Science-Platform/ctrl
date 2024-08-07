@@ -2352,6 +2352,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/winston@npm:^2.4.4":
+  version: 2.4.4
+  resolution: "@types/winston@npm:2.4.4"
+  dependencies:
+    winston: "npm:*"
+  checksum: 8b967c089ba71773cca671b76aba931b2849afb3a6c03cbc5ef04d19e44092e0957573c730cdfbdda71eeb44984d3554e7edb88391c2a3c1aa36cafadc8f2b87
+  languageName: node
+  linkType: hard
+
 "@types/yargs-parser@npm:*":
   version: 21.0.3
   resolution: "@types/yargs-parser@npm:21.0.3"
@@ -3148,6 +3157,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "common@workspace:application/common"
   dependencies:
+    "@types/winston": "npm:^2.4.4"
     dotenv: "npm:^16.4.5"
     typescript: "npm:^5.3.3"
     winston: "npm:^3.13.1"
@@ -7491,7 +7501,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"winston@npm:^3.13.1":
+"winston@npm:*, winston@npm:^3.13.1":
   version: 3.13.1
   resolution: "winston@npm:3.13.1"
   dependencies:

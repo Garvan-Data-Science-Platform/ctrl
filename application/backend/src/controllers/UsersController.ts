@@ -26,7 +26,7 @@ interface UserUpdateRequest {
   firstName?: string
   email?: string
   role?: string
-  organisation?: string
+  organisations?: string[]
 }
 
 @Route('users')
@@ -129,20 +129,20 @@ export class UsersController extends Controller {
       return error
     }
 
-    const { firstName, email, role, organisation } = bodyRequest
+    const { firstName, email, role, organisations } = bodyRequest
 
     const updateQuery = `
       UPDATE users
       SET first_name = COALESCE($1, first_name),
           email = COALESCE($2, email),
           user_role = COALESCE($3, user_role),
-          organisations = array_append(COALESCE(organisations, '{}'), $4)
+          organisations = COALESCE($4, organisations)
       WHERE user_id = $5
       RETURNING *
     `
 
     try {
-      await this.db.query(updateQuery, [firstName, email, role, organisation, userID])
+      await this.db.query(updateQuery, [firstName, email, role, organisations, userID])
     } catch (err) {
       const error = { message: 'Error updating user', error: err }
       logger.error(error)

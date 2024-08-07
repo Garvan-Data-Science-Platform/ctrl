@@ -36,10 +36,12 @@ To access the Swagger UI documentation, follow these steps:
 1. Start the Server: Ensure your development server is running.
 
 ```bash
-yarn run
+yarn run dev
 # or
 make docker-run
 ```
+
+_**NOTE**: If you want to run the server using Yarn, you should also setup the postgres database container using, `make docker-run-db`._
 
 2. Open Your Browser: Navigate to the Swagger UI by visiting:
 
@@ -47,7 +49,11 @@ make docker-run
 http://localhost:{port}/docs
 ```
 
-_**NOTE**: Replace {port} with the port number your server is running on (typically 5000)._
+_**NOTE**_
+
+_Replace {port} with the port number your server is running on (typically 5000)._
+
+_Currently, there is a known issue where swagger docs are not available if you are running server as a docker container._
 
 ### Editing Swagger Documentation
 
