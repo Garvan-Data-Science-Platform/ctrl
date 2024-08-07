@@ -4,6 +4,7 @@ services:
     image: postgres:16-alpine
     ports:
       - '5432:5432'
+    env_file: application/backend/.env
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -15,7 +16,7 @@ services:
       retries: 60
     volumes:
       - ./application/backend/database:/docker-entrypoint-initdb.d
-    env_file: .env
+    command: ['postgres', '-c', 'log_statement=all']
 
   app:
     image: 'ctrl-next:latest'
