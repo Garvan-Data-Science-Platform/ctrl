@@ -7,21 +7,6 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
-			"Workspace": {
-				"properties": {
-					"version": {
-						"type": "string"
-					},
-					"name": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"version",
-					"name"
-				],
-				"type": "object"
-			},
 			"User": {
 				"properties": {
 					"firstName": {
@@ -103,6 +88,21 @@
 				},
 				"type": "object",
 				"additionalProperties": false
+			},
+			"Workspace": {
+				"properties": {
+					"version": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"version",
+					"name"
+				],
+				"type": "object"
 			}
 		},
 		"securitySchemes": {}
@@ -112,36 +112,6 @@
 		"contact": {}
 	},
 	"paths": {
-		"/workspaces": {
-			"get": {
-				"operationId": "GetAllWorkspaces",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/Workspace"
-									},
-									"type": "array"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error"
-					}
-				},
-				"description": "Get all Workspaces",
-				"summary": "Get all Workspaces",
-				"tags": [
-					"Workspaces"
-				],
-				"security": [],
-				"parameters": []
-			}
-		},
 		"/users": {
 			"get": {
 				"operationId": "GetAllUsers",
@@ -383,121 +353,7 @@
 				]
 			}
 		},
-		"/somemodule/add": {
-			"post": {
-				"operationId": "AddNumbers",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"result": {}
-									},
-									"required": [
-										"result"
-									],
-									"type": "object"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error"
-					}
-				},
-				"description": "Adds two numbers together and returns the result",
-				"summary": "Add two numbers",
-				"tags": [
-					"SomeModule"
-				],
-				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"properties": {
-									"b": {
-										"type": "number",
-										"format": "double"
-									},
-									"a": {
-										"type": "number",
-										"format": "double"
-									}
-								},
-								"required": [
-									"b",
-									"a"
-								],
-								"type": "object"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/somemodule/subtract": {
-			"post": {
-				"operationId": "SubtractNumbers",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"result": {}
-									},
-									"required": [
-										"result"
-									],
-									"type": "object"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error"
-					}
-				},
-				"description": "Subtracts two numbers and returns the result",
-				"summary": "Subtract two numbers",
-				"tags": [
-					"SomeModule"
-				],
-				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"properties": {
-									"b": {
-										"type": "number",
-										"format": "double"
-									},
-									"a": {
-										"type": "number",
-										"format": "double"
-									}
-								},
-								"required": [
-									"b",
-									"a"
-								],
-								"type": "object"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/somemodule": {
+		"/healthcheck": {
 			"get": {
 				"operationId": "HealthCheck",
 				"responses": {
@@ -526,7 +382,37 @@
 				"description": "Health check to ensure server is up and running",
 				"summary": "Health Check",
 				"tags": [
-					"SomeModule"
+					"Healthcheck"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/healthcheck/workspaces": {
+			"get": {
+				"operationId": "GetAllWorkspaces",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Workspace"
+									},
+									"type": "array"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error"
+					}
+				},
+				"description": "Get all Workspaces",
+				"summary": "Get all Workspaces",
+				"tags": [
+					"Healthcheck"
 				],
 				"security": [],
 				"parameters": []

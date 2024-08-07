@@ -3,11 +3,9 @@
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { TsoaRoute, fetchMiddlewares, ExpressTemplateService } from '@tsoa/runtime';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import { WorkspacesController } from './controllers/WorkspacesController';
-// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { UsersController } from './controllers/UsersController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import { SomeModuleController } from './controllers/SomeModuleController';
+import { HealthCheckController } from './controllers/HealthCheckController';
 import type { Request as ExRequest, Response as ExResponse, RequestHandler, Router } from 'express';
 
 
@@ -15,11 +13,6 @@ import type { Request as ExRequest, Response as ExResponse, RequestHandler, Rout
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
 const models: TsoaRoute.Models = {
-    "Workspace": {
-        "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"version":{"dataType":"string","required":true},"name":{"dataType":"string","required":true}},"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "User": {
         "dataType": "refObject",
         "properties": {
@@ -55,6 +48,11 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Workspace": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"version":{"dataType":"string","required":true},"name":{"dataType":"string","required":true}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 };
 const templateService = new ExpressTemplateService(models, {"noImplicitAdditionalProperties":"throw-on-extras","bodyCoercion":true});
 
@@ -72,35 +70,6 @@ export function RegisterRoutes(app: Router) {
 
 
     
-        app.get('/workspaces',
-            ...(fetchMiddlewares<RequestHandler>(WorkspacesController)),
-            ...(fetchMiddlewares<RequestHandler>(WorkspacesController.prototype.getAllWorkspaces)),
-
-            async function WorkspacesController_getAllWorkspaces(request: ExRequest, response: ExResponse, next: any) {
-            const args: Record<string, TsoaRoute.ParameterSchema> = {
-            };
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args, request, response });
-
-                const controller = new WorkspacesController();
-
-              await templateService.apiHandler({
-                methodName: 'getAllWorkspaces',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: 200,
-              });
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/users',
             ...(fetchMiddlewares<RequestHandler>(UsersController)),
             ...(fetchMiddlewares<RequestHandler>(UsersController.prototype.getAllUsers)),
@@ -251,71 +220,11 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/somemodule/add',
-            ...(fetchMiddlewares<RequestHandler>(SomeModuleController)),
-            ...(fetchMiddlewares<RequestHandler>(SomeModuleController.prototype.addNumbers)),
+        app.get('/healthcheck',
+            ...(fetchMiddlewares<RequestHandler>(HealthCheckController)),
+            ...(fetchMiddlewares<RequestHandler>(HealthCheckController.prototype.HealthCheck)),
 
-            async function SomeModuleController_addNumbers(request: ExRequest, response: ExResponse, next: any) {
-            const args: Record<string, TsoaRoute.ParameterSchema> = {
-                    bodyRequest: {"in":"body","name":"bodyRequest","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"b":{"dataType":"double","required":true},"a":{"dataType":"double","required":true}}},
-            };
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args, request, response });
-
-                const controller = new SomeModuleController();
-
-              await templateService.apiHandler({
-                methodName: 'addNumbers',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: 200,
-              });
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/somemodule/subtract',
-            ...(fetchMiddlewares<RequestHandler>(SomeModuleController)),
-            ...(fetchMiddlewares<RequestHandler>(SomeModuleController.prototype.subtractNumbers)),
-
-            async function SomeModuleController_subtractNumbers(request: ExRequest, response: ExResponse, next: any) {
-            const args: Record<string, TsoaRoute.ParameterSchema> = {
-                    bodyRequest: {"in":"body","name":"bodyRequest","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"b":{"dataType":"double","required":true},"a":{"dataType":"double","required":true}}},
-            };
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args, request, response });
-
-                const controller = new SomeModuleController();
-
-              await templateService.apiHandler({
-                methodName: 'subtractNumbers',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: 200,
-              });
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.get('/somemodule',
-            ...(fetchMiddlewares<RequestHandler>(SomeModuleController)),
-            ...(fetchMiddlewares<RequestHandler>(SomeModuleController.prototype.HealthCheck)),
-
-            async function SomeModuleController_HealthCheck(request: ExRequest, response: ExResponse, next: any) {
+            async function HealthCheckController_HealthCheck(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
             };
 
@@ -325,10 +234,39 @@ export function RegisterRoutes(app: Router) {
             try {
                 validatedArgs = templateService.getValidatedArgs({ args, request, response });
 
-                const controller = new SomeModuleController();
+                const controller = new HealthCheckController();
 
               await templateService.apiHandler({
                 methodName: 'HealthCheck',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/healthcheck/workspaces',
+            ...(fetchMiddlewares<RequestHandler>(HealthCheckController)),
+            ...(fetchMiddlewares<RequestHandler>(HealthCheckController.prototype.getAllWorkspaces)),
+
+            async function HealthCheckController_getAllWorkspaces(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new HealthCheckController();
+
+              await templateService.apiHandler({
+                methodName: 'getAllWorkspaces',
                 controller,
                 response,
                 next,
