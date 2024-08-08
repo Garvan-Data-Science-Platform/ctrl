@@ -1,9 +1,9 @@
 import winston, { format, transports } from 'winston'
-const { combine, timestamp, json, errors } = format
+const { combine, timestamp, json, errors, prettyPrint } = format
 
 const logger = winston.createLogger({
-  level: 'debug',
-  format: combine(errors({ stack: true }), timestamp(), json()),
+  level: 'info',
+  format: combine(errors({ stack: true }), timestamp(), json(), prettyPrint()),
   transports: [new transports.Console()],
 })
 
