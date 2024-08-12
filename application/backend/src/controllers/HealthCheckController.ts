@@ -1,5 +1,6 @@
 import { Workspace } from 'common/src/index'
 import { Get, Route, Tags, Controller, SuccessResponse, Response } from 'tsoa'
+import logger from 'common/src/logger'
 
 const workspaces: Workspace[] = [
   { name: 'backend', version: '1.0.0' },
@@ -19,7 +20,9 @@ export class HealthCheckController extends Controller {
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
   public async HealthCheck(): Promise<{ message: string }> {
-    return { message: 'API is healthy' }
+    const response = { message: 'API is healthy' }
+    logger.info(response)
+    return response
   }
 
   /**
@@ -30,7 +33,9 @@ export class HealthCheckController extends Controller {
   @Get('/workspaces')
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
-  public async getAllWorkspaces(): Promise<{ data: Workspace[] }> {
-    return { data: workspaces }
+  public async getAllWorkspaces(): Promise<{ message: string; data: Workspace[] }> {
+    const response = { message: 'Getting workspaces', data: workspaces }
+    logger.info(response)
+    return response
   }
 }

@@ -1,4 +1,5 @@
 import { Pool, QueryResult } from 'pg'
+import logger from 'common/src/logger'
 
 class Database {
   private static instance: Database
@@ -20,7 +21,7 @@ class Database {
     })
 
     this.pool.on('error', (err: unknown) => {
-      console.error('Unexpected error on idle client', err)
+      logger.error({ message: 'Unexpected error on idle client', error: err })
       process.exit(-1)
     })
   }

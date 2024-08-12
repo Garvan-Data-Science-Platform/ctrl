@@ -13,6 +13,7 @@ import {
 } from 'tsoa'
 import Database from '../Database'
 import { User } from '../entities/User'
+import logger from 'common/src/logger'
 
 interface UserCreationRequest {
   firstName: string
@@ -41,10 +42,10 @@ export class UsersController extends Controller {
   @Get('/')
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
-  public async getAllUsers(): Promise<{ msg: string; users: User[] }> {
+  public async getAllUsers(): Promise<{ message: string; users: User[] }> {
     const result = await this.db.query('SELECT * FROM users')
-    const responseData = { msg: 'Got all users', users: result.rows }
-    console.log(responseData)
+    const responseData = { message: 'Got all users', users: result.rows }
+    logger.info({ ...responseData })
     return responseData
   }
 
@@ -56,16 +57,19 @@ export class UsersController extends Controller {
   @Get('/{userID}')
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
-  public async getUserById(@Path() userID: number): Promise<{ msg: string; user: User | null }> {
+  public async getUserById(
+    @Path() userID: number,
+  ): Promise<{ message: string; user: User | null }> {
     const result = await this.db.query('SELECT * FROM users WHERE user_id = $1', [userID])
     if (result.rows.length !== 1) {
-      console.error(`User with ID: ${userID} not found`)
+      const error = { message: `User with ID: ${userID} not found`, user: null }
+      logger.error({ ...error })
       this.setStatus(404)
-      return { msg: `User with ID: ${userID} not found`, user: null }
+      return error
     }
     const user = result.rows[0]
-    const responseData = { msg: `Get user w/ ID: ${userID}`, user }
-    console.log(responseData)
+    const responseData = { message: `Get user w/ ID: ${userID}`, user }
+    logger.info({ ...responseData })
     return responseData
   }
 
@@ -82,8 +86,8 @@ export class UsersController extends Controller {
 
     // Validation check
     if (!firstName || !email || !role || !organisations) {
-      const error = { msg: 'Missing required fields: first_name, email, role, organisations' }
-      console.error(error)
+      const error = { message: 'Missing required fields: first_name, email, role, organisations' }
+      logger.error({ ...error })
       return error
     }
 
@@ -94,14 +98,14 @@ export class UsersController extends Controller {
       )
       const insertedUser = result.rows[0]
       const responseData = {
-        msg: `Created user w/ ID: ${insertedUser.user_id}`,
+        message: `Created user w/ ID: ${insertedUser.user_id}`,
         newUser: insertedUser,
       }
-      console.log(responseData)
+      logger.info({ ...responseData })
       return responseData
     } catch (err) {
-      const error = { msg: 'Error creating user', error: err }
-      console.error(error)
+      const error = { message: 'Error creating user', error: err }
+      logger.error({ ...error })
       return error
     }
   }
@@ -121,8 +125,8 @@ export class UsersController extends Controller {
 
     if (result.rows.length !== 1) {
       // No user found
-      const error = { msg: `User w/ ID: ${userID} not found` }
-      console.error(error)
+      const error = { message: `User w/ ID: ${userID} not found` }
+      logger.error({ ...error })
       return error
     }
 
@@ -141,8 +145,8 @@ export class UsersController extends Controller {
     try {
       await this.db.query(updateQuery, [firstName, email, role, organisations, userID])
     } catch (err) {
-      const error = { msg: 'Error updating user', error: err }
-      console.error(error)
+      const error = { message: 'Error updating user', error: err }
+      logger.error({ ...error })
       return error
     }
 
@@ -150,13 +154,16 @@ export class UsersController extends Controller {
 
     if (updatedResult.rows.length !== 1) {
       // No user found
-      const error = { msg: `User w/ ID: ${userID} not found` }
-      console.error(error)
+      const error = { message: `User w/ ID: ${userID} not found` }
+      logger.error({ ...error })
       return error
     }
 
-    const responseData = { msg: `Update user w/ ID: ${userID}`, updatedUser: updatedResult.rows[0] }
-    console.log(responseData)
+    const responseData = {
+      message: `Update user w/ ID: ${userID}`,
+      updatedUser: updatedResult.rows[0],
+    }
+    logger.info({ ...responseData })
     return responseData
   }
 
@@ -175,16 +182,16 @@ export class UsersController extends Controller {
 
     if (result.rows.length !== 1) {
       // No user found
-      const error = { msg: `User w/ ID: ${userID} not found` }
-      console.error(error)
+      const error = { message: `User w/ ID: ${userID} not found` }
+      logger.error({ ...error })
       return error
     }
 
     // Delete the user from the database
     await this.db.query(`DELETE FROM users WHERE user_id = ${userID}`)
 
-    const responseData = { msg: `Deleted user w/ ID: ${userID}`, deletedUser: result.rows[0] }
-    console.log(responseData)
+    const responseData = { message: `Deleted user w/ ID: ${userID}`, deletedUser: result.rows[0] }
+    logger.info({ ...responseData })
     return responseData
   }
 }

@@ -131,13 +131,13 @@
 											},
 											"type": "array"
 										},
-										"msg": {
+										"message": {
 											"type": "string"
 										}
 									},
 									"required": [
 										"users",
-										"msg"
+										"message"
 									],
 									"type": "object"
 								}
@@ -165,12 +165,12 @@
 							"application/json": {
 								"schema": {
 									"properties": {
-										"msg": {
+										"message": {
 											"type": "string"
 										}
 									},
 									"required": [
-										"msg"
+										"message"
 									],
 									"type": "object"
 								}
@@ -218,13 +218,13 @@
 											],
 											"nullable": true
 										},
-										"msg": {
+										"message": {
 											"type": "string"
 										}
 									},
 									"required": [
 										"user",
-										"msg"
+										"message"
 									],
 									"type": "object"
 								}
@@ -262,12 +262,12 @@
 							"application/json": {
 								"schema": {
 									"properties": {
-										"msg": {
+										"message": {
 											"type": "string"
 										}
 									},
 									"required": [
-										"msg"
+										"message"
 									],
 									"type": "object"
 								}
@@ -318,12 +318,12 @@
 							"application/json": {
 								"schema": {
 									"properties": {
-										"msg": {
+										"message": {
 											"type": "string"
 										}
 									},
 									"required": [
-										"msg"
+										"message"
 									],
 									"type": "object"
 								}
@@ -406,10 +406,14 @@
 												"$ref": "#/components/schemas/Workspace"
 											},
 											"type": "array"
+										},
+										"message": {
+											"type": "string"
 										}
 									},
 									"required": [
-										"data"
+										"data",
+										"message"
 									],
 									"type": "object"
 								}
