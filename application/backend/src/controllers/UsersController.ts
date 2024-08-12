@@ -15,14 +15,14 @@ import Database from '../Database'
 import { User } from '../entities/User'
 import logger from 'common/src/logger'
 
-interface UserCreationRequest {
+export interface UserCreationRequest {
   firstName: string
   email: string
   role: string
   organisations: string[]
 }
 
-interface UserUpdateRequest {
+export interface UserUpdateRequest {
   firstName?: string
   email?: string
   role?: string
@@ -132,15 +132,8 @@ export class UsersController extends Controller {
 
     const { firstName, email, role, organisations } = bodyRequest
 
-    const updateQuery = `
-      UPDATE users
-      SET first_name = COALESCE($1, first_name),
-          email = COALESCE($2, email),
-          user_role = COALESCE($3, user_role),
-          organisations = COALESCE($4, organisations)
-      WHERE user_id = $5
-      RETURNING *
-    `
+    const updateQuery =
+      'UPDATE users SET first_name = COALESCE($1, first_name), email = COALESCE($2, email), user_role = COALESCE($3, user_role), organisations = COALESCE($4, organisations) WHERE user_id = $5 RETURNING * '
 
     try {
       await this.db.query(updateQuery, [firstName, email, role, organisations, userID])
@@ -160,7 +153,7 @@ export class UsersController extends Controller {
     }
 
     const responseData = {
-      message: `Update user w/ ID: ${userID}`,
+      message: `Updated user w/ ID: ${userID}`,
       updatedUser: updatedResult.rows[0],
     }
     logger.info({ ...responseData })
