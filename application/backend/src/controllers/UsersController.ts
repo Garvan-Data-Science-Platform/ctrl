@@ -121,7 +121,7 @@ export class UsersController extends Controller {
   @Response('404', 'Not Found')
   public async updateUser(@Path() userID: number, @Body() bodyRequest: UserUpdateRequest) {
     // Check if the user exists in the database
-    const result = await this.db.query(`SELECT * FROM users WHERE user_id = ${userID}`)
+    const result = await this.db.query('SELECT * FROM users WHERE user_id = $1', [userID])
 
     if (result.rows.length !== 1) {
       // No user found
@@ -143,7 +143,7 @@ export class UsersController extends Controller {
       return error
     }
 
-    const updatedResult = await this.db.query(`SELECT * FROM users WHERE user_id = ${userID}`)
+    const updatedResult = await this.db.query('SELECT * FROM users WHERE user_id = $1', [userID])
 
     if (updatedResult.rows.length !== 1) {
       // No user found
@@ -171,7 +171,7 @@ export class UsersController extends Controller {
   @Response('404', 'Not Found')
   public async deleteUser(@Path() userID: number) {
     // Check if the user exists in the database
-    const result = await this.db.query(`SELECT * FROM users WHERE user_id = ${userID}`)
+    const result = await this.db.query('SELECT * FROM users WHERE user_id = $1', [userID])
 
     if (result.rows.length !== 1) {
       // No user found
@@ -181,7 +181,7 @@ export class UsersController extends Controller {
     }
 
     // Delete the user from the database
-    await this.db.query(`DELETE FROM users WHERE user_id = ${userID}`)
+    await this.db.query('DELETE FROM users WHERE user_id = $1', [userID])
 
     const responseData = { message: `Deleted user w/ ID: ${userID}`, deletedUser: result.rows[0] }
     logger.info({ ...responseData })
