@@ -1,4 +1,5 @@
-import { UserCreationRequest, UserUpdateRequest, UsersController } from './UsersController'
+import { UsersController } from './UsersController'
+import { type UserCreationRequest, type UserUpdateRequest } from 'common'
 import Database from '../Database'
 
 jest.mock('../Database', () => {

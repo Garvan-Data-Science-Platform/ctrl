@@ -14,20 +14,7 @@ import {
 import Database from '../Database'
 import { User } from '../entities/User'
 import logger from 'common/src/logger'
-
-export interface UserCreationRequest {
-  firstName: string
-  email: string
-  role: string
-  organisations: string[]
-}
-
-export interface UserUpdateRequest {
-  firstName?: string
-  email?: string
-  role?: string
-  organisations?: string[]
-}
+import { type UserCreationRequest, type UserUpdateRequest } from 'common'
 
 @Route('users')
 @Tags('Users')
