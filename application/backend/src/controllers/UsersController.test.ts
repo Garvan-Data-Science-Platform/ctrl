@@ -171,7 +171,9 @@ describe('UsersController', () => {
       const expectedUpdateQuery =
         'UPDATE users SET first_name = COALESCE($1, first_name), email = COALESCE($2, email), user_role = COALESCE($3, user_role), organisations = COALESCE($4, organisations) WHERE user_id = $5 RETURNING * '
 
-      expect(mockQuery).toHaveBeenNthCalledWith(1, `SELECT * FROM users WHERE user_id = ${userID}`)
+      expect(mockQuery).toHaveBeenNthCalledWith(1, 'SELECT * FROM users WHERE user_id = $1', [
+        userID,
+      ])
       expect(mockQuery).toHaveBeenNthCalledWith(2, expectedUpdateQuery, [
         bodyRequest.firstName,
         bodyRequest.email,
@@ -179,7 +181,9 @@ describe('UsersController', () => {
         bodyRequest.organisations,
         userID,
       ])
-      expect(mockQuery).toHaveBeenNthCalledWith(3, `SELECT * FROM users WHERE user_id = ${userID}`)
+      expect(mockQuery).toHaveBeenNthCalledWith(3, 'SELECT * FROM users WHERE user_id = $1', [
+        userID,
+      ])
       expect(result).toEqual(expectedResult)
     })
 
@@ -199,7 +203,9 @@ describe('UsersController', () => {
 
       const result = await usersController.updateUser(userID, bodyRequest)
 
-      expect(mockQuery).toHaveBeenNthCalledWith(1, `SELECT * FROM users WHERE user_id = ${userID}`)
+      expect(mockQuery).toHaveBeenNthCalledWith(1, 'SELECT * FROM users WHERE user_id = $1', [
+        userID,
+      ])
       expect(result).toEqual(expectedResult)
     })
 
@@ -236,8 +242,10 @@ describe('UsersController', () => {
 
       const result = await usersController.deleteUser(userID)
 
-      expect(mockQuery).toHaveBeenNthCalledWith(1, `SELECT * FROM users WHERE user_id = ${userID}`)
-      expect(mockQuery).toHaveBeenNthCalledWith(2, `DELETE FROM users WHERE user_id = ${userID}`)
+      expect(mockQuery).toHaveBeenNthCalledWith(1, 'SELECT * FROM users WHERE user_id = $1', [
+        userID,
+      ])
+      expect(mockQuery).toHaveBeenNthCalledWith(2, 'DELETE FROM users WHERE user_id = $1', [userID])
       expect(result).toEqual(expectedResult)
     })
 
@@ -251,7 +259,9 @@ describe('UsersController', () => {
 
       const result = await usersController.deleteUser(userID)
 
-      expect(mockQuery).toHaveBeenNthCalledWith(1, `SELECT * FROM users WHERE user_id = ${userID}`)
+      expect(mockQuery).toHaveBeenNthCalledWith(1, 'SELECT * FROM users WHERE user_id = $1', [
+        userID,
+      ])
       expect(result).toEqual(expectedResult)
     })
   })
