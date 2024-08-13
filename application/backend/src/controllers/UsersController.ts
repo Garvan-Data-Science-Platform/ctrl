@@ -119,9 +119,15 @@ export class UsersController extends Controller {
 
     const { firstName, email, role, organisations } = bodyRequest
 
-    const updateQuery =
-      'UPDATE users SET first_name = COALESCE($1, first_name), email = COALESCE($2, email), user_role = COALESCE($3, user_role), organisations = COALESCE($4, organisations) WHERE user_id = $5 RETURNING * '
-
+    const updateQuery = `
+      UPDATE users
+      SET first_name = COALESCE($1, first_name),
+          email = COALESCE($2, email),
+          user_role = COALESCE($3, user_role),
+          organisations = COALESCE($4, organisations)
+      WHERE user_id = $5
+      RETURNING *
+    `
     try {
       await this.db.query(updateQuery, [firstName, email, role, organisations, userID])
     } catch (err) {
