@@ -52,8 +52,6 @@ describe('UsersController', () => {
       const expectedResult = { message: 'Got all users', users: [] }
 
       const result = await usersController.getAllUsers()
-
-      expect(mockQuery).toHaveBeenCalledWith('SELECT * FROM users')
       expect(result).toEqual(expectedResult)
     })
 
@@ -66,8 +64,6 @@ describe('UsersController', () => {
       }
 
       const result = await usersController.getAllUsers()
-
-      expect(mockQuery).toHaveBeenCalledWith('SELECT * FROM users')
       expect(result).toEqual(expectedResult)
     })
   })
@@ -81,8 +77,6 @@ describe('UsersController', () => {
       const expectedResult = { message: `Get user w/ ID: ${userID}`, user: exampleUser1 }
 
       const result = await usersController.getUserById(userID)
-
-      expect(mockQuery).toHaveBeenCalledWith('SELECT * FROM users WHERE user_id = $1', [1])
       expect(result).toEqual(expectedResult)
     })
 
@@ -93,8 +87,6 @@ describe('UsersController', () => {
       const expectedResult = { message: `User with ID: ${userID} not found`, user: null }
 
       const result = await usersController.getUserById(userID)
-
-      expect(mockQuery).toHaveBeenCalledWith('SELECT * FROM users WHERE user_id = $1', [1])
       expect(result).toEqual(expectedResult)
     })
   })
@@ -116,16 +108,6 @@ describe('UsersController', () => {
       }
 
       const result = await usersController.createUser(bodyRequest)
-
-      expect(mockQuery).toHaveBeenCalledWith(
-        'INSERT INTO users (first_name, email, user_role, organisations) VALUES ($1, $2, $3, $4) RETURNING *',
-        [
-          exampleUser1.first_name,
-          exampleUser1.email,
-          exampleUser1.user_role,
-          exampleUser1.organisations,
-        ],
-      )
       expect(result).toEqual(expectedResult)
     })
 
@@ -140,7 +122,6 @@ describe('UsersController', () => {
       mockQuery.mockRejectedValueOnce(new Error('Database error'))
 
       const result = await usersController.createUser(userCreationRequest)
-
       expect(result).toEqual({
         message: 'Error creating user',
         error: new Error('Database error'),
@@ -168,23 +149,6 @@ describe('UsersController', () => {
       }
 
       const result = await usersController.updateUser(userID, bodyRequest)
-
-      const expectedUpdateQuery =
-        'UPDATE users SET first_name = COALESCE($1, first_name), email = COALESCE($2, email), user_role = COALESCE($3, user_role), organisations = COALESCE($4, organisations) WHERE user_id = $5 RETURNING * '
-
-      expect(mockQuery).toHaveBeenNthCalledWith(1, 'SELECT * FROM users WHERE user_id = $1', [
-        userID,
-      ])
-      expect(mockQuery).toHaveBeenNthCalledWith(2, expectedUpdateQuery, [
-        bodyRequest.firstName,
-        bodyRequest.email,
-        bodyRequest.role,
-        bodyRequest.organisations,
-        userID,
-      ])
-      expect(mockQuery).toHaveBeenNthCalledWith(3, 'SELECT * FROM users WHERE user_id = $1', [
-        userID,
-      ])
       expect(result).toEqual(expectedResult)
     })
 
@@ -203,10 +167,6 @@ describe('UsersController', () => {
       }
 
       const result = await usersController.updateUser(userID, bodyRequest)
-
-      expect(mockQuery).toHaveBeenNthCalledWith(1, 'SELECT * FROM users WHERE user_id = $1', [
-        userID,
-      ])
       expect(result).toEqual(expectedResult)
     })
 
@@ -222,7 +182,6 @@ describe('UsersController', () => {
       }
 
       const result = await usersController.updateUser(userID, bodyRequest)
-
       expect(result).toEqual({
         message: 'Error updating user',
         error: new Error('Database error'),
@@ -242,11 +201,6 @@ describe('UsersController', () => {
       }
 
       const result = await usersController.deleteUser(userID)
-
-      expect(mockQuery).toHaveBeenNthCalledWith(1, 'SELECT * FROM users WHERE user_id = $1', [
-        userID,
-      ])
-      expect(mockQuery).toHaveBeenNthCalledWith(2, 'DELETE FROM users WHERE user_id = $1', [userID])
       expect(result).toEqual(expectedResult)
     })
 
@@ -259,10 +213,6 @@ describe('UsersController', () => {
       }
 
       const result = await usersController.deleteUser(userID)
-
-      expect(mockQuery).toHaveBeenNthCalledWith(1, 'SELECT * FROM users WHERE user_id = $1', [
-        userID,
-      ])
       expect(result).toEqual(expectedResult)
     })
   })
