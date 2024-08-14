@@ -21,7 +21,7 @@ export class HealthCheckController extends Controller {
   @Response('500', 'Internal Server Error')
   public async HealthCheck(): Promise<{ message: string }> {
     const response = { message: 'API is healthy' }
-    logger.info(response)
+    logger.info({ ...response })
     return response
   }
 
@@ -35,7 +35,7 @@ export class HealthCheckController extends Controller {
   @Response('500', 'Internal Server Error')
   public async getAllWorkspaces(): Promise<{ message: string; data: Workspace[] }> {
     const response = { message: 'Getting workspaces', data: workspaces }
-    logger.info(response)
+    logger.info({ ...response })
     return response
   }
 }
