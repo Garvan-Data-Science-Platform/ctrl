@@ -16,6 +16,9 @@
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "packageManager": "yarn@4.0.2",
   "dependencies": {
     "@prisma/client": "5.18.0",
