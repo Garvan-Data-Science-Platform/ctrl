@@ -2,7 +2,7 @@
   "name": "backend",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --external:express --external:cors",
+    "build": "yarn pnpify prisma generate && esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --external:express --external:cors",
     "start": "node dist/index.js",
     "type-check": "tsc",
     "test": "jest --detectOpenHandles",
@@ -10,8 +10,12 @@
     "tsoa:routes": "tsoa routes",
     "build-docs": "yarn run tsoa:routes && yarn run tsoa:spec"
   },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "packageManager": "yarn@4.0.2",
   "dependencies": {
+    "@prisma/client": "5.18.0",
     "@tsoa/runtime": "^6.4.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -28,6 +32,7 @@
     "@types/pg": "^8.11.6",
     "@types/supertest": "^6.0.2",
     "@types/swagger-ui-express": "^4.1.6",
+    "@yarnpkg/pnpify": "^4.1.1",
     "common": "workspace:^",
     "esbuild": "^0.20.0",
     "jest": "^29.7.0",
