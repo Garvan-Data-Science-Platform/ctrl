@@ -15,6 +15,9 @@ import Database from '../Database'
 import { User } from '../entities/User'
 import logger from 'common/src/logger'
 import { type UserCreationRequest, type UserUpdateRequest } from 'common'
+import { PrismaClient } from '../../prisma/generated/client'
+
+const prisma = new PrismaClient()
 
 @Route('users')
 @Tags('Users')
@@ -30,8 +33,8 @@ export class UsersController extends Controller {
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
   public async getAllUsers(): Promise<{ message: string; users: User[] }> {
-    const result = await this.db.query('SELECT * FROM users')
-    const responseData = { message: 'Got all users', users: result.rows }
+    const result: User[] = await prisma.user.findMany({})
+    const responseData = { message: 'Got all users', users: result }
     logger.info({ ...responseData })
     return responseData
   }
