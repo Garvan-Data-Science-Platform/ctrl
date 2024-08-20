@@ -11,18 +11,15 @@ import {
   Response,
   Controller,
 } from 'tsoa'
-import Database from '../Database'
 import { User } from '../entities/User'
 import logger from 'common/src/logger'
 import { type UserCreationRequest, type UserUpdateRequest } from 'common'
 import { PrismaClient } from '../../prisma/generated/client'
 
-const prisma = new PrismaClient()
-
 @Route('users')
 @Tags('Users')
 export class UsersController extends Controller {
-  private db: Database = Database.getInstance()
+  userRepo = new PrismaClient().user
 
   /**
    * Get all Users
@@ -33,7 +30,7 @@ export class UsersController extends Controller {
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
   public async getAllUsers(): Promise<{ message: string; users: User[] }> {
-    const result: User[] = await prisma.user.findMany({})
+    const result: User[] = await this.userRepo.findMany({})
     const responseData = { message: 'Got all users', users: result }
     logger.info({ ...responseData })
     return responseData
@@ -50,14 +47,15 @@ export class UsersController extends Controller {
   public async getUserById(
     @Path() userID: number,
   ): Promise<{ message: string; user: User | null }> {
-    const result = await this.db.query('SELECT * FROM users WHERE user_id = $1', [userID])
-    if (result.rows.length !== 1) {
-      const error = { message: `User with ID: ${userID} not found`, user: null }
+    const user: User | null = await this.userRepo.findUnique({
+      where: { id: userID },
+    })
+    if (!user) {
+      const error = { message: `User with ID: ${userID} not found`, user }
       logger.error({ ...error })
       this.setStatus(404)
       return error
     }
-    const user = result.rows[0]
     const responseData = { message: `Get user w/ ID: ${userID}`, user }
     logger.info({ ...responseData })
     return responseData
