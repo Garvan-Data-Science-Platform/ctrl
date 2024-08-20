@@ -11,10 +11,9 @@ import {
   Response,
   Controller,
 } from 'tsoa'
-import { User } from '../entities/User'
 import logger from 'common/src/logger'
 import { type UserCreationRequest, type UserUpdateRequest } from 'common'
-import { PrismaClient } from '../../prisma/generated/client'
+import { PrismaClient, type User } from '../../prisma/generated/client'
 
 @Route('users')
 @Tags('Users')
