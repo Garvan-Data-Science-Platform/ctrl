@@ -30,8 +30,8 @@ export class UsersController extends Controller {
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
   public async getAllUsers(): Promise<{ message: string; users: User[] }> {
-    const result: User[] = await this.userRepo.findMany({})
-    const responseData = { message: 'Got all users', users: result }
+    const users: User[] = await this.userRepo.findMany({})
+    const responseData = { message: 'Got all users', users }
     logger.info({ ...responseData })
     return responseData
   }
@@ -69,31 +69,32 @@ export class UsersController extends Controller {
   @Post('/')
   @SuccessResponse('201', 'Created')
   @Response('500', 'Internal Server Error')
-  public async createUser(@Body() bodyRequest: UserCreationRequest) {
-    const { firstName, email, role, organisations } = bodyRequest
+  public async createUser(
+    @Body() bodyRequest: UserCreationRequest,
+  ): Promise<{ message: string; newUser: User | null }> {
+    const { firstName, lastName, email, role, organisations } = bodyRequest
 
     // Validation check
-    if (!firstName || !email || !role || !organisations) {
-      const error = { message: 'Missing required fields: first_name, email, role, organisations' }
+    if (!firstName || !lastName || !email || !role || !organisations) {
+      const error = {
+        message: 'Missing required fields: firstName, lastName, email, role, organisations',
+        newUser: null,
+      }
       logger.error({ ...error })
       return error
     }
 
     try {
-      const result = await this.db.query(
-        'INSERT INTO users (first_name, email, user_role, organisations) VALUES ($1, $2, $3, $4) RETURNING *',
-        [firstName, email, role, organisations],
-      )
-      const insertedUser = result.rows[0]
+      const insertedUser = await this.userRepo.create({ data: bodyRequest })
       const responseData = {
-        message: `Created user w/ ID: ${insertedUser.user_id}`,
+        message: `Created user w/ ID: ${insertedUser.id}`,
         newUser: insertedUser,
       }
       logger.info({ ...responseData })
       return responseData
     } catch (err) {
-      const error = { message: 'Error creating user', error: err }
-      logger.error({ ...error })
+      const error = { message: 'Error creating user', newUser: null }
+      logger.error({ ...error, err })
       return error
     }
   }
@@ -107,51 +108,26 @@ export class UsersController extends Controller {
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
   @Response('404', 'Not Found')
-  public async updateUser(@Path() userID: number, @Body() bodyRequest: UserUpdateRequest) {
-    // Check if the user exists in the database
-    const result = await this.db.query('SELECT * FROM users WHERE user_id = $1', [userID])
-
-    if (result.rows.length !== 1) {
-      // No user found
-      const error = { message: `User w/ ID: ${userID} not found` }
-      logger.error({ ...error })
-      return error
-    }
-
-    const { firstName, email, role, organisations } = bodyRequest
-
-    const updateQuery = `
-      UPDATE users
-      SET first_name = COALESCE($1, first_name),
-          email = COALESCE($2, email),
-          user_role = COALESCE($3, user_role),
-          organisations = COALESCE($4, organisations)
-      WHERE user_id = $5
-      RETURNING *
-    `
+  public async updateUser(
+    @Path() userID: number,
+    @Body() bodyRequest: UserUpdateRequest,
+  ): Promise<{ message: string; updatedUser: User | null }> {
     try {
-      await this.db.query(updateQuery, [firstName, email, role, organisations, userID])
+      const updatedUser = await this.userRepo.update({
+        where: { id: userID },
+        data: bodyRequest,
+      })
+      const responseData = {
+        message: `Updated user w/ ID: ${userID}`,
+        updatedUser,
+      }
+      logger.info({ ...responseData })
+      return responseData
     } catch (err) {
-      const error = { message: 'Error updating user', error: err }
-      logger.error({ ...error })
+      const error = { message: 'Error updating user', updatedUser: null }
+      logger.error({ ...error, err })
       return error
     }
-
-    const updatedResult = await this.db.query('SELECT * FROM users WHERE user_id = $1', [userID])
-
-    if (updatedResult.rows.length !== 1) {
-      // No user found
-      const error = { message: `User w/ ID: ${userID} not found` }
-      logger.error({ ...error })
-      return error
-    }
-
-    const responseData = {
-      message: `Updated user w/ ID: ${userID}`,
-      updatedUser: updatedResult.rows[0],
-    }
-    logger.info({ ...responseData })
-    return responseData
   }
 
   /**
@@ -163,22 +139,18 @@ export class UsersController extends Controller {
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
   @Response('404', 'Not Found')
-  public async deleteUser(@Path() userID: number) {
-    // Check if the user exists in the database
-    const result = await this.db.query('SELECT * FROM users WHERE user_id = $1', [userID])
-
-    if (result.rows.length !== 1) {
-      // No user found
-      const error = { message: `User w/ ID: ${userID} not found` }
-      logger.error({ ...error })
+  public async deleteUser(
+    @Path() userID: number,
+  ): Promise<{ message: string; deletedUser: User | null }> {
+    try {
+      const deletedUser = await this.userRepo.delete({ where: { id: userID } })
+      const responseData = { message: `Deleted user w/ ID: ${userID}`, deletedUser }
+      logger.info({ ...responseData })
+      return responseData
+    } catch (err) {
+      const error = { message: 'Error deleting user', deletedUser: null }
+      logger.error({ ...error, err })
       return error
     }
-
-    // Delete the user from the database
-    await this.db.query('DELETE FROM users WHERE user_id = $1', [userID])
-
-    const responseData = { message: `Deleted user w/ ID: ${userID}`, deletedUser: result.rows[0] }
-    logger.info({ ...responseData })
-    return responseData
   }
 }

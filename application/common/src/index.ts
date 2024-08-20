@@ -7,6 +7,7 @@ export const backendPort = 5000
 
 export interface UserCreationRequest {
   firstName: string
+  lastName: string
   email: string
   role: string
   organisations: string[]
@@ -14,6 +15,7 @@ export interface UserCreationRequest {
 
 export interface UserUpdateRequest {
   firstName?: string
+  lastName?: string
   email?: string
   role?: string
   organisations?: string[]
