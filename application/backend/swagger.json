@@ -12,6 +12,9 @@
 					"firstName": {
 						"type": "string"
 					},
+					"lastName": {
+						"type": "string"
+					},
 					"email": {
 						"type": "string"
 					},
@@ -35,6 +38,7 @@
 				},
 				"required": [
 					"firstName",
+					"lastName",
 					"email",
 					"role",
 					"organisations",
@@ -47,6 +51,9 @@
 			"UserCreationRequest": {
 				"properties": {
 					"firstName": {
+						"type": "string"
+					},
+					"lastName": {
 						"type": "string"
 					},
 					"email": {
@@ -64,6 +71,7 @@
 				},
 				"required": [
 					"firstName",
+					"lastName",
 					"email",
 					"role",
 					"organisations"
@@ -74,6 +82,9 @@
 			"UserUpdateRequest": {
 				"properties": {
 					"firstName": {
+						"type": "string"
+					},
+					"lastName": {
 						"type": "string"
 					},
 					"email": {
@@ -165,11 +176,20 @@
 							"application/json": {
 								"schema": {
 									"properties": {
+										"newUser": {
+											"allOf": [
+												{
+													"$ref": "#/components/schemas/User"
+												}
+											],
+											"nullable": true
+										},
 										"message": {
 											"type": "string"
 										}
 									},
 									"required": [
+										"newUser",
 										"message"
 									],
 									"type": "object"
@@ -262,11 +282,20 @@
 							"application/json": {
 								"schema": {
 									"properties": {
+										"updatedUser": {
+											"allOf": [
+												{
+													"$ref": "#/components/schemas/User"
+												}
+											],
+											"nullable": true
+										},
 										"message": {
 											"type": "string"
 										}
 									},
 									"required": [
+										"updatedUser",
 										"message"
 									],
 									"type": "object"
@@ -318,11 +347,20 @@
 							"application/json": {
 								"schema": {
 									"properties": {
+										"deletedUser": {
+											"allOf": [
+												{
+													"$ref": "#/components/schemas/User"
+												}
+											],
+											"nullable": true
+										},
 										"message": {
 											"type": "string"
 										}
 									},
 									"required": [
+										"deletedUser",
 										"message"
 									],
 									"type": "object"
