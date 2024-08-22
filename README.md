@@ -4,7 +4,7 @@ ctrl-next is the next incarnation of the dynamic consent platform CTRL developed
 
 ## Running locally via node
 
-ctrl-next uses a recent Node.js version as specified in `.nvmrc` in combination with the yarn modern package manager through corepack. 
+ctrl-next uses a recent Node.js version as specified in `.nvmrc` in combination with the yarn modern package manager through corepack.
 
 ### Install required software and packages
 
@@ -60,7 +60,7 @@ yarn build
 yarn start
 ```
 
-### Running locally via docker
+## Running locally via docker
 
 A docker image of `ctrl-next` can be built and used to run the built application (as with the command `yarn start`) or any of the `yarn` commands listed above. Along with the [Dockerfile](Dockerfile), a [Makefile](Makefile) is provided to facilitate running common docker commands:
 
@@ -76,7 +76,7 @@ docker build \
   -f Dockerfile .
 ```
 
-**Note**: an [alternative Dockerfile](Dockerfile_with_nvm) is provided, that install Node.js through `nvm`. 
+**Note**: an [alternative Dockerfile](Dockerfile_with_nvm) is provided, that install Node.js through `nvm`.
 
 To run `ctrl-next` once the image has been built and its Postgres DB a [docker-compose.yml](docker-compose.yml) file is provided. The following commands are supported:
 
@@ -96,6 +96,23 @@ make docker-run-db:
 By default the `ctrl-next` docker image will simply run a build of `ctrl-next`. Any command line arguments passed to `docker run` will be interpreted as Bash commands and executed from the `ctrl-next` repository root inside the container.
 
 For instance, to run type-checks on the code in the container use:
+
 ```bash
 docker run ctrl-next:latest yarn type-check
+```
+
+## Prisma Database Management
+
+```bash
+# Copy example env variables and fill out with correct values
+cp application/backend/.env.example application/backend/.env
+
+# Run db
+make docker-run-db
+
+# Generate Prisma Client
+yarn prisma:generate
+
+# Run migrations
+yarn prisma:migrate
 ```

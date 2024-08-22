@@ -1,17 +1,6 @@
 import { PrismaClient } from './generated/client'
 import * as users from './seedUserData.json'
 
-// Setup Database URL
-const { POSTGRES_HOST, POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_PORT, POSTGRES_DB } = process.env
-
-if (!POSTGRES_HOST || !POSTGRES_USER || !POSTGRES_PASSWORD || !POSTGRES_PORT || !POSTGRES_DB) {
-  throw new Error('Missing required environment variables for PostgreSQL.')
-}
-
-const databaseUrl: string = `postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}`
-
-process.env.DATABASE_URL = databaseUrl
-
 const prisma = new PrismaClient()
 
 const main = async () => {
