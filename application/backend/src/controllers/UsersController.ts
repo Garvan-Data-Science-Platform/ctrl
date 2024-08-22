@@ -13,12 +13,13 @@ import {
 } from 'tsoa'
 import logger from 'common/src/logger'
 import { type UserCreationRequest, type UserUpdateRequest } from 'common'
-import { PrismaClient, type User } from '../../prisma/generated/client'
+import { type User } from '../../prisma/generated/client'
+import prisma from '../PrismaClient'
 
 @Route('users')
 @Tags('Users')
 export class UsersController extends Controller {
-  userRepo = new PrismaClient().user
+  userRepo = prisma.user
 
   /**
    * Get all Users
