@@ -1,0 +1,45 @@
+[
+  {
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "johndoe@example.com",
+    "role": "Admin",
+    "organisations": ["Company A", "Company B"]
+  },
+
+  {
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "email": "janesmith@example.com",
+    "role": "User",
+    "organisations": ["Company C"]
+  },
+  {
+    "firstName": "Alice",
+    "lastName": "Johnson",
+    "email": "alicejohnson@example.com",
+    "role": "Guest",
+    "organisations": ["Company D", "Company E"]
+  },
+  {
+    "firstName": "Bob",
+    "lastName": "Brown",
+    "email": "bobbrown@example.com",
+    "role": "Admin",
+    "organisations": ["Company F"]
+  },
+  {
+    "firstName": "Emily",
+    "lastName": "Davis",
+    "email": "emilydavis@example.com",
+    "role": "User",
+    "organisations": ["Company G", "Company H"]
+  },
+  {
+    "firstName": "Michael",
+    "lastName": "Wilson",
+    "email": "michaelwilson@example.com",
+    "role": "Guest",
+    "organisations": ["Company I"]
+  }
+]
