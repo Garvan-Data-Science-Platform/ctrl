@@ -56,7 +56,7 @@ export class UsersController extends Controller {
       this.setStatus(404)
       return error
     }
-    const responseData = { message: `Get user w/ ID: ${userID}`, user }
+    const responseData = { message: `Get user with ID: ${userID}`, user }
     logger.info({ ...responseData })
     return responseData
   }
@@ -87,7 +87,7 @@ export class UsersController extends Controller {
     try {
       const insertedUser = await this.userRepo.create({ data: bodyRequest })
       const responseData = {
-        message: `Created user w/ ID: ${insertedUser.id}`,
+        message: `Created user with ID: ${insertedUser.id}`,
         newUser: insertedUser,
       }
       logger.info({ ...responseData })
@@ -118,7 +118,7 @@ export class UsersController extends Controller {
         data: bodyRequest,
       })
       const responseData = {
-        message: `Updated user w/ ID: ${userID}`,
+        message: `Updated user with ID: ${userID}`,
         updatedUser,
       }
       logger.info({ ...responseData })
@@ -144,7 +144,7 @@ export class UsersController extends Controller {
   ): Promise<{ message: string; deletedUser: User | null }> {
     try {
       const deletedUser = await this.userRepo.delete({ where: { id: userID } })
-      const responseData = { message: `Deleted user w/ ID: ${userID}`, deletedUser }
+      const responseData = { message: `Deleted user with ID: ${userID}`, deletedUser }
       logger.info({ ...responseData })
       return responseData
     } catch (err) {
