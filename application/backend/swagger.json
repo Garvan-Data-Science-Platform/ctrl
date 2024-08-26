@@ -7,19 +7,15 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
-			"User": {
+			"DefaultSelection_Prisma._36_UserPayload_": {
 				"properties": {
-					"firstName": {
-						"type": "string"
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
 					},
-					"lastName": {
-						"type": "string"
-					},
-					"email": {
-						"type": "string"
-					},
-					"role": {
-						"type": "string"
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
 					},
 					"organisations": {
 						"items": {
@@ -27,26 +23,38 @@
 						},
 						"type": "array"
 					},
-					"createdAt": {
-						"type": "string",
-						"format": "date-time"
+					"role": {
+						"type": "string"
 					},
-					"updatedAt": {
-						"type": "string",
-						"format": "date-time"
+					"email": {
+						"type": "string"
+					},
+					"lastName": {
+						"type": "string"
+					},
+					"firstName": {
+						"type": "string"
+					},
+					"id": {
+						"type": "number",
+						"format": "double"
 					}
 				},
 				"required": [
-					"firstName",
-					"lastName",
-					"email",
-					"role",
-					"organisations",
+					"updatedAt",
 					"createdAt",
-					"updatedAt"
+					"organisations",
+					"role",
+					"email",
+					"lastName",
+					"firstName",
+					"id"
 				],
-				"type": "object",
-				"additionalProperties": false
+				"type": "object"
+			},
+			"User": {
+				"$ref": "#/components/schemas/DefaultSelection_Prisma._36_UserPayload_",
+				"description": "Model User"
 			},
 			"UserCreationRequest": {
 				"properties": {
