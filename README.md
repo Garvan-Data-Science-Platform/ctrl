@@ -127,7 +127,7 @@ As software is developed, previous decisions around schema design are often reco
 
 1. Get started by editing the `schema.prisma` file.
 
-   _E.g. We have a user model. We don’t currently capture the last name of the user but we would like to in the future. We can simply edit the `schema.prisma` file like so:_
+   _E.g. We have a user model. We don’t currently capture the middle name of the user but we would like to in the future. We can simply edit the `schema.prisma` file like so:_
 
    ```typescript
    ...
