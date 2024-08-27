@@ -7,16 +7,15 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
-			"User": {
+			"DefaultSelection_Prisma._36_UserPayload_": {
 				"properties": {
-					"firstName": {
-						"type": "string"
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
 					},
-					"email": {
-						"type": "string"
-					},
-					"role": {
-						"type": "string"
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
 					},
 					"organisations": {
 						"items": {
@@ -24,31 +23,47 @@
 						},
 						"type": "array"
 					},
-					"createdAt": {
-						"type": "string",
-						"format": "date-time"
+					"role": {
+						"type": "string"
 					},
-					"updatedAt": {
-						"type": "string",
-						"format": "date-time"
+					"email": {
+						"type": "string"
+					},
+					"lastName": {
+						"type": "string"
+					},
+					"firstName": {
+						"type": "string"
+					},
+					"id": {
+						"type": "number",
+						"format": "double"
 					}
 				},
 				"required": [
-					"firstName",
-					"email",
-					"role",
-					"organisations",
+					"updatedAt",
 					"createdAt",
-					"updatedAt"
+					"organisations",
+					"role",
+					"email",
+					"lastName",
+					"firstName",
+					"id"
 				],
-				"type": "object",
-				"additionalProperties": false
+				"type": "object"
+			},
+			"User": {
+				"$ref": "#/components/schemas/DefaultSelection_Prisma._36_UserPayload_",
+				"description": "Model User"
 			},
 			"UserCreationRequest": {
 				"properties": {
 					"firstName": {
 						"type": "string"
 					},
+					"lastName": {
+						"type": "string"
+					},
 					"email": {
 						"type": "string"
 					},
@@ -64,6 +79,7 @@
 				},
 				"required": [
 					"firstName",
+					"lastName",
 					"email",
 					"role",
 					"organisations"
@@ -74,6 +90,9 @@
 			"UserUpdateRequest": {
 				"properties": {
 					"firstName": {
+						"type": "string"
+					},
+					"lastName": {
 						"type": "string"
 					},
 					"email": {
@@ -165,11 +184,20 @@
 							"application/json": {
 								"schema": {
 									"properties": {
+										"newUser": {
+											"allOf": [
+												{
+													"$ref": "#/components/schemas/User"
+												}
+											],
+											"nullable": true
+										},
 										"message": {
 											"type": "string"
 										}
 									},
 									"required": [
+										"newUser",
 										"message"
 									],
 									"type": "object"
@@ -262,11 +290,20 @@
 							"application/json": {
 								"schema": {
 									"properties": {
+										"updatedUser": {
+											"allOf": [
+												{
+													"$ref": "#/components/schemas/User"
+												}
+											],
+											"nullable": true
+										},
 										"message": {
 											"type": "string"
 										}
 									},
 									"required": [
+										"updatedUser",
 										"message"
 									],
 									"type": "object"
@@ -318,11 +355,20 @@
 							"application/json": {
 								"schema": {
 									"properties": {
+										"deletedUser": {
+											"allOf": [
+												{
+													"$ref": "#/components/schemas/User"
+												}
+											],
+											"nullable": true
+										},
 										"message": {
 											"type": "string"
 										}
 									},
 									"required": [
+										"deletedUser",
 										"message"
 									],
 									"type": "object"

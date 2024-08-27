@@ -3070,6 +3070,7 @@ __metadata:
     esbuild: "npm:^0.20.0"
     express: "npm:^4.18.2"
     jest: "npm:^29.7.0"
+    jest-mock-extended: "npm:^3.0.7"
     pg: "npm:^8.12.0"
     prisma: "npm:^5.18.0"
     supertest: "npm:^7.0.0"
@@ -5475,6 +5476,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"jest-mock-extended@npm:^3.0.7":
+  version: 3.0.7
+  resolution: "jest-mock-extended@npm:3.0.7"
+  dependencies:
+    ts-essentials: "npm:^10.0.0"
+  peerDependencies:
+    jest: ^24.0.0 || ^25.0.0 || ^26.0.0 || ^27.0.0 || ^28.0.0 || ^29.0.0
+    typescript: ^3.0.0 || ^4.0.0 || ^5.0.0
+  checksum: 17d2e816eae8e95933817102987ba9f700890c4b1223495012bca2ec76644cd203336843a4c381a662e03bde0b637767ad8e2c13b490e9a5eaeb87d211994647
+  languageName: node
+  linkType: hard
+
 "jest-mock@npm:^29.7.0":
   version: 29.7.0
   resolution: "jest-mock@npm:29.7.0"
@@ -7735,6 +7748,18 @@ __metadata:
   version: 7.0.1
   resolution: "ts-deepmerge@npm:7.0.1"
   checksum: 33267d87d412d5f8f7f2cd024e435c4f5c721b74d10abcf2271329737b305196e8558ff17579631f17f89289afc1689601c5e0f91352a35ba4dd6dc923893c01
+  languageName: node
+  linkType: hard
+
+"ts-essentials@npm:^10.0.0":
+  version: 10.0.2
+  resolution: "ts-essentials@npm:10.0.2"
+  peerDependencies:
+    typescript: ">=4.5.0"
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 660d83eb089f41975fd6137732d84913f8c68405d986613c92161b2f638529a15f2e0cb49d8a0eb318750ec22bd93907e7d277e07161bf280e1b4c1ff6f36654
   languageName: node
   linkType: hard
 
