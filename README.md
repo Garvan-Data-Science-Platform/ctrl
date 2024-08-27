@@ -116,3 +116,65 @@ yarn prisma:generate
 # Run migrations
 yarn prisma:migrate
 ```
+
+### Migrations
+
+#### Purpose
+
+As software is developed, previous decisions around schema design are often reconsidered and changed to meet new project requirements. Reworking the database schema is a process known as migrations, it is important to plan and take care to ensure that data is accessible, consistent, compatible and without loss. In an attempt to ensure the safety of our data, we want to document and plan our database migrations carefully.
+
+#### Strategy
+
+1. Get started by editing the `schema.prisma` file.
+
+   _E.g. We have a user model. We don’t currently capture the last name of the user but we would like to in the future. We can simply edit the `schema.prisma` file like so:_
+
+   ```typescript
+   ...
+
+   model User {
+     id            Int      @id @default(autoincrement())
+     firstName     String
+     lastName      String
+   ++middleName    String <<<<<<<<<<<<
+     email         String   @unique
+     role          String
+     organisations String[]
+     createdAt     DateTime @default(now())
+     updatedAt     DateTime @updatedAt
+   }
+
+   ...
+   ```
+
+2. Run `yarn prisma:migrate --create-only` to create the migration (optionally add: `--name {an appropriate migration name}`) and name the migration something that explains what updates to the schema we intend to perform.  
+   **NOTE: `--create-only` here is used to ensure that we do not apply the new migration directly, but instead just create it in order to edit it.**  
+   _E.g. name to be used in this example `add_middle_name_to_user`_
+
+3. A new folder under `prisma/migrations` will be created with the timestamp and name of your migration, in which a `migration.sql` is also created. It is necessary to open the `migration.sql` file and ensure that the migration is doing exactly as you expected.  
+   _E.g. In our case, the generated migration looks like the following:_
+
+   ```SQL
+   /*
+     Warnings:
+
+     - Added the required column `middleName` to the `User` table without a default value. This is not possible if the table is not empty.
+
+   */
+   -- AlterTable
+   ALTER TABLE "User" ADD COLUMN     "middleName" TEXT NOT NULL;
+   ```
+
+   _Which we would like to update to the following:_
+
+   ```SQL
+   -- AlterTable
+   ALTER TABLE "User" ADD COLUMN "middleName" TEXT; // Add the middleName column as a TEXT data type (ensuring that it can be NULL)
+
+   UPDATE "User" SET "middleName" = 'UNKNOWN' WHERE "middleName" IS NULL; // Update all users where the middleName is NULL (in order to ensure we can make this a NOT NULL column)
+
+   ALTER TABLE "User" ALTER COLUMN "middleName" SET NOT NULL; // Alter the column to ensure that it is a required field by setting NOT NULL
+   ```
+
+4. Apply the new migration to our database by running: `yarn prisma:migrate`.
+5. Now our database is up to date with our prisma schema, we can ensure data safety.
