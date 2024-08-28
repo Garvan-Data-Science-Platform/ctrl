@@ -14,7 +14,26 @@ model User {
   lastName      String
   email         String   @unique
   role          String
-  organisations String[]
+  organisations Organisation[]
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+model Organisation {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  users       User[]
+  type        OrganisationType[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum OrganisationType {
+  INSTITUTION
+  COMPANY
+  UNIVERSITY
+  GOVERNMENT
+  NON_PROFIT
+  RESEARCH_CENTER
+  OTHER
 }
