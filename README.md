@@ -127,7 +127,7 @@ As software is developed, previous decisions around schema design are often reco
 
 1. Get started by editing the `schema.prisma` file.
 
-   _E.g. We have a user model. We don’t currently capture the middle name of the user but we would like to in the future. We can simply edit the `schema.prisma` file like so:_
+   _E.g. We have a user model. We don’t currently capture the middle name of the user but we would like to in the future if the user has a middle name. We can simply edit the `schema.prisma` file like so:_
 
    ```typescript
    ...
@@ -136,7 +136,7 @@ As software is developed, previous decisions around schema design are often reco
      id            Int      @id @default(autoincrement())
      firstName     String
      lastName      String
-   ++middleName    String <<<<<<<<<<<<
+   ++middleName    String? <<<<<<<<<<<<
      email         String   @unique
      role          String
      organisations String[]
@@ -152,29 +152,12 @@ As software is developed, previous decisions around schema design are often reco
    _E.g. name to be used in this example `add_middle_name_to_user`_
 
 3. A new folder under `prisma/migrations` will be created with the timestamp and name of your migration, in which a `migration.sql` is also created. It is necessary to open the `migration.sql` file and ensure that the migration is doing exactly as you expected.  
-   _E.g. In our case, the generated migration looks like the following:_
-
-   ```SQL
-   /*
-     Warnings:
-
-     - Added the required column `middleName` to the `User` table without a default value. This is not possible if the table is not empty.
-
-   */
-   -- AlterTable
-   ALTER TABLE "User" ADD COLUMN     "middleName" TEXT NOT NULL;
-   ```
-
-   _Which we would like to update to the following:_
+   _E.g. In our case, the generated migration looks like the following, which correctly implements the optional new `middleName` column:_
 
    ```SQL
    -- AlterTable
-   ALTER TABLE "User" ADD COLUMN "middleName" TEXT; // Add the middleName column as a TEXT data type (ensuring that it can be NULL)
-
-   UPDATE "User" SET "middleName" = 'UNKNOWN' WHERE "middleName" IS NULL; // Update all users where the middleName is NULL (in order to ensure we can make this a NOT NULL column)
-
-   ALTER TABLE "User" ALTER COLUMN "middleName" SET NOT NULL; // Alter the column to ensure that it is a required field by setting NOT NULL
+   ALTER TABLE "User" ADD COLUMN "middleName" TEXT;
    ```
 
-4. Apply the new migration to our database by running: `yarn prisma:migrate`.
-5. Now our database is up to date with our prisma schema, we can ensure data safety.
+5. Apply the new migration to our database by running: `yarn prisma:migrate`.
+6. Now our database is up to date with our prisma schema, we can ensure data safety.
