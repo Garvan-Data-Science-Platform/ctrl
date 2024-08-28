@@ -1,9 +1,3 @@
-/*
-  Warnings:
-
-  - You are about to drop the column `organisations` on the `User` table. All the data in the column will be lost.
-
-*/
 -- CreateEnum
 CREATE TYPE "OrganisationType" AS ENUM ('INSTITUTION', 'COMPANY', 'UNIVERSITY', 'GOVERNMENT', 'NON_PROFIT', 'RESEARCH_CENTER', 'OTHER');
 
@@ -14,7 +8,7 @@ ALTER TABLE "User" DROP COLUMN "organisations";
 CREATE TABLE "Organisation" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "type" "OrganisationType"[],
+    "type" "OrganisationType",
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
