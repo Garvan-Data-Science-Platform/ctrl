@@ -1,8 +1,19 @@
-import { Controller, Get, Post, SuccessResponse, Response, Path, Route, Tags, Body } from 'tsoa'
+import {
+  Controller,
+  Get,
+  Post,
+  SuccessResponse,
+  Response,
+  Path,
+  Route,
+  Tags,
+  Body,
+  Put,
+} from 'tsoa'
 import logger from 'common/src/logger'
 import prisma from '../PrismaClient'
 import { type Organisation } from '../../prisma/generated/client'
-import { type OrganisationCreationRequest } from 'common/src/index'
+import { type OrganisationCreationRequest, type OrganisationUpdateRequest } from 'common/src/index'
 
 @Route('organisations')
 @Tags('Organisations')
@@ -80,6 +91,51 @@ export class OrganisationsController extends Controller {
       return responseData
     } catch (err) {
       const error = { message: 'Error creating organisation', newOrganisation: null }
+      logger.error({ ...error, err })
+      return error
+    }
+  }
+
+  /**
+   * Update an existing organisation
+   *
+   * @summary Update an existing Organisation
+   */
+  @Put('/{orgID}')
+  @SuccessResponse('200', 'OK')
+  @Response('500', 'Internal Server Error')
+  @Response('404', 'Not Found')
+  public async updateOrganisation(
+    @Path() orgID: number,
+    @Body() bodyRequest: OrganisationUpdateRequest,
+  ): Promise<{
+    message: string
+    updatedOrganisation: Organisation | null
+  }> {
+    try {
+      const updatedOrganisation = await this.organisationRepo.update({
+        where: { id: orgID },
+        data: bodyRequest,
+      })
+
+      if (!updatedOrganisation) {
+        const error = {
+          message: `Organisation with ID: ${orgID} not found`,
+          updatedOrganisation: null,
+        }
+        logger.error({ ...error })
+        this.setStatus(404)
+        return error
+      }
+
+      const responseData = {
+        message: `Updated organisation with ID: ${orgID}`,
+        updatedOrganisation,
+      }
+      logger.info({ ...responseData })
+      return responseData
+    } catch (err) {
+      const error = { message: 'Error updating organisation', updatedOrganisation: null }
       logger.error({ ...error, err })
       return error
     }
