@@ -1,3 +1,5 @@
+import { $Enums } from '../../backend/prisma/generated/client'
+
 export type Workspace = {
   name: string
   version: string
@@ -17,4 +19,14 @@ export interface UserUpdateRequest {
   lastName?: string
   email?: string
   role?: string
+}
+
+export interface OrganisationCreationRequest {
+  name: string
+  type?: $Enums.OrganisationType
+}
+
+export interface OrganisationUpdateRequest {
+  name?: string
+  type?: $Enums.OrganisationType
 }

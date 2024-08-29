@@ -1,7 +1,8 @@
-import { Controller, Get, SuccessResponse, Response, Path, Route, Tags } from 'tsoa'
+import { Controller, Get, Post, SuccessResponse, Response, Path, Route, Tags, Body } from 'tsoa'
 import logger from 'common/src/logger'
 import prisma from '../PrismaClient'
-import { Organisation } from '../../prisma/generated/client'
+import { type Organisation } from '../../prisma/generated/client'
+import { type OrganisationCreationRequest } from 'common/src/index'
 
 @Route('organisations')
 @Tags('Organisations')
@@ -47,5 +48,40 @@ export class OrganisationsController extends Controller {
     const responseData = { message: `Get organisation with ID: ${orgID}`, organisation }
     logger.info({ ...responseData })
     return responseData
+  }
+
+  /**
+   * Create a new organisation
+   *
+   * @summary Create a new Organisation
+   */
+  @Post('/')
+  @SuccessResponse('201', 'Created')
+  @Response('500', 'Internal Server Error')
+  public async createOrganisation(
+    @Body() bodyRequest: OrganisationCreationRequest,
+  ): Promise<{ message: string; newOrganisation: Organisation | null }> {
+    const { name, type } = bodyRequest
+
+    // Validation check
+    if (!name || !type) {
+      const error = { message: 'Missing required fields: name, type', newOrganisation: null }
+      logger.error({ ...error })
+      return error
+    }
+
+    try {
+      const newOrganisation: Organisation = await this.organisationRepo.create({
+        data: { name, type },
+      })
+
+      const responseData = { message: 'Created new organisation', newOrganisation }
+      logger.info({ ...responseData })
+      return responseData
+    } catch (err) {
+      const error = { message: 'Error creating organisation', newOrganisation: null }
+      logger.error({ ...error, err })
+      return error
+    }
   }
 }
