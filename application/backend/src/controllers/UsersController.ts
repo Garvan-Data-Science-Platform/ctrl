@@ -72,12 +72,12 @@ export class UsersController extends Controller {
   public async createUser(
     @Body() bodyRequest: UserCreationRequest,
   ): Promise<{ message: string; newUser: User | null }> {
-    const { firstName, lastName, email, role, organisations } = bodyRequest
+    const { firstName, lastName, email, role } = bodyRequest
 
     // Validation check
-    if (!firstName || !lastName || !email || !role || !organisations) {
+    if (!firstName || !lastName || !email || !role) {
       const error = {
-        message: 'Missing required fields: firstName, lastName, email, role, organisations',
+        message: 'Missing required fields: firstName, lastName, email, role',
         newUser: null,
       }
       logger.error({ ...error })

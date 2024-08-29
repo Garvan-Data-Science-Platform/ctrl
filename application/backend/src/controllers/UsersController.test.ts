@@ -9,7 +9,6 @@ const exampleUser1 = {
   lastName: 'Doe',
   email: 'johndoe@example.com',
   role: 'Admin',
-  organisations: ['Company A', 'Company B'],
   createdAt: new Date(),
   updatedAt: new Date(),
 }
@@ -20,7 +19,6 @@ const exampleUser2 = {
   lastName: 'Smith',
   email: 'janesmith@example.com',
   role: 'User',
-  organisations: ['Company C'],
   createdAt: new Date(),
   updatedAt: new Date(),
 }
@@ -87,7 +85,6 @@ describe('UsersController', () => {
         lastName: exampleUser1.lastName,
         email: exampleUser1.email,
         role: exampleUser1.role,
-        organisations: exampleUser1.organisations,
       }
 
       const expectedResult = {
@@ -106,7 +103,6 @@ describe('UsersController', () => {
         lastName: 'Doe',
         email: 'johndoe@example.com',
         role: 'admin',
-        organisations: ['Org1', 'Org2'],
       }
 
       const expectedResult = {
@@ -127,7 +123,6 @@ describe('UsersController', () => {
         firstName: 'Jane Doe',
         email: 'janedoe@example.com',
         role: 'Software Developer',
-        organisations: ['Org3'],
       }
 
       const expectedResult = {
@@ -153,7 +148,6 @@ describe('UsersController', () => {
         lastName: 'Doe',
         email: 'janedoe@example.com',
         role: 'Software Developer',
-        organisations: ['Org3'],
       }
 
       const expectedResult = {
@@ -172,7 +166,6 @@ describe('UsersController', () => {
         firstName: 'Jane Doe',
         email: 'janedoe@example.com',
         role: 'Software Developer',
-        organisations: ['Org3'],
       }
 
       const result = await usersController.updateUser(userID, bodyRequest)
