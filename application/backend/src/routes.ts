@@ -71,6 +71,15 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "OrganisationUpdateRequest": {
+        "dataType": "refObject",
+        "properties": {
+            "name": {"dataType":"string"},
+            "type": {"ref":"_36_Enums.OrganisationType"},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Workspace": {
         "dataType": "refAlias",
         "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"version":{"dataType":"string","required":true},"name":{"dataType":"string","required":true}},"validators":{}},
@@ -326,6 +335,37 @@ export function RegisterRoutes(app: Router) {
                 next,
                 validatedArgs,
                 successStatus: 201,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.put('/organisations/:orgID',
+            ...(fetchMiddlewares<RequestHandler>(OrganisationsController)),
+            ...(fetchMiddlewares<RequestHandler>(OrganisationsController.prototype.updateOrganisation)),
+
+            async function OrganisationsController_updateOrganisation(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    orgID: {"in":"path","name":"orgID","required":true,"dataType":"double"},
+                    bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"OrganisationUpdateRequest"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new OrganisationsController();
+
+              await templateService.apiHandler({
+                methodName: 'updateOrganisation',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
               });
             } catch (err) {
                 return next(err);

@@ -152,6 +152,18 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"OrganisationUpdateRequest": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"type": {
+						"$ref": "#/components/schemas/_36_Enums.OrganisationType"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
 			"Workspace": {
 				"properties": {
 					"version": {
@@ -592,6 +604,71 @@
 						}
 					}
 				]
+			},
+			"put": {
+				"operationId": "UpdateOrganisation",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"updatedOrganisation": {
+											"allOf": [
+												{
+													"$ref": "#/components/schemas/Organisation"
+												}
+											],
+											"nullable": true
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"updatedOrganisation",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found"
+					},
+					"500": {
+						"description": "Internal Server Error"
+					}
+				},
+				"description": "Update an existing organisation",
+				"summary": "Update an existing Organisation",
+				"tags": [
+					"Organisations"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgID",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/OrganisationUpdateRequest"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/healthcheck": {
