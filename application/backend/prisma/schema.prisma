@@ -23,7 +23,7 @@ model Organisation {
   id          Int      @id @default(autoincrement())
   name        String   @unique
   users       User[]
-  type        OrganisationType[]
+  type        OrganisationType?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
