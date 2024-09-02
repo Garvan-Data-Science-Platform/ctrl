@@ -72,18 +72,18 @@ export class OrganisationsController extends Controller {
   public async createOrganisation(
     @Body() bodyRequest: OrganisationCreationRequest,
   ): Promise<{ message: string; newOrganisation: Organisation | null }> {
-    const { name, type } = bodyRequest
+    const { name } = bodyRequest
 
     // Validation check
-    if (!name || !type) {
-      const error = { message: 'Missing required fields: name, type', newOrganisation: null }
+    if (!name) {
+      const error = { message: 'Missing required fields: name', newOrganisation: null }
       logger.error({ ...error })
       return error
     }
 
     try {
       const newOrganisation: Organisation = await this.organisationRepo.create({
-        data: { name, type },
+        data: { name },
       })
 
       const responseData = { message: 'Created new organisation', newOrganisation }
