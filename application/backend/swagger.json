@@ -17,12 +17,6 @@
 						"type": "string",
 						"format": "date-time"
 					},
-					"organisations": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
 					"role": {
 						"type": "string"
 					},
@@ -43,7 +37,6 @@
 				"required": [
 					"updatedAt",
 					"createdAt",
-					"organisations",
 					"role",
 					"email",
 					"lastName",
@@ -69,20 +62,13 @@
 					},
 					"role": {
 						"type": "string"
-					},
-					"organisations": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
 					}
 				},
 				"required": [
 					"firstName",
 					"lastName",
 					"email",
-					"role",
-					"organisations"
+					"role"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -100,12 +86,6 @@
 					},
 					"role": {
 						"type": "string"
-					},
-					"organisations": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
 					}
 				},
 				"type": "object",

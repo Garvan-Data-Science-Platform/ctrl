@@ -1,0 +1,62 @@
+{
+  "users": [
+    {
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "johndoe@example.com",
+      "role": "Admin",
+      "organisations": ["Garvan Institute of Medical Research", "University of New South Wales"]
+    },
+
+    {
+      "firstName": "Jane",
+      "lastName": "Smith",
+      "email": "janesmith@example.com",
+      "role": "User",
+      "organisations": ["University of New South Wales"]
+    },
+    {
+      "firstName": "Alice",
+      "lastName": "Johnson",
+      "email": "alicejohnson@example.com",
+      "role": "Guest",
+      "organisations": []
+    },
+    {
+      "firstName": "Bob",
+      "lastName": "Brown",
+      "email": "bobbrown@example.com",
+      "role": "Admin",
+      "organisations": []
+    },
+    {
+      "firstName": "Emily",
+      "lastName": "Davis",
+      "email": "emilydavis@example.com",
+      "role": "User",
+      "organisations": ["Garvan Institute of Medical Research", "Apple Inc."]
+    },
+    {
+      "firstName": "Michael",
+      "lastName": "Wilson",
+      "email": "michaelwilson@example.com",
+      "role": "Guest",
+      "organisations": [
+        "Apple Inc.",
+        "University of New South Wales",
+        "Garvan Institute of Medical Research"
+      ]
+    }
+  ],
+  "organisations": [
+    {
+      "name": "Garvan Institute of Medical Research"
+    },
+    {
+      "name": "University of New South Wales"
+    },
+    {
+      "name": "Apple Inc."
+    }
+  ]
+}

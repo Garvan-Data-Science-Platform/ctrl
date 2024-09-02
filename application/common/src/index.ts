@@ -10,7 +10,6 @@ export interface UserCreationRequest {
   lastName: string
   email: string
   role: string
-  organisations: string[]
 }
 
 export interface UserUpdateRequest {
@@ -18,5 +17,4 @@ export interface UserUpdateRequest {
   lastName?: string
   email?: string
   role?: string
-  organisations?: string[]
 }

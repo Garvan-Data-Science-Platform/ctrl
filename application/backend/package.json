@@ -14,7 +14,7 @@
     "prisma:migrate": "yarn pnpify prisma migrate dev"
   },
   "prisma": {
-    "seed": "tsx prisma/seed.ts"
+    "seed": "tsx prisma/seed/seed.ts"
   },
   "packageManager": "yarn@4.0.2",
   "dependencies": {
