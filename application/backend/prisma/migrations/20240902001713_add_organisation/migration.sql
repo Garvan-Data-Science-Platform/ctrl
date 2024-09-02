@@ -1,6 +1,3 @@
--- CreateEnum
-CREATE TYPE "OrganisationType" AS ENUM ('INSTITUTION', 'COMPANY', 'UNIVERSITY', 'GOVERNMENT', 'NON_PROFIT', 'RESEARCH_CENTER', 'OTHER');
-
 -- AlterTable
 ALTER TABLE "User" DROP COLUMN "organisations";
 
@@ -8,7 +5,6 @@ ALTER TABLE "User" DROP COLUMN "organisations";
 CREATE TABLE "Organisation" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "type" "OrganisationType",
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 

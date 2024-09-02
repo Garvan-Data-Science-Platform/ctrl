@@ -50,16 +50,13 @@
   ],
   "organisations": [
     {
-      "name": "Garvan Institute of Medical Research",
-      "type": "INSTITUTION"
+      "name": "Garvan Institute of Medical Research"
     },
     {
-      "name": "University of New South Wales",
-      "type": "UNIVERSITY"
+      "name": "University of New South Wales"
     },
     {
-      "name": "Apple Inc.",
-      "type": "COMPANY"
+      "name": "Apple Inc."
     }
   ]
 }

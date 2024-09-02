@@ -1,4 +1,4 @@
-import { PrismaClient, OrganisationType, User } from '../generated/client'
+import { PrismaClient, User } from '../generated/client'
 import * as data from './seedUserData.json'
 
 const prisma = new PrismaClient()
@@ -10,7 +10,6 @@ const main = async () => {
   const createdOrganisations = await prisma.organisation.createMany({
     data: organisations.map((org) => ({
       name: org.name,
-      type: org.type as OrganisationType,
     })),
     skipDuplicates: true, // Skip duplicates if any
   })
