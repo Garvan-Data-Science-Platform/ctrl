@@ -372,6 +372,36 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.delete('/organisations/:orgID',
+            ...(fetchMiddlewares<RequestHandler>(OrganisationsController)),
+            ...(fetchMiddlewares<RequestHandler>(OrganisationsController.prototype.deleteOrganisation)),
+
+            async function OrganisationsController_deleteOrganisation(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    orgID: {"in":"path","name":"orgID","required":true,"dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new OrganisationsController();
+
+              await templateService.apiHandler({
+                methodName: 'deleteOrganisation',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/healthcheck',
             ...(fetchMiddlewares<RequestHandler>(HealthCheckController)),
             ...(fetchMiddlewares<RequestHandler>(HealthCheckController.prototype.HealthCheck)),

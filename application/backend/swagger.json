@@ -669,6 +669,61 @@
 						}
 					}
 				}
+			},
+			"delete": {
+				"operationId": "DeleteOrganisation",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"deletedOrganisation": {
+											"allOf": [
+												{
+													"$ref": "#/components/schemas/Organisation"
+												}
+											],
+											"nullable": true
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"deletedOrganisation",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found"
+					},
+					"500": {
+						"description": "Internal Server Error"
+					}
+				},
+				"description": "Delete an existing organisation",
+				"summary": "Delete an existing Organisation",
+				"tags": [
+					"Organisations"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgID",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
 			}
 		},
 		"/healthcheck": {

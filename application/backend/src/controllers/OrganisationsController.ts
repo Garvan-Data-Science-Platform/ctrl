@@ -9,6 +9,7 @@ import {
   Tags,
   Body,
   Put,
+  Delete,
 } from 'tsoa'
 import logger from 'common/src/logger'
 import prisma from '../PrismaClient'
@@ -136,6 +137,48 @@ export class OrganisationsController extends Controller {
       return responseData
     } catch (err) {
       const error = { message: 'Error updating organisation', updatedOrganisation: null }
+      logger.error({ ...error, err })
+      return error
+    }
+  }
+
+  /**
+   * Delete an existing organisation
+   *
+   * @summary Delete an existing Organisation
+   */
+  @Delete('/{orgID}')
+  @SuccessResponse('200', 'OK')
+  @Response('500', 'Internal Server Error')
+  @Response('404', 'Not Found')
+  public async deleteOrganisation(@Path() orgID: number): Promise<{
+    message: string
+    deletedOrganisation: Organisation | null
+  }> {
+    try {
+      const deletedOrganisation = await this.organisationRepo.delete({
+        where: { id: orgID },
+        include: { users: true },
+      })
+
+      if (!deletedOrganisation) {
+        const error = {
+          message: `Organisation with ID: ${orgID} not found`,
+          deletedOrganisation: null,
+        }
+        logger.error({ ...error })
+        this.setStatus(404)
+        return error
+      }
+
+      const responseData = {
+        message: `Deleted organisation with ID: ${orgID}`,
+        deletedOrganisation,
+      }
+      logger.info({ ...responseData })
+      return responseData
+    } catch (err) {
+      const error = { message: 'Error deleting organisation', deletedOrganisation: null }
       logger.error({ ...error, err })
       return error
     }
