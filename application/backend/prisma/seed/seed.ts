@@ -24,8 +24,22 @@ const main = async () => {
 
   const savedUsers = await Promise.all(
     users.map(async (user) => {
-      return await prisma.user.create({
-        data: {
+      return await prisma.user.upsert({
+        where: {
+          email: user.email,
+        },
+        update: {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          role: user.role,
+          organisations: {
+            connect: user.organisations
+              .map((orgName) => savedOrganisations.find((org) => org.name === orgName)?.id)
+              .map((id) => ({ id: id! })),
+          },
+        },
+        create: {
           firstName: user.firstName,
           lastName: user.lastName,
           email: user.email,
