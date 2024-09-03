@@ -47,14 +47,9 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "_36_Enums.OrganisationType": {
-        "dataType": "refAlias",
-        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["INSTITUTION"]},{"dataType":"enum","enums":["COMPANY"]},{"dataType":"enum","enums":["UNIVERSITY"]},{"dataType":"enum","enums":["GOVERNMENT"]},{"dataType":"enum","enums":["NON_PROFIT"]},{"dataType":"enum","enums":["RESEARCH_CENTER"]},{"dataType":"enum","enums":["OTHER"]}],"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "DefaultSelection_Prisma._36_OrganisationPayload_": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"updatedAt":{"dataType":"datetime","required":true},"createdAt":{"dataType":"datetime","required":true},"type":{"ref":"_36_Enums.OrganisationType","required":true},"name":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"updatedAt":{"dataType":"datetime","required":true},"createdAt":{"dataType":"datetime","required":true},"name":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Organisation": {
@@ -66,7 +61,6 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "name": {"dataType":"string","required":true},
-            "type": {"ref":"_36_Enums.OrganisationType"},
         },
         "additionalProperties": false,
     },
@@ -75,7 +69,6 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "name": {"dataType":"string"},
-            "type": {"ref":"_36_Enums.OrganisationType"},
         },
         "additionalProperties": false,
     },
@@ -391,6 +384,98 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'deleteOrganisation',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/organisations/:orgID/organisations/users',
+            ...(fetchMiddlewares<RequestHandler>(OrganisationsController)),
+            ...(fetchMiddlewares<RequestHandler>(OrganisationsController.prototype.getOrganisationUsers)),
+
+            async function OrganisationsController_getOrganisationUsers(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    orgID: {"in":"path","name":"orgID","required":true,"dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new OrganisationsController();
+
+              await templateService.apiHandler({
+                methodName: 'getOrganisationUsers',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/organisations/:orgID/users/:userID',
+            ...(fetchMiddlewares<RequestHandler>(OrganisationsController)),
+            ...(fetchMiddlewares<RequestHandler>(OrganisationsController.prototype.addUserToOrganisation)),
+
+            async function OrganisationsController_addUserToOrganisation(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    orgID: {"in":"path","name":"orgID","required":true,"dataType":"double"},
+                    userID: {"in":"path","name":"userID","required":true,"dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new OrganisationsController();
+
+              await templateService.apiHandler({
+                methodName: 'addUserToOrganisation',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.delete('/organisations/:orgID/users/:userID',
+            ...(fetchMiddlewares<RequestHandler>(OrganisationsController)),
+            ...(fetchMiddlewares<RequestHandler>(OrganisationsController.prototype.removeUserFromOrganisation)),
+
+            async function OrganisationsController_removeUserFromOrganisation(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    orgID: {"in":"path","name":"orgID","required":true,"dataType":"double"},
+                    userID: {"in":"path","name":"userID","required":true,"dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new OrganisationsController();
+
+              await templateService.apiHandler({
+                methodName: 'removeUserFromOrganisation',
                 controller,
                 response,
                 next,
