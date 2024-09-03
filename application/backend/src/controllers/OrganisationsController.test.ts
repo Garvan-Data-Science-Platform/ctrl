@@ -200,6 +200,7 @@ describe('OrganisationsController', () => {
     it('should return a list of all users in the organisation', async () => {
       const exampleUser1 = { id: 1, name: 'User 1' }
       const exampleUser2 = { id: 2, name: 'User 2' }
+
       const exampleOrgWithUsers = { ...exampleOrg1, users: [exampleUser1, exampleUser2] }
 
       PrismaClientMock.organisation.findUnique.mockResolvedValueOnce(exampleOrgWithUsers)
@@ -259,16 +260,42 @@ describe('OrganisationsController', () => {
       }
       await expect(orgController.addUserToOrganisation(orgID, 2)).resolves.toEqual(expectedResult)
     })
+
+    it('should return an error message if the user is already in the organisation', async () => {
+      const exampleUser1 = { id: 1, name: 'User 1' }
+      const exampleUser2 = { id: 2, name: 'User 2' }
+
+      const exampleOrgWithUsers = {
+        ...exampleOrg1,
+        users: [exampleUser1, exampleUser2],
+      }
+      PrismaClientMock.organisation.findUnique.mockResolvedValueOnce(exampleOrgWithUsers)
+      PrismaClientMock.organisation.update.mockResolvedValueOnce(exampleOrgWithUsers)
+
+      const orgID = 1
+      const userID = 2
+
+      const expectedResult = {
+        message: `User with ID: ${userID} already in organisation with ID: ${orgID}`,
+        user: null,
+      }
+      await expect(orgController.addUserToOrganisation(orgID, userID)).resolves.toEqual(
+        expectedResult,
+      )
+    })
   })
 
   describe('removeUserFromOrganisation', () => {
     it('should remove a user from the organisation and return a success message', async () => {
       const exampleUser1 = { id: 1, name: 'User 1' }
+      const exampleUser2 = { id: 2, name: 'User 2' }
+
       const exampleOrgWithUsers = {
         ...exampleOrg1,
-        users: [exampleUser1, { id: 2, name: 'User 2' }],
+        users: [exampleUser1, exampleUser2],
       }
 
+      PrismaClientMock.organisation.findUnique.mockResolvedValueOnce(exampleOrg1)
       PrismaClientMock.organisation.update.mockResolvedValueOnce(exampleOrgWithUsers)
 
       const orgID = 1
@@ -276,6 +303,7 @@ describe('OrganisationsController', () => {
 
       const expectedResult = {
         message: `User with ID: ${userID} removed from organisation with ID: ${orgID}`,
+        user: null,
       }
 
       await expect(orgController.removeUserFromOrganisation(orgID, userID)).resolves.toEqual(
@@ -285,9 +313,11 @@ describe('OrganisationsController', () => {
 
     it('should return an error message if the user does not exist', async () => {
       const exampleUser1 = { id: 1, name: 'User 1' }
+      const exampleUser2 = { id: 2, name: 'User 2' }
+
       const exampleOrgWithUsers = {
         ...exampleOrg1,
-        users: [exampleUser1, { id: 2, name: 'User 2' }],
+        users: [exampleUser1, exampleUser2],
       }
       PrismaClientMock.organisation.update.mockRejectedValueOnce(exampleOrgWithUsers)
 
@@ -295,7 +325,25 @@ describe('OrganisationsController', () => {
       const userID = 3
 
       const expectedResult = {
-        message: 'Error removing user from organisation',
+        message: `User with ID: ${userID} not in organisation with ID: ${orgID}`,
+        user: null,
+      }
+      await expect(orgController.removeUserFromOrganisation(orgID, userID)).resolves.toEqual(
+        expectedResult,
+      )
+    })
+    it('should return an error message if the user is not in the organisation', async () => {
+      const exampleOrgWithUsers = {
+        ...exampleOrg1,
+        users: [{ id: 2, name: 'User 2' }],
+      }
+      PrismaClientMock.organisation.update.mockResolvedValueOnce(exampleOrgWithUsers)
+
+      const orgID = 1
+      const userID = 2
+
+      const expectedResult = {
+        message: `User with ID: ${userID} not in organisation with ID: ${orgID}`,
         user: null,
       }
       await expect(orgController.removeUserFromOrganisation(orgID, userID)).resolves.toEqual(

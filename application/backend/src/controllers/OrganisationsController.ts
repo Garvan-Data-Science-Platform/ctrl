@@ -226,6 +226,23 @@ export class OrganisationsController extends Controller {
     @Path() userID: number,
   ): Promise<{ message: string }> {
     try {
+      // Check if user already in organisation
+      const userInOrganisation = await this.organisationRepo.findUnique({
+        where: {
+          id: orgID,
+          users: { some: { id: userID } },
+        },
+      })
+
+      if (userInOrganisation) {
+        const error = {
+          message: `User with ID: ${userID} already in organisation with ID: ${orgID}`,
+          user: null,
+        }
+        logger.error({ ...error })
+        return error
+      }
+
       // Add user to organisation
       await this.organisationRepo.update({
         where: { id: orgID },
@@ -249,8 +266,25 @@ export class OrganisationsController extends Controller {
   public async removeUserFromOrganisation(
     @Path() orgID: number,
     @Path() userID: number,
-  ): Promise<{ message: string }> {
+  ): Promise<{ message: string; user: User | null }> {
     try {
+      // Check if user is actually in the organisation
+      const userInOrganisation = await this.organisationRepo.findUnique({
+        where: {
+          id: orgID,
+          users: { some: { id: userID } },
+        },
+      })
+
+      if (!userInOrganisation) {
+        const error = {
+          message: `User with ID: ${userID} not in organisation with ID: ${orgID}`,
+          user: null,
+        }
+        logger.error({ ...error })
+        return error
+      }
+
       // Remove user from organisation
       await this.organisationRepo.update({
         where: { id: orgID },
@@ -258,6 +292,7 @@ export class OrganisationsController extends Controller {
       })
       const responseData = {
         message: `User with ID: ${userID} removed from organisation with ID: ${orgID}`,
+        user: null,
       }
       logger.info({ ...responseData })
       return responseData
