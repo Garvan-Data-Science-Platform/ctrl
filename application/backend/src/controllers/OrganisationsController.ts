@@ -13,7 +13,7 @@ import {
 } from 'tsoa'
 import logger from 'common/src/logger'
 import prisma from '../PrismaClient'
-import { type Organisation } from '../../prisma/generated/client'
+import { User, type Organisation } from '../../prisma/generated/client'
 import { type OrganisationCreationRequest, type OrganisationUpdateRequest } from 'common/src/index'
 
 @Route('organisations')
@@ -180,6 +180,90 @@ export class OrganisationsController extends Controller {
     } catch (err) {
       const error = { message: 'Error deleting organisation', deletedOrganisation: null }
       logger.error({ ...error, err })
+      return error
+    }
+  }
+
+  @Get('/{orgID}/organisations/users')
+  @SuccessResponse('200', 'OK')
+  @Response('500', 'Internal Server Error')
+  @Response('404', 'Not Found')
+  public async getOrganisationUsers(@Path() orgID: number): Promise<{
+    message: string
+    users: User[] | null
+  }> {
+    try {
+      const organisation = await this.organisationRepo.findUnique({
+        where: { id: orgID },
+        include: { users: true },
+      })
+
+      if (!organisation) {
+        const error = { message: `Organisation with ID: ${orgID} not found`, users: null }
+        logger.error({ ...error })
+        this.setStatus(404)
+        return error
+      }
+
+      const responseData = {
+        message: `Got users of organisation with ID: ${orgID}`,
+        users: organisation.users,
+      }
+      logger.info({ ...responseData })
+      return responseData
+    } catch (err) {
+      const error = { message: 'Error getting users of organisation', users: null }
+      logger.error({ ...error })
+      return error
+    }
+  }
+
+  @Post('/{orgID}/users/{userID}')
+  @SuccessResponse('200', 'OK')
+  @Response('500', 'Internal Server Error')
+  public async addUserToOrganisation(
+    @Path() orgID: number,
+    @Path() userID: number,
+  ): Promise<{ message: string }> {
+    try {
+      // Add user to organisation
+      await this.organisationRepo.update({
+        where: { id: orgID },
+        data: { users: { connect: { id: userID } } },
+      })
+      const responseData = {
+        message: `User with ID: ${userID} added to organisation with ID: ${orgID}`,
+      }
+      logger.info({ ...responseData })
+      return responseData
+    } catch (err) {
+      const error = { message: 'Error adding user to organisation', user: null }
+      logger.error({ ...error })
+      return error
+    }
+  }
+
+  @Delete('/{orgID}/users/{userID}')
+  @SuccessResponse('200', 'OK')
+  @Response('500', 'Internal Server Error')
+  public async removeUserFromOrganisation(
+    @Path() orgID: number,
+    @Path() userID: number,
+  ): Promise<{ message: string }> {
+    try {
+      // Remove user from organisation
+      await this.organisationRepo.update({
+        where: { id: orgID },
+        data: { users: { disconnect: { id: userID } } },
+      })
+      const responseData = {
+        message: `User with ID: ${userID} removed from organisation with ID: ${orgID}`,
+      }
+      logger.info({ ...responseData })
+      return responseData
+    } catch (err) {
+      const error = { message: 'Error removing user from organisation', user: null }
+      logger.error({ ...error })
       return error
     }
   }
