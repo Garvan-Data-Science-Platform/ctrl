@@ -508,7 +508,7 @@
 						"description": "Internal Server Error"
 					}
 				},
-				"description": "Create a new organisation",
+				"description": "createOrganisation",
 				"summary": "Create a new Organisation",
 				"tags": [
 					"Organisations"
@@ -620,7 +620,7 @@
 						"description": "Internal Server Error"
 					}
 				},
-				"description": "Update an existing organisation",
+				"description": "updateOrganisation",
 				"summary": "Update an existing Organisation",
 				"tags": [
 					"Organisations"
@@ -685,7 +685,7 @@
 						"description": "Internal Server Error"
 					}
 				},
-				"description": "Delete an existing organisation",
+				"description": "deleteOrganisation",
 				"summary": "Delete an existing Organisation",
 				"tags": [
 					"Organisations"
@@ -741,7 +741,7 @@
 						"description": "Internal Server Error"
 					}
 				},
-				"description": "Get Organisation Users",
+				"description": "getOrganisationUsers",
 				"summary": "Get all Users within a specific Organisation",
 				"tags": [
 					"Organisations"
@@ -786,7 +786,7 @@
 						"description": "Internal Server Error"
 					}
 				},
-				"description": "Add User to Organisation",
+				"description": "addUserToOrganisation",
 				"summary": "Add specific User to specific Organisation",
 				"tags": [
 					"Organisations"
@@ -847,7 +847,7 @@
 						"description": "Internal Server Error"
 					}
 				},
-				"description": "Remove User from Organisation",
+				"description": "removeUserFromOrganisation",
 				"summary": "Removes a specific User from a specific Organisation",
 				"tags": [
 					"Organisations"
