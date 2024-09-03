@@ -63,7 +63,7 @@ export class OrganisationsController extends Controller {
   }
 
   /**
-   * Create a new organisation
+   * createOrganisation
    *
    * @summary Create a new Organisation
    */
@@ -98,7 +98,7 @@ export class OrganisationsController extends Controller {
   }
 
   /**
-   * Update an existing organisation
+   * updateOrganisation
    *
    * @summary Update an existing Organisation
    */
@@ -143,7 +143,7 @@ export class OrganisationsController extends Controller {
   }
 
   /**
-   * Delete an existing organisation
+   * deleteOrganisation
    *
    * @summary Delete an existing Organisation
    */
@@ -185,7 +185,7 @@ export class OrganisationsController extends Controller {
   }
 
   /**
-   * Get Organisation Users
+   * getOrganisationUsers
    *
    * @summary Get all Users within a specific Organisation
    */
@@ -224,7 +224,7 @@ export class OrganisationsController extends Controller {
   }
 
   /**
-   * Add User to Organisation
+   * addUserToOrganisation
    *
    * @summary Add specific User to specific Organisation
    */
@@ -271,7 +271,7 @@ export class OrganisationsController extends Controller {
   }
 
   /**
-   * Remove User from Organisation
+   * removeUserFromOrganisation
    *
    * @summary Removes a specific User from a specific Organisation
    */
