@@ -741,6 +741,8 @@
 						"description": "Internal Server Error"
 					}
 				},
+				"description": "Get Organisation Users",
+				"summary": "Get all Users within a specific Organisation",
 				"tags": [
 					"Organisations"
 				],
@@ -784,6 +786,8 @@
 						"description": "Internal Server Error"
 					}
 				},
+				"description": "Add User to Organisation",
+				"summary": "Add specific User to specific Organisation",
 				"tags": [
 					"Organisations"
 				],
@@ -818,11 +822,20 @@
 							"application/json": {
 								"schema": {
 									"properties": {
+										"user": {
+											"allOf": [
+												{
+													"$ref": "#/components/schemas/User"
+												}
+											],
+											"nullable": true
+										},
 										"message": {
 											"type": "string"
 										}
 									},
 									"required": [
+										"user",
 										"message"
 									],
 									"type": "object"
@@ -834,6 +847,8 @@
 						"description": "Internal Server Error"
 					}
 				},
+				"description": "Remove User from Organisation",
+				"summary": "Removes a specific User from a specific Organisation",
 				"tags": [
 					"Organisations"
 				],

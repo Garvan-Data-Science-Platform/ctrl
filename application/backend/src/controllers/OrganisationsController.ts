@@ -184,6 +184,11 @@ export class OrganisationsController extends Controller {
     }
   }
 
+  /**
+   * Get Organisation Users
+   *
+   * @summary Get all Users within a specific Organisation
+   */
   @Get('/{orgID}/organisations/users')
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
@@ -218,6 +223,11 @@ export class OrganisationsController extends Controller {
     }
   }
 
+  /**
+   * Add User to Organisation
+   *
+   * @summary Add specific User to specific Organisation
+   */
   @Post('/{orgID}/users/{userID}')
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
@@ -260,6 +270,11 @@ export class OrganisationsController extends Controller {
     }
   }
 
+  /**
+   * Remove User from Organisation
+   *
+   * @summary Removes a specific User from a specific Organisation
+   */
   @Delete('/{orgID}/users/{userID}')
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
