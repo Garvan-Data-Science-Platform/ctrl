@@ -189,7 +189,7 @@ export class OrganisationsController extends Controller {
    *
    * @summary Get all Users within a specific Organisation
    */
-  @Get('/{orgID}/organisations/users')
+  @Get('/{orgID}/users')
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
   @Response('404', 'Not Found')

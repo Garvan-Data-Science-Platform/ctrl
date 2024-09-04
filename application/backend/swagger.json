@@ -704,7 +704,7 @@
 				]
 			}
 		},
-		"/organisations/{orgID}/organisations/users": {
+		"/organisations/{orgID}/users": {
 			"get": {
 				"operationId": "GetOrganisationUsers",
 				"responses": {
