@@ -1,4 +1,4 @@
-import { PrismaClient, User } from '../generated/client'
+import { PrismaClient } from '../generated/client'
 import * as data from './seedUserData.json'
 
 const prisma = new PrismaClient()

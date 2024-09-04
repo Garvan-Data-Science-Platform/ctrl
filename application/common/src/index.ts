@@ -18,3 +18,11 @@ export interface UserUpdateRequest {
   email?: string
   role?: string
 }
+
+export interface OrganisationCreationRequest {
+  name: string
+}
+
+export interface OrganisationUpdateRequest {
+  name?: string
+}

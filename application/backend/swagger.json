@@ -91,6 +91,57 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"DefaultSelection_Prisma._36_OrganisationPayload_": {
+				"properties": {
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"name": {
+						"type": "string"
+					},
+					"id": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"updatedAt",
+					"createdAt",
+					"name",
+					"id"
+				],
+				"type": "object"
+			},
+			"Organisation": {
+				"$ref": "#/components/schemas/DefaultSelection_Prisma._36_OrganisationPayload_",
+				"description": "Model Organisation"
+			},
+			"OrganisationCreationRequest": {
+				"properties": {
+					"name": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"name"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"OrganisationUpdateRequest": {
+				"properties": {
+					"name": {
+						"type": "string"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
 			"Workspace": {
 				"properties": {
 					"version": {
@@ -370,6 +421,448 @@
 				],
 				"security": [],
 				"parameters": [
+					{
+						"in": "path",
+						"name": "userID",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/organisations": {
+			"get": {
+				"operationId": "GetAllOrganisations",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"organisations": {
+											"items": {
+												"$ref": "#/components/schemas/Organisation"
+											},
+											"type": "array"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"organisations",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error"
+					}
+				},
+				"description": "getAllOrganisations",
+				"summary": "Get all Organisations",
+				"tags": [
+					"Organisations"
+				],
+				"security": [],
+				"parameters": []
+			},
+			"post": {
+				"operationId": "CreateOrganisation",
+				"responses": {
+					"201": {
+						"description": "Created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"newOrganisation": {
+											"allOf": [
+												{
+													"$ref": "#/components/schemas/Organisation"
+												}
+											],
+											"nullable": true
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"newOrganisation",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error"
+					}
+				},
+				"description": "createOrganisation",
+				"summary": "Create a new Organisation",
+				"tags": [
+					"Organisations"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/OrganisationCreationRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/organisations/{orgID}": {
+			"get": {
+				"operationId": "GetOrganisationById",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"organisation": {
+											"allOf": [
+												{
+													"$ref": "#/components/schemas/Organisation"
+												}
+											],
+											"nullable": true
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"organisation",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found"
+					},
+					"500": {
+						"description": "Internal Server Error"
+					}
+				},
+				"description": "getOrganisationById",
+				"summary": "Get a specific Organisation",
+				"tags": [
+					"Organisations"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgID",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"put": {
+				"operationId": "UpdateOrganisation",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"updatedOrganisation": {
+											"allOf": [
+												{
+													"$ref": "#/components/schemas/Organisation"
+												}
+											],
+											"nullable": true
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"updatedOrganisation",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found"
+					},
+					"500": {
+						"description": "Internal Server Error"
+					}
+				},
+				"description": "updateOrganisation",
+				"summary": "Update an existing Organisation",
+				"tags": [
+					"Organisations"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgID",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/OrganisationUpdateRequest"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteOrganisation",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"deletedOrganisation": {
+											"allOf": [
+												{
+													"$ref": "#/components/schemas/Organisation"
+												}
+											],
+											"nullable": true
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"deletedOrganisation",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found"
+					},
+					"500": {
+						"description": "Internal Server Error"
+					}
+				},
+				"description": "deleteOrganisation",
+				"summary": "Delete an existing Organisation",
+				"tags": [
+					"Organisations"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgID",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/organisations/{orgID}/users": {
+			"get": {
+				"operationId": "GetOrganisationUsers",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"users": {
+											"items": {
+												"$ref": "#/components/schemas/User"
+											},
+											"type": "array",
+											"nullable": true
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"users",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found"
+					},
+					"500": {
+						"description": "Internal Server Error"
+					}
+				},
+				"description": "getOrganisationUsers",
+				"summary": "Get all Users within a specific Organisation",
+				"tags": [
+					"Organisations"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgID",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/organisations/{orgID}/users/{userID}": {
+			"post": {
+				"operationId": "AddUserToOrganisation",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error"
+					}
+				},
+				"description": "addUserToOrganisation",
+				"summary": "Add specific User to specific Organisation",
+				"tags": [
+					"Organisations"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgID",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "path",
+						"name": "userID",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"delete": {
+				"operationId": "RemoveUserFromOrganisation",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"user": {
+											"allOf": [
+												{
+													"$ref": "#/components/schemas/User"
+												}
+											],
+											"nullable": true
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"user",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error"
+					}
+				},
+				"description": "removeUserFromOrganisation",
+				"summary": "Removes a specific User from a specific Organisation",
+				"tags": [
+					"Organisations"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orgID",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
 					{
 						"in": "path",
 						"name": "userID",
