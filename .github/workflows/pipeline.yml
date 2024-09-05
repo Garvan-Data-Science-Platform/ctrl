@@ -21,8 +21,4 @@ jobs:
         run: docker run ctrl-next:latest yarn test
 
   security-checks:
-    name: security checks
-    runs-on: ubuntu-latest
-    steps:
-      - name: Snyk Check
-        uses: Garvan-Data-Science-Platform/reusable-ci-actions/.github/workflows/security-audit.yml@feature/39-security-audits
+    uses: Garvan-Data-Science-Platform/reusable-ci-actions/.github/workflows/security-audit.yml@feature/39-security-audits
