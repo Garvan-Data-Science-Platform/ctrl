@@ -23,3 +23,5 @@ jobs:
         run: docker run ctrl-next:latest yarn test
   security-checks:
     uses: Garvan-Data-Science-Platform/reusable-ci-actions/.github/workflows/security-audit.yml@main
+    secrets:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
