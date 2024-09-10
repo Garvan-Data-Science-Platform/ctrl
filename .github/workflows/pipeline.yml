@@ -1,6 +1,8 @@
 name: Build checks
 
-on: [push]
+on:
+  workflow_dispatch:
+  push:
 
 jobs:
   build-checks:
