@@ -1,7 +1,7 @@
 import { UsersController } from './UsersController'
 import { type UserCreationRequest, type UserUpdateRequest } from 'common'
 import { PrismaClientMock } from '../PrismaClientMock'
-import { Prisma } from '../../prisma/generated/client'
+import { Prisma } from '@prisma/client'
 
 const exampleUser1 = {
   id: 1,
