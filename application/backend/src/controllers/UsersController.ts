@@ -13,7 +13,7 @@ import {
 } from 'tsoa'
 import logger from 'common/src/logger'
 import { type UserCreationRequest, type UserUpdateRequest } from 'common'
-import { type User } from '../../prisma/generated/client'
+import { User } from '@prisma/client'
 import prisma from '../PrismaClient'
 
 @Route('users')

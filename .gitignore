@@ -13,6 +13,3 @@
 # Dependency directories
 node_modules/
 application/*/dist/
-
-# Prisma
-application/*/prisma/generated

@@ -1,7 +1,7 @@
 import { OrganisationsController } from './OrganisationsController'
 import { PrismaClientMock } from '../PrismaClientMock'
 import { OrganisationCreationRequest, OrganisationUpdateRequest } from 'common/src/index'
-import { Prisma } from '../../prisma/generated/client'
+import { Prisma } from '@prisma/client'
 
 const exampleOrg1 = {
   id: 1,
