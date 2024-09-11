@@ -48,27 +48,18 @@ export default function NavBar() {
   }
 
   return (
-    <AppBar position="static" color="transparent" sx={{ boxShadow: '1' }}>
+    <AppBar position="static" sx={{ boxShadow: 'none', left: 0, backgroundColor: 'white' }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
-          <Typography
-            variant="h6"
-            noWrap
-            component="a"
-            href="#app-bar-with-responsive-menu"
-            sx={{
-              mr: 2,
-              display: { xs: 'none', md: 'flex' },
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
-            }}
-          >
-            LOGO
-          </Typography>
+          <Box>
+            <img
+              src="./australian-genomics-logo.png"
+              height={30}
+              onClick={() => nav('/')}
+              style={{ marginRight: 20, cursor: 'pointer' }}
+            />
+          </Box>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
