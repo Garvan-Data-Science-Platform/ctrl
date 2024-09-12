@@ -7,10 +7,11 @@ import { blue, red } from '@mui/material/colors'
 import { RouterProvider } from 'react-router-dom'
 import router from './router.tsx'
 import { AuthProvider } from './auth'
+import { useBearStore } from './store.ts'
 
 function App() {
-  const [count, setCount] = useState(0)
-  const theme = customTheme({ primary: count >= 0 ? red : blue, secondary: blue })
+  const bear = useBearStore()
+  const theme = customTheme({ primary: bear.bears >= 3 ? red : blue, secondary: blue })
 
   return (
     <AuthProvider>
