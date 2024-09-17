@@ -1,6 +1,5 @@
-import { useState } from 'react'
 import './App.css'
-import { Box, Button, ThemeProvider } from '@mui/material'
+import { Box, ThemeProvider } from '@mui/material'
 import customTheme from './theme'
 import { blue, red } from '@mui/material/colors'
 
