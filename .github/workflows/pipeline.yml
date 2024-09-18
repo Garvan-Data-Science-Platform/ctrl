@@ -13,8 +13,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '20.10.0'
-      - run: corepack enable
-      - run: yarn
+      - run: corepack enable && yarn install && yarn build
       - name: Check Types
         run: yarn type-check
       - name: Format Code
