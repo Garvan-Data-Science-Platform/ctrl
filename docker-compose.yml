@@ -4,19 +4,10 @@ services:
     image: postgres:16-alpine
     ports:
       - '5432:5432'
-    env_file: application/backend/.env
+    #env_file: application/backend/.env
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 1s
       timeout: 1s
       retries: 60
     command: ['postgres', '-c', 'log_statement=all']
-
-  app:
-    image: 'ctrl-next:latest'
-    environment:
-      POSTGRES_HOST: db
-
-    ports:
-      - '3000:3000'
-      - '5000:5000'

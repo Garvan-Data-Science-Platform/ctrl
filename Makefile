@@ -7,19 +7,22 @@ NODE_VERSION=$(shell cat .nvmrc|sed 's/^v//')
 help:
 	@echo "--- List of available targets:"
 	@echo "- help - print this help message."
-	@echo "- docker-build - build/tag the ctrl-next:latest Docker image."
-	@echo "- docker-run - run ctrl-next and its DB from docker images."
-	@echo "- docker-stop - stop the ctrl-next and DB docker containers"
-	@echo "- docker-run-db - run the DB from its docker image"
+	@echo "- e2e - spin up db/frontend/backend and run e2e tests"
+	@echo "- db - spin up db"
 
-docker-build:
-	docker build --build-arg="NODE_VERSION=$(NODE_VERSION)" -t ctrl-next:latest .
+e2e:
+	docker compose up -d
+	yarn workspace backend build
+	yarn workspace user-client build
+	yarn workspace backend start & \
+	export BACKEND_PID=$$! ; \
+	yarn workspace user-client preview & \
+	export FRONTEND_PID=$$! ; \
+	yarn workspace user-client cy:run; \
+	export EXIT_CODE=$$?;\
+	kill $${FRONTEND_PID}; \
+	kill $${BACKEND_PID}; \
+    exit $$EXIT_CODE
 
-docker-run:
-	docker compose up
-
-docker-stop:
-	docker compose down
-
-docker-run-db:
-	docker compose up db
+db: 
+	docker compose up -d
