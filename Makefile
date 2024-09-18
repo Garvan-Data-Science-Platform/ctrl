@@ -19,8 +19,10 @@ e2e:
 	yarn workspace user-client preview & \
 	export FRONTEND_PID=$$! ; \
 	yarn workspace user-client cy:run; \
+	export EXIT_CODE=$$?;\
 	kill $${FRONTEND_PID}; \
-	kill $${BACKEND_PID}
+	kill $${BACKEND_PID}; \
+    exit $$EXIT_CODE
 
 db: 
 	docker compose up -d
