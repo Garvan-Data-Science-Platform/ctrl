@@ -9,16 +9,21 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-      - name: Build Image
-        run: make docker-build
+      - name: Setup Nodejs and npm
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20.10.0'
       - name: Check Types
-        run: docker run ctrl-next:latest yarn type-check
+        run: yarn type-check
       - name: Format Code
-        run: docker run ctrl-next:latest yarn format
+        run: yarn format
       - name: Lint Code
-        run: docker run ctrl-next:latest yarn lint
+        run: yarn lint
       - name: Run Unit Testing
-        run: docker run ctrl-next:latest yarn test
+        run: yarn test
+      - name: e2e tests
+        run: make e2e
+
   security-checks:
     uses: Garvan-Data-Science-Platform/reusable-ci-actions/.github/workflows/security-audit.yml@main
     secrets: inherit
