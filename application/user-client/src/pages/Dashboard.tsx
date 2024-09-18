@@ -10,13 +10,13 @@ import {
 } from '@mui/material'
 import NavBar from '../components/NavBar'
 import { useBearStore } from '../store'
-import { useForm, SubmitHandler } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 
 export default function Dashboard() {
   const bears = useBearStore()
 
   const { register, handleSubmit } = useForm()
-  const onSubmit = (data) => console.log(data)
+  const onSubmit = (data: unknown) => console.log(data)
 
   return (
     <>

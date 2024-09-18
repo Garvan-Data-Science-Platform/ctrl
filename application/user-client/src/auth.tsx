@@ -3,13 +3,15 @@ import { Outlet, Navigate } from 'react-router-dom'
 
 const AuthContext = createContext({
   isAuthenticated: true,
-  login: (token) => {},
+  login: (token: string) => {
+    console.log(token)
+  },
   logout: () => {},
 })
 
-export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState<String | null>('DUMMY_TOKEN')
-  const login = (userToken: String) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [token, setToken] = useState<string | null>('DUMMY_TOKEN')
+  const login = (userToken: string) => {
     setToken(userToken)
   }
   const logout = () => {
