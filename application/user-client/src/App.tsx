@@ -7,19 +7,23 @@ import { RouterProvider } from 'react-router-dom'
 import router from './router.tsx'
 import { AuthProvider } from './auth'
 import { useBearStore } from './store.ts'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 function App() {
   const bear = useBearStore()
   const theme = customTheme({ primary: bear.bears >= 3 ? red : blue, secondary: blue })
+  const queryClient = new QueryClient()
 
   return (
-    <AuthProvider>
-      <ThemeProvider theme={theme}>
-        <Box sx={{ backgroundColor: '#f8fbff', height: '100vh' }}>
-          <RouterProvider router={router} />
-        </Box>
-      </ThemeProvider>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <ThemeProvider theme={theme}>
+          <Box sx={{ backgroundColor: '#f8fbff', height: '100vh' }}>
+            <RouterProvider router={router} />
+          </Box>
+        </ThemeProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   )
 }
 
