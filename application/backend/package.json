@@ -8,7 +8,7 @@
     "test": "jest --detectOpenHandles --coverage",
     "tsoa:spec": "tsoa spec",
     "tsoa:routes": "tsoa routes",
-    "build-docs": "yarn run tsoa:routes && yarn run tsoa:spec",
+    "build-docs": "yarn run tsoa:routes && yarn run tsoa:spec && tsx scripts/replace-refs.ts",
     "prisma:generate": "yarn prisma generate",
     "prisma:seed": "yarn prisma db seed",
     "prisma:migrate": "yarn prisma migrate dev"

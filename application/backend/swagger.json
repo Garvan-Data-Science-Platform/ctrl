@@ -1,961 +1,955 @@
 {
-	"openapi": "3.0.0",
-	"components": {
-		"examples": {},
-		"headers": {},
-		"parameters": {},
-		"requestBodies": {},
-		"responses": {},
-		"schemas": {
-			"DefaultSelection_Prisma._36_UserPayload_": {
-				"properties": {
-					"updatedAt": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"createdAt": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"role": {
-						"type": "string"
-					},
-					"email": {
-						"type": "string"
-					},
-					"lastName": {
-						"type": "string"
-					},
-					"firstName": {
-						"type": "string"
-					},
-					"id": {
-						"type": "number",
-						"format": "double"
-					}
-				},
-				"required": [
-					"updatedAt",
-					"createdAt",
-					"role",
-					"email",
-					"lastName",
-					"firstName",
-					"id"
-				],
-				"type": "object"
-			},
-			"User": {
-				"$ref": "#/components/schemas/DefaultSelection_Prisma._36_UserPayload_",
-				"description": "Model User"
-			},
-			"UserCreationRequest": {
-				"properties": {
-					"firstName": {
-						"type": "string"
-					},
-					"lastName": {
-						"type": "string"
-					},
-					"email": {
-						"type": "string"
-					},
-					"role": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"firstName",
-					"lastName",
-					"email",
-					"role"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"UserUpdateRequest": {
-				"properties": {
-					"firstName": {
-						"type": "string"
-					},
-					"lastName": {
-						"type": "string"
-					},
-					"email": {
-						"type": "string"
-					},
-					"role": {
-						"type": "string"
-					}
-				},
-				"type": "object",
-				"additionalProperties": false
-			},
-			"DefaultSelection_Prisma._36_OrganisationPayload_": {
-				"properties": {
-					"updatedAt": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"createdAt": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"name": {
-						"type": "string"
-					},
-					"id": {
-						"type": "number",
-						"format": "double"
-					}
-				},
-				"required": [
-					"updatedAt",
-					"createdAt",
-					"name",
-					"id"
-				],
-				"type": "object"
-			},
-			"Organisation": {
-				"$ref": "#/components/schemas/DefaultSelection_Prisma._36_OrganisationPayload_",
-				"description": "Model Organisation"
-			},
-			"OrganisationCreationRequest": {
-				"properties": {
-					"name": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"name"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"OrganisationUpdateRequest": {
-				"properties": {
-					"name": {
-						"type": "string"
-					}
-				},
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Workspace": {
-				"properties": {
-					"version": {
-						"type": "string"
-					},
-					"name": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"version",
-					"name"
-				],
-				"type": "object"
-			}
-		},
-		"securitySchemes": {}
-	},
-	"info": {
-		"title": "backend",
-		"contact": {}
-	},
-	"paths": {
-		"/users": {
-			"get": {
-				"operationId": "GetAllUsers",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"users": {
-											"items": {
-												"$ref": "#/components/schemas/User"
-											},
-											"type": "array"
-										},
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"users",
-										"message"
-									],
-									"type": "object"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error"
-					}
-				},
-				"description": "Get all Users",
-				"summary": "Get all Users",
-				"tags": [
-					"Users"
-				],
-				"security": [],
-				"parameters": []
-			},
-			"post": {
-				"operationId": "CreateUser",
-				"responses": {
-					"201": {
-						"description": "Created",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"newUser": {
-											"allOf": [
-												{
-													"$ref": "#/components/schemas/User"
-												}
-											],
-											"nullable": true
-										},
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"newUser",
-										"message"
-									],
-									"type": "object"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error"
-					}
-				},
-				"description": "Create and persist a new user.",
-				"summary": "Create a new User",
-				"tags": [
-					"Users"
-				],
-				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/UserCreationRequest"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/users/{userID}": {
-			"get": {
-				"operationId": "GetUserById",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"user": {
-											"allOf": [
-												{
-													"$ref": "#/components/schemas/User"
-												}
-											],
-											"nullable": true
-										},
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"user",
-										"message"
-									],
-									"type": "object"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error"
-					}
-				},
-				"description": "Gets a Specific User using their ID",
-				"summary": "Get Specific User",
-				"tags": [
-					"Users"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "userID",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			},
-			"put": {
-				"operationId": "UpdateUser",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"updatedUser": {
-											"allOf": [
-												{
-													"$ref": "#/components/schemas/User"
-												}
-											],
-											"nullable": true
-										},
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"updatedUser",
-										"message"
-									],
-									"type": "object"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found"
-					},
-					"500": {
-						"description": "Internal Server Error"
-					}
-				},
-				"description": "Update an existing user.",
-				"summary": "Update a User",
-				"tags": [
-					"Users"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "userID",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/UserUpdateRequest"
-							}
-						}
-					}
-				}
-			},
-			"delete": {
-				"operationId": "DeleteUser",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"deletedUser": {
-											"allOf": [
-												{
-													"$ref": "#/components/schemas/User"
-												}
-											],
-											"nullable": true
-										},
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"deletedUser",
-										"message"
-									],
-									"type": "object"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found"
-					},
-					"500": {
-						"description": "Internal Server Error"
-					}
-				},
-				"description": "Delete a user.",
-				"summary": "Delete a User",
-				"tags": [
-					"Users"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "userID",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			}
-		},
-		"/organisations": {
-			"get": {
-				"operationId": "GetAllOrganisations",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"organisations": {
-											"items": {
-												"$ref": "#/components/schemas/Organisation"
-											},
-											"type": "array"
-										},
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"organisations",
-										"message"
-									],
-									"type": "object"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error"
-					}
-				},
-				"description": "getAllOrganisations",
-				"summary": "Get all Organisations",
-				"tags": [
-					"Organisations"
-				],
-				"security": [],
-				"parameters": []
-			},
-			"post": {
-				"operationId": "CreateOrganisation",
-				"responses": {
-					"201": {
-						"description": "Created",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"newOrganisation": {
-											"allOf": [
-												{
-													"$ref": "#/components/schemas/Organisation"
-												}
-											],
-											"nullable": true
-										},
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"newOrganisation",
-										"message"
-									],
-									"type": "object"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error"
-					}
-				},
-				"description": "createOrganisation",
-				"summary": "Create a new Organisation",
-				"tags": [
-					"Organisations"
-				],
-				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/OrganisationCreationRequest"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/organisations/{orgID}": {
-			"get": {
-				"operationId": "GetOrganisationById",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"organisation": {
-											"allOf": [
-												{
-													"$ref": "#/components/schemas/Organisation"
-												}
-											],
-											"nullable": true
-										},
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"organisation",
-										"message"
-									],
-									"type": "object"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found"
-					},
-					"500": {
-						"description": "Internal Server Error"
-					}
-				},
-				"description": "getOrganisationById",
-				"summary": "Get a specific Organisation",
-				"tags": [
-					"Organisations"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "orgID",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			},
-			"put": {
-				"operationId": "UpdateOrganisation",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"updatedOrganisation": {
-											"allOf": [
-												{
-													"$ref": "#/components/schemas/Organisation"
-												}
-											],
-											"nullable": true
-										},
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"updatedOrganisation",
-										"message"
-									],
-									"type": "object"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found"
-					},
-					"500": {
-						"description": "Internal Server Error"
-					}
-				},
-				"description": "updateOrganisation",
-				"summary": "Update an existing Organisation",
-				"tags": [
-					"Organisations"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "orgID",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/OrganisationUpdateRequest"
-							}
-						}
-					}
-				}
-			},
-			"delete": {
-				"operationId": "DeleteOrganisation",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"deletedOrganisation": {
-											"allOf": [
-												{
-													"$ref": "#/components/schemas/Organisation"
-												}
-											],
-											"nullable": true
-										},
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"deletedOrganisation",
-										"message"
-									],
-									"type": "object"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found"
-					},
-					"500": {
-						"description": "Internal Server Error"
-					}
-				},
-				"description": "deleteOrganisation",
-				"summary": "Delete an existing Organisation",
-				"tags": [
-					"Organisations"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "orgID",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			}
-		},
-		"/organisations/{orgID}/users": {
-			"get": {
-				"operationId": "GetOrganisationUsers",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"users": {
-											"items": {
-												"$ref": "#/components/schemas/User"
-											},
-											"type": "array",
-											"nullable": true
-										},
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"users",
-										"message"
-									],
-									"type": "object"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found"
-					},
-					"500": {
-						"description": "Internal Server Error"
-					}
-				},
-				"description": "getOrganisationUsers",
-				"summary": "Get all Users within a specific Organisation",
-				"tags": [
-					"Organisations"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "orgID",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			}
-		},
-		"/organisations/{orgID}/users/{userID}": {
-			"post": {
-				"operationId": "AddUserToOrganisation",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"message"
-									],
-									"type": "object"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error"
-					}
-				},
-				"description": "addUserToOrganisation",
-				"summary": "Add specific User to specific Organisation",
-				"tags": [
-					"Organisations"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "orgID",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					},
-					{
-						"in": "path",
-						"name": "userID",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			},
-			"delete": {
-				"operationId": "RemoveUserFromOrganisation",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"user": {
-											"allOf": [
-												{
-													"$ref": "#/components/schemas/User"
-												}
-											],
-											"nullable": true
-										},
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"user",
-										"message"
-									],
-									"type": "object"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error"
-					}
-				},
-				"description": "removeUserFromOrganisation",
-				"summary": "Removes a specific User from a specific Organisation",
-				"tags": [
-					"Organisations"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "orgID",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					},
-					{
-						"in": "path",
-						"name": "userID",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			}
-		},
-		"/healthcheck": {
-			"get": {
-				"operationId": "HealthCheck",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"message"
-									],
-									"type": "object"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error"
-					}
-				},
-				"description": "Health check to ensure server is up and running",
-				"summary": "Health Check",
-				"tags": [
-					"Healthcheck"
-				],
-				"security": [],
-				"parameters": []
-			}
-		},
-		"/healthcheck/workspaces": {
-			"get": {
-				"operationId": "GetAllWorkspaces",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"data": {
-											"items": {
-												"$ref": "#/components/schemas/Workspace"
-											},
-											"type": "array"
-										},
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"data",
-										"message"
-									],
-									"type": "object"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error"
-					}
-				},
-				"description": "Get all Workspaces",
-				"summary": "Get all Workspaces",
-				"tags": [
-					"Healthcheck"
-				],
-				"security": [],
-				"parameters": []
-			}
-		}
-	},
-	"servers": [
-		{
-			"url": "/"
-		}
-	]
+  "openapi": "3.0.0",
+  "components": {
+    "examples": {},
+    "headers": {},
+    "parameters": {},
+    "requestBodies": {},
+    "responses": {},
+    "schemas": {
+      "User": {
+        "description": "Model User",
+        "properties": {
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "role": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "id": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": [
+          "updatedAt",
+          "createdAt",
+          "role",
+          "email",
+          "lastName",
+          "firstName",
+          "id"
+        ],
+        "type": "object"
+      },
+      "UserCreationRequest": {
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "email",
+          "role"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UserUpdateRequest": {
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "additionalProperties": false
+      },
+      "Organisation": {
+        "description": "Model Organisation",
+        "properties": {
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": [
+          "updatedAt",
+          "createdAt",
+          "name",
+          "id"
+        ],
+        "type": "object"
+      },
+      "OrganisationCreationRequest": {
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "OrganisationUpdateRequest": {
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "additionalProperties": false
+      },
+      "Workspace": {
+        "properties": {
+          "version": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "version",
+          "name"
+        ],
+        "type": "object"
+      }
+    },
+    "securitySchemes": {}
+  },
+  "info": {
+    "title": "backend",
+    "contact": {}
+  },
+  "paths": {
+    "/users": {
+      "get": {
+        "operationId": "GetAllUsers",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "users": {
+                      "items": {
+                        "$ref": "#/components/schemas/User"
+                      },
+                      "type": "array"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "users",
+                    "message"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Get all Users",
+        "summary": "Get all Users",
+        "tags": [
+          "Users"
+        ],
+        "security": [],
+        "parameters": []
+      },
+      "post": {
+        "operationId": "CreateUser",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "newUser": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/User"
+                        }
+                      ],
+                      "nullable": true
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "newUser",
+                    "message"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Create and persist a new user.",
+        "summary": "Create a new User",
+        "tags": [
+          "Users"
+        ],
+        "security": [],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCreationRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{userID}": {
+      "get": {
+        "operationId": "GetUserById",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "user": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/User"
+                        }
+                      ],
+                      "nullable": true
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "user",
+                    "message"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Gets a Specific User using their ID",
+        "summary": "Get Specific User",
+        "tags": [
+          "Users"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userID",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      },
+      "put": {
+        "operationId": "UpdateUser",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "updatedUser": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/User"
+                        }
+                      ],
+                      "nullable": true
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "updatedUser",
+                    "message"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Update an existing user.",
+        "summary": "Update a User",
+        "tags": [
+          "Users"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userID",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserUpdateRequest"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "DeleteUser",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "deletedUser": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/User"
+                        }
+                      ],
+                      "nullable": true
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "deletedUser",
+                    "message"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Delete a user.",
+        "summary": "Delete a User",
+        "tags": [
+          "Users"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userID",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/organisations": {
+      "get": {
+        "operationId": "GetAllOrganisations",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "organisations": {
+                      "items": {
+                        "$ref": "#/components/schemas/Organisation"
+                      },
+                      "type": "array"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "organisations",
+                    "message"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "getAllOrganisations",
+        "summary": "Get all Organisations",
+        "tags": [
+          "Organisations"
+        ],
+        "security": [],
+        "parameters": []
+      },
+      "post": {
+        "operationId": "CreateOrganisation",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "newOrganisation": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/Organisation"
+                        }
+                      ],
+                      "nullable": true
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "newOrganisation",
+                    "message"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "createOrganisation",
+        "summary": "Create a new Organisation",
+        "tags": [
+          "Organisations"
+        ],
+        "security": [],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganisationCreationRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/organisations/{orgID}": {
+      "get": {
+        "operationId": "GetOrganisationById",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "organisation": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/Organisation"
+                        }
+                      ],
+                      "nullable": true
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "organisation",
+                    "message"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "getOrganisationById",
+        "summary": "Get a specific Organisation",
+        "tags": [
+          "Organisations"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orgID",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      },
+      "put": {
+        "operationId": "UpdateOrganisation",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "updatedOrganisation": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/Organisation"
+                        }
+                      ],
+                      "nullable": true
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "updatedOrganisation",
+                    "message"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "updateOrganisation",
+        "summary": "Update an existing Organisation",
+        "tags": [
+          "Organisations"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orgID",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganisationUpdateRequest"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "DeleteOrganisation",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "deletedOrganisation": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/Organisation"
+                        }
+                      ],
+                      "nullable": true
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "deletedOrganisation",
+                    "message"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "deleteOrganisation",
+        "summary": "Delete an existing Organisation",
+        "tags": [
+          "Organisations"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orgID",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/organisations/{orgID}/users": {
+      "get": {
+        "operationId": "GetOrganisationUsers",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "users": {
+                      "items": {
+                        "$ref": "#/components/schemas/User"
+                      },
+                      "type": "array",
+                      "nullable": true
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "users",
+                    "message"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "getOrganisationUsers",
+        "summary": "Get all Users within a specific Organisation",
+        "tags": [
+          "Organisations"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orgID",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/organisations/{orgID}/users/{userID}": {
+      "post": {
+        "operationId": "AddUserToOrganisation",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "addUserToOrganisation",
+        "summary": "Add specific User to specific Organisation",
+        "tags": [
+          "Organisations"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orgID",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "userID",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "RemoveUserFromOrganisation",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "user": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/User"
+                        }
+                      ],
+                      "nullable": true
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "user",
+                    "message"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "removeUserFromOrganisation",
+        "summary": "Removes a specific User from a specific Organisation",
+        "tags": [
+          "Organisations"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orgID",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "userID",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/healthcheck": {
+      "get": {
+        "operationId": "HealthCheck",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Health check to ensure server is up and running",
+        "summary": "Health Check",
+        "tags": [
+          "Healthcheck"
+        ],
+        "security": [],
+        "parameters": []
+      }
+    },
+    "/healthcheck/workspaces": {
+      "get": {
+        "operationId": "GetAllWorkspaces",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/Workspace"
+                      },
+                      "type": "array"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "message"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Get all Workspaces",
+        "summary": "Get all Workspaces",
+        "tags": [
+          "Healthcheck"
+        ],
+        "security": [],
+        "parameters": []
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ]
 }
