@@ -8,7 +8,7 @@ import {
   Route,
   Tags,
   Body,
-  Put,
+  Patch,
   Delete,
 } from 'tsoa'
 import logger from 'common/src/logger'
@@ -102,7 +102,7 @@ export class OrganisationsController extends Controller {
    *
    * @summary Update an existing Organisation
    */
-  @Put('/{orgID}')
+  @Patch('/{orgID}')
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
   @Response('404', 'Not Found')

@@ -1,6 +1,6 @@
 import {
   Get,
-  Put,
+  Patch,
   Post,
   Delete,
   Route,
@@ -104,7 +104,7 @@ export class UsersController extends Controller {
    *
    * @summary Update a User
    */
-  @Put('/{userID}')
+  @Patch('/{userID}')
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
   @Response('404', 'Not Found')
