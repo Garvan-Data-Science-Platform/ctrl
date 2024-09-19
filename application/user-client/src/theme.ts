@@ -10,6 +10,7 @@ function customTheme(props: ThemeProps) {
     palette: {
       primary: props.primary,
       secondary: props.secondary,
+      text: { primary: '#272952' },
     },
   })
 }
