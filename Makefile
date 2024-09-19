@@ -9,6 +9,7 @@ help:
 	@echo "- help - print this help message."
 	@echo "- e2e - spin up db/frontend/backend and run e2e tests"
 	@echo "- db - spin up db"
+	@echo "- "
 
 e2e:
 	docker compose up -d
@@ -23,6 +24,14 @@ e2e:
 	kill $${FRONTEND_PID}; \
 	kill $${BACKEND_PID}; \
     exit $$EXIT_CODE
+
+# Check everything that will run in ci
+check:
+	yarn type-check
+	yarn format
+	yarn lint
+	yarn test
+	make e2e
 
 db: 
 	docker compose up -d

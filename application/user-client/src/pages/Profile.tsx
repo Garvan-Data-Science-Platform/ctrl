@@ -1,4 +1,4 @@
-import { Button, Card, Table, Typography } from '@mui/material'
+import { Button, Card, Typography } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import NavBar from '../components/NavBar'
 import { useQuery } from '@tanstack/react-query'

@@ -7,8 +7,6 @@ import Typography from '@mui/material/Typography'
 import Menu from '@mui/material/Menu'
 import MenuIcon from '@mui/icons-material/Menu'
 import Container from '@mui/material/Container'
-import Avatar from '@mui/material/Avatar'
-import Tooltip from '@mui/material/Tooltip'
 import MenuItem from '@mui/material/MenuItem'
 import AdbIcon from '@mui/icons-material/Adb'
 import { Button, Tab, Tabs } from '@mui/material'
@@ -21,28 +19,19 @@ const pages = [
   { name: 'News and Information', route: '/' },
   { name: 'Glossary', route: '/' },
 ]
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout']
 
 export default function NavBar() {
   const location = useLocation()
   const nav = useNavigate()
   const activePage = pages.filter((val) => val.route == location.pathname).at(0) || pages[0]
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null)
-  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null)
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget)
   }
-  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElUser(event.currentTarget)
-  }
 
   const handleCloseNavMenu = () => {
     setAnchorElNav(null)
-  }
-
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null)
   }
 
   return (
