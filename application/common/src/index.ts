@@ -52,6 +52,13 @@ export interface AlternativeContact {
   email: string
 }
 
+export interface OnBehalf {
+  firstName: string
+  middleName?: string
+  lastName: string
+  dob: string
+}
+
 export interface UserProfile {
   firstName: string
   middleName?: string
@@ -67,4 +74,5 @@ export interface UserProfile {
   preferredContact: ContactMethod
   isParentOrGuardian: boolean
   alternativeContact?: AlternativeContact
+  onBehalfOf?: OnBehalf
 }

@@ -151,70 +151,124 @@ export default function Profile() {
                 <tr>
                   <td>
                     <Typography fontWeight="bold">
-                      Are you registering as a parent/guardian or carer?
+                      Registered as a parent/guardian or carer?
                     </Typography>
                   </td>
                   <td>
                     <Typography>{data.isParentOrGuardian ? 'Yes' : 'No'}</Typography>
                   </td>
                 </tr>
-                <tr>
-                  <td>
-                    <Typography fontWeight="bold" sx={{ mt: 1, mb: 1 }}>
-                      Nominated alternate contact
-                    </Typography>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <Typography fontWeight="bold" lineHeight={2.5}>
-                      First Name
-                    </Typography>
-                  </td>
-                  <td>
-                    <Typography>{data.alternativeContact?.firstName}</Typography>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <Typography fontWeight="bold" lineHeight={2.5}>
-                      Middle Name
-                    </Typography>
-                  </td>
-                  <td>
-                    <Typography>{data.alternativeContact?.middleName}</Typography>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <Typography fontWeight="bold" lineHeight={2.5}>
-                      Family Name
-                    </Typography>
-                  </td>
-                  <td>
-                    <Typography>{data.alternativeContact?.lastName}</Typography>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <Typography fontWeight="bold" lineHeight={2.5}>
-                      Email
-                    </Typography>
-                  </td>
-                  <td>
-                    <Typography>{data.alternativeContact?.email}</Typography>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <Typography fontWeight="bold" lineHeight={2.5}>
-                      Contact No.
-                    </Typography>
-                  </td>
-                  <td>
-                    <Typography>{data.alternativeContact?.phone}</Typography>
-                  </td>
-                </tr>
+                {data.isParentOrGuardian ? (
+                  <>
+                    <tr>
+                      <td>
+                        <Typography fontWeight="bold" sx={{ mt: 1, mb: 1 }}>
+                          Registered on behalf of
+                        </Typography>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <Typography fontWeight="bold" lineHeight={2.5}>
+                          First Name
+                        </Typography>
+                      </td>
+                      <td>
+                        <Typography>{data.onBehalfOf?.firstName}</Typography>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <Typography fontWeight="bold" lineHeight={2.5}>
+                          Middle Name
+                        </Typography>
+                      </td>
+                      <td>
+                        <Typography>{data.onBehalfOf?.middleName}</Typography>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <Typography fontWeight="bold" lineHeight={2.5}>
+                          Family Name
+                        </Typography>
+                      </td>
+                      <td>
+                        <Typography>{data.onBehalfOf?.lastName}</Typography>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <Typography fontWeight="bold" lineHeight={2.5}>
+                          Date of Birth
+                        </Typography>
+                      </td>
+                      <td>
+                        <Typography>{data.onBehalfOf?.dob}</Typography>
+                      </td>
+                    </tr>
+                  </>
+                ) : (
+                  <>
+                    <tr>
+                      <td>
+                        <Typography fontWeight="bold" sx={{ mt: 1, mb: 1 }}>
+                          Nominated alternate contact
+                        </Typography>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <Typography fontWeight="bold" lineHeight={2.5}>
+                          First Name
+                        </Typography>
+                      </td>
+                      <td>
+                        <Typography>{data.alternativeContact?.firstName}</Typography>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <Typography fontWeight="bold" lineHeight={2.5}>
+                          Middle Name
+                        </Typography>
+                      </td>
+                      <td>
+                        <Typography>{data.alternativeContact?.middleName}</Typography>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <Typography fontWeight="bold" lineHeight={2.5}>
+                          Family Name
+                        </Typography>
+                      </td>
+                      <td>
+                        <Typography>{data.alternativeContact?.lastName}</Typography>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <Typography fontWeight="bold" lineHeight={2.5}>
+                          Email
+                        </Typography>
+                      </td>
+                      <td>
+                        <Typography>{data.alternativeContact?.email}</Typography>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <Typography fontWeight="bold" lineHeight={2.5}>
+                          Contact No.
+                        </Typography>
+                      </td>
+                      <td>
+                        <Typography>{data.alternativeContact?.phone}</Typography>
+                      </td>
+                    </tr>
+                  </>
+                )}
               </tbody>
             </table>
           </Card>
