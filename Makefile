@@ -9,6 +9,7 @@ help:
 	@echo "- help - print this help message."
 	@echo "- e2e - spin up db/frontend/backend and run e2e tests"
 	@echo "- db - spin up db"
+	@echo "- db-down - bring down db"
 	@echo "- "
 
 e2e:
@@ -35,3 +36,6 @@ check:
 
 db: 
 	docker compose up -d
+
+db-down:
+	docker compose down
