@@ -184,7 +184,7 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.put('/users/:userID',
+        app.patch('/users/:userID',
             ...(fetchMiddlewares<RequestHandler>(UsersController)),
             ...(fetchMiddlewares<RequestHandler>(UsersController.prototype.updateUser)),
 
@@ -334,7 +334,7 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.put('/organisations/:orgID',
+        app.patch('/organisations/:orgID',
             ...(fetchMiddlewares<RequestHandler>(OrganisationsController)),
             ...(fetchMiddlewares<RequestHandler>(OrganisationsController.prototype.updateOrganisation)),
 

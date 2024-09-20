@@ -306,7 +306,7 @@
           }
         ]
       },
-      "put": {
+      "patch": {
         "operationId": "UpdateUser",
         "responses": {
           "200": {
@@ -577,7 +577,7 @@
           }
         ]
       },
-      "put": {
+      "patch": {
         "operationId": "UpdateOrganisation",
         "responses": {
           "200": {
