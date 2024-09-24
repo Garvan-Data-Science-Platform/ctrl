@@ -9,11 +9,11 @@ import {
   Typography,
 } from '@mui/material'
 import NavBar from '../components/NavBar'
-import { useBearStore } from '../store'
+import { useAppStore } from '../store'
 import { useForm } from 'react-hook-form'
 
 export default function Dashboard() {
-  const bears = useBearStore()
+  const bears = useAppStore()
 
   const { register, handleSubmit } = useForm()
   const onSubmit = (data: unknown) => console.log(data)
