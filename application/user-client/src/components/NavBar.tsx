@@ -15,7 +15,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 const pages = [
   { name: 'My Activities', route: '/' },
   { name: 'My Personal Details', route: '/profile' },
-  { name: 'Contact us', route: '/' },
+  { name: 'Contact us', route: '/contact', alt: ['/message_sent'] },
   { name: 'News and Information', route: '/' },
   { name: 'Glossary', route: '/' },
 ]
@@ -23,7 +23,10 @@ const pages = [
 export default function NavBar() {
   const location = useLocation()
   const nav = useNavigate()
-  const activePage = pages.filter((val) => val.route == location.pathname).at(0) || pages[0]
+  const activePage =
+    pages
+      .filter((val) => val.route == location.pathname || val.alt?.includes(location.pathname))
+      .at(0) || pages[0]
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null)
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
