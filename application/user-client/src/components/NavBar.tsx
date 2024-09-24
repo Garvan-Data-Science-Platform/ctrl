@@ -16,8 +16,8 @@ const pages = [
   { name: 'My Activities', route: '/' },
   { name: 'My Personal Details', route: '/profile' },
   { name: 'Contact us', route: '/contact', alt: ['/message_sent'] },
-  { name: 'News and Information', route: '/' },
-  { name: 'Glossary', route: '/' },
+  { name: 'News and Information', route: '/news' },
+  { name: 'Glossary', route: '/glossary' },
 ]
 
 export default function NavBar() {

@@ -19,18 +19,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <ThemeProvider theme={theme}>
-          <Box
-            sx={{
-              backgroundColor: '#f8fbff',
-              minHeight: '100vh',
-              height: '100%',
-              pb: 3,
-              pl: 1,
-              pr: 1,
-            }}
-          >
-            <RouterProvider router={router} />
-          </Box>
+          <RouterProvider router={router} />
         </ThemeProvider>
       </AuthProvider>
     </QueryClientProvider>
