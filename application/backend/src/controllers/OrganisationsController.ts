@@ -11,7 +11,7 @@ import {
   Patch,
   Delete,
 } from 'tsoa'
-import logger from 'common/src/logger'
+import logger from '@common/src/logger'
 import prisma from '../PrismaClient'
 import type { Organisation } from '@prisma/client'
 import type {

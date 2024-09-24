@@ -11,7 +11,7 @@ import {
   Response,
   Controller,
 } from 'tsoa'
-import logger from 'common/src/logger'
+import logger from '@common/src/logger'
 import type {
   GetUserByIdResponse,
   DeleteUserResponse,

@@ -1,6 +1,6 @@
 import { Api } from './Api'
 import dotenv from 'dotenv'
-import logger from 'common/src/logger'
+import logger from '@common/src/logger'
 
 dotenv.config()
 
