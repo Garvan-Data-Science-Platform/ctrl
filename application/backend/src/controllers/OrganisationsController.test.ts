@@ -256,7 +256,6 @@ describe('OrganisationsController', () => {
       const orgID = 1
       const expectedResult = {
         message: 'Error adding user to organisation',
-        user: null,
       }
       await expect(orgController.addUserToOrganisation(orgID, 2)).resolves.toEqual(expectedResult)
     })
@@ -277,7 +276,6 @@ describe('OrganisationsController', () => {
 
       const expectedResult = {
         message: `User with ID: ${userID} already in organisation with ID: ${orgID}`,
-        user: null,
       }
       await expect(orgController.addUserToOrganisation(orgID, userID)).resolves.toEqual(
         expectedResult,
