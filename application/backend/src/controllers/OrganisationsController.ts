@@ -14,7 +14,10 @@ import {
 import logger from 'common/src/logger'
 import prisma from '../PrismaClient'
 import { User, type Organisation } from '@prisma/client'
-import { type OrganisationCreationRequest, type OrganisationUpdateRequest } from 'common/src/index'
+import {
+  type OrganisationCreationRequest,
+  type OrganisationUpdateRequest,
+} from 'common/src/Organisation'
 
 @Route('organisations')
 @Tags('Organisations')

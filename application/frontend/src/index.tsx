@@ -1,7 +1,8 @@
 import { StrictMode, useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 
-import { backendPort, Workspace } from 'common'
+import { backendPort } from 'common/src/config'
+import { Workspace } from 'common/src/HealthCheck'
 
 const App = () => {
   const [data, setData] = useState<Workspace[]>([])

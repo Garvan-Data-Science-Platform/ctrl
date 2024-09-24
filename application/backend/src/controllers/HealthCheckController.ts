@@ -1,4 +1,4 @@
-import { Workspace } from 'common/src/index'
+import { Workspace } from 'common/src/HealthCheck'
 import { Get, Route, Tags, Controller, SuccessResponse, Response } from 'tsoa'
 import logger from 'common/src/logger'
 

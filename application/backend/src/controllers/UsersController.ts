@@ -12,7 +12,7 @@ import {
   Controller,
 } from 'tsoa'
 import logger from 'common/src/logger'
-import { type UserCreationRequest, type UserUpdateRequest } from 'common'
+import { type UserCreationRequest, type UserUpdateRequest } from 'common/src/User'
 import { User } from '@prisma/client'
 import prisma from '../PrismaClient'
 

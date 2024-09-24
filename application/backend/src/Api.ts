@@ -1,5 +1,5 @@
 import cors from 'cors'
-import { backendPort } from '../../common/src/index'
+import { backendPort } from '../../common/src/config'
 import express, { Response, Request, NextFunction, Application } from 'express'
 import { type Server } from 'http'
 import swaggerUi from 'swagger-ui-express'
