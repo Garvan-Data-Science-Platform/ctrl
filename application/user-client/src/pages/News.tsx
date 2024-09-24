@@ -1,4 +1,4 @@
-import { Box, Container, Typography } from '@mui/material'
+import { Box, Container } from '@mui/material'
 import NavBar from '../components/NavBar'
 
 export default function News() {
@@ -11,9 +11,8 @@ export default function News() {
             width="100%"
             height="100%"
             src="https://ctrldynamicconsent.wordpress.com"
-            frameborder="0"
+            frameBorder="0"
             allow="autoplay; encrypted-media"
-            allowfullscreen=""
           ></iframe>
         </Box>
       </Container>

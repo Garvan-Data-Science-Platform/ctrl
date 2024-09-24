@@ -1,5 +1,5 @@
 import './App.css'
-import { Box, ThemeProvider } from '@mui/material'
+import { ThemeProvider } from '@mui/material'
 import customTheme from './theme'
 import { blue, red } from '@mui/material/colors'
 
