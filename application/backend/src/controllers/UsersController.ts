@@ -11,15 +11,15 @@ import {
   Response,
   Controller,
 } from 'tsoa'
-import logger from 'common/src/logger'
+import logger from '@common/src/logger'
 import type {
   UserCreationRequest,
   GetAllUsersResponse,
   CreateUserResponse,
   DeleteUserResponse,
-} from 'common/src/User'
-import type { GetUserById } from 'common/types/api/users/getUserById'
-import type { UpdateUser } from 'common/types/api/users/updateUser'
+} from '@common/src/User'
+import type { GetUserById } from '@common/types/api/users/getUserById'
+import type { UpdateUser } from '@common/types/api/users/updateUser'
 import { User } from '@prisma/client'
 import prisma from '../PrismaClient'
 

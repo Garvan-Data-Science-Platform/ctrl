@@ -1,6 +1,6 @@
-import { Workspace } from 'common/src/HealthCheck'
 import { Get, Route, Tags, Controller, SuccessResponse, Response } from 'tsoa'
-import logger from 'common/src/logger'
+import { Workspace } from '@common/src/HealthCheck'
+import logger from '@common/src/logger'
 
 const workspaces: Workspace[] = [
   { name: 'backend', version: '1.0.0' },
