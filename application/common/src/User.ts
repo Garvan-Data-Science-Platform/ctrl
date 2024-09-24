@@ -1,3 +1,5 @@
+import { User } from '@prisma/client'
+
 export interface UserCreationRequest {
   firstName: string
   lastName: string
@@ -10,6 +12,31 @@ export interface UserUpdateRequest {
   lastName?: string
   email?: string
   role?: string
+}
+
+export interface GetAllUsersResponse {
+  message: string
+  users: User[]
+}
+
+export interface GetUserByIdResponse {
+  message: string
+  user: User | null
+}
+
+export interface CreateUserResponse {
+  message: string
+  newUser: User | null
+}
+
+export interface UpdateUserResponse {
+  message: string
+  updatedUser: User | null
+}
+
+export interface DeleteUserResponse {
+  message: string
+  deletedUser: User | null
 }
 
 export enum ContactMethod {
