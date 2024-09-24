@@ -14,7 +14,7 @@ import {
 import logger from 'common/src/logger'
 import prisma from '../PrismaClient'
 import { type Organisation } from '@prisma/client'
-import {
+import type {
   AddUserToOrganisationResponse,
   CreateOrganisationResponse,
   DeleteOrganisationResponse,
@@ -23,8 +23,8 @@ import {
   GetOrganisationUsersResponse,
   RemoveUserFromOrganisationResponse,
   UpdateOrganisationResponse,
-  type OrganisationCreationRequest,
-  type OrganisationUpdateRequest,
+  OrganisationCreationRequest,
+  OrganisationUpdateRequest,
 } from 'common/src/Organisation'
 
 @Route('organisations')
