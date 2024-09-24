@@ -35,15 +35,7 @@
             "format": "double"
           }
         },
-        "required": [
-          "updatedAt",
-          "createdAt",
-          "role",
-          "email",
-          "lastName",
-          "firstName",
-          "id"
-        ],
+        "required": ["updatedAt", "createdAt", "role", "email", "lastName", "firstName", "id"],
         "type": "object"
       },
       "GetAllUsersResponse": {
@@ -58,10 +50,7 @@
             "type": "array"
           }
         },
-        "required": [
-          "message",
-          "users"
-        ],
+        "required": ["message", "users"],
         "type": "object",
         "additionalProperties": false
       },
@@ -79,10 +68,7 @@
             "nullable": true
           }
         },
-        "required": [
-          "message",
-          "user"
-        ],
+        "required": ["message", "user"],
         "type": "object",
         "additionalProperties": false
       },
@@ -100,10 +86,7 @@
             "nullable": true
           }
         },
-        "required": [
-          "message",
-          "newUser"
-        ],
+        "required": ["message", "newUser"],
         "type": "object",
         "additionalProperties": false
       },
@@ -122,12 +105,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "firstName",
-          "lastName",
-          "email",
-          "role"
-        ],
+        "required": ["firstName", "lastName", "email", "role"],
         "type": "object",
         "additionalProperties": false
       },
@@ -145,10 +123,7 @@
             "nullable": true
           }
         },
-        "required": [
-          "message",
-          "updatedUser"
-        ],
+        "required": ["message", "updatedUser"],
         "type": "object",
         "additionalProperties": false
       },
@@ -184,10 +159,7 @@
             "nullable": true
           }
         },
-        "required": [
-          "message",
-          "deletedUser"
-        ],
+        "required": ["message", "deletedUser"],
         "type": "object",
         "additionalProperties": false
       },
@@ -210,12 +182,7 @@
             "format": "double"
           }
         },
-        "required": [
-          "updatedAt",
-          "createdAt",
-          "name",
-          "id"
-        ],
+        "required": ["updatedAt", "createdAt", "name", "id"],
         "type": "object"
       },
       "GetAllOrganisationsResponse": {
@@ -230,10 +197,7 @@
             "type": "array"
           }
         },
-        "required": [
-          "message",
-          "organisations"
-        ],
+        "required": ["message", "organisations"],
         "type": "object",
         "additionalProperties": false
       },
@@ -251,10 +215,7 @@
             "nullable": true
           }
         },
-        "required": [
-          "message",
-          "organisation"
-        ],
+        "required": ["message", "organisation"],
         "type": "object",
         "additionalProperties": false
       },
@@ -272,10 +233,7 @@
             "nullable": true
           }
         },
-        "required": [
-          "message",
-          "newOrganisation"
-        ],
+        "required": ["message", "newOrganisation"],
         "type": "object",
         "additionalProperties": false
       },
@@ -285,9 +243,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "name"
-        ],
+        "required": ["name"],
         "type": "object",
         "additionalProperties": false
       },
@@ -305,10 +261,7 @@
             "nullable": true
           }
         },
-        "required": [
-          "message",
-          "updatedOrganisation"
-        ],
+        "required": ["message", "updatedOrganisation"],
         "type": "object",
         "additionalProperties": false
       },
@@ -335,10 +288,7 @@
             "nullable": true
           }
         },
-        "required": [
-          "message",
-          "deletedOrganisation"
-        ],
+        "required": ["message", "deletedOrganisation"],
         "type": "object",
         "additionalProperties": false
       },
@@ -355,10 +305,7 @@
             "nullable": true
           }
         },
-        "required": [
-          "message",
-          "users"
-        ],
+        "required": ["message", "users"],
         "type": "object",
         "additionalProperties": false
       },
@@ -368,9 +315,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "message"
-        ],
+        "required": ["message"],
         "type": "object",
         "additionalProperties": false
       },
@@ -388,10 +333,7 @@
             "nullable": true
           }
         },
-        "required": [
-          "message",
-          "user"
-        ],
+        "required": ["message", "user"],
         "type": "object",
         "additionalProperties": false
       },
@@ -404,10 +346,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "version",
-          "name"
-        ],
+        "required": ["version", "name"],
         "type": "object"
       }
     },
@@ -438,9 +377,7 @@
         },
         "description": "Get all Users",
         "summary": "Get all Users",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "security": [],
         "parameters": []
       },
@@ -463,9 +400,7 @@
         },
         "description": "Create and persist a new user.",
         "summary": "Create a new User",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "security": [],
         "parameters": [],
         "requestBody": {
@@ -500,9 +435,7 @@
         },
         "description": "Gets a Specific User using their ID",
         "summary": "Get Specific User",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "security": [],
         "parameters": [
           {
@@ -538,9 +471,7 @@
         },
         "description": "Update an existing user.",
         "summary": "Update a User",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "security": [],
         "parameters": [
           {
@@ -586,9 +517,7 @@
         },
         "description": "Delete a user.",
         "summary": "Delete a User",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "security": [],
         "parameters": [
           {
@@ -623,9 +552,7 @@
         },
         "description": "getAllOrganisations",
         "summary": "Get all Organisations",
-        "tags": [
-          "Organisations"
-        ],
+        "tags": ["Organisations"],
         "security": [],
         "parameters": []
       },
@@ -648,9 +575,7 @@
         },
         "description": "createOrganisation",
         "summary": "Create a new Organisation",
-        "tags": [
-          "Organisations"
-        ],
+        "tags": ["Organisations"],
         "security": [],
         "parameters": [],
         "requestBody": {
@@ -688,9 +613,7 @@
         },
         "description": "getOrganisationById",
         "summary": "Get a specific Organisation",
-        "tags": [
-          "Organisations"
-        ],
+        "tags": ["Organisations"],
         "security": [],
         "parameters": [
           {
@@ -726,9 +649,7 @@
         },
         "description": "updateOrganisation",
         "summary": "Update an existing Organisation",
-        "tags": [
-          "Organisations"
-        ],
+        "tags": ["Organisations"],
         "security": [],
         "parameters": [
           {
@@ -774,9 +695,7 @@
         },
         "description": "deleteOrganisation",
         "summary": "Delete an existing Organisation",
-        "tags": [
-          "Organisations"
-        ],
+        "tags": ["Organisations"],
         "security": [],
         "parameters": [
           {
@@ -814,9 +733,7 @@
         },
         "description": "getOrganisationUsers",
         "summary": "Get all Users within a specific Organisation",
-        "tags": [
-          "Organisations"
-        ],
+        "tags": ["Organisations"],
         "security": [],
         "parameters": [
           {
@@ -851,9 +768,7 @@
         },
         "description": "addUserToOrganisation",
         "summary": "Add specific User to specific Organisation",
-        "tags": [
-          "Organisations"
-        ],
+        "tags": ["Organisations"],
         "security": [],
         "parameters": [
           {
@@ -895,9 +810,7 @@
         },
         "description": "removeUserFromOrganisation",
         "summary": "Removes a specific User from a specific Organisation",
-        "tags": [
-          "Organisations"
-        ],
+        "tags": ["Organisations"],
         "security": [],
         "parameters": [
           {
@@ -935,9 +848,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ],
+                  "required": ["message"],
                   "type": "object"
                 }
               }
@@ -949,9 +860,7 @@
         },
         "description": "Health check to ensure server is up and running",
         "summary": "Health Check",
-        "tags": [
-          "Healthcheck"
-        ],
+        "tags": ["Healthcheck"],
         "security": [],
         "parameters": []
       }
@@ -976,10 +885,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "data",
-                    "message"
-                  ],
+                  "required": ["data", "message"],
                   "type": "object"
                 }
               }
@@ -991,9 +897,7 @@
         },
         "description": "Get all Workspaces",
         "summary": "Get all Workspaces",
-        "tags": [
-          "Healthcheck"
-        ],
+        "tags": ["Healthcheck"],
         "security": [],
         "parameters": []
       }
