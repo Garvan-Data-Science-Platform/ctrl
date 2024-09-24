@@ -3,6 +3,8 @@ import Dashboard from './pages/Dashboard'
 import Profile from './pages/Profile'
 import { ProtectedRoutes } from './auth'
 import UpdateProfile from './pages/UpdateProfile'
+import Contact from './pages/Contact'
+import MessageSent from './pages/MessageSent'
 
 const router = createBrowserRouter([
   {
@@ -19,6 +21,14 @@ const router = createBrowserRouter([
       {
         path: '/profile/update',
         element: <UpdateProfile />,
+      },
+      {
+        path: '/contact',
+        element: <Contact />,
+      },
+      {
+        path: '/message_sent',
+        element: <MessageSent />,
       },
     ],
   },
