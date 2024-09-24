@@ -14,13 +14,12 @@ import {
 import logger from 'common/src/logger'
 import type {
   UserCreationRequest,
-  UserUpdateRequest,
   GetAllUsersResponse,
   CreateUserResponse,
   DeleteUserResponse,
-  GetUserByIdResponse,
-  UpdateUserResponse,
 } from 'common/src/User'
+import type { GetUserById } from 'common/types/api/users/getUserById'
+import type { UpdateUser } from 'common/types/api/users/updateUser'
 import { User } from '@prisma/client'
 import prisma from '../PrismaClient'
 
@@ -52,7 +51,7 @@ export class UsersController extends Controller {
   @Get('/{userID}')
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
-  public async getUserById(@Path() userID: number): Promise<GetUserByIdResponse> {
+  public async getUserById(@Path() userID: number): Promise<GetUserById['Response']> {
     const user: User | null = await this.userRepo.findUnique({
       where: { id: userID },
     })
@@ -114,8 +113,8 @@ export class UsersController extends Controller {
   @Response('404', 'Not Found')
   public async updateUser(
     @Path() userID: number,
-    @Body() bodyRequest: UserUpdateRequest,
-  ): Promise<UpdateUserResponse> {
+    @Body() bodyRequest: UpdateUser['Request'],
+  ): Promise<UpdateUser['Response']> {
     try {
       const updatedUser = await this.userRepo.update({
         where: { id: userID },
