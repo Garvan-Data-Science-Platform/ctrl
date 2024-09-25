@@ -5,6 +5,8 @@ import { ProtectedRoutes } from './auth'
 import UpdateProfile from './pages/UpdateProfile'
 import Contact from './pages/Contact'
 import MessageSent from './pages/MessageSent'
+import News from './pages/News'
+import Glossary from './pages/Glossary'
 
 const router = createBrowserRouter([
   {
@@ -29,6 +31,14 @@ const router = createBrowserRouter([
       {
         path: '/message_sent',
         element: <MessageSent />,
+      },
+      {
+        path: '/news',
+        element: <News />,
+      },
+      {
+        path: '/glossary',
+        element: <Glossary />,
       },
     ],
   },
