@@ -12,12 +12,14 @@ import {
   Controller,
 } from 'tsoa'
 import logger from '@common/src/logger'
-import {
-  GetUserById,
-  UpdateUser,
-  DeleteUser,
-  GetAllUsers,
-  CreateUser,
+import type {
+  GetUserByIdResponse,
+  DeleteUserResponse,
+  GetAllUsersResponse,
+  CreateUserRequest,
+  CreateUserResponse,
+  UpdateUserRequest,
+  UpdateUserResponse,
 } from '@common/types/api/users'
 import { User } from '@prisma/client'
 import prisma from '../PrismaClient'
@@ -35,7 +37,7 @@ export class UsersController extends Controller {
   @Get('/')
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
-  public async getAllUsers(): Promise<GetAllUsers['Response']> {
+  public async getAllUsers(): Promise<GetAllUsersResponse> {
     const users: User[] = await this.userRepo.findMany({})
     const responseData = { message: 'Got all users', users }
     logger.info({ ...responseData })
@@ -50,7 +52,7 @@ export class UsersController extends Controller {
   @Get('/{userID}')
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
-  public async getUserById(@Path() userID: number): Promise<GetUserById['Response']> {
+  public async getUserById(@Path() userID: number): Promise<GetUserByIdResponse> {
     const user: User | null = await this.userRepo.findUnique({
       where: { id: userID },
     })
@@ -73,9 +75,7 @@ export class UsersController extends Controller {
   @Post('/')
   @SuccessResponse('201', 'Created')
   @Response('500', 'Internal Server Error')
-  public async createUser(
-    @Body() bodyRequest: CreateUser['Request'],
-  ): Promise<CreateUser['Response']> {
+  public async createUser(@Body() bodyRequest: CreateUserRequest): Promise<CreateUserResponse> {
     const { firstName, lastName, email, role } = bodyRequest
 
     // Validation check
@@ -114,8 +114,8 @@ export class UsersController extends Controller {
   @Response('404', 'Not Found')
   public async updateUser(
     @Path() userID: number,
-    @Body() bodyRequest: UpdateUser['Request'],
-  ): Promise<UpdateUser['Response']> {
+    @Body() bodyRequest: UpdateUserRequest,
+  ): Promise<UpdateUserResponse> {
     try {
       const updatedUser = await this.userRepo.update({
         where: { id: userID },
@@ -143,7 +143,7 @@ export class UsersController extends Controller {
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
   @Response('404', 'Not Found')
-  public async deleteUser(@Path() userID: number): Promise<DeleteUser['Response']> {
+  public async deleteUser(@Path() userID: number): Promise<DeleteUserResponse> {
     try {
       const deletedUser = await this.userRepo.delete({ where: { id: userID } })
       const responseData = { message: `Deleted user with ID: ${userID}`, deletedUser }

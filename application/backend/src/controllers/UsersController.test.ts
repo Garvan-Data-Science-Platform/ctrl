@@ -1,8 +1,7 @@
 import { UsersController } from './UsersController'
-import { type CreateUser } from '@common/types/api/users/createUser'
+import type { CreateUserRequest, UpdateUserRequest } from '@common/types/api/users'
 import { PrismaClientMock } from '../PrismaClientMock'
 import { Prisma } from '@prisma/client'
-import { UpdateUser } from '@common/types/api/users/updateUser'
 
 const exampleUser1 = {
   id: 1,
@@ -81,7 +80,7 @@ describe('UsersController', () => {
     it('should create a user with the correct User details', async () => {
       PrismaClientMock.user.create.mockResolvedValueOnce(exampleUser1)
 
-      const bodyRequest: CreateUser['Request'] = {
+      const bodyRequest: CreateUserRequest = {
         firstName: exampleUser1.firstName,
         lastName: exampleUser1.lastName,
         email: exampleUser1.email,
@@ -99,7 +98,7 @@ describe('UsersController', () => {
     it('should return an error if there is a database error', async () => {
       PrismaClientMock.user.create.mockRejectedValueOnce(new Error('Database error'))
 
-      const bodyRequest: CreateUser['Request'] = {
+      const bodyRequest: CreateUserRequest = {
         firstName: 'John',
         lastName: 'Doe',
         email: 'johndoe@example.com',
@@ -120,7 +119,7 @@ describe('UsersController', () => {
       PrismaClientMock.user.update.mockResolvedValueOnce(exampleUser1)
 
       const userID = 1
-      const bodyRequest: UpdateUser['Request'] = {
+      const bodyRequest: UpdateUserRequest = {
         firstName: 'Jane Doe',
         email: 'janedoe@example.com',
         role: 'Software Developer',
@@ -144,7 +143,7 @@ describe('UsersController', () => {
         ),
       )
       const userID = 1
-      const bodyRequest: UpdateUser['Request'] = {
+      const bodyRequest: UpdateUserRequest = {
         firstName: 'Jane',
         lastName: 'Doe',
         email: 'janedoe@example.com',
@@ -163,7 +162,7 @@ describe('UsersController', () => {
     it('should return an error if there is a database error', async () => {
       PrismaClientMock.user.update.mockRejectedValueOnce(new Error('Database error'))
       const userID = 1
-      const bodyRequest: UpdateUser['Request'] = {
+      const bodyRequest: UpdateUserRequest = {
         firstName: 'Jane Doe',
         email: 'janedoe@example.com',
         role: 'Software Developer',
