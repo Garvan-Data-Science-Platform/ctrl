@@ -16,6 +16,9 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "jsx": "preserve",
+    "paths": {
+      "@common/*": ["../../common/*"]
+    }
   },
-  "include": ["./src"],
+  "include": ["./src"]
 }

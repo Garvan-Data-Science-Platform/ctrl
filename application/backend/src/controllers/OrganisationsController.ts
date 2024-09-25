@@ -11,10 +11,19 @@ import {
   Patch,
   Delete,
 } from 'tsoa'
-import logger from 'common/src/logger'
+import logger from '@common/src/logger'
 import prisma from '../PrismaClient'
-import { User, type Organisation } from '@prisma/client'
-import { type OrganisationCreationRequest, type OrganisationUpdateRequest } from 'common/src/index'
+import type { Organisation } from '@prisma/client'
+import type {
+  GetAllOrganisations,
+  GetOrganisationById,
+  CreateOrganisation,
+  UpdateOrganisation,
+  DeleteOrganisation,
+  AddUserToOrganisation,
+  RemoveUserFromOrganisation,
+  GetOrganisationUsers,
+} from '@common/types/api/organisations'
 
 @Route('organisations')
 @Tags('Organisations')
@@ -29,7 +38,7 @@ export class OrganisationsController extends Controller {
   @Get('/')
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
-  public async getAllOrganisations(): Promise<{ message: string; organisations: Organisation[] }> {
+  public async getAllOrganisations(): Promise<GetAllOrganisations['Response']> {
     const organisations: Organisation[] = await this.organisationRepo.findMany({})
     const responseData = { message: 'Got all organisations', organisations }
     logger.info({ ...responseData })
@@ -47,7 +56,7 @@ export class OrganisationsController extends Controller {
   @Response('404', 'Not Found')
   public async getOrganisationById(
     @Path() orgID: number,
-  ): Promise<{ message: string; organisation: Organisation | null }> {
+  ): Promise<GetOrganisationById['Response']> {
     const organisation: Organisation | null = await this.organisationRepo.findUnique({
       where: { id: orgID },
     })
@@ -71,8 +80,8 @@ export class OrganisationsController extends Controller {
   @SuccessResponse('201', 'Created')
   @Response('500', 'Internal Server Error')
   public async createOrganisation(
-    @Body() bodyRequest: OrganisationCreationRequest,
-  ): Promise<{ message: string; newOrganisation: Organisation | null }> {
+    @Body() bodyRequest: CreateOrganisation['Request'],
+  ): Promise<CreateOrganisation['Response']> {
     const { name } = bodyRequest
 
     // Validation check
@@ -108,11 +117,8 @@ export class OrganisationsController extends Controller {
   @Response('404', 'Not Found')
   public async updateOrganisation(
     @Path() orgID: number,
-    @Body() bodyRequest: OrganisationUpdateRequest,
-  ): Promise<{
-    message: string
-    updatedOrganisation: Organisation | null
-  }> {
+    @Body() bodyRequest: UpdateOrganisation['Request'],
+  ): Promise<UpdateOrganisation['Response']> {
     try {
       const updatedOrganisation = await this.organisationRepo.update({
         where: { id: orgID },
@@ -151,10 +157,7 @@ export class OrganisationsController extends Controller {
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
   @Response('404', 'Not Found')
-  public async deleteOrganisation(@Path() orgID: number): Promise<{
-    message: string
-    deletedOrganisation: Organisation | null
-  }> {
+  public async deleteOrganisation(@Path() orgID: number): Promise<DeleteOrganisation['Response']> {
     try {
       const deletedOrganisation = await this.organisationRepo.delete({
         where: { id: orgID },
@@ -193,10 +196,9 @@ export class OrganisationsController extends Controller {
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
   @Response('404', 'Not Found')
-  public async getOrganisationUsers(@Path() orgID: number): Promise<{
-    message: string
-    users: User[] | null
-  }> {
+  public async getOrganisationUsers(
+    @Path() orgID: number,
+  ): Promise<GetOrganisationUsers['Response']> {
     try {
       const organisation = await this.organisationRepo.findUnique({
         where: { id: orgID },
@@ -234,7 +236,7 @@ export class OrganisationsController extends Controller {
   public async addUserToOrganisation(
     @Path() orgID: number,
     @Path() userID: number,
-  ): Promise<{ message: string }> {
+  ): Promise<AddUserToOrganisation['Response']> {
     try {
       // Check if user already in organisation
       const userInOrganisation = await this.organisationRepo.findUnique({
@@ -247,7 +249,6 @@ export class OrganisationsController extends Controller {
       if (userInOrganisation) {
         const error = {
           message: `User with ID: ${userID} already in organisation with ID: ${orgID}`,
-          user: null,
         }
         logger.error({ ...error })
         return error
@@ -264,7 +265,7 @@ export class OrganisationsController extends Controller {
       logger.info({ ...responseData })
       return responseData
     } catch (err) {
-      const error = { message: 'Error adding user to organisation', user: null }
+      const error = { message: 'Error adding user to organisation' }
       logger.error({ ...error })
       return error
     }
@@ -281,7 +282,7 @@ export class OrganisationsController extends Controller {
   public async removeUserFromOrganisation(
     @Path() orgID: number,
     @Path() userID: number,
-  ): Promise<{ message: string; user: User | null }> {
+  ): Promise<RemoveUserFromOrganisation['Response']> {
     try {
       // Check if user is actually in the organisation
       const userInOrganisation = await this.organisationRepo.findUnique({

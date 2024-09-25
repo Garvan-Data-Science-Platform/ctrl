@@ -46,6 +46,67 @@
         ],
         "type": "object"
       },
+      "GetAllUsersResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "users": {
+            "items": {
+              "$ref": "#/components/schemas/User"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "message",
+          "users"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "GetUserByIdResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "user": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/User"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "required": [
+          "message",
+          "user"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "CreateUserResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "newUser": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/User"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "required": [
+          "message",
+          "newUser"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
       "UserCreationRequest": {
         "properties": {
           "firstName": {
@@ -70,6 +131,27 @@
         "type": "object",
         "additionalProperties": false
       },
+      "UpdateUserResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "updatedUser": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/User"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "required": [
+          "message",
+          "updatedUser"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
       "UserUpdateRequest": {
         "properties": {
           "firstName": {
@@ -85,6 +167,27 @@
             "type": "string"
           }
         },
+        "type": "object",
+        "additionalProperties": false
+      },
+      "DeleteUserResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "deletedUser": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/User"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "required": [
+          "message",
+          "deletedUser"
+        ],
         "type": "object",
         "additionalProperties": false
       },
@@ -115,6 +218,67 @@
         ],
         "type": "object"
       },
+      "GetAllOrganisationsResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "organisations": {
+            "items": {
+              "$ref": "#/components/schemas/Organisation"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "message",
+          "organisations"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "GetOrganisationByIdResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "organisation": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Organisation"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "required": [
+          "message",
+          "organisation"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "CreateOrganisationResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "newOrganisation": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Organisation"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "required": [
+          "message",
+          "newOrganisation"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
       "OrganisationCreationRequest": {
         "properties": {
           "name": {
@@ -127,12 +291,107 @@
         "type": "object",
         "additionalProperties": false
       },
+      "UpdateOrganisationResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "updatedOrganisation": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Organisation"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "required": [
+          "message",
+          "updatedOrganisation"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
       "OrganisationUpdateRequest": {
         "properties": {
           "name": {
             "type": "string"
           }
         },
+        "type": "object",
+        "additionalProperties": false
+      },
+      "DeleteOrganisationResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "deletedOrganisation": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Organisation"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "required": [
+          "message",
+          "deletedOrganisation"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "GetOrganisationUsersResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "users": {
+            "items": {
+              "$ref": "#/components/schemas/User"
+            },
+            "type": "array",
+            "nullable": true
+          }
+        },
+        "required": [
+          "message",
+          "users"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "AddUserToOrganisationResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "RemoveUserFromOrganisationResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "user": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/User"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "required": [
+          "message",
+          "user"
+        ],
         "type": "object",
         "additionalProperties": false
       },
@@ -168,22 +427,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "properties": {
-                    "users": {
-                      "items": {
-                        "$ref": "#/components/schemas/User"
-                      },
-                      "type": "array"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "users",
-                    "message"
-                  ],
-                  "type": "object"
+                  "$ref": "#/components/schemas/GetAllUsersResponse"
                 }
               }
             }
@@ -208,24 +452,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "properties": {
-                    "newUser": {
-                      "allOf": [
-                        {
-                          "$ref": "#/components/schemas/User"
-                        }
-                      ],
-                      "nullable": true
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "newUser",
-                    "message"
-                  ],
-                  "type": "object"
+                  "$ref": "#/components/schemas/CreateUserResponse"
                 }
               }
             }
@@ -262,24 +489,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "properties": {
-                    "user": {
-                      "allOf": [
-                        {
-                          "$ref": "#/components/schemas/User"
-                        }
-                      ],
-                      "nullable": true
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "user",
-                    "message"
-                  ],
-                  "type": "object"
+                  "$ref": "#/components/schemas/GetUserByIdResponse"
                 }
               }
             }
@@ -314,24 +524,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "properties": {
-                    "updatedUser": {
-                      "allOf": [
-                        {
-                          "$ref": "#/components/schemas/User"
-                        }
-                      ],
-                      "nullable": true
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "updatedUser",
-                    "message"
-                  ],
-                  "type": "object"
+                  "$ref": "#/components/schemas/UpdateUserResponse"
                 }
               }
             }
@@ -379,24 +572,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "properties": {
-                    "deletedUser": {
-                      "allOf": [
-                        {
-                          "$ref": "#/components/schemas/User"
-                        }
-                      ],
-                      "nullable": true
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "deletedUser",
-                    "message"
-                  ],
-                  "type": "object"
+                  "$ref": "#/components/schemas/DeleteUserResponse"
                 }
               }
             }
@@ -436,22 +612,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "properties": {
-                    "organisations": {
-                      "items": {
-                        "$ref": "#/components/schemas/Organisation"
-                      },
-                      "type": "array"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "organisations",
-                    "message"
-                  ],
-                  "type": "object"
+                  "$ref": "#/components/schemas/GetAllOrganisationsResponse"
                 }
               }
             }
@@ -476,24 +637,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "properties": {
-                    "newOrganisation": {
-                      "allOf": [
-                        {
-                          "$ref": "#/components/schemas/Organisation"
-                        }
-                      ],
-                      "nullable": true
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "newOrganisation",
-                    "message"
-                  ],
-                  "type": "object"
+                  "$ref": "#/components/schemas/CreateOrganisationResponse"
                 }
               }
             }
@@ -530,24 +674,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "properties": {
-                    "organisation": {
-                      "allOf": [
-                        {
-                          "$ref": "#/components/schemas/Organisation"
-                        }
-                      ],
-                      "nullable": true
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "organisation",
-                    "message"
-                  ],
-                  "type": "object"
+                  "$ref": "#/components/schemas/GetOrganisationByIdResponse"
                 }
               }
             }
@@ -585,24 +712,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "properties": {
-                    "updatedOrganisation": {
-                      "allOf": [
-                        {
-                          "$ref": "#/components/schemas/Organisation"
-                        }
-                      ],
-                      "nullable": true
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "updatedOrganisation",
-                    "message"
-                  ],
-                  "type": "object"
+                  "$ref": "#/components/schemas/UpdateOrganisationResponse"
                 }
               }
             }
@@ -650,24 +760,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "properties": {
-                    "deletedOrganisation": {
-                      "allOf": [
-                        {
-                          "$ref": "#/components/schemas/Organisation"
-                        }
-                      ],
-                      "nullable": true
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "deletedOrganisation",
-                    "message"
-                  ],
-                  "type": "object"
+                  "$ref": "#/components/schemas/DeleteOrganisationResponse"
                 }
               }
             }
@@ -707,23 +800,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "properties": {
-                    "users": {
-                      "items": {
-                        "$ref": "#/components/schemas/User"
-                      },
-                      "type": "array",
-                      "nullable": true
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "users",
-                    "message"
-                  ],
-                  "type": "object"
+                  "$ref": "#/components/schemas/GetOrganisationUsersResponse"
                 }
               }
             }
@@ -763,15 +840,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "message"
-                  ],
-                  "type": "object"
+                  "$ref": "#/components/schemas/AddUserToOrganisationResponse"
                 }
               }
             }
@@ -815,24 +884,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "properties": {
-                    "user": {
-                      "allOf": [
-                        {
-                          "$ref": "#/components/schemas/User"
-                        }
-                      ],
-                      "nullable": true
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "user",
-                    "message"
-                  ],
-                  "type": "object"
+                  "$ref": "#/components/schemas/RemoveUserFromOrganisationResponse"
                 }
               }
             }
