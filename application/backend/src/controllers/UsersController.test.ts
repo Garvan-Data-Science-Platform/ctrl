@@ -9,6 +9,7 @@ const exampleUser1 = {
   lastName: 'Doe',
   email: 'johndoe@example.com',
   role: 'Admin',
+  password: 'SomePassword123',
   createdAt: new Date(),
   updatedAt: new Date(),
 }
@@ -19,6 +20,7 @@ const exampleUser2 = {
   lastName: 'Smith',
   email: 'janesmith@example.com',
   role: 'User',
+  password: 'SomePassword123',
   createdAt: new Date(),
   updatedAt: new Date(),
 }
@@ -85,6 +87,7 @@ describe('UsersController', () => {
         lastName: exampleUser1.lastName,
         email: exampleUser1.email,
         role: exampleUser1.role,
+        password: exampleUser1.password,
       }
 
       const expectedResult = {
@@ -103,6 +106,7 @@ describe('UsersController', () => {
         lastName: 'Doe',
         email: 'johndoe@example.com',
         role: 'admin',
+        password: 'SomePassword123',
       }
 
       const expectedResult = {
