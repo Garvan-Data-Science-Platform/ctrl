@@ -1,4 +1,4 @@
-import { PrismaClient } from '../generated/client'
+import { PrismaClient } from '@prisma/client'
 import * as data from './seedUserData.json'
 
 const prisma = new PrismaClient()
@@ -33,6 +33,7 @@ const main = async () => {
           lastName: user.lastName,
           email: user.email,
           role: user.role,
+          password: user.password,
           organisations: {
             connect: user.organisations
               .map((orgName) => savedOrganisations.find((org) => org.name === orgName)?.id)
@@ -44,6 +45,7 @@ const main = async () => {
           lastName: user.lastName,
           email: user.email,
           role: user.role,
+          password: user.password,
           organisations: {
             connect: user.organisations
               .map((orgName) => savedOrganisations.find((org) => org.name === orgName)?.id)
