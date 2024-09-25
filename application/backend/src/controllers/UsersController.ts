@@ -12,11 +12,13 @@ import {
   Controller,
 } from 'tsoa'
 import logger from '@common/src/logger'
-import type { GetUserById } from '@common/types/api/users/getUserById'
-import type { UpdateUser } from '@common/types/api/users/updateUser'
-import type { DeleteUser } from '@common/types/api/users/deleteUser'
-import type { GetAllUsers } from '@common/types/api/users/getAllUsers'
-import type { CreateUser } from '@common/types/api/users/createUser'
+import {
+  GetUserById,
+  UpdateUser,
+  DeleteUser,
+  GetAllUsers,
+  CreateUser,
+} from '@common/types/api/users'
 import { User } from '@prisma/client'
 import prisma from '../PrismaClient'
 

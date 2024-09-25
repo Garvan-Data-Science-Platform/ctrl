@@ -14,14 +14,16 @@ import {
 import logger from '@common/src/logger'
 import prisma from '../PrismaClient'
 import type { Organisation } from '@prisma/client'
-import type { GetAllOrganisations } from '@common/types/api/organisations/getAllOrganisations'
-import type { GetOrganisationById } from '@common/types/api/organisations/getOrganisationById'
-import type { CreateOrganisation } from '@common/types/api/organisations/createOrganisation'
-import type { UpdateOrganisation } from '@common/types/api/organisations/updateOrganisation'
-import type { DeleteOrganisation } from '@common/types/api/organisations/deleteOrganisation'
-import type { AddUserToOrganisation } from '@common/types/api/organisations/addUserToOrganisation'
-import type { RemoveUserFromOrganisation } from '@common/types/api/organisations/removeUserFromOrganisation'
-import type { GetOrganisationUsers } from '@common/types/api/organisations/getOrganisationUsers'
+import type {
+  GetAllOrganisations,
+  GetOrganisationById,
+  CreateOrganisation,
+  UpdateOrganisation,
+  DeleteOrganisation,
+  AddUserToOrganisation,
+  RemoveUserFromOrganisation,
+  GetOrganisationUsers,
+} from '@common/types/api/organisations'
 
 @Route('organisations')
 @Tags('Organisations')
