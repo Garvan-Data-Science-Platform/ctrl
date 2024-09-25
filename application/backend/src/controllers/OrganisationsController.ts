@@ -40,7 +40,7 @@ export class OrganisationsController extends Controller {
   @Get('/')
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
-  public async getAllOrganisations(): Promise<GetAllOrganisationsResponse> {
+  public async getAllOrganisations(): Promise<GetAllOrganisations['Response']> {
     const organisations: Organisation[] = await this.organisationRepo.findMany({})
     const responseData = { message: 'Got all organisations', organisations }
     logger.info({ ...responseData })
@@ -56,7 +56,9 @@ export class OrganisationsController extends Controller {
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
   @Response('404', 'Not Found')
-  public async getOrganisationById(@Path() orgID: number): Promise<GetOrganisationByIdResponse> {
+  public async getOrganisationById(
+    @Path() orgID: number,
+  ): Promise<GetOrganisationById['Response']> {
     const organisation: Organisation | null = await this.organisationRepo.findUnique({
       where: { id: orgID },
     })
@@ -157,7 +159,7 @@ export class OrganisationsController extends Controller {
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
   @Response('404', 'Not Found')
-  public async deleteOrganisation(@Path() orgID: number): Promise<DeleteOrganisationResponse> {
+  public async deleteOrganisation(@Path() orgID: number): Promise<DeleteOrganisation['Response']> {
     try {
       const deletedOrganisation = await this.organisationRepo.delete({
         where: { id: orgID },
@@ -196,7 +198,9 @@ export class OrganisationsController extends Controller {
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
   @Response('404', 'Not Found')
-  public async getOrganisationUsers(@Path() orgID: number): Promise<GetOrganisationUsersResponse> {
+  public async getOrganisationUsers(
+    @Path() orgID: number,
+  ): Promise<GetOrganisationUsers['Response']> {
     try {
       const organisation = await this.organisationRepo.findUnique({
         where: { id: orgID },
@@ -234,7 +238,7 @@ export class OrganisationsController extends Controller {
   public async addUserToOrganisation(
     @Path() orgID: number,
     @Path() userID: number,
-  ): Promise<AddUserToOrganisationResponse> {
+  ): Promise<AddUserToOrganisation['Response']> {
     try {
       // Check if user already in organisation
       const userInOrganisation = await this.organisationRepo.findUnique({
@@ -280,7 +284,7 @@ export class OrganisationsController extends Controller {
   public async removeUserFromOrganisation(
     @Path() orgID: number,
     @Path() userID: number,
-  ): Promise<RemoveUserFromOrganisationResponse> {
+  ): Promise<RemoveUserFromOrganisation['Response']> {
     try {
       // Check if user is actually in the organisation
       const userInOrganisation = await this.organisationRepo.findUnique({
