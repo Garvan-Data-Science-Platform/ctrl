@@ -12,14 +12,11 @@ import {
   Controller,
 } from 'tsoa'
 import logger from '@common/src/logger'
-import type {
-  UserCreationRequest,
-  GetAllUsersResponse,
-  CreateUserResponse,
-  DeleteUserResponse,
-} from '@common/src/User'
 import type { GetUserById } from '@common/types/api/users/getUserById'
 import type { UpdateUser } from '@common/types/api/users/updateUser'
+import type { DeleteUser } from '@common/types/api/users/deleteUser'
+import type { GetAllUsers } from '@common/types/api/users/getAllUsers'
+import type { CreateUser } from '@common/types/api/users/createUser'
 import { User } from '@prisma/client'
 import prisma from '../PrismaClient'
 
@@ -36,7 +33,7 @@ export class UsersController extends Controller {
   @Get('/')
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
-  public async getAllUsers(): Promise<GetAllUsersResponse> {
+  public async getAllUsers(): Promise<GetAllUsers['Response']> {
     const users: User[] = await this.userRepo.findMany({})
     const responseData = { message: 'Got all users', users }
     logger.info({ ...responseData })
@@ -74,7 +71,9 @@ export class UsersController extends Controller {
   @Post('/')
   @SuccessResponse('201', 'Created')
   @Response('500', 'Internal Server Error')
-  public async createUser(@Body() bodyRequest: UserCreationRequest): Promise<CreateUserResponse> {
+  public async createUser(
+    @Body() bodyRequest: CreateUser['Request'],
+  ): Promise<CreateUser['Response']> {
     const { firstName, lastName, email, role } = bodyRequest
 
     // Validation check
@@ -142,7 +141,7 @@ export class UsersController extends Controller {
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
   @Response('404', 'Not Found')
-  public async deleteUser(@Path() userID: number): Promise<DeleteUserResponse> {
+  public async deleteUser(@Path() userID: number): Promise<DeleteUser['Response']> {
     try {
       const deletedUser = await this.userRepo.delete({ where: { id: userID } })
       const responseData = { message: `Deleted user with ID: ${userID}`, deletedUser }

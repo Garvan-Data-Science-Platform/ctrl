@@ -1,5 +1,5 @@
 import { UsersController } from './UsersController'
-import { type UserCreationRequest } from '@common/src/User'
+import { type CreateUser } from '@common/types/api/users/createUser'
 import { PrismaClientMock } from '../PrismaClientMock'
 import { Prisma } from '@prisma/client'
 import { UpdateUser } from '@common/types/api/users/updateUser'
@@ -81,7 +81,7 @@ describe('UsersController', () => {
     it('should create a user with the correct User details', async () => {
       PrismaClientMock.user.create.mockResolvedValueOnce(exampleUser1)
 
-      const bodyRequest: UserCreationRequest = {
+      const bodyRequest: CreateUser['Request'] = {
         firstName: exampleUser1.firstName,
         lastName: exampleUser1.lastName,
         email: exampleUser1.email,
@@ -99,7 +99,7 @@ describe('UsersController', () => {
     it('should return an error if there is a database error', async () => {
       PrismaClientMock.user.create.mockRejectedValueOnce(new Error('Database error'))
 
-      const bodyRequest: UserCreationRequest = {
+      const bodyRequest: CreateUser['Request'] = {
         firstName: 'John',
         lastName: 'Doe',
         email: 'johndoe@example.com',

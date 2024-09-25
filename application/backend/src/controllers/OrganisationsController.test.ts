@@ -1,6 +1,7 @@
 import { OrganisationsController } from './OrganisationsController'
 import { PrismaClientMock } from '../PrismaClientMock'
-import { OrganisationCreationRequest, OrganisationUpdateRequest } from '@common/src/Organisation'
+import type { CreateOrganisation } from '@common/types/api/organisations/createOrganisation'
+import type { UpdateOrganisation } from '@common/types/api/organisations/updateOrganisation'
 import { Prisma } from '@prisma/client'
 
 const exampleOrg1 = {
@@ -80,7 +81,7 @@ describe('OrganisationsController', () => {
     it('should create a new organisation with the correct details', async () => {
       PrismaClientMock.organisation.create.mockResolvedValueOnce(exampleOrg1)
 
-      const bodyRequest: OrganisationCreationRequest = {
+      const bodyRequest: CreateOrganisation['Request'] = {
         name: exampleOrg1.name,
       }
 
@@ -97,7 +98,7 @@ describe('OrganisationsController', () => {
         new Error('Error creating organisation'),
       )
 
-      const bodyRequest: OrganisationCreationRequest = {
+      const bodyRequest: CreateOrganisation['Request'] = {
         name: exampleOrg1.name,
       }
 
@@ -115,7 +116,7 @@ describe('OrganisationsController', () => {
       PrismaClientMock.organisation.update.mockResolvedValueOnce(exampleOrg1)
 
       const orgID = 1
-      const bodyRequest: OrganisationUpdateRequest = {
+      const bodyRequest: UpdateOrganisation['Request'] = {
         name: exampleOrg1.name,
       }
 
@@ -138,7 +139,7 @@ describe('OrganisationsController', () => {
         ),
       )
       const orgID = 1
-      const bodyRequest: OrganisationUpdateRequest = {
+      const bodyRequest: UpdateOrganisation['Request'] = {
         name: exampleOrg1.name,
       }
 
