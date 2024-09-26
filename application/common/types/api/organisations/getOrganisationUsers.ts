@@ -1,8 +1,6 @@
 import { User } from '@prisma/client'
 
-export interface GetOrganisationUsers {
-  Response: {
-    message: string
-    users: User[] | null
-  }
+export interface GetOrganisationUsersResponse {
+  message: string
+  users: User[] | null
 }

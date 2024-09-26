@@ -1,11 +1,10 @@
 import { Organisation } from '@prisma/client'
 
-export interface CreateOrganisation {
-  Request: {
-    name: string
-  }
-  Response: {
-    message: string
-    newOrganisation: Organisation | null
-  }
+export interface CreateOrganisationRequest {
+  name: string
+}
+
+export interface CreateOrganisationResponse {
+  message: string
+  newOrganisation: Organisation | null
 }
