@@ -11,7 +11,7 @@ import {
   Response,
   Controller,
 } from 'tsoa'
-import logger from '@common/src/logger'
+import logger from 'common/src/logger'
 import type {
   GetUserByIdResponse,
   DeleteUserResponse,
@@ -20,7 +20,7 @@ import type {
   CreateUserResponse,
   UpdateUserRequest,
   UpdateUserResponse,
-} from '@common/types/api/users'
+} from 'common/types/api/users'
 import { User } from '@prisma/client'
 import prisma from '../PrismaClient'
 

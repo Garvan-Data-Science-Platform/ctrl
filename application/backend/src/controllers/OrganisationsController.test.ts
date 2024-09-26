@@ -3,7 +3,7 @@ import { PrismaClientMock } from '../PrismaClientMock'
 import type {
   CreateOrganisationRequest,
   UpdateOrganisationRequest,
-} from '@common/types/api/organisations'
+} from 'common/types/api/organisations'
 import { Prisma } from '@prisma/client'
 
 const exampleOrg1 = {

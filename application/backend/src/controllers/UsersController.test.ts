@@ -1,5 +1,5 @@
 import { UsersController } from './UsersController'
-import type { CreateUserRequest, UpdateUserRequest } from '@common/types/api/users'
+import type { CreateUserRequest, UpdateUserRequest } from 'common/types/api/users'
 import { PrismaClientMock } from '../PrismaClientMock'
 import { Prisma } from '@prisma/client'
 
