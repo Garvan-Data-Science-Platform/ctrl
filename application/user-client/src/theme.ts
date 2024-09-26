@@ -12,6 +12,9 @@ function customTheme(props: ThemeProps) {
       secondary: props.secondary,
       text: { primary: '#272952' },
     },
+    typography: {
+      h3: { color: '#272952', fontSize: 40 },
+    },
   })
 }
 

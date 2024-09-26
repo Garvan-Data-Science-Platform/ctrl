@@ -21,7 +21,7 @@ export default function Profile() {
     <>
       <NavBar />
       <Container>
-        <Typography variant="h3" sx={{ mt: 3, mb: 4, color: '#272952' }}>
+        <Typography variant="h3" sx={{ mt: 3, mb: 4, textAlign: 'left' }}>
           My Personal Details
         </Typography>
         <Grid container spacing={2}>

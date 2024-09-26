@@ -7,6 +7,7 @@ import Contact from './pages/Contact'
 import MessageSent from './pages/MessageSent'
 import News from './pages/News'
 import Glossary from './pages/Glossary'
+import ConsentForm from './pages/ConsentForm'
 
 const router = createBrowserRouter([
   {
@@ -15,6 +16,10 @@ const router = createBrowserRouter([
       {
         path: '/',
         element: <Dashboard />,
+      },
+      {
+        path: '/consent_form',
+        element: <ConsentForm />,
       },
       {
         path: '/profile',

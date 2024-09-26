@@ -1,0 +1,15 @@
+{
+  "steps": [
+    {
+      "title": "CTRL Introduction",
+      "tooltip": "Watch the video introduction to why we are asking you to provide your consent to our program online.",
+      "status": "reviewed",
+      "last_updated": "2024-09-26"
+    },
+    {
+      "title": "Consent for the genomic test",
+      "tooltip": "Tooltip for genomic test",
+      "status": "review_required"
+    }
+  ]
+}
