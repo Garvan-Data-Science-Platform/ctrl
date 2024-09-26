@@ -7,7 +7,7 @@ export default function Glossary() {
       <NavBar />
       <Container maxWidth="md">
         <Box sx={{ textAlign: 'left' }}>
-          <Typography variant="h4" sx={{ mt: 2, mb: 2 }}>
+          <Typography variant="h3" sx={{ mt: 2, mb: 2 }}>
             Glossary
           </Typography>
 
