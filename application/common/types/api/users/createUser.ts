@@ -1,14 +1,13 @@
 import { User } from '@prisma/client'
 
-export interface CreateUser {
-  Request: {
-    firstName: string
-    lastName: string
-    email: string
-    role: string
-  }
-  Response: {
-    message: string
-    newUser: User | null
-  }
+export interface CreateUserRequest {
+  firstName: string
+  lastName: string
+  email: string
+  role: string
+}
+
+export interface CreateUserResponse {
+  message: string
+  newUser: User | null
 }

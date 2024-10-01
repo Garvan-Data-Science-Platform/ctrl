@@ -52,7 +52,7 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "UserCreationRequest": {
+    "CreateUserRequest": {
         "dataType": "refObject",
         "properties": {
             "firstName": {"dataType":"string","required":true},
@@ -72,7 +72,7 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "UserUpdateRequest": {
+    "UpdateUserRequest": {
         "dataType": "refObject",
         "properties": {
             "firstName": {"dataType":"string"},
@@ -129,7 +129,7 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "OrganisationCreationRequest": {
+    "CreateOrganisationRequest": {
         "dataType": "refObject",
         "properties": {
             "name": {"dataType":"string","required":true},
@@ -146,7 +146,7 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "OrganisationUpdateRequest": {
+    "UpdateOrganisationRequest": {
         "dataType": "refObject",
         "properties": {
             "name": {"dataType":"string"},
@@ -276,7 +276,7 @@ export function RegisterRoutes(app: Router) {
 
             async function UsersController_createUser(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
-                    bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"UserCreationRequest"},
+                    bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"CreateUserRequest"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -307,7 +307,7 @@ export function RegisterRoutes(app: Router) {
             async function UsersController_updateUser(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
                     userID: {"in":"path","name":"userID","required":true,"dataType":"double"},
-                    bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"UserUpdateRequest"},
+                    bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"UpdateUserRequest"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -426,7 +426,7 @@ export function RegisterRoutes(app: Router) {
 
             async function OrganisationsController_createOrganisation(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
-                    bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"OrganisationCreationRequest"},
+                    bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"CreateOrganisationRequest"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -457,7 +457,7 @@ export function RegisterRoutes(app: Router) {
             async function OrganisationsController_updateOrganisation(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
                     orgID: {"in":"path","name":"orgID","required":true,"dataType":"double"},
-                    bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"OrganisationUpdateRequest"},
+                    bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"UpdateOrganisationRequest"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa

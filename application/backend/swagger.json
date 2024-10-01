@@ -107,7 +107,7 @@
         "type": "object",
         "additionalProperties": false
       },
-      "UserCreationRequest": {
+      "CreateUserRequest": {
         "properties": {
           "firstName": {
             "type": "string"
@@ -152,7 +152,7 @@
         "type": "object",
         "additionalProperties": false
       },
-      "UserUpdateRequest": {
+      "UpdateUserRequest": {
         "properties": {
           "firstName": {
             "type": "string"
@@ -279,7 +279,7 @@
         "type": "object",
         "additionalProperties": false
       },
-      "OrganisationCreationRequest": {
+      "CreateOrganisationRequest": {
         "properties": {
           "name": {
             "type": "string"
@@ -312,7 +312,7 @@
         "type": "object",
         "additionalProperties": false
       },
-      "OrganisationUpdateRequest": {
+      "UpdateOrganisationRequest": {
         "properties": {
           "name": {
             "type": "string"
@@ -473,7 +473,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserCreationRequest"
+                "$ref": "#/components/schemas/CreateUserRequest"
               }
             }
           }
@@ -558,7 +558,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserUpdateRequest"
+                "$ref": "#/components/schemas/UpdateUserRequest"
               }
             }
           }
@@ -658,7 +658,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OrganisationCreationRequest"
+                "$ref": "#/components/schemas/CreateOrganisationRequest"
               }
             }
           }
@@ -746,7 +746,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OrganisationUpdateRequest"
+                "$ref": "#/components/schemas/UpdateOrganisationRequest"
               }
             }
           }

@@ -1,19 +1,21 @@
-import type { GetAllOrganisations } from './getAllOrganisations'
-import type { GetOrganisationById } from './getOrganisationById'
-import type { CreateOrganisation } from './createOrganisation'
-import type { UpdateOrganisation } from './updateOrganisation'
-import type { DeleteOrganisation } from './deleteOrganisation'
-import type { AddUserToOrganisation } from './addUserToOrganisation'
-import type { RemoveUserFromOrganisation } from './removeUserFromOrganisation'
-import type { GetOrganisationUsers } from './getOrganisationUsers'
+import type { GetAllOrganisationsResponse } from './getAllOrganisations'
+import type { GetOrganisationByIdResponse } from './getOrganisationById'
+import type { CreateOrganisationRequest, CreateOrganisationResponse } from './createOrganisation'
+import type { UpdateOrganisationRequest, UpdateOrganisationResponse } from './updateOrganisation'
+import type { DeleteOrganisationResponse } from './deleteOrganisation'
+import type { AddUserToOrganisationResponse } from './addUserToOrganisation'
+import type { RemoveUserFromOrganisationResponse } from './removeUserFromOrganisation'
+import type { GetOrganisationUsersResponse } from './getOrganisationUsers'
 
 export {
-  GetAllOrganisations,
-  GetOrganisationById,
-  CreateOrganisation,
-  UpdateOrganisation,
-  DeleteOrganisation,
-  AddUserToOrganisation,
-  RemoveUserFromOrganisation,
-  GetOrganisationUsers,
+  GetAllOrganisationsResponse,
+  GetOrganisationByIdResponse,
+  CreateOrganisationRequest,
+  CreateOrganisationResponse,
+  UpdateOrganisationRequest,
+  UpdateOrganisationResponse,
+  DeleteOrganisationResponse,
+  AddUserToOrganisationResponse,
+  RemoveUserFromOrganisationResponse,
+  GetOrganisationUsersResponse,
 }

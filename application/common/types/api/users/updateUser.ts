@@ -1,14 +1,13 @@
 import { User } from '@prisma/client'
 
-export interface UpdateUser {
-  Request: {
-    firstName?: string
-    lastName?: string
-    email?: string
-    role?: string
-  }
-  Response: {
-    message: string
-    updatedUser: User | null
-  }
+export interface UpdateUserRequest {
+  firstName?: string
+  lastName?: string
+  email?: string
+  role?: string
+}
+
+export interface UpdateUserResponse {
+  message: string
+  updatedUser: User | null
 }

@@ -1,8 +1,17 @@
-import type { GetUserById } from './getUserById'
-import type { UpdateUser } from './updateUser'
-import type { DeleteUser } from './deleteUser'
-import type { GetAllUsers } from './getAllUsers'
-import type { CreateUser } from './createUser'
-import type { GetUserProfile } from './getProfile'
+import type { GetUserByIdResponse } from './getUserById'
+import type { GetUserProfileResponse } from './getProfile'
+import type { GetAllUsersResponse } from './getAllUsers'
+import type { CreateUserRequest, CreateUserResponse } from './createUser'
+import type { UpdateUserRequest, UpdateUserResponse } from './updateUser'
+import type { DeleteUserResponse } from './deleteUser'
 
-export { GetUserById, UpdateUser, DeleteUser, GetAllUsers, CreateUser, GetUserProfile }
+export {
+  GetUserByIdResponse,
+  GetUserProfileResponse,
+  GetAllUsersResponse,
+  CreateUserRequest,
+  CreateUserResponse,
+  UpdateUserRequest,
+  UpdateUserResponse,
+  DeleteUserResponse,
+}

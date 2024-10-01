@@ -1,5 +1,3 @@
-export interface AddUserToOrganisation {
-  Response: {
-    message: string
-  }
+export interface AddUserToOrganisationResponse {
+  message: string
 }
