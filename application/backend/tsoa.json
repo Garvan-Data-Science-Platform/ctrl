@@ -7,13 +7,14 @@
     "specVersion": 3,
     "securityDefinitions": {
       "jwt": {
-        "type": "apiKey",
-        "name": "Authorization",
-        "in": "header"
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     }
   },
   "routes": {
+    "authenticationModule": "src/authentication.ts",
     "basePath": "/",
     "routesDir": "src"
   }
