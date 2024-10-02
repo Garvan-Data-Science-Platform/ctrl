@@ -43,7 +43,7 @@ export class Api {
       if (err instanceof Error) {
         logger.error(`Caught Error for ${req.path}:`, { error: err.message })
         return res.status(500).json({
-          message: err.message || 'Internal Server Error',
+          message: 'Internal Server Error',
           error: err,
         })
       }
