@@ -10,6 +10,7 @@ import {
   Body,
   Patch,
   Delete,
+  Security,
 } from 'tsoa'
 import logger from 'common/src/logger'
 import prisma from '../PrismaClient'
@@ -29,6 +30,7 @@ import type {
 
 @Route('organisations')
 @Tags('Organisations')
+@Security('jwt')
 export class OrganisationsController extends Controller {
   organisationRepo = prisma.organisation
 

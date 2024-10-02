@@ -10,6 +10,7 @@ import {
   SuccessResponse,
   Response,
   Controller,
+  Security,
 } from 'tsoa'
 import logger from 'common/src/logger'
 import type {
@@ -26,6 +27,7 @@ import prisma from '../PrismaClient'
 
 @Route('users')
 @Tags('Users')
+@Security('jwt')
 export class UsersController extends Controller {
   userRepo = prisma.user
 
@@ -89,7 +91,9 @@ export class UsersController extends Controller {
     }
 
     try {
-      const insertedUser = await this.userRepo.create({ data: bodyRequest })
+      const insertedUser = await this.userRepo.create({
+        data: { ...bodyRequest, password: 'temp_password_hash' },
+      })
       const responseData = {
         message: `Created user with ID: ${insertedUser.id}`,
         newUser: insertedUser,
