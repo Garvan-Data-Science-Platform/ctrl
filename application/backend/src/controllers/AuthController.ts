@@ -22,22 +22,17 @@ export class AuthController extends Controller {
   public async register(@Body() bodyRequest: RegisterRequest): Promise<RegisterResponse> {
     const { password, ...userDetails } = bodyRequest
 
-    // Validation check
-    if (
-      !userDetails.firstName ||
-      !userDetails.lastName ||
-      !userDetails.email ||
-      !userDetails.role
-    ) {
-      const error = {
-        message: 'Missing required fields: firstName, lastName, email, role',
-        token: null,
-      }
-      logger.error({ ...error })
-      return error
-    }
-
     try {
+      // Validation check
+      if (
+        !userDetails.firstName ||
+        !userDetails.lastName ||
+        !userDetails.email ||
+        !userDetails.role ||
+        !password
+      ) {
+        throw Error('Missing required fields: firstName, lastName, email, password, role')
+      }
       const hashedPassword = await this.hashPassword(password)
       const insertedUser = await this.userRepo.create({
         data: {
@@ -51,12 +46,13 @@ export class AuthController extends Controller {
       const responseData = {
         message: `Created user with ID: ${insertedUser.id}`,
         token,
+        error: null,
       }
       logger.info(responseData)
 
       return responseData
     } catch (err) {
-      const error = { message: 'Could not Register User', token: null }
+      const error = { message: 'Could not Register User', token: null, error: err as Error }
       logger.error({ ...error, err })
       return error
     }
