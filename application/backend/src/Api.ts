@@ -21,15 +21,18 @@ export class Api {
 
     // JWT middleware to protect routes
     if (!process.env.JWT_SECRET) {
+      logger.error({ message: 'JWT_SECRET environment variable not set' })
       throw new Error('JWT_SECRET environment variable not set')
     }
 
     this.app.use(
-      expressjwt({ secret: process.env.JWT_SECRET, algorithms: ['HS256'] }).unless({
-        path: ['/auth/register', '/auth/login'],
+      expressjwt({
+        secret: process.env.JWT_SECRET,
+        algorithms: ['HS256'],
+      }).unless({
+        path: ['/auth/register', '/auth/login', '/docs'],
       }),
     )
-
     // Set up Swagger UI to serve the API documentation
     this.app.use('/docs', swaggerUi.serve, async (req: Request, res: Response) => {
       return res.send(swaggerUi.generateHTML(await import('../swagger.json')))
@@ -53,6 +56,7 @@ export class Api {
         })
       }
       if (err instanceof Error) {
+        logger.error(`Caught Error for ${req.path}:`, { error: err.message })
         return res.status(500).json({
           message: 'Internal Server Error',
         })
