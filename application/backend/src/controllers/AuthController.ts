@@ -1,9 +1,9 @@
-import { CreateUser } from '@common/types/api/users/createUser'
+import type { RegisterRequest, RegisterResponse } from 'common/types/api/auth'
 import { Route, Tags, Controller, Body, Post, SuccessResponse, Response } from 'tsoa'
-import jwt from 'jsonwebtoken'
+import jsonwebtoken from 'jsonwebtoken'
 import crypto from 'crypto'
 import prisma from '../PrismaClient'
-import logger from '@common/src/logger'
+import logger from 'common/src/logger'
 
 @Route('auth')
 @Tags('Auth')
@@ -19,25 +19,25 @@ export class AuthController extends Controller {
   @SuccessResponse('201', 'User Created')
   @Response('422', 'Validation Failed')
   @Response('500', 'Internal Server Error')
-  public async register(
-    @Body() bodyRequest: CreateUser['Request'],
-  ): Promise<CreateUser['Response']> {
+  public async register(@Body() bodyRequest: RegisterRequest): Promise<RegisterResponse> {
     const { password, ...userDetails } = bodyRequest
-    try {
-      if (
-        !userDetails.firstName ||
-        !userDetails.lastName ||
-        !userDetails.email ||
-        !userDetails.role
-      ) {
-        const error = {
-          message: 'Missing required fields: firstName, lastName, email, role',
-          token: null,
-          userId: null,
-        }
-        logger.error({ ...error })
-        return error
+
+    // Validation check
+    if (
+      !userDetails.firstName ||
+      !userDetails.lastName ||
+      !userDetails.email ||
+      !userDetails.role
+    ) {
+      const error = {
+        message: 'Missing required fields: firstName, lastName, email, role',
+        token: null,
       }
+      logger.error({ ...error })
+      return error
+    }
+
+    try {
       const hashedPassword = await this.hashPassword(password)
       const insertedUser = await this.userRepo.create({
         data: {
@@ -46,26 +46,19 @@ export class AuthController extends Controller {
         },
       })
 
-      // JWT middleware to protect routes
-      if (!process.env.JWT_SECRET) {
-        logger.error({ message: 'JWT_SECRET environment variable not set' })
-        throw new Error('JWT_SECRET environment variable not set')
-      }
-
-      const token = jwt.sign({ userId: insertedUser.id }, process.env.JWT_SECRET, {
-        algorithm: 'HS256',
-      })
+      const token = await this.generateToken(insertedUser.id)
 
       const responseData = {
         message: `Created user with ID: ${insertedUser.id}`,
-        userId: insertedUser.id,
         token,
       }
       logger.info(responseData)
 
       return responseData
-    } catch (error) {
-      return { message: 'Email already exists', token: null, userId: null }
+    } catch (err) {
+      const error = { message: 'Could not Register User', token: null }
+      logger.error({ ...error, err })
+      return error
     }
   }
 
@@ -87,6 +80,19 @@ export class AuthController extends Controller {
         if (err) reject(err)
         resolve(salt.toString('hex') + ':' + derivedKey.toString('hex'))
       })
+    })
+  }
+
+  private async generateToken(userId: number): Promise<string> {
+    if (!process.env.JWT_SECRET) {
+      logger.error({ message: 'JWT_SECRET environment variable not set' })
+      throw new Error('JWT_SECRET environment variable not set')
+    }
+
+    // Generate JWT token
+    return jsonwebtoken.sign({ userId }, process.env.JWT_SECRET, {
+      algorithm: 'HS256',
+      expiresIn: '1h',
     })
   }
 
