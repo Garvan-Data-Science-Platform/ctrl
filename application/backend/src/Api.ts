@@ -41,11 +41,13 @@ export class Api {
         })
       }
       if (err instanceof Error) {
-        logger.error(`Caught Error for ${req.path}:`, { error: err.message })
-        return res.status(500).json({
+        const error = {
           message: 'Internal Server Error',
-          error: err,
-        })
+          request_path: req.path,
+          error: { message: err.message },
+        }
+        logger.error(error)
+        return res.status(500).json(error)
       }
 
       next()
