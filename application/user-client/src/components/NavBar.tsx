@@ -11,6 +11,7 @@ import MenuItem from '@mui/material/MenuItem'
 import AdbIcon from '@mui/icons-material/Adb'
 import { Button, Tab, Tabs } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { useAuth } from '../auth'
 
 const pages = [
   { name: 'My Activities', route: '/' },
@@ -23,6 +24,7 @@ const pages = [
 export default function NavBar() {
   const location = useLocation()
   const nav = useNavigate()
+  const { logout } = useAuth()
   const activePage =
     pages
       .filter((val) => val.route == location.pathname || val.alt?.includes(location.pathname))
@@ -98,7 +100,7 @@ export default function NavBar() {
             </Tabs>
           </Box>
           <Box sx={{ flexGrow: 0 }}>
-            <Button variant="outlined" href="/logout">
+            <Button variant="outlined" onClick={logout}>
               Log Out
             </Button>
           </Box>

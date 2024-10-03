@@ -18,11 +18,10 @@ import { useQuery } from '@tanstack/react-query'
 import CheckCircle from '@mui/icons-material/CheckCircle'
 import InfoOutlined from '@mui/icons-material/InfoOutlined'
 import Circle from '@mui/icons-material/Circle'
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 export default function Dashboard() {
   //const bears = useAppStore()
-  const nav = useNavigate()
 
   const { isPending, error, data } = useQuery({
     queryKey: ['consent_forms'],
@@ -30,8 +29,8 @@ export default function Dashboard() {
     queryFn: () => surveySteps as GetSurveyStepsResponse,
   })
 
-  const renderReviewStatus = (status: 'reviewed' | 'review_required') => {
-    if (status == 'reviewed') {
+  const renderReviewStatus = (status: 'completed' | 'viewed' | 'review_required') => {
+    if (['viewed', 'completed'].includes(status)) {
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <CheckCircle sx={{ mr: 2, color: '#92cd8a', fontSize: 30 }} />
@@ -77,7 +76,7 @@ export default function Dashboard() {
         <Alert
           severity="warning"
           action={
-            <Button onClick={() => nav('/profile')} color="inherit">
+            <Button component={Link} to="/profile" color="inherit">
               Complete
             </Button>
           }
@@ -91,7 +90,7 @@ export default function Dashboard() {
         <Typography variant="h3" textAlign="left" sx={{ mt: 3, mb: 3 }}>
           Welcome FirstName
         </Typography>
-        {data?.steps.map((val) => (
+        {data?.steps.map((val, idx) => (
           <Card
             sx={{
               boxShadow: '0',
@@ -110,7 +109,24 @@ export default function Dashboard() {
                     height: '100%',
                   }}
                 >
-                  <Typography>{val.title}</Typography>
+                  <Box sx={{ display: 'flex', gap: 3 }}>
+                    <Box
+                      sx={{
+                        width: 24,
+                        height: 24,
+                        borderRadius: '50%',
+                        border: '2px solid',
+                        borderColor: 'primary.light',
+                        bgcolor: 'primary.main',
+                        color: 'white',
+                      }}
+                    >
+                      <Typography lineHeight="24px" fontWeight="bold">
+                        {idx}
+                      </Typography>
+                    </Box>
+                    <Typography lineHeight="24px">{val.title}</Typography>
+                  </Box>
                   <Tooltip title={val.tooltip}>
                     <InfoOutlined />
                   </Tooltip>
@@ -135,7 +151,11 @@ export default function Dashboard() {
               </Grid>
               <Grid size={{ xs: 12, sm: 2 }}>
                 <Button fullWidth variant="contained">
-                  {val.status == 'reviewed' ? 'View' : 'Review'}
+                  {val.status == 'completed'
+                    ? 'Edit'
+                    : val.status == 'review_required'
+                      ? 'Review'
+                      : 'View'}
                 </Button>
               </Grid>
             </Grid>
