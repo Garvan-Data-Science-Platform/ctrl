@@ -5,6 +5,8 @@ import crypto from 'crypto'
 import prisma from '../PrismaClient'
 import logger from 'common/src/logger'
 
+const JWT_EXPIRY = process.env.JWT_EXPIRY || '1h'
+
 @Route('auth')
 @Tags('Auth')
 export class AuthController extends Controller {
@@ -88,7 +90,7 @@ export class AuthController extends Controller {
     // Generate JWT token
     return jsonwebtoken.sign({ userId }, process.env.JWT_SECRET, {
       algorithm: 'HS256',
-      expiresIn: '1h',
+      expiresIn: JWT_EXPIRY,
     })
   }
 
