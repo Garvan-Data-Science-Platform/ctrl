@@ -1,5 +1,10 @@
-import type { RegisterRequest, RegisterResponse } from 'common/types/api/auth'
-import { Route, Tags, Controller, Body, Post, SuccessResponse, Response } from 'tsoa'
+import type {
+  RegisterRequest,
+  RegisterResponse,
+  LoginRequest,
+  LoginResponse,
+} from 'common/types/api/auth'
+import { Route, Tags, Controller, Body, Post, SuccessResponse, Response, ValidateError } from 'tsoa'
 import jsonwebtoken from 'jsonwebtoken'
 import crypto from 'crypto'
 import prisma from '../PrismaClient'
@@ -33,8 +38,11 @@ export class AuthController extends Controller {
         !userDetails.role ||
         !password
       ) {
-        throw Error('Missing required fields: firstName, lastName, email, password, role')
+        throw Error(
+          'Missing required fields: firstName, lastName, email, password, role',
+        ) as ValidateError
       }
+
       const hashedPassword = await this.hashPassword(password)
       const insertedUser = await this.userRepo.create({
         data: {
@@ -49,6 +57,7 @@ export class AuthController extends Controller {
         message: `Created user with ID: ${insertedUser.id}`,
         token,
       }
+
       logger.info(responseData)
 
       return responseData
@@ -59,16 +68,44 @@ export class AuthController extends Controller {
     }
   }
 
-  // /**
-  //  * login
-  //  *
-  //  * @summary Login a User
-  //  */
-  // @Post('/login')
-  // @SuccessResponse('200', 'Logged In')
-  // @Response('401', 'Unauthorized')
-  // @Response('500', 'Internal Server Error')
-  // public async login(): Promise<void> {}
+  /**
+   * login
+   *
+   * @summary Login a User
+   */
+  @Post('/login')
+  @SuccessResponse('200', 'Logged In')
+  @Response('401', 'Unauthorized')
+  @Response('500', 'Internal Server Error')
+  public async login(@Body() bodyRequest: LoginRequest): Promise<LoginResponse> {
+    try {
+      // Validation check
+      if (!bodyRequest.email || !bodyRequest.password) {
+        throw Error('Missing required fields: email, password') as ValidateError
+      }
+
+      // Check if user exists and password matches
+      const user = await this.userRepo.findUnique({ where: { email: bodyRequest.email } })
+      if (!user || !(await this.verifyPassword(user.password, bodyRequest.password))) {
+        throw Error('Invalid email or password')
+      }
+
+      const token = await this.generateToken(user.id)
+      const responseData = {
+        message: 'Logged In',
+        token,
+        error: null,
+      }
+
+      logger.info(responseData)
+
+      return responseData
+    } catch (err) {
+      const error = { message: 'Could not Login User', token: null, error: err as Error }
+      logger.error({ ...error, err })
+      return error
+    }
+  }
 
   private async hashPassword(password: string): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -93,13 +130,13 @@ export class AuthController extends Controller {
     })
   }
 
-  // private async verifyPassword(hashedPassword: string, password: string): Promise<boolean> {
-  //   return new Promise((resolve, reject) => {
-  //     const [salt, key] = hashedPassword.split(':')
-  //     crypto.scrypt(password, Buffer.from(salt, 'hex'), 64, (err, derivedKey) => {
-  //       if (err) reject(err)
-  //       resolve(key === derivedKey.toString('hex'))
-  //     })
-  //   })
-  // }
+  private async verifyPassword(hashedPassword: string, password: string): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      const [salt, key] = hashedPassword.split(':')
+      crypto.scrypt(password, Buffer.from(salt, 'hex'), 64, (err, derivedKey) => {
+        if (err) reject(err)
+        resolve(key === derivedKey.toString('hex'))
+      })
+    })
+  }
 }
