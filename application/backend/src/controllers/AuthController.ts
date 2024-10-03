@@ -48,13 +48,12 @@ export class AuthController extends Controller {
       const responseData = {
         message: `Created user with ID: ${insertedUser.id}`,
         token,
-        error: null,
       }
       logger.info(responseData)
 
       return responseData
     } catch (err) {
-      const error = { message: 'Could not Register User', token: null, error: err as Error }
+      const error = { message: 'Could not Register User', token: null }
       logger.error({ ...error, err })
       return error
     }

@@ -9,5 +9,4 @@ export interface RegisterRequest {
 export interface RegisterResponse {
   message: string
   token: string | null
-  error: Error | null
 }
