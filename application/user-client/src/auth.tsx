@@ -3,7 +3,7 @@ import { Outlet, Navigate } from 'react-router-dom'
 
 const AuthContext = createContext({
   isAuthenticated: true,
-  login: (_: string) => {},
+  login: (_: string) => {}, // eslint-disable-line
   logout: () => {},
   token: null as string | null,
 })

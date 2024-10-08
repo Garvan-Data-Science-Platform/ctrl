@@ -1,2 +1,2 @@
-import { LoginRequest, LoginResponse } from './login'
+import type { LoginRequest, LoginResponse } from './login'
 export { LoginRequest, LoginResponse }

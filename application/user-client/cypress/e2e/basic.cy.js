@@ -1,8 +1,8 @@
 /// <reference types="cypress" />
 
-describe('example to-do app', () => {
+describe('basic', () => {
   it('renders homepage', () => {
     cy.visit('/')
-    cy.contains('My Activities').should('exist')
+    cy.contains('Log In').should('exist')
   })
 })
