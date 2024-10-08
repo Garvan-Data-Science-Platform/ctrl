@@ -2,7 +2,7 @@ export interface GetSurveyStepsResponse {
   steps: {
     title: string
     tooltip: string
-    status: 'reviewed' | 'review_required'
+    status: 'completed' | 'review_required' | 'viewed' // Viewed means there were no questions, just a video
     last_updated?: string
   }[]
 }

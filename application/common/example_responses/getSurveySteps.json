@@ -3,12 +3,18 @@
     {
       "title": "CTRL Introduction",
       "tooltip": "Watch the video introduction to why we are asking you to provide your consent to our program online.",
-      "status": "reviewed",
+      "status": "viewed",
       "last_updated": "2024-09-26"
     },
     {
       "title": "Consent for the genomic test",
       "tooltip": "Tooltip for genomic test",
+      "status": "completed",
+      "last_updated": "2024-09-27"
+    },
+    {
+      "title": "Consent for the genomic test 2",
+      "tooltip": "Tooltip for genomic test 2",
       "status": "review_required"
     }
   ]
