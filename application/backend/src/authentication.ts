@@ -3,6 +3,13 @@ import * as express from 'express'
 import * as jwt from 'jsonwebtoken'
 import logger from 'common/src/logger'
 
+export class NoTokenError extends Error {
+  constructor() {
+    super('No token provided')
+    this.name = 'NoTokenError'
+  }
+}
+
 export function expressAuthentication(
   request: express.Request,
   securityName: string,
@@ -14,7 +21,7 @@ export function expressAuthentication(
 
     return new Promise((resolve, reject) => {
       if (!token) {
-        reject(new Error('No token provided'))
+        reject(new NoTokenError())
         return
       }
 

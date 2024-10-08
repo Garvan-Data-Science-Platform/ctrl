@@ -31,6 +31,7 @@ import type {
 @Route('organisations')
 @Tags('Organisations')
 @Security('jwt')
+@Response('401', 'Unauthorized')
 export class OrganisationsController extends Controller {
   organisationRepo = prisma.organisation
 
