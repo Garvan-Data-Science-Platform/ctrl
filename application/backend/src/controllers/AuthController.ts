@@ -9,6 +9,7 @@ import jsonwebtoken from 'jsonwebtoken'
 import crypto from 'crypto'
 import prisma from '../PrismaClient'
 import logger from 'common/src/logger'
+import { User } from '@prisma/client'
 
 const JWT_EXPIRY = process.env.JWT_EXPIRY || '1h'
 
@@ -44,7 +45,7 @@ export class AuthController extends Controller {
       }
 
       const hashedPassword = await this.hashPassword(password)
-      const insertedUser = await this.userRepo.create({
+      const insertedUser: User = await this.userRepo.create({
         data: {
           ...userDetails,
           password: hashedPassword,
@@ -58,11 +59,12 @@ export class AuthController extends Controller {
         token,
       }
 
-      logger.info(responseData)
+      logger.info({ ...responseData })
 
       return responseData
     } catch (err) {
       const error = { message: 'Could not Register User', token: null }
+      console.log(err)
       logger.error({ ...error, err })
       return error
     }
@@ -97,7 +99,7 @@ export class AuthController extends Controller {
         error: null,
       }
 
-      logger.info(responseData)
+      logger.info({ ...responseData })
 
       return responseData
     } catch (err) {

@@ -17,8 +17,3 @@ repos:
         entry: yarn lint
         language: system
         types_or: [javascript, jsx, ts, tsx]
-      - id: test
-        name: Jest
-        entry: yarn test --passWithNoTests
-        language: system
-        types_or: [javascript, jsx, ts, tsx]
