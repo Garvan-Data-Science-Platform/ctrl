@@ -156,7 +156,7 @@ describe('AuthController', () => {
       expect(getAllUsersBody2.message).toEqual('Got all users')
     })
 
-    it("shouldn't allow the user to login with the incorrect password", async () => {
+    it("should return 401 and shouldn't allow the user to login with the incorrect password", async () => {
       // Login the user with incorrect password
       const loginRequest: LoginRequest = {
         email: 'johndoe@email.com',
