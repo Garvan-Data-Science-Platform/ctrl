@@ -87,6 +87,7 @@ export class AuthController extends Controller {
       // Check if user exists and password matches
       const user = await this.userRepo.findUnique({ where: { email: bodyRequest.email } })
       if (!user || !(await this.verifyPassword(user.password, bodyRequest.password))) {
+        this.setStatus(401)
         throw Error('Invalid email or password')
       }
 
@@ -100,7 +101,8 @@ export class AuthController extends Controller {
 
       return responseData
     } catch (err) {
-      const error = { message: 'Could not Login User', token: null }
+      const errorMessage = err instanceof Error ? err.message : 'Could not login'
+      const error = { message: errorMessage, token: null }
       logger.error({ ...error, err })
       return error
     }
