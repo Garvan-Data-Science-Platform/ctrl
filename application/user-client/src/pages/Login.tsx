@@ -21,6 +21,7 @@ export default function Login() {
       .then((res) => {
         if (res.ok) {
           res.json().then((data: LoginResponse) => {
+            if (!data.token) throw new Error('No token provided')
             login(data.token)
             nav('/')
           })
