@@ -8,6 +8,7 @@ import type {
 } from 'common/types/api/auth'
 import type { GetAllUsersResponse } from 'common/types/api/users'
 import prisma from '../PrismaClient'
+import { resetDB } from '../TestHelpers'
 
 const api = new Api()
 const app = api.app
@@ -15,6 +16,7 @@ const app = api.app
 describe('AuthController', () => {
   beforeAll(async () => {
     api.run()
+    await resetDB()
   })
 
   afterAll(async () => {
@@ -101,6 +103,7 @@ describe('AuthController', () => {
       const body = response.body
       expect(body.message).toBe('Validation Failed')
     })
+
     it('should return an error if the user is already registered', async () => {})
   })
 
@@ -118,6 +121,7 @@ describe('AuthController', () => {
       const response = await request(app).post('/auth/register').send(registerRequest)
       if (response.status != 201) throw Error('Could not register user!')
     })
+
     it('should allow access to protected routes', async () => {
       // Try to make a protected route request
       const protectedRouteResponse1 = await request(app).get('/users')
@@ -151,16 +155,32 @@ describe('AuthController', () => {
       expect(protectedRouteResponse2.status).toEqual(200)
       expect(getAllUsersBody2.message).toEqual('Got all users')
     })
-    it('should login the user returning a token', async () => {})
-    it("shouldn't allow the user to login with the incorrect password", async () => {})
-    it('should return 422 if validation fails', async () => {})
-  })
 
-  describe('hashPassword', () => {
-    it('should hash the given password', async () => {})
-    it('should produce different hashes for the same password due to random salt', async () => {})
-    it('should throw an error if scrypt fails', async () => {})
+    it("shouldn't allow the user to login with the incorrect password", async () => {
+      // Login the user with incorrect password
+      const loginRequest: LoginRequest = {
+        email: 'johndoe@email.com',
+        password: 'wrongPassword',
+      }
+
+      const loginResponse = await request(app).post('/auth/login').send(loginRequest)
+      expect(loginResponse.status).toEqual(401)
+
+      const body = loginResponse.body
+      expect(body.message).toBe('Invalid email or password')
+      expect(body.token).toBeNull()
+    })
+
+    it('should return 422 if validation fails', async () => {
+      const loginRequest = {
+        email: 'johndoe@email.com',
+      }
+
+      const response = await request(app).post('/auth/login').send(loginRequest)
+      expect(response.status).toEqual(422)
+
+      const body = response.body
+      expect(body.message).toBe('Validation Failed')
+    })
   })
-  describe('verifyPassword', () => {})
-  describe('generateToken', () => {})
 })

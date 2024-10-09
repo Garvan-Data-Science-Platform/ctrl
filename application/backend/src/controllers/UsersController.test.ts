@@ -9,25 +9,28 @@ import {
   GetUserByIdResponse,
   UpdateUserResponse,
 } from 'common/types/api/users'
+import { resetDB } from '../TestHelpers'
 
 const api = new Api()
 const app = api.app
 
 describe('UsersController', () => {
   let token: string
+
+  const testUser: RegisterRequest = {
+    firstName: 'Test',
+    lastName: 'User',
+    email: 'test@user.com',
+    password: 'password123',
+    role: 'test',
+  }
+
   beforeAll(async () => {
     api.run()
-
-    const user: RegisterRequest = {
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'example@email.com',
-      password: 'password123',
-      role: 'user',
-    }
+    await resetDB()
 
     // Register user
-    const registerResponse = await request(app).post('/auth/register').send(user)
+    const registerResponse = await request(app).post('/auth/register').send(testUser)
     const body: RegisterResponse = registerResponse.body
     if (!body.token) throw new Error()
     token = body.token
@@ -56,7 +59,7 @@ describe('UsersController', () => {
       expect(body).toHaveProperty('users')
     })
 
-    it('should return an error if a database error occurs', async () => {
+    it('should return a 500 error if a database error occurs', async () => {
       jest.spyOn(prisma.user, 'findMany').mockImplementationOnce(() => {
         throw new Error('Internal Server Error')
       })
@@ -126,7 +129,7 @@ describe('UsersController', () => {
     })
 
     it('should create a new user', async () => {
-      const user = {
+      const newUser = {
         firstName: 'Jane',
         lastName: 'Doe',
         email: 'jane@example.com',
@@ -135,7 +138,7 @@ describe('UsersController', () => {
       }
 
       // Check that the user does not already exist
-      const existingUser = await prisma.user.findFirst({ where: { email: user.email } })
+      const existingUser = await prisma.user.findFirst({ where: { email: newUser.email } })
       if (existingUser) {
         throw new Error('User with email already exists')
       }
@@ -144,17 +147,17 @@ describe('UsersController', () => {
       const response = await request(app)
         .post('/users')
         .set({ Authorization: `Bearer ${token}` })
-        .send(user)
+        .send(newUser)
       expect(response.status).toBe(201)
 
       const body: CreateUserResponse = response.body
       expect(body.message).toMatch(/Created user with ID: \d+/)
 
-      const newUser = await prisma.user.findFirst({ where: { email: user.email } })
-      if (!newUser) {
+      const createdUser = await prisma.user.findFirst({ where: { email: newUser.email } })
+      if (!createdUser) {
         throw new Error('User with email already exists')
       }
-      expect(newUser?.email).toBe(user.email)
+      expect(createdUser?.email).toBe(newUser.email)
     })
   })
 
@@ -168,23 +171,17 @@ describe('UsersController', () => {
     })
 
     it('should update a user by ID', async () => {
-      const userID: number = 2
-      const user = {
-        firstName: 'Jane',
-        lastName: 'Doe',
-        email: 'jane@example.com',
-        role: 'user',
-      }
+      const userID: number = 1
 
       const newFirstName: string = 'Updated'
 
       // Get existing user details
       const existingUser = await prisma.user.findFirst({ where: { id: userID } })
 
-      expect(existingUser?.email).toBe(user.email)
-      expect(existingUser?.firstName).toBe(user.firstName)
-      expect(existingUser?.lastName).toBe(user.lastName)
-      expect(existingUser?.role).toBe(user.role)
+      expect(existingUser?.email).toBe(testUser.email)
+      expect(existingUser?.firstName).toBe(testUser.firstName)
+      expect(existingUser?.lastName).toBe(testUser.lastName)
+      expect(existingUser?.role).toBe(testUser.role)
 
       const response = await request(app)
         .patch(`/users/${userID}`)
