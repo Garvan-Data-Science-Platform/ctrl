@@ -29,11 +29,7 @@ const main = async () => {
           email: user.email,
         },
         update: {
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
-          role: user.role,
-          password: user.password,
+          ...user,
           organisations: {
             connect: user.organisations
               .map((orgName) => savedOrganisations.find((org) => org.name === orgName)?.id)
@@ -41,11 +37,7 @@ const main = async () => {
           },
         },
         create: {
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
-          role: user.role,
-          password: user.password,
+          ...user,
           organisations: {
             connect: user.organisations
               .map((orgName) => savedOrganisations.find((org) => org.name === orgName)?.id)
