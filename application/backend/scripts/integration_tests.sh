@@ -1,5 +1,5 @@
 # Spin-up db
-docker compose --env-file ./.env.tests up -d
+docker compose --env-file .env up -d
 
 # Wait for db
 echo "Waiting for db to spin up..."
