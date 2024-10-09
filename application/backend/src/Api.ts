@@ -45,7 +45,7 @@ export class Api {
         const error = {
           message: 'No token provided',
         }
-        logger.error(error)
+        logger.error({ ...error })
         return res.status(401).json(error)
       }
 

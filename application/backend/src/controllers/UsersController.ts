@@ -67,7 +67,7 @@ export class UsersController extends Controller {
       this.setStatus(404)
       return error
     }
-    const responseData = { message: `Get user with ID: ${userID}`, user }
+    const responseData = { message: `Got user with ID: ${userID}`, user }
     logger.info({ ...responseData })
     return responseData
   }
@@ -137,8 +137,9 @@ export class UsersController extends Controller {
       logger.info({ ...responseData })
       return responseData
     } catch (err) {
-      const error = { message: 'Error updating user', updatedUser: null }
-      logger.error({ ...error, err })
+      const error = { message: `User with ID: ${userID} not found`, updatedUser: null }
+      logger.error({ ...error })
+      this.setStatus(404)
       return error
     }
   }
@@ -156,12 +157,13 @@ export class UsersController extends Controller {
   public async deleteUser(@Path() userID: number): Promise<DeleteUserResponse> {
     try {
       const deletedUser = await this.userRepo.delete({ where: { id: userID } })
-      const responseData = { message: `Deleted user with ID: ${userID}`, deletedUser }
-      logger.info({ ...responseData })
+      const responseData = { message: `Deleted user with ID: ${userID}` }
+      logger.info({ ...responseData, deletedUser })
       return responseData
     } catch (err) {
-      const error = { message: 'Error deleting user', deletedUser: null }
+      const error = { message: `User with ID: ${userID} not found` }
       logger.error({ ...error, err })
+      this.setStatus(404)
       return error
     }
   }

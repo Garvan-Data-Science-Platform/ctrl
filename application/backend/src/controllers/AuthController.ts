@@ -60,11 +60,9 @@ export class AuthController extends Controller {
       }
 
       logger.info({ ...responseData })
-
       return responseData
     } catch (err) {
       const error = { message: 'Could not Register User', token: null }
-      console.log(err)
       logger.error({ ...error, err })
       return error
     }
@@ -94,16 +92,15 @@ export class AuthController extends Controller {
 
       const token = await this.generateToken(user.id)
       const responseData = {
-        message: 'Logged In',
+        message: 'Logged in Successfully!',
         token,
-        error: null,
       }
 
       logger.info({ ...responseData })
 
       return responseData
     } catch (err) {
-      const error = { message: 'Could not Login User', token: null, error: err as Error }
+      const error = { message: 'Could not Login User', token: null }
       logger.error({ ...error, err })
       return error
     }
