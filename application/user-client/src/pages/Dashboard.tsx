@@ -122,7 +122,7 @@ export default function Dashboard() {
                       }}
                     >
                       <Typography lineHeight="24px" fontWeight="bold">
-                        {idx}
+                        {idx + 1}
                       </Typography>
                     </Box>
                     <Typography lineHeight="24px">{val.title}</Typography>
@@ -150,7 +150,7 @@ export default function Dashboard() {
                 </Box>
               </Grid>
               <Grid size={{ xs: 12, sm: 2 }}>
-                <Button fullWidth variant="contained">
+                <Button component={Link} to={`/consent_form/${idx}`} fullWidth variant="contained">
                   {val.status == 'completed'
                     ? 'Edit'
                     : val.status == 'review_required'
