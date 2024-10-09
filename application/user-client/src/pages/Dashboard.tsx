@@ -92,6 +92,7 @@ export default function Dashboard() {
         </Typography>
         {data?.steps.map((val, idx) => (
           <Card
+            key={idx}
             sx={{
               boxShadow: '0',
               p: 3,
