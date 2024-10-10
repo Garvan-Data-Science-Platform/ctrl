@@ -4,5 +4,6 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  token: string
+  message: string
+  token: string | null
 }

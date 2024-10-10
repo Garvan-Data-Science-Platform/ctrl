@@ -4,9 +4,17 @@
   "controllerPathGlobs": ["src/controllers/*Controller.ts"],
   "spec": {
     "outputDirectory": ".",
-    "specVersion": 3
+    "specVersion": 3,
+    "securityDefinitions": {
+      "jwt": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
   },
   "routes": {
+    "authenticationModule": "src/authentication.ts",
     "basePath": "/",
     "routesDir": "src"
   }
