@@ -16,6 +16,9 @@ const app = api.app
 describe('AuthController', () => {
   beforeAll(async () => {
     api.run()
+  })
+
+  beforeEach(async () => {
     await resetDB()
   })
 
@@ -108,7 +111,7 @@ describe('AuthController', () => {
   })
 
   describe('POST /auth/login', () => {
-    beforeAll(async () => {
+    beforeEach(async () => {
       // Register a user
       const registerRequest: RegisterRequest = {
         firstName: 'John',

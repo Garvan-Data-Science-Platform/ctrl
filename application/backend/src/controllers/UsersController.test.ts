@@ -10,12 +10,14 @@ import {
   UpdateUserResponse,
 } from 'common/types/api/users'
 import { resetDB } from '../TestHelpers'
+import { getUserIdFromToken } from '../authentication'
 
 const api = new Api()
 const app = api.app
 
 describe('UsersController', () => {
   let token: string
+  let registeredUserID: number
 
   const testUser: RegisterRequest = {
     firstName: 'Test',
@@ -27,6 +29,9 @@ describe('UsersController', () => {
 
   beforeAll(async () => {
     api.run()
+  })
+
+  beforeEach(async () => {
     await resetDB()
 
     // Register user
@@ -34,6 +39,7 @@ describe('UsersController', () => {
     const body: RegisterResponse = registerResponse.body
     if (!body.token) throw new Error()
     token = body.token
+    registeredUserID = getUserIdFromToken(token)
   })
 
   afterAll(async () => {
@@ -84,7 +90,7 @@ describe('UsersController', () => {
     })
 
     it('should return a user by ID', async () => {
-      const userID = 1
+      const userID = registeredUserID
       const response = await request(app)
         .get(`/users/${userID}`)
         .set({ Authorization: `Bearer ${token}` })
@@ -171,7 +177,7 @@ describe('UsersController', () => {
     })
 
     it('should update a user by ID', async () => {
-      const userID: number = 1
+      const userID: number = registeredUserID
 
       const newFirstName: string = 'Updated'
 
@@ -228,7 +234,7 @@ describe('UsersController', () => {
     })
 
     it('should delete a user by ID', async () => {
-      const userID: number = 1
+      const userID: number = registeredUserID
 
       // Check that user exists in db
       const existingUser = await prisma.user.findFirst({ where: { id: userID } })
