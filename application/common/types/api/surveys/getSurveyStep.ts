@@ -1,8 +1,15 @@
 export interface SurveyQuestion {
   text: string
   tooltip?: string
-  checked: boolean
+  value: boolean | string
   required: boolean
+  type: 'checkbox' | 'choices'
+  choices?: string[]
+}
+
+export interface SurveySubHeading {
+  text: string
+  position: number
 }
 
 interface RefusalText {
@@ -18,6 +25,7 @@ export interface GetSurveyStepResponse {
   current_step: number
   total_steps: number
   questions: SurveyQuestion[]
+  subheadings: SurveySubHeading[]
   refusal_text: RefusalText
 }
 

@@ -6,27 +6,23 @@ import {
   Checkbox,
   CircularProgress,
   Container,
-  FormControl,
-  InputLabel,
-  MenuItem,
+  FormControlLabel,
   Modal,
-  Select,
+  Radio,
+  RadioGroup,
   Step,
   StepLabel,
   Stepper,
-  TextField,
   Tooltip,
   Typography,
 } from '@mui/material'
 
-import { useAppStore } from '../store'
-import { useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { GetSurveyStepResponse } from '@common/types/api/surveys'
 import surveyStep from '@common/example_responses/getSurveyStep.json'
 import { Info } from '@mui/icons-material'
-import { SurveyQuestion } from '@common/types/api/surveys/getSurveyStep'
+import { SurveyQuestion, SurveySubHeading } from '@common/types/api/surveys/getSurveyStep'
 import { useEffect, useState } from 'react'
 
 export default function ConsentForm() {
@@ -35,7 +31,7 @@ export default function ConsentForm() {
   const params = useParams()
   const currentStep = Number(params.step)
 
-  const [formState, setFormState] = useState<SurveyQuestion[]>()
+  const [formState, setFormState] = useState<SurveyQuestion[]>([])
   const [modalOpen, setModalOpen] = useState(false)
 
   const { isPending, data } = useQuery({
@@ -44,11 +40,12 @@ export default function ConsentForm() {
     queryFn: () => {
       return surveyStep as GetSurveyStepResponse
     },
+    placeholderData: keepPreviousData,
   })
 
   const handleNext = () => {
-    for (var i in data!!.questions) {
-      if (data?.questions[i].required && !data?.questions[i].checked) {
+    for (const i in data?.questions || []) {
+      if (data?.questions[i].required && !data?.questions[i].value) {
         setModalOpen(true)
         return
       }
@@ -62,11 +59,35 @@ export default function ConsentForm() {
   }
 
   useEffect(() => {
-    console.log('Setting form state', data?.questions)
-    setFormState(data?.questions)
+    setFormState(data?.questions || [])
   }, [data])
 
-  const renderQuestion = ({ text, tooltip, checked }: SurveyQuestion, idx: number) => {
+  const renderQuestionsAndSubheadings = (
+    questions: SurveyQuestion[],
+    subheadings: SurveySubHeading[],
+  ) => {
+    const results = []
+    for (const i in questions) {
+      let found = false
+      for (const sh of subheadings) {
+        if (sh.position == Number(i)) {
+          found = true
+          results.push(
+            <Typography key={`sh_${i}`} sx={{ mt: 2, mb: 2, fontWeight: 'bold' }}>
+              {sh.text}
+            </Typography>,
+          )
+          results.push(renderQuestion(questions[i], Number(i)))
+        }
+      }
+      if (!found) {
+        results.push(renderQuestion(questions[i], Number(i)))
+      }
+    }
+    return results
+  }
+
+  const renderQuestion = ({ text, type, tooltip, value, choices }: SurveyQuestion, idx: number) => {
     return (
       <Card
         key={idx}
@@ -88,17 +109,42 @@ export default function ConsentForm() {
         ) : (
           <Box width={10} />
         )}
-        <Checkbox
-          checked={formState!![idx].checked}
-          onClick={() =>
-            setFormState((state) => {
-              const s = [...state!!]
-              s[idx].checked = !checked
-              console.log('SETTING FORM STATE', s)
-              return s
-            })
-          }
-        />
+        {type == 'checkbox' && (
+          <Checkbox
+            checked={!!formState[idx].value}
+            onClick={() =>
+              setFormState((state) => {
+                const s = [...state]
+                s[idx].value = !s[idx].value
+                console.log('SETTING FORM STATE', s)
+                return s
+              })
+            }
+          />
+        )}
+        {type == 'choices' && (
+          <Box sx={{ width: 800 }}>
+            <RadioGroup value={value} row>
+              {choices?.map((val, i) => {
+                return (
+                  <FormControlLabel
+                    key={`choice_${idx}_${i}`}
+                    value={val}
+                    control={<Radio />}
+                    label={val}
+                    onChange={() => {
+                      setFormState((state) => {
+                        const s = [...state]
+                        s[idx].value = val
+                        return s
+                      })
+                    }}
+                  />
+                )
+              })}
+            </RadioGroup>
+          </Box>
+        )}
       </Card>
     )
   }
@@ -164,7 +210,7 @@ export default function ConsentForm() {
           <>
             <Typography variant="h4">{data?.title}</Typography>
             <Typography sx={{ mt: 3, mb: 3 }}>{data?.text}</Typography>
-            {formState?.map((val, idx) => renderQuestion(val, idx))}
+            {renderQuestionsAndSubheadings(formState, data?.subheadings || [])}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
               {currentStep == 0 ? (
                 <Box width={70} />

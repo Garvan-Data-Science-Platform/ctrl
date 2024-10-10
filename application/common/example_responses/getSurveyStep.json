@@ -8,12 +8,22 @@
       "text": "I understand I am providing a sample so that my DNA can be extracted and all of my genes could be looked at. This is called a genomic test.",
       "tooltip": "The sample you have given may have been blood, saliva, skin or other sample already collected as part of your medical care. These samples contain your cells, and your DNA can be extracted from the cells. Your DNA is needed for the genomic test. DNA makes up genes. Genes are inside almost every cell of your body. There are over 20,000 genes in each of your cells, and together these genes make up your “genome”. Each gene has a specific function, however the function of every gene is not yet known. Everyone has different variations within their genes, which is why we are all unique. Most variations are harmless, but other variations can change how a gene works, which might cause a health condition. Identifying variations may help to find the cause of your health condition. Previously, testing to look for variations in genes involved looking at only one gene at a time. New technology means we can now look at many or all of our genes at once. This is known as “genomic testing”.",
       "required": false,
-      "checked": true
+      "type": "checkbox",
+      "value": true
     },
     {
       "text": "I understand all of the information above and the choices I have made. \n (leaving this box unchecked means you will be contacted by a Genetic Counsellor who will give you more information)",
+      "tooltip": "Tooltip",
       "required": true,
-      "checked": true
+      "type": "choices",
+      "choices": ["Yes", "No", "Not Sure"],
+      "value": "Not Sure"
+    }
+  ],
+  "subheadings": [
+    {
+      "text": "What kinds of research can they do with my de-identified samples and information?",
+      "position": 1
     }
   ],
   "refusal_text": {
