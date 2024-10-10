@@ -19,7 +19,7 @@ const router = createBrowserRouter([
         element: <Dashboard />,
       },
       {
-        path: '/consent_form',
+        path: '/consent_form/:step',
         element: <ConsentForm />,
       },
       {
