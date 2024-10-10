@@ -28,6 +28,7 @@ e2e:
 
 # Check everything that will run in ci
 check:
+	yarn workspace backend build
 	yarn type-check
 	yarn format
 	yarn lint
