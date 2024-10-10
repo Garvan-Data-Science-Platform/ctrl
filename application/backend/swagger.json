@@ -21,6 +21,9 @@
           "role": {
             "type": "string"
           },
+          "password": {
+            "type": "string"
+          },
           "email": {
             "type": "string"
           },
@@ -39,6 +42,7 @@
           "updatedAt",
           "createdAt",
           "role",
+          "password",
           "email",
           "lastName",
           "firstName",
@@ -118,6 +122,9 @@
           "email": {
             "type": "string"
           },
+          "password": {
+            "type": "string"
+          },
           "role": {
             "type": "string"
           }
@@ -126,6 +133,7 @@
           "firstName",
           "lastName",
           "email",
+          "password",
           "role"
         ],
         "type": "object",
@@ -409,9 +417,121 @@
           "name"
         ],
         "type": "object"
+      },
+      "RegisterResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "message",
+          "token"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "RegisterRequest": {
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "email",
+          "password",
+          "role"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "Error": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "stack": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "message"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "LoginResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string",
+            "nullable": true
+          },
+          "error": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Error"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "required": [
+          "message",
+          "token",
+          "error"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "LoginRequest": {
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ],
+        "type": "object",
+        "additionalProperties": false
       }
     },
-    "securitySchemes": {}
+    "securitySchemes": {
+      "jwt": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
   },
   "info": {
     "title": "backend",
@@ -432,6 +552,9 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -441,7 +564,11 @@
         "tags": [
           "Users"
         ],
-        "security": [],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
         "parameters": []
       },
       "post": {
@@ -457,6 +584,9 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -466,7 +596,11 @@
         "tags": [
           "Users"
         ],
-        "security": [],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -494,6 +628,12 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -503,7 +643,11 @@
         "tags": [
           "Users"
         ],
-        "security": [],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
@@ -529,6 +673,9 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "404": {
             "description": "Not Found"
           },
@@ -541,7 +688,11 @@
         "tags": [
           "Users"
         ],
-        "security": [],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
@@ -577,6 +728,9 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "404": {
             "description": "Not Found"
           },
@@ -589,7 +743,11 @@
         "tags": [
           "Users"
         ],
-        "security": [],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
@@ -617,6 +775,9 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -626,7 +787,11 @@
         "tags": [
           "Organisations"
         ],
-        "security": [],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
         "parameters": []
       },
       "post": {
@@ -642,6 +807,9 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -651,7 +819,11 @@
         "tags": [
           "Organisations"
         ],
-        "security": [],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -679,6 +851,9 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "404": {
             "description": "Not Found"
           },
@@ -691,7 +866,11 @@
         "tags": [
           "Organisations"
         ],
-        "security": [],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
@@ -717,6 +896,9 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "404": {
             "description": "Not Found"
           },
@@ -729,7 +911,11 @@
         "tags": [
           "Organisations"
         ],
-        "security": [],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
@@ -765,6 +951,9 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "404": {
             "description": "Not Found"
           },
@@ -777,7 +966,11 @@
         "tags": [
           "Organisations"
         ],
-        "security": [],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
@@ -805,6 +998,9 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "404": {
             "description": "Not Found"
           },
@@ -817,7 +1013,11 @@
         "tags": [
           "Organisations"
         ],
-        "security": [],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
@@ -845,6 +1045,9 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -854,7 +1057,11 @@
         "tags": [
           "Organisations"
         ],
-        "security": [],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
@@ -889,6 +1096,9 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -898,7 +1108,11 @@
         "tags": [
           "Organisations"
         ],
-        "security": [],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
@@ -996,6 +1210,86 @@
         ],
         "security": [],
         "parameters": []
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "operationId": "Register",
+        "responses": {
+          "201": {
+            "description": "User Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "register",
+        "summary": "Register a new user",
+        "tags": [
+          "Auth"
+        ],
+        "security": [],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "Login",
+        "responses": {
+          "200": {
+            "description": "Logged In",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "login",
+        "summary": "Login a User",
+        "tags": [
+          "Auth"
+        ],
+        "security": [],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        }
       }
     }
   },

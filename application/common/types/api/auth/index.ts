@@ -1,2 +1,4 @@
+import type { RegisterRequest, RegisterResponse } from './register'
 import type { LoginRequest, LoginResponse } from './login'
-export { LoginRequest, LoginResponse }
+
+export { RegisterRequest, RegisterResponse, LoginRequest, LoginResponse }

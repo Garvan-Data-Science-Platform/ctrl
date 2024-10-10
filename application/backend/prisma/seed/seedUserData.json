@@ -5,6 +5,7 @@
       "lastName": "Doe",
       "email": "johndoe@example.com",
       "role": "Admin",
+      "password": "SomePassword123",
       "organisations": ["Garvan Institute of Medical Research", "University of New South Wales"]
     },
 
@@ -13,6 +14,7 @@
       "lastName": "Smith",
       "email": "janesmith@example.com",
       "role": "User",
+      "password": "SomePassword123",
       "organisations": ["University of New South Wales"]
     },
     {
@@ -20,6 +22,7 @@
       "lastName": "Johnson",
       "email": "alicejohnson@example.com",
       "role": "Guest",
+      "password": "SomePassword123",
       "organisations": []
     },
     {
@@ -27,6 +30,7 @@
       "lastName": "Brown",
       "email": "bobbrown@example.com",
       "role": "Admin",
+      "password": "SomePassword123",
       "organisations": []
     },
     {
@@ -34,6 +38,7 @@
       "lastName": "Davis",
       "email": "emilydavis@example.com",
       "role": "User",
+      "password": "SomePassword123",
       "organisations": ["Garvan Institute of Medical Research", "Apple Inc."]
     },
     {
@@ -41,6 +46,7 @@
       "lastName": "Wilson",
       "email": "michaelwilson@example.com",
       "role": "Guest",
+      "password": "SomePassword123",
       "organisations": [
         "Apple Inc.",
         "University of New South Wales",

@@ -1,206 +1,273 @@
-import { UsersController } from './UsersController'
-import type { CreateUserRequest, UpdateUserRequest } from 'common/types/api/users'
-import { PrismaClientMock } from '../PrismaClientMock'
-import { Prisma } from '@prisma/client'
+import request from 'supertest'
+import { Api } from '../Api'
+import type { RegisterRequest, RegisterResponse } from 'common/types/api/auth'
+import prisma from '../PrismaClient'
+import {
+  CreateUserResponse,
+  DeleteUserResponse,
+  GetAllUsersResponse,
+  GetUserByIdResponse,
+  UpdateUserResponse,
+} from 'common/types/api/users'
+import { resetDB } from '../TestHelpers'
+import { getUserIdFromToken } from '../authentication'
 
-const exampleUser1 = {
-  id: 1,
-  firstName: 'John',
-  lastName: 'Doe',
-  email: 'johndoe@example.com',
-  role: 'Admin',
-  createdAt: new Date(),
-  updatedAt: new Date(),
-}
-
-const exampleUser2 = {
-  id: 2,
-  firstName: 'Jane',
-  lastName: 'Smith',
-  email: 'janesmith@example.com',
-  role: 'User',
-  createdAt: new Date(),
-  updatedAt: new Date(),
-}
+const api = new Api()
+const app = api.app
 
 describe('UsersController', () => {
-  let usersController: UsersController
+  let token: string
+  let registeredUserID: number
 
-  beforeEach(() => {
-    usersController = new UsersController()
+  const testUser: RegisterRequest = {
+    firstName: 'Test',
+    lastName: 'User',
+    email: 'test@user.com',
+    password: 'password123',
+    role: 'test',
+  }
+
+  beforeAll(async () => {
+    api.run()
   })
 
-  afterEach(() => {
-    jest.clearAllMocks()
+  beforeEach(async () => {
+    await resetDB()
+
+    // Register user
+    const registerResponse = await request(app).post('/auth/register').send(testUser)
+    const body: RegisterResponse = registerResponse.body
+    if (!body.token) throw new Error()
+    token = body.token
+    registeredUserID = getUserIdFromToken(token)
   })
 
-  describe('getAllUsers', () => {
-    it('should return an empty list of users if the database is empty', async () => {
-      PrismaClientMock.user.findMany.mockResolvedValueOnce([])
-
-      const expectedResult = { message: 'Got all users', users: [] }
-
-      await expect(usersController.getAllUsers()).resolves.toEqual(expectedResult)
-    })
-
-    it('should return a list of all users in the databse', async () => {
-      PrismaClientMock.user.findMany.mockResolvedValueOnce([exampleUser1, exampleUser2])
-
-      const expectedResult = {
-        message: 'Got all users',
-        users: [exampleUser1, exampleUser2],
-      }
-
-      await expect(usersController.getAllUsers()).resolves.toEqual(expectedResult)
-    })
+  afterAll(async () => {
+    api.stop()
   })
 
-  describe('getUserById', () => {
-    it('should return a user if the user exists', async () => {
-      PrismaClientMock.user.findUnique.mockResolvedValueOnce(exampleUser1)
+  describe('GET /users', () => {
+    it('should be a protected route', async () => {
+      const response = await request(app).get('/users')
+      expect(response.status).toBe(401)
 
-      const userID = 1
-
-      const expectedResult = { message: `Get user with ID: ${userID}`, user: exampleUser1 }
-
-      await expect(usersController.getUserById(userID)).resolves.toEqual(expectedResult)
+      const body: GetAllUsersResponse = response.body
+      expect(body.message).toBe('No token provided')
     })
 
-    it('should return null if the user does not exist', async () => {
-      PrismaClientMock.user.findUnique.mockResolvedValueOnce(null)
-      const userID = 1
+    it('should return a list of users', async () => {
+      const response = await request(app)
+        .get('/users')
+        .set({ Authorization: `Bearer ${token}` })
+      expect(response.status).toBe(200)
 
-      const expectedResult = { message: `User with ID: ${userID} not found`, user: null }
-
-      await expect(usersController.getUserById(userID)).resolves.toEqual(expectedResult)
-    })
-  })
-
-  describe('createUser', () => {
-    it('should create a user with the correct User details', async () => {
-      PrismaClientMock.user.create.mockResolvedValueOnce(exampleUser1)
-
-      const bodyRequest: CreateUserRequest = {
-        firstName: exampleUser1.firstName,
-        lastName: exampleUser1.lastName,
-        email: exampleUser1.email,
-        role: exampleUser1.role,
-      }
-
-      const expectedResult = {
-        message: `Created user with ID: ${exampleUser1.id}`,
-        newUser: exampleUser1,
-      }
-
-      await expect(usersController.createUser(bodyRequest)).resolves.toEqual(expectedResult)
+      const body: GetAllUsersResponse = response.body
+      expect(body).toHaveProperty('users')
     })
 
-    it('should return an error if there is a database error', async () => {
-      PrismaClientMock.user.create.mockRejectedValueOnce(new Error('Database error'))
+    it('should return a 500 error if a database error occurs', async () => {
+      jest.spyOn(prisma.user, 'findMany').mockImplementationOnce(() => {
+        throw new Error('Internal Server Error')
+      })
+      const response = await request(app)
+        .get('/users')
+        .set({ Authorization: `Bearer ${token}` })
 
-      const bodyRequest: CreateUserRequest = {
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'johndoe@example.com',
-        role: 'admin',
-      }
+      expect(response.status).toBe(500)
 
-      const expectedResult = {
-        message: 'Error creating user',
-        newUser: null,
-      }
-
-      await expect(usersController.createUser(bodyRequest)).resolves.toEqual(expectedResult)
+      const body: GetAllUsersResponse = response.body
+      expect(body.users).toBe(undefined)
     })
   })
 
-  describe('updateUser', () => {
-    it('should update a user if the user exists and return the updated user', async () => {
-      PrismaClientMock.user.update.mockResolvedValueOnce(exampleUser1)
+  describe('GET /users/:id', () => {
+    it('should be a protected route', async () => {
+      const response = await request(app).get('/users/1')
+      expect(response.status).toBe(401)
 
-      const userID = 1
-      const bodyRequest: UpdateUserRequest = {
-        firstName: 'Jane Doe',
-        email: 'janedoe@example.com',
-        role: 'Software Developer',
-      }
-
-      const expectedResult = {
-        message: `Updated user with ID: ${userID}`,
-        updatedUser: exampleUser1,
-      }
-
-      const result = await usersController.updateUser(userID, bodyRequest)
-      expect(result).toEqual(expectedResult)
+      const body: GetUserByIdResponse = response.body
+      expect(body.message).toBe('No token provided')
     })
 
-    it('should return null if the user does not exist', async () => {
-      PrismaClientMock.user.update.mockRejectedValueOnce(
-        new Prisma.PrismaClientInitializationError(
-          'Data not found in db',
-          'someClientVersion',
-          'P2025',
-        ),
-      )
-      const userID = 1
-      const bodyRequest: UpdateUserRequest = {
+    it('should return a user by ID', async () => {
+      const userID = registeredUserID
+      const response = await request(app)
+        .get(`/users/${userID}`)
+        .set({ Authorization: `Bearer ${token}` })
+
+      expect(response.status).toBe(200)
+
+      const body: GetUserByIdResponse = response.body
+      expect(body.message).toBe(`Got user with ID: ${userID}`)
+      expect(body).toHaveProperty('user')
+    })
+
+    it('should return an error for a non-existent user', async () => {
+      const userID = 9999
+      const response = await request(app)
+        .get(`/users/${userID}`)
+        .set({
+          Authorization: `Bearer ${token}`,
+        })
+
+      expect(response.status).toBe(404)
+
+      const body: GetUserByIdResponse = response.body
+      expect(body.message).toBe(`User with ID: ${userID} not found`)
+      expect(body.user).toBe(null)
+    })
+  })
+
+  describe('POST /users', () => {
+    it('should be a protected route', async () => {
+      const response = await request(app).post('/users').send({
         firstName: 'Jane',
         lastName: 'Doe',
-        email: 'janedoe@example.com',
-        role: 'Software Developer',
-      }
+        email: 'jane@example.com',
+        password: 'password123',
+        role: 'user',
+      })
 
-      const expectedResult = {
-        message: 'Error updating user',
-        updatedUser: null,
-      }
+      expect(response.status).toBe(401)
 
-      const result = await usersController.updateUser(userID, bodyRequest)
-      expect(result).toEqual(expectedResult)
+      const body: CreateUserResponse = response.body
+      expect(body.message).toBe('No token provided')
     })
 
-    it('should return an error if there is a database error', async () => {
-      PrismaClientMock.user.update.mockRejectedValueOnce(new Error('Database error'))
-      const userID = 1
-      const bodyRequest: UpdateUserRequest = {
-        firstName: 'Jane Doe',
-        email: 'janedoe@example.com',
-        role: 'Software Developer',
+    it('should create a new user', async () => {
+      const newUser = {
+        firstName: 'Jane',
+        lastName: 'Doe',
+        email: 'jane@example.com',
+        password: 'password123',
+        role: 'user',
       }
 
-      const result = await usersController.updateUser(userID, bodyRequest)
-      expect(result).toEqual({
-        message: 'Error updating user',
-        updatedUser: null,
-      })
+      // Check that the user does not already exist
+      const existingUser = await prisma.user.findFirst({ where: { email: newUser.email } })
+      if (existingUser) {
+        throw new Error('User with email already exists')
+      }
+
+      // Create a new user
+      const response = await request(app)
+        .post('/users')
+        .set({ Authorization: `Bearer ${token}` })
+        .send(newUser)
+      expect(response.status).toBe(201)
+
+      const body: CreateUserResponse = response.body
+      expect(body.message).toMatch(/Created user with ID: \d+/)
+
+      const createdUser = await prisma.user.findFirst({ where: { email: newUser.email } })
+      if (!createdUser) {
+        throw new Error('User with email already exists')
+      }
+      expect(createdUser?.email).toBe(newUser.email)
     })
   })
 
-  describe('deleteUser', () => {
-    it('should delete a user and return the deleted user', async () => {
-      PrismaClientMock.user.delete.mockResolvedValueOnce(exampleUser1)
-      const userID = 1
+  describe('PATCH /users/:id', () => {
+    it('should be a protected route', async () => {
+      const response = await request(app).patch('/users/1').send({ firstName: 'Updated' })
+      expect(response.status).toBe(401)
 
-      const expectedResult = {
-        message: `Deleted user with ID: ${userID}`,
-        deletedUser: exampleUser1,
-      }
-
-      const result = await usersController.deleteUser(userID)
-      expect(result).toEqual(expectedResult)
+      const body: UpdateUserResponse = response.body
+      expect(body.message).toBe('No token provided')
     })
 
-    it('should return null if the user does not exist', async () => {
-      PrismaClientMock.user.delete.mockRejectedValueOnce(new Error('Database error'))
-      const userID = 1
+    it('should update a user by ID', async () => {
+      const userID: number = registeredUserID
 
-      const expectedResult = {
-        message: 'Error deleting user',
-        deletedUser: null,
-      }
+      const newFirstName: string = 'Updated'
 
-      const result = await usersController.deleteUser(userID)
-      expect(result).toEqual(expectedResult)
+      // Get existing user details
+      const existingUser = await prisma.user.findFirst({ where: { id: userID } })
+
+      expect(existingUser?.email).toBe(testUser.email)
+      expect(existingUser?.firstName).toBe(testUser.firstName)
+      expect(existingUser?.lastName).toBe(testUser.lastName)
+      expect(existingUser?.role).toBe(testUser.role)
+
+      const response = await request(app)
+        .patch(`/users/${userID}`)
+        .set({ Authorization: `Bearer ${token}` })
+        .send({ firstName: newFirstName })
+
+      expect(response.status).toBe(200)
+
+      const body: UpdateUserResponse = response.body
+      expect(body.message).toBe(`Updated user with ID: ${userID}`)
+      expect(body.updatedUser?.firstName).toBe(newFirstName)
+
+      // Check if the user is updated successfully
+      const updatedUser = await prisma.user.findFirst({ where: { id: userID } })
+
+      expect(updatedUser?.firstName).toBe(newFirstName)
+    })
+
+    it('should return an error for a non-existent user', async () => {
+      const userID: number = 9999
+      const newFirstName: string = 'Updated'
+      const response = await request(app)
+        .patch(`/users/${userID}`)
+        .set({
+          Authorization: `Bearer ${token}`,
+        })
+        .send({ firstName: newFirstName })
+
+      expect(response.status).toBe(404)
+
+      const body: UpdateUserResponse = response.body
+      expect(body.message).toBe(`User with ID: ${userID} not found`)
+      expect(body.updatedUser).toBe(null)
+    })
+  })
+
+  describe('DELETE /users/:id', () => {
+    it('should be a protected route', async () => {
+      const response = await request(app).delete('/users/1')
+      expect(response.status).toBe(401)
+
+      const body: UpdateUserResponse = response.body
+      expect(body.message).toBe('No token provided')
+    })
+
+    it('should delete a user by ID', async () => {
+      const userID: number = registeredUserID
+
+      // Check that user exists in db
+      const existingUser = await prisma.user.findFirst({ where: { id: userID } })
+
+      expect(existingUser).not.toBe(null)
+      expect(existingUser?.id).toBe(userID)
+
+      // Delete User
+      const response = await request(app)
+        .delete(`/users/${userID}`)
+        .set({ Authorization: `Bearer ${token}` })
+
+      expect(response.status).toBe(200)
+
+      const body: DeleteUserResponse = response.body
+      expect(body.message).toBe(`Deleted user with ID: ${userID}`)
+
+      // Check that user exists in db
+      const deletedUser = await prisma.user.findFirst({ where: { id: userID } })
+
+      expect(deletedUser).toBe(null)
+    })
+
+    it('should return an error for a non-existent user', async () => {
+      const userID: number = 999
+      const response = await request(app)
+        .delete(`/users/${userID}`)
+        .set({ Authorization: `Bearer ${token}` })
+
+      expect(response.status).toBe(404)
+
+      const body: DeleteUserResponse = response.body
+      expect(body.message).toBe(`User with ID: ${userID} not found`)
     })
   })
 })

@@ -35,7 +35,7 @@ check:
 	make e2e
 
 db: 
-	docker compose up -d
+	docker compose --env-file application/backend/.env up -d
 
 db-down:
 	docker compose down

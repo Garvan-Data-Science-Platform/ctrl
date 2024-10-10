@@ -10,6 +10,7 @@ import {
   SuccessResponse,
   Response,
   Controller,
+  Security,
 } from 'tsoa'
 import logger from 'common/src/logger'
 import type {
@@ -26,6 +27,7 @@ import prisma from '../PrismaClient'
 
 @Route('users')
 @Tags('Users')
+@Security('jwt')
 export class UsersController extends Controller {
   userRepo = prisma.user
 
@@ -37,6 +39,7 @@ export class UsersController extends Controller {
   @Get('/')
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
+  @Response('401', 'Unauthorized')
   public async getAllUsers(): Promise<GetAllUsersResponse> {
     const users: User[] = await this.userRepo.findMany({})
     const responseData = { message: 'Got all users', users }
@@ -52,6 +55,8 @@ export class UsersController extends Controller {
   @Get('/{userID}')
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
+  @Response('404', 'Not Found')
+  @Response('401', 'Unauthorized')
   public async getUserById(@Path() userID: number): Promise<GetUserByIdResponse> {
     const user: User | null = await this.userRepo.findUnique({
       where: { id: userID },
@@ -62,7 +67,7 @@ export class UsersController extends Controller {
       this.setStatus(404)
       return error
     }
-    const responseData = { message: `Get user with ID: ${userID}`, user }
+    const responseData = { message: `Got user with ID: ${userID}`, user }
     logger.info({ ...responseData })
     return responseData
   }
@@ -75,6 +80,7 @@ export class UsersController extends Controller {
   @Post('/')
   @SuccessResponse('201', 'Created')
   @Response('500', 'Internal Server Error')
+  @Response('401', 'Unauthorized')
   public async createUser(@Body() bodyRequest: CreateUserRequest): Promise<CreateUserResponse> {
     const { firstName, lastName, email, role } = bodyRequest
 
@@ -89,7 +95,9 @@ export class UsersController extends Controller {
     }
 
     try {
-      const insertedUser = await this.userRepo.create({ data: bodyRequest })
+      const insertedUser = await this.userRepo.create({
+        data: { ...bodyRequest, password: 'temp_password_hash' },
+      })
       const responseData = {
         message: `Created user with ID: ${insertedUser.id}`,
         newUser: insertedUser,
@@ -112,6 +120,7 @@ export class UsersController extends Controller {
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
   @Response('404', 'Not Found')
+  @Response('401', 'Unauthorized')
   public async updateUser(
     @Path() userID: number,
     @Body() bodyRequest: UpdateUserRequest,
@@ -128,8 +137,9 @@ export class UsersController extends Controller {
       logger.info({ ...responseData })
       return responseData
     } catch (err) {
-      const error = { message: 'Error updating user', updatedUser: null }
-      logger.error({ ...error, err })
+      const error = { message: `User with ID: ${userID} not found`, updatedUser: null }
+      logger.error({ ...error })
+      this.setStatus(404)
       return error
     }
   }
@@ -143,15 +153,17 @@ export class UsersController extends Controller {
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
   @Response('404', 'Not Found')
+  @Response('401', 'Unauthorized')
   public async deleteUser(@Path() userID: number): Promise<DeleteUserResponse> {
     try {
       const deletedUser = await this.userRepo.delete({ where: { id: userID } })
-      const responseData = { message: `Deleted user with ID: ${userID}`, deletedUser }
-      logger.info({ ...responseData })
+      const responseData = { message: `Deleted user with ID: ${userID}` }
+      logger.info({ ...responseData, deletedUser })
       return responseData
     } catch (err) {
-      const error = { message: 'Error deleting user', deletedUser: null }
+      const error = { message: `User with ID: ${userID} not found` }
       logger.error({ ...error, err })
+      this.setStatus(404)
       return error
     }
   }
