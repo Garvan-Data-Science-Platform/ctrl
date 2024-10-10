@@ -4,6 +4,7 @@ import {
   Button,
   Card,
   Checkbox,
+  CircularProgress,
   Container,
   FormControl,
   InputLabel,
@@ -37,10 +38,12 @@ export default function ConsentForm() {
   const [formState, setFormState] = useState<SurveyQuestion[]>()
   const [modalOpen, setModalOpen] = useState(false)
 
-  const { isPending, error, data } = useQuery({
-    queryKey: ['form_step'],
+  const { isPending, data } = useQuery({
+    queryKey: ['form_step', currentStep],
     //queryFn: () => fetch('/api/user/profile').then((res) => res.json()) as Promise<UserProfile>,
-    queryFn: () => surveyStep as GetSurveyStepResponse,
+    queryFn: () => {
+      return surveyStep as GetSurveyStepResponse
+    },
   })
 
   const handleNext = () => {
@@ -59,8 +62,8 @@ export default function ConsentForm() {
   }
 
   useEffect(() => {
+    console.log('Setting form state', data?.questions)
     setFormState(data?.questions)
-    console.log('QUERY COMPLETED, SETTING FORM STATE')
   }, [data])
 
   const renderQuestion = ({ text, tooltip, checked }: SurveyQuestion, idx: number) => {
@@ -91,6 +94,7 @@ export default function ConsentForm() {
             setFormState((state) => {
               const s = [...state!!]
               s[idx].checked = !checked
+              console.log('SETTING FORM STATE', s)
               return s
             })
           }
@@ -126,7 +130,9 @@ export default function ConsentForm() {
             <Button sx={{ mr: 1 }} variant="outlined">
               {data?.refusal_text.button_text}
             </Button>
-            <Button variant="contained">Review Answers</Button>
+            <Button variant="contained" onClick={() => setModalOpen(false)}>
+              Review Answers
+            </Button>
           </Box>
           <Typography
             fontSize={12}
@@ -152,26 +158,32 @@ export default function ConsentForm() {
           ))}
       </Stepper>
       <Card sx={{ p: 3, boxShadow: 0, border: '1px solid lightgrey' }}>
-        <Typography variant="h4">{data?.title}</Typography>
-        <Typography sx={{ mt: 3, mb: 3 }}>{data?.text}</Typography>
-        {formState?.map((val, idx) => renderQuestion(val, idx))}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
-          {currentStep == 0 ? (
-            <Box width={70} />
-          ) : (
-            <Button onClick={handleBack} variant="contained" color="secondary">
-              Back
-            </Button>
-          )}
-          <Button variant="contained">Save and Exit</Button>
-          {currentStep + 1 == data?.total_steps ? (
-            <Box width={70} />
-          ) : (
-            <Button onClick={handleNext} variant="contained" color="secondary">
-              Next
-            </Button>
-          )}
-        </Box>
+        {isPending ? (
+          <CircularProgress />
+        ) : (
+          <>
+            <Typography variant="h4">{data?.title}</Typography>
+            <Typography sx={{ mt: 3, mb: 3 }}>{data?.text}</Typography>
+            {formState?.map((val, idx) => renderQuestion(val, idx))}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+              {currentStep == 0 ? (
+                <Box width={70} />
+              ) : (
+                <Button onClick={handleBack} variant="contained" color="secondary">
+                  Back
+                </Button>
+              )}
+              <Button variant="contained">Save and Exit</Button>
+              {currentStep + 1 == data?.total_steps ? (
+                <Box width={70} />
+              ) : (
+                <Button onClick={handleNext} variant="contained" color="secondary">
+                  Next
+                </Button>
+              )}
+            </Box>
+          </>
+        )}
       </Card>
     </Container>
   )
