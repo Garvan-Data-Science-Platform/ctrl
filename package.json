@@ -4,7 +4,7 @@
   "scripts": {
     "build": "yarn workspaces foreach --all run build",
     "start": "yarn workspaces foreach --all --parallel --interlaced run start",
-    "dev": "yarn workspaces foreach --all --parallel --interlaced run dev",
+    "dev": "make db && yarn workspaces foreach --all --parallel --interlaced run dev",
     "type-check": "yarn workspaces foreach --all run type-check",
     "format": "yarn run prettier --write './application/**/*.(js|ts|jsx|tsx)'",
     "test": "yarn workspaces foreach --all --parallel run test",
