@@ -9,6 +9,6 @@ sleep 5
 yarn prisma migrate deploy
 
 # run tests
-jest --detectOpenHandles --coverage
+jest --detectOpenHandles --coverage $1
 
 docker compose down
