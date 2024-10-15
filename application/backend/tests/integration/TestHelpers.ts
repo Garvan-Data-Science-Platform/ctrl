@@ -1,4 +1,4 @@
-import prisma from './PrismaClient'
+import prisma from '../../src/PrismaClient'
 import logger from 'common/src/logger'
 
 // Function to reset DB state

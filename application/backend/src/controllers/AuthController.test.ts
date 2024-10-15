@@ -8,7 +8,7 @@ import type {
 } from 'common/types/api/auth'
 import type { GetAllUsersResponse } from 'common/types/api/users'
 import prisma from '../PrismaClient'
-import { resetDB } from '../TestHelpers'
+import { resetDB } from '../../tests/integration/TestHelpers'
 
 const api = new Api()
 const app = api.app
