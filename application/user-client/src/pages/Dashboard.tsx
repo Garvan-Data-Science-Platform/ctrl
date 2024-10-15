@@ -1,5 +1,4 @@
 import {
-  Alert,
   alpha,
   Box,
   Button,
@@ -73,20 +72,6 @@ export default function Dashboard() {
     <>
       <NavBar />
       <Container maxWidth="md">
-        <Alert
-          severity="warning"
-          action={
-            <Button component={Link} to="/profile" color="inherit">
-              Complete
-            </Button>
-          }
-          sx={{
-            mt: 3,
-            mb: 3,
-          }}
-        >
-          Your personal details need to be completed
-        </Alert>
         <Typography variant="h3" textAlign="left" sx={{ mt: 3, mb: 3 }}>
           Welcome FirstName
         </Typography>

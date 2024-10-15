@@ -15,9 +15,14 @@ export default function Login() {
   const nav = useNavigate()
 
   const onSubmit = (data: unknown) => {
-    login('TOKEN')
-    nav('/')
-    fetch('/api/auth/login', { method: 'POST', body: JSON.stringify(data as LoginRequest) })
+    //login('TOKEN')
+    //nav('/')
+    console.log('DATA', data)
+    fetch(import.meta.env.VITE_BACKEND_URL + '/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data as LoginRequest),
+    })
       .then((res) => {
         if (res.ok) {
           res.json().then((data: LoginResponse) => {
@@ -26,7 +31,11 @@ export default function Login() {
             nav('/')
           })
         } else {
-          setError('root.serverError', { message: `Error Logging In: ${res.statusText}` })
+          res.json().then((data) => {
+            setError('root.serverError', {
+              message: `Error Logging In: ${JSON.stringify(data.message)}`,
+            })
+          })
         }
       })
       .catch((e) => {

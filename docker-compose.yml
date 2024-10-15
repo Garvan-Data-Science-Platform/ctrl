@@ -13,3 +13,14 @@ services:
       timeout: 1s
       retries: 60
     command: ['postgres', '-c', 'log_statement=all']
+    volumes:
+      - ctrl-db:/var/lib/postgresql/data
+  admin:
+    image: adminer
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - 8080:8080
+volumes:
+  ctrl-db:
