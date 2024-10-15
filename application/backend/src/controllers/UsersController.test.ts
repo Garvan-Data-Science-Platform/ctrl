@@ -9,7 +9,7 @@ import {
   GetUserByIdResponse,
   UpdateUserResponse,
 } from 'common/types/api/users'
-import { resetDB } from '../../tests/integration/TestHelpers'
+import { resetDB } from '../../tests/TestHelpers'
 import { getUserIdFromToken } from '../authentication'
 
 const api = new Api()

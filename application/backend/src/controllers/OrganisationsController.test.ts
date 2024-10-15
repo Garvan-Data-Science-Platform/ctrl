@@ -13,7 +13,7 @@ import {
   RemoveUserFromOrganisationResponse,
   GetOrganisationUsersResponse,
 } from 'common/types/api/organisations'
-import { resetDB } from '../../tests/integration/TestHelpers'
+import { resetDB } from '../../tests/TestHelpers'
 import { getUserIdFromToken } from '../authentication'
 import { RegisterRequest, RegisterResponse } from 'common/types/api/auth'
 
