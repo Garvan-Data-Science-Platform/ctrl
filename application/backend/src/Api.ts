@@ -36,7 +36,11 @@ export class Api {
       next: NextFunction,
     ): Response | void {
       if (err instanceof ValidateError) {
-        logger.warn(`Caught Validation Error for ${req.path}:`, err.fields)
+        const error = {
+          message: 'Validation Failed',
+          details: err?.fields,
+        }
+        logger.warn({ ...error })
         return res.status(422).json({
           message: 'Validation Failed',
           details: err?.fields,
@@ -59,10 +63,10 @@ export class Api {
 
       if (err instanceof Error) {
         const error = {
-          message: 'Internal Server Error',
-          error: { message: err.message },
+          message: err.message,
+          error: err,
         }
-        logger.error(error)
+        logger.error({ ...error })
         return res.status(500).json(error)
       }
 

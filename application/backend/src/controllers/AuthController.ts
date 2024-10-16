@@ -27,42 +27,23 @@ export class AuthController extends Controller {
   public async register(@Body() bodyRequest: RegisterRequest): Promise<RegisterResponse> {
     const { password, ...userDetails } = bodyRequest
 
-    try {
-      // Validation check
-      if (
-        !userDetails.firstName ||
-        !userDetails.lastName ||
-        !userDetails.email ||
-        !userDetails.role ||
-        !password
-      ) {
-        throw Error(
-          'Missing required fields: firstName, lastName, email, password, role',
-        ) as ValidateError
-      }
+    const hashedPassword = await hashPassword(password)
+    const insertedUser: User = await this.userRepo.create({
+      data: {
+        ...userDetails,
+        password: hashedPassword,
+      },
+    })
 
-      const hashedPassword = await hashPassword(password)
-      const insertedUser: User = await this.userRepo.create({
-        data: {
-          ...userDetails,
-          password: hashedPassword,
-        },
-      })
+    const token = await generateToken(insertedUser.id)
 
-      const token = await generateToken(insertedUser.id)
-
-      const responseData = {
-        message: `Created user with ID: ${insertedUser.id}`,
-        token,
-      }
-
-      logger.info({ ...responseData })
-      return responseData
-    } catch (err) {
-      const error = { message: 'Could not Register User', token: null }
-      logger.error({ ...error, err })
-      return error
+    const responseData = {
+      message: `Created user with ID: ${insertedUser.id}`,
+      token,
     }
+
+    logger.info({ ...responseData })
+    return responseData
   }
 
   /**
@@ -76,11 +57,6 @@ export class AuthController extends Controller {
   @Response('500', 'Internal Server Error')
   public async login(@Body() bodyRequest: LoginRequest): Promise<LoginResponse> {
     try {
-      // Validation check
-      if (!bodyRequest.email || !bodyRequest.password) {
-        throw Error('Missing required fields: email, password') as ValidateError
-      }
-
       // Check if user exists and password matches
       const user = await this.userRepo.findUnique({ where: { email: bodyRequest.email } })
       if (!user || !(await verifyPassword(user.password, bodyRequest.password))) {

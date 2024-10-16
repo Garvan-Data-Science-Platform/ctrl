@@ -82,18 +82,6 @@ export class UsersController extends Controller {
   @Response('500', 'Internal Server Error')
   @Response('401', 'Unauthorized')
   public async createUser(@Body() bodyRequest: CreateUserRequest): Promise<CreateUserResponse> {
-    const { firstName, lastName, email, role } = bodyRequest
-
-    // Validation check
-    if (!firstName || !lastName || !email || !role) {
-      const error = {
-        message: 'Missing required fields: firstName, lastName, email, role',
-        newUser: null,
-      }
-      logger.error({ ...error })
-      return error
-    }
-
     try {
       const insertedUser = await this.userRepo.create({
         data: { ...bodyRequest, password: 'temp_password_hash' },

@@ -1,10 +1,15 @@
-import { Organisation } from '@prisma/client'
-
+/**
+ * @example {
+ *  "name": "ABC. Corp",
+ * }
+ */
 export interface CreateOrganisationRequest {
+  /**
+   * @minLength 1
+   */
   name: string
 }
 
 export interface CreateOrganisationResponse {
   message: string
-  newOrganisation: Organisation | null
 }

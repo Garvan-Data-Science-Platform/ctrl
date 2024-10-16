@@ -159,7 +159,6 @@ describe('UsersController', () => {
 
       const body: UpdateUserResponse = response.body
       expect(body.message).toBe(`Updated user with ID: ${userID}`)
-      expect(body.updatedUser?.firstName).toBe(newFirstName)
 
       // Check if the user is updated successfully
       const updatedUser = await prisma.user.findFirst({ where: { id: userID } })
@@ -181,7 +180,6 @@ describe('UsersController', () => {
 
       const body: UpdateUserResponse = response.body
       expect(body.message).toBe(`User with ID: ${userID} not found`)
-      expect(body.updatedUser).toBe(null)
     })
   })
 

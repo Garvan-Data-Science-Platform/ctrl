@@ -86,15 +86,19 @@ export class OrganisationsController extends Controller {
   public async createOrganisation(
     @Body() bodyRequest: CreateOrganisationRequest,
   ): Promise<CreateOrganisationResponse> {
-    const { name } = bodyRequest
+    try {
+      const newOrganisation: Organisation = await this.organisationRepo.create({
+        data: { name: bodyRequest.name },
+      })
 
-    const newOrganisation: Organisation = await this.organisationRepo.create({
-      data: { name },
-    })
-
-    const responseData = { message: 'Created new organisation', newOrganisation }
-    logger.info({ ...responseData })
-    return responseData
+      const responseData = { message: 'Created new organisation' }
+      logger.info({ ...responseData, newOrganisation })
+      return responseData
+    } catch (err) {
+      const error = { message: 'Error creating organisation' }
+      logger.error({ ...error, err })
+      return error
+    }
   }
 
   /**
@@ -115,26 +119,23 @@ export class OrganisationsController extends Controller {
         where: { id: orgID },
         data: bodyRequest,
       })
-
-      const responseData = {
-        message: `Updated organisation with ID: ${orgID}`,
-        updatedOrganisation,
-      }
-      logger.info({ ...responseData })
-      return responseData
-    } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
+      if (!updatedOrganisation) {
         const error = {
           message: `Organisation with ID: ${orgID} not found`,
-          updatedOrganisation: null,
         }
         logger.error({ ...error })
         this.setStatus(404)
         return error
       }
-      const error = { message: 'Error updating organisation', updatedOrganisation: null }
+
+      const responseData = {
+        message: `Updated organisation with ID: ${orgID}`,
+      }
+      logger.info({ ...responseData, updatedOrganisation })
+      return responseData
+    } catch (err) {
+      const error = { message: 'Error updating organisation' }
       logger.error({ ...error, err })
-      this.setStatus(500)
       return error
     }
   }
@@ -154,26 +155,23 @@ export class OrganisationsController extends Controller {
         where: { id: orgID },
         include: { users: true },
       })
-
-      const responseData = {
-        message: `Deleted organisation with ID: ${orgID}`,
-        deletedOrganisation,
-      }
-      logger.info({ ...responseData })
-      return responseData
-    } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
+      if (!deletedOrganisation) {
         const error = {
           message: `Organisation with ID: ${orgID} not found`,
-          deletedOrganisation: null,
         }
         logger.error({ ...error })
         this.setStatus(404)
         return error
       }
-      const error = { message: 'Error deleting organisation', deletedOrganisation: null }
+
+      const responseData = {
+        message: `Deleted organisation with ID: ${orgID}`,
+      }
+      logger.info({ ...responseData, deletedOrganisation })
+      return responseData
+    } catch (err) {
+      const error = { message: 'Error deleting organisation' }
       logger.error({ ...error, err })
-      this.setStatus(500)
       return error
     }
   }
