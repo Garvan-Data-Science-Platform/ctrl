@@ -59,7 +59,8 @@
             "items": {
               "$ref": "#/components/schemas/User"
             },
-            "type": "array"
+            "type": "array",
+            "nullable": true
           }
         },
         "required": [
@@ -94,19 +95,10 @@
         "properties": {
           "message": {
             "type": "string"
-          },
-          "newUser": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/User"
-              }
-            ],
-            "nullable": true
           }
         },
         "required": [
-          "message",
-          "newUser"
+          "message"
         ],
         "type": "object",
         "additionalProperties": false
@@ -114,16 +106,20 @@
       "CreateUserRequest": {
         "properties": {
           "firstName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "lastName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "email": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^(.+)@(.+)$"
           },
           "password": {
-            "type": "string"
+            "type": "string",
+            "minLength": 8
           },
           "role": {
             "type": "string"
@@ -137,25 +133,23 @@
           "role"
         ],
         "type": "object",
-        "additionalProperties": false
+        "additionalProperties": false,
+        "example": {
+          "firstName": "John",
+          "lastName": "Doe",
+          "email": "john.doe@email.com",
+          "password": "Password123",
+          "role": "User"
+        }
       },
       "UpdateUserResponse": {
         "properties": {
           "message": {
             "type": "string"
-          },
-          "updatedUser": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/User"
-              }
-            ],
-            "nullable": true
           }
         },
         "required": [
-          "message",
-          "updatedUser"
+          "message"
         ],
         "type": "object",
         "additionalProperties": false
@@ -163,38 +157,38 @@
       "UpdateUserRequest": {
         "properties": {
           "firstName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "lastName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "email": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^(.+)@(.+)$"
           },
           "role": {
             "type": "string"
           }
         },
         "type": "object",
-        "additionalProperties": false
+        "additionalProperties": false,
+        "example": {
+          "firstName": "John",
+          "lastName": "Doe",
+          "email": "john.doe@email.com",
+          "role": "User"
+        }
       },
       "DeleteUserResponse": {
         "properties": {
           "message": {
             "type": "string"
-          },
-          "deletedUser": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/User"
-              }
-            ],
-            "nullable": true
           }
         },
         "required": [
-          "message",
-          "deletedUser"
+          "message"
         ],
         "type": "object",
         "additionalProperties": false
@@ -270,19 +264,10 @@
         "properties": {
           "message": {
             "type": "string"
-          },
-          "newOrganisation": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Organisation"
-              }
-            ],
-            "nullable": true
           }
         },
         "required": [
-          "message",
-          "newOrganisation"
+          "message"
         ],
         "type": "object",
         "additionalProperties": false
@@ -290,7 +275,8 @@
       "CreateOrganisationRequest": {
         "properties": {
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
         },
         "required": [
@@ -303,19 +289,10 @@
         "properties": {
           "message": {
             "type": "string"
-          },
-          "updatedOrganisation": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Organisation"
-              }
-            ],
-            "nullable": true
           }
         },
         "required": [
-          "message",
-          "updatedOrganisation"
+          "message"
         ],
         "type": "object",
         "additionalProperties": false
@@ -323,7 +300,8 @@
       "UpdateOrganisationRequest": {
         "properties": {
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
         },
         "type": "object",
@@ -333,19 +311,10 @@
         "properties": {
           "message": {
             "type": "string"
-          },
-          "deletedOrganisation": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Organisation"
-              }
-            ],
-            "nullable": true
           }
         },
         "required": [
-          "message",
-          "deletedOrganisation"
+          "message"
         ],
         "type": "object",
         "additionalProperties": false
@@ -438,16 +407,20 @@
       "RegisterRequest": {
         "properties": {
           "firstName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "lastName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "email": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^(.+)@(.+)$"
           },
           "password": {
-            "type": "string"
+            "type": "string",
+            "minLength": 8
           },
           "role": {
             "type": "string"
@@ -461,26 +434,14 @@
           "role"
         ],
         "type": "object",
-        "additionalProperties": false
-      },
-      "Error": {
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          },
-          "stack": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "name",
-          "message"
-        ],
-        "type": "object",
-        "additionalProperties": false
+        "additionalProperties": false,
+        "example": {
+          "firstName": "John",
+          "lastName": "Doe",
+          "email": "john.doe@email.com",
+          "password": "Password123",
+          "role": "User"
+        }
       },
       "LoginResponse": {
         "properties": {
@@ -490,20 +451,11 @@
           "token": {
             "type": "string",
             "nullable": true
-          },
-          "error": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Error"
-              }
-            ],
-            "nullable": true
           }
         },
         "required": [
           "message",
-          "token",
-          "error"
+          "token"
         ],
         "type": "object",
         "additionalProperties": false
@@ -511,10 +463,12 @@
       "LoginRequest": {
         "properties": {
           "email": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^(.+)@(.+)$"
           },
           "password": {
-            "type": "string"
+            "type": "string",
+            "minLength": 8
           }
         },
         "required": [
@@ -522,7 +476,11 @@
           "password"
         ],
         "type": "object",
-        "additionalProperties": false
+        "additionalProperties": false,
+        "example": {
+          "email": "john.doe@email.com",
+          "password": "Password123"
+        }
       }
     },
     "securitySchemes": {

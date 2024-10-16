@@ -34,7 +34,7 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "message": {"dataType":"string","required":true},
-            "users": {"dataType":"array","array":{"dataType":"refAlias","ref":"User"},"required":true},
+            "users": {"dataType":"union","subSchemas":[{"dataType":"array","array":{"dataType":"refAlias","ref":"User"}},{"dataType":"enum","enums":[null]}],"required":true},
         },
         "additionalProperties": false,
     },
@@ -52,7 +52,6 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "message": {"dataType":"string","required":true},
-            "newUser": {"dataType":"union","subSchemas":[{"ref":"User"},{"dataType":"enum","enums":[null]}],"required":true},
         },
         "additionalProperties": false,
     },
@@ -60,10 +59,10 @@ const models: TsoaRoute.Models = {
     "CreateUserRequest": {
         "dataType": "refObject",
         "properties": {
-            "firstName": {"dataType":"string","required":true},
-            "lastName": {"dataType":"string","required":true},
-            "email": {"dataType":"string","required":true},
-            "password": {"dataType":"string","required":true},
+            "firstName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
+            "lastName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
+            "email": {"dataType":"string","required":true,"validators":{"pattern":{"errorMsg":"please provide valid email","value":"^(.+)@(.+)$"}}},
+            "password": {"dataType":"string","required":true,"validators":{"minLength":{"value":8}}},
             "role": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
@@ -73,7 +72,6 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "message": {"dataType":"string","required":true},
-            "updatedUser": {"dataType":"union","subSchemas":[{"ref":"User"},{"dataType":"enum","enums":[null]}],"required":true},
         },
         "additionalProperties": false,
     },
@@ -81,9 +79,9 @@ const models: TsoaRoute.Models = {
     "UpdateUserRequest": {
         "dataType": "refObject",
         "properties": {
-            "firstName": {"dataType":"string"},
-            "lastName": {"dataType":"string"},
-            "email": {"dataType":"string"},
+            "firstName": {"dataType":"string","validators":{"minLength":{"value":1}}},
+            "lastName": {"dataType":"string","validators":{"minLength":{"value":1}}},
+            "email": {"dataType":"string","validators":{"pattern":{"errorMsg":"please provide valid email","value":"^(.+)@(.+)$"}}},
             "role": {"dataType":"string"},
         },
         "additionalProperties": false,
@@ -93,7 +91,6 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "message": {"dataType":"string","required":true},
-            "deletedUser": {"dataType":"union","subSchemas":[{"ref":"User"},{"dataType":"enum","enums":[null]}],"required":true},
         },
         "additionalProperties": false,
     },
@@ -130,7 +127,6 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "message": {"dataType":"string","required":true},
-            "newOrganisation": {"dataType":"union","subSchemas":[{"ref":"Organisation"},{"dataType":"enum","enums":[null]}],"required":true},
         },
         "additionalProperties": false,
     },
@@ -138,7 +134,7 @@ const models: TsoaRoute.Models = {
     "CreateOrganisationRequest": {
         "dataType": "refObject",
         "properties": {
-            "name": {"dataType":"string","required":true},
+            "name": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
         },
         "additionalProperties": false,
     },
@@ -147,7 +143,6 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "message": {"dataType":"string","required":true},
-            "updatedOrganisation": {"dataType":"union","subSchemas":[{"ref":"Organisation"},{"dataType":"enum","enums":[null]}],"required":true},
         },
         "additionalProperties": false,
     },
@@ -155,7 +150,7 @@ const models: TsoaRoute.Models = {
     "UpdateOrganisationRequest": {
         "dataType": "refObject",
         "properties": {
-            "name": {"dataType":"string"},
+            "name": {"dataType":"string","validators":{"minLength":{"value":1}}},
         },
         "additionalProperties": false,
     },
@@ -164,7 +159,6 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "message": {"dataType":"string","required":true},
-            "deletedOrganisation": {"dataType":"union","subSchemas":[{"ref":"Organisation"},{"dataType":"enum","enums":[null]}],"required":true},
         },
         "additionalProperties": false,
     },
@@ -212,21 +206,11 @@ const models: TsoaRoute.Models = {
     "RegisterRequest": {
         "dataType": "refObject",
         "properties": {
-            "firstName": {"dataType":"string","required":true},
-            "lastName": {"dataType":"string","required":true},
-            "email": {"dataType":"string","required":true},
-            "password": {"dataType":"string","required":true},
+            "firstName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
+            "lastName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
+            "email": {"dataType":"string","required":true,"validators":{"pattern":{"errorMsg":"please provide valid email","value":"^(.+)@(.+)$"}}},
+            "password": {"dataType":"string","required":true,"validators":{"minLength":{"errorMsg":"Password must be at least 8 characters","value":8}}},
             "role": {"dataType":"string","required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Error": {
-        "dataType": "refObject",
-        "properties": {
-            "name": {"dataType":"string","required":true},
-            "message": {"dataType":"string","required":true},
-            "stack": {"dataType":"string"},
         },
         "additionalProperties": false,
     },
@@ -236,7 +220,6 @@ const models: TsoaRoute.Models = {
         "properties": {
             "message": {"dataType":"string","required":true},
             "token": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},
-            "error": {"dataType":"union","subSchemas":[{"ref":"Error"},{"dataType":"enum","enums":[null]}],"required":true},
         },
         "additionalProperties": false,
     },
@@ -244,8 +227,8 @@ const models: TsoaRoute.Models = {
     "LoginRequest": {
         "dataType": "refObject",
         "properties": {
-            "email": {"dataType":"string","required":true},
-            "password": {"dataType":"string","required":true},
+            "email": {"dataType":"string","required":true,"validators":{"pattern":{"errorMsg":"Please provide valid email","value":"^(.+)@(.+)$"}}},
+            "password": {"dataType":"string","required":true,"validators":{"minLength":{"errorMsg":"Password must be at least 8 characters","value":8}}},
         },
         "additionalProperties": false,
     },
