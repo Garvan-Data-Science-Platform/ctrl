@@ -9,6 +9,7 @@ import News from './pages/News'
 import Glossary from './pages/Glossary'
 import ConsentForm from './pages/ConsentForm'
 import Login from './pages/Login'
+import Register from './pages/Register'
 
 const router = createBrowserRouter([
   {
@@ -54,7 +55,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/register',
-    element: <Dashboard />,
+    element: <Register />,
   },
   {
     path: '/forgot',

@@ -15,17 +15,14 @@ enum StateTerritory {
   WA = 'wa',
 }
 
-interface AlternativeContact {
+export interface AlternativeContact {
   firstName: string
-  middleName?: string
   lastName: string
-  phone: string
   email: string
 }
 
-interface OnBehalf {
+export interface OnBehalf {
   firstName: string
-  middleName?: string
   lastName: string
   dob: string
 }
