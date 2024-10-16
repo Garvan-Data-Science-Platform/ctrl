@@ -181,16 +181,6 @@ export default function Profile() {
                       <tr>
                         <td>
                           <Typography fontWeight="bold" lineHeight={2.5}>
-                            Middle Name
-                          </Typography>
-                        </td>
-                        <td>
-                          <Typography>{data.onBehalfOf?.middleName}</Typography>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <Typography fontWeight="bold" lineHeight={2.5}>
                             Family Name
                           </Typography>
                         </td>
@@ -231,16 +221,6 @@ export default function Profile() {
                       <tr>
                         <td>
                           <Typography fontWeight="bold" lineHeight={2.5}>
-                            Middle Name
-                          </Typography>
-                        </td>
-                        <td>
-                          <Typography>{data.alternativeContact?.middleName}</Typography>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <Typography fontWeight="bold" lineHeight={2.5}>
                             Family Name
                           </Typography>
                         </td>
@@ -256,16 +236,6 @@ export default function Profile() {
                         </td>
                         <td>
                           <Typography>{data.alternativeContact?.email}</Typography>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <Typography fontWeight="bold" lineHeight={2.5}>
-                            Contact No.
-                          </Typography>
-                        </td>
-                        <td>
-                          <Typography>{data.alternativeContact?.phone}</Typography>
                         </td>
                       </tr>
                     </>
