@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom'
 
 export default function Profile() {
   const { isPending, error, data } = useQuery({
-    queryKey: ['profile'],
+    queryKey: ['profile', 'get'],
     //queryFn: () => fetch('/api/user/profile').then((res) => res.json()) as Promise<UserProfile>,
     queryFn: () => ProfileData as GetUserProfileResponse,
   })

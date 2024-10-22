@@ -15,7 +15,7 @@ import { useAuth } from '../auth'
 
 const pages = [
   { name: 'My Activities', route: '/' },
-  { name: 'My Personal Details', route: '/profile' },
+  { name: 'My Personal Details', route: '/profile', alt: ['/profile/update'] },
   { name: 'Contact us', route: '/contact', alt: ['/message_sent'] },
   { name: 'News and Information', route: '/news' },
   { name: 'Glossary', route: '/glossary' },
@@ -46,7 +46,7 @@ export default function NavBar() {
           <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
           <Box>
             <img
-              src="./australian-genomics-logo.png"
+              src="/australian-genomics-logo.png"
               height={30}
               onClick={() => nav('/')}
               style={{ marginRight: 20, cursor: 'pointer' }}

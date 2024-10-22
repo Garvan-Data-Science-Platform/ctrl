@@ -10,11 +10,11 @@
   "state": "vic",
   "postcode": "1234",
   "preferredContact": "mobile",
-  "isParentOrGuardian": false,
-  "alternativeContact": {
+  "isParentOrGuardian": true,
+  "onBehalfOf": {
     "firstName": "Jenny",
     "lastName": "Smith",
     "phone": "041223545648",
-    "email": "jenny@test.com"
+    "dob": "1980-01-01"
   }
 }
