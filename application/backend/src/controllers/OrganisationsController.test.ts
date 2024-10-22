@@ -150,14 +150,6 @@ describe('OrganisationsController', () => {
     it('should create a new organisation', async () => {
       const newOrganisationName = 'New Test Organisation'
 
-      // Check organisation doesn't exist
-      const existingOrg = await prisma.organisation.findFirst({
-        where: { name: newOrganisationName },
-      })
-      if (existingOrg) {
-        throw new Error('Organisation with that name already exists')
-      }
-
       const response = await request(app)
         .post('/organisations')
         .set({ Authorization: `Bearer ${token}` })
@@ -173,6 +165,15 @@ describe('OrganisationsController', () => {
         where: { name: newOrganisationName },
       })
       expect(createdOrg).not.toBeNull()
+    })
+
+    it('should return an error if the organisation already exists', async () => {
+      const organisationNameAlreadyExists = 'Test Organisation'
+      const response = await request(app)
+        .post('/organisations')
+        .set({ Authorization: `Bearer ${token}` })
+        .send({ name: organisationNameAlreadyExists } as CreateOrganisationRequest)
+      expect(response.status).toBe(500)
     })
 
     it('should return a 500 error if a database error occurs', async () => {
