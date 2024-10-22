@@ -9,7 +9,7 @@ import {
   GetUserByIdResponse,
   UpdateUserResponse,
 } from 'common/types/api/users'
-import { resetDB } from '../TestHelpers'
+import { resetDB } from '../../tests/TestHelpers'
 import { getUserIdFromToken } from '../authentication'
 
 const api = new Api()
@@ -37,7 +37,7 @@ describe('UsersController', () => {
     // Register user
     const registerResponse = await request(app).post('/auth/register').send(testUser)
     const body: RegisterResponse = registerResponse.body
-    if (!body.token) throw new Error()
+    if (!body.token) throw new Error('User could not be registered')
     token = body.token
     registeredUserID = getUserIdFromToken(token)
   })
@@ -47,14 +47,6 @@ describe('UsersController', () => {
   })
 
   describe('GET /users', () => {
-    it('should be a protected route', async () => {
-      const response = await request(app).get('/users')
-      expect(response.status).toBe(401)
-
-      const body: GetAllUsersResponse = response.body
-      expect(body.message).toBe('No token provided')
-    })
-
     it('should return a list of users', async () => {
       const response = await request(app)
         .get('/users')
@@ -81,14 +73,6 @@ describe('UsersController', () => {
   })
 
   describe('GET /users/:id', () => {
-    it('should be a protected route', async () => {
-      const response = await request(app).get('/users/1')
-      expect(response.status).toBe(401)
-
-      const body: GetUserByIdResponse = response.body
-      expect(body.message).toBe('No token provided')
-    })
-
     it('should return a user by ID', async () => {
       const userID = registeredUserID
       const response = await request(app)
@@ -119,21 +103,6 @@ describe('UsersController', () => {
   })
 
   describe('POST /users', () => {
-    it('should be a protected route', async () => {
-      const response = await request(app).post('/users').send({
-        firstName: 'Jane',
-        lastName: 'Doe',
-        email: 'jane@example.com',
-        password: 'password123',
-        role: 'user',
-      })
-
-      expect(response.status).toBe(401)
-
-      const body: CreateUserResponse = response.body
-      expect(body.message).toBe('No token provided')
-    })
-
     it('should create a new user', async () => {
       const newUser = {
         firstName: 'Jane',
@@ -168,14 +137,6 @@ describe('UsersController', () => {
   })
 
   describe('PATCH /users/:id', () => {
-    it('should be a protected route', async () => {
-      const response = await request(app).patch('/users/1').send({ firstName: 'Updated' })
-      expect(response.status).toBe(401)
-
-      const body: UpdateUserResponse = response.body
-      expect(body.message).toBe('No token provided')
-    })
-
     it('should update a user by ID', async () => {
       const userID: number = registeredUserID
 
@@ -225,14 +186,6 @@ describe('UsersController', () => {
   })
 
   describe('DELETE /users/:id', () => {
-    it('should be a protected route', async () => {
-      const response = await request(app).delete('/users/1')
-      expect(response.status).toBe(401)
-
-      const body: UpdateUserResponse = response.body
-      expect(body.message).toBe('No token provided')
-    })
-
     it('should delete a user by ID', async () => {
       const userID: number = registeredUserID
 

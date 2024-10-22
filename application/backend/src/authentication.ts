@@ -2,6 +2,7 @@
 import * as express from 'express'
 import * as jwt from 'jsonwebtoken'
 import logger from 'common/src/logger'
+import crypto from 'crypto'
 
 export class NoTokenError extends Error {
   constructor() {
@@ -61,4 +62,37 @@ export function getUserIdFromToken(token: string): number {
   }
 
   throw new Error('UserID not encoded in token.')
+}
+
+export async function hashPassword(password: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const salt = crypto.randomBytes(16)
+    crypto.scrypt(password, salt, 64, (err, derivedKey) => {
+      if (err) reject(err)
+      resolve(salt.toString('hex') + ':' + derivedKey.toString('hex'))
+    })
+  })
+}
+
+export async function verifyPassword(hashedPassword: string, password: string): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    const [salt, key] = hashedPassword.split(':')
+    crypto.scrypt(password, Buffer.from(salt, 'hex'), 64, (err, derivedKey) => {
+      if (err) reject(err)
+      resolve(key === derivedKey.toString('hex'))
+    })
+  })
+}
+
+export async function generateToken(userId: number): Promise<string> {
+  if (!process.env.JWT_SECRET) {
+    logger.error({ message: 'JWT_SECRET environment variable not set' })
+    throw new Error('JWT_SECRET environment variable not set')
+  }
+
+  // Generate JWT token
+  return jwt.sign({ userId }, process.env.JWT_SECRET, {
+    algorithm: 'HS256',
+    expiresIn: process.env.JWT_EXPIRY || '1h',
+  })
 }
