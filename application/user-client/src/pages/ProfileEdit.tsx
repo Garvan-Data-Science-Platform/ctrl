@@ -10,12 +10,10 @@ import {
   Typography,
 } from '@mui/material'
 import { useForm } from 'react-hook-form'
-import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../auth'
-import { RegisterParticipantRequest, RegisterParticipantResponse } from '@common/types/api/auth'
+import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { GetUserProfileResponse } from '@common/types/api/users'
+import { GetUserProfileResponse, UpdateProfileRequest } from '@common/types/api/users'
 import ProfileData from '@common/example_responses/getUserProfile.json'
 import NavBar from '../components/NavBar'
 
@@ -40,10 +38,8 @@ export default function ProfileEdit() {
     register,
     handleSubmit,
     setError,
-    watch,
     formState: { errors },
   } = useForm<FormValues>()
-  const { login } = useAuth()
   const nav = useNavigate()
   const queryClient = useQueryClient()
 
@@ -62,6 +58,10 @@ export default function ProfileEdit() {
     setIsParentOrGuardian(data?.isParentOrGuardian || false)
   }, [data])
 
+  useEffect(() => {
+    if (error) setError('root.serverError', error)
+  }, [error])
+
   const onSubmit = (data: FormValues) => {
     //login('TOKEN')
     //nav('/')
@@ -75,7 +75,7 @@ export default function ProfileEdit() {
       studyID: data.studyID,
     }
 
-    let reqData: RegisterParticipantRequest
+    let reqData: UpdateProfileRequest
 
     if (isParentOrGuardian) {
       reqData = {
