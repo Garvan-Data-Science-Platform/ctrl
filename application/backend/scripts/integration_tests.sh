@@ -1,12 +1,16 @@
 set -e
 
 # Spin-up db
-docker compose up -d db-test --wait
+docker compose --env-file .env up -d
+
+# Wait for db
+echo "Waiting for db to spin up..."
+sleep 5
 
 # migrate db
-dotenv -e .env.test -- yarn prisma migrate deploy
+yarn prisma migrate deploy
 
 # run tests
-dotenv -e .env.test -- jest --detectOpenHandles --coverage $1
+jest --detectOpenHandles --coverage $1
 
-docker compose down db-test
+docker compose down

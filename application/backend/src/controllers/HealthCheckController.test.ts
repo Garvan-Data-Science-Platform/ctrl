@@ -27,8 +27,4 @@ describe('HealthCheckController', () => {
       })
     })
   })
-
-  it('FAIL', () => {
-    expect(true).toBe(false)
-  })
 })

@@ -13,7 +13,7 @@ help:
 	@echo "- "
 
 e2e:
-	docker compose up -d db-test
+	docker compose up -d
 	yarn workspace backend build
 	yarn workspace user-client build
 	yarn workspace backend start & \
@@ -25,7 +25,6 @@ e2e:
 	kill $${FRONTEND_PID}; \
 	kill $${BACKEND_PID}; \
     exit $$EXIT_CODE
-	docker compose down db-test
 
 # Check everything that will run in ci
 check:
@@ -37,7 +36,7 @@ check:
 	make e2e
 
 db: 
-	docker compose up -d db
+	docker compose --env-file application/backend/.env up -d
 
 db-down:
 	docker compose down
