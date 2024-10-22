@@ -1,22 +1,12 @@
 import request from 'supertest'
 import { Api } from '../../src/Api'
-import type {
-  CreateUserResponse,
-  DeleteUserResponse,
-  GetAllUsersResponse,
-  GetUserByIdResponse,
-  UpdateUserResponse,
-} from 'common/types/api/users'
-import type {
-  AddUserToOrganisationResponse,
-  CreateOrganisationResponse,
-  DeleteOrganisationResponse,
-  GetAllOrganisationsResponse,
-  GetOrganisationByIdResponse,
-  GetOrganisationUsersResponse,
-  RemoveUserFromOrganisationResponse,
-  UpdateOrganisationResponse,
-} from 'common/types/api/organisations'
+
+enum HttpMethod {
+  GET = 'get',
+  POST = 'post',
+  PATCH = 'patch',
+  DELETE = 'delete',
+}
 
 const api = new Api()
 const app = api.app
@@ -30,136 +20,46 @@ describe('Api', () => {
     api.stop()
   })
 
-  describe('UsersController', () => {
-    describe('GET /users', () => {
-      it('should be a protected route', async () => {
-        const response = await request(app).get('/users')
-        expect(response.status).toBe(401)
+  describe('Protected Routes', () => {
+    const checkProtectedRoute = async (method: HttpMethod, url: string) => {
+      const response = await request(app)[method](url)
+      expect(response.status).toBe(401)
 
-        const body: GetAllUsersResponse = response.body
-        expect(body.message).toBe('No token provided')
+      const body = response.body
+      expect(body.message).toBe('No token provided')
+    }
+
+    const userRoutes = [
+      { method: HttpMethod.GET, url: '/users' },
+      { method: HttpMethod.GET, url: '/users/1' },
+      { method: HttpMethod.PATCH, url: '/users/1' },
+      { method: HttpMethod.DELETE, url: '/users/1' },
+    ]
+
+    const organisationRoutes = [
+      { method: HttpMethod.GET, url: '/organisations' },
+      { method: HttpMethod.GET, url: '/organisations/1' },
+      { method: HttpMethod.POST, url: '/organisations' },
+      { method: HttpMethod.PATCH, url: '/organisations/1' },
+      { method: HttpMethod.DELETE, url: '/organisations/1' },
+      { method: HttpMethod.GET, url: '/organisations/1/users' },
+      { method: HttpMethod.POST, url: '/organisations/1/users/2' },
+      { method: HttpMethod.DELETE, url: '/organisations/1/users/2' },
+    ]
+
+    describe('User Routes', () => {
+      userRoutes.forEach(({ method, url }) => {
+        it(`${method.toUpperCase()} ${url} should be a protected route`, async () => {
+          await checkProtectedRoute(method, url)
+        })
       })
     })
 
-    describe('GET /users/{userID}', () => {
-      it('should be a protected route', async () => {
-        const response = await request(app).get('/users/1')
-        expect(response.status).toBe(401)
-
-        const body: GetUserByIdResponse = response.body
-        expect(body.message).toBe('No token provided')
-      })
-    })
-
-    describe('POST /users', () => {
-      it('should be a protected route', async () => {
-        const response = await request(app).post('/users')
-        expect(response.status).toBe(401)
-
-        const body: CreateUserResponse = response.body
-        expect(body.message).toBe('No token provided')
-      })
-    })
-
-    describe('PATCH /users/{userID}', () => {
-      it('should be a protected route', async () => {
-        const response = await request(app).patch('/users/1')
-        expect(response.status).toBe(401)
-
-        const body: UpdateUserResponse = response.body
-        expect(body.message).toBe('No token provided')
-      })
-    })
-
-    describe('DELETE /users/{userID}', () => {
-      it('should be a protected route', async () => {
-        const response = await request(app).delete('/users/1')
-        expect(response.status).toBe(401)
-
-        const body: DeleteUserResponse = response.body
-        expect(body.message).toBe('No token provided')
-      })
-    })
-  })
-
-  describe('OrganisationsController', () => {
-    describe('GET /organisations', () => {
-      it('should be a protected route', async () => {
-        const response = await request(app).get('/organisations')
-        expect(response.status).toBe(401)
-
-        const body: GetAllOrganisationsResponse = response.body
-        expect(body.message).toBe('No token provided')
-      })
-    })
-
-    describe('GET /organisations/{orgID}', () => {
-      it('should be a protected route', async () => {
-        const response = await request(app).get('/organisations/1')
-        expect(response.status).toBe(401)
-
-        const body: GetOrganisationByIdResponse = response.body
-        expect(body.message).toBe('No token provided')
-      })
-    })
-
-    describe('POST /organisations', () => {
-      it('should be a protected route', async () => {
-        const response = await request(app).post('/organisations')
-        expect(response.status).toBe(401)
-
-        const body: CreateOrganisationResponse = response.body
-        expect(body.message).toBe('No token provided')
-      })
-    })
-
-    describe('PATCH /organisations/{orgID}', () => {
-      it('should be a protected route', async () => {
-        const response = await request(app).patch('/organisations/1')
-        expect(response.status).toBe(401)
-
-        const body: UpdateOrganisationResponse = response.body
-        expect(body.message).toBe('No token provided')
-      })
-    })
-
-    describe('DELETE /organisations/{orgID}', () => {
-      it('should be a protected route', async () => {
-        const response = await request(app).delete('/organisations/1')
-        expect(response.status).toBe(401)
-
-        const body: DeleteOrganisationResponse = response.body
-        expect(body.message).toBe('No token provided')
-      })
-    })
-
-    describe('GET /organisations/{orgID}/users', () => {
-      it('should be a protected route', async () => {
-        const response = await request(app).get(`/organisations/1/users`)
-        expect(response.status).toBe(401)
-
-        const body: GetOrganisationUsersResponse = response.body
-        expect(body.message).toBe('No token provided')
-      })
-    })
-
-    describe('POST /organisations/{orgID}/users/{userID}', () => {
-      it('should be a protected route', async () => {
-        const response = await request(app).post(`/organisations/1/users/2`)
-        expect(response.status).toBe(401)
-
-        const body: AddUserToOrganisationResponse = response.body
-        expect(body.message).toBe('No token provided')
-      })
-    })
-
-    describe('DELETE /organisations/{orgID}/users/{userID}', () => {
-      it('should be a protected route', async () => {
-        const response = await request(app).delete(`/organisations/1/users/2`)
-        expect(response.status).toBe(401)
-
-        const body: RemoveUserFromOrganisationResponse = response.body
-        expect(body.message).toBe('No token provided')
+    describe('Organisation Routes', () => {
+      organisationRoutes.forEach(({ method, url }) => {
+        it(`${method.toUpperCase()} ${url} should be a protected route`, async () => {
+          await checkProtectedRoute(method, url)
+        })
       })
     })
   })
