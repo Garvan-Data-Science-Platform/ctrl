@@ -1,8 +1,8 @@
 import { createBrowserRouter } from 'react-router-dom'
 import Dashboard from './pages/Dashboard'
 import Profile from './pages/Profile'
+import ProfileEdit from './pages/ProfileEdit'
 import { ProtectedRoutes } from './auth'
-import UpdateProfile from './pages/UpdateProfile'
 import Contact from './pages/Contact'
 import MessageSent from './pages/MessageSent'
 import News from './pages/News'
@@ -29,7 +29,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/profile/update',
-        element: <UpdateProfile />,
+        element: <ProfileEdit />,
       },
       {
         path: '/contact',
