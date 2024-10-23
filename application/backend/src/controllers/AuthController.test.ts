@@ -107,7 +107,22 @@ describe('AuthController', () => {
       expect(body.message).toBe('Validation Failed')
     })
 
-    it('should return an error if the user is already registered', async () => {})
+    it('should return an error if the user is already registered', async () => {
+      const registerRequest: RegisterRequest = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'johndoe@example.com',
+        password: 'password123',
+        role: 'user',
+      }
+
+      // Register user
+      await request(app).post('/auth/register').send(registerRequest)
+
+      // Try to register again with the same email
+      const response = await request(app).post('/auth/register').send(registerRequest)
+      expect(response.status).toEqual(500)
+    })
   })
 
   describe('POST /auth/login', () => {
