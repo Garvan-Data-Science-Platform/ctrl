@@ -17,7 +17,7 @@ export interface RegisterRequest {
    */
   lastName: string
   /**
-   * @pattern ^(.+)@(.+)$ please provide valid email
+   * @pattern ^(.+)@(.+)$ Please provide valid email
    */
   email: string
   /**

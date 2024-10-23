@@ -208,7 +208,7 @@ const models: TsoaRoute.Models = {
         "properties": {
             "firstName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
             "lastName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
-            "email": {"dataType":"string","required":true,"validators":{"pattern":{"errorMsg":"please provide valid email","value":"^(.+)@(.+)$"}}},
+            "email": {"dataType":"string","required":true,"validators":{"pattern":{"errorMsg":"Please provide valid email","value":"^(.+)@(.+)$"}}},
             "password": {"dataType":"string","required":true,"validators":{"minLength":{"errorMsg":"Password must be at least 8 characters","value":8}}},
             "role": {"dataType":"string","required":true},
         },
