@@ -69,10 +69,13 @@ describe('OrganisationsController', () => {
       .post('/organisations')
       .set({ Authorization: `Bearer ${token}` })
       .send({ name: 'Test Organisation' } as CreateOrganisationRequest)
-    const createOrganisationBody: CreateOrganisationResponse = createOrganisationResponse.body
-    if (!createOrganisationBody.newOrganisation)
+    if (createOrganisationResponse.status !== 201)
       throw new Error('Organisation could not be created')
-    testOrganisationID = createOrganisationBody.newOrganisation.id
+    const createOrganisationBody: CreateOrganisationResponse = createOrganisationResponse.body
+
+    if (!createOrganisationBody.organisationID) throw new Error('Organisation could not be created')
+
+    testOrganisationID = createOrganisationBody.organisationID
 
     // Add user to organisation
     const addUserToOrganisationResponse = await request(app)
@@ -156,15 +159,11 @@ describe('OrganisationsController', () => {
         .send({ name: newOrganisationName } as CreateOrganisationRequest)
       expect(response.status).toBe(201)
 
-      const body: CreateOrganisationResponse = response.body
-      expect(body.newOrganisation).not.toBeNull()
-      expect(body.newOrganisation?.name).toBe(newOrganisationName)
-
       // Check organisation now exists in db
       const createdOrg = await prisma.organisation.findFirst({
         where: { name: newOrganisationName },
       })
-      expect(createdOrg).not.toBeNull()
+      expect(createdOrg?.name).toBe(newOrganisationName)
     })
 
     it('should return an error if the organisation already exists', async () => {
@@ -189,8 +188,8 @@ describe('OrganisationsController', () => {
       expect(response.status).toBe(500)
 
       const body: CreateOrganisationResponse = response.body
-      expect(body.message).toBe('Internal Server Error')
-      expect(body.newOrganisation).toBe(undefined)
+      expect(body.message).toBe('Error creating organisation')
+      expect(body.organisationID).toBe(null)
     })
   })
 
@@ -212,10 +211,6 @@ describe('OrganisationsController', () => {
         .send({ name: updatedOrganisationName } as UpdateOrganisationRequest)
       expect(response.status).toBe(200)
 
-      const body: UpdateOrganisationResponse = response.body
-      expect(body.updatedOrganisation).not.toBeNull()
-      expect(body.updatedOrganisation?.name).toBe(updatedOrganisationName)
-
       // Check updated organisation in db
       const updatedOrg = await prisma.organisation.findFirst({
         where: { id: testOrganisationID },
@@ -235,23 +230,6 @@ describe('OrganisationsController', () => {
 
       const body: UpdateOrganisationResponse = response.body
       expect(body.message).toBe(`Organisation with ID: ${notExistingOrganisationId} not found`)
-      expect(body.updatedOrganisation).toBe(null)
-    })
-
-    it('should return a 500 error if a database error occurs', async () => {
-      jest.spyOn(prisma.organisation, 'update').mockImplementationOnce(() => {
-        throw new Error('Internal Server Error')
-      })
-
-      const response = await request(app)
-        .patch(`/organisations/${testOrganisationID}`)
-        .set({ Authorization: `Bearer ${token}` })
-        .send({ name: 'Updated Test Organisation' } as UpdateOrganisationRequest)
-
-      expect(response.status).toBe(500)
-
-      const body: UpdateOrganisationResponse = response.body
-      expect(body.message).toBe('Error updating organisation')
     })
   })
 
@@ -261,10 +239,6 @@ describe('OrganisationsController', () => {
         .delete(`/organisations/${testOrganisationID}`)
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(200)
-
-      const body: DeleteOrganisationResponse = response.body
-      expect(body.deletedOrganisation).not.toBeNull()
-      expect(body.deletedOrganisation?.id).toBe(testOrganisationID)
 
       // Check deleted organisation in db
       const deletedOrg = await prisma.organisation.findFirst({
@@ -283,22 +257,6 @@ describe('OrganisationsController', () => {
 
       const body: DeleteOrganisationResponse = response.body
       expect(body.message).toBe(`Organisation with ID: ${notExistingOrganisationId} not found`)
-      expect(body.deletedOrganisation).toBe(null)
-    })
-
-    it('should return a 500 error if a database error occurs', async () => {
-      jest.spyOn(prisma.organisation, 'delete').mockImplementationOnce(() => {
-        throw new Error('Internal Server Error')
-      })
-
-      const response = await request(app)
-        .delete(`/organisations/${testOrganisationID}`)
-        .set({ Authorization: `Bearer ${token}` })
-
-      expect(response.status).toBe(500)
-
-      const body: DeleteOrganisationResponse = response.body
-      expect(body.message).toBe('Error deleting organisation')
     })
   })
 

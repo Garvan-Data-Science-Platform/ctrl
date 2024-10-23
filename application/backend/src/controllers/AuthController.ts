@@ -4,7 +4,7 @@ import type {
   LoginRequest,
   LoginResponse,
 } from 'common/types/api/auth'
-import { Route, Tags, Controller, Body, Post, SuccessResponse, Response, ValidateError } from 'tsoa'
+import { Route, Tags, Controller, Body, Post, SuccessResponse, Response } from 'tsoa'
 import prisma from '../PrismaClient'
 import logger from 'common/src/logger'
 import { User } from '@prisma/client'

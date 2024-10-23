@@ -14,7 +14,7 @@ import {
 } from 'tsoa'
 import logger from 'common/src/logger'
 import prisma from '../PrismaClient'
-import { type Organisation, Prisma } from '@prisma/client'
+import { type Organisation } from '@prisma/client'
 import type {
   GetAllOrganisationsResponse,
   GetOrganisationByIdResponse,
@@ -91,12 +91,17 @@ export class OrganisationsController extends Controller {
         data: { name: bodyRequest.name },
       })
 
-      const responseData = { message: 'Created new organisation' }
+      const responseData = {
+        message: 'Created new organisation',
+        organisationID: newOrganisation.id,
+      }
+
       logger.info({ ...responseData, newOrganisation })
       return responseData
     } catch (err) {
-      const error = { message: 'Error creating organisation' }
+      const error = { message: 'Error creating organisation', organisationID: null }
       logger.error({ ...error, err })
+      this.setStatus(500)
       return error
     }
   }
@@ -114,30 +119,26 @@ export class OrganisationsController extends Controller {
     @Path() orgID: number,
     @Body() bodyRequest: UpdateOrganisationRequest,
   ): Promise<UpdateOrganisationResponse> {
+    let updatedOrganisation: Organisation
     try {
-      const updatedOrganisation = await this.organisationRepo.update({
+      updatedOrganisation = await this.organisationRepo.update({
         where: { id: orgID },
         data: bodyRequest,
       })
-      if (!updatedOrganisation) {
-        const error = {
-          message: `Organisation with ID: ${orgID} not found`,
-        }
-        logger.error({ ...error })
-        this.setStatus(404)
-        return error
-      }
-
-      const responseData = {
-        message: `Updated organisation with ID: ${orgID}`,
-      }
-      logger.info({ ...responseData, updatedOrganisation })
-      return responseData
     } catch (err) {
-      const error = { message: 'Error updating organisation' }
+      const error = {
+        message: `Organisation with ID: ${orgID} not found`,
+      }
       logger.error({ ...error, err })
+      this.setStatus(404)
       return error
     }
+
+    const responseData = {
+      message: `Updated organisation with ID: ${orgID}`,
+    }
+    logger.info({ ...responseData, updatedOrganisation })
+    return responseData
   }
 
   /**
@@ -150,30 +151,25 @@ export class OrganisationsController extends Controller {
   @Response('500', 'Internal Server Error')
   @Response('404', 'Not Found')
   public async deleteOrganisation(@Path() orgID: number): Promise<DeleteOrganisationResponse> {
+    let deletedOrganisation: Organisation
     try {
-      const deletedOrganisation = await this.organisationRepo.delete({
+      deletedOrganisation = await this.organisationRepo.delete({
         where: { id: orgID },
         include: { users: true },
       })
-      if (!deletedOrganisation) {
-        const error = {
-          message: `Organisation with ID: ${orgID} not found`,
-        }
-        logger.error({ ...error })
-        this.setStatus(404)
-        return error
-      }
-
-      const responseData = {
-        message: `Deleted organisation with ID: ${orgID}`,
-      }
-      logger.info({ ...responseData, deletedOrganisation })
-      return responseData
     } catch (err) {
-      const error = { message: 'Error deleting organisation' }
+      const error = {
+        message: `Organisation with ID: ${orgID} not found`,
+      }
       logger.error({ ...error, err })
+      this.setStatus(404)
       return error
     }
+    const responseData = {
+      message: `Deleted organisation with ID: ${orgID}`,
+    }
+    logger.info({ ...responseData, deletedOrganisation })
+    return responseData
   }
 
   /**
