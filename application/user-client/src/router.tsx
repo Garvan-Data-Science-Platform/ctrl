@@ -10,6 +10,8 @@ import Glossary from './pages/Glossary'
 import ConsentForm from './pages/ConsentForm'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetConfirmation from './pages/ResetConfirmation'
 
 const router = createBrowserRouter([
   {
@@ -59,7 +61,11 @@ const router = createBrowserRouter([
   },
   {
     path: '/forgot',
-    element: <Dashboard />,
+    element: <ForgotPassword />,
+  },
+  {
+    path: '/reset-confirm',
+    element: <ResetConfirmation />,
   },
 ])
 export default router
