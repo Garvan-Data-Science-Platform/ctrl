@@ -123,6 +123,71 @@ describe('AuthController', () => {
       const response = await request(app).post('/auth/register').send(registerRequest)
       expect(response.status).toEqual(500)
     })
+
+    it('should fail validation if provided with an invalid email', async () => {
+      const registerRequest: RegisterRequest = {
+        email: 'invalid email',
+        firstName: 'John',
+        lastName: 'Doe',
+        password: 'password123',
+        role: 'user',
+      }
+
+      const response = await request(app).post('/auth/register').send(registerRequest)
+      expect(response.status).toEqual(422)
+
+      const body = response.body
+      expect(body.message).toBe('Validation Failed')
+      expect(body.details).toEqual({
+        'bodyRequest.email': {
+          message: 'please provide valid email',
+          value: registerRequest.email,
+        },
+      })
+    })
+
+    it('should fail validation if provided with an invalid password', async () => {
+      const registerRequest: RegisterRequest = {
+        email: 'johndoe@example.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        password: 'pass',
+        role: 'user',
+      }
+
+      const response = await request(app).post('/auth/register').send(registerRequest)
+      expect(response.status).toEqual(422)
+
+      const body = response.body
+      expect(body.message).toBe('Validation Failed')
+      expect(body.details).toEqual({
+        'bodyRequest.password': {
+          message: 'Password must be at least 8 characters',
+          value: 'pass',
+        },
+      })
+    })
+    it('should fail validation if provided with empty values', async () => {
+      const registerRequest: RegisterRequest = {
+        email: '',
+        firstName: '',
+        lastName: '',
+        password: '',
+        role: '',
+      }
+
+      const response = await request(app).post('/auth/register').send(registerRequest)
+      expect(response.status).toEqual(422)
+
+      const body = response.body
+      expect(body.message).toBe('Validation Failed')
+      expect(body.details).toEqual({
+        'bodyRequest.firstName': { message: 'minLength 1', value: '' },
+        'bodyRequest.lastName': { message: 'minLength 1', value: '' },
+        'bodyRequest.email': { message: 'please provide valid email', value: '' },
+        'bodyRequest.password': { message: 'Password must be at least 8 characters', value: '' },
+      })
+    })
   })
 
   describe('POST /auth/login', () => {
