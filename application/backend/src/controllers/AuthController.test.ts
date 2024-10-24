@@ -189,6 +189,26 @@ describe('AuthController', () => {
         'bodyRequest.password': { message: 'Password must be at least 8 characters', value: '' },
       })
     })
+
+    it('should fail validation if the password is not strong', async () => {
+      const registerRequest: RegisterRequest = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'johndoe@example.com',
+        password: 'somepasswordthatsnotstrong',
+        role: 'user',
+      }
+
+      const response = await request(app).post('/auth/register').send(registerRequest)
+      expect(response.status).toEqual(422)
+
+      const body = response.body
+      expect(body.message).toBe('Validation Failed')
+      expect(body.details).toEqual({
+        Uppercase: { message: 'Password must contain at least one uppercase letter' },
+        Number: { message: 'Password must contain at least one number' },
+      })
+    })
   })
 
   describe('POST /auth/login', () => {
@@ -264,7 +284,6 @@ describe('AuthController', () => {
       expect(response.status).toEqual(422)
 
       const body = response.body
-      console.log(body)
       expect(body.message).toBe('Validation Failed')
     })
 
@@ -295,7 +314,6 @@ describe('AuthController', () => {
       expect(response.status).toEqual(422)
 
       const body = response.body
-      console.log(body)
       expect(body.message).toBe('Validation Failed')
       expect(body.details).toEqual({
         'bodyRequest.email': { message: 'Please provide valid email', value: loginRequest.email },
