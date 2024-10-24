@@ -63,28 +63,20 @@ export class AuthController extends Controller {
   @Response('401', 'Unauthorized')
   @Response('500', 'Internal Server Error')
   public async login(@Body() bodyRequest: LoginRequest): Promise<LoginResponse> {
-    try {
-      // Check if user exists and password matches
-      const user = await this.userRepo.findUnique({ where: { email: bodyRequest.email } })
-      if (!user || !(await verifyPassword(user.password, bodyRequest.password))) {
-        this.setStatus(401)
-        throw Error('Invalid email or password')
-      }
-
-      const token = await generateToken(user.id)
-      const responseData = {
-        message: 'Logged in Successfully!',
-        token,
-      }
-
-      logger.info({ ...responseData })
-
-      return responseData
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Could not login'
-      const error = { message: errorMessage, token: null }
-      logger.error({ ...error, err })
-      return error
+    // Check if user exists and password matches
+    const user = await this.userRepo.findUnique({ where: { email: bodyRequest.email } })
+    if (!user || !(await verifyPassword(user.password, bodyRequest.password))) {
+      throw Error('Invalid email or password')
     }
+
+    const token = await generateToken(user.id)
+    const responseData = {
+      message: 'Logged in Successfully!',
+      token,
+    }
+
+    logger.info({ ...responseData })
+
+    return responseData
   }
 }
