@@ -36,15 +36,12 @@ export class Api {
       next: NextFunction,
     ): Response | void {
       if (err instanceof ValidateError) {
-        const error = {
+        const errorResponse = {
           message: 'Validation Failed',
           details: err?.fields,
         }
-        logger.warn({ ...error })
-        return res.status(422).json({
-          message: 'Validation Failed',
-          details: err?.fields,
-        })
+        logger.error({ ...errorResponse })
+        return res.status(422).json({ errorResponse })
       }
       if (err instanceof NoTokenError) {
         const error = {

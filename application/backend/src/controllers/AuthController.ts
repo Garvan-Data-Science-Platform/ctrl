@@ -4,9 +4,10 @@ import type {
   LoginRequest,
   LoginResponse,
 } from 'common/types/api/auth'
-import { Route, Tags, Controller, Body, Post, SuccessResponse, Response } from 'tsoa'
+import { Route, Tags, Controller, Body, Post, SuccessResponse, Response, ValidateError } from 'tsoa'
 import prisma from '../PrismaClient'
 import logger from 'common/src/logger'
+import { checkPasswordStrength } from 'common/src/PasswordStrength'
 import { User } from '@prisma/client'
 import { generateToken, hashPassword, verifyPassword } from '../authentication'
 
@@ -26,6 +27,12 @@ export class AuthController extends Controller {
   @Response('500', 'Internal Server Error')
   public async register(@Body() bodyRequest: RegisterRequest): Promise<RegisterResponse> {
     const { password, ...userDetails } = bodyRequest
+
+    const { isValid, fields } = await checkPasswordStrength(password)
+
+    if (!isValid) {
+      throw new ValidateError(fields, 'Password does not meet strength requirements')
+    }
 
     const hashedPassword = await hashPassword(password)
     const insertedUser: User = await this.userRepo.create({
