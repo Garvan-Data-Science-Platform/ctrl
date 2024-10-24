@@ -1,22 +1,14 @@
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import { useMany } from '@refinedev/core'
-import {
-  DateField,
-  DeleteButton,
-  EditButton,
-  List,
-  MarkdownField,
-  ShowButton,
-  useDataGrid,
-} from '@refinedev/mui'
+import { DateField, DeleteButton, EditButton, List, ShowButton, useDataGrid } from '@refinedev/mui'
 import React from 'react'
 
-export const BlogPostList = () => {
+export const UserList = () => {
   const { dataGridProps } = useDataGrid({
     syncWithLocation: true,
   })
 
-  const { data: categoryData, isLoading: categoryIsLoading } = useMany({
+  const { data: categoryData } = useMany({
     resource: 'categories',
     ids: dataGridProps?.rows?.map((item: any) => item?.category?.id).filter(Boolean) ?? [],
     queryOptions: {
@@ -33,42 +25,27 @@ export const BlogPostList = () => {
         minWidth: 50,
       },
       {
-        field: 'title',
+        field: 'firstName',
         flex: 1,
-        headerName: 'Title',
+        headerName: 'First Name',
         minWidth: 200,
       },
       {
-        field: 'content',
+        field: 'lastName',
         flex: 1,
-        headerName: 'Content',
-        minWidth: 250,
-        renderCell: function render({ value }) {
-          if (!value) return '-'
-          return <MarkdownField value={value?.slice(0, 80) + '...' || ''} />
-        },
+        headerName: 'Last Name',
+        minWidth: 200,
       },
       {
-        field: 'category',
+        field: 'email',
         flex: 1,
-        headerName: 'Category',
-        minWidth: 300,
-        valueGetter: ({ row }) => {
-          const value = row?.category
-          return value
-        },
-        renderCell: function render({ value }) {
-          return categoryIsLoading ? (
-            <>Loading...</>
-          ) : (
-            categoryData?.data?.find((item) => item.id === value?.id)?.title
-          )
-        },
+        headerName: 'Email',
+        minWidth: 200,
       },
       {
-        field: 'status',
+        field: 'role',
         flex: 1,
-        headerName: 'Status',
+        headerName: 'Role',
         minWidth: 200,
       },
       {

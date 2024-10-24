@@ -54,7 +54,7 @@ describe('UsersController', () => {
       expect(response.status).toBe(200)
 
       const body: GetAllUsersResponse = response.body
-      expect(body).toHaveProperty('users')
+      expect(body).toHaveProperty('data')
     })
 
     it('should return a 500 error if a database error occurs', async () => {
@@ -68,7 +68,7 @@ describe('UsersController', () => {
       expect(response.status).toBe(500)
 
       const body: GetAllUsersResponse = response.body
-      expect(body.users).toBe(undefined)
+      expect(body.data).toBe(undefined)
     })
   })
 
@@ -83,7 +83,7 @@ describe('UsersController', () => {
 
       const body: GetUserByIdResponse = response.body
       expect(body.message).toBe(`Got user with ID: ${userID}`)
-      expect(body).toHaveProperty('user')
+      expect(body).toHaveProperty('data')
     })
 
     it('should return an error for a non-existent user', async () => {
@@ -98,7 +98,7 @@ describe('UsersController', () => {
 
       const body: GetUserByIdResponse = response.body
       expect(body.message).toBe(`User with ID: ${userID} not found`)
-      expect(body.user).toBe(null)
+      expect(body.data).toBe(null)
     })
   })
 

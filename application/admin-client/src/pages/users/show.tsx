@@ -1,24 +1,19 @@
 import { Stack, Typography } from '@mui/material'
-import { useOne, useShow } from '@refinedev/core'
-import { DateField, MarkdownField, Show, TextFieldComponent as TextField } from '@refinedev/mui'
+import { useShow } from '@refinedev/core'
+import { DateField, Show, TextFieldComponent as TextField } from '@refinedev/mui'
 
-export const BlogPostShow = () => {
+export const UserShow = () => {
   const { queryResult } = useShow({})
 
   const { data, isLoading } = queryResult
 
   const record = data?.data
 
-  const { data: categoryData, isLoading: categoryIsLoading } = useOne({
-    resource: 'categories',
-    id: record?.category?.id || '',
-    queryOptions: {
-      enabled: !!record,
-    },
-  })
-
   return (
-    <Show isLoading={isLoading}>
+    <Show
+      isLoading={isLoading}
+      title={<Typography variant="h4">{`${record?.firstName} ${record?.lastName}`}</Typography>}
+    >
       <Stack gap={1}>
         <Typography variant="body1" fontWeight="bold">
           {'ID'}
@@ -26,23 +21,23 @@ export const BlogPostShow = () => {
         <TextField value={record?.id} />
 
         <Typography variant="body1" fontWeight="bold">
-          {'Title'}
+          {'First Name'}
         </Typography>
-        <TextField value={record?.title} />
+        <TextField value={record?.firstName} />
 
         <Typography variant="body1" fontWeight="bold">
-          {'Content'}
+          {'Last Name'}
         </Typography>
-        <MarkdownField value={record?.content} />
+        <TextField value={record?.lastName} />
 
         <Typography variant="body1" fontWeight="bold">
-          {'Category'}
+          {'email'}
         </Typography>
-        {categoryIsLoading ? <>Loading...</> : <>{categoryData?.data?.title}</>}
+        <TextField value={record?.email} />
         <Typography variant="body1" fontWeight="bold">
-          {'Status'}
+          {'Role'}
         </Typography>
-        <TextField value={record?.status} />
+        <TextField value={record?.role} />
         <Typography variant="body1" fontWeight="bold">
           {'CreatedAt'}
         </Typography>

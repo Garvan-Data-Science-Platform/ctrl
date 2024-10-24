@@ -38,6 +38,7 @@ check:
 
 db: 
 	docker compose up -d db
+	docker compose up -d admin
 
 db-down:
 	docker compose down

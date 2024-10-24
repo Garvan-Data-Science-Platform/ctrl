@@ -9,7 +9,7 @@ import {
   ThemedLayoutV2,
 } from '@refinedev/mui'
 
-import dataProvider from '@refinedev/simple-rest'
+import { dataProvider } from './providers/dataProvider'
 import CssBaseline from '@mui/material/CssBaseline'
 import GlobalStyles from '@mui/material/GlobalStyles'
 import { BrowserRouter, Route, Routes, Outlet } from 'react-router-dom'
@@ -19,14 +19,16 @@ import routerBindings, {
   UnsavedChangesNotifier,
   DocumentTitleHandler,
 } from '@refinedev/react-router-v6'
-import { BlogPostList, BlogPostCreate, BlogPostEdit, BlogPostShow } from './pages/blog-posts'
+import { UserList, UserCreate, UserEdit, UserShow } from './pages/users'
 import { CategoryList, CategoryCreate, CategoryEdit, CategoryShow } from './pages/categories'
 import { ColorModeContextProvider } from './contexts/color-mode'
 import { Header } from './components/header'
 import { Login } from './pages/login'
 import { Register } from './pages/register'
 import { ForgotPassword } from './pages/forgotPassword'
-import { authProvider } from './authProvider'
+import { authProvider } from './providers/authProvider'
+
+const API_URL = 'http://localhost:5000'
 
 function App() {
   return (
@@ -39,7 +41,7 @@ function App() {
           <RefineSnackbarProvider>
             <DevtoolsProvider>
               <Refine
-                dataProvider={dataProvider('http://localhost:5000')}
+                dataProvider={dataProvider(API_URL)}
                 notificationProvider={notificationProvider}
                 routerProvider={routerBindings}
                 authProvider={authProvider}
@@ -87,10 +89,10 @@ function App() {
                   >
                     <Route index element={<NavigateToResource resource="users" />} />
                     <Route path="/users">
-                      <Route index element={<BlogPostList />} />
-                      <Route path="create" element={<BlogPostCreate />} />
-                      <Route path="edit/:id" element={<BlogPostEdit />} />
-                      <Route path="show/:id" element={<BlogPostShow />} />
+                      <Route index element={<UserList />} />
+                      <Route path="create" element={<UserCreate />} />
+                      <Route path="update/:id" element={<UserEdit />} />
+                      <Route path=":id" element={<UserShow />} />
                     </Route>
                     <Route path="/organisations">
                       <Route index element={<CategoryList />} />

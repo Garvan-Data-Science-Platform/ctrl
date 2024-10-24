@@ -42,7 +42,7 @@ export class UsersController extends Controller {
   @Response('401', 'Unauthorized')
   public async getAllUsers(): Promise<GetAllUsersResponse> {
     const users: User[] = await this.userRepo.findMany({})
-    const responseData = { message: 'Got all users', users }
+    const responseData = { message: 'Got all users', data: users }
     logger.info({ ...responseData })
     return responseData
   }
@@ -62,12 +62,12 @@ export class UsersController extends Controller {
       where: { id: userID },
     })
     if (!user) {
-      const error = { message: `User with ID: ${userID} not found`, user }
+      const error = { message: `User with ID: ${userID} not found`, data: user }
       logger.error({ ...error })
       this.setStatus(404)
       return error
     }
-    const responseData = { message: `Got user with ID: ${userID}`, user }
+    const responseData = { message: `Got user with ID: ${userID}`, data: user }
     logger.info({ ...responseData })
     return responseData
   }
