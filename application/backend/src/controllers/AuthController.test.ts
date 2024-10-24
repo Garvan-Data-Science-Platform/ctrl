@@ -35,7 +35,7 @@ describe('AuthController', () => {
 
       expect(protectedRouteResponse1.status).toEqual(401)
       expect(getAllUsersBody1.message).toEqual('No token provided')
-      expect(getAllUsersBody1.users).toBe(undefined)
+      expect(getAllUsersBody1.data).toBe(undefined)
 
       const registerRequest: RegisterRequest = {
         firstName: 'John',
@@ -133,7 +133,7 @@ describe('AuthController', () => {
       // Should not allow access to protected routes without valid token
       expect(protectedRouteResponse1.status).toEqual(401)
       expect(getAllUsersBody1.message).toEqual('No token provided')
-      expect(getAllUsersBody1.users).toBe(undefined)
+      expect(getAllUsersBody1.data).toBe(undefined)
 
       // Login the user
       const loginRequest: LoginRequest = {

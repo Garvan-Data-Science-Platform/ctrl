@@ -71,7 +71,13 @@ export const authProvider: AuthProvider = {
     return null
   },
   onError: async (error) => {
-    console.error(error)
+    if (error?.status === 401) {
+      return {
+        logout: true,
+        error: { name: 'Auth error', message: error.message },
+      }
+    }
+
     return { error }
   },
 }
