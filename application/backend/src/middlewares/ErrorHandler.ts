@@ -18,7 +18,7 @@ export function ErrorHandler(
       details: err?.fields,
     }
     logger.error({ ...errorResponse })
-    return res.status(422).json({ errorResponse })
+    return res.status(422).json(errorResponse)
   }
 
   // Token Errors

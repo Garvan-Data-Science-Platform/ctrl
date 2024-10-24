@@ -31,7 +31,7 @@ describe('OrganisationsController', () => {
     firstName: 'Test',
     lastName: 'User',
     email: 'test@user.com',
-    password: 'password123',
+    password: 'Password123',
     role: 'test',
   }
 
@@ -39,7 +39,7 @@ describe('OrganisationsController', () => {
     firstName: 'Test',
     lastName: 'UserInOrg',
     email: 'test@org.com',
-    password: 'password123',
+    password: 'Password123',
     role: 'test',
   }
 

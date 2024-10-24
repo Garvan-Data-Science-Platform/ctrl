@@ -11,7 +11,7 @@ describe('Auth', () => {
     firstName: 'Test',
     lastName: 'User',
     email: 'test@user.com',
-    password: 'password123',
+    password: 'Password123',
     role: 'test',
   }
 
