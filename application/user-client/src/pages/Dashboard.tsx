@@ -10,7 +10,7 @@ import {
   Typography,
 } from '@mui/material'
 import NavBar from '../components/NavBar'
-import surveySteps from '@common/example_responses/getSurveySteps.json'
+import surveySteps from '@common/example_responses/getUserSurveySteps.json'
 import type { GetSurveyStepsResponse } from '@common/types/api/surveys'
 //import { useAppStore } from '../store'
 import { useQuery } from '@tanstack/react-query'
@@ -75,7 +75,7 @@ export default function Dashboard() {
         <Typography variant="h3" textAlign="left" sx={{ mt: 3, mb: 3 }}>
           Welcome FirstName
         </Typography>
-        {data?.steps.map((val, idx) => (
+        {data?.data.map((val, idx) => (
           <Card
             key={idx}
             sx={{
