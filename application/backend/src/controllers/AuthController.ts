@@ -10,9 +10,17 @@ import logger from 'common/src/logger'
 import { checkPasswordStrength } from 'common/src/PasswordStrength'
 import { User } from '@prisma/client'
 import { generateToken, hashPassword, verifyPassword } from '../authentication'
+import type {
+  InternalErrorResponse,
+  UnauthorizedErrorResponse,
+  ValidateErrorResponse,
+} from 'common/types/api/errors'
+import { IncorrectPasswordError, NotFoundError } from 'middlewares/ErrorHandler'
 
 @Route('auth')
 @Tags('Auth')
+@Response<InternalErrorResponse>('500', 'Internal Server Error')
+@Response<ValidateErrorResponse>('422', 'Validation Failed')
 export class AuthController extends Controller {
   userRepo = prisma.user
 
@@ -23,8 +31,6 @@ export class AuthController extends Controller {
    */
   @Post('/register')
   @SuccessResponse('201', 'User Created')
-  @Response('422', 'Validation Failed')
-  @Response('500', 'Internal Server Error')
   public async register(@Body() bodyRequest: RegisterRequest): Promise<RegisterResponse> {
     const { password, ...userDetails } = bodyRequest
 
@@ -60,13 +66,16 @@ export class AuthController extends Controller {
    */
   @Post('/login')
   @SuccessResponse('200', 'Logged In')
-  @Response('401', 'Unauthorized')
-  @Response('500', 'Internal Server Error')
+  @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
   public async login(@Body() bodyRequest: LoginRequest): Promise<LoginResponse> {
     // Check if user exists and password matches
     const user = await this.userRepo.findUnique({ where: { email: bodyRequest.email } })
-    if (!user || !(await verifyPassword(user.password, bodyRequest.password))) {
-      throw Error('Invalid email or password')
+    if (!user) {
+      throw new NotFoundError(`User ${bodyRequest.email} does not exist`)
+    }
+
+    if (!(await verifyPassword(user.password, bodyRequest.password))) {
+      throw new IncorrectPasswordError()
     }
 
     const token = await generateToken(user.id)

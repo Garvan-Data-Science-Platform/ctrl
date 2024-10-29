@@ -3,13 +3,7 @@ import * as express from 'express'
 import * as jwt from 'jsonwebtoken'
 import logger from 'common/src/logger'
 import crypto from 'crypto'
-
-export class NoTokenError extends Error {
-  constructor() {
-    super('No token provided')
-    this.name = 'NoTokenError'
-  }
-}
+import { NoTokenError } from 'middlewares/ErrorHandler'
 
 export function expressAuthentication(
   request: express.Request,
