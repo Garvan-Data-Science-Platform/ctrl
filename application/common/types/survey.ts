@@ -27,24 +27,24 @@ export interface RefusalText {
   button_text: string
 }
 
-export enum SurveyElementType {
-  CHOICES = 'question-choices',
-  CHECKBOX = 'question-checkbox',
-  SUBHEADING = 'subheading',
-  VIDEO = 'video',
-}
+export type SurveyElementType = 'question-choices' | 'question-checkbox' | 'subheading' | 'video'
 
-export interface SurveyElement {
-  type: SurveyElementType
-  data: SurveyQuestionCheckbox | SurveyQuestionChoices | SurveySubHeading | SurveyVideo
-}
+export type SurveyElement =
+  | {
+      type: 'question-choices'
+      data: SurveyQuestionChoices
+    }
+  | { type: 'question-checkbox'; data: SurveyQuestionCheckbox }
+  | { type: 'video'; data: SurveyVideo }
+  | { type: 'subheading'; data: SurveySubHeading }
+  | { type: SurveyElementType; data: any }
 
 export interface SurveyStep {
   title: string
   text: string
   last_updated?: string
   elements: SurveyElement[]
-  refusal_text: RefusalText
+  //refusal_text: RefusalText
 }
 
 export interface UserSurveyStep {
@@ -53,7 +53,7 @@ export interface UserSurveyStep {
   last_updated?: string
   current_step: number
   total_steps: number
-  refusal_text: RefusalText
+  //refusal_text: RefusalText
 }
 
 export interface SurveyStepBasic {

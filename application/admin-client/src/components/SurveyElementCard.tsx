@@ -6,8 +6,8 @@ import {
   SurveySubHeading,
   SurveyVideo,
 } from '@common/types/survey'
-import { Delete, DragIndicator } from '@mui/icons-material'
-import { Box, IconButton, TextField, Typography } from '@mui/material'
+import { Add, Close, Delete, DragIndicator } from '@mui/icons-material'
+import { Box, IconButton, InputAdornment, TextField, Typography } from '@mui/material'
 import { useDrag, useDrop } from 'react-dnd'
 
 /**
@@ -15,6 +15,10 @@ import { useDrag, useDrop } from 'react-dnd'
  */
 interface SurveyElementCardProps {
   element: SurveyElement
+  key: any
+  handleDelete: () => void
+  handleMove: (dropIndex: number) => void
+  handleAddChoice?: () => void
 }
 
 function SubHeading(data: SurveySubHeading) {
@@ -42,7 +46,7 @@ function QuestionCheckbox(data: SurveyQuestionCheckbox) {
   )
 }
 
-function QuestionChoices(data: SurveyQuestionChoices) {
+function QuestionChoices(data: SurveyQuestionChoices, handleAddChoice: () => void) {
   return (
     <Box sx={{ width: '100%' }}>
       <Typography fontWeight="bold">Multi-choice Question</Typography>
@@ -54,6 +58,30 @@ function QuestionChoices(data: SurveyQuestionChoices) {
         label="Tooltip (optional)"
         value={data.tooltip}
       />
+      <Typography sx={{ mt: 1, fontSize: 15 }}>Choices</Typography>
+      <Box sx={{ mt: 1, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1 }}>
+        {data.choices.map((val, idx) => (
+          <Box key={`choice_${idx}`}>
+            <TextField
+              value={val}
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton sx={{}}>
+                        <Close />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            />
+          </Box>
+        ))}
+        <IconButton sx={{ width: 50, height: 50 }} onClick={handleAddChoice}>
+          <Add />
+        </IconButton>
+      </Box>
     </Box>
   )
 }
@@ -67,34 +95,47 @@ function Video(data: SurveyVideo) {
   )
 }
 
-export function SurveyElementCard({ element }: SurveyElementCardProps) {
+interface DropResult {
+  dropIndex: number
+}
+
+export function SurveyElementCard({
+  element,
+  key,
+  handleDelete,
+  handleMove,
+  handleAddChoice,
+}: SurveyElementCardProps) {
   const [{ opacity }, dragRef] = useDrag(
     () => ({
       type: 'CARD',
-      //item: { text },
+      end: (item, monitor) => {
+        if (monitor.didDrop()) {
+          let result = monitor.getDropResult() as DropResult
+          handleMove(result.dropIndex)
+        }
+      },
       collect: (monitor) => ({
         opacity: monitor.isDragging() ? 0.5 : 1,
       }),
     }),
     [],
   )
-  var contents
-  switch (element.type) {
-    case SurveyElementType.CHOICES:
-      contents = QuestionChoices(element.data as SurveyQuestionChoices)
-      break
-    case SurveyElementType.CHECKBOX:
-      contents = QuestionCheckbox(element.data as SurveyQuestionCheckbox)
-      break
-    case SurveyElementType.VIDEO:
-      contents = Video(element.data as SurveyVideo)
-      break
-    default:
-      contents = SubHeading(element.data as SurveySubHeading)
-      break
+
+  type ContentRenderer = {
+    [key in SurveyElementType]: () => JSX.Element | null
+  }
+
+  const contentRenderer: ContentRenderer = {
+    'question-choices': () =>
+      handleAddChoice ? QuestionChoices(element.data, handleAddChoice) : null,
+    'question-checkbox': () => QuestionCheckbox(element.data),
+    video: () => Video(element.data),
+    subheading: () => SubHeading(element.data),
   }
   return (
     <Box
+      key={key}
       sx={{
         display: 'flex',
         flexDirection: 'row',
@@ -108,9 +149,9 @@ export function SurveyElementCard({ element }: SurveyElementCardProps) {
       <Box sx={{ cursor: 'grab', display: 'flex', alignItems: 'center' }} ref={dragRef}>
         <DragIndicator />
       </Box>
-      {contents}
+      {contentRenderer[element.type]()}
       <Box sx={{ flexGrow: 1 }} />
-      <IconButton sx={{ width: 50, height: 50 }}>
+      <IconButton sx={{ width: 50, height: 50 }} onClick={handleDelete}>
         <Delete />
       </IconButton>
     </Box>
@@ -124,7 +165,9 @@ export function SurveyDropSpace({ index }: SurveyDropSpaceProps) {
   const [{ isOver }, drop] = useDrop(
     () => ({
       accept: 'CARD',
-      drop: () => console.log('DROPPED at', index),
+      drop: () => ({
+        dropIndex: index,
+      }),
       collect: (monitor) => ({
         isOver: !!monitor.isOver(),
       }),

@@ -16,15 +16,23 @@ import {
 } from '@mui/material'
 import { Edit } from '@refinedev/mui'
 import { useForm } from '@refinedev/react-hook-form'
-import survey from '@common/example_responses/getSurvey.json'
-import type { SurveyVersion } from '@common/types/survey'
+import { SurveyElementType, type SurveyVersion } from '@common/types/survey'
 import { act, useState } from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { SurveyElementCard, SurveyDropSpace } from '../../components/SurveyElementCard'
+import { useSurveyStore } from '../../surveyStore'
 
 export const SurveyEditor = () => {
-  const [surveyState, setSurveyState] = useState(survey as SurveyVersion)
+  const {
+    data: surveyData,
+    addStep,
+    addElement,
+    deleteElement,
+    moveElement,
+    addChoice,
+    updateStepField,
+  } = useSurveyStore()
   const [activeStep, setActiveStep] = useState(0)
 
   return (
@@ -33,7 +41,7 @@ export const SurveyEditor = () => {
         <ListSubheader>Survey Steps</ListSubheader>
         <Divider />
         <List>
-          {surveyState.data.map((val, index) => (
+          {surveyData.map((val, index) => (
             <ListItem key={`step_${index}`} disablePadding>
               <ListItemButton onClick={() => setActiveStep(index)} selected={activeStep == index}>
                 <ListItemText primary={val.title} />
@@ -48,34 +56,91 @@ export const SurveyEditor = () => {
               <ListItemIcon>
                 <Add />
               </ListItemIcon>
-              <ListItemText primary={'New Step'} />
+              <ListItemText
+                primary={'New Step'}
+                onClick={() => {
+                  addStep()
+                  setActiveStep(surveyData.length)
+                }}
+              />
             </ListItemButton>
           </ListItem>
         </List>
       </Box>
       <DndProvider backend={HTML5Backend}>
         <Box sx={{ flexGrow: 1, ml: 3 }}>
-          <TextField fullWidth label="Title" value={survey.data[activeStep].title}></TextField>
+          <TextField
+            fullWidth
+            label="Title"
+            onChange={(e) => updateStepField(activeStep, 'title', e.target.value)}
+            value={surveyData[activeStep].title}
+          ></TextField>
           <TextField
             fullWidth
             multiline
             sx={{ mt: 3 }}
             label="Description"
-            value={survey.data[activeStep].text}
+            onChange={(e) => updateStepField(activeStep, 'text', e.target.value)}
+            value={surveyData[activeStep].text}
           ></TextField>
           <Divider sx={{ mt: 3, mb: 1 }} />
           <SurveyDropSpace key={`space_${activeStep}_${-1}`} index={-1} />
-          {survey.data[activeStep].elements.map((val, idx) => (
+          {surveyData[activeStep].elements.map((val, idx) => (
             <>
-              <SurveyElementCard element={val} key={`el_${activeStep}_${idx}`}></SurveyElementCard>
+              <SurveyElementCard
+                element={val}
+                handleDelete={() => {
+                  deleteElement(activeStep, idx)
+                }}
+                handleMove={(dropIndex) => {
+                  console.log('Move', idx, dropIndex)
+                  moveElement(activeStep, idx, dropIndex)
+                }}
+                handleAddChoice={
+                  val.type == 'question-choices'
+                    ? () => {
+                        addChoice(activeStep, idx)
+                      }
+                    : undefined
+                }
+                key={`el_${activeStep}_${idx}`}
+              ></SurveyElementCard>
               <SurveyDropSpace key={`space_${activeStep}_${idx}`} index={idx} />
             </>
           ))}
           <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-            <Button startIcon={<AddCircle />}>Subheading</Button>
-            <Button startIcon={<AddCircle />}>Checkbox question</Button>
-            <Button startIcon={<AddCircle />}>Multi-choice question</Button>
-            <Button startIcon={<AddCircle />}>Video/Embeded</Button>
+            <Button
+              startIcon={<AddCircle />}
+              onClick={() => {
+                addElement('subheading', activeStep)
+              }}
+            >
+              Subheading
+            </Button>
+            <Button
+              startIcon={<AddCircle />}
+              onClick={() => {
+                addElement('question-checkbox', activeStep)
+              }}
+            >
+              Checkbox question
+            </Button>
+            <Button
+              startIcon={<AddCircle />}
+              onClick={() => {
+                addElement('question-choices', activeStep)
+              }}
+            >
+              Multi-choice question
+            </Button>
+            <Button
+              startIcon={<AddCircle />}
+              onClick={() => {
+                addElement('video', activeStep)
+              }}
+            >
+              Video/Embeded
+            </Button>
           </Box>
         </Box>
       </DndProvider>

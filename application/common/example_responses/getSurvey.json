@@ -41,12 +41,7 @@
             "text": "What kinds of research can they do with my de-identified samples and information?"
           }
         }
-      ],
-      "refusal_text": {
-        "title": "Are you sure you don’t want the test?",
-        "text": "You have not selected all statements, which means you have not agreed to have genomic testing.",
-        "button_text": "I don't want the test"
-      }
+      ]
     }
   ]
 }
