@@ -20,6 +20,33 @@ const expressAuthenticationRecasted = expressAuthentication as (req: ExRequest, 
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
 const models: TsoaRoute.Models = {
+    "UnauthorizedErrorResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "message": {"dataType":"string","required":true},
+            "details": {"dataType":"any"},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "InternalErrorResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "message": {"dataType":"enum","enums":["Internal Server Error"],"required":true},
+            "details": {"dataType":"any"},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ValidateErrorResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "message": {"dataType":"enum","enums":["Validation Failed"],"required":true},
+            "details": {"dataType":"nestedObjectLiteral","nestedProperties":{},"additionalProperties":{"dataType":"any"},"required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "DefaultSelection_Prisma._36_UserPayload_": {
         "dataType": "refAlias",
         "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"updatedAt":{"dataType":"datetime","required":true},"createdAt":{"dataType":"datetime","required":true},"role":{"dataType":"string","required":true},"password":{"dataType":"string","required":true},"email":{"dataType":"string","required":true},"lastName":{"dataType":"string","required":true},"firstName":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}},"validators":{}},
@@ -34,7 +61,7 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "message": {"dataType":"string","required":true},
-            "users": {"dataType":"union","subSchemas":[{"dataType":"array","array":{"dataType":"refAlias","ref":"User"}},{"dataType":"enum","enums":[null]}],"required":true},
+            "users": {"dataType":"array","array":{"dataType":"refAlias","ref":"User"},"required":true},
         },
         "additionalProperties": false,
     },
@@ -43,7 +70,16 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "message": {"dataType":"string","required":true},
-            "user": {"dataType":"union","subSchemas":[{"ref":"User"},{"dataType":"enum","enums":[null]}],"required":true},
+            "user": {"ref":"User","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "NotFoundErrorResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "message": {"dataType":"enum","enums":["Not Found"],"required":true},
+            "details": {"dataType":"any"},
         },
         "additionalProperties": false,
     },
@@ -118,7 +154,7 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "message": {"dataType":"string","required":true},
-            "organisation": {"dataType":"union","subSchemas":[{"ref":"Organisation"},{"dataType":"enum","enums":[null]}],"required":true},
+            "organisation": {"ref":"Organisation","required":true},
         },
         "additionalProperties": false,
     },
@@ -127,7 +163,7 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "message": {"dataType":"string","required":true},
-            "organisationID": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},
+            "organisationID": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
     },
@@ -168,7 +204,7 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "message": {"dataType":"string","required":true},
-            "users": {"dataType":"union","subSchemas":[{"dataType":"array","array":{"dataType":"refAlias","ref":"User"}},{"dataType":"enum","enums":[null]}],"required":true},
+            "users": {"dataType":"array","array":{"dataType":"refAlias","ref":"User"},"required":true},
         },
         "additionalProperties": false,
     },
@@ -198,7 +234,7 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "message": {"dataType":"string","required":true},
-            "token": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},
+            "token": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },
@@ -219,7 +255,7 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "message": {"dataType":"string","required":true},
-            "token": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},
+            "token": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },
