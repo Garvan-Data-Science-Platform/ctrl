@@ -29,7 +29,7 @@ import {
   NotFoundErrorResponse,
   UnauthorizedErrorResponse,
 } from 'common/types/api/errors'
-import { NotFoundError } from 'middlewares/ErrorHandler'
+import { NotFoundError } from '../middlewares/ErrorHandler'
 
 @Route('users')
 @Tags('Users')

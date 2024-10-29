@@ -3,7 +3,7 @@ import * as express from 'express'
 import * as jwt from 'jsonwebtoken'
 import logger from 'common/src/logger'
 import crypto from 'crypto'
-import { NoTokenError } from 'middlewares/ErrorHandler'
+import { NoTokenError } from './middlewares/ErrorHandler'
 
 export function expressAuthentication(
   request: express.Request,

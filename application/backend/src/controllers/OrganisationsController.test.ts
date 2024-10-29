@@ -134,8 +134,7 @@ describe('OrganisationsController', () => {
       expect(response.status).toBe(404)
 
       const body: GetOrganisationByIdResponse = response.body
-      expect(body.message).toBe(`Organisation with ID: ${notExistingOrganisationId} not found`)
-      expect(body.organisation).toBe(null)
+      expect(body.message).toBe('Not Found')
     })
 
     it('should return a 500 error if a database error occurs', async () => {
@@ -188,8 +187,7 @@ describe('OrganisationsController', () => {
       expect(response.status).toBe(500)
 
       const body: CreateOrganisationResponse = response.body
-      expect(body.message).toBe('Error creating organisation')
-      expect(body.organisationID).toBe(null)
+      expect(body.message).toBe('Internal Server Error')
     })
   })
 
@@ -229,7 +227,7 @@ describe('OrganisationsController', () => {
       expect(response.status).toBe(404)
 
       const body: UpdateOrganisationResponse = response.body
-      expect(body.message).toBe(`Organisation with ID: ${notExistingOrganisationId} not found`)
+      expect(body.message).toBe('Not Found')
     })
   })
 
@@ -256,7 +254,7 @@ describe('OrganisationsController', () => {
       expect(response.status).toBe(404)
 
       const body: DeleteOrganisationResponse = response.body
-      expect(body.message).toBe(`Organisation with ID: ${notExistingOrganisationId} not found`)
+      expect(body.message).toBe('Not Found')
     })
   })
 
@@ -280,8 +278,7 @@ describe('OrganisationsController', () => {
 
       expect(response.status).toBe(404)
       const body: GetOrganisationUsersResponse = response.body
-      expect(body.message).toBe(`Organisation with ID: ${notExistingOrganisationId} not found`)
-      expect(body.users).toBe(null)
+      expect(body.message).toBe('Not Found')
     })
   })
 
@@ -307,7 +304,7 @@ describe('OrganisationsController', () => {
       expect(response.status).toBe(404)
 
       const body: AddUserToOrganisationResponse = response.body
-      expect(body.message).toBe(`User with ID: ${notExistingUserId} not found`)
+      expect(body.message).toBe('Not Found')
     })
 
     it('should return a 404 error if the organisation is not found', async () => {
@@ -319,7 +316,7 @@ describe('OrganisationsController', () => {
       expect(response.status).toBe(404)
 
       const body: RemoveUserFromOrganisationResponse = response.body
-      expect(body.message).toBe(`Organisation with ID: ${notExistingOrganisationId} not found`)
+      expect(body.message).toBe('Not Found')
     })
   })
 
@@ -345,7 +342,7 @@ describe('OrganisationsController', () => {
       expect(response.status).toBe(404)
 
       const body: RemoveUserFromOrganisationResponse = response.body
-      expect(body.message).toBe(`User with ID: ${notExistingUserId} not found`)
+      expect(body.message).toBe('Not Found')
     })
 
     it('should return a 404 error if the organisation is not found', async () => {
@@ -357,7 +354,7 @@ describe('OrganisationsController', () => {
       expect(response.status).toBe(404)
 
       const body: RemoveUserFromOrganisationResponse = response.body
-      expect(body.message).toBe(`Organisation with ID: ${notExistingOrganisationId} not found`)
+      expect(body.message).toBe('Not Found')
     })
   })
 })

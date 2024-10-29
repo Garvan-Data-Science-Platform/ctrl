@@ -15,7 +15,7 @@ import type {
   UnauthorizedErrorResponse,
   ValidateErrorResponse,
 } from 'common/types/api/errors'
-import { IncorrectPasswordError, NotFoundError } from 'middlewares/ErrorHandler'
+import { IncorrectPasswordError, NotFoundError } from '../middlewares/ErrorHandler'
 
 @Route('auth')
 @Tags('Auth')

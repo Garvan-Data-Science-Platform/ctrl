@@ -97,8 +97,7 @@ describe('UsersController', () => {
       expect(response.status).toBe(404)
 
       const body: GetUserByIdResponse = response.body
-      expect(body.message).toBe(`User with ID: ${userID} not found`)
-      expect(body.data).toBe(null)
+      expect(body.message).toBe('Not Found')
     })
   })
 
@@ -179,7 +178,7 @@ describe('UsersController', () => {
       expect(response.status).toBe(404)
 
       const body: UpdateUserResponse = response.body
-      expect(body.message).toBe(`User with ID: ${userID} not found`)
+      expect(body.message).toBe('Not Found')
     })
   })
 
@@ -218,7 +217,7 @@ describe('UsersController', () => {
       expect(response.status).toBe(404)
 
       const body: DeleteUserResponse = response.body
-      expect(body.message).toBe(`User with ID: ${userID} not found`)
+      expect(body.message).toBe('Not Found')
     })
   })
 })

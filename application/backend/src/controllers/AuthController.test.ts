@@ -268,10 +268,10 @@ describe('AuthController', () => {
       }
 
       const loginResponse = await request(app).post('/auth/login').send(loginRequest)
-      expect(loginResponse.status).toEqual(500)
+      expect(loginResponse.status).toEqual(401)
 
       const body = loginResponse.body
-      expect(body.message).toBe('Invalid email or password')
+      expect(body.message).toBe('Incorrect Password')
       expect(body.token).toBe(undefined)
     })
 

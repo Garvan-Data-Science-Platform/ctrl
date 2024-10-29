@@ -176,29 +176,23 @@ export class OrganisationsController extends Controller {
   @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async getOrganisationUsers(@Path() orgID: number): Promise<GetOrganisationUsersResponse> {
-    try {
-      const organisation = await this.organisationRepo.findUnique({
-        where: { id: orgID },
-        include: { users: true },
-      })
+    const organisation = await this.organisationRepo.findUnique({
+      where: { id: orgID },
+      include: { users: true },
+    })
 
-      if (!organisation) {
-        const errorMessage: string = `Organisation with ID: ${orgID} not found`
-        logger.error({ errorMessage })
-        throw new NotFoundError(errorMessage)
-      }
-
-      const responseData = {
-        message: `Got users of organisation with ID: ${orgID}`,
-        users: organisation.users,
-      }
-      logger.info({ ...responseData })
-      return responseData
-    } catch (err) {
-      const errorMessage: string = 'Error getting users of organisation'
+    if (!organisation) {
+      const errorMessage: string = `Organisation with ID: ${orgID} not found`
       logger.error({ errorMessage })
-      throw new Error(errorMessage)
+      throw new NotFoundError(errorMessage)
     }
+
+    const responseData = {
+      message: `Got users of organisation with ID: ${orgID}`,
+      users: organisation.users,
+    }
+    logger.info({ ...responseData })
+    return responseData
   }
 
   /**
@@ -213,54 +207,50 @@ export class OrganisationsController extends Controller {
     @Path() orgID: number,
     @Path() userID: number,
   ): Promise<AddUserToOrganisationResponse> {
-    try {
-      // Check if user exists
-      const user = await this.userRepo.findUnique({ where: { id: userID } })
+    // Check if user exists
+    const user = await this.userRepo.findUnique({ where: { id: userID } })
 
-      if (!user) {
-        const errorMessage: string = `User with ID: ${userID} not found`
-        logger.error({ errorMessage })
-        throw new NotFoundError(errorMessage)
-      }
+    if (!user) {
+      const errorMessage: string = `User with ID: ${userID} not found`
+      logger.error({ errorMessage })
+      throw new NotFoundError(errorMessage)
+    }
 
-      // Check if organisation exists
-      const organisation = await this.organisationRepo.findUnique({ where: { id: orgID } })
+    // Check if organisation exists
+    const organisation = await this.organisationRepo.findUnique({ where: { id: orgID } })
 
-      if (!organisation) {
-        const errorMessage: string = `Organisation with ID: ${orgID} not found`
-        logger.error({ errorMessage })
-        throw new NotFoundError(errorMessage)
-      }
+    if (!organisation) {
+      const errorMessage: string = `Organisation with ID: ${orgID} not found`
+      logger.error({ errorMessage })
+      throw new NotFoundError(errorMessage)
+    }
 
-      // Check if user already in organisation
-      const userInOrganisation = await this.organisationRepo.findUnique({
-        where: {
-          id: orgID,
-          users: { some: { id: userID } },
-        },
-      })
+    // Check if user already in organisation
+    const userInOrganisation = await this.organisationRepo.findUnique({
+      where: {
+        id: orgID,
+        users: { some: { id: userID } },
+      },
+    })
 
-      if (userInOrganisation) {
-        const errorMessage: string = `User with ID: ${userID} already in organisation with ID: ${orgID}`
-        logger.error({ errorMessage })
-        throw new Error(errorMessage)
-      }
-
-      // Add user to organisation
-      await this.organisationRepo.update({
-        where: { id: orgID },
-        data: { users: { connect: { id: userID } } },
-      })
-      const responseData = {
-        message: `User with ID: ${userID} added to organisation with ID: ${orgID}`,
-      }
-      logger.info({ ...responseData })
-      return responseData
-    } catch (err) {
-      const errorMessage: string = 'Error adding user to organisation'
+    if (userInOrganisation) {
+      const errorMessage: string = `User with ID: ${userID} already in organisation with ID: ${orgID}`
       logger.error({ errorMessage })
       throw new Error(errorMessage)
     }
+
+    // Add user to organisation
+    await this.organisationRepo.update({
+      where: { id: orgID },
+      data: { users: { connect: { id: userID } } },
+    })
+
+    const responseData = {
+      message: `User with ID: ${userID} added to organisation with ID: ${orgID}`,
+    }
+
+    logger.info({ ...responseData })
+    return responseData
   }
 
   /**
@@ -275,54 +265,48 @@ export class OrganisationsController extends Controller {
     @Path() orgID: number,
     @Path() userID: number,
   ): Promise<RemoveUserFromOrganisationResponse> {
-    try {
-      // Check if user exists
-      const user = await this.userRepo.findUnique({ where: { id: userID } })
+    // Check if user exists
+    const user = await this.userRepo.findUnique({ where: { id: userID } })
 
-      if (!user) {
-        const errorMessage: string = `User with ID: ${userID} not found`
-        logger.error({ errorMessage })
-        throw new NotFoundError(errorMessage)
-      }
+    if (!user) {
+      const errorMessage: string = `User with ID: ${userID} not found`
+      logger.error({ errorMessage })
+      throw new NotFoundError(errorMessage)
+    }
 
-      // Check if organisation exists
-      const organisation = await this.organisationRepo.findUnique({ where: { id: orgID } })
+    // Check if organisation exists
+    const organisation = await this.organisationRepo.findUnique({ where: { id: orgID } })
 
-      if (!organisation) {
-        const errorMessage: string = `Organisation with ID: ${orgID} not found`
-        logger.error({ errorMessage })
-        throw new NotFoundError(errorMessage)
-      }
+    if (!organisation) {
+      const errorMessage: string = `Organisation with ID: ${orgID} not found`
+      logger.error({ errorMessage })
+      throw new NotFoundError(errorMessage)
+    }
 
-      // Check if user is actually in the organisation
-      const userInOrganisation = await this.organisationRepo.findUnique({
-        where: {
-          id: orgID,
-          users: { some: { id: userID } },
-        },
-      })
+    // Check if user is actually in the organisation
+    const userInOrganisation = await this.organisationRepo.findUnique({
+      where: {
+        id: orgID,
+        users: { some: { id: userID } },
+      },
+    })
 
-      if (!userInOrganisation) {
-        const errorMessage: string = `User with ID: ${userID} not in organisation with ID: ${orgID}`
-        logger.error({ errorMessage })
-        throw new Error(errorMessage)
-      }
-
-      // Remove user from organisation
-      await this.organisationRepo.update({
-        where: { id: orgID },
-        data: { users: { disconnect: { id: userID } } },
-      })
-      const responseData = {
-        message: `User with ID: ${userID} removed from organisation with ID: ${orgID}`,
-      }
-
-      logger.info({ ...responseData })
-      return responseData
-    } catch (err) {
-      const errorMessage: string = 'Error removing user from organisation'
+    if (!userInOrganisation) {
+      const errorMessage: string = `User with ID: ${userID} not in organisation with ID: ${orgID}`
       logger.error({ errorMessage })
       throw new Error(errorMessage)
     }
+
+    // Remove user from organisation
+    await this.organisationRepo.update({
+      where: { id: orgID },
+      data: { users: { disconnect: { id: userID } } },
+    })
+    const responseData = {
+      message: `User with ID: ${userID} removed from organisation with ID: ${orgID}`,
+    }
+
+    logger.info({ ...responseData })
+    return responseData
   }
 }
