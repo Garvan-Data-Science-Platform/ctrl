@@ -24,10 +24,18 @@ import type {
 } from 'common/types/api/users'
 import { User } from '@prisma/client'
 import prisma from '../PrismaClient'
+import {
+  InternalErrorResponse,
+  NotFoundErrorResponse,
+  UnauthorizedErrorResponse,
+} from 'common/types/api/errors'
+import { NotFoundError } from 'middlewares/ErrorHandler'
 
 @Route('users')
 @Tags('Users')
 @Security('jwt')
+@Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
+@Response<InternalErrorResponse>('500', 'Internal Server Error')
 export class UsersController extends Controller {
   userRepo = prisma.user
 
@@ -38,8 +46,6 @@ export class UsersController extends Controller {
    */
   @Get('/')
   @SuccessResponse('200', 'OK')
-  @Response('500', 'Internal Server Error')
-  @Response('401', 'Unauthorized')
   public async getAllUsers(): Promise<GetAllUsersResponse> {
     const users: User[] = await this.userRepo.findMany({})
     const responseData = { message: 'Got all users', data: users }
@@ -54,18 +60,15 @@ export class UsersController extends Controller {
    */
   @Get('/{userID}')
   @SuccessResponse('200', 'OK')
-  @Response('500', 'Internal Server Error')
-  @Response('404', 'Not Found')
-  @Response('401', 'Unauthorized')
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async getUserById(@Path() userID: number): Promise<GetUserByIdResponse> {
     const user: User | null = await this.userRepo.findUnique({
       where: { id: userID },
     })
     if (!user) {
-      const error = { message: `User with ID: ${userID} not found`, data: user }
-      logger.error({ ...error })
-      this.setStatus(404)
-      return error
+      const errorMessage: string = `User with ID: ${userID} not found`
+      logger.error({ errorMessage })
+      throw new NotFoundError(errorMessage)
     }
     const responseData = { message: `Got user with ID: ${userID}`, data: user }
     logger.info({ ...responseData })
@@ -79,8 +82,6 @@ export class UsersController extends Controller {
    */
   @Post('/')
   @SuccessResponse('201', 'Created')
-  @Response('500', 'Internal Server Error')
-  @Response('401', 'Unauthorized')
   public async createUser(@Body() bodyRequest: CreateUserRequest): Promise<CreateUserResponse> {
     try {
       const insertedUser = await this.userRepo.create({
@@ -93,9 +94,9 @@ export class UsersController extends Controller {
       logger.info({ ...responseData })
       return responseData
     } catch (err) {
-      const error = { message: 'Error creating user', newUser: null }
-      logger.error({ ...error, err })
-      return error
+      const errorMessage: string = 'Error creating user'
+      logger.error({ errorMessage, err })
+      throw new Error(errorMessage)
     }
   }
 
@@ -106,9 +107,7 @@ export class UsersController extends Controller {
    */
   @Patch('/{userID}')
   @SuccessResponse('200', 'OK')
-  @Response('500', 'Internal Server Error')
-  @Response('404', 'Not Found')
-  @Response('401', 'Unauthorized')
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async updateUser(
     @Path() userID: number,
     @Body() bodyRequest: UpdateUserRequest,
@@ -125,10 +124,9 @@ export class UsersController extends Controller {
       logger.info({ ...responseData })
       return responseData
     } catch (err) {
-      const error = { message: `User with ID: ${userID} not found`, updatedUser: null }
-      logger.error({ ...error })
-      this.setStatus(404)
-      return error
+      const errorMessage: string = `User with ID: ${userID} not found`
+      logger.error({ errorMessage, err })
+      throw new NotFoundError(errorMessage)
     }
   }
 
@@ -139,9 +137,7 @@ export class UsersController extends Controller {
    */
   @Delete('/{userID}')
   @SuccessResponse('200', 'OK')
-  @Response('500', 'Internal Server Error')
-  @Response('404', 'Not Found')
-  @Response('401', 'Unauthorized')
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async deleteUser(@Path() userID: number): Promise<DeleteUserResponse> {
     try {
       const deletedUser = await this.userRepo.delete({ where: { id: userID } })
@@ -149,10 +145,9 @@ export class UsersController extends Controller {
       logger.info({ ...responseData, deletedUser })
       return responseData
     } catch (err) {
-      const error = { message: `User with ID: ${userID} not found` }
-      logger.error({ ...error, err })
-      this.setStatus(404)
-      return error
+      const errorMessage: string = `User with ID: ${userID} not found`
+      logger.error({ errorMessage, err })
+      throw new NotFoundError(errorMessage)
     }
   }
 }
