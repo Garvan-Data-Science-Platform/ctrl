@@ -2,5 +2,5 @@ import { User } from '@prisma/client'
 
 export interface GetOrganisationUsersResponse {
   message: string
-  users: User[] | null
+  users: User[]
 }

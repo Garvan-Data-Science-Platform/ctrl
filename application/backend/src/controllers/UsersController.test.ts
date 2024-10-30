@@ -23,7 +23,7 @@ describe('UsersController', () => {
     firstName: 'Test',
     lastName: 'User',
     email: 'test@user.com',
-    password: 'password123',
+    password: 'Password123',
     role: 'test',
   }
 
@@ -97,8 +97,7 @@ describe('UsersController', () => {
       expect(response.status).toBe(404)
 
       const body: GetUserByIdResponse = response.body
-      expect(body.message).toBe(`User with ID: ${userID} not found`)
-      expect(body.data).toBe(null)
+      expect(body.message).toBe('Not Found')
     })
   })
 
@@ -159,7 +158,6 @@ describe('UsersController', () => {
 
       const body: UpdateUserResponse = response.body
       expect(body.message).toBe(`Updated user with ID: ${userID}`)
-      expect(body.updatedUser?.firstName).toBe(newFirstName)
 
       // Check if the user is updated successfully
       const updatedUser = await prisma.user.findFirst({ where: { id: userID } })
@@ -180,8 +178,7 @@ describe('UsersController', () => {
       expect(response.status).toBe(404)
 
       const body: UpdateUserResponse = response.body
-      expect(body.message).toBe(`User with ID: ${userID} not found`)
-      expect(body.updatedUser).toBe(null)
+      expect(body.message).toBe('Not Found')
     })
   })
 
@@ -220,7 +217,7 @@ describe('UsersController', () => {
       expect(response.status).toBe(404)
 
       const body: DeleteUserResponse = response.body
-      expect(body.message).toBe(`User with ID: ${userID} not found`)
+      expect(body.message).toBe('Not Found')
     })
   })
 })

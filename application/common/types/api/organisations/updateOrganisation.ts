@@ -1,10 +1,15 @@
-import { Organisation } from '@prisma/client'
-
+/**
+ * @example {
+ *  "name": "UpdatedOrganisationName",
+ * }
+ */
 export interface UpdateOrganisationRequest {
+  /**
+   * @minLength 1
+   */
   name?: string
 }
 
 export interface UpdateOrganisationResponse {
   message: string
-  updatedOrganisation: Organisation | null
 }

@@ -7,6 +7,77 @@
     "requestBodies": {},
     "responses": {},
     "schemas": {
+      "UnauthorizedErrorResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "details": {}
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "message": "Unauthorized",
+          "details": {
+            "message": "Token not in headers"
+          }
+        }
+      },
+      "InternalErrorResponse": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "enum": [
+              "Internal Server Error"
+            ],
+            "nullable": false
+          },
+          "details": {}
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "message": "Internal Server Error",
+          "details": {
+            "message": "Some error happened D:"
+          }
+        }
+      },
+      "ValidateErrorResponse": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "enum": [
+              "Validation Failed"
+            ],
+            "nullable": false
+          },
+          "details": {
+            "properties": {},
+            "additionalProperties": {},
+            "type": "object"
+          }
+        },
+        "required": [
+          "message",
+          "details"
+        ],
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "message": "Validation Failed",
+          "bodyRequest.firstName": {
+            "message": "minLength 1",
+            "value": ""
+          }
+        }
+      },
       "User": {
         "description": "Model User",
         "properties": {
@@ -75,12 +146,7 @@
             "type": "string"
           },
           "user": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/User"
-              }
-            ],
-            "nullable": true
+            "$ref": "#/components/schemas/User"
           }
         },
         "required": [
@@ -90,23 +156,37 @@
         "type": "object",
         "additionalProperties": false
       },
+      "NotFoundErrorResponse": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "enum": [
+              "Not Found"
+            ],
+            "nullable": false
+          },
+          "details": {}
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "message": "Not Found",
+          "details": {
+            "message": "User not found"
+          }
+        }
+      },
       "CreateUserResponse": {
         "properties": {
           "message": {
             "type": "string"
-          },
-          "newUser": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/User"
-              }
-            ],
-            "nullable": true
           }
         },
         "required": [
-          "message",
-          "newUser"
+          "message"
         ],
         "type": "object",
         "additionalProperties": false
@@ -114,16 +194,20 @@
       "CreateUserRequest": {
         "properties": {
           "firstName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "lastName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "email": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^(.+)@(.+)$"
           },
           "password": {
-            "type": "string"
+            "type": "string",
+            "minLength": 8
           },
           "role": {
             "type": "string"
@@ -137,25 +221,23 @@
           "role"
         ],
         "type": "object",
-        "additionalProperties": false
+        "additionalProperties": false,
+        "example": {
+          "firstName": "John",
+          "lastName": "Doe",
+          "email": "john.doe@email.com",
+          "password": "Password123",
+          "role": "User"
+        }
       },
       "UpdateUserResponse": {
         "properties": {
           "message": {
             "type": "string"
-          },
-          "updatedUser": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/User"
-              }
-            ],
-            "nullable": true
           }
         },
         "required": [
-          "message",
-          "updatedUser"
+          "message"
         ],
         "type": "object",
         "additionalProperties": false
@@ -163,38 +245,38 @@
       "UpdateUserRequest": {
         "properties": {
           "firstName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "lastName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "email": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^(.+)@(.+)$"
           },
           "role": {
             "type": "string"
           }
         },
         "type": "object",
-        "additionalProperties": false
+        "additionalProperties": false,
+        "example": {
+          "firstName": "John",
+          "lastName": "Doe",
+          "email": "john.doe@email.com",
+          "role": "User"
+        }
       },
       "DeleteUserResponse": {
         "properties": {
           "message": {
             "type": "string"
-          },
-          "deletedUser": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/User"
-              }
-            ],
-            "nullable": true
           }
         },
         "required": [
-          "message",
-          "deletedUser"
+          "message"
         ],
         "type": "object",
         "additionalProperties": false
@@ -251,12 +333,7 @@
             "type": "string"
           },
           "organisation": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Organisation"
-              }
-            ],
-            "nullable": true
+            "$ref": "#/components/schemas/Organisation"
           }
         },
         "required": [
@@ -271,18 +348,14 @@
           "message": {
             "type": "string"
           },
-          "newOrganisation": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Organisation"
-              }
-            ],
-            "nullable": true
+          "organisationID": {
+            "type": "number",
+            "format": "double"
           }
         },
         "required": [
           "message",
-          "newOrganisation"
+          "organisationID"
         ],
         "type": "object",
         "additionalProperties": false
@@ -290,7 +363,8 @@
       "CreateOrganisationRequest": {
         "properties": {
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
         },
         "required": [
@@ -303,19 +377,10 @@
         "properties": {
           "message": {
             "type": "string"
-          },
-          "updatedOrganisation": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Organisation"
-              }
-            ],
-            "nullable": true
           }
         },
         "required": [
-          "message",
-          "updatedOrganisation"
+          "message"
         ],
         "type": "object",
         "additionalProperties": false
@@ -323,7 +388,8 @@
       "UpdateOrganisationRequest": {
         "properties": {
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
         },
         "type": "object",
@@ -333,19 +399,10 @@
         "properties": {
           "message": {
             "type": "string"
-          },
-          "deletedOrganisation": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Organisation"
-              }
-            ],
-            "nullable": true
           }
         },
         "required": [
-          "message",
-          "deletedOrganisation"
+          "message"
         ],
         "type": "object",
         "additionalProperties": false
@@ -359,8 +416,7 @@
             "items": {
               "$ref": "#/components/schemas/User"
             },
-            "type": "array",
-            "nullable": true
+            "type": "array"
           }
         },
         "required": [
@@ -386,19 +442,10 @@
         "properties": {
           "message": {
             "type": "string"
-          },
-          "user": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/User"
-              }
-            ],
-            "nullable": true
           }
         },
         "required": [
-          "message",
-          "user"
+          "message"
         ],
         "type": "object",
         "additionalProperties": false
@@ -424,8 +471,7 @@
             "type": "string"
           },
           "token": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "required": [
@@ -438,16 +484,20 @@
       "RegisterRequest": {
         "properties": {
           "firstName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "lastName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "email": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^(.+)@(.+)$"
           },
           "password": {
-            "type": "string"
+            "type": "string",
+            "minLength": 8
           },
           "role": {
             "type": "string"
@@ -461,26 +511,14 @@
           "role"
         ],
         "type": "object",
-        "additionalProperties": false
-      },
-      "Error": {
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          },
-          "stack": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "name",
-          "message"
-        ],
-        "type": "object",
-        "additionalProperties": false
+        "additionalProperties": false,
+        "example": {
+          "firstName": "John",
+          "lastName": "Doe",
+          "email": "john.doe@email.com",
+          "password": "Password123",
+          "role": "User"
+        }
       },
       "LoginResponse": {
         "properties": {
@@ -488,22 +526,12 @@
             "type": "string"
           },
           "token": {
-            "type": "string",
-            "nullable": true
-          },
-          "error": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Error"
-              }
-            ],
-            "nullable": true
+            "type": "string"
           }
         },
         "required": [
           "message",
-          "token",
-          "error"
+          "token"
         ],
         "type": "object",
         "additionalProperties": false
@@ -511,10 +539,12 @@
       "LoginRequest": {
         "properties": {
           "email": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^(.+)@(.+)$"
           },
           "password": {
-            "type": "string"
+            "type": "string",
+            "minLength": 8
           }
         },
         "required": [
@@ -522,7 +552,11 @@
           "password"
         ],
         "type": "object",
-        "additionalProperties": false
+        "additionalProperties": false,
+        "example": {
+          "email": "john.doe@email.com",
+          "password": "Password123"
+        }
       }
     },
     "securitySchemes": {
@@ -553,10 +587,24 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal Server Error"
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
           }
         },
         "description": "Get all Users",
@@ -585,10 +633,24 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal Server Error"
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
           }
         },
         "description": "Create and persist a new user.",
@@ -629,13 +691,37 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal Server Error"
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
           }
         },
         "description": "Gets a Specific User using their ID",
@@ -674,13 +760,37 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal Server Error"
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
           }
         },
         "description": "Update an existing user.",
@@ -729,13 +839,37 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal Server Error"
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
           }
         },
         "description": "Delete a user.",
@@ -776,10 +910,24 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal Server Error"
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
           }
         },
         "description": "getAllOrganisations",
@@ -808,10 +956,24 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal Server Error"
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
           }
         },
         "description": "createOrganisation",
@@ -852,13 +1014,37 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal Server Error"
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
           }
         },
         "description": "getOrganisationById",
@@ -897,13 +1083,37 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal Server Error"
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
           }
         },
         "description": "updateOrganisation",
@@ -952,13 +1162,37 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal Server Error"
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
           }
         },
         "description": "deleteOrganisation",
@@ -999,13 +1233,37 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal Server Error"
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
           }
         },
         "description": "getOrganisationUsers",
@@ -1046,10 +1304,37 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal Server Error"
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
           }
         },
         "description": "addUserToOrganisation",
@@ -1097,10 +1382,37 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal Server Error"
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
           }
         },
         "description": "removeUserFromOrganisation",
@@ -1227,10 +1539,24 @@
             }
           },
           "422": {
-            "description": "Validation Failed"
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal Server Error"
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
           }
         },
         "description": "register",
@@ -1267,10 +1593,37 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal Server Error"
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
           }
         },
         "description": "login",

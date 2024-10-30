@@ -41,7 +41,7 @@ describe('AuthController', () => {
         firstName: 'John',
         lastName: 'Doe',
         email: 'testregister@example.com',
-        password: 'password123',
+        password: 'Password123',
         role: 'user',
       }
 
@@ -70,7 +70,7 @@ describe('AuthController', () => {
         firstName: 'John',
         lastName: 'Doe',
         email: 'newUser@example.com',
-        password: 'password123',
+        password: 'Password123',
         role: 'user',
       }
 
@@ -107,7 +107,108 @@ describe('AuthController', () => {
       expect(body.message).toBe('Validation Failed')
     })
 
-    it('should return an error if the user is already registered', async () => {})
+    it('should return an error if the user is already registered', async () => {
+      const registerRequest: RegisterRequest = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'johndoe@example.com',
+        password: 'Password123',
+        role: 'user',
+      }
+
+      // Register user
+      await request(app).post('/auth/register').send(registerRequest)
+
+      // Try to register again with the same email
+      const response = await request(app).post('/auth/register').send(registerRequest)
+      expect(response.status).toEqual(500)
+    })
+
+    it('should fail validation if provided with an invalid email', async () => {
+      const registerRequest: RegisterRequest = {
+        email: 'invalid email',
+        firstName: 'John',
+        lastName: 'Doe',
+        password: 'Password123',
+        role: 'user',
+      }
+
+      const response = await request(app).post('/auth/register').send(registerRequest)
+      expect(response.status).toEqual(422)
+
+      const body = response.body
+      expect(body.message).toBe('Validation Failed')
+      expect(body.details).toEqual({
+        'bodyRequest.email': {
+          message: 'Please provide valid email',
+          value: registerRequest.email,
+        },
+      })
+    })
+
+    it('should fail validation if provided with an invalid password', async () => {
+      const registerRequest: RegisterRequest = {
+        email: 'johndoe@example.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        password: 'pass',
+        role: 'user',
+      }
+
+      const response = await request(app).post('/auth/register').send(registerRequest)
+      expect(response.status).toEqual(422)
+
+      const body = response.body
+      expect(body.message).toBe('Validation Failed')
+      expect(body.details).toEqual({
+        'bodyRequest.password': {
+          message: 'Password must be at least 8 characters',
+          value: 'pass',
+        },
+      })
+    })
+
+    it('should fail validation if provided with empty values', async () => {
+      const registerRequest: RegisterRequest = {
+        email: '',
+        firstName: '',
+        lastName: '',
+        password: '',
+        role: '',
+      }
+
+      const response = await request(app).post('/auth/register').send(registerRequest)
+      expect(response.status).toEqual(422)
+
+      const body = response.body
+      expect(body.message).toBe('Validation Failed')
+      expect(body.details).toEqual({
+        'bodyRequest.firstName': { message: 'minLength 1', value: '' },
+        'bodyRequest.lastName': { message: 'minLength 1', value: '' },
+        'bodyRequest.email': { message: 'Please provide valid email', value: '' },
+        'bodyRequest.password': { message: 'Password must be at least 8 characters', value: '' },
+      })
+    })
+
+    it('should fail validation if the password is not strong', async () => {
+      const registerRequest: RegisterRequest = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'johndoe@example.com',
+        password: 'somepasswordthatsnotstrong',
+        role: 'user',
+      }
+
+      const response = await request(app).post('/auth/register').send(registerRequest)
+      expect(response.status).toEqual(422)
+
+      const body = response.body
+      expect(body.message).toBe('Validation Failed')
+      expect(body.details).toEqual({
+        Uppercase: { message: 'Password must contain at least one uppercase letter' },
+        Number: { message: 'Password must contain at least one number' },
+      })
+    })
   })
 
   describe('POST /auth/login', () => {
@@ -163,15 +264,15 @@ describe('AuthController', () => {
       // Login the user with incorrect password
       const loginRequest: LoginRequest = {
         email: 'johndoe@email.com',
-        password: 'wrongPassword',
+        password: 'wrongPassword123',
       }
 
       const loginResponse = await request(app).post('/auth/login').send(loginRequest)
       expect(loginResponse.status).toEqual(401)
 
       const body = loginResponse.body
-      expect(body.message).toBe('Invalid email or password')
-      expect(body.token).toBeNull()
+      expect(body.message).toBe('Incorrect Password')
+      expect(body.token).toBe(undefined)
     })
 
     it('should return 422 if validation fails', async () => {
@@ -184,6 +285,39 @@ describe('AuthController', () => {
 
       const body = response.body
       expect(body.message).toBe('Validation Failed')
+    })
+
+    it('should fail validation if provided with empty values', async () => {
+      const loginRequest: LoginRequest = {
+        email: '',
+        password: '',
+      }
+
+      const response = await request(app).post('/auth/login').send(loginRequest)
+      expect(response.status).toEqual(422)
+
+      const body = response.body
+      expect(body.message).toBe('Validation Failed')
+      expect(body.details).toEqual({
+        'bodyRequest.email': { message: 'Please provide valid email', value: '' },
+        'bodyRequest.password': { message: 'Password must be at least 8 characters', value: '' },
+      })
+    })
+
+    it('should fail validation if provided with an invalid email', async () => {
+      const loginRequest: LoginRequest = {
+        email: 'Invalid Email',
+        password: 'SomeGoodPassword123',
+      }
+
+      const response = await request(app).post('/auth/login').send(loginRequest)
+      expect(response.status).toEqual(422)
+
+      const body = response.body
+      expect(body.message).toBe('Validation Failed')
+      expect(body.details).toEqual({
+        'bodyRequest.email': { message: 'Please provide valid email', value: loginRequest.email },
+      })
     })
   })
 })

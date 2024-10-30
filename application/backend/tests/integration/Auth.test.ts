@@ -11,7 +11,7 @@ describe('Auth', () => {
     firstName: 'Test',
     lastName: 'User',
     email: 'test@user.com',
-    password: 'password123',
+    password: 'Password123',
     role: 'test',
   }
 
@@ -67,7 +67,7 @@ describe('Auth', () => {
       .set({ Authorization: `Bearer ${token}` })
 
     expect(protectedRouteResponse.status).toBe(401)
-    expect(protectedRouteResponse.body.message).toBe('Token has expired')
+    expect(protectedRouteResponse.body.message).toBe('jwt expired')
 
     // Revert expiry back
     process.env.JWT_EXPIRY = '1h'
