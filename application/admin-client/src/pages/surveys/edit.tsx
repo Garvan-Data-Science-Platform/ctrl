@@ -32,15 +32,25 @@ export const SurveyEditor = () => {
     moveElement,
     addChoice,
     updateStepField,
+    updateElementField,
   } = useSurveyStore()
   const [activeStep, setActiveStep] = useState(0)
 
+  type ElementLabels = {
+    [key in SurveyElementType]: string
+  }
+  const elementsLabels: ElementLabels = {
+    'question-checkbox': 'Checkbox question',
+    'question-choices': 'Multi-choice question',
+    subheading: 'Subheading',
+    video: 'Video/Embedded',
+  }
   return (
     <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-      <Box sx={{ border: '1px solid lightgrey', height: '100vh', minWidth: 200, ml: -3, mt: -3 }}>
+      <Box sx={{ border: '1px solid lightgrey', height: '100vh', ml: -3, mt: -3 }}>
         <ListSubheader>Survey Steps</ListSubheader>
         <Divider />
-        <List>
+        <List sx={{ width: 250 }}>
           {surveyData.map((val, index) => (
             <ListItem key={`step_${index}`} disablePadding>
               <ListItemButton onClick={() => setActiveStep(index)} selected={activeStep == index}>
@@ -103,44 +113,26 @@ export const SurveyEditor = () => {
                       }
                     : undefined
                 }
+                handleUpdateField={(field, value) =>
+                  updateElementField(activeStep, idx, field, value)
+                }
                 key={`el_${activeStep}_${idx}`}
               ></SurveyElementCard>
               <SurveyDropSpace key={`space_${activeStep}_${idx}`} index={idx} />
             </>
           ))}
           <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-            <Button
-              startIcon={<AddCircle />}
-              onClick={() => {
-                addElement('subheading', activeStep)
-              }}
-            >
-              Subheading
-            </Button>
-            <Button
-              startIcon={<AddCircle />}
-              onClick={() => {
-                addElement('question-checkbox', activeStep)
-              }}
-            >
-              Checkbox question
-            </Button>
-            <Button
-              startIcon={<AddCircle />}
-              onClick={() => {
-                addElement('question-choices', activeStep)
-              }}
-            >
-              Multi-choice question
-            </Button>
-            <Button
-              startIcon={<AddCircle />}
-              onClick={() => {
-                addElement('video', activeStep)
-              }}
-            >
-              Video/Embeded
-            </Button>
+            {Object.entries(elementsLabels).map((val, idx) => (
+              <Button
+                key={`add_${idx}`}
+                startIcon={<AddCircle />}
+                onClick={() => {
+                  addElement(val[0] as SurveyElementType, activeStep)
+                }}
+              >
+                {val[1]}
+              </Button>
+            ))}
           </Box>
         </Box>
       </DndProvider>

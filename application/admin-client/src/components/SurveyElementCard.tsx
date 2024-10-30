@@ -19,80 +19,7 @@ interface SurveyElementCardProps {
   handleDelete: () => void
   handleMove: (dropIndex: number) => void
   handleAddChoice?: () => void
-}
-
-function SubHeading(data: SurveySubHeading) {
-  return (
-    <Box sx={{ width: '100%' }}>
-      <Typography fontWeight="bold">Subheading</Typography>
-      <TextField multiline fullWidth sx={{ mt: 2 }} label="Subheading text" value={data.text} />
-    </Box>
-  )
-}
-
-function QuestionCheckbox(data: SurveyQuestionCheckbox) {
-  return (
-    <Box sx={{ width: '100%' }}>
-      <Typography fontWeight="bold">Checkbox Question</Typography>
-      <TextField multiline fullWidth sx={{ mt: 2 }} label="Question Text" value={data.text} />
-      <TextField
-        multiline
-        fullWidth
-        sx={{ mt: 2 }}
-        label="Tooltip (optional)"
-        value={data.tooltip}
-      />
-    </Box>
-  )
-}
-
-function QuestionChoices(data: SurveyQuestionChoices, handleAddChoice: () => void) {
-  return (
-    <Box sx={{ width: '100%' }}>
-      <Typography fontWeight="bold">Multi-choice Question</Typography>
-      <TextField multiline fullWidth sx={{ mt: 2 }} label="Question Text" value={data.text} />
-      <TextField
-        multiline
-        fullWidth
-        sx={{ mt: 2 }}
-        label="Tooltip (optional)"
-        value={data.tooltip}
-      />
-      <Typography sx={{ mt: 1, fontSize: 15 }}>Choices</Typography>
-      <Box sx={{ mt: 1, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1 }}>
-        {data.choices.map((val, idx) => (
-          <Box key={`choice_${idx}`}>
-            <TextField
-              value={val}
-              slotProps={{
-                input: {
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton sx={{}}>
-                        <Close />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                },
-              }}
-            />
-          </Box>
-        ))}
-        <IconButton sx={{ width: 50, height: 50 }} onClick={handleAddChoice}>
-          <Add />
-        </IconButton>
-      </Box>
-    </Box>
-  )
-}
-
-function Video(data: SurveyVideo) {
-  return (
-    <Box sx={{ width: '100%' }}>
-      <Typography fontWeight="bold">Video/Embedded</Typography>
-      <TextField multiline fullWidth sx={{ mt: 2 }} label="URL" value={data.link} />
-    </Box>
-  )
+  handleUpdateField: (field: string, value: any) => void
 }
 
 interface DropResult {
@@ -105,6 +32,7 @@ export function SurveyElementCard({
   handleDelete,
   handleMove,
   handleAddChoice,
+  handleUpdateField,
 }: SurveyElementCardProps) {
   const [{ opacity }, dragRef] = useDrag(
     () => ({
@@ -122,13 +50,128 @@ export function SurveyElementCard({
     [],
   )
 
+  function SubHeading(data: SurveySubHeading) {
+    return (
+      <Box sx={{ width: '100%' }}>
+        <Typography fontWeight="bold">Subheading</Typography>
+        <TextField
+          multiline
+          fullWidth
+          sx={{ mt: 2 }}
+          label="Subheading text"
+          value={data.text}
+          onChange={(e) => {
+            handleUpdateField('text', e.target.value)
+          }}
+        />
+      </Box>
+    )
+  }
+
+  function QuestionCheckbox(data: SurveyQuestionCheckbox) {
+    return (
+      <Box sx={{ width: '100%' }}>
+        <Typography fontWeight="bold">Checkbox Question</Typography>
+        <TextField
+          multiline
+          fullWidth
+          sx={{ mt: 2 }}
+          label="Question Text"
+          value={data.text}
+          onChange={(e) => {
+            handleUpdateField('text', e.target.value)
+          }}
+        />
+        <TextField
+          multiline
+          fullWidth
+          sx={{ mt: 2 }}
+          label="Tooltip (optional)"
+          value={data.tooltip}
+          onChange={(e) => {
+            handleUpdateField('tooltip', e.target.value)
+          }}
+        />
+      </Box>
+    )
+  }
+
+  function QuestionChoices(data: SurveyQuestionChoices) {
+    return (
+      <Box sx={{ width: '100%' }}>
+        <Typography fontWeight="bold">Multi-choice Question</Typography>
+        <TextField
+          multiline
+          fullWidth
+          sx={{ mt: 2 }}
+          label="Question Text"
+          value={data.text}
+          onChange={(e) => {
+            handleUpdateField('text', e.target.value)
+          }}
+        />
+        <TextField
+          multiline
+          fullWidth
+          sx={{ mt: 2 }}
+          label="Tooltip (optional)"
+          value={data.tooltip}
+          onChange={(e) => {
+            handleUpdateField('tooltip', e.target.value)
+          }}
+        />
+        <Typography sx={{ mt: 1, fontSize: 15 }}>Choices</Typography>
+        <Box sx={{ mt: 1, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1 }}>
+          {data.choices.map((val, idx) => (
+            <Box key={`choice_${idx}`}>
+              <TextField
+                value={val}
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton sx={{}}>
+                          <Close />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  },
+                }}
+              />
+            </Box>
+          ))}
+          <IconButton sx={{ width: 50, height: 50 }} onClick={handleAddChoice}>
+            <Add />
+          </IconButton>
+        </Box>
+      </Box>
+    )
+  }
+
+  function Video(data: SurveyVideo) {
+    return (
+      <Box sx={{ width: '100%' }}>
+        <Typography fontWeight="bold">Video/Embedded</Typography>
+        <TextField
+          multiline
+          fullWidth
+          sx={{ mt: 2 }}
+          label="URL"
+          value={data.link}
+          onChange={(e) => {
+            handleUpdateField('link', e.target.value)
+          }}
+        />
+      </Box>
+    )
+  }
+
   type ContentRenderer = {
     [key in SurveyElementType]: () => JSX.Element | null
   }
 
   const contentRenderer: ContentRenderer = {
-    'question-choices': () =>
-      handleAddChoice ? QuestionChoices(element.data, handleAddChoice) : null,
+    'question-choices': () => QuestionChoices(element.data),
     'question-checkbox': () => QuestionCheckbox(element.data),
     video: () => Video(element.data),
     subheading: () => SubHeading(element.data),
@@ -175,6 +218,9 @@ export function SurveyDropSpace({ index }: SurveyDropSpaceProps) {
     [index],
   )
   return (
-    <Box ref={drop} sx={{ width: '100%', height: 15, bgcolor: isOver ? 'green' : 'transparent' }} />
+    <Box
+      ref={drop}
+      sx={{ width: '100%', height: 15, bgcolor: isOver ? '#fffccc' : 'transparent' }}
+    />
   )
 }

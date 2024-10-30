@@ -16,7 +16,8 @@ interface SurveyState {
   moveElement: (step: number, index: number, destination: number) => void
   addChoice: (step: number, element: number) => void
   deleteChoice: (step: number, element: number, choice: number) => void
-  updateStepField: (step: number, field: string, value: string) => void
+  updateStepField: (step: number, field: keyof Omit<SurveyStep, 'elements'>, value: string) => void
+  updateElementField: (step: number, element: number, field: string, value: any) => void
 }
 
 type DefaultElementData = {
@@ -75,10 +76,17 @@ export const useSurveyStore = create<SurveyState>((set) => ({
       }),
     ),
   deleteChoice: (step: number, element: number, choice: number) => set((state) => state),
-  updateStepField: (step: number, field: string, value: string) => {
+  updateStepField: (step: number, field: keyof Omit<SurveyStep, 'elements'>, value: string) => {
     set(
-      produce((state) => {
+      produce((state: SurveyState) => {
         state.data[step][field] = value
+      }),
+    )
+  },
+  updateElementField: (step: number, element: number, field: string, value: any) => {
+    set(
+      produce((state: SurveyState) => {
+        state.data[step].elements[element].data[field] = value
       }),
     )
   },
