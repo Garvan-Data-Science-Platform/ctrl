@@ -46,7 +46,7 @@ export interface RegisterParticipantRequest {
    */
   email: string
   /**
-   * @pattern ^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$
+   * @pattern ^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$ please provide valid phone number
    */
   mobile: string
   preferredContact: ContactMethod
