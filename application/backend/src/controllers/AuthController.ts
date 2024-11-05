@@ -31,7 +31,7 @@ export class AuthController extends Controller {
    *
    * @summary Register a new user
    */
-  @Post('/register')
+  @Post('/register/user')
   @SuccessResponse('201', 'User Created')
   public async registerUser(@Body() bodyRequest: RegisterRequest): Promise<RegisterResponse> {
     const { password, ...userDetails } = bodyRequest
@@ -119,6 +119,59 @@ export class AuthController extends Controller {
     const insertedUser = await this.userRepo.create({
       data,
     })
+
+    const token = await generateToken(insertedUser.id)
+
+    const responseData = {
+      message: `Created participant with user ID: ${insertedUser.id}`,
+      token,
+    }
+
+    logger.info({ ...responseData })
+    return responseData
+  }
+
+  /**
+   * registerParticipant
+   *
+   * @summary Register a participant
+   */
+  @Post('/register/participant')
+  @SuccessResponse('201', 'Participant Created')
+  public async registerParticipant(
+    @Body() bodyRequest: RegisterParticipantRequest,
+  ): Promise<RegisterParticipantResponse> {
+    const { password, ...participantData } = bodyRequest
+
+    const { firstName, middleName, lastName, email, dob, ...profileData } = participantData
+    const userDetails = { firstName, middleName, lastName, email }
+    const { nextOfKin, studyID, onBehalfOf, ...noNextOfKinProfileData } = profileData
+
+    const participantDOB = new Date(dob)
+
+    console.log(nextOfKin) // TODO: NEXT OF KIN IN DB AlternativeContact
+    console.log(studyID) // TODO: Adds studyID to schema
+    console.log(onBehalfOf) // TODO: Add behalfOf to schema
+
+    const { isValid, fields } = await checkPasswordStrength(password)
+
+    if (!isValid) {
+      throw new ValidateError(fields, 'Password does not meet strength requirements')
+    }
+
+    const hashedPassword = await hashPassword(password)
+    const insertedUser: User = await this.userRepo.create({
+      data: {
+        ...userDetails,
+        role: 'participant', // TODO: This should be an enum
+        password: hashedPassword,
+        profile: {
+          create: { dob: participantDOB, ...noNextOfKinProfileData },
+        },
+      },
+    })
+
+    console.log(insertedUser)
 
     const token = await generateToken(insertedUser.id)
 

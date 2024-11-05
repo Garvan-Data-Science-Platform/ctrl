@@ -427,7 +427,7 @@ const models: TsoaRoute.Models = {
         "properties": {
             "firstName": {"dataType":"string","required":true},
             "lastName": {"dataType":"string","required":true},
-            "dob": {"dataType":"datetime","required":true},
+            "dob": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },
@@ -1079,7 +1079,7 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/auth/register',
+        app.post('/auth/register/user',
             ...(fetchMiddlewares<RequestHandler>(AuthController)),
             ...(fetchMiddlewares<RequestHandler>(AuthController.prototype.registerUser)),
 

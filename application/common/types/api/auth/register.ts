@@ -4,7 +4,16 @@
  *  "lastName": "Doe",
  *  "email": "john.doe@email.com",
  *  "password": "Password123",
- *  "role": "User"
+ *  "role": "User",
+ *    "dob": "1990-01-01",
+ *    "participantID": "P12345",
+ *    "mobile": "0412345678",
+ *    "addressLine": "123 Main St",
+ *    "suburb": "Sydney",
+ *    "state": "NSW",
+ *    "postcode": "2000",
+ *    "preferredContact": "MOBILE"
+ *  }
  * }
  */
 export interface RegisterRequest {
