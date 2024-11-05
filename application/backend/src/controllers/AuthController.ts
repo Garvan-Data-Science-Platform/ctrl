@@ -31,7 +31,7 @@ export class AuthController extends Controller {
    *
    * @summary Register a new user
    */
-  @Post('/register/user')
+  @Post('/register')
   @SuccessResponse('201', 'User Created')
   public async registerUser(@Body() bodyRequest: RegisterRequest): Promise<RegisterResponse> {
     const { password, ...userDetails } = bodyRequest
