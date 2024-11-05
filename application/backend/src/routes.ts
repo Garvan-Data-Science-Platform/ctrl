@@ -49,7 +49,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "DefaultSelection_Prisma._36_UserPayload_": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"updatedAt":{"dataType":"datetime","required":true},"createdAt":{"dataType":"datetime","required":true},"role":{"dataType":"string","required":true},"password":{"dataType":"string","required":true},"email":{"dataType":"string","required":true},"lastName":{"dataType":"string","required":true},"firstName":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"updatedAt":{"dataType":"datetime","required":true},"createdAt":{"dataType":"datetime","required":true},"role":{"dataType":"string","required":true},"password":{"dataType":"string","required":true},"email":{"dataType":"string","required":true},"lastName":{"dataType":"string","required":true},"middleName":{"dataType":"string","required":true},"firstName":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "User": {
@@ -61,7 +61,7 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "message": {"dataType":"string","required":true},
-            "users": {"dataType":"array","array":{"dataType":"refAlias","ref":"User"},"required":true},
+            "data": {"dataType":"array","array":{"dataType":"refAlias","ref":"User"},"required":true},
         },
         "additionalProperties": false,
     },
@@ -70,7 +70,7 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "message": {"dataType":"string","required":true},
-            "user": {"ref":"User","required":true},
+            "data": {"ref":"User","required":true},
         },
         "additionalProperties": false,
     },
@@ -243,10 +243,73 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "firstName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
+            "middleName": {"dataType":"string","validators":{"minLength":{"value":1}}},
             "lastName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
             "email": {"dataType":"string","required":true,"validators":{"pattern":{"errorMsg":"Please provide valid email","value":"^(.+)@(.+)$"}}},
             "password": {"dataType":"string","required":true,"validators":{"minLength":{"errorMsg":"Password must be at least 8 characters","value":8}}},
             "role": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "RegisterParticipantResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "message": {"dataType":"string","required":true},
+            "token": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ContactMethod": {
+        "dataType": "refEnum",
+        "enums": ["MOBILE","EMAIL","MAIL"],
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "RelationshipType": {
+        "dataType": "refEnum",
+        "enums": ["PARENT","GUARDIAN","CHILD","OTHER"],
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "AlternativeContact": {
+        "dataType": "refObject",
+        "properties": {
+            "firstName": {"dataType":"string","required":true},
+            "middleName": {"dataType":"string"},
+            "lastName": {"dataType":"string","required":true},
+            "mobile": {"dataType":"string"},
+            "email": {"dataType":"string","required":true},
+            "relationship": {"ref":"RelationshipType","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "OnBehalf": {
+        "dataType": "refObject",
+        "properties": {
+            "firstName": {"dataType":"string","required":true},
+            "lastName": {"dataType":"string","required":true},
+            "dob": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "RegisterParticipantRequest": {
+        "dataType": "refObject",
+        "properties": {
+            "firstName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
+            "middleName": {"dataType":"string","validators":{"minLength":{"value":1}}},
+            "lastName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
+            "email": {"dataType":"string","required":true,"validators":{"pattern":{"errorMsg":"please provide valid email","value":"^(.+)@(.+)$"}}},
+            "mobile": {"dataType":"string","required":true},
+            "preferredContact": {"ref":"ContactMethod","required":true},
+            "password": {"dataType":"string","required":true,"validators":{"minLength":{"errorMsg":"Password must be at least 8 characters","value":8}}},
+            "dob": {"dataType":"string","required":true,"validators":{"isDate":{"errorMsg":"Date of birth must be of date format"}}},
+            "studyID": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
+            "participantID": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
+            "isParentOrGuardian": {"dataType":"boolean","required":true},
+            "nextOfKin": {"ref":"AlternativeContact"},
+            "onBehalfOf": {"ref":"OnBehalf"},
         },
         "additionalProperties": false,
     },
@@ -749,11 +812,11 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/auth/register',
+        app.post('/auth/register/user',
             ...(fetchMiddlewares<RequestHandler>(AuthController)),
-            ...(fetchMiddlewares<RequestHandler>(AuthController.prototype.register)),
+            ...(fetchMiddlewares<RequestHandler>(AuthController.prototype.registerUser)),
 
-            async function AuthController_register(request: ExRequest, response: ExResponse, next: any) {
+            async function AuthController_registerUser(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
                     bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"RegisterRequest"},
             };
@@ -767,7 +830,37 @@ export function RegisterRoutes(app: Router) {
                 const controller = new AuthController();
 
               await templateService.apiHandler({
-                methodName: 'register',
+                methodName: 'registerUser',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 201,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/auth/register/participant',
+            ...(fetchMiddlewares<RequestHandler>(AuthController)),
+            ...(fetchMiddlewares<RequestHandler>(AuthController.prototype.registerParticipant)),
+
+            async function AuthController_registerParticipant(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"RegisterParticipantRequest"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new AuthController();
+
+              await templateService.apiHandler({
+                methodName: 'registerParticipant',
                 controller,
                 response,
                 next,

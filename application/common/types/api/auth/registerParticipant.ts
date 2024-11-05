@@ -1,23 +1,30 @@
-import type { OnBehalf, AlternativeContact } from '../users/getProfile'
+import type { OnBehalf, AlternativeContact, ContactMethod } from '../users/ParticipantProfile'
 
 /**
  * @example {
  *  "firstName": "John",
+ *  "middleName": "James",
  *  "lastName": "Doe",
  *  "email": "john.doe@email.com",
  *  "password": "Password123",
- *  "dob": "",
- *  "studyID": "",
+ *  "dob": "2000-05-21",
+ *  "participantID": "P12345678",
+ *  "studyID": "S12345678",
+ *  "mobile": "0412341234",
  *  "isParentOrGuardian": false,
+ *  "preferredContact": "MOBILE",
  *  "nextOfKin": {
- *    "firstName": "Sonofjohn",
+ *    "firstName": "Jeremy",
+ *    "middleName": "Jimmy",
  *    "lastName": "Doe",
- *    "email": "mysons@email.com",
+ *    "mobile": "0412341432",
+ *    "email": "jeremydoe@email.com",
+ *    "relationship": "PARENT"
  *  },
  *  "onBehalfOf": {
- *    "firstName": "John",
+ *    "firstName": "Timothy",
  *    "lastName": "Doe",
- *    "dob": ""
+ *    "dob": "1963-05-27"
  *  }
  * }
  */
@@ -38,6 +45,8 @@ export interface RegisterParticipantRequest {
    * @pattern ^(.+)@(.+)$ please provide valid email
    */
   email: string
+  mobile: string
+  preferredContact: ContactMethod
   /**
    * @minLength 8 Password must be at least 8 characters
    */
@@ -51,6 +60,10 @@ export interface RegisterParticipantRequest {
    */
   studyID: string
   /**
+   * @minLength 1
+   */
+  participantID: string
+  /**
    * @isBool
    */
   isParentOrGuardian: boolean
@@ -59,5 +72,6 @@ export interface RegisterParticipantRequest {
 }
 
 export interface RegisterParticipantResponse {
+  message: string
   token: string
 }
