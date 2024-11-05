@@ -519,7 +519,14 @@
           "role"
         ],
         "type": "object",
-        "additionalProperties": false
+        "additionalProperties": false,
+        "example": {
+          "firstName": "John",
+          "lastName": "Doe",
+          "email": "john.doe@email.com",
+          "password": "Password123",
+          "role": "User"
+        }
       },
       "RegisterParticipantResponse": {
         "properties": {
@@ -623,7 +630,8 @@
             "pattern": "^(.+)@(.+)$"
           },
           "mobile": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^(\\+\\d{1,2}\\s?)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$"
           },
           "preferredContact": {
             "$ref": "#/components/schemas/ContactMethod"
