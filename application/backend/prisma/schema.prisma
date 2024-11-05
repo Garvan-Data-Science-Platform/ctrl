@@ -8,31 +8,52 @@ datasource db {
 }
 
 model User {
-  id            Int            @id @default(autoincrement())
+  id            Int                 @id @default(autoincrement())
   firstName     String
   middleName    String?
   lastName      String
-  email         String         @unique
+  email         String              @unique
   password      String
   role          String
   organisations Organisation[]
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  Profile       Profile?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  profile       ParticipantProfile?
 }
 
-model Profile {
-  id               Int             @id @default(autoincrement())
-  dob              DateTime        @db.Date
-  participantID    String
-  mobile           String
-  addressLine      String?
-  suburb           String?
-  state            StateTerritory?
-  postcode         String?
-  preferredContact ContactMethod
-  userID           Int             @unique
-  user             User            @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: Cascade)
+model ParticipantProfile {
+  id                 Int                 @id @default(autoincrement())
+  dob                DateTime            @db.Date
+  participantID      String
+  mobile             String
+  addressLine        String?
+  suburb             String?
+  state              StateTerritory?
+  postcode           String?
+  isParentOrGuardian Boolean
+  nextOfKin          AlternativeContact?
+  preferredContact   ContactMethod
+  userID             Int                 @unique
+  user               User                @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model AlternativeContact {
+  id                   Int                @id @default(autoincrement())
+  firstName            String
+  middleName           String?
+  lastName             String
+  mobile               String?
+  email                String             @unique
+  relationship         RelationshipType
+  ParticipantProfile   ParticipantProfile @relation(fields: [participantProfileId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  participantProfileId Int                @unique
+}
+
+enum RelationshipType {
+  PARENT
+  GUARDIAN
+  CHILD
+  OTHER
 }
 
 enum StateTerritory {
