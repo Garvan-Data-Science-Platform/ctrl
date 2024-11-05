@@ -1,7 +1,7 @@
 export enum ContactMethod {
-  mobile = 'MOBILE',
-  email = 'EMAIL',
-  mail = 'MAIL',
+  MOBILE = 'MOBILE',
+  EMAIL = 'EMAIL',
+  MAIL = 'MAIL',
 }
 
 export enum StateTerritory {

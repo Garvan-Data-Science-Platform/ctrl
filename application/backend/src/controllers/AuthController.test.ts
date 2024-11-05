@@ -3,12 +3,15 @@ import { Api } from '../Api'
 import type {
   LoginRequest,
   LoginResponse,
+  RegisterParticipantRequest,
   RegisterRequest,
   RegisterResponse,
 } from 'common/types/api/auth'
 import type { GetAllUsersResponse } from 'common/types/api/users'
 import prisma from '../PrismaClient'
 import { resetDB } from '../../tests/TestHelpers'
+import { ContactMethod } from '../../../common/types/api/users/ParticipantProfile'
+import { GetAllOrganisationsResponse } from 'common/types/api/organisations'
 
 const api = new Api()
 const app = api.app
@@ -51,7 +54,7 @@ describe('AuthController', () => {
 
       const registerBody: RegisterResponse = registerResponse.body
 
-      expect(registerBody.message).toMatch(/Created user with ID: \d+/)
+      expect(registerBody.message).toMatch(/Registered user with ID: \d+/)
       expect(registerBody.token).not.toBeNull()
 
       // Add token to protected route request
@@ -82,7 +85,7 @@ describe('AuthController', () => {
       const response = await request(app).post('/auth/register').send(registerRequest)
       expect(response.status).toEqual(201)
       const body: RegisterResponse = response.body
-      expect(body.message).toMatch(/Created user with ID: \d+/)
+      expect(body.message).toMatch(/Registered user with ID: \d+/)
       expect(body.token).not.toBeNull()
 
       // Check if user is now registered
@@ -209,6 +212,56 @@ describe('AuthController', () => {
         Number: { message: 'Password must contain at least one number' },
       })
     })
+  })
+
+  describe('POST /auth/register/participant', () => {
+    it('should allow access to protected routes', async () => {
+      // Try to make a protected route request
+      const protectedRouteResponse1 = await request(app).get('/organisations')
+
+      const getAllOrganisationsBody1: GetAllOrganisationsResponse = protectedRouteResponse1.body
+
+      // Should not allow access to protected routes without valid token
+      expect(protectedRouteResponse1.status).toEqual(401)
+      expect(getAllOrganisationsBody1.message).toEqual('No token provided')
+      expect(getAllOrganisationsBody1.organisations).toBe(undefined)
+
+      // Register the participant
+      const participantRequest: RegisterParticipantRequest = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'johndoe@example.com',
+        password: 'johnDoesP@ssword123',
+        mobile: '07777777777',
+        preferredContact: ContactMethod.MOBILE,
+        dob: '1990-01-01',
+        studyID: 'STUDY123',
+        participantID: 'PARTICIPANT123',
+        isParentOrGuardian: true,
+      }
+
+      const participantResponse = await request(app)
+        .post('/auth/register/participant')
+        .send(participantRequest)
+      expect(participantResponse.status).toEqual(201)
+
+      const participantBody: RegisterResponse = participantResponse.body
+      expect(participantBody.message).toMatch(/Created participant with user ID: \d+/)
+      expect(participantBody.token).not.toBeNull()
+
+      // Add token to protected route request
+      const protectedRouteResponse2 = await request(app)
+        .get('/organisations')
+        .set({ Authorization: `Bearer ${participantBody.token}` })
+
+      const getAllOrganisationsBody2: GetAllOrganisationsResponse = protectedRouteResponse2.body
+      expect(protectedRouteResponse2.status).toEqual(200)
+      expect(getAllOrganisationsBody2.message).toEqual('Got all organisations')
+    })
+
+    it('should register a new user returning a token', async () => {})
+    it('should fail validation if the password is not strong', async () => {})
+    it('should fail validation if provided with empty values', async () => {})
   })
 
   describe('POST /auth/login', () => {

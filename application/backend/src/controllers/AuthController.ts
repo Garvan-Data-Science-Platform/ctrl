@@ -53,7 +53,7 @@ export class AuthController extends Controller {
     const token = await generateToken(insertedUser.id)
 
     const responseData = {
-      message: `Created user with ID: ${insertedUser.id}`,
+      message: `Registered user with ID: ${insertedUser.id}`,
       token,
     }
 
