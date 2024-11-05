@@ -1698,7 +1698,7 @@
         "parameters": []
       }
     },
-    "/auth/register/user": {
+    "/auth/register": {
       "post": {
         "operationId": "RegisterUser",
         "responses": {
