@@ -4,6 +4,7 @@ import type {
   LoginRequest,
   LoginResponse,
   RegisterParticipantRequest,
+  RegisterParticipantResponse,
   RegisterRequest,
   RegisterResponse,
 } from 'common/types/api/auth'
@@ -245,7 +246,7 @@ describe('AuthController', () => {
         .send(participantRequest)
       expect(participantResponse.status).toEqual(201)
 
-      const participantBody: RegisterResponse = participantResponse.body
+      const participantBody: RegisterParticipantResponse = participantResponse.body
       expect(participantBody.message).toMatch(/Created participant with user ID: \d+/)
       expect(participantBody.token).not.toBeNull()
 
@@ -259,9 +260,94 @@ describe('AuthController', () => {
       expect(getAllOrganisationsBody2.message).toEqual('Got all organisations')
     })
 
-    it('should register a new user returning a token', async () => {})
-    it('should fail validation if the password is not strong', async () => {})
-    it('should fail validation if provided with empty values', async () => {})
+    it('should register a new user returning a token', async () => {
+      const registerParticipantRequest: RegisterParticipantRequest = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'johndoe@example.com',
+        password: 'johnDoesP@ssword123',
+        mobile: '07777777777',
+        preferredContact: ContactMethod.MOBILE,
+        dob: '1990-01-01',
+        studyID: 'STUDY123',
+        participantID: 'PARTICIPANT123',
+        isParentOrGuardian: true,
+      }
+
+      const participantResponse = await request(app)
+        .post('/auth/register/participant')
+        .send(registerParticipantRequest)
+      expect(participantResponse.status).toEqual(201)
+
+      const participantBody: RegisterParticipantResponse = participantResponse.body
+      expect(participantBody.message).toMatch(/Created participant with user ID: \d+/)
+      expect(participantBody.token).not.toBeNull()
+    })
+    it('should fail validation if the password is not strong', async () => {
+      const registerParticipantRequest: RegisterParticipantRequest = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'johndoe@example.com',
+        password: 'weakpassword',
+        mobile: '07777777777',
+        preferredContact: ContactMethod.MOBILE,
+        dob: '1990-01-01',
+        studyID: 'STUDY123',
+        participantID: 'PARTICIPANT123',
+        isParentOrGuardian: true,
+      }
+
+      const registerParticipantResponse = await request(app)
+        .post('/auth/register/participant')
+        .send(registerParticipantRequest)
+      expect(registerParticipantResponse.status).toEqual(422)
+
+      const registerParticipantBody = registerParticipantResponse.body
+      expect(registerParticipantBody.message).toEqual('Validation Failed')
+      expect(registerParticipantBody.token).toBe(undefined)
+      expect(registerParticipantBody.details).toEqual({
+        Uppercase: { message: 'Password must contain at least one uppercase letter' },
+        Number: { message: 'Password must contain at least one number' },
+      })
+    })
+
+    it('should fail validation if provided with empty values', async () => {
+      const registerParticipantRequest: RegisterParticipantRequest = {
+        firstName: 'John',
+        lastName: '',
+        email: 'johndoe@example.com',
+        password: 'GooD02Password',
+        mobile: '07777777777',
+        preferredContact: ContactMethod.MOBILE,
+        dob: '1990-01-01',
+        studyID: '',
+        participantID: '',
+        isParentOrGuardian: true,
+      }
+
+      const registerParticipantResponse = await request(app)
+        .post('/auth/register/participant')
+        .send(registerParticipantRequest)
+      expect(registerParticipantResponse.status).toEqual(422)
+
+      const registerParticipantBody = registerParticipantResponse.body
+      expect(registerParticipantBody.message).toEqual('Validation Failed')
+      expect(registerParticipantBody.token).toBe(undefined)
+      expect(registerParticipantBody.details).toEqual({
+        'bodyRequest.lastName': {
+          message: 'minLength 1',
+          value: '',
+        },
+        'bodyRequest.participantID': {
+          message: 'minLength 1',
+          value: '',
+        },
+        'bodyRequest.studyID': {
+          message: 'minLength 1',
+          value: '',
+        },
+      })
+    })
   })
 
   describe('POST /auth/login', () => {
