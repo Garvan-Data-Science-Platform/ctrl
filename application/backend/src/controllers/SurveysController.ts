@@ -1,17 +1,45 @@
-import { Get, Route, Tags, Path, SuccessResponse, Response, Controller, Security } from 'tsoa'
+import {
+  Get,
+  Body,
+  Request,
+  Post,
+  Route,
+  Tags,
+  Path,
+  SuccessResponse,
+  Response,
+  Controller,
+  Security,
+} from 'tsoa'
 import logger from 'common/src/logger'
-import type { GetSurveyVersionsResponse } from 'common/types/api/surveys'
-import { SurveyVersion as SurveyVersionPrisma } from '@prisma/client'
-import { SurveyStep } from 'common/types/survey'
+import type {
+  GetSurveyVersionsResponse,
+  UpdateSurveyAnswersRequest,
+  UpdateSurveyAnswersResponse,
+} from 'common/types/api/surveys'
+import { Prisma, SurveyVersion as SurveyVersionPrisma } from '@prisma/client'
+import {
+  SurveyElementType,
+  SurveyStep,
+  UserSurveyStepState,
+  SurveyStepStatus,
+  SurveyVersion,
+} from 'common/types/survey'
 import prisma from '../PrismaClient'
 import { GetSurveyVersionByIdResponse } from 'common/types/api/surveys/getSurveyVersionById'
 import versionsResponse from 'common/example_responses/getSurveyVersions.json'
+import { validateAnswers } from 'utils/validateSurveyAnswers'
+import { createEmptyAnswers } from 'utils/createEmptyAnswers'
+import surveyVersion from 'common/example_responses/getSurvey.json'
+import { JsonArray } from '@prisma/client/runtime/library'
+import { response } from 'express'
 
 @Route('surveys')
 @Tags('Surveys')
 @Security('jwt')
 export class SurveysController extends Controller {
   surveyRepo = prisma.surveyVersion
+  answersRepo = prisma.surveyAnswers
 
   /**
    * Get all Surveys
@@ -54,6 +82,80 @@ export class SurveysController extends Controller {
     const responseData: GetSurveyVersionByIdResponse = {
       data: { id: surveyID, data: survey.data as unknown as SurveyStep[] },
     }
+    logger.info({ ...responseData })
+    return responseData
+  }
+
+  /**
+   * Update survey answers
+   *
+   * @summary Update a Survey
+   */
+  @Post('/answers')
+  @SuccessResponse('200', 'OK')
+  @Response('500', 'Internal Server Error')
+  @Response('404', 'Not Found')
+  @Response('401', 'Unauthorized')
+  public async updateSurveyAnswers(
+    @Request() request: any,
+    @Body() { step, data, surveyVersionId }: UpdateSurveyAnswersRequest,
+  ): Promise<UpdateSurveyAnswersResponse> {
+    var currentAnswers = await this.answersRepo.findFirst({
+      where: { versionId: surveyVersionId, userId: request.user.userId },
+    })
+
+    var answers: UserSurveyStepState[]
+
+    /*const survey = await this.surveyRepo.findFirst({
+      where: { id: surveyVersionId },
+    })*/
+    const survey = surveyVersion
+
+    const surveySteps = survey?.data as unknown as SurveyStep[]
+
+    if (currentAnswers === null) {
+      answers = createEmptyAnswers(surveySteps)
+    } else {
+      answers = currentAnswers.data as unknown as UserSurveyStepState[]
+    }
+
+    type StatusMap = {
+      [key in SurveyElementType]: SurveyStepStatus
+    }
+
+    const statusMap: StatusMap = {
+      video: 'viewed',
+      subheading: 'viewed',
+      'question-checkbox': 'completed',
+      'question-choices': 'completed',
+    }
+
+    //Maps the type of the first element to the updated status
+    const status = statusMap[surveySteps[step].elements[0].type]
+
+    if (!validateAnswers(surveySteps[step], data)) {
+      throw Error('Answers did not match survey question structure')
+    }
+
+    answers[step].status = status
+    answers[step].answers = data
+
+    var responseData = {
+      message: 'Updated Answers',
+    }
+
+    if (currentAnswers) {
+      await this.answersRepo.update({
+        where: { id: currentAnswers.id }, //
+        data: { data: answers as any },
+      })
+    } else {
+      await this.answersRepo.create({
+        data: { data: answers as any, userId: request.user.userId, versionId: surveyVersionId },
+      })
+      responseData.message = 'Created new answers'
+    }
+
     logger.info({ ...responseData })
     return responseData
   }

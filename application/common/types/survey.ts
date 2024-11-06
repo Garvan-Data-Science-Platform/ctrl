@@ -47,24 +47,18 @@ export interface SurveyStep {
   //refusal_text: RefusalText
 }
 
-export interface UserSurveyStep {
-  title: string
-  text: string
-  last_updated?: string
-  current_step: number
-  total_steps: number
-  //refusal_text: RefusalText
-}
-
-export interface SurveyVersionBasic {
-  id?: number
-  version_number?: number
-  published_date?: string
-}
-
 export interface SurveyVersion {
   id?: number
   version_number?: number
   published_date?: string
   data: SurveyStep[]
+}
+
+export type SurveyStepStatus = 'completed' | 'review_required' | 'viewed'
+
+export type SurveyStepAnswerArray = (string | boolean | undefined)[]
+
+export interface UserSurveyStepState {
+  status: SurveyStepStatus
+  answers: SurveyStepAnswerArray
 }
