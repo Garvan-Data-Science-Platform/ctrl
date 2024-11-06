@@ -73,16 +73,7 @@ export class AuthController extends Controller {
   ): Promise<RegisterParticipantResponse> {
     const { password, ...participantData } = bodyRequest
 
-    const { firstName, middleName, lastName, email, dob, ...profileData } = participantData
-    const userDetails = { firstName, middleName, lastName, email }
-    const { nextOfKin, studyID, onBehalfOf, ...noNextOfKinProfileData } = profileData
-
-    const participantDOB = new Date(dob)
-
-    console.log(nextOfKin) // TODO: NEXT OF KIN IN DB AlternativeContact
-    console.log(studyID) // TODO: Adds studyID to schema
-    console.log(onBehalfOf) // TODO: Add behalfOf to schema
-
+    // Check Password
     const { isValid, fields } = await checkPasswordStrength(password)
 
     if (!isValid) {
@@ -90,18 +81,43 @@ export class AuthController extends Controller {
     }
 
     const hashedPassword = await hashPassword(password)
-    const insertedUser: User = await this.userRepo.create({
-      data: {
-        ...userDetails,
-        role: 'participant', // TODO: This should be an enum
-        password: hashedPassword,
-        profile: {
-          create: { dob: participantDOB, ...noNextOfKinProfileData },
+
+    // Pull out data from request
+    const { firstName, middleName, lastName, email, dob, ...profileData } = participantData
+    const userDetails = { firstName, middleName, lastName, email }
+
+    const { nextOfKin, studyID, onBehalfOf, ...noNextOfKinProfileData } = profileData
+
+    let onBehalfOfData
+    if (onBehalfOf) {
+      onBehalfOf.dob = new Date(onBehalfOf.dob)
+      onBehalfOfData = { onBehalfOf: { create: { onBehalfOf } } }
+    }
+
+    let nextOfKinData
+    if (nextOfKin) {
+      nextOfKinData = { nextOfKin: { create: { nextOfKin } } }
+    }
+
+    console.log(studyID)
+
+    const data = {
+      ...userDetails,
+      role: 'participant', // TODO: This should be an enum
+      password: hashedPassword,
+      profile: {
+        create: {
+          dob: new Date(dob),
+          ...noNextOfKinProfileData,
+          nextOfKinData,
+          onBehalfOfData,
         },
       },
-    })
+    }
 
-    console.log(insertedUser)
+    const insertedUser = await this.userRepo.create({
+      data,
+    })
 
     const token = await generateToken(insertedUser.id)
 

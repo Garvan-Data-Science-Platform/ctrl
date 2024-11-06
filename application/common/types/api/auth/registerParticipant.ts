@@ -11,6 +11,7 @@ import type { OnBehalf, AlternativeContact, ContactMethod } from '../users/Parti
  *  "participantID": "P12345678",
  *  "studyID": "S12345678",
  *  "mobile": "0412341234",
+ *  "addressLine": "123 Sydney Street, Sydney NSW 2000",
  *  "isParentOrGuardian": false,
  *  "preferredContact": "MOBILE",
  *  "nextOfKin": {
@@ -50,6 +51,7 @@ export interface RegisterParticipantRequest {
    */
   mobile: string
   preferredContact: ContactMethod
+  addressLine: string
   /**
    * @minLength 8 Password must be at least 8 characters
    */

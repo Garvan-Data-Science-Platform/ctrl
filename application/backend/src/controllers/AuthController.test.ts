@@ -234,6 +234,7 @@ describe('AuthController', () => {
         email: 'johndoe@example.com',
         password: 'johnDoesP@ssword123',
         mobile: '+61477777777',
+        addressLine: '123 Some Street, Sydney, NSW',
         preferredContact: ContactMethod.MOBILE,
         dob: '1990-01-01',
         studyID: 'STUDY123',
@@ -267,6 +268,7 @@ describe('AuthController', () => {
         email: 'johndoe@example.com',
         password: 'johnDoesP@ssword123',
         mobile: '+61477777777',
+        addressLine: '123 Some Street, Sydney, NSW',
         preferredContact: ContactMethod.MOBILE,
         dob: '1990-01-01',
         studyID: 'STUDY123',
@@ -277,6 +279,7 @@ describe('AuthController', () => {
       const participantResponse = await request(app)
         .post('/auth/register/participant')
         .send(registerParticipantRequest)
+
       expect(participantResponse.status).toEqual(201)
 
       const participantBody: RegisterParticipantResponse = participantResponse.body
@@ -290,6 +293,7 @@ describe('AuthController', () => {
         email: 'johndoe@example.com',
         password: 'weakpassword',
         mobile: '+61477777777',
+        addressLine: '123 Some Street, Sydney, NSW',
         preferredContact: ContactMethod.MOBILE,
         dob: '1990-01-01',
         studyID: 'STUDY123',
@@ -318,6 +322,7 @@ describe('AuthController', () => {
         email: 'johndoe@example.com',
         password: 'GooD02Password',
         mobile: '12341234',
+        addressLine: '123 Some Street, Sydney, NSW',
         preferredContact: ContactMethod.MOBILE,
         dob: '1990-01-01',
         studyID: '',

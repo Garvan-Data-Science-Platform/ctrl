@@ -289,7 +289,7 @@ const models: TsoaRoute.Models = {
         "properties": {
             "firstName": {"dataType":"string","required":true},
             "lastName": {"dataType":"string","required":true},
-            "dob": {"dataType":"string","required":true},
+            "dob": {"dataType":"datetime","required":true},
         },
         "additionalProperties": false,
     },
@@ -303,6 +303,7 @@ const models: TsoaRoute.Models = {
             "email": {"dataType":"string","required":true,"validators":{"pattern":{"errorMsg":"please provide valid email","value":"^(.+)@(.+)$"}}},
             "mobile": {"dataType":"string","required":true,"validators":{"pattern":{"errorMsg":"please provide valid phone number","value":"^(\\+\\d{1,2}\\s?)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$"}}},
             "preferredContact": {"ref":"ContactMethod","required":true},
+            "addressLine": {"dataType":"string","required":true},
             "password": {"dataType":"string","required":true,"validators":{"minLength":{"errorMsg":"Password must be at least 8 characters","value":8}}},
             "dob": {"dataType":"string","required":true,"validators":{"isDate":{"errorMsg":"Date of birth must be of date format"}}},
             "studyID": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
