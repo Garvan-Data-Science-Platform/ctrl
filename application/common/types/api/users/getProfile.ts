@@ -1,31 +1,4 @@
-enum ContactMethod {
-  mobile = 'mobile',
-  email = 'email',
-  mail = 'mail',
-}
-
-enum StateTerritory {
-  ACT = 'act',
-  NSW = 'nsw',
-  NT = 'nt',
-  QLD = 'qld',
-  SA = 'sa',
-  TAS = 'tas',
-  VIC = 'vic',
-  WA = 'wa',
-}
-
-export interface AlternativeContact {
-  firstName: string
-  lastName: string
-  email: string
-}
-
-export interface OnBehalf {
-  firstName: string
-  lastName: string
-  dob: string
-}
+import { AlternativeContact, ContactMethod, OnBehalf, StateTerritory } from './ParticipantProfile'
 
 export interface GetUserProfileResponse {
   firstName: string

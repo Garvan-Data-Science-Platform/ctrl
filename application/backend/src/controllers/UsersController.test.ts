@@ -1,7 +1,9 @@
 import request from 'supertest'
 import { Api } from '../Api'
-import type { RegisterRequest, RegisterResponse } from 'common/types/api/auth'
 import prisma from '../PrismaClient'
+import { resetDB } from '../../tests/TestHelpers'
+import { getUserIdFromToken } from '../authentication'
+import type { RegisterRequest, RegisterResponse } from 'common/types/api/auth'
 import {
   CreateUserResponse,
   DeleteUserResponse,
@@ -9,8 +11,6 @@ import {
   GetUserByIdResponse,
   UpdateUserResponse,
 } from 'common/types/api/users'
-import { resetDB } from '../../tests/TestHelpers'
-import { getUserIdFromToken } from '../authentication'
 
 const api = new Api()
 const app = api.app

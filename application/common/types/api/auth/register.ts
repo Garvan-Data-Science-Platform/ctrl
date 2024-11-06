@@ -15,6 +15,10 @@ export interface RegisterRequest {
   /**
    * @minLength 1
    */
+  middleName?: string
+  /**
+   * @minLength 1
+   */
   lastName: string
   /**
    * @pattern ^(.+)@(.+)$ Please provide valid email

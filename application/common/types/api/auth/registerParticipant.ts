@@ -1,23 +1,36 @@
-import type { OnBehalf, AlternativeContact } from '../users/getProfile'
+import type {
+  OnBehalf,
+  AlternativeContact,
+  ContactMethod,
+  StateTerritory,
+} from '../users/ParticipantProfile'
 
 /**
  * @example {
  *  "firstName": "John",
+ *  "middleName": "James",
  *  "lastName": "Doe",
  *  "email": "john.doe@email.com",
  *  "password": "Password123",
- *  "dob": "",
- *  "studyID": "",
+ *  "dob": "2000-05-21",
+ *  "participantID": "P12345678",
+ *  "studyID": "S12345678",
+ *  "mobile": "0412341234",
+ *  "addressLine": "123 Sydney Street, Sydney NSW 2000",
  *  "isParentOrGuardian": false,
+ *  "preferredContact": "MOBILE",
  *  "nextOfKin": {
- *    "firstName": "Sonofjohn",
+ *    "firstName": "Jeremy",
+ *    "middleName": "Jimmy",
  *    "lastName": "Doe",
- *    "email": "mysons@email.com",
+ *    "mobile": "0412341432",
+ *    "email": "jeremydoe@email.com",
+ *    "relationship": "PARENT"
  *  },
  *  "onBehalfOf": {
- *    "firstName": "John",
+ *    "firstName": "Timothy",
  *    "lastName": "Doe",
- *    "dob": ""
+ *    "dob": "1963-05-27"
  *  }
  * }
  */
@@ -39,6 +52,24 @@ export interface RegisterParticipantRequest {
    */
   email: string
   /**
+   * @pattern ^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$ please provide valid phone number
+   */
+  mobile: string
+  preferredContact: ContactMethod
+  /**
+   * @minLength 1
+   */
+  addressLine: string
+  /**
+   * @minLength 1
+   */
+  suburb: string
+  /**
+   * @minLength 1
+   */
+  postcode: string
+  state: StateTerritory
+  /**
    * @minLength 8 Password must be at least 8 characters
    */
   password: string
@@ -51,6 +82,10 @@ export interface RegisterParticipantRequest {
    */
   studyID: string
   /**
+   * @minLength 1
+   */
+  participantID: string
+  /**
    * @isBool
    */
   isParentOrGuardian: boolean
@@ -59,5 +94,6 @@ export interface RegisterParticipantRequest {
 }
 
 export interface RegisterParticipantResponse {
+  message: string
   token: string
 }
