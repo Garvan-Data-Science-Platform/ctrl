@@ -552,6 +552,19 @@
         ],
         "type": "string"
       },
+      "StateTerritory": {
+        "enum": [
+          "ACT",
+          "NSW",
+          "NT",
+          "QLD",
+          "SA",
+          "TAS",
+          "VIC",
+          "WA"
+        ],
+        "type": "string"
+      },
       "RelationshipType": {
         "enum": [
           "PARENT",
@@ -638,7 +651,19 @@
             "$ref": "#/components/schemas/ContactMethod"
           },
           "addressLine": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
+          },
+          "suburb": {
+            "type": "string",
+            "minLength": 1
+          },
+          "postcode": {
+            "type": "string",
+            "minLength": 1
+          },
+          "state": {
+            "$ref": "#/components/schemas/StateTerritory"
           },
           "password": {
             "type": "string",
@@ -672,6 +697,9 @@
           "mobile",
           "preferredContact",
           "addressLine",
+          "suburb",
+          "postcode",
+          "state",
           "password",
           "dob",
           "studyID",

@@ -88,15 +88,15 @@ export class AuthController extends Controller {
 
     const { nextOfKin, studyID, onBehalfOf, ...noNextOfKinProfileData } = profileData
 
-    let onBehalfOfData
+    let onBehalfOfCreateData
     if (onBehalfOf) {
       onBehalfOf.dob = new Date(onBehalfOf.dob)
-      onBehalfOfData = { onBehalfOf: { create: { onBehalfOf } } }
+      onBehalfOfCreateData = { onBehalfOf: { create: { onBehalfOf } } }
     }
 
-    let nextOfKinData
+    let nextOfKinCreateData
     if (nextOfKin) {
-      nextOfKinData = { nextOfKin: { create: { nextOfKin } } }
+      nextOfKinCreateData = { nextOfKin: { create: { nextOfKin } } }
     }
 
     console.log(studyID)
@@ -109,8 +109,8 @@ export class AuthController extends Controller {
         create: {
           dob: new Date(dob),
           ...noNextOfKinProfileData,
-          nextOfKinData,
-          onBehalfOfData,
+          onBehalfOfCreateData,
+          nextOfKinCreateData,
         },
       },
     }
