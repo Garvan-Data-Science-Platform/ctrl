@@ -600,7 +600,8 @@
             "type": "string"
           },
           "dob": {
-            "type": "string"
+            "type": "string",
+            "format": "date-time"
           }
         },
         "required": [
@@ -636,6 +637,9 @@
           "preferredContact": {
             "$ref": "#/components/schemas/ContactMethod"
           },
+          "addressLine": {
+            "type": "string"
+          },
           "password": {
             "type": "string",
             "minLength": 8
@@ -667,6 +671,7 @@
           "email",
           "mobile",
           "preferredContact",
+          "addressLine",
           "password",
           "dob",
           "studyID",
@@ -685,6 +690,7 @@
           "participantID": "P12345678",
           "studyID": "S12345678",
           "mobile": "0412341234",
+          "addressLine": "123 Sydney Street, Sydney NSW 2000",
           "isParentOrGuardian": false,
           "preferredContact": "MOBILE",
           "nextOfKin": {

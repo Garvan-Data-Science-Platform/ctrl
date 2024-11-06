@@ -34,5 +34,5 @@ export interface AlternativeContact {
 export interface OnBehalf {
   firstName: string
   lastName: string
-  dob: string
+  dob: Date
 }

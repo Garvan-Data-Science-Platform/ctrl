@@ -56,6 +56,7 @@ export interface RegisterParticipantRequest {
    */
   mobile: string
   preferredContact: ContactMethod
+  addressLine: string
   /**
    * @minLength 1
    */

@@ -427,7 +427,7 @@ const models: TsoaRoute.Models = {
         "properties": {
             "firstName": {"dataType":"string","required":true},
             "lastName": {"dataType":"string","required":true},
-            "dob": {"dataType":"string","required":true},
+            "dob": {"dataType":"datetime","required":true},
         },
         "additionalProperties": false,
     },
