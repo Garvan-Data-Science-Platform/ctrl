@@ -11,7 +11,7 @@ import type {
 import type { GetAllUsersResponse } from 'common/types/api/users'
 import prisma from '../PrismaClient'
 import { resetDB } from '../../tests/TestHelpers'
-import { ContactMethod } from '../../../common/types/api/users/ParticipantProfile'
+import { ContactMethod, StateTerritory } from '../../../common/types/api/users/ParticipantProfile'
 
 const api = new Api()
 const app = api.app
@@ -222,7 +222,10 @@ describe('AuthController', () => {
         email: 'johndoe@example.com',
         password: 'johnDoesP@ssword123',
         mobile: '+61477777777',
-        addressLine: '123 Some Street, Sydney, NSW',
+        addressLine: '123 Some Street',
+        suburb: 'Sydney',
+        postcode: '2000',
+        state: StateTerritory.NSW,
         preferredContact: ContactMethod.MOBILE,
         dob: '1990-01-01',
         studyID: 'STUDY123',
@@ -247,7 +250,10 @@ describe('AuthController', () => {
         email: 'johndoe@example.com',
         password: 'weakpassword',
         mobile: '+61477777777',
-        addressLine: '123 Some Street, Sydney, NSW',
+        addressLine: '123 Some Street',
+        suburb: 'Sydney',
+        postcode: '2000',
+        state: StateTerritory.NSW,
         preferredContact: ContactMethod.MOBILE,
         dob: '1990-01-01',
         studyID: 'STUDY123',
@@ -276,7 +282,10 @@ describe('AuthController', () => {
         email: 'johndoe@example.com',
         password: 'GooD02Password',
         mobile: '12341234',
-        addressLine: '123 Some Street, Sydney, NSW',
+        addressLine: '123 Some Street',
+        suburb: 'Sydney',
+        postcode: '2000',
+        state: StateTerritory.NSW,
         preferredContact: ContactMethod.MOBILE,
         dob: '1990-01-01',
         studyID: '',

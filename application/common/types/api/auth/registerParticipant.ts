@@ -1,4 +1,9 @@
-import type { OnBehalf, AlternativeContact, ContactMethod } from '../users/ParticipantProfile'
+import type {
+  OnBehalf,
+  AlternativeContact,
+  ContactMethod,
+  StateTerritory,
+} from '../users/ParticipantProfile'
 
 /**
  * @example {
@@ -51,7 +56,19 @@ export interface RegisterParticipantRequest {
    */
   mobile: string
   preferredContact: ContactMethod
+  /**
+   * @minLength 1
+   */
   addressLine: string
+  /**
+   * @minLength 1
+   */
+  suburb: string
+  /**
+   * @minLength 1
+   */
+  postcode: string
+  state: StateTerritory
   /**
    * @minLength 8 Password must be at least 8 characters
    */

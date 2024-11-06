@@ -7,7 +7,7 @@ import {
   RegisterResponse,
 } from 'common/types/api/auth'
 import { resetDB } from '../TestHelpers'
-import { ContactMethod } from 'common/types/api/users/ParticipantProfile'
+import { ContactMethod, StateTerritory } from 'common/types/api/users/ParticipantProfile'
 import { GetAllOrganisationsResponse } from 'common/types/api/organisations'
 
 const api = new Api()
@@ -98,7 +98,10 @@ describe('Auth', () => {
       email: 'johndoe@example.com',
       password: 'johnDoesP@ssword123',
       mobile: '+61477777777',
-      addressLine: '123 Some Street, Sydney, NSW',
+      addressLine: '123 Some Street',
+      suburb: 'Sydney',
+      postcode: '2000',
+      state: StateTerritory.NSW,
       preferredContact: ContactMethod.MOBILE,
       dob: '1990-01-01',
       studyID: 'STUDY123',
