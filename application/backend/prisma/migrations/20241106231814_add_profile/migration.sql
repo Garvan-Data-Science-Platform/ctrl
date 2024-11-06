@@ -17,9 +17,9 @@ CREATE TABLE "ParticipantProfile" (
     "participantID" TEXT NOT NULL,
     "mobile" TEXT NOT NULL,
     "addressLine" TEXT NOT NULL,
-    "suburb" TEXT,
-    "state" "StateTerritory",
-    "postcode" TEXT,
+    "suburb" TEXT NOT NULL,
+    "state" "StateTerritory" NOT NULL,
+    "postcode" TEXT NOT NULL,
     "isParentOrGuardian" BOOLEAN NOT NULL,
     "preferredContact" "ContactMethod" NOT NULL,
     "userID" INTEGER NOT NULL,
@@ -28,14 +28,14 @@ CREATE TABLE "ParticipantProfile" (
 );
 
 -- CreateTable
-CREATE TABLE "onBehalf" (
+CREATE TABLE "OnBehalf" (
     "id" SERIAL NOT NULL,
     "firstName" TEXT NOT NULL,
     "lastName" TEXT NOT NULL,
     "dob" DATE NOT NULL,
     "participantProfileId" INTEGER NOT NULL,
 
-    CONSTRAINT "onBehalf_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "OnBehalf_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -56,7 +56,7 @@ CREATE TABLE "AlternativeContact" (
 CREATE UNIQUE INDEX "ParticipantProfile_userID_key" ON "ParticipantProfile"("userID");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "onBehalf_participantProfileId_key" ON "onBehalf"("participantProfileId");
+CREATE UNIQUE INDEX "OnBehalf_participantProfileId_key" ON "OnBehalf"("participantProfileId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "AlternativeContact_participantProfileId_key" ON "AlternativeContact"("participantProfileId");
@@ -65,7 +65,7 @@ CREATE UNIQUE INDEX "AlternativeContact_participantProfileId_key" ON "Alternativ
 ALTER TABLE "ParticipantProfile" ADD CONSTRAINT "ParticipantProfile_userID_fkey" FOREIGN KEY ("userID") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "onBehalf" ADD CONSTRAINT "onBehalf_participantProfileId_fkey" FOREIGN KEY ("participantProfileId") REFERENCES "ParticipantProfile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "OnBehalf" ADD CONSTRAINT "OnBehalf_participantProfileId_fkey" FOREIGN KEY ("participantProfileId") REFERENCES "ParticipantProfile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "AlternativeContact" ADD CONSTRAINT "AlternativeContact_participantProfileId_fkey" FOREIGN KEY ("participantProfileId") REFERENCES "ParticipantProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
