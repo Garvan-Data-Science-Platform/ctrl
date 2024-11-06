@@ -1,4 +1,4 @@
-import { Refine, GitHubBanner, Authenticated } from '@refinedev/core'
+import { Refine, Authenticated } from '@refinedev/core'
 import { DevtoolsPanel, DevtoolsProvider } from '@refinedev/devtools'
 import { RefineKbar, RefineKbarProvider } from '@refinedev/kbar'
 
@@ -20,13 +20,7 @@ import routerBindings, {
   DocumentTitleHandler,
 } from '@refinedev/react-router-v6'
 import { UserList, UserCreate, UserEdit, UserShow } from './pages/users'
-import {
-  CategoryList,
-  CategoryCreate,
-  CategoryEdit,
-  CategoryShow,
-  SurveyEditor,
-} from './pages/surveys'
+import { CategoryList, CategoryShow, SurveyEditor } from './pages/surveys'
 import { ColorModeContextProvider } from './contexts/color-mode'
 import { Header } from './components/header'
 import { Login } from './pages/login'

@@ -1,14 +1,12 @@
 {
   "data": [
     {
-      "id": "123",
+      "id": 123,
       "version_number": 1,
-      "published_date": "2024-10-24",
-      "steps": []
+      "published_date": "2024-10-24"
     },
     {
-      "id": "124",
-      "steps": []
+      "id": 124
     }
   ]
 }

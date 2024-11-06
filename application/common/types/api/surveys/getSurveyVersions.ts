@@ -1,5 +1,5 @@
-import type { SurveyVersion } from '../../survey'
+import type { SurveyVersionBasic } from '../../survey'
 
 export interface GetSurveyVersionsResponse {
-  data: SurveyVersion[]
+  data: SurveyVersionBasic[]
 }

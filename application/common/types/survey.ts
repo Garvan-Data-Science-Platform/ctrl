@@ -56,15 +56,10 @@ export interface UserSurveyStep {
   //refusal_text: RefusalText
 }
 
-export interface SurveyStepBasic {
-  title: string
-  text: string
-  last_updated?: string
-  current_step: number
-  total_steps: number
-  questions: SurveyQuestion[]
-  subheadings: SurveySubHeading[]
-  refusal_text: RefusalText
+export interface SurveyVersionBasic {
+  id?: number
+  version_number?: number
+  published_date?: string
 }
 
 export interface SurveyVersion {

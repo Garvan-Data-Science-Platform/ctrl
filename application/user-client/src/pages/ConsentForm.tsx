@@ -19,11 +19,12 @@ import {
 
 import { useNavigate, useParams } from 'react-router-dom'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { GetSurveyStepResponse } from '@common/types/api/surveys'
-import surveyStep from '@common/example_responses/getSurveyStep.json'
+import { GetUserSurveyStepResponse } from '@common/types/api/surveys'
+import surveyStep from '@common/example_responses/getUserSurveyStep.json'
 import { Info } from '@mui/icons-material'
-import { SurveyQuestion, SurveySubHeading } from '@common/types/api/surveys/getSurveyStep'
+
 import { useEffect, useState } from 'react'
+import { SurveyElement } from '@common/types/survey'
 
 export default function ConsentForm() {
   const nav = useNavigate()
@@ -31,21 +32,21 @@ export default function ConsentForm() {
   const params = useParams()
   const currentStep = Number(params.step)
 
-  const [formState, setFormState] = useState<SurveyQuestion[]>([])
+  const [formState, setFormState] = useState<SurveyElement[]>([])
   const [modalOpen, setModalOpen] = useState(false)
 
   const { isPending, data } = useQuery({
     queryKey: ['form_step', currentStep],
     //queryFn: () => fetch('/api/user/profile').then((res) => res.json()) as Promise<UserProfile>,
     queryFn: () => {
-      return surveyStep as GetSurveyStepResponse
+      return surveyStep as GetUserSurveyStepResponse
     },
     placeholderData: keepPreviousData,
   })
 
   const handleNext = () => {
-    for (const i in data?.questions || []) {
-      if (data?.questions[i].required && !data?.questions[i].value) {
+    for (const i in data?.data.elements || []) {
+      if (data?.data.elements[i].data.required && !data?.data.elements[i].data.value) {
         setModalOpen(true)
         return
       }
@@ -59,35 +60,26 @@ export default function ConsentForm() {
   }
 
   useEffect(() => {
-    setFormState(data?.questions || [])
+    setFormState(data?.data.elements || [])
   }, [data])
 
-  const renderQuestionsAndSubheadings = (
-    questions: SurveyQuestion[],
-    subheadings: SurveySubHeading[],
-  ) => {
+  const renderElements = (elements: SurveyElement[]) => {
     const results = []
-    for (const i in questions) {
-      let found = false
-      for (const sh of subheadings) {
-        if (sh.position == Number(i)) {
-          found = true
-          results.push(
-            <Typography key={`sh_${i}`} sx={{ mt: 2, mb: 2, fontWeight: 'bold' }}>
-              {sh.text}
-            </Typography>,
-          )
-          results.push(renderQuestion(questions[i], Number(i)))
-        }
-      }
-      if (!found) {
-        results.push(renderQuestion(questions[i], Number(i)))
+    for (const i in elements) {
+      if (elements[i].type == 'subheading') {
+        results.push(
+          <Typography key={`sh_${i}`} sx={{ mt: 2, mb: 2, fontWeight: 'bold' }}>
+            {elements[i].data.text}
+          </Typography>,
+        )
+      } else {
+        results.push(renderQuestion(elements[i], Number(i)))
       }
     }
     return results
   }
 
-  const renderQuestion = ({ text, type, tooltip, value, choices }: SurveyQuestion, idx: number) => {
+  const renderQuestion = ({ type, data }: SurveyElement, idx: number) => {
     return (
       <Card
         key={idx}
@@ -101,31 +93,31 @@ export default function ConsentForm() {
           boxShadow: '0',
         }}
       >
-        <Typography>{text}</Typography>
-        {tooltip ? (
-          <Tooltip title={<Typography fontSize={13}>{tooltip}</Typography>}>
+        <Typography>{data.text}</Typography>
+        {data.tooltip ? (
+          <Tooltip title={<Typography fontSize={13}>{data.tooltip}</Typography>}>
             <Info />
           </Tooltip>
         ) : (
           <Box width={10} />
         )}
-        {type == 'checkbox' && (
+        {type == 'question-checkbox' && (
           <Checkbox
-            checked={!!formState[idx].value}
+            checked={!!formState[idx].data.value}
             onClick={() =>
               setFormState((state) => {
                 const s = [...state]
-                s[idx].value = !s[idx].value
+                s[idx].data.value = !s[idx].data.value
                 console.log('SETTING FORM STATE', s)
                 return s
               })
             }
           />
         )}
-        {type == 'choices' && (
+        {type == 'question-choices' && (
           <Box sx={{ width: 800 }}>
-            <RadioGroup value={value} row>
-              {choices?.map((val, i) => {
+            <RadioGroup value={data.value} row>
+              {data.choices?.map((val: string, i: number) => {
                 return (
                   <FormControlLabel
                     key={`choice_${idx}_${i}`}
@@ -135,7 +127,7 @@ export default function ConsentForm() {
                     onChange={() => {
                       setFormState((state) => {
                         const s = [...state]
-                        s[idx].value = val
+                        s[idx].data.value = val
                         return s
                       })
                     }}
@@ -167,14 +159,14 @@ export default function ConsentForm() {
             textAlign: 'center',
           }}
         >
-          <Typography variant="h4">{data?.refusal_text.title}</Typography>
-          <Typography sx={{ mt: 3 }}>{data?.refusal_text.text}</Typography>
+          <Typography variant="h4">Are you sure?</Typography>
+          <Typography sx={{ mt: 3 }}>You have not selected a required statement.</Typography>
           <Typography
             sx={{ mt: 3 }}
-          >{`If you choose "${data?.refusal_text.button_text}" an Australian Genomics Genetic Counsellor will contact you to talk about your options. It may take 7 days for the study genetic counsellor to contact you.`}</Typography>
+          >{`If you choose "Proceed", an Australian Genomics Genetic Counsellor will contact you to talk about your options. It may take 7 days for the study genetic counsellor to contact you.`}</Typography>
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
             <Button sx={{ mr: 1 }} variant="outlined">
-              {data?.refusal_text.button_text}
+              Proceed
             </Button>
             <Button variant="contained" onClick={() => setModalOpen(false)}>
               Review Answers
@@ -195,7 +187,7 @@ export default function ConsentForm() {
         />
       </Box>
       <Stepper activeStep={Number(params.step)} sx={{ mt: 6, mb: 4 }}>
-        {Array(data?.total_steps)
+        {Array(data?.data.total_steps)
           .fill(0)
           .map((_, idx) => (
             <Step key={idx}>
@@ -208,9 +200,9 @@ export default function ConsentForm() {
           <CircularProgress />
         ) : (
           <>
-            <Typography variant="h4">{data?.title}</Typography>
-            <Typography sx={{ mt: 3, mb: 3 }}>{data?.text}</Typography>
-            {renderQuestionsAndSubheadings(formState, data?.subheadings || [])}
+            <Typography variant="h4">{data?.data.title}</Typography>
+            <Typography sx={{ mt: 3, mb: 3 }}>{data?.data.text}</Typography>
+            {renderElements(formState)}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
               {currentStep == 0 ? (
                 <Box width={70} />
@@ -220,7 +212,7 @@ export default function ConsentForm() {
                 </Button>
               )}
               <Button variant="contained">Save and Exit</Button>
-              {currentStep + 1 == data?.total_steps ? (
+              {currentStep + 1 == data?.data.total_steps ? (
                 <Box width={70} />
               ) : (
                 <Button onClick={handleNext} variant="contained" color="secondary">

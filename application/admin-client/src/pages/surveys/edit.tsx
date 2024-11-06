@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   Divider,
-  Drawer,
   List,
   ListItem,
   ListItemButton,
@@ -11,13 +10,9 @@ import {
   ListItemText,
   ListSubheader,
   TextField,
-  Toolbar,
-  Typography,
 } from '@mui/material'
-import { Edit } from '@refinedev/mui'
-import { useForm } from '@refinedev/react-hook-form'
-import { SurveyElementType, type SurveyVersion } from '@common/types/survey'
-import { act, useState } from 'react'
+import { SurveyElementType } from '@common/types/survey'
+import { useState } from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { SurveyElementCard, SurveyDropSpace } from '../../components/SurveyElementCard'
@@ -31,6 +26,8 @@ export const SurveyEditor = () => {
     deleteElement,
     moveElement,
     addChoice,
+    deleteChoice,
+    updateChoice,
     updateStepField,
     updateElementField,
   } = useSurveyStore()
@@ -96,7 +93,7 @@ export const SurveyEditor = () => {
           <Divider sx={{ mt: 3, mb: 1 }} />
           <SurveyDropSpace key={`space_${activeStep}_${-1}`} index={-1} />
           {surveyData[activeStep].elements.map((val, idx) => (
-            <>
+            <Box key={`el_${activeStep}_${idx}`}>
               <SurveyElementCard
                 element={val}
                 handleDelete={() => {
@@ -113,13 +110,14 @@ export const SurveyEditor = () => {
                       }
                     : undefined
                 }
+                handleDeleteChoice={(choice) => deleteChoice(activeStep, idx, choice)}
                 handleUpdateField={(field, value) =>
                   updateElementField(activeStep, idx, field, value)
                 }
-                key={`el_${activeStep}_${idx}`}
+                handleUpdateChoice={(choice, value) => updateChoice(activeStep, idx, choice, value)}
               ></SurveyElementCard>
               <SurveyDropSpace key={`space_${activeStep}_${idx}`} index={idx} />
-            </>
+            </Box>
           ))}
           <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 4 }}>
             {Object.entries(elementsLabels).map((val, idx) => (

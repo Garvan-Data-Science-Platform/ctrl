@@ -1,4 +1,4 @@
-export interface GetSurveyStepsResponse {
+export interface GetUserSurveyStepsResponse {
   data: {
     title: string
     tooltip: string
@@ -7,6 +7,6 @@ export interface GetSurveyStepsResponse {
   }[]
 }
 
-export interface GetSurveyStepsRequest {
+export interface GetUserSurveyStepsRequest {
   study_id?: string
 }

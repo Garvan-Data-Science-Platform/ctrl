@@ -7,7 +7,15 @@ import {
   SurveyVideo,
 } from '@common/types/survey'
 import { Add, Close, Delete, DragIndicator } from '@mui/icons-material'
-import { Box, IconButton, InputAdornment, TextField, Typography } from '@mui/material'
+import {
+  Box,
+  Checkbox,
+  FormControlLabel,
+  IconButton,
+  InputAdornment,
+  TextField,
+  Typography,
+} from '@mui/material'
 import { useDrag, useDrop } from 'react-dnd'
 
 /**
@@ -15,10 +23,11 @@ import { useDrag, useDrop } from 'react-dnd'
  */
 interface SurveyElementCardProps {
   element: SurveyElement
-  key: any
   handleDelete: () => void
   handleMove: (dropIndex: number) => void
   handleAddChoice?: () => void
+  handleDeleteChoice?: (choice: number) => void
+  handleUpdateChoice?: (choice: number, value: string) => void
   handleUpdateField: (field: string, value: any) => void
 }
 
@@ -28,10 +37,11 @@ interface DropResult {
 
 export function SurveyElementCard({
   element,
-  key,
   handleDelete,
   handleMove,
   handleAddChoice,
+  handleDeleteChoice,
+  handleUpdateChoice,
   handleUpdateField,
 }: SurveyElementCardProps) {
   const [{ opacity }, dragRef] = useDrag(
@@ -39,7 +49,7 @@ export function SurveyElementCard({
       type: 'CARD',
       end: (item, monitor) => {
         if (monitor.didDrop()) {
-          let result = monitor.getDropResult() as DropResult
+          const result = monitor.getDropResult() as DropResult
           handleMove(result.dropIndex)
         }
       },
@@ -72,6 +82,7 @@ export function SurveyElementCard({
     return (
       <Box sx={{ width: '100%' }}>
         <Typography fontWeight="bold">Checkbox Question</Typography>
+        <FormControlLabel control={<Checkbox defaultChecked />} label="Required" />
         <TextField
           multiline
           fullWidth
@@ -121,16 +132,17 @@ export function SurveyElementCard({
           }}
         />
         <Typography sx={{ mt: 1, fontSize: 15 }}>Choices</Typography>
-        <Box sx={{ mt: 1, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1 }}>
+        <Box sx={{ mt: 1, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1 }}>
           {data.choices.map((val, idx) => (
             <Box key={`choice_${idx}`}>
               <TextField
                 value={val}
+                onChange={(e) => handleUpdateChoice && handleUpdateChoice(idx, e.target.value)}
                 slotProps={{
                   input: {
                     endAdornment: (
                       <InputAdornment position="end">
-                        <IconButton sx={{}}>
+                        <IconButton onClick={() => handleDeleteChoice && handleDeleteChoice(idx)}>
                           <Close />
                         </IconButton>
                       </InputAdornment>
@@ -178,7 +190,6 @@ export function SurveyElementCard({
   }
   return (
     <Box
-      key={key}
       sx={{
         display: 'flex',
         flexDirection: 'row',

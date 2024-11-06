@@ -1,9 +1,4 @@
-import type {
-  SurveyElement,
-  SurveyElementType,
-  SurveyQuestionChoices,
-  SurveyStep,
-} from '@common/types/survey'
+import type { SurveyElement, SurveyElementType, SurveyStep } from '@common/types/survey'
 import { create } from 'zustand'
 import survey from '@common/example_responses/getSurvey.json'
 import { produce } from 'immer'
@@ -16,6 +11,7 @@ interface SurveyState {
   moveElement: (step: number, index: number, destination: number) => void
   addChoice: (step: number, element: number) => void
   deleteChoice: (step: number, element: number, choice: number) => void
+  updateChoice: (step: number, element: number, choice: number, value: string) => void
   updateStepField: (step: number, field: keyof Omit<SurveyStep, 'elements'>, value: string) => void
   updateElementField: (step: number, element: number, field: string, value: any) => void
 }
@@ -58,12 +54,12 @@ export const useSurveyStore = create<SurveyState>((set) => ({
     set(
       produce((state) => {
         if (destination < index - 1) {
-          var a = state.data[step].elements[index]
+          const a = state.data[step].elements[index]
           state.data[step].elements[index] = state.data[step].elements[destination + 1]
           state.data[step].elements[destination + 1] = a
         }
         if (destination > index) {
-          var a = state.data[step].elements[index]
+          const a = state.data[step].elements[index]
           state.data[step].elements[index] = state.data[step].elements[destination]
           state.data[step].elements[destination] = a
         }
@@ -75,7 +71,19 @@ export const useSurveyStore = create<SurveyState>((set) => ({
         state.data[step].elements[element].data.choices.push('')
       }),
     ),
-  deleteChoice: (step: number, element: number, choice: number) => set((state) => state),
+  deleteChoice: (step: number, element: number, choice: number) =>
+    set(
+      produce((state: SurveyState) => {
+        console.log('DELETING', choice)
+        state.data[step].elements[element].data.choices.splice(choice, 1)
+      }),
+    ),
+  updateChoice: (step: number, element: number, choice: number, value: string) =>
+    set(
+      produce((state: SurveyState) => {
+        state.data[step].elements[element].data.choices[choice] = value
+      }),
+    ),
   updateStepField: (step: number, field: keyof Omit<SurveyStep, 'elements'>, value: string) => {
     set(
       produce((state: SurveyState) => {

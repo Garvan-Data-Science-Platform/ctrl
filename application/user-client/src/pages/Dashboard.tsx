@@ -11,7 +11,7 @@ import {
 } from '@mui/material'
 import NavBar from '../components/NavBar'
 import surveySteps from '@common/example_responses/getUserSurveySteps.json'
-import type { GetSurveyStepsResponse } from '@common/types/api/surveys'
+import type { GetUserSurveyStepsResponse } from '@common/types/api/surveys'
 //import { useAppStore } from '../store'
 import { useQuery } from '@tanstack/react-query'
 import CheckCircle from '@mui/icons-material/CheckCircle'
@@ -25,7 +25,7 @@ export default function Dashboard() {
   const { isPending, error, data } = useQuery({
     queryKey: ['consent_forms'],
     //queryFn: () => fetch('/api/user/profile').then((res) => res.json()) as Promise<UserProfile>,
-    queryFn: () => surveySteps as GetSurveyStepsResponse,
+    queryFn: () => surveySteps as GetUserSurveyStepsResponse,
   })
 
   const renderReviewStatus = (status: 'completed' | 'viewed' | 'review_required') => {

@@ -1,21 +1,8 @@
-import {
-  Get,
-  Patch,
-  Post,
-  Delete,
-  Route,
-  Tags,
-  Path,
-  Body,
-  SuccessResponse,
-  Response,
-  Controller,
-  Security,
-} from 'tsoa'
+import { Get, Route, Tags, Path, SuccessResponse, Response, Controller, Security } from 'tsoa'
 import logger from 'common/src/logger'
 import type { GetSurveyVersionsResponse } from 'common/types/api/surveys'
 import { SurveyVersion as SurveyVersionPrisma } from '@prisma/client'
-import { SurveyStep, SurveyVersion } from 'common/types/survey'
+import { SurveyStep } from 'common/types/survey'
 import prisma from '../PrismaClient'
 import { GetSurveyVersionByIdResponse } from 'common/types/api/surveys/getSurveyVersionById'
 import versionsResponse from 'common/example_responses/getSurveyVersions.json'
@@ -36,10 +23,7 @@ export class SurveysController extends Controller {
   @Response('500', 'Internal Server Error')
   @Response('401', 'Unauthorized')
   public async getAllSurveys(): Promise<GetSurveyVersionsResponse> {
-    const surveys: SurveyVersionPrisma[] = await this.surveyRepo.findMany({})
-    const versions = surveys.map((val) => {
-      return { id: val.id, data: [] }
-    })
+    //const surveys: SurveyVersionPrisma[] = await this.surveyRepo.findMany({})
     const responseData = versionsResponse //{ data: versions }
     logger.info({ ...responseData })
     return responseData
