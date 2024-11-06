@@ -16,7 +16,7 @@ CREATE TABLE "ParticipantProfile" (
     "dob" DATE NOT NULL,
     "participantID" TEXT NOT NULL,
     "mobile" TEXT NOT NULL,
-    "addressLine" TEXT,
+    "addressLine" TEXT NOT NULL,
     "suburb" TEXT,
     "state" "StateTerritory",
     "postcode" TEXT,
@@ -25,6 +25,17 @@ CREATE TABLE "ParticipantProfile" (
     "userID" INTEGER NOT NULL,
 
     CONSTRAINT "ParticipantProfile_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "onBehalf" (
+    "id" SERIAL NOT NULL,
+    "firstName" TEXT NOT NULL,
+    "lastName" TEXT NOT NULL,
+    "dob" DATE NOT NULL,
+    "participantProfileId" INTEGER NOT NULL,
+
+    CONSTRAINT "onBehalf_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -45,10 +56,16 @@ CREATE TABLE "AlternativeContact" (
 CREATE UNIQUE INDEX "ParticipantProfile_userID_key" ON "ParticipantProfile"("userID");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "onBehalf_participantProfileId_key" ON "onBehalf"("participantProfileId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "AlternativeContact_participantProfileId_key" ON "AlternativeContact"("participantProfileId");
 
 -- AddForeignKey
 ALTER TABLE "ParticipantProfile" ADD CONSTRAINT "ParticipantProfile_userID_fkey" FOREIGN KEY ("userID") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "onBehalf" ADD CONSTRAINT "onBehalf_participantProfileId_fkey" FOREIGN KEY ("participantProfileId") REFERENCES "ParticipantProfile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "AlternativeContact" ADD CONSTRAINT "AlternativeContact_participantProfileId_fkey" FOREIGN KEY ("participantProfileId") REFERENCES "ParticipantProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
