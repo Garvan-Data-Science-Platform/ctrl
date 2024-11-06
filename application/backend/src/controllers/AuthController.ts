@@ -89,9 +89,10 @@ export class AuthController extends Controller {
     const { nextOfKin, studyID, onBehalfOf, ...noNextOfKinProfileData } = profileData
 
     let onBehalfOfCreateData
+    let onBehalfOfDOB
     if (onBehalfOf) {
-      onBehalfOf.dob = new Date(onBehalfOf.dob)
-      onBehalfOfCreateData = { onBehalfOf: { create: { onBehalfOf } } }
+      onBehalfOfDOB = new Date(onBehalfOf.dob)
+      onBehalfOfCreateData = { onBehalfOf: { create: { onBehalfOf, dob: onBehalfOfDOB } } }
     }
 
     let nextOfKinCreateData
