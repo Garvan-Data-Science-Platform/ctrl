@@ -1,5 +1,5 @@
-export interface GetSurveyStepsResponse {
-  steps: {
+export interface GetUserSurveyStepsResponse {
+  data: {
     title: string
     tooltip: string
     status: 'completed' | 'review_required' | 'viewed' // Viewed means there were no questions, just a video
@@ -7,6 +7,6 @@ export interface GetSurveyStepsResponse {
   }[]
 }
 
-export interface GetSurveyStepsRequest {
+export interface GetUserSurveyStepsRequest {
   study_id?: string
 }

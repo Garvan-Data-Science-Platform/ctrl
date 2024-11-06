@@ -1,4 +1,5 @@
-import type { GetSurveyStepsResponse } from './getSurveySteps'
-import type { GetSurveyStepResponse } from './getSurveyStep'
+import type { GetUserSurveyStepsResponse } from './getUserSurveySteps'
+import type { GetUserSurveyStepResponse } from './getUserSurveyStep'
+import type { GetSurveyVersionsResponse } from './getSurveyVersions'
 
-export { GetSurveyStepsResponse, GetSurveyStepResponse }
+export { GetUserSurveyStepsResponse, GetUserSurveyStepResponse, GetSurveyVersionsResponse }

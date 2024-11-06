@@ -1,4 +1,4 @@
-import { Refine, GitHubBanner, Authenticated } from '@refinedev/core'
+import { Refine, Authenticated } from '@refinedev/core'
 import { DevtoolsPanel, DevtoolsProvider } from '@refinedev/devtools'
 import { RefineKbar, RefineKbarProvider } from '@refinedev/kbar'
 
@@ -20,7 +20,7 @@ import routerBindings, {
   DocumentTitleHandler,
 } from '@refinedev/react-router-v6'
 import { UserList, UserCreate, UserEdit, UserShow } from './pages/users'
-import { CategoryList, CategoryCreate, CategoryEdit, CategoryShow } from './pages/categories'
+import { CategoryList, CategoryShow, SurveyEditor } from './pages/surveys'
 import { ColorModeContextProvider } from './contexts/color-mode'
 import { Header } from './components/header'
 import { Login } from './pages/login'
@@ -33,7 +33,6 @@ const API_URL = 'http://localhost:5000'
 function App() {
   return (
     <BrowserRouter>
-      <GitHubBanner />
       <RefineKbarProvider>
         <ColorModeContextProvider>
           <CssBaseline />
@@ -57,11 +56,10 @@ function App() {
                     },
                   },
                   {
-                    name: 'organisations',
-                    list: '/organisations',
-                    create: '/organisations/create',
-                    edit: '/organisations/edit/:id',
-                    show: '/organisations/:id',
+                    name: 'surveys',
+                    list: '/surveys',
+                    edit: '/surveys/edit',
+                    show: '/surveys/:id',
                     meta: {
                       canDelete: true,
                     },
@@ -94,11 +92,10 @@ function App() {
                       <Route path="update/:id" element={<UserEdit />} />
                       <Route path=":id" element={<UserShow />} />
                     </Route>
-                    <Route path="/organisations">
+                    <Route path="/surveys">
                       <Route index element={<CategoryList />} />
-                      <Route path="create" element={<CategoryCreate />} />
-                      <Route path="edit/:id" element={<CategoryEdit />} />
-                      <Route path="show/:id" element={<CategoryShow />} />
+                      <Route path="edit" element={<SurveyEditor />} />
+                      <Route path=":id" element={<CategoryShow />} />
                     </Route>
                     <Route path="*" element={<ErrorComponent />} />
                   </Route>

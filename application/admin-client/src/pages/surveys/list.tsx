@@ -3,21 +3,18 @@ import { DeleteButton, EditButton, List, ShowButton, useDataGrid } from '@refine
 import React from 'react'
 
 export const CategoryList = () => {
-  const { dataGridProps } = useDataGrid({})
+  const { dataGridProps } = useDataGrid({
+    sorters: { initial: [{ field: 'version_number', order: 'asc' }] },
+  })
 
   const columns = React.useMemo<GridColDef[]>(
     () => [
       {
-        field: 'id',
-        headerName: 'ID',
-        type: 'number',
-        minWidth: 50,
-      },
-      {
-        field: 'title',
+        field: 'version_number',
         flex: 1,
-        headerName: 'Title',
+        headerName: 'Version',
         minWidth: 200,
+        valueGetter: (val) => val.value || 'Current Draft',
       },
       {
         field: 'actions',

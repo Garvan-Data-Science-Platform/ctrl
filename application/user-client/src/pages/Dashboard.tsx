@@ -10,8 +10,8 @@ import {
   Typography,
 } from '@mui/material'
 import NavBar from '../components/NavBar'
-import surveySteps from '@common/example_responses/getSurveySteps.json'
-import type { GetSurveyStepsResponse } from '@common/types/api/surveys'
+import surveySteps from '@common/example_responses/getUserSurveySteps.json'
+import type { GetUserSurveyStepsResponse } from '@common/types/api/surveys'
 //import { useAppStore } from '../store'
 import { useQuery } from '@tanstack/react-query'
 import CheckCircle from '@mui/icons-material/CheckCircle'
@@ -25,7 +25,7 @@ export default function Dashboard() {
   const { isPending, error, data } = useQuery({
     queryKey: ['consent_forms'],
     //queryFn: () => fetch('/api/user/profile').then((res) => res.json()) as Promise<UserProfile>,
-    queryFn: () => surveySteps as GetSurveyStepsResponse,
+    queryFn: () => surveySteps as GetUserSurveyStepsResponse,
   })
 
   const renderReviewStatus = (status: 'completed' | 'viewed' | 'review_required') => {
@@ -75,7 +75,7 @@ export default function Dashboard() {
         <Typography variant="h3" textAlign="left" sx={{ mt: 3, mb: 3 }}>
           Welcome FirstName
         </Typography>
-        {data?.steps.map((val, idx) => (
+        {data?.data.map((val, idx) => (
           <Card
             key={idx}
             sx={{
