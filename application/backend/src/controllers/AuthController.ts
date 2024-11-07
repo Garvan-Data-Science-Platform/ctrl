@@ -3,6 +3,8 @@ import type {
   RegisterResponse,
   LoginRequest,
   LoginResponse,
+  RegisterParticipantRequest,
+  RegisterParticipantResponse,
 } from 'common/types/api/auth'
 import { Route, Tags, Controller, Body, Post, SuccessResponse, Response, ValidateError } from 'tsoa'
 import prisma from '../PrismaClient'
@@ -31,7 +33,7 @@ export class AuthController extends Controller {
    */
   @Post('/register')
   @SuccessResponse('201', 'User Created')
-  public async register(@Body() bodyRequest: RegisterRequest): Promise<RegisterResponse> {
+  public async registerUser(@Body() bodyRequest: RegisterRequest): Promise<RegisterResponse> {
     const { password, ...userDetails } = bodyRequest
 
     const { isValid, fields } = await checkPasswordStrength(password)
@@ -51,7 +53,77 @@ export class AuthController extends Controller {
     const token = await generateToken(insertedUser.id)
 
     const responseData = {
-      message: `Created user with ID: ${insertedUser.id}`,
+      message: `Registered user with ID: ${insertedUser.id}`,
+      token,
+    }
+
+    logger.info({ ...responseData })
+    return responseData
+  }
+
+  /**
+   * registerParticipant
+   *
+   * @summary Register a participant
+   */
+  @Post('/register/participant')
+  @SuccessResponse('201', 'Participant Created')
+  public async registerParticipant(
+    @Body() bodyRequest: RegisterParticipantRequest,
+  ): Promise<RegisterParticipantResponse> {
+    const { password, ...participantData } = bodyRequest
+
+    // Check Password
+    const { isValid, fields } = await checkPasswordStrength(password)
+
+    if (!isValid) {
+      throw new ValidateError(fields, 'Password does not meet strength requirements')
+    }
+
+    const hashedPassword = await hashPassword(password)
+
+    // Pull out data from request
+    const { firstName, middleName, lastName, email, dob, ...profileData } = participantData
+    const userDetails = { firstName, middleName, lastName, email }
+
+    const { nextOfKin, studyID, onBehalfOf, ...noNextOfKinProfileData } = profileData
+
+    let onBehalfOfCreateData
+    let onBehalfOfDOB
+    if (onBehalfOf) {
+      onBehalfOfDOB = new Date(onBehalfOf.dob)
+      onBehalfOfCreateData = { onBehalfOf: { create: { onBehalfOf, dob: onBehalfOfDOB } } }
+    }
+
+    let nextOfKinCreateData
+    if (nextOfKin) {
+      nextOfKinCreateData = { nextOfKin: { create: { nextOfKin } } }
+    }
+
+    console.log(studyID)
+
+    const data = {
+      ...userDetails,
+      role: 'participant', // TODO: This should be an enum
+      password: hashedPassword,
+      profile: {
+        create: {
+          dob: new Date(dob),
+          ...noNextOfKinProfileData,
+          onBehalfOfCreateData,
+          nextOfKinCreateData,
+        },
+      },
+    }
+
+    const insertedUser = await this.userRepo.create({
+      data,
+    })
+
+    const token = await generateToken(insertedUser.id)
+
+    const responseData = {
+      message: `Created participant with user ID: ${insertedUser.id}`,
       token,
     }
 

@@ -3,12 +3,15 @@ import { Api } from '../Api'
 import type {
   LoginRequest,
   LoginResponse,
+  RegisterParticipantRequest,
+  RegisterParticipantResponse,
   RegisterRequest,
   RegisterResponse,
 } from 'common/types/api/auth'
 import type { GetAllUsersResponse } from 'common/types/api/users'
 import prisma from '../PrismaClient'
 import { resetDB } from '../../tests/TestHelpers'
+import { ContactMethod, StateTerritory } from '../../../common/types/api/users/ParticipantProfile'
 
 const api = new Api()
 const app = api.app
@@ -51,7 +54,7 @@ describe('AuthController', () => {
 
       const registerBody: RegisterResponse = registerResponse.body
 
-      expect(registerBody.message).toMatch(/Created user with ID: \d+/)
+      expect(registerBody.message).toMatch(/Registered user with ID: \d+/)
       expect(registerBody.token).not.toBeNull()
 
       // Add token to protected route request
@@ -82,7 +85,7 @@ describe('AuthController', () => {
       const response = await request(app).post('/auth/register').send(registerRequest)
       expect(response.status).toEqual(201)
       const body: RegisterResponse = response.body
-      expect(body.message).toMatch(/Created user with ID: \d+/)
+      expect(body.message).toMatch(/Registered user with ID: \d+/)
       expect(body.token).not.toBeNull()
 
       // Check if user is now registered
@@ -207,6 +210,114 @@ describe('AuthController', () => {
       expect(body.details).toEqual({
         Uppercase: { message: 'Password must contain at least one uppercase letter' },
         Number: { message: 'Password must contain at least one number' },
+      })
+    })
+  })
+
+  describe('POST /auth/register/participant', () => {
+    it('should register a new user returning a token', async () => {
+      const registerParticipantRequest: RegisterParticipantRequest = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'johndoe@example.com',
+        password: 'johnDoesP@ssword123',
+        mobile: '+61477777777',
+        addressLine: '123 Some Street',
+        suburb: 'Sydney',
+        postcode: '2000',
+        state: StateTerritory.NSW,
+        preferredContact: ContactMethod.MOBILE,
+        dob: '1990-01-01',
+        studyID: 'STUDY123',
+        participantID: 'PARTICIPANT123',
+        isParentOrGuardian: true,
+      }
+
+      const participantResponse = await request(app)
+        .post('/auth/register/participant')
+        .send(registerParticipantRequest)
+
+      expect(participantResponse.status).toEqual(201)
+
+      const participantBody: RegisterParticipantResponse = participantResponse.body
+      expect(participantBody.message).toMatch(/Created participant with user ID: \d+/)
+      expect(participantBody.token).not.toBeNull()
+    })
+    it('should fail validation if the password is not strong', async () => {
+      const registerParticipantRequest: RegisterParticipantRequest = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'johndoe@example.com',
+        password: 'weakpassword',
+        mobile: '+61477777777',
+        addressLine: '123 Some Street',
+        suburb: 'Sydney',
+        postcode: '2000',
+        state: StateTerritory.NSW,
+        preferredContact: ContactMethod.MOBILE,
+        dob: '1990-01-01',
+        studyID: 'STUDY123',
+        participantID: 'PARTICIPANT123',
+        isParentOrGuardian: true,
+      }
+
+      const registerParticipantResponse = await request(app)
+        .post('/auth/register/participant')
+        .send(registerParticipantRequest)
+      expect(registerParticipantResponse.status).toEqual(422)
+
+      const registerParticipantBody = registerParticipantResponse.body
+      expect(registerParticipantBody.message).toEqual('Validation Failed')
+      expect(registerParticipantBody.token).toBe(undefined)
+      expect(registerParticipantBody.details).toEqual({
+        Uppercase: { message: 'Password must contain at least one uppercase letter' },
+        Number: { message: 'Password must contain at least one number' },
+      })
+    })
+
+    it('should fail validation if provided with empty values', async () => {
+      const registerParticipantRequest: RegisterParticipantRequest = {
+        firstName: 'John',
+        lastName: '',
+        email: 'johndoe@example.com',
+        password: 'GooD02Password',
+        mobile: '12341234',
+        addressLine: '123 Some Street',
+        suburb: 'Sydney',
+        postcode: '2000',
+        state: StateTerritory.NSW,
+        preferredContact: ContactMethod.MOBILE,
+        dob: '1990-01-01',
+        studyID: '',
+        participantID: '',
+        isParentOrGuardian: true,
+      }
+
+      const registerParticipantResponse = await request(app)
+        .post('/auth/register/participant')
+        .send(registerParticipantRequest)
+      expect(registerParticipantResponse.status).toEqual(422)
+
+      const registerParticipantBody = registerParticipantResponse.body
+      expect(registerParticipantBody.message).toEqual('Validation Failed')
+      expect(registerParticipantBody.token).toBe(undefined)
+      expect(registerParticipantBody.details).toEqual({
+        'bodyRequest.lastName': {
+          message: 'minLength 1',
+          value: '',
+        },
+        'bodyRequest.participantID': {
+          message: 'minLength 1',
+          value: '',
+        },
+        'bodyRequest.mobile': {
+          message: 'please provide valid phone number',
+          value: '12341234',
+        },
+        'bodyRequest.studyID': {
+          message: 'minLength 1',
+          value: '',
+        },
       })
     })
   })

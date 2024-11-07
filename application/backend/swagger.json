@@ -101,6 +101,9 @@
           "lastName": {
             "type": "string"
           },
+          "middleName": {
+            "type": "string"
+          },
           "firstName": {
             "type": "string"
           },
@@ -116,6 +119,7 @@
           "password",
           "email",
           "lastName",
+          "middleName",
           "firstName",
           "id"
         ],
@@ -126,7 +130,7 @@
           "message": {
             "type": "string"
           },
-          "users": {
+          "data": {
             "items": {
               "$ref": "#/components/schemas/User"
             },
@@ -135,7 +139,7 @@
         },
         "required": [
           "message",
-          "users"
+          "data"
         ],
         "type": "object",
         "additionalProperties": false
@@ -145,13 +149,13 @@
           "message": {
             "type": "string"
           },
-          "user": {
+          "data": {
             "$ref": "#/components/schemas/User"
           }
         },
         "required": [
           "message",
-          "user"
+          "data"
         ],
         "type": "object",
         "additionalProperties": false
@@ -487,6 +491,10 @@
             "type": "string",
             "minLength": 1
           },
+          "middleName": {
+            "type": "string",
+            "minLength": 1
+          },
           "lastName": {
             "type": "string",
             "minLength": 1
@@ -518,6 +526,214 @@
           "email": "john.doe@email.com",
           "password": "Password123",
           "role": "User"
+        }
+      },
+      "RegisterParticipantResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message",
+          "token"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "ContactMethod": {
+        "enum": [
+          "MOBILE",
+          "EMAIL",
+          "MAIL"
+        ],
+        "type": "string"
+      },
+      "StateTerritory": {
+        "enum": [
+          "ACT",
+          "NSW",
+          "NT",
+          "QLD",
+          "SA",
+          "TAS",
+          "VIC",
+          "WA"
+        ],
+        "type": "string"
+      },
+      "RelationshipType": {
+        "enum": [
+          "PARENT",
+          "GUARDIAN",
+          "CHILD",
+          "OTHER"
+        ],
+        "type": "string"
+      },
+      "AlternativeContact": {
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "middleName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "mobile": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "relationship": {
+            "$ref": "#/components/schemas/RelationshipType"
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "email",
+          "relationship"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "OnBehalf": {
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "dob": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "dob"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "RegisterParticipantRequest": {
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "middleName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "lastName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "email": {
+            "type": "string",
+            "pattern": "^(.+)@(.+)$"
+          },
+          "mobile": {
+            "type": "string",
+            "pattern": "^(\\+\\d{1,2}\\s?)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$"
+          },
+          "preferredContact": {
+            "$ref": "#/components/schemas/ContactMethod"
+          },
+          "addressLine": {
+            "type": "string",
+            "minLength": 1
+          },
+          "suburb": {
+            "type": "string",
+            "minLength": 1
+          },
+          "postcode": {
+            "type": "string",
+            "minLength": 1
+          },
+          "state": {
+            "$ref": "#/components/schemas/StateTerritory"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8
+          },
+          "dob": {
+            "type": "string"
+          },
+          "studyID": {
+            "type": "string",
+            "minLength": 1
+          },
+          "participantID": {
+            "type": "string",
+            "minLength": 1
+          },
+          "isParentOrGuardian": {
+            "type": "boolean"
+          },
+          "nextOfKin": {
+            "$ref": "#/components/schemas/AlternativeContact"
+          },
+          "onBehalfOf": {
+            "$ref": "#/components/schemas/OnBehalf"
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "email",
+          "mobile",
+          "preferredContact",
+          "addressLine",
+          "suburb",
+          "postcode",
+          "state",
+          "password",
+          "dob",
+          "studyID",
+          "participantID",
+          "isParentOrGuardian"
+        ],
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "firstName": "John",
+          "middleName": "James",
+          "lastName": "Doe",
+          "email": "john.doe@email.com",
+          "password": "Password123",
+          "dob": "2000-05-21",
+          "participantID": "P12345678",
+          "studyID": "S12345678",
+          "mobile": "0412341234",
+          "addressLine": "123 Sydney Street, Sydney NSW 2000",
+          "isParentOrGuardian": false,
+          "preferredContact": "MOBILE",
+          "nextOfKin": {
+            "firstName": "Jeremy",
+            "middleName": "Jimmy",
+            "lastName": "Doe",
+            "mobile": "0412341432",
+            "email": "jeremydoe@email.com",
+            "relationship": "PARENT"
+          },
+          "onBehalfOf": {
+            "firstName": "Timothy",
+            "lastName": "Doe",
+            "dob": "1963-05-27"
+          }
         }
       },
       "LoginResponse": {
@@ -1526,7 +1742,7 @@
     },
     "/auth/register": {
       "post": {
-        "operationId": "Register",
+        "operationId": "RegisterUser",
         "responses": {
           "201": {
             "description": "User Created",
@@ -1572,6 +1788,60 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/register/participant": {
+      "post": {
+        "operationId": "RegisterParticipant",
+        "responses": {
+          "201": {
+            "description": "Participant Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterParticipantResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "registerParticipant",
+        "summary": "Register a participant",
+        "tags": [
+          "Auth"
+        ],
+        "security": [],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterParticipantRequest"
               }
             }
           }
