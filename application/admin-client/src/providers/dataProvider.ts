@@ -2,7 +2,7 @@ import type { DataProvider } from '@refinedev/core'
 import axios from 'axios'
 import { TOKEN_KEY } from './authProvider'
 
-const axiosInstance = axios.create()
+export const axiosInstance = axios.create()
 
 axiosInstance.interceptors.request.use(
   async (config) => {

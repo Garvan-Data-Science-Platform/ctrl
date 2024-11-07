@@ -82,10 +82,16 @@ model Organisation {
   updatedAt DateTime @updatedAt
 }
 
+enum SurveyVersionStatus {
+  DRAFT
+  PUBLISHED
+}
+
 model SurveyVersion {
   id            Int      @id @default(autoincrement())
-  versionNumber Int
+  versionNumber Int      @default(autoincrement())
   data          Json
+  status        SurveyVersionStatus @default(DRAFT)
   surveyAnsers  SurveyAnswers[]
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

@@ -1,10 +1,10 @@
 import type { SurveyElement, SurveyElementType, SurveyStep } from '@common/types/survey'
 import { create } from 'zustand'
-import survey from '@common/example_responses/getSurvey.json'
 import { produce } from 'immer'
 
 interface SurveyState {
   data: SurveyStep[]
+  setData: (data: SurveyStep[]) => void
   addStep: () => void
   addElement: (type: SurveyElementType, step: number) => void
   deleteElement: (step: number, index: number) => void
@@ -28,7 +28,13 @@ const defaultElementData: DefaultElementData = {
 }
 
 export const useSurveyStore = create<SurveyState>((set) => ({
-  data: survey.data as SurveyStep[],
+  data: [],
+  setData: (data: SurveyStep[]) =>
+    set(
+      produce((state) => {
+        state.data = data
+      }),
+    ),
   addStep: () =>
     set(
       produce((state) => {

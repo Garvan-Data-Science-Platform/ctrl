@@ -28,7 +28,7 @@ import { Register } from './pages/register'
 import { ForgotPassword } from './pages/forgotPassword'
 import { authProvider } from './providers/authProvider'
 
-const API_URL = 'http://localhost:5000'
+export const API_URL = 'http://localhost:5000'
 
 function App() {
   return (
@@ -58,7 +58,7 @@ function App() {
                   {
                     name: 'surveys',
                     list: '/surveys',
-                    edit: '/surveys/edit',
+                    edit: '/surveys/edit/:id',
                     show: '/surveys/:id',
                     meta: {
                       canDelete: true,
@@ -94,7 +94,7 @@ function App() {
                     </Route>
                     <Route path="/surveys">
                       <Route index element={<CategoryList />} />
-                      <Route path="edit" element={<SurveyEditor />} />
+                      <Route path="edit/:id" element={<SurveyEditor />} />
                       <Route path=":id" element={<CategoryShow />} />
                     </Route>
                     <Route path="*" element={<ErrorComponent />} />

@@ -82,7 +82,15 @@ export function SurveyElementCard({
     return (
       <Box sx={{ width: '100%' }}>
         <Typography fontWeight="bold">Checkbox Question</Typography>
-        <FormControlLabel control={<Checkbox defaultChecked />} label="Required" />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={data.required}
+              onChange={() => handleUpdateField('required', !data.required)}
+            />
+          }
+          label="Mandatory"
+        />
         <TextField
           multiline
           fullWidth
