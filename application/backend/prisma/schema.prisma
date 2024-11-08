@@ -37,6 +37,7 @@ model ParticipantProfile {
   preferredContact   ContactMethod
   userID             Int                 @unique
   user               User                @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  studies            StudyParticipant[]
 }
 
 model OnBehalf {
@@ -92,28 +93,44 @@ model Organisation {
   updatedAt DateTime @updatedAt
 }
 
+model Study {
+  id           Int                @id @default(autoincrement())
+  participants StudyParticipant[]
+}
+
 enum SurveyVersionStatus {
   DRAFT
   PUBLISHED
 }
 
 model SurveyVersion {
-  id            Int      @id @default(autoincrement())
-  versionNumber Int      @default(autoincrement())
-  data          Json
-  status        SurveyVersionStatus @default(DRAFT)
-  surveyAnsers  SurveyAnswers[]
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                Int                 @id @default(autoincrement())
+  versionNumber     Int                 @default(autoincrement())
+  data              Json
+  status            SurveyVersionStatus @default(DRAFT)
+  surveyAnsers      SurveyAnswers[]
+  studyParticipants StudyParticipant[]
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
 }
 
 model SurveyAnswers {
-  id            Int      @id @default(autoincrement())
-  version       SurveyVersion @relation(fields: [versionId], references: [id])
-  versionId     Int
-  user          User @relation(fields: [userId], references: [id])
-  userId        Int
-  data          Json
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id        Int           @id @default(autoincrement())
+  version   SurveyVersion @relation(fields: [versionId], references: [id])
+  versionId Int
+  user      User          @relation(fields: [userId], references: [id])
+  userId    Int
+  data      Json
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model StudyParticipant {
+  id                 Int                @id @default(autoincrement())
+  study              Study              @relation(fields: [studyId], references: [id])
+  studyId            Int @default(1)
+  version            SurveyVersion      @relation(fields: [versionId], references: [id])
+  versionId          Int
+  participantProfile ParticipantProfile @relation(fields: [profileId], references: [id])
+  profileId          Int
 }

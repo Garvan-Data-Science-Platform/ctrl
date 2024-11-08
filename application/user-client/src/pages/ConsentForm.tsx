@@ -20,11 +20,12 @@ import {
 import { useNavigate, useParams } from 'react-router-dom'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { GetUserSurveyStepResponse } from '@common/types/api/surveys'
-import surveyStep from '@common/example_responses/getUserSurveyStep.json'
+import { apiClient } from '../apiClient'
 import { Info } from '@mui/icons-material'
 
 import { useEffect, useState } from 'react'
 import { SurveyElement } from '@common/types/survey'
+import { useAuth } from '../auth'
 
 export default function ConsentForm() {
   const nav = useNavigate()
@@ -35,18 +36,29 @@ export default function ConsentForm() {
   const [formState, setFormState] = useState<SurveyElement[]>([])
   const [modalOpen, setModalOpen] = useState(false)
 
+  const { token } = useAuth()
+
   const { isPending, data } = useQuery({
     queryKey: ['form_step', currentStep],
     //queryFn: () => fetch('/api/user/profile').then((res) => res.json()) as Promise<UserProfile>,
-    queryFn: () => {
-      return surveyStep as GetUserSurveyStepResponse
+    queryFn: async () => {
+      try {
+        let surveyStep = (await apiClient.get(`/surveys/step/1/${currentStep}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })) as GetUserSurveyStepResponse
+        return surveyStep.data
+      } catch (error: any) {
+        if (error.response?.status == 401) {
+          nav('/login')
+        }
+      }
     },
     placeholderData: keepPreviousData,
   })
 
   const handleNext = () => {
-    for (const i in data?.data.elements || []) {
-      if (data?.data.elements[i].data.required && !data?.data.elements[i].data.value) {
+    for (const i in data?.elements || []) {
+      if (data?.elements[i].data.required && !data?.elements[i].data.value) {
         setModalOpen(true)
         return
       }
@@ -60,7 +72,8 @@ export default function ConsentForm() {
   }
 
   useEffect(() => {
-    setFormState(data?.data.elements || [])
+    console.log('GOT DATA', data)
+    setFormState(data?.elements || [])
   }, [data])
 
   const renderElements = (elements: SurveyElement[]) => {

@@ -15,6 +15,7 @@ import {
 import logger from 'common/src/logger'
 import type {
   GetSurveyVersionsResponse,
+  GetUserSurveyStepResponse,
   UpdateSurveyAnswersRequest,
   UpdateSurveyAnswersResponse,
   UpdateSurveyRequest,
@@ -26,11 +27,14 @@ import {
   SurveyStep,
   UserSurveyStepState,
   SurveyStepStatus,
+  SurveyElement,
+  SurveyStepAnswerArray,
 } from 'common/types/survey'
 import prisma from '../PrismaClient'
 import { GetSurveyVersionByIdResponse } from 'common/types/api/surveys/getSurveyVersionById'
 import { validateAnswers } from 'utils/validateSurveyAnswers'
 import { createEmptyAnswers } from 'utils/createEmptyAnswers'
+import { populateSurveyStepAnswers } from 'utils/populateSurveyStepAnswers'
 
 @Route('surveys')
 @Tags('Surveys')
@@ -38,6 +42,7 @@ import { createEmptyAnswers } from 'utils/createEmptyAnswers'
 export class SurveysController extends Controller {
   surveyRepo = prisma.surveyVersion
   answersRepo = prisma.surveyAnswers
+  spRepo = prisma.studyParticipant
 
   /**
    * Get all Surveys
@@ -86,6 +91,45 @@ export class SurveysController extends Controller {
     }
     logger.info({ ...responseData })
     return responseData
+  }
+
+  /**
+   * Update survey answers
+   *
+   * @summary Update a Survey
+   */
+  @Get('/step/:study/:step')
+  @SuccessResponse('200', 'OK')
+  @Response('500', 'Internal Server Error')
+  @Response('404', 'Not Found')
+  @Response('401', 'Unauthorized')
+  public async getUserSurveyStep(
+    @Request() request: any,
+    @Path() study: number,
+    @Path() step: number,
+  ): Promise<GetUserSurveyStepResponse> {
+    const studyParticipant = await this.spRepo.findFirstOrThrow({
+      where: { studyId: study, participantProfile: { userID: request.user.userId } },
+    })
+
+    const surveyVersionId = studyParticipant.versionId
+
+    const survey = await this.surveyRepo.findUniqueOrThrow({ where: { id: surveyVersionId } })
+
+    var currentAnswers = await this.answersRepo.findFirst({
+      where: { versionId: surveyVersionId, userId: request.user.userId },
+    })
+
+    let stepData = survey.data as unknown as SurveyStep[]
+
+    if (currentAnswers) {
+      stepData[step] = populateSurveyStepAnswers(
+        stepData[step],
+        currentAnswers.data as SurveyStepAnswerArray,
+      )
+    }
+
+    return { data: { ...stepData[step], current_step: step, total_steps: stepData.length } }
   }
 
   /**
