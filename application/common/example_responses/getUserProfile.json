@@ -1,20 +1,28 @@
 {
-  "firstName": "John",
-  "lastName": "Smith",
-  "dob": "1980-01-01",
-  "participantID": "abc123",
-  "email": "test@example.com",
-  "mobile": "0412345678",
-  "addressLine": "5 Smith St",
-  "suburb": "Smithtown",
-  "state": "vic",
-  "postcode": "1234",
-  "preferredContact": "mobile",
-  "isParentOrGuardian": true,
-  "onBehalfOf": {
-    "firstName": "Jenny",
-    "lastName": "Smith",
-    "phone": "041223545648",
-    "dob": "1980-01-01"
+  "message": "",
+  "data": {
+    "id": 1,
+    "dob": "1980-01-01",
+    "participantID": "abc123",
+    "email": "test@example.com",
+    "mobile": "0412345678",
+    "addressLine": "5 Smith St",
+    "suburb": "Smithtown",
+    "state": "vic",
+    "postcode": "1234",
+    "preferredContact": "mobile",
+    "isParentOrGuardian": true,
+    "onBehalfOf": {
+      "firstName": "Jenny",
+      "lastName": "Smith",
+      "phone": "041223545648",
+      "dob": "1980-01-01"
+    },
+    "userID": "4",
+    "user": {
+      "firstName": "John",
+      "lastName": "Smith",
+      "email": "test@example.com"
+    }
   }
 }

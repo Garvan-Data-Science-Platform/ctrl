@@ -31,8 +31,8 @@ import {
 } from 'common/types/survey'
 import prisma from '../PrismaClient'
 import { GetSurveyVersionByIdResponse } from 'common/types/api/surveys/getSurveyVersionById'
-import { validateAnswers } from 'utils/validateSurveyAnswers'
-import { createEmptyAnswers } from 'utils/createEmptyAnswers'
+import { validateAnswers } from '../utils/validateSurveyAnswers'
+import { createEmptyAnswers } from '../utils/createEmptyAnswers'
 
 @Route('surveys')
 @Tags('Surveys')

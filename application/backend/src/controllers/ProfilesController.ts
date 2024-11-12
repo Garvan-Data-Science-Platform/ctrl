@@ -1,4 +1,3 @@
-import { ParticipantProfile } from '@prisma/client'
 import { getUserIdFromToken } from '../authentication'
 import logger from 'common/src/logger'
 import prisma from '../PrismaClient'
@@ -54,7 +53,8 @@ export class ProfilesController extends Controller {
 
     const userID: number = getUserIdFromToken(token)
 
-    const profile: ParticipantProfile | null = await this.participantProfileRepo.findUnique({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const data = await this.participantProfileRepo.findUnique({
       where: { userID },
       include: {
         user: {
@@ -63,15 +63,18 @@ export class ProfilesController extends Controller {
       },
     })
 
-    if (!profile) {
+    if (!data) {
       const errorMessage: string = `Participant Profile with userID: ${userID} not found`
       logger.error({ errorMessage })
       throw new NotFoundError(errorMessage)
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { user, ...profile }: any = data
+
     const responseData: GetParticipantProfileByIDResponse = {
       message: `Got Participant Profile with userID: ${userID}`,
-      data: profile,
+      data: { ...profile, user },
     }
     logger.info({ ...responseData })
     return responseData
@@ -88,7 +91,7 @@ export class ProfilesController extends Controller {
   public async getParticipantProfileByID(
     @Path() userID: number,
   ): Promise<GetParticipantProfileByIDResponse> {
-    const profile: ParticipantProfile | null = await this.participantProfileRepo.findUnique({
+    const data = await this.participantProfileRepo.findUnique({
       where: { userID },
       include: {
         user: {
@@ -97,15 +100,18 @@ export class ProfilesController extends Controller {
       },
     })
 
-    if (!profile) {
+    if (!data) {
       const errorMessage: string = `Participant Profile with userID: ${userID} not found`
       logger.error({ errorMessage })
       throw new NotFoundError(errorMessage)
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { user, ...profile }: any = data
+
     const responseData: GetParticipantProfileByIDResponse = {
       message: `Got Participant Profile with userID: ${userID}`,
-      data: profile,
+      data: { ...profile, user },
     }
     logger.info({ ...responseData })
     return responseData

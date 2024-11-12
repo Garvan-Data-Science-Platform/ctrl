@@ -290,7 +290,7 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "message": {"dataType":"string","required":true},
-            "data": {"ref":"ParticipantProfile","required":true},
+            "data": {"dataType":"intersection","subSchemas":[{"ref":"ParticipantProfile"},{"dataType":"nestedObjectLiteral","nestedProperties":{"user":{"dataType":"nestedObjectLiteral","nestedProperties":{"email":{"dataType":"string","required":true},"lastName":{"dataType":"string","required":true},"middleName":{"dataType":"string"},"firstName":{"dataType":"string","required":true}},"required":true}}}],"required":true},
         },
         "additionalProperties": false,
     },

@@ -713,7 +713,41 @@
             "type": "string"
           },
           "data": {
-            "$ref": "#/components/schemas/ParticipantProfile"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ParticipantProfile"
+              },
+              {
+                "properties": {
+                  "user": {
+                    "properties": {
+                      "email": {
+                        "type": "string"
+                      },
+                      "lastName": {
+                        "type": "string"
+                      },
+                      "middleName": {
+                        "type": "string"
+                      },
+                      "firstName": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "email",
+                      "lastName",
+                      "firstName"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "user"
+                ],
+                "type": "object"
+              }
+            ]
           }
         },
         "required": [

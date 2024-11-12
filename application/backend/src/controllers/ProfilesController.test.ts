@@ -185,8 +185,6 @@ describe('ProfilesController', () => {
       const participantProfileByIDBody: GetParticipantProfileByIDResponse =
         participantProfileByIDResponse.body
 
-      console.log(participantProfileByIDBody, currentUserProfileBody)
-
       expect(participantProfileByIDBody).toEqual(currentUserProfileBody)
     })
   })
