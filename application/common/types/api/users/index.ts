@@ -1,5 +1,5 @@
 import type { GetUserByIdResponse } from './getUserByID'
-import type { GetUserProfileByIDResponse } from './getParticipantProfileByID'
+import type { GetParticipantProfileByIDResponse } from './getParticipantProfileByID'
 import type { GetAllUsersResponse } from './getAllUsers'
 import type { CreateUserRequest, CreateUserResponse } from './createUser'
 import type { UpdateUserRequest, UpdateUserResponse } from './updateUser'
@@ -8,7 +8,7 @@ import type { DeleteUserResponse } from './deleteUser'
 
 export {
   GetUserByIdResponse,
-  GetUserProfileByIDResponse,
+  GetParticipantProfileByIDResponse,
   GetAllUsersResponse,
   CreateUserRequest,
   CreateUserResponse,

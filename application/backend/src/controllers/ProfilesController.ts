@@ -7,7 +7,7 @@ import {
   InternalErrorResponse,
   NotFoundErrorResponse,
 } from 'common/types/api/errors'
-import { GetUserProfileByIDResponse } from 'common/types/api/users'
+import { GetParticipantProfileByIDResponse } from 'common/types/api/users'
 import { NotFoundError, NoTokenError } from '../middlewares/ErrorHandler'
 import {
   Route,
@@ -39,7 +39,7 @@ export class ProfilesController extends Controller {
   @SuccessResponse('200', 'OK')
   public async getParticipantProfileByToken(
     @Request() request: express.Request,
-  ): Promise<GetUserProfileByIDResponse> {
+  ): Promise<GetParticipantProfileByIDResponse> {
     /**
      * This endpoint (GET /profiles/current) is ordered above
      * the endpoint (GET /profile/{userID}) in order to avoid collisions
@@ -69,7 +69,7 @@ export class ProfilesController extends Controller {
       throw new NotFoundError(errorMessage)
     }
 
-    const responseData: GetUserProfileByIDResponse = {
+    const responseData: GetParticipantProfileByIDResponse = {
       message: `Got Participant Profile with userID: ${userID}`,
       data: profile,
     }
@@ -87,7 +87,7 @@ export class ProfilesController extends Controller {
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async getParticipantProfileByID(
     @Path() userID: number,
-  ): Promise<GetUserProfileByIDResponse> {
+  ): Promise<GetParticipantProfileByIDResponse> {
     const profile: ParticipantProfile | null = await this.participantProfileRepo.findUnique({
       where: { userID },
       include: {
@@ -103,7 +103,7 @@ export class ProfilesController extends Controller {
       throw new NotFoundError(errorMessage)
     }
 
-    const responseData: GetUserProfileByIDResponse = {
+    const responseData: GetParticipantProfileByIDResponse = {
       message: `Got Participant Profile with userID: ${userID}`,
       data: profile,
     }
