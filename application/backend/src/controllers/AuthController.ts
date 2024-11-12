@@ -92,12 +92,12 @@ export class AuthController extends Controller {
     let onBehalfOfDOB
     if (onBehalfOf) {
       onBehalfOfDOB = new Date(onBehalfOf.dob)
-      onBehalfOfCreateData = { onBehalfOf: { create: { onBehalfOf, dob: onBehalfOfDOB } } }
+      onBehalfOfCreateData = { onBehalfOf: { create: { ...onBehalfOf, dob: onBehalfOfDOB } } }
     }
 
     let nextOfKinCreateData
     if (nextOfKin) {
-      nextOfKinCreateData = { nextOfKin: { create: { nextOfKin } } }
+      nextOfKinCreateData = { nextOfKin: { create: { ...nextOfKin } } }
     }
 
     console.log(studyID)
@@ -110,12 +110,11 @@ export class AuthController extends Controller {
         create: {
           dob: new Date(dob),
           ...noNextOfKinProfileData,
-          onBehalfOfCreateData,
-          nextOfKinCreateData,
+          ...onBehalfOfCreateData,
+          ...nextOfKinCreateData,
         },
       },
     }
-
     const insertedUser = await this.userRepo.create({
       data,
     })
