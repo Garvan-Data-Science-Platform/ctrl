@@ -20,7 +20,7 @@ import routerBindings, {
   DocumentTitleHandler,
 } from '@refinedev/react-router-v6'
 import { UserList, UserCreate, UserEdit, UserShow } from './pages/users'
-import { CategoryList, CategoryShow, SurveyEditor } from './pages/surveys'
+import { CategoryList, SurveyEditor } from './pages/surveys'
 import { ColorModeContextProvider } from './contexts/color-mode'
 import { Header } from './components/header'
 import { Login } from './pages/login'
@@ -95,7 +95,7 @@ function App() {
                     <Route path="/surveys">
                       <Route index element={<CategoryList />} />
                       <Route path="edit/:id" element={<SurveyEditor />} />
-                      <Route path=":id" element={<CategoryShow />} />
+                      <Route path=":id" element={<SurveyEditor />} />
                     </Route>
                     <Route path="*" element={<ErrorComponent />} />
                   </Route>

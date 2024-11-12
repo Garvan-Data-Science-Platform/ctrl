@@ -1,0 +1,19 @@
+[
+  { "title": "", "text": "", "elements": [] },
+  {
+    "title": "",
+    "text": "",
+    "elements": [
+      { "type": "question-checkbox", "data": { "text": "Question 1", "value": true } },
+      { "type": "subheading", "data": { "text": "SUBHEADING text" } },
+      {
+        "type": "question-choices",
+        "data": { "text": "Question 2", "choices": ["Choice 1", "Choice 2"], "value": "Choice 2" }
+      },
+      {
+        "type": "video",
+        "data": { "link": "www.google.com" }
+      }
+    ]
+  }
+]

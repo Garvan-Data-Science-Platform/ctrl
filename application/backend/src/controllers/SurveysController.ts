@@ -31,10 +31,11 @@ import {
   SurveyStepAnswerArray,
 } from 'common/types/survey'
 import prisma from '../PrismaClient'
+import '../jsontypes'
 import { GetSurveyVersionByIdResponse } from 'common/types/api/surveys/getSurveyVersionById'
-import { validateAnswers } from 'utils/validateSurveyAnswers'
-import { createEmptyAnswers } from 'utils/createEmptyAnswers'
-import { populateSurveyStepAnswers } from 'utils/populateSurveyStepAnswers'
+import { validateAnswers } from 'common/src/surveys/validateSurveyAnswers'
+import { createEmptyAnswers } from 'common/src/surveys/createEmptyAnswers'
+import { populateSurveyStepAnswers } from 'common/src/surveys/populateSurveyStepAnswers'
 
 @Route('surveys')
 @Tags('Surveys')
@@ -54,9 +55,13 @@ export class SurveysController extends Controller {
   @Response('500', 'Internal Server Error')
   @Response('401', 'Unauthorized')
   public async getAllSurveys(): Promise<GetSurveyVersionsResponse> {
-    const surveys: SurveyVersionPrisma[] = await this.surveyRepo.findMany({})
+    const surveys: SurveyVersionPrisma[] = await this.surveyRepo.findMany({
+      orderBy: [{ id: 'desc' }],
+    })
     if (surveys.length == 0) {
-      let initial_survey = await this.surveyRepo.create({ data: { data: [], status: 'DRAFT' } })
+      let initial_survey = await this.surveyRepo.create({
+        data: { versionNumber: 1, data: [], status: 'DRAFT' },
+      })
       surveys.push(initial_survey)
     }
     const responseData = { data: surveys }
@@ -87,16 +92,16 @@ export class SurveysController extends Controller {
       throw Error('NO GOOD')
     }
     const responseData: GetSurveyVersionByIdResponse = {
-      data: { id: surveyID, data: survey.data as unknown as SurveyStep[] },
+      data: { id: surveyID, status: survey.status, data: survey.data as unknown as SurveyStep[] },
     }
     logger.info({ ...responseData })
     return responseData
   }
 
   /**
-   * Update survey answers
+   * Get user survey step
    *
-   * @summary Update a Survey
+   * @summary Get questions and current answers for step of a survey
    */
   @Get('/step/:study/:step')
   @SuccessResponse('200', 'OK')
@@ -120,13 +125,11 @@ export class SurveysController extends Controller {
       where: { versionId: surveyVersionId, userId: request.user.userId },
     })
 
-    let stepData = survey.data as unknown as SurveyStep[]
+    let stepData = survey.data
 
     if (currentAnswers) {
-      stepData[step] = populateSurveyStepAnswers(
-        stepData[step],
-        currentAnswers.data as SurveyStepAnswerArray,
-      )
+      var ans = currentAnswers.data
+      stepData[step] = populateSurveyStepAnswers(stepData[step], ans[step].answers)
     }
 
     return { data: { ...stepData[step], current_step: step, total_steps: stepData.length } }
@@ -144,8 +147,9 @@ export class SurveysController extends Controller {
   @Response('401', 'Unauthorized')
   public async updateSurveyAnswers(
     @Request() request: any,
-    @Body() { step, data, surveyVersionId }: UpdateSurveyAnswersRequest,
+    @Body() body: UpdateSurveyAnswersRequest,
   ): Promise<UpdateSurveyAnswersResponse> {
+    const { step, data, surveyVersionId } = body
     var currentAnswers = await this.answersRepo.findFirst({
       where: { versionId: surveyVersionId, userId: request.user.userId },
     })
@@ -235,6 +239,38 @@ export class SurveysController extends Controller {
 
     const responseData = {
       message: `Updated survey with ID: ${surveyId}`,
+    }
+    logger.info({ ...responseData })
+    return responseData
+  }
+
+  /**
+   *
+   * @summary Publish a draft survey
+   */
+  @Post('/publish/{surveyId}')
+  @SuccessResponse('200', 'OK')
+  @Response('500', 'Internal Server Error')
+  @Response('404', 'Not Found')
+  @Response('401', 'Unauthorized')
+  public async publishSurvey(@Path() surveyId: number): Promise<UpdateSurveyResponse> {
+    const survey = await this.surveyRepo.findUniqueOrThrow({ where: { id: surveyId } })
+
+    if (survey.status != 'DRAFT') {
+      throw Error('Can only publish a draft survey')
+    }
+
+    await this.surveyRepo.create({
+      data: { status: 'DRAFT', data: survey.data, versionNumber: survey.versionNumber + 1 },
+    })
+
+    await this.surveyRepo.update({
+      where: { id: surveyId },
+      data: { status: 'PUBLISHED' },
+    })
+
+    const responseData = {
+      message: `Published survey with ID: ${surveyId}`,
     }
     logger.info({ ...responseData })
     return responseData

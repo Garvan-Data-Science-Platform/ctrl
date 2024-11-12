@@ -4,29 +4,27 @@ import React from 'react'
 
 export const CategoryList = () => {
   const { dataGridProps } = useDataGrid({
-    sorters: { initial: [{ field: 'version_number', order: 'asc' }] },
+    sorters: { initial: [{ field: 'versionNumber', order: 'desc' }] },
   })
 
   const columns = React.useMemo<GridColDef[]>(
     () => [
       {
-        field: 'version_number',
+        field: 'versionNumber',
         flex: 1,
         headerName: 'Version',
         minWidth: 200,
-        valueGetter: (val) => val.value || 'Current Draft',
+        valueGetter: (val) => (val.row.status == 'DRAFT' ? 'Current Draft' : val.row.versionNumber),
       },
       {
         field: 'actions',
         headerName: 'Actions',
         sortable: false,
         renderCell: function render({ row }) {
-          return (
-            <>
-              <EditButton hideText recordItemId={row.id} />
-              <ShowButton hideText recordItemId={row.id} />
-              <DeleteButton hideText recordItemId={row.id} />
-            </>
+          return row.status == 'DRAFT' ? (
+            <EditButton hideText recordItemId={row.id} />
+          ) : (
+            <ShowButton hideText recordItemId={row.id} />
           )
         },
         align: 'center',

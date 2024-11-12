@@ -20,5 +20,11 @@
       "common/*": ["../../common/*"]
     }
   },
-  "include": ["./src"]
+  "include": [
+    "./src",
+    "../common/src/surveys/validateSurveyAnswers.ts",
+    "../common/src/surveys/populateSurveyStepAnswers.ts",
+    "../common/src/surveys/extractSurveyStepAnswers.ts",
+    "../common/src/surveys/createEmptyAnswers.ts"
+  ]
 }

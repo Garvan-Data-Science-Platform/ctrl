@@ -51,6 +51,7 @@ export interface SurveyVersion {
   id?: number
   version_number?: number
   published_date?: string
+  status: 'PUBLISHED' | 'DRAFT'
   data: SurveyStep[]
 }
 

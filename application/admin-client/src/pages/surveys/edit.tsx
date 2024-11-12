@@ -2,6 +2,10 @@ import { Add, AddCircle } from '@mui/icons-material'
 import {
   Box,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Divider,
   List,
   ListItem,
@@ -10,6 +14,7 @@ import {
   ListItemText,
   ListSubheader,
   TextField,
+  Typography,
 } from '@mui/material'
 import { SurveyElementType } from '@common/types/survey'
 import { useEffect, useState } from 'react'
@@ -19,7 +24,7 @@ import { SurveyElementCard, SurveyDropSpace } from '../../components/SurveyEleme
 import { useSurveyStore } from '../../surveyStore'
 import { axiosInstance } from '../../providers/dataProvider'
 import { API_URL } from '../../App'
-import { useOnError, useResource, useShow, useUpdate } from '@refinedev/core'
+import { useOnError, useResource, useShow, useUpdate, useNavigation } from '@refinedev/core'
 
 export const SurveyEditor = () => {
   const {
@@ -37,6 +42,10 @@ export const SurveyEditor = () => {
   } = useSurveyStore()
   const [activeStep, setActiveStep] = useState(0)
   const [savePending, setSavePending] = useState(false)
+  const [publishDialogOpen, setPublishDialogOpen] = useState(false)
+  const [justLoaded, setJustLoaded] = useState(true)
+
+  const { list } = useNavigation()
 
   const { id } = useResource()
 
@@ -54,21 +63,26 @@ export const SurveyEditor = () => {
 
   const { data: queryData, isLoading } = queryResult
 
+  const disabled = queryData?.data.status != 'DRAFT'
+
   useEffect(() => {
     if (queryData && !isLoading) {
+      setJustLoaded(true)
       setData(queryData.data.data)
     }
   }, [isLoading])
 
   useEffect(() => {
-    if (!savePending && surveyData && !isLoading) {
+    if (justLoaded) {
+      setTimeout(() => {
+        setJustLoaded(false)
+      }, 500)
+      return
+    }
+    if (!savePending && surveyData && !justLoaded) {
       setSavePending(true)
       setTimeout(() => {
         mutate({ id, values: { data: surveyData } })
-        //axiosInstance.patch(API_URL + `/surveys/${id}X`, { data: surveyData }).catch((error) => {
-        //  console.log("ERROR")
-        //})
-        //TODO: Handle errors: expired token, server unreachable
         setSavePending(false)
       }, 4000)
     }
@@ -83,6 +97,18 @@ export const SurveyEditor = () => {
     subheading: 'Subheading',
     video: 'Video/Embedded',
   }
+
+  const handlePublish = () => {
+    axiosInstance
+      .post(`${API_URL}/surveys/publish/${id}`)
+      .then(() => {
+        list('surveys')
+      })
+      .catch(() => {
+        alert('ERROR PUBLISHING')
+      })
+  }
+
   return isLoading ? null : (
     <Box sx={{ display: 'flex', flexDirection: 'row' }}>
       <Box sx={{ border: '1px solid lightgrey', height: '100vh', ml: -3, mt: -3 }}>
@@ -100,7 +126,7 @@ export const SurveyEditor = () => {
         <Divider />
         <List>
           <ListItem disablePadding>
-            <ListItemButton>
+            <ListItemButton disabled={disabled}>
               <ListItemIcon>
                 <Add />
               </ListItemIcon>
@@ -118,11 +144,33 @@ export const SurveyEditor = () => {
       {surveyData.length > 0 ? (
         <DndProvider backend={HTML5Backend}>
           <Box sx={{ flexGrow: 1, ml: 3 }}>
+            <Box sx={{ mb: 3, display: 'flex', flexDirection: 'row' }}>
+              <Button
+                variant="outlined"
+                disabled={savePending || disabled}
+                onClick={() => setPublishDialogOpen(true)}
+              >
+                Publish
+              </Button>
+            </Box>
+            <Dialog open={publishDialogOpen} onClose={() => setPublishDialogOpen(false)}>
+              <DialogTitle>Publish new version</DialogTitle>
+              <DialogContent>
+                A published survey version can be used for a study. Once you publish a version it
+                can't be edited. You can continue editing this survey in draft mode after
+                publishing.
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handlePublish}>Publish</Button>
+                <Button onClick={() => setPublishDialogOpen(false)}>Cancel</Button>
+              </DialogActions>
+            </Dialog>
             <TextField
               fullWidth
               label="Title"
               onChange={(e) => updateStepField(activeStep, 'title', e.target.value)}
               value={surveyData[activeStep].title}
+              disabled={disabled}
             ></TextField>
             <TextField
               fullWidth
@@ -131,6 +179,7 @@ export const SurveyEditor = () => {
               label="Description"
               onChange={(e) => updateStepField(activeStep, 'text', e.target.value)}
               value={surveyData[activeStep].text}
+              disabled={disabled}
             ></TextField>
             <Divider sx={{ mt: 3, mb: 1 }} />
             <SurveyDropSpace key={`space_${activeStep}_${-1}`} index={-1} />
@@ -138,12 +187,14 @@ export const SurveyEditor = () => {
               <Box key={`el_${activeStep}_${idx}`}>
                 <SurveyElementCard
                   element={val}
+                  disabled={disabled}
                   handleDelete={() => {
                     deleteElement(activeStep, idx)
                   }}
                   handleMove={(dropIndex) => {
-                    console.log('Move', idx, dropIndex)
-                    moveElement(activeStep, idx, dropIndex)
+                    if (!disabled) {
+                      moveElement(activeStep, idx, dropIndex)
+                    }
                   }}
                   handleAddChoice={
                     val.type == 'question-choices'
@@ -167,6 +218,7 @@ export const SurveyEditor = () => {
               {Object.entries(elementsLabels).map((val, idx) => (
                 <Button
                   key={`add_${idx}`}
+                  disabled={disabled}
                   startIcon={<AddCircle />}
                   onClick={() => {
                     addElement(val[0] as SurveyElementType, activeStep)

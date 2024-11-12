@@ -1,7 +1,8 @@
 interface SurveyVersionBasic {
   id?: number
-  version_number?: number
+  versionNumber?: number
   published_date?: string
+  status: 'DRAFT' | 'PUBLISHED'
 }
 
 export interface GetSurveyVersionsResponse {
