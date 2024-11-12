@@ -17,9 +17,7 @@ import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { SurveyElementCard, SurveyDropSpace } from '../../components/SurveyElementCard'
 import { useSurveyStore } from '../../surveyStore'
-import { axiosInstance } from '../../providers/dataProvider'
-import { API_URL } from '../../App'
-import { useOnError, useResource, useShow, useUpdate } from '@refinedev/core'
+import { useResource, useShow, useUpdate } from '@refinedev/core'
 
 export const SurveyEditor = () => {
   const {

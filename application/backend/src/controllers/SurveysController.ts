@@ -1,3 +1,5 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+
 import {
   Get,
   Body,
@@ -51,7 +53,7 @@ export class SurveysController extends Controller {
   public async getAllSurveys(): Promise<GetSurveyVersionsResponse> {
     const surveys: SurveyVersionPrisma[] = await this.surveyRepo.findMany({})
     if (surveys.length == 0) {
-      let initial_survey = await this.surveyRepo.create({ data: { data: [], status: 'DRAFT' } })
+      const initial_survey = await this.surveyRepo.create({ data: { data: [], status: 'DRAFT' } })
       surveys.push(initial_survey)
     }
     const responseData = { data: surveys }
@@ -100,13 +102,14 @@ export class SurveysController extends Controller {
   @Response('401', 'Unauthorized')
   public async updateSurveyAnswers(
     @Request() request: any,
-    @Body() { step, data, surveyVersionId }: UpdateSurveyAnswersRequest,
+    @Body() bodyRequest: UpdateSurveyAnswersRequest,
   ): Promise<UpdateSurveyAnswersResponse> {
-    var currentAnswers = await this.answersRepo.findFirst({
+    const { step, data, surveyVersionId } = bodyRequest
+    const currentAnswers = await this.answersRepo.findFirst({
       where: { versionId: surveyVersionId, userId: request.user.userId },
     })
 
-    var answers: UserSurveyStepState[]
+    let answers: UserSurveyStepState[]
 
     const survey = await this.surveyRepo.findUniqueOrThrow({
       where: { id: surveyVersionId },
@@ -145,7 +148,7 @@ export class SurveysController extends Controller {
     answers[step].status = status
     answers[step].answers = data
 
-    var responseData = {
+    const responseData = {
       message: 'Updated Answers',
     }
 
