@@ -6,7 +6,7 @@ import {
   RegisterResponse,
 } from 'common/types/api/auth'
 import { ContactMethod, StateTerritory } from 'common/types/api/users/ParticipantProfile'
-import { GetParticipantProfileByIDResponse } from 'common/types/api/users'
+import { GetParticipantProfileResponse } from 'common/types/api/users'
 import { getUserIdFromToken } from '../authentication'
 import { Api } from '../Api'
 import { resetDB } from '../../tests/TestHelpers'
@@ -101,7 +101,7 @@ describe('ProfilesController', () => {
         userID: expect.any(Number),
       })
 
-      const body: GetParticipantProfileByIDResponse = response.body
+      const body: GetParticipantProfileResponse = response.body
       expect(body.message).toBe(
         `Got Participant Profile with userID: ${registeredParticipantUserID}`,
       )
@@ -148,7 +148,7 @@ describe('ProfilesController', () => {
         userID: expect.any(Number),
       })
 
-      const body: GetParticipantProfileByIDResponse = response.body
+      const body: GetParticipantProfileResponse = response.body
       expect(body.message).toBe(
         `Got Participant Profile with userID: ${registeredParticipantUserID}`,
       )
@@ -179,10 +179,10 @@ describe('ProfilesController', () => {
       expect(currentParticipantProfileResponse.status).toBe(200)
       expect(participantProfileByIDResponse.status).toBe(200)
 
-      const currentUserProfileBody: GetParticipantProfileByIDResponse =
+      const currentUserProfileBody: GetParticipantProfileResponse =
         currentParticipantProfileResponse.body
 
-      const participantProfileByIDBody: GetParticipantProfileByIDResponse =
+      const participantProfileByIDBody: GetParticipantProfileResponse =
         participantProfileByIDResponse.body
 
       expect(participantProfileByIDBody).toEqual(currentUserProfileBody)

@@ -13,7 +13,7 @@ import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { GetUserProfileResponse, UpdateProfileRequest } from '@common/types/api/users'
+import { GetParticipantProfileResponse, UpdateProfileRequest } from '@common/types/api/users'
 import ProfileData from '@common/example_responses/getUserProfile.json'
 import NavBar from '../components/NavBar'
 
@@ -48,7 +48,7 @@ export default function ProfileEdit() {
     //queryFn: () => fetch('/api/user/profile').then((res) => res.json()) as Promise<UserProfile>,
     queryFn: async () => {
       await new Promise((r) => setTimeout(r, 2000))
-      return ProfileData as GetUserProfileResponse
+      return ProfileData as GetParticipantProfileResponse
     },
   })
 
