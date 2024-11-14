@@ -1,5 +1,6 @@
 import prisma from '../src/PrismaClient'
 import logger from 'common/src/logger'
+import { seedTests } from './seed'
 
 // Function to reset DB state
 export async function resetDB(): Promise<void> {
@@ -16,7 +17,11 @@ export async function resetDB(): Promise<void> {
 
   try {
     await prisma.$executeRawUnsafe(`TRUNCATE TABLE ${tables} CASCADE;`)
+    await seedTests(prisma)
+    //await prisma.$disconnect()
   } catch (error) {
     logger.error({ error })
+    prisma.$disconnect()
+    throw error
   }
 }

@@ -86,7 +86,7 @@ export class AuthController extends Controller {
     const { firstName, middleName, lastName, email, dob, ...profileData } = participantData
     const userDetails = { firstName, middleName, lastName, email }
 
-    const { nextOfKin, studyID, onBehalfOf, ...noNextOfKinProfileData } = profileData
+    const { nextOfKin, onBehalfOf, ...noNextOfKinProfileData } = profileData
 
     let onBehalfOfCreateData
     let onBehalfOfDOB
@@ -99,8 +99,6 @@ export class AuthController extends Controller {
     if (nextOfKin) {
       nextOfKinCreateData = { nextOfKin: { create: { nextOfKin } } }
     }
-
-    console.log(studyID)
 
     const data = {
       ...userDetails,
