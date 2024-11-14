@@ -1,2912 +1,2651 @@
 {
-	"openapi": "3.0.0",
-	"components": {
-		"examples": {},
-		"headers": {},
-		"parameters": {},
-		"requestBodies": {},
-		"responses": {},
-		"schemas": {
-			"UnauthorizedErrorResponse": {
-				"properties": {
-					"message": {
-						"type": "string"
-					},
-					"details": {}
-				},
-				"required": [
-					"message"
-				],
-				"type": "object",
-				"additionalProperties": false,
-				"example": {
-					"message": "Unauthorized",
-					"details": {
-						"message": "Token not in headers"
-					}
-				}
-			},
-			"InternalErrorResponse": {
-				"properties": {
-					"message": {
-						"type": "string",
-						"enum": [
-							"Internal Server Error"
-						],
-						"nullable": false
-					},
-					"details": {}
-				},
-				"required": [
-					"message"
-				],
-				"type": "object",
-				"additionalProperties": false,
-				"example": {
-					"message": "Internal Server Error",
-					"details": {
-						"message": "Some error happened D:"
-					}
-				}
-			},
-			"ValidateErrorResponse": {
-				"properties": {
-					"message": {
-						"type": "string",
-						"enum": [
-							"Validation Failed"
-						],
-						"nullable": false
-					},
-					"details": {
-						"properties": {},
-						"additionalProperties": {},
-						"type": "object"
-					}
-				},
-				"required": [
-					"message",
-					"details"
-				],
-				"type": "object",
-				"additionalProperties": false,
-				"example": {
-					"message": "Validation Failed",
-					"bodyRequest.firstName": {
-						"message": "minLength 1",
-						"value": ""
-					}
-				}
-			},
-			"DefaultSelection_Prisma._36_UserPayload_": {
-				"properties": {
-					"updatedAt": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"createdAt": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"role": {
-						"type": "string"
-					},
-					"password": {
-						"type": "string"
-					},
-					"email": {
-						"type": "string"
-					},
-					"lastName": {
-						"type": "string"
-					},
-					"middleName": {
-						"type": "string"
-					},
-					"firstName": {
-						"type": "string"
-					},
-					"id": {
-						"type": "number",
-						"format": "double"
-					}
-				},
-				"required": [
-					"updatedAt",
-					"createdAt",
-					"role",
-					"password",
-					"email",
-					"lastName",
-					"middleName",
-					"firstName",
-					"id"
-				],
-				"type": "object"
-			},
-			"User": {
-				"$ref": "#/components/schemas/DefaultSelection_Prisma._36_UserPayload_",
-				"description": "Model User"
-			},
-			"GetAllUsersResponse": {
-				"properties": {
-					"message": {
-						"type": "string"
-					},
-					"data": {
-						"items": {
-							"$ref": "#/components/schemas/User"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"message",
-					"data"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"GetUserByIdResponse": {
-				"properties": {
-					"message": {
-						"type": "string"
-					},
-					"data": {
-						"$ref": "#/components/schemas/User"
-					}
-				},
-				"required": [
-					"message",
-					"data"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"NotFoundErrorResponse": {
-				"properties": {
-					"message": {
-						"type": "string",
-						"enum": [
-							"Not Found"
-						],
-						"nullable": false
-					},
-					"details": {}
-				},
-				"required": [
-					"message"
-				],
-				"type": "object",
-				"additionalProperties": false,
-				"example": {
-					"message": "Not Found",
-					"details": {
-						"message": "User not found"
-					}
-				}
-			},
-			"CreateUserResponse": {
-				"properties": {
-					"message": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"message"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"CreateUserRequest": {
-				"properties": {
-					"firstName": {
-						"type": "string",
-						"minLength": 1
-					},
-					"lastName": {
-						"type": "string",
-						"minLength": 1
-					},
-					"email": {
-						"type": "string",
-						"pattern": "^(.+)@(.+)$"
-					},
-					"password": {
-						"type": "string",
-						"minLength": 8
-					},
-					"role": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"firstName",
-					"lastName",
-					"email",
-					"password",
-					"role"
-				],
-				"type": "object",
-				"additionalProperties": false,
-				"example": {
-					"firstName": "John",
-					"lastName": "Doe",
-					"email": "john.doe@email.com",
-					"password": "Password123",
-					"role": "User"
-				}
-			},
-			"UpdateUserResponse": {
-				"properties": {
-					"message": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"message"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"UpdateUserRequest": {
-				"properties": {
-					"firstName": {
-						"type": "string",
-						"minLength": 1
-					},
-					"lastName": {
-						"type": "string",
-						"minLength": 1
-					},
-					"email": {
-						"type": "string",
-						"pattern": "^(.+)@(.+)$"
-					},
-					"role": {
-						"type": "string"
-					}
-				},
-				"type": "object",
-				"additionalProperties": false,
-				"example": {
-					"firstName": "John",
-					"lastName": "Doe",
-					"email": "john.doe@email.com",
-					"role": "User"
-				}
-			},
-			"DeleteUserResponse": {
-				"properties": {
-					"message": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"message"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"SurveyVersionStatus": {
-				"type": "string",
-				"enum": [
-					"PUBLISHED",
-					"DRAFT"
-				]
-			},
-			"SurveyVersionBasic": {
-				"properties": {
-					"id": {
-						"type": "number",
-						"format": "double"
-					},
-					"versionNumber": {
-						"type": "number",
-						"format": "double"
-					},
-					"published_date": {
-						"type": "string"
-					},
-					"status": {
-						"$ref": "#/components/schemas/SurveyVersionStatus"
-					}
-				},
-				"required": [
-					"status"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"GetSurveyVersionsResponse": {
-				"properties": {
-					"data": {
-						"items": {
-							"$ref": "#/components/schemas/SurveyVersionBasic"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"data"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"SurveyQuestionChoices": {
-				"properties": {
-					"text": {
-						"type": "string"
-					},
-					"tooltip": {
-						"type": "string"
-					},
-					"value": {
-						"type": "string"
-					},
-					"required": {
-						"type": "boolean"
-					},
-					"choices": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"text",
-					"value",
-					"required",
-					"choices"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"SurveyQuestionCheckbox": {
-				"properties": {
-					"text": {
-						"type": "string"
-					},
-					"tooltip": {
-						"type": "string"
-					},
-					"value": {
-						"type": "boolean"
-					},
-					"required": {
-						"type": "boolean"
-					}
-				},
-				"required": [
-					"text",
-					"value",
-					"required"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"SurveyVideo": {
-				"properties": {
-					"link": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"link"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"SurveySubHeading": {
-				"properties": {
-					"text": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"text"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"SurveyElementType": {
-				"type": "string",
-				"enum": [
-					"question-choices",
-					"question-checkbox",
-					"subheading",
-					"video"
-				]
-			},
-			"SurveyElement": {
-				"anyOf": [
-					{
-						"properties": {
-							"data": {
-								"$ref": "#/components/schemas/SurveyQuestionChoices"
-							},
-							"type": {
-								"type": "string",
-								"enum": [
-									"question-choices"
-								],
-								"nullable": false
-							}
-						},
-						"required": [
-							"data",
-							"type"
-						],
-						"type": "object"
-					},
-					{
-						"properties": {
-							"data": {
-								"$ref": "#/components/schemas/SurveyQuestionCheckbox"
-							},
-							"type": {
-								"type": "string",
-								"enum": [
-									"question-checkbox"
-								],
-								"nullable": false
-							}
-						},
-						"required": [
-							"data",
-							"type"
-						],
-						"type": "object"
-					},
-					{
-						"properties": {
-							"data": {
-								"$ref": "#/components/schemas/SurveyVideo"
-							},
-							"type": {
-								"type": "string",
-								"enum": [
-									"video"
-								],
-								"nullable": false
-							}
-						},
-						"required": [
-							"data",
-							"type"
-						],
-						"type": "object"
-					},
-					{
-						"properties": {
-							"data": {
-								"$ref": "#/components/schemas/SurveySubHeading"
-							},
-							"type": {
-								"type": "string",
-								"enum": [
-									"subheading"
-								],
-								"nullable": false
-							}
-						},
-						"required": [
-							"data",
-							"type"
-						],
-						"type": "object"
-					},
-					{
-						"properties": {
-							"data": {},
-							"type": {
-								"$ref": "#/components/schemas/SurveyElementType"
-							}
-						},
-						"required": [
-							"data",
-							"type"
-						],
-						"type": "object"
-					}
-				]
-			},
-			"SurveyStep": {
-				"properties": {
-					"title": {
-						"type": "string"
-					},
-					"text": {
-						"type": "string"
-					},
-					"last_updated": {
-						"type": "string"
-					},
-					"elements": {
-						"items": {
-							"$ref": "#/components/schemas/SurveyElement"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"title",
-					"text",
-					"elements"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"SurveyVersion": {
-				"properties": {
-					"id": {
-						"type": "number",
-						"format": "double"
-					},
-					"version_number": {
-						"type": "number",
-						"format": "double"
-					},
-					"published_date": {
-						"type": "string"
-					},
-					"status": {
-						"$ref": "#/components/schemas/SurveyVersionStatus"
-					},
-					"data": {
-						"items": {
-							"$ref": "#/components/schemas/SurveyStep"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"status",
-					"data"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"GetSurveyVersionByIdResponse": {
-				"properties": {
-					"data": {
-						"$ref": "#/components/schemas/SurveyVersion"
-					}
-				},
-				"required": [
-					"data"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"UpdateSurveyResponse": {
-				"properties": {
-					"message": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"message"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"UserStepContext": {
-				"properties": {
-					"current_step": {
-						"type": "number",
-						"format": "double"
-					},
-					"total_steps": {
-						"type": "number",
-						"format": "double"
-					}
-				},
-				"required": [
-					"current_step",
-					"total_steps"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"GetUserSurveyStepResponse": {
-				"properties": {
-					"data": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/SurveyStep"
-							},
-							{
-								"$ref": "#/components/schemas/UserStepContext"
-							}
-						]
-					}
-				},
-				"required": [
-					"data"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"UpdateSurveyAnswersResponse": {
-				"properties": {
-					"message": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"message"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"UpdateSurveyAnswersRequest": {
-				"properties": {
-					"surveyVersionId": {
-						"type": "number",
-						"format": "double"
-					},
-					"step": {
-						"type": "number",
-						"format": "double"
-					},
-					"data": {
-						"items": {
-							"anyOf": [
-								{
-									"type": "string"
-								},
-								{
-									"type": "boolean"
-								}
-							]
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"surveyVersionId",
-					"step",
-					"data"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"UpdateSurveyRequest": {
-				"properties": {
-					"data": {
-						"items": {
-							"$ref": "#/components/schemas/SurveyStep"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"data"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"_36_Enums.StateTerritory": {
-				"type": "string",
-				"enum": [
-					"ACT",
-					"NSW",
-					"NT",
-					"QLD",
-					"SA",
-					"TAS",
-					"VIC",
-					"WA"
-				]
-			},
-			"_36_Enums.ContactMethod": {
-				"type": "string",
-				"enum": [
-					"EMAIL",
-					"MOBILE",
-					"MAIL"
-				]
-			},
-			"DefaultSelection_Prisma._36_ParticipantProfilePayload_": {
-				"properties": {
-					"userID": {
-						"type": "number",
-						"format": "double"
-					},
-					"preferredContact": {
-						"$ref": "#/components/schemas/_36_Enums.ContactMethod"
-					},
-					"isParentOrGuardian": {
-						"type": "boolean"
-					},
-					"postcode": {
-						"type": "string"
-					},
-					"state": {
-						"$ref": "#/components/schemas/_36_Enums.StateTerritory"
-					},
-					"suburb": {
-						"type": "string"
-					},
-					"addressLine": {
-						"type": "string"
-					},
-					"mobile": {
-						"type": "string"
-					},
-					"participantID": {
-						"type": "string"
-					},
-					"dob": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"id": {
-						"type": "number",
-						"format": "double"
-					}
-				},
-				"required": [
-					"userID",
-					"preferredContact",
-					"isParentOrGuardian",
-					"postcode",
-					"state",
-					"suburb",
-					"addressLine",
-					"mobile",
-					"participantID",
-					"dob",
-					"id"
-				],
-				"type": "object"
-			},
-			"ParticipantProfile": {
-				"$ref": "#/components/schemas/DefaultSelection_Prisma._36_ParticipantProfilePayload_",
-				"description": "Model ParticipantProfile"
-			},
-			"GetParticipantProfileResponse": {
-				"properties": {
-					"message": {
-						"type": "string"
-					},
-					"data": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/ParticipantProfile"
-							},
-							{
-								"properties": {
-									"user": {
-										"properties": {
-											"email": {
-												"type": "string"
-											},
-											"lastName": {
-												"type": "string"
-											},
-											"middleName": {
-												"type": "string"
-											},
-											"firstName": {
-												"type": "string"
-											}
-										},
-										"required": [
-											"email",
-											"lastName",
-											"firstName"
-										],
-										"type": "object"
-									}
-								},
-								"required": [
-									"user"
-								],
-								"type": "object"
-							}
-						]
-					}
-				},
-				"required": [
-					"message",
-					"data"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"DefaultSelection_Prisma._36_OrganisationPayload_": {
-				"properties": {
-					"updatedAt": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"createdAt": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"name": {
-						"type": "string"
-					},
-					"id": {
-						"type": "number",
-						"format": "double"
-					}
-				},
-				"required": [
-					"updatedAt",
-					"createdAt",
-					"name",
-					"id"
-				],
-				"type": "object"
-			},
-			"Organisation": {
-				"$ref": "#/components/schemas/DefaultSelection_Prisma._36_OrganisationPayload_",
-				"description": "Model Organisation"
-			},
-			"GetAllOrganisationsResponse": {
-				"properties": {
-					"message": {
-						"type": "string"
-					},
-					"organisations": {
-						"items": {
-							"$ref": "#/components/schemas/Organisation"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"message",
-					"organisations"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"GetOrganisationByIdResponse": {
-				"properties": {
-					"message": {
-						"type": "string"
-					},
-					"organisation": {
-						"$ref": "#/components/schemas/Organisation"
-					}
-				},
-				"required": [
-					"message",
-					"organisation"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"CreateOrganisationResponse": {
-				"properties": {
-					"message": {
-						"type": "string"
-					},
-					"organisationID": {
-						"type": "number",
-						"format": "double"
-					}
-				},
-				"required": [
-					"message",
-					"organisationID"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"CreateOrganisationRequest": {
-				"properties": {
-					"name": {
-						"type": "string",
-						"minLength": 1
-					}
-				},
-				"required": [
-					"name"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"UpdateOrganisationResponse": {
-				"properties": {
-					"message": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"message"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"UpdateOrganisationRequest": {
-				"properties": {
-					"name": {
-						"type": "string",
-						"minLength": 1
-					}
-				},
-				"type": "object",
-				"additionalProperties": false
-			},
-			"DeleteOrganisationResponse": {
-				"properties": {
-					"message": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"message"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"GetOrganisationUsersResponse": {
-				"properties": {
-					"message": {
-						"type": "string"
-					},
-					"users": {
-						"items": {
-							"$ref": "#/components/schemas/User"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"message",
-					"users"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"AddUserToOrganisationResponse": {
-				"properties": {
-					"message": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"message"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"RemoveUserFromOrganisationResponse": {
-				"properties": {
-					"message": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"message"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Workspace": {
-				"properties": {
-					"version": {
-						"type": "string"
-					},
-					"name": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"version",
-					"name"
-				],
-				"type": "object"
-			},
-			"RegisterResponse": {
-				"properties": {
-					"message": {
-						"type": "string"
-					},
-					"token": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"message",
-					"token"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"RegisterRequest": {
-				"properties": {
-					"firstName": {
-						"type": "string",
-						"minLength": 1
-					},
-					"middleName": {
-						"type": "string",
-						"minLength": 1
-					},
-					"lastName": {
-						"type": "string",
-						"minLength": 1
-					},
-					"email": {
-						"type": "string",
-						"pattern": "^(.+)@(.+)$"
-					},
-					"password": {
-						"type": "string",
-						"minLength": 8
-					},
-					"role": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"firstName",
-					"lastName",
-					"email",
-					"password",
-					"role"
-				],
-				"type": "object",
-				"additionalProperties": false,
-				"example": {
-					"firstName": "John",
-					"lastName": "Doe",
-					"email": "john.doe@email.com",
-					"password": "Password123",
-					"role": "User"
-				}
-			},
-			"RegisterParticipantResponse": {
-				"properties": {
-					"message": {
-						"type": "string"
-					},
-					"token": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"message",
-					"token"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"ContactMethod": {
-				"enum": [
-					"MOBILE",
-					"EMAIL",
-					"MAIL"
-				],
-				"type": "string"
-			},
-			"StateTerritory": {
-				"enum": [
-					"ACT",
-					"NSW",
-					"NT",
-					"QLD",
-					"SA",
-					"TAS",
-					"VIC",
-					"WA"
-				],
-				"type": "string"
-			},
-			"RelationshipType": {
-				"enum": [
-					"PARENT",
-					"GUARDIAN",
-					"CHILD",
-					"OTHER"
-				],
-				"type": "string"
-			},
-			"AlternativeContact": {
-				"properties": {
-					"firstName": {
-						"type": "string"
-					},
-					"middleName": {
-						"type": "string"
-					},
-					"lastName": {
-						"type": "string"
-					},
-					"mobile": {
-						"type": "string"
-					},
-					"email": {
-						"type": "string"
-					},
-					"relationship": {
-						"$ref": "#/components/schemas/RelationshipType"
-					}
-				},
-				"required": [
-					"firstName",
-					"lastName",
-					"email",
-					"relationship"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"OnBehalf": {
-				"properties": {
-					"firstName": {
-						"type": "string"
-					},
-					"lastName": {
-						"type": "string"
-					},
-					"dob": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"firstName",
-					"lastName",
-					"dob"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"RegisterParticipantRequest": {
-				"properties": {
-					"firstName": {
-						"type": "string",
-						"minLength": 1
-					},
-					"middleName": {
-						"type": "string",
-						"minLength": 1
-					},
-					"lastName": {
-						"type": "string",
-						"minLength": 1
-					},
-					"email": {
-						"type": "string",
-						"pattern": "^(.+)@(.+)$"
-					},
-					"mobile": {
-						"type": "string",
-						"pattern": "^(\\+\\d{1,2}\\s?)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$"
-					},
-					"preferredContact": {
-						"$ref": "#/components/schemas/ContactMethod"
-					},
-					"addressLine": {
-						"type": "string",
-						"minLength": 1
-					},
-					"suburb": {
-						"type": "string",
-						"minLength": 1
-					},
-					"postcode": {
-						"type": "string",
-						"minLength": 1
-					},
-					"state": {
-						"$ref": "#/components/schemas/StateTerritory"
-					},
-					"password": {
-						"type": "string",
-						"minLength": 8
-					},
-					"dob": {
-						"type": "string"
-					},
-					"studyID": {
-						"type": "string",
-						"minLength": 1
-					},
-					"participantID": {
-						"type": "string",
-						"minLength": 1
-					},
-					"isParentOrGuardian": {
-						"type": "boolean"
-					},
-					"nextOfKin": {
-						"$ref": "#/components/schemas/AlternativeContact"
-					},
-					"onBehalfOf": {
-						"$ref": "#/components/schemas/OnBehalf"
-					}
-				},
-				"required": [
-					"firstName",
-					"lastName",
-					"email",
-					"mobile",
-					"preferredContact",
-					"addressLine",
-					"suburb",
-					"postcode",
-					"state",
-					"password",
-					"dob",
-					"studyID",
-					"participantID",
-					"isParentOrGuardian"
-				],
-				"type": "object",
-				"additionalProperties": false,
-				"example": {
-					"firstName": "John",
-					"middleName": "James",
-					"lastName": "Doe",
-					"email": "john.doe@email.com",
-					"password": "Password123",
-					"dob": "2000-05-21",
-					"participantID": "P12345678",
-					"studyID": "S12345678",
-					"mobile": "0412341234",
-					"addressLine": "123 Sydney Street",
-					"suburb": "Sydney",
-					"postcode": "2000",
-					"state": "NSW",
-					"isParentOrGuardian": false,
-					"preferredContact": "MOBILE",
-					"nextOfKin": {
-						"firstName": "Jeremy",
-						"middleName": "Jimmy",
-						"lastName": "Doe",
-						"mobile": "0412341432",
-						"email": "jeremydoe@email.com",
-						"relationship": "PARENT"
-					},
-					"onBehalfOf": {
-						"firstName": "Timothy",
-						"lastName": "Doe",
-						"dob": "1963-05-27"
-					}
-				}
-			},
-			"LoginResponse": {
-				"properties": {
-					"message": {
-						"type": "string"
-					},
-					"token": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"message",
-					"token"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"LoginRequest": {
-				"properties": {
-					"email": {
-						"type": "string",
-						"pattern": "^(.+)@(.+)$"
-					},
-					"password": {
-						"type": "string",
-						"minLength": 8
-					}
-				},
-				"required": [
-					"email",
-					"password"
-				],
-				"type": "object",
-				"additionalProperties": false,
-				"example": {
-					"email": "john.doe@email.com",
-					"password": "Password123"
-				}
-			}
-		},
-		"securitySchemes": {
-			"jwt": {
-				"type": "http",
-				"scheme": "bearer",
-				"bearerFormat": "JWT"
-			}
-		}
-	},
-	"info": {
-		"title": "backend",
-		"contact": {}
-	},
-	"paths": {
-		"/users": {
-			"get": {
-				"operationId": "GetAllUsers",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/GetAllUsersResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/UnauthorizedErrorResponse"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/InternalErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "Get all Users",
-				"summary": "Get all Users",
-				"tags": [
-					"Users"
-				],
-				"security": [
-					{
-						"jwt": []
-					}
-				],
-				"parameters": []
-			},
-			"post": {
-				"operationId": "CreateUser",
-				"responses": {
-					"201": {
-						"description": "Created",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/CreateUserResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/UnauthorizedErrorResponse"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/InternalErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "Create and persist a new user.",
-				"summary": "Create a new User",
-				"tags": [
-					"Users"
-				],
-				"security": [
-					{
-						"jwt": []
-					}
-				],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/CreateUserRequest"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/users/{userID}": {
-			"get": {
-				"operationId": "GetUserById",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/GetUserByIdResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/UnauthorizedErrorResponse"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/NotFoundErrorResponse"
-								},
-								"examples": {
-									"Example 1": {}
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/InternalErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "Gets a Specific User using their ID",
-				"summary": "Get Specific User",
-				"tags": [
-					"Users"
-				],
-				"security": [
-					{
-						"jwt": []
-					}
-				],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "userID",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			},
-			"patch": {
-				"operationId": "UpdateUser",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/UpdateUserResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/UnauthorizedErrorResponse"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/NotFoundErrorResponse"
-								},
-								"examples": {
-									"Example 1": {}
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/InternalErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "Update an existing user.",
-				"summary": "Update a User",
-				"tags": [
-					"Users"
-				],
-				"security": [
-					{
-						"jwt": []
-					}
-				],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "userID",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/UpdateUserRequest"
-							}
-						}
-					}
-				}
-			},
-			"delete": {
-				"operationId": "DeleteUser",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/DeleteUserResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/UnauthorizedErrorResponse"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/NotFoundErrorResponse"
-								},
-								"examples": {
-									"Example 1": {}
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/InternalErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "Delete a user.",
-				"summary": "Delete a User",
-				"tags": [
-					"Users"
-				],
-				"security": [
-					{
-						"jwt": []
-					}
-				],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "userID",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			}
-		},
-		"/surveys": {
-			"get": {
-				"operationId": "GetAllSurveys",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/GetSurveyVersionsResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized"
-					},
-					"500": {
-						"description": "Internal Server Error"
-					}
-				},
-				"description": "Get all Surveys",
-				"summary": "Get all Surveys",
-				"tags": [
-					"Surveys"
-				],
-				"security": [
-					{
-						"jwt": []
-					}
-				],
-				"parameters": []
-			}
-		},
-		"/surveys/{surveyID}": {
-			"get": {
-				"operationId": "GetSurveyVersionById",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/GetSurveyVersionByIdResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized"
-					},
-					"404": {
-						"description": "Not Found"
-					},
-					"500": {
-						"description": "Internal Server Error"
-					}
-				},
-				"description": "Gets a Specific Survey using their ID",
-				"summary": "Get Specific Survey",
-				"tags": [
-					"Surveys"
-				],
-				"security": [
-					{
-						"jwt": []
-					}
-				],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "surveyID",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			}
-		},
-		"/surveys/participant/{surveyId}": {
-			"post": {
-				"operationId": "AddParticipant",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/UpdateSurveyResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized"
-					},
-					"404": {
-						"description": "Not Found"
-					},
-					"500": {
-						"description": "Internal Server Error"
-					}
-				},
-				"summary": "Add participant to survey",
-				"tags": [
-					"Surveys"
-				],
-				"security": [
-					{
-						"jwt": []
-					}
-				],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "surveyId",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			}
-		},
-		"/surveys/step/{study}/{step}": {
-			"get": {
-				"operationId": "GetUserSurveyStep",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/GetUserSurveyStepResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized"
-					},
-					"404": {
-						"description": "Not Found"
-					},
-					"500": {
-						"description": "Internal Server Error"
-					}
-				},
-				"description": "Get user survey step",
-				"summary": "Get questions and current answers for step of a survey",
-				"tags": [
-					"Surveys"
-				],
-				"security": [
-					{
-						"jwt": []
-					}
-				],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "study",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					},
-					{
-						"in": "path",
-						"name": "step",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			}
-		},
-		"/surveys/answers": {
-			"post": {
-				"operationId": "UpdateSurveyAnswers",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/UpdateSurveyAnswersResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized"
-					},
-					"404": {
-						"description": "Not Found"
-					},
-					"500": {
-						"description": "Internal Server Error"
-					}
-				},
-				"description": "Update survey answers",
-				"summary": "Update a Survey",
-				"tags": [
-					"Surveys"
-				],
-				"security": [
-					{
-						"jwt": []
-					}
-				],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/UpdateSurveyAnswersRequest"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/surveys/{surveyId}": {
-			"patch": {
-				"operationId": "UpdateSurvey",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/UpdateSurveyResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized"
-					},
-					"404": {
-						"description": "Not Found"
-					},
-					"500": {
-						"description": "Internal Server Error"
-					}
-				},
-				"summary": "Update draft survey",
-				"tags": [
-					"Surveys"
-				],
-				"security": [
-					{
-						"jwt": []
-					}
-				],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "surveyId",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/UpdateSurveyRequest"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/surveys/publish/{surveyId}": {
-			"post": {
-				"operationId": "PublishSurvey",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/UpdateSurveyResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized"
-					},
-					"404": {
-						"description": "Not Found"
-					},
-					"500": {
-						"description": "Internal Server Error"
-					}
-				},
-				"summary": "Publish a draft survey",
-				"tags": [
-					"Surveys"
-				],
-				"security": [
-					{
-						"jwt": []
-					}
-				],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "surveyId",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			}
-		},
-		"/profiles/current": {
-			"get": {
-				"operationId": "GetParticipantProfileByToken",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/GetParticipantProfileResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/UnauthorizedErrorResponse"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/InternalErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "Get a Participants Profile by token",
-				"summary": "Get a Participants Profile by token",
-				"tags": [
-					"Profiles"
-				],
-				"security": [
-					{
-						"jwt": []
-					}
-				],
-				"parameters": []
-			}
-		},
-		"/profiles/{userID}": {
-			"get": {
-				"operationId": "GetParticipantProfileByID",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/GetParticipantProfileResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/UnauthorizedErrorResponse"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/NotFoundErrorResponse"
-								},
-								"examples": {
-									"Example 1": {}
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/InternalErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "Get a Participants Profile by ID",
-				"summary": "Get a Participants Profile by ID",
-				"tags": [
-					"Profiles"
-				],
-				"security": [
-					{
-						"jwt": []
-					}
-				],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "userID",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			}
-		},
-		"/organisations": {
-			"get": {
-				"operationId": "GetAllOrganisations",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/GetAllOrganisationsResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/UnauthorizedErrorResponse"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/InternalErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "getAllOrganisations",
-				"summary": "Get all Organisations",
-				"tags": [
-					"Organisations"
-				],
-				"security": [
-					{
-						"jwt": []
-					}
-				],
-				"parameters": []
-			},
-			"post": {
-				"operationId": "CreateOrganisation",
-				"responses": {
-					"201": {
-						"description": "Created",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/CreateOrganisationResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/UnauthorizedErrorResponse"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/InternalErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "createOrganisation",
-				"summary": "Create a new Organisation",
-				"tags": [
-					"Organisations"
-				],
-				"security": [
-					{
-						"jwt": []
-					}
-				],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/CreateOrganisationRequest"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/organisations/{orgID}": {
-			"get": {
-				"operationId": "GetOrganisationById",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/GetOrganisationByIdResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/UnauthorizedErrorResponse"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/NotFoundErrorResponse"
-								},
-								"examples": {
-									"Example 1": {}
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/InternalErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "getOrganisationById",
-				"summary": "Get a specific Organisation",
-				"tags": [
-					"Organisations"
-				],
-				"security": [
-					{
-						"jwt": []
-					}
-				],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "orgID",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			},
-			"patch": {
-				"operationId": "UpdateOrganisation",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/UpdateOrganisationResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/UnauthorizedErrorResponse"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/NotFoundErrorResponse"
-								},
-								"examples": {
-									"Example 1": {}
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/InternalErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "updateOrganisation",
-				"summary": "Update an existing Organisation",
-				"tags": [
-					"Organisations"
-				],
-				"security": [
-					{
-						"jwt": []
-					}
-				],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "orgID",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/UpdateOrganisationRequest"
-							}
-						}
-					}
-				}
-			},
-			"delete": {
-				"operationId": "DeleteOrganisation",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/DeleteOrganisationResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/UnauthorizedErrorResponse"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/NotFoundErrorResponse"
-								},
-								"examples": {
-									"Example 1": {}
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/InternalErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "deleteOrganisation",
-				"summary": "Delete an existing Organisation",
-				"tags": [
-					"Organisations"
-				],
-				"security": [
-					{
-						"jwt": []
-					}
-				],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "orgID",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			}
-		},
-		"/organisations/{orgID}/users": {
-			"get": {
-				"operationId": "GetOrganisationUsers",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/GetOrganisationUsersResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/UnauthorizedErrorResponse"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/NotFoundErrorResponse"
-								},
-								"examples": {
-									"Example 1": {}
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/InternalErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "getOrganisationUsers",
-				"summary": "Get all Users within a specific Organisation",
-				"tags": [
-					"Organisations"
-				],
-				"security": [
-					{
-						"jwt": []
-					}
-				],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "orgID",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			}
-		},
-		"/organisations/{orgID}/users/{userID}": {
-			"post": {
-				"operationId": "AddUserToOrganisation",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/AddUserToOrganisationResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/UnauthorizedErrorResponse"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/NotFoundErrorResponse"
-								},
-								"examples": {
-									"Example 1": {}
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/InternalErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "addUserToOrganisation",
-				"summary": "Add specific User to specific Organisation",
-				"tags": [
-					"Organisations"
-				],
-				"security": [
-					{
-						"jwt": []
-					}
-				],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "orgID",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					},
-					{
-						"in": "path",
-						"name": "userID",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			},
-			"delete": {
-				"operationId": "RemoveUserFromOrganisation",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/RemoveUserFromOrganisationResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/UnauthorizedErrorResponse"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/NotFoundErrorResponse"
-								},
-								"examples": {
-									"Example 1": {}
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/InternalErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "removeUserFromOrganisation",
-				"summary": "Removes a specific User from a specific Organisation",
-				"tags": [
-					"Organisations"
-				],
-				"security": [
-					{
-						"jwt": []
-					}
-				],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "orgID",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					},
-					{
-						"in": "path",
-						"name": "userID",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			}
-		},
-		"/healthcheck": {
-			"get": {
-				"operationId": "HealthCheck",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"message"
-									],
-									"type": "object"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error"
-					}
-				},
-				"description": "Health check to ensure server is up and running",
-				"summary": "Health Check",
-				"tags": [
-					"Healthcheck"
-				],
-				"security": [],
-				"parameters": []
-			}
-		},
-		"/healthcheck/workspaces": {
-			"get": {
-				"operationId": "GetAllWorkspaces",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"data": {
-											"items": {
-												"$ref": "#/components/schemas/Workspace"
-											},
-											"type": "array"
-										},
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"data",
-										"message"
-									],
-									"type": "object"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error"
-					}
-				},
-				"description": "Get all Workspaces",
-				"summary": "Get all Workspaces",
-				"tags": [
-					"Healthcheck"
-				],
-				"security": [],
-				"parameters": []
-			}
-		},
-		"/auth/register": {
-			"post": {
-				"operationId": "RegisterUser",
-				"responses": {
-					"201": {
-						"description": "User Created",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/RegisterResponse"
-								}
-							}
-						}
-					},
-					"422": {
-						"description": "Validation Failed",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ValidateErrorResponse"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/InternalErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "register",
-				"summary": "Register a new user",
-				"tags": [
-					"Auth"
-				],
-				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/RegisterRequest"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/auth/register/participant": {
-			"post": {
-				"operationId": "RegisterParticipant",
-				"responses": {
-					"201": {
-						"description": "Participant Created",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/RegisterParticipantResponse"
-								}
-							}
-						}
-					},
-					"422": {
-						"description": "Validation Failed",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ValidateErrorResponse"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/InternalErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "registerParticipant",
-				"summary": "Register a participant",
-				"tags": [
-					"Auth"
-				],
-				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/RegisterParticipantRequest"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/auth/login": {
-			"post": {
-				"operationId": "Login",
-				"responses": {
-					"200": {
-						"description": "Logged In",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/LoginResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/UnauthorizedErrorResponse"
-								},
-								"examples": {
-									"Example 1": {}
-								}
-							}
-						}
-					},
-					"422": {
-						"description": "Validation Failed",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ValidateErrorResponse"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/InternalErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "login",
-				"summary": "Login a User",
-				"tags": [
-					"Auth"
-				],
-				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/LoginRequest"
-							}
-						}
-					}
-				}
-			}
-		}
-	},
-	"servers": [
-		{
-			"url": "/"
-		}
-	]
+  "openapi": "3.0.0",
+  "components": {
+    "examples": {},
+    "headers": {},
+    "parameters": {},
+    "requestBodies": {},
+    "responses": {},
+    "schemas": {
+      "UnauthorizedErrorResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "details": {}
+        },
+        "required": ["message"],
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "message": "Unauthorized",
+          "details": {
+            "message": "Token not in headers"
+          }
+        }
+      },
+      "InternalErrorResponse": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "enum": ["Internal Server Error"],
+            "nullable": false
+          },
+          "details": {}
+        },
+        "required": ["message"],
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "message": "Internal Server Error",
+          "details": {
+            "message": "Some error happened D:"
+          }
+        }
+      },
+      "ValidateErrorResponse": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "enum": ["Validation Failed"],
+            "nullable": false
+          },
+          "details": {
+            "properties": {},
+            "additionalProperties": {},
+            "type": "object"
+          }
+        },
+        "required": ["message", "details"],
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "message": "Validation Failed",
+          "bodyRequest.firstName": {
+            "message": "minLength 1",
+            "value": ""
+          }
+        }
+      },
+      "DefaultSelection_Prisma._36_UserPayload_": {
+        "properties": {
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "role": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "middleName": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "id": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": [
+          "updatedAt",
+          "createdAt",
+          "role",
+          "password",
+          "email",
+          "lastName",
+          "middleName",
+          "firstName",
+          "id"
+        ],
+        "type": "object"
+      },
+      "User": {
+        "$ref": "#/components/schemas/DefaultSelection_Prisma._36_UserPayload_",
+        "description": "Model User"
+      },
+      "GetAllUsersResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/User"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["message", "data"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "GetUserByIdResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/User"
+          }
+        },
+        "required": ["message", "data"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "NotFoundErrorResponse": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "enum": ["Not Found"],
+            "nullable": false
+          },
+          "details": {}
+        },
+        "required": ["message"],
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "message": "Not Found",
+          "details": {
+            "message": "User not found"
+          }
+        }
+      },
+      "CreateUserResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["message"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "CreateUserRequest": {
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "lastName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "email": {
+            "type": "string",
+            "pattern": "^(.+)@(.+)$"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8
+          },
+          "role": {
+            "type": "string"
+          }
+        },
+        "required": ["firstName", "lastName", "email", "password", "role"],
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "firstName": "John",
+          "lastName": "Doe",
+          "email": "john.doe@email.com",
+          "password": "Password123",
+          "role": "User"
+        }
+      },
+      "UpdateUserResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["message"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UpdateUserRequest": {
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "lastName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "email": {
+            "type": "string",
+            "pattern": "^(.+)@(.+)$"
+          },
+          "role": {
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "firstName": "John",
+          "lastName": "Doe",
+          "email": "john.doe@email.com",
+          "role": "User"
+        }
+      },
+      "DeleteUserResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["message"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "SurveyVersionStatus": {
+        "type": "string",
+        "enum": ["PUBLISHED", "DRAFT"]
+      },
+      "SurveyVersionBasic": {
+        "properties": {
+          "id": {
+            "type": "number",
+            "format": "double"
+          },
+          "versionNumber": {
+            "type": "number",
+            "format": "double"
+          },
+          "published_date": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SurveyVersionStatus"
+          }
+        },
+        "required": ["status"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "GetSurveyVersionsResponse": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/SurveyVersionBasic"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["data"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "SurveyQuestionChoices": {
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "tooltip": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "choices": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["text", "value", "required", "choices"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "SurveyQuestionCheckbox": {
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "tooltip": {
+            "type": "string"
+          },
+          "value": {
+            "type": "boolean"
+          },
+          "required": {
+            "type": "boolean"
+          }
+        },
+        "required": ["text", "value", "required"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "SurveyVideo": {
+        "properties": {
+          "link": {
+            "type": "string"
+          }
+        },
+        "required": ["link"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "SurveySubHeading": {
+        "properties": {
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": ["text"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "SurveyElementType": {
+        "type": "string",
+        "enum": ["question-choices", "question-checkbox", "subheading", "video"]
+      },
+      "SurveyElement": {
+        "anyOf": [
+          {
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SurveyQuestionChoices"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["question-choices"],
+                "nullable": false
+              }
+            },
+            "required": ["data", "type"],
+            "type": "object"
+          },
+          {
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SurveyQuestionCheckbox"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["question-checkbox"],
+                "nullable": false
+              }
+            },
+            "required": ["data", "type"],
+            "type": "object"
+          },
+          {
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SurveyVideo"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["video"],
+                "nullable": false
+              }
+            },
+            "required": ["data", "type"],
+            "type": "object"
+          },
+          {
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SurveySubHeading"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["subheading"],
+                "nullable": false
+              }
+            },
+            "required": ["data", "type"],
+            "type": "object"
+          },
+          {
+            "properties": {
+              "data": {},
+              "type": {
+                "$ref": "#/components/schemas/SurveyElementType"
+              }
+            },
+            "required": ["data", "type"],
+            "type": "object"
+          }
+        ]
+      },
+      "SurveyStep": {
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "last_updated": {
+            "type": "string"
+          },
+          "elements": {
+            "items": {
+              "$ref": "#/components/schemas/SurveyElement"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["title", "text", "elements"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "SurveyVersion": {
+        "properties": {
+          "id": {
+            "type": "number",
+            "format": "double"
+          },
+          "version_number": {
+            "type": "number",
+            "format": "double"
+          },
+          "published_date": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SurveyVersionStatus"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/SurveyStep"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["status", "data"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "GetSurveyVersionByIdResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/SurveyVersion"
+          }
+        },
+        "required": ["data"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UpdateSurveyResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["message"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UserStepContext": {
+        "properties": {
+          "current_step": {
+            "type": "number",
+            "format": "double"
+          },
+          "total_steps": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": ["current_step", "total_steps"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "GetUserSurveyStepResponse": {
+        "properties": {
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SurveyStep"
+              },
+              {
+                "$ref": "#/components/schemas/UserStepContext"
+              }
+            ]
+          }
+        },
+        "required": ["data"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UpdateSurveyAnswersResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["message"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UpdateSurveyAnswersRequest": {
+        "properties": {
+          "surveyVersionId": {
+            "type": "number",
+            "format": "double"
+          },
+          "step": {
+            "type": "number",
+            "format": "double"
+          },
+          "data": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "boolean"
+                }
+              ]
+            },
+            "type": "array"
+          }
+        },
+        "required": ["surveyVersionId", "step", "data"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UpdateSurveyRequest": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/SurveyStep"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["data"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "_36_Enums.StateTerritory": {
+        "type": "string",
+        "enum": ["ACT", "NSW", "NT", "QLD", "SA", "TAS", "VIC", "WA"]
+      },
+      "_36_Enums.ContactMethod": {
+        "type": "string",
+        "enum": ["EMAIL", "MOBILE", "MAIL"]
+      },
+      "DefaultSelection_Prisma._36_ParticipantProfilePayload_": {
+        "properties": {
+          "userId": {
+            "type": "number",
+            "format": "double"
+          },
+          "preferredContact": {
+            "$ref": "#/components/schemas/_36_Enums.ContactMethod"
+          },
+          "isParentOrGuardian": {
+            "type": "boolean"
+          },
+          "postcode": {
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/_36_Enums.StateTerritory"
+          },
+          "suburb": {
+            "type": "string"
+          },
+          "addressLine": {
+            "type": "string"
+          },
+          "mobile": {
+            "type": "string"
+          },
+          "participantID": {
+            "type": "string"
+          },
+          "dob": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": [
+          "userId",
+          "preferredContact",
+          "isParentOrGuardian",
+          "postcode",
+          "state",
+          "suburb",
+          "addressLine",
+          "mobile",
+          "participantID",
+          "dob",
+          "id"
+        ],
+        "type": "object"
+      },
+      "ParticipantProfile": {
+        "$ref": "#/components/schemas/DefaultSelection_Prisma._36_ParticipantProfilePayload_",
+        "description": "Model ParticipantProfile"
+      },
+      "GetParticipantProfileResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ParticipantProfile"
+              },
+              {
+                "properties": {
+                  "user": {
+                    "properties": {
+                      "email": {
+                        "type": "string"
+                      },
+                      "lastName": {
+                        "type": "string"
+                      },
+                      "middleName": {
+                        "type": "string"
+                      },
+                      "firstName": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["email", "lastName", "firstName"],
+                    "type": "object"
+                  }
+                },
+                "required": ["user"],
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "required": ["message", "data"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "DefaultSelection_Prisma._36_OrganisationPayload_": {
+        "properties": {
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": ["updatedAt", "createdAt", "name", "id"],
+        "type": "object"
+      },
+      "Organisation": {
+        "$ref": "#/components/schemas/DefaultSelection_Prisma._36_OrganisationPayload_",
+        "description": "Model Organisation"
+      },
+      "GetAllOrganisationsResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "organisations": {
+            "items": {
+              "$ref": "#/components/schemas/Organisation"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["message", "organisations"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "GetOrganisationByIdResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "organisation": {
+            "$ref": "#/components/schemas/Organisation"
+          }
+        },
+        "required": ["message", "organisation"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "CreateOrganisationResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "organisationID": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": ["message", "organisationID"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "CreateOrganisationRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": ["name"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UpdateOrganisationResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["message"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UpdateOrganisationRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "type": "object",
+        "additionalProperties": false
+      },
+      "DeleteOrganisationResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["message"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "GetOrganisationUsersResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "users": {
+            "items": {
+              "$ref": "#/components/schemas/User"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["message", "users"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "AddUserToOrganisationResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["message"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "RemoveUserFromOrganisationResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["message"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "Workspace": {
+        "properties": {
+          "version": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": ["version", "name"],
+        "type": "object"
+      },
+      "RegisterResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": ["message", "token"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "RegisterRequest": {
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "middleName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "lastName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "email": {
+            "type": "string",
+            "pattern": "^(.+)@(.+)$"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8
+          },
+          "role": {
+            "type": "string"
+          }
+        },
+        "required": ["firstName", "lastName", "email", "password", "role"],
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "firstName": "John",
+          "lastName": "Doe",
+          "email": "john.doe@email.com",
+          "password": "Password123",
+          "role": "User"
+        }
+      },
+      "RegisterParticipantResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": ["message", "token"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "ContactMethod": {
+        "enum": ["MOBILE", "EMAIL", "MAIL"],
+        "type": "string"
+      },
+      "StateTerritory": {
+        "enum": ["ACT", "NSW", "NT", "QLD", "SA", "TAS", "VIC", "WA"],
+        "type": "string"
+      },
+      "RelationshipType": {
+        "enum": ["PARENT", "GUARDIAN", "CHILD", "OTHER"],
+        "type": "string"
+      },
+      "AlternativeContact": {
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "middleName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "mobile": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "relationship": {
+            "$ref": "#/components/schemas/RelationshipType"
+          }
+        },
+        "required": ["firstName", "lastName", "email", "relationship"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "OnBehalf": {
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "dob": {
+            "type": "string"
+          }
+        },
+        "required": ["firstName", "lastName", "dob"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "RegisterParticipantRequest": {
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "middleName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "lastName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "email": {
+            "type": "string",
+            "pattern": "^(.+)@(.+)$"
+          },
+          "mobile": {
+            "type": "string",
+            "pattern": "^(\\+\\d{1,2}\\s?)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$"
+          },
+          "preferredContact": {
+            "$ref": "#/components/schemas/ContactMethod"
+          },
+          "addressLine": {
+            "type": "string",
+            "minLength": 1
+          },
+          "suburb": {
+            "type": "string",
+            "minLength": 1
+          },
+          "postcode": {
+            "type": "string",
+            "minLength": 1
+          },
+          "state": {
+            "$ref": "#/components/schemas/StateTerritory"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8
+          },
+          "dob": {
+            "type": "string"
+          },
+          "studyId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "participantID": {
+            "type": "string",
+            "minLength": 1
+          },
+          "isParentOrGuardian": {
+            "type": "boolean"
+          },
+          "nextOfKin": {
+            "$ref": "#/components/schemas/AlternativeContact"
+          },
+          "onBehalfOf": {
+            "$ref": "#/components/schemas/OnBehalf"
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "email",
+          "mobile",
+          "preferredContact",
+          "addressLine",
+          "suburb",
+          "postcode",
+          "state",
+          "password",
+          "dob",
+          "studyId",
+          "participantID",
+          "isParentOrGuardian"
+        ],
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "firstName": "John",
+          "middleName": "James",
+          "lastName": "Doe",
+          "email": "john.doe@email.com",
+          "password": "Password123",
+          "dob": "2000-05-21",
+          "participantID": "P12345678",
+          "studyId": "S12345678",
+          "mobile": "0412341234",
+          "addressLine": "123 Sydney Street",
+          "suburb": "Sydney",
+          "postcode": "2000",
+          "state": "NSW",
+          "isParentOrGuardian": false,
+          "preferredContact": "MOBILE",
+          "nextOfKin": {
+            "firstName": "Jeremy",
+            "middleName": "Jimmy",
+            "lastName": "Doe",
+            "mobile": "0412341432",
+            "email": "jeremydoe@email.com",
+            "relationship": "PARENT"
+          },
+          "onBehalfOf": {
+            "firstName": "Timothy",
+            "lastName": "Doe",
+            "dob": "1963-05-27"
+          }
+        }
+      },
+      "LoginResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": ["message", "token"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "LoginRequest": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "pattern": "^(.+)@(.+)$"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8
+          }
+        },
+        "required": ["email", "password"],
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "email": "john.doe@email.com",
+          "password": "Password123"
+        }
+      }
+    },
+    "securitySchemes": {
+      "jwt": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "info": {
+    "title": "backend",
+    "contact": {}
+  },
+  "paths": {
+    "/users": {
+      "get": {
+        "operationId": "GetAllUsers",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllUsersResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Get all Users",
+        "summary": "Get all Users",
+        "tags": ["Users"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": []
+      },
+      "post": {
+        "operationId": "CreateUser",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateUserResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Create and persist a new user.",
+        "summary": "Create a new User",
+        "tags": ["Users"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{userId}": {
+      "get": {
+        "operationId": "GetUserById",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetUserByIdResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Gets a Specific User using their ID",
+        "summary": "Get Specific User",
+        "tags": ["Users"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "UpdateUser",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateUserResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Update an existing user.",
+        "summary": "Update a User",
+        "tags": ["Users"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRequest"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "DeleteUser",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteUserResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Delete a user.",
+        "summary": "Delete a User",
+        "tags": ["Users"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/surveys": {
+      "get": {
+        "operationId": "GetAllSurveys",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetSurveyVersionsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Get all Surveys",
+        "summary": "Get all Surveys",
+        "tags": ["Surveys"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": []
+      }
+    },
+    "/surveys/{surveyID}": {
+      "get": {
+        "operationId": "GetSurveyVersionById",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetSurveyVersionByIdResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Gets a Specific Survey using their ID",
+        "summary": "Get Specific Survey",
+        "tags": ["Surveys"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "surveyID",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/surveys/participant/{surveyId}": {
+      "post": {
+        "operationId": "AddParticipant",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateSurveyResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Add participant to survey",
+        "tags": ["Surveys"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "surveyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/surveys/step/{study}/{step}": {
+      "get": {
+        "operationId": "GetUserSurveyStep",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetUserSurveyStepResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Get user survey step",
+        "summary": "Get questions and current answers for step of a survey",
+        "tags": ["Surveys"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "study",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "step",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/surveys/answers": {
+      "post": {
+        "operationId": "UpdateSurveyAnswers",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateSurveyAnswersResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Update survey answers",
+        "summary": "Update a Survey",
+        "tags": ["Surveys"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSurveyAnswersRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/surveys/{surveyId}": {
+      "patch": {
+        "operationId": "UpdateSurvey",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateSurveyResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Update draft survey",
+        "tags": ["Surveys"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "surveyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSurveyRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/surveys/publish/{surveyId}": {
+      "post": {
+        "operationId": "PublishSurvey",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateSurveyResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Publish a draft survey",
+        "tags": ["Surveys"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "surveyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/profiles/current": {
+      "get": {
+        "operationId": "GetParticipantProfileByToken",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetParticipantProfileResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Get a Participants Profile by token",
+        "summary": "Get a Participants Profile by token",
+        "tags": ["Profiles"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": []
+      }
+    },
+    "/profiles/{userId}": {
+      "get": {
+        "operationId": "GetParticipantProfileByID",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetParticipantProfileResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Get a Participants Profile by ID",
+        "summary": "Get a Participants Profile by ID",
+        "tags": ["Profiles"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/organisations": {
+      "get": {
+        "operationId": "GetAllOrganisations",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllOrganisationsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "getAllOrganisations",
+        "summary": "Get all Organisations",
+        "tags": ["Organisations"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": []
+      },
+      "post": {
+        "operationId": "CreateOrganisation",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateOrganisationResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "createOrganisation",
+        "summary": "Create a new Organisation",
+        "tags": ["Organisations"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrganisationRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/organisations/{orgID}": {
+      "get": {
+        "operationId": "GetOrganisationById",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetOrganisationByIdResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "getOrganisationById",
+        "summary": "Get a specific Organisation",
+        "tags": ["Organisations"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orgID",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "UpdateOrganisation",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateOrganisationResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "updateOrganisation",
+        "summary": "Update an existing Organisation",
+        "tags": ["Organisations"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orgID",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrganisationRequest"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "DeleteOrganisation",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteOrganisationResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "deleteOrganisation",
+        "summary": "Delete an existing Organisation",
+        "tags": ["Organisations"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orgID",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/organisations/{orgID}/users": {
+      "get": {
+        "operationId": "GetOrganisationUsers",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetOrganisationUsersResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "getOrganisationUsers",
+        "summary": "Get all Users within a specific Organisation",
+        "tags": ["Organisations"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orgID",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/organisations/{orgID}/users/{userId}": {
+      "post": {
+        "operationId": "AddUserToOrganisation",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddUserToOrganisationResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "addUserToOrganisation",
+        "summary": "Add specific User to specific Organisation",
+        "tags": ["Organisations"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orgID",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "RemoveUserFromOrganisation",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RemoveUserFromOrganisationResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "removeUserFromOrganisation",
+        "summary": "Removes a specific User from a specific Organisation",
+        "tags": ["Organisations"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orgID",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/healthcheck": {
+      "get": {
+        "operationId": "HealthCheck",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Health check to ensure server is up and running",
+        "summary": "Health Check",
+        "tags": ["Healthcheck"],
+        "security": [],
+        "parameters": []
+      }
+    },
+    "/healthcheck/workspaces": {
+      "get": {
+        "operationId": "GetAllWorkspaces",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/Workspace"
+                      },
+                      "type": "array"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["data", "message"],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Get all Workspaces",
+        "summary": "Get all Workspaces",
+        "tags": ["Healthcheck"],
+        "security": [],
+        "parameters": []
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "operationId": "RegisterUser",
+        "responses": {
+          "201": {
+            "description": "User Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "register",
+        "summary": "Register a new user",
+        "tags": ["Auth"],
+        "security": [],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/register/participant": {
+      "post": {
+        "operationId": "RegisterParticipant",
+        "responses": {
+          "201": {
+            "description": "Participant Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterParticipantResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "registerParticipant",
+        "summary": "Register a participant",
+        "tags": ["Auth"],
+        "security": [],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterParticipantRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "Login",
+        "responses": {
+          "200": {
+            "description": "Logged In",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "login",
+        "summary": "Login a User",
+        "tags": ["Auth"],
+        "security": [],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ]
 }

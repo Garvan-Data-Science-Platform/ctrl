@@ -228,7 +228,7 @@ describe('AuthController', () => {
         state: StateTerritory.NSW,
         preferredContact: ContactMethod.MOBILE,
         dob: '1990-01-01',
-        studyID: 'STUDY123',
+        studyId: 'STUDY123',
         participantID: 'PARTICIPANT123',
         isParentOrGuardian: true,
       }
@@ -256,7 +256,7 @@ describe('AuthController', () => {
         state: StateTerritory.NSW,
         preferredContact: ContactMethod.MOBILE,
         dob: '1990-01-01',
-        studyID: 'STUDY123',
+        studyId: 'STUDY123',
         participantID: 'PARTICIPANT123',
         isParentOrGuardian: true,
       }
@@ -288,7 +288,7 @@ describe('AuthController', () => {
         state: StateTerritory.NSW,
         preferredContact: ContactMethod.MOBILE,
         dob: '1990-01-01',
-        studyID: '',
+        studyId: '',
         participantID: '',
         isParentOrGuardian: true,
       }
@@ -314,7 +314,7 @@ describe('AuthController', () => {
           message: 'please provide valid phone number',
           value: '12341234',
         },
-        'bodyRequest.studyID': {
+        'bodyRequest.studyId': {
           message: 'minLength 1',
           value: '',
         },

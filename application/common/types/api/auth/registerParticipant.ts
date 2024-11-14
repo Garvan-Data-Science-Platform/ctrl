@@ -14,7 +14,7 @@ import type {
  *  "password": "Password123",
  *  "dob": "2000-05-21",
  *  "participantID": "P12345678",
- *  "studyID": "S12345678",
+ *  "studyId": "S12345678",
  *  "mobile": "0412341234",
  *  "addressLine": "123 Sydney Street",
  *  "suburb": "Sydney",
@@ -83,7 +83,7 @@ export interface RegisterParticipantRequest {
   /**
    * @minLength 1
    */
-  studyID: string
+  studyId: string
   /**
    * @minLength 1
    */

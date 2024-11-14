@@ -39,8 +39,8 @@ model ParticipantProfile {
   nextOfKin          AlternativeContact?
   onBehalfOf         OnBehalf?
   preferredContact   ContactMethod
-  userID             Int                 @unique
-  user               User                @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId             Int                 @unique
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model OnBehalf {

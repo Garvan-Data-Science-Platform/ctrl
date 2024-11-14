@@ -12,7 +12,7 @@ interface FormValues {
   password: string
   confirm_password: string
   dob: string
-  studyID: string
+  studyId: string
   nok_first: string
   nok_surname: string
   nok_email: string
@@ -44,7 +44,7 @@ export default function Register() {
       email: data.email,
       password: data.password,
       dob: data.dob,
-      studyID: data.studyID,
+      studyId: data.studyId,
     }
 
     let reqData: RegisterParticipantRequest
@@ -155,7 +155,7 @@ export default function Register() {
                 fullWidth
                 sx={{ m: 1 }}
                 label="Study ID"
-                {...register('studyID', { required: true })}
+                {...register('studyId', { required: true })}
               />
 
               <Typography sx={{ m: 1 }}>

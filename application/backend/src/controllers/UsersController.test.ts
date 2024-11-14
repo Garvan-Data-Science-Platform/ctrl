@@ -74,22 +74,22 @@ describe('UsersController', () => {
 
   describe('GET /users/:id', () => {
     it('should return a user by ID', async () => {
-      const userID = registeredUserID
+      const userId = registeredUserID
       const response = await request(app)
-        .get(`/users/${userID}`)
+        .get(`/users/${userId}`)
         .set({ Authorization: `Bearer ${token}` })
 
       expect(response.status).toBe(200)
 
       const body: GetUserByIdResponse = response.body
-      expect(body.message).toBe(`Got user with ID: ${userID}`)
+      expect(body.message).toBe(`Got user with ID: ${userId}`)
       expect(body).toHaveProperty('data')
     })
 
     it('should return an error for a non-existent user', async () => {
-      const userID = 9999
+      const userId = 9999
       const response = await request(app)
-        .get(`/users/${userID}`)
+        .get(`/users/${userId}`)
         .set({
           Authorization: `Bearer ${token}`,
         })
@@ -137,12 +137,12 @@ describe('UsersController', () => {
 
   describe('PATCH /users/:id', () => {
     it('should update a user by ID', async () => {
-      const userID: number = registeredUserID
+      const userId: number = registeredUserID
 
       const newFirstName: string = 'Updated'
 
       // Get existing user details
-      const existingUser = await prisma.user.findFirst({ where: { id: userID } })
+      const existingUser = await prisma.user.findFirst({ where: { id: userId } })
 
       expect(existingUser?.email).toBe(testUser.email)
       expect(existingUser?.firstName).toBe(testUser.firstName)
@@ -150,26 +150,26 @@ describe('UsersController', () => {
       expect(existingUser?.role).toBe(testUser.role)
 
       const response = await request(app)
-        .patch(`/users/${userID}`)
+        .patch(`/users/${userId}`)
         .set({ Authorization: `Bearer ${token}` })
         .send({ firstName: newFirstName })
 
       expect(response.status).toBe(200)
 
       const body: UpdateUserResponse = response.body
-      expect(body.message).toBe(`Updated user with ID: ${userID}`)
+      expect(body.message).toBe(`Updated user with ID: ${userId}`)
 
       // Check if the user is updated successfully
-      const updatedUser = await prisma.user.findFirst({ where: { id: userID } })
+      const updatedUser = await prisma.user.findFirst({ where: { id: userId } })
 
       expect(updatedUser?.firstName).toBe(newFirstName)
     })
 
     it('should return an error for a non-existent user', async () => {
-      const userID: number = 9999
+      const userId: number = 9999
       const newFirstName: string = 'Updated'
       const response = await request(app)
-        .patch(`/users/${userID}`)
+        .patch(`/users/${userId}`)
         .set({
           Authorization: `Bearer ${token}`,
         })
@@ -184,34 +184,34 @@ describe('UsersController', () => {
 
   describe('DELETE /users/:id', () => {
     it('should delete a user by ID', async () => {
-      const userID: number = registeredUserID
+      const userId: number = registeredUserID
 
       // Check that user exists in db
-      const existingUser = await prisma.user.findFirst({ where: { id: userID } })
+      const existingUser = await prisma.user.findFirst({ where: { id: userId } })
 
       expect(existingUser).not.toBe(null)
-      expect(existingUser?.id).toBe(userID)
+      expect(existingUser?.id).toBe(userId)
 
       // Delete User
       const response = await request(app)
-        .delete(`/users/${userID}`)
+        .delete(`/users/${userId}`)
         .set({ Authorization: `Bearer ${token}` })
 
       expect(response.status).toBe(200)
 
       const body: DeleteUserResponse = response.body
-      expect(body.message).toBe(`Deleted user with ID: ${userID}`)
+      expect(body.message).toBe(`Deleted user with ID: ${userId}`)
 
       // Check that user exists in db
-      const deletedUser = await prisma.user.findFirst({ where: { id: userID } })
+      const deletedUser = await prisma.user.findFirst({ where: { id: userId } })
 
       expect(deletedUser).toBe(null)
     })
 
     it('should return an error for a non-existent user', async () => {
-      const userID: number = 999
+      const userId: number = 999
       const response = await request(app)
-        .delete(`/users/${userID}`)
+        .delete(`/users/${userId}`)
         .set({ Authorization: `Bearer ${token}` })
 
       expect(response.status).toBe(404)

@@ -104,7 +104,7 @@ describe('Auth', () => {
       state: StateTerritory.NSW,
       preferredContact: ContactMethod.MOBILE,
       dob: '1990-01-01',
-      studyID: 'STUDY123',
+      studyId: 'STUDY123',
       participantID: 'PARTICIPANT123',
       isParentOrGuardian: true,
     }

@@ -40,7 +40,7 @@ describe('ProfilesController', () => {
       state: StateTerritory.NSW,
       preferredContact: ContactMethod.MOBILE,
       dob: '1990-01-02',
-      studyID: 'S12345',
+      studyId: 'S12345',
       participantID: 'P12345',
       isParentOrGuardian: true,
     }
@@ -72,7 +72,7 @@ describe('ProfilesController', () => {
     api.stop()
   })
 
-  describe('GET /profiles/:userID', () => {
+  describe('GET /profiles/:userId', () => {
     it('should return the profile of a user if they exist', async () => {
       // Get user profile
       const response = await request(app)
@@ -98,20 +98,20 @@ describe('ProfilesController', () => {
           lastName: 'Doe',
           middleName: null,
         },
-        userID: expect.any(Number),
+        userId: expect.any(Number),
       })
 
       const body: GetParticipantProfileResponse = response.body
       expect(body.message).toBe(
-        `Got Participant Profile with userID: ${registeredParticipantUserID}`,
+        `Got Participant Profile with userId: ${registeredParticipantUserID}`,
       )
       expect(body.data).toEqual(expectedProfileData)
     })
 
     it('should return a 404 error if the user does not exist', async () => {
-      const userID: number = 999
+      const userId: number = 999
       const response = await request(app)
-        .get(`/profiles/${userID}`)
+        .get(`/profiles/${userId}`)
         .set({ Authorization: `Bearer ${registeredParticipantToken}` })
 
       expect(response.status).toBe(404)
@@ -145,12 +145,12 @@ describe('ProfilesController', () => {
           lastName: 'Doe',
           middleName: null,
         },
-        userID: expect.any(Number),
+        userId: expect.any(Number),
       })
 
       const body: GetParticipantProfileResponse = response.body
       expect(body.message).toBe(
-        `Got Participant Profile with userID: ${registeredParticipantUserID}`,
+        `Got Participant Profile with userId: ${registeredParticipantUserID}`,
       )
       expect(body.data).toEqual(expectedProfileData)
     })
@@ -166,7 +166,7 @@ describe('ProfilesController', () => {
     })
   })
 
-  describe('GET /profiles/current and GET /profiles/:userID', () => {
+  describe('GET /profiles/current and GET /profiles/:userId', () => {
     it('should return the same values', async () => {
       const currentParticipantProfileResponse = await request(app)
         .get('/profiles/current')

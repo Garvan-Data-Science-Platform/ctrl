@@ -49,7 +49,7 @@ export async function seedTests(prisma: PrismaClient) {
       preferredContact: 'EMAIL',
       state: 'VIC',
       suburb: 'M',
-      userID: 98,
+      userId: 98,
     },
   })
   await prisma.participantProfile.create({
@@ -64,7 +64,7 @@ export async function seedTests(prisma: PrismaClient) {
       preferredContact: 'EMAIL',
       state: 'VIC',
       suburb: 'M',
-      userID: 99,
+      userId: 99,
     },
   })
   await prisma.study.create({ data: { id: 1 } })

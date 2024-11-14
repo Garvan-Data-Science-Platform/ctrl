@@ -200,18 +200,18 @@ export class OrganisationsController extends Controller {
    *
    * @summary Add specific User to specific Organisation
    */
-  @Post('/{orgID}/users/{userID}')
+  @Post('/{orgID}/users/{userId}')
   @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async addUserToOrganisation(
     @Path() orgID: number,
-    @Path() userID: number,
+    @Path() userId: number,
   ): Promise<AddUserToOrganisationResponse> {
     // Check if user exists
-    const user = await this.userRepo.findUnique({ where: { id: userID } })
+    const user = await this.userRepo.findUnique({ where: { id: userId } })
 
     if (!user) {
-      const errorMessage: string = `User with ID: ${userID} not found`
+      const errorMessage: string = `User with ID: ${userId} not found`
       logger.error({ errorMessage })
       throw new NotFoundError(errorMessage)
     }
@@ -229,12 +229,12 @@ export class OrganisationsController extends Controller {
     const userInOrganisation = await this.organisationRepo.findUnique({
       where: {
         id: orgID,
-        users: { some: { id: userID } },
+        users: { some: { id: userId } },
       },
     })
 
     if (userInOrganisation) {
-      const errorMessage: string = `User with ID: ${userID} already in organisation with ID: ${orgID}`
+      const errorMessage: string = `User with ID: ${userId} already in organisation with ID: ${orgID}`
       logger.error({ errorMessage })
       throw new Error(errorMessage)
     }
@@ -242,11 +242,11 @@ export class OrganisationsController extends Controller {
     // Add user to organisation
     await this.organisationRepo.update({
       where: { id: orgID },
-      data: { users: { connect: { id: userID } } },
+      data: { users: { connect: { id: userId } } },
     })
 
     const responseData = {
-      message: `User with ID: ${userID} added to organisation with ID: ${orgID}`,
+      message: `User with ID: ${userId} added to organisation with ID: ${orgID}`,
     }
 
     logger.info({ ...responseData })
@@ -258,18 +258,18 @@ export class OrganisationsController extends Controller {
    *
    * @summary Removes a specific User from a specific Organisation
    */
-  @Delete('/{orgID}/users/{userID}')
+  @Delete('/{orgID}/users/{userId}')
   @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async removeUserFromOrganisation(
     @Path() orgID: number,
-    @Path() userID: number,
+    @Path() userId: number,
   ): Promise<RemoveUserFromOrganisationResponse> {
     // Check if user exists
-    const user = await this.userRepo.findUnique({ where: { id: userID } })
+    const user = await this.userRepo.findUnique({ where: { id: userId } })
 
     if (!user) {
-      const errorMessage: string = `User with ID: ${userID} not found`
+      const errorMessage: string = `User with ID: ${userId} not found`
       logger.error({ errorMessage })
       throw new NotFoundError(errorMessage)
     }
@@ -287,12 +287,12 @@ export class OrganisationsController extends Controller {
     const userInOrganisation = await this.organisationRepo.findUnique({
       where: {
         id: orgID,
-        users: { some: { id: userID } },
+        users: { some: { id: userId } },
       },
     })
 
     if (!userInOrganisation) {
-      const errorMessage: string = `User with ID: ${userID} not in organisation with ID: ${orgID}`
+      const errorMessage: string = `User with ID: ${userId} not in organisation with ID: ${orgID}`
       logger.error({ errorMessage })
       throw new Error(errorMessage)
     }
@@ -300,10 +300,10 @@ export class OrganisationsController extends Controller {
     // Remove user from organisation
     await this.organisationRepo.update({
       where: { id: orgID },
-      data: { users: { disconnect: { id: userID } } },
+      data: { users: { disconnect: { id: userId } } },
     })
     const responseData = {
-      message: `User with ID: ${userID} removed from organisation with ID: ${orgID}`,
+      message: `User with ID: ${userId} removed from organisation with ID: ${orgID}`,
     }
 
     logger.info({ ...responseData })
