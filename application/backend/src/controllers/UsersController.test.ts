@@ -220,4 +220,16 @@ describe('UsersController', () => {
       expect(body.message).toBe('Not Found')
     })
   })
+
+  describe('PATCH /users/:id/role', () => {
+    it('should update a users role to the role provided', async () => {})
+
+    it('should keep the same role if the provided role is invalid', async () => {})
+
+    it('should return an error for an invalid role', async () => {})
+
+    it('should return an error for a non-existent user', async () => {})
+
+    it('should return an error if the', async () => {})
+  })
 })
