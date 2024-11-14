@@ -14,12 +14,26 @@ model User {
   lastName      String
   email         String              @unique
   password      String
-  role          String
+  role          Role                @default(Participant)
   organisations Organisation[]
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
   profile       ParticipantProfile?
   surveyAnsers  SurveyAnswers[]
+}
+
+enum Role {
+  OperatorAdmin
+  Participant
+  OrganisationAdmin
+}
+
+model Organisation {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  users     User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model ParticipantProfile {
@@ -37,6 +51,23 @@ model ParticipantProfile {
   preferredContact   ContactMethod
   userID             Int                 @unique
   user               User                @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+enum StateTerritory {
+  ACT
+  NSW
+  NT
+  QLD
+  SA
+  TAS
+  VIC
+  WA
+}
+
+enum ContactMethod {
+  EMAIL
+  MOBILE
+  MAIL
 }
 
 model OnBehalf {
@@ -65,31 +96,6 @@ enum RelationshipType {
   GUARDIAN
   CHILD
   OTHER
-}
-
-enum StateTerritory {
-  ACT
-  NSW
-  NT
-  QLD
-  SA
-  TAS
-  VIC
-  WA
-}
-
-enum ContactMethod {
-  EMAIL
-  MOBILE
-  MAIL
-}
-
-model Organisation {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  users     User[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 enum SurveyVersionStatus {
