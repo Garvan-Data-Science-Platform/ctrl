@@ -471,7 +471,6 @@ const models: TsoaRoute.Models = {
             "state": {"ref":"StateTerritory","required":true},
             "password": {"dataType":"string","required":true,"validators":{"minLength":{"errorMsg":"Password must be at least 8 characters","value":8}}},
             "dob": {"dataType":"string","required":true,"validators":{"isDate":{"errorMsg":"Date of birth must be of date format"}}},
-            "studyID": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
             "participantID": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
             "isParentOrGuardian": {"dataType":"boolean","required":true},
             "nextOfKin": {"ref":"AlternativeContact"},
