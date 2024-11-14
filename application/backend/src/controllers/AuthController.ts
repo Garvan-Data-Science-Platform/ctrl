@@ -100,20 +100,6 @@ export class AuthController extends Controller {
       nextOfKinCreateData = { create: { ...nextOfKin } }
     }
 
-    const data = {
-      ...userDetails,
-      role: 'participant', // TODO: This should be an enum
-      password: hashedPassword,
-      profile: {
-        create: {
-          dob: new Date(dob),
-          ...noNextOfKinProfileData,
-          onBehalfOfCreateData,
-          nextOfKinCreateData,
-        },
-      },
-    }
-
     const insertedUser = await this.userRepo.create({
       data: {
         ...userDetails,
