@@ -10,7 +10,7 @@ import { Route, Tags, Controller, Body, Post, SuccessResponse, Response, Validat
 import prisma from '../PrismaClient'
 import logger from 'common/src/logger'
 import { checkPasswordStrength } from 'common/src/PasswordStrength'
-import { User } from '@prisma/client'
+import { User, Role } from '@prisma/client'
 import { generateToken, hashPassword, verifyPassword } from '../authentication'
 import type {
   InternalErrorResponse,
@@ -104,7 +104,7 @@ export class AuthController extends Controller {
 
     const data = {
       ...userDetails,
-      role: 'participant', // TODO: This should be an enum
+      role: Role.Participant,
       password: hashedPassword,
       profile: {
         create: {

@@ -1,10 +1,11 @@
+import { Role } from '@prisma/client'
 /**
  * @example {
  *  "firstName": "John",
  *  "lastName": "Doe",
  *  "email": "john.doe@email.com",
  *  "password": "Password123",
- *  "role": "User"
+ *  "role": "OrganisationAdmin"
  * }
  */
 export interface RegisterRequest {
@@ -28,7 +29,7 @@ export interface RegisterRequest {
    * @minLength 8 Password must be at least 8 characters
    */
   password: string
-  role: string
+  role: Role
 }
 
 export interface RegisterResponse {

@@ -13,6 +13,7 @@ import {
   RemoveUserFromOrganisationResponse,
   GetOrganisationUsersResponse,
 } from 'common/types/api/organisations'
+import { Role } from '@prisma/client'
 import { resetDB } from '../../tests/TestHelpers'
 import { getUserIdFromToken } from '../authentication'
 import { RegisterRequest, RegisterResponse } from 'common/types/api/auth'
@@ -32,7 +33,7 @@ describe('OrganisationsController', () => {
     lastName: 'User',
     email: 'test@user.com',
     password: 'Password123',
-    role: 'test',
+    role: Role.Participant,
   }
 
   const testUserInOrg: RegisterRequest = {
@@ -40,7 +41,7 @@ describe('OrganisationsController', () => {
     lastName: 'UserInOrg',
     email: 'test@org.com',
     password: 'Password123',
-    role: 'test',
+    role: Role.Participant,
   }
 
   beforeAll(async () => {

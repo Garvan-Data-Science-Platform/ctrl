@@ -19,7 +19,6 @@ export interface UpdateUserRequest {
    * @pattern ^(.+)@(.+)$ please provide valid email
    */
   email?: string
-  role?: string
 }
 
 export interface UpdateUserResponse {

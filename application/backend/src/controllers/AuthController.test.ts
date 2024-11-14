@@ -10,6 +10,7 @@ import type {
 } from 'common/types/api/auth'
 import type { GetAllUsersResponse } from 'common/types/api/users'
 import prisma from '../PrismaClient'
+import { Role } from '@prisma/client'
 import { resetDB } from '../../tests/TestHelpers'
 import { ContactMethod, StateTerritory } from '../../../common/types/api/users/ParticipantProfile'
 
@@ -45,7 +46,7 @@ describe('AuthController', () => {
         lastName: 'Doe',
         email: 'testregister@example.com',
         password: 'Password123',
-        role: 'user',
+        role: Role.Participant,
       }
 
       // Register user
@@ -74,7 +75,7 @@ describe('AuthController', () => {
         lastName: 'Doe',
         email: 'newUser@example.com',
         password: 'Password123',
-        role: 'user',
+        role: Role.Participant,
       }
 
       // Check if user is already registered
@@ -100,7 +101,7 @@ describe('AuthController', () => {
         firstName: 'John',
         lastName: 'Doe',
         password: 'password123',
-        role: 'user',
+        role: Role.Participant,
       }
 
       const response = await request(app).post('/auth/register').send(registerRequest)
@@ -116,7 +117,7 @@ describe('AuthController', () => {
         lastName: 'Doe',
         email: 'johndoe@example.com',
         password: 'Password123',
-        role: 'user',
+        role: Role.Participant,
       }
 
       // Register user
@@ -133,7 +134,7 @@ describe('AuthController', () => {
         firstName: 'John',
         lastName: 'Doe',
         password: 'Password123',
-        role: 'user',
+        role: Role.Participant,
       }
 
       const response = await request(app).post('/auth/register').send(registerRequest)
@@ -155,7 +156,7 @@ describe('AuthController', () => {
         firstName: 'John',
         lastName: 'Doe',
         password: 'pass',
-        role: 'user',
+        role: Role.Participant,
       }
 
       const response = await request(app).post('/auth/register').send(registerRequest)
@@ -177,7 +178,7 @@ describe('AuthController', () => {
         firstName: '',
         lastName: '',
         password: '',
-        role: '',
+        role: Role.Participant,
       }
 
       const response = await request(app).post('/auth/register').send(registerRequest)
@@ -199,7 +200,7 @@ describe('AuthController', () => {
         lastName: 'Doe',
         email: 'johndoe@example.com',
         password: 'somepasswordthatsnotstrong',
-        role: 'user',
+        role: Role.Participant,
       }
 
       const response = await request(app).post('/auth/register').send(registerRequest)
@@ -330,7 +331,7 @@ describe('AuthController', () => {
         lastName: 'Doe',
         email: 'johndoe@email.com',
         password: 'johnDoesP@ssword123',
-        role: 'user',
+        role: Role.Participant,
       }
 
       const response = await request(app).post('/auth/register').send(registerRequest)

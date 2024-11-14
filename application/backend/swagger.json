@@ -78,6 +78,14 @@
           }
         }
       },
+      "_36_Enums.Role": {
+        "type": "string",
+        "enum": [
+          "OperatorAdmin",
+          "Participant",
+          "OrganisationAdmin"
+        ]
+      },
       "User": {
         "description": "Model User",
         "properties": {
@@ -90,7 +98,7 @@
             "format": "date-time"
           },
           "role": {
-            "type": "string"
+            "$ref": "#/components/schemas/_36_Enums.Role"
           },
           "password": {
             "type": "string"
@@ -195,6 +203,9 @@
         "type": "object",
         "additionalProperties": false
       },
+      "Role": {
+        "$ref": "#/components/schemas/_36_Enums.Role"
+      },
       "CreateUserRequest": {
         "properties": {
           "firstName": {
@@ -214,7 +225,7 @@
             "minLength": 8
           },
           "role": {
-            "type": "string"
+            "$ref": "#/components/schemas/Role"
           }
         },
         "required": [
@@ -231,7 +242,7 @@
           "lastName": "Doe",
           "email": "john.doe@email.com",
           "password": "Password123",
-          "role": "User"
+          "role": "Participant"
         }
       },
       "UpdateUserResponse": {
@@ -259,9 +270,6 @@
           "email": {
             "type": "string",
             "pattern": "^(.+)@(.+)$"
-          },
-          "role": {
-            "type": "string"
           }
         },
         "type": "object",
@@ -284,6 +292,33 @@
         ],
         "type": "object",
         "additionalProperties": false
+      },
+      "UpdateUserRoleResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UpdateUserRoleRequest": {
+        "properties": {
+          "newRole": {
+            "$ref": "#/components/schemas/Role"
+          }
+        },
+        "required": [
+          "newRole"
+        ],
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "newRole": "OperatorAdmin"
+        }
       },
       "SurveyVersionBasic": {
         "properties": {
@@ -707,7 +742,7 @@
         ],
         "type": "object"
       },
-      "GetParticipantProfileByIDResponse": {
+      "GetParticipantProfileResponse": {
         "properties": {
           "message": {
             "type": "string"
@@ -980,7 +1015,7 @@
             "minLength": 8
           },
           "role": {
-            "type": "string"
+            "$ref": "#/components/schemas/Role"
           }
         },
         "required": [
@@ -997,7 +1032,7 @@
           "lastName": "Doe",
           "email": "john.doe@email.com",
           "password": "Password123",
-          "role": "User"
+          "role": "OrganisationAdmin"
         }
       },
       "RegisterParticipantResponse": {
@@ -1585,6 +1620,87 @@
         ]
       }
     },
+    "/users/{userID}/role": {
+      "patch": {
+        "operationId": "UpdateUserRole",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateUserRoleResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Update a users role.",
+        "summary": "Update a Users Role",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userID",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRoleRequest"
+              }
+            }
+          }
+        }
+      }
+    },
     "/surveys": {
       "get": {
         "operationId": "GetAllSurveys",
@@ -1778,7 +1894,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetParticipantProfileByIDResponse"
+                  "$ref": "#/components/schemas/GetParticipantProfileResponse"
                 }
               }
             }
@@ -1826,7 +1942,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetParticipantProfileByIDResponse"
+                  "$ref": "#/components/schemas/GetParticipantProfileResponse"
                 }
               }
             }

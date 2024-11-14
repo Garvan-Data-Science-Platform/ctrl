@@ -10,6 +10,7 @@ import { GetParticipantProfileResponse } from 'common/types/api/users'
 import { getUserIdFromToken } from '../authentication'
 import { Api } from '../Api'
 import { resetDB } from '../../tests/TestHelpers'
+import { Role } from '@prisma/client'
 
 const api = new Api()
 const app = api.app
@@ -59,7 +60,7 @@ describe('ProfilesController', () => {
       lastName: 'Smith',
       email: 'jimmy.smith@email.com',
       password: 'GooD02Password',
-      role: 'Administrator',
+      role: Role.OperatorAdmin,
     }
 
     const registerUserResponse = await request(app).post('/auth/register').send(registerUserRequest)

@@ -1,10 +1,12 @@
+import { Role } from '@prisma/client'
+
 /**
  * @example {
  *  "firstName": "John",
  *  "lastName": "Doe",
  *  "email": "john.doe@email.com",
  *  "password": "Password123",
- *  "role": "User"
+ *  "role": "Participant"
  * }
  */
 export interface CreateUserRequest {
@@ -24,7 +26,7 @@ export interface CreateUserRequest {
    * @minLength 8
    */
   password: string
-  role: string
+  role: Role
 }
 
 export interface CreateUserResponse {

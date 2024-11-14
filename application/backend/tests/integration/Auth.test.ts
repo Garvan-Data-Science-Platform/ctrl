@@ -9,6 +9,7 @@ import {
 import { resetDB } from '../TestHelpers'
 import { ContactMethod, StateTerritory } from 'common/types/api/users/ParticipantProfile'
 import { GetAllOrganisationsResponse } from 'common/types/api/organisations'
+import { Role } from '@prisma/client'
 
 const api = new Api()
 const app = api.app
@@ -19,7 +20,7 @@ describe('Auth', () => {
     lastName: 'User',
     email: 'test@user.com',
     password: 'Password123',
-    role: 'test',
+    role: Role.Participant,
   }
 
   beforeAll(async () => {
@@ -129,6 +130,10 @@ describe('Auth', () => {
   })
 
   it('should return a 401 unauthorized error when accessing protected routes with without the correct role', async () => {
-    // TODO: Implement roles check and test here
+    // TODO: Implement roles check for testing here
+  })
+
+  it('should return a 401 unauthorized error if the Authenticated user is not Authorised to change a users roles', async () => {
+    // TODO: Implement roles check for testing here
   })
 })
