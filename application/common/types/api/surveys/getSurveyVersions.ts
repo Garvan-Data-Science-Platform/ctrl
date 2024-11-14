@@ -1,7 +1,10 @@
+import { SurveyVersionStatus } from 'common/types/survey'
+
 interface SurveyVersionBasic {
   id?: number
-  version_number?: number
+  versionNumber?: number
   published_date?: string
+  status: SurveyVersionStatus
 }
 
 export interface GetSurveyVersionsResponse {

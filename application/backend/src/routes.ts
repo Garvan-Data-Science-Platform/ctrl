@@ -135,12 +135,18 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "SurveyVersionStatus": {
+        "dataType": "refAlias",
+        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["PUBLISHED"]},{"dataType":"enum","enums":["DRAFT"]}],"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "SurveyVersionBasic": {
         "dataType": "refObject",
         "properties": {
             "id": {"dataType":"double"},
-            "version_number": {"dataType":"double"},
+            "versionNumber": {"dataType":"double"},
             "published_date": {"dataType":"string"},
+            "status": {"ref":"SurveyVersionStatus","required":true},
         },
         "additionalProperties": false,
     },
@@ -219,6 +225,7 @@ const models: TsoaRoute.Models = {
             "id": {"dataType":"double"},
             "version_number": {"dataType":"double"},
             "published_date": {"dataType":"string"},
+            "status": {"ref":"SurveyVersionStatus","required":true},
             "data": {"dataType":"array","array":{"dataType":"refObject","ref":"SurveyStep"},"required":true},
         },
         "additionalProperties": false,
@@ -228,6 +235,31 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "data": {"ref":"SurveyVersion","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "UpdateSurveyResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "message": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "UserStepContext": {
+        "dataType": "refObject",
+        "properties": {
+            "current_step": {"dataType":"double","required":true},
+            "total_steps": {"dataType":"double","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GetUserSurveyStepResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "data": {"dataType":"intersection","subSchemas":[{"ref":"SurveyStep"},{"ref":"UserStepContext"}],"required":true},
         },
         "additionalProperties": false,
     },
@@ -253,15 +285,36 @@ const models: TsoaRoute.Models = {
     "UpdateSurveyResponse": {
         "dataType": "refObject",
         "properties": {
-            "message": {"dataType":"string","required":true},
+            "data": {"dataType":"array","array":{"dataType":"refObject","ref":"SurveyStep"},"required":true},
         },
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "UpdateSurveyRequest": {
+    "_36_Enums.StateTerritory": {
+        "dataType": "refAlias",
+        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["ACT"]},{"dataType":"enum","enums":["NSW"]},{"dataType":"enum","enums":["NT"]},{"dataType":"enum","enums":["QLD"]},{"dataType":"enum","enums":["SA"]},{"dataType":"enum","enums":["TAS"]},{"dataType":"enum","enums":["VIC"]},{"dataType":"enum","enums":["WA"]}],"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "_36_Enums.ContactMethod": {
+        "dataType": "refAlias",
+        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["EMAIL"]},{"dataType":"enum","enums":["MOBILE"]},{"dataType":"enum","enums":["MAIL"]}],"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "DefaultSelection_Prisma._36_ParticipantProfilePayload_": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"userID":{"dataType":"double","required":true},"preferredContact":{"ref":"_36_Enums.ContactMethod","required":true},"isParentOrGuardian":{"dataType":"boolean","required":true},"postcode":{"dataType":"string","required":true},"state":{"ref":"_36_Enums.StateTerritory","required":true},"suburb":{"dataType":"string","required":true},"addressLine":{"dataType":"string","required":true},"mobile":{"dataType":"string","required":true},"participantID":{"dataType":"string","required":true},"dob":{"dataType":"datetime","required":true},"id":{"dataType":"double","required":true}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ParticipantProfile": {
+        "dataType": "refAlias",
+        "type": {"ref":"DefaultSelection_Prisma._36_ParticipantProfilePayload_","validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GetParticipantProfileByIDResponse": {
         "dataType": "refObject",
         "properties": {
-            "data": {"dataType":"array","array":{"dataType":"refObject","ref":"SurveyStep"},"required":true},
+            "message": {"dataType":"string","required":true},
+            "data": {"dataType":"intersection","subSchemas":[{"ref":"ParticipantProfile"},{"dataType":"nestedObjectLiteral","nestedProperties":{"user":{"dataType":"nestedObjectLiteral","nestedProperties":{"email":{"dataType":"string","required":true},"lastName":{"dataType":"string","required":true},"middleName":{"dataType":"string"},"firstName":{"dataType":"string","required":true}},"required":true}}}],"required":true},
         },
         "additionalProperties": false,
     },
@@ -458,6 +511,7 @@ const models: TsoaRoute.Models = {
         "properties": {
             "firstName": {"dataType":"string","required":true},
             "lastName": {"dataType":"string","required":true},
+            "dob": {"dataType":"string","required":true},
             "dob": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
@@ -727,6 +781,71 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'getSurveyVersionById',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/surveys/participant/:surveyId',
+            authenticateMiddleware([{"jwt":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(SurveysController)),
+            ...(fetchMiddlewares<RequestHandler>(SurveysController.prototype.addParticipant)),
+
+            async function SurveysController_addParticipant(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    request: {"in":"request","name":"request","required":true,"dataType":"object"},
+                    surveyId: {"in":"path","name":"surveyId","required":true,"dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new SurveysController();
+
+              await templateService.apiHandler({
+                methodName: 'addParticipant',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/surveys/step/:study/:step',
+            authenticateMiddleware([{"jwt":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(SurveysController)),
+            ...(fetchMiddlewares<RequestHandler>(SurveysController.prototype.getUserSurveyStep)),
+
+            async function SurveysController_getUserSurveyStep(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    request: {"in":"request","name":"request","required":true,"dataType":"object"},
+                    study: {"in":"path","name":"study","required":true,"dataType":"double"},
+                    step: {"in":"path","name":"step","required":true,"dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new SurveysController();
+
+              await templateService.apiHandler({
+                methodName: 'getUserSurveyStep',
                 controller,
                 response,
                 next,

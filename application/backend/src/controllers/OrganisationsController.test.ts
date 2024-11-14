@@ -53,14 +53,12 @@ describe('OrganisationsController', () => {
     // Register user
     const registerResponse1 = await request(app).post('/auth/register').send(testUser)
     const body1: RegisterResponse = registerResponse1.body
-    if (!body1.token) throw new Error()
     token = body1.token
     testUserID = getUserIdFromToken(token)
 
     // Register user
     const registerResponse2 = await request(app).post('/auth/register').send(testUserInOrg)
     const body2: RegisterResponse = registerResponse2.body
-    if (!body2.token) throw new Error()
     token2 = body2.token
     testUserInOrgID = getUserIdFromToken(token2)
 

@@ -3060,6 +3060,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@prisma/debug@npm:5.20.0":
+  version: 5.20.0
+  resolution: "@prisma/debug@npm:5.20.0"
+  checksum: 820e3e2c25f1a046024383a3a83f28707a99af1e04f46016c78d6b6231a901353755202578ce27760e00a654b357b634a3e79b99bfe710ba6d6a7f480fcdf6b9
+  languageName: node
+  linkType: hard
+
 "@prisma/engines-version@npm:5.19.1-2.69d742ee20b815d88e17e54db4a2a7a3b30324e3":
   version: 5.19.1-2.69d742ee20b815d88e17e54db4a2a7a3b30324e3
   resolution: "@prisma/engines-version@npm:5.19.1-2.69d742ee20b815d88e17e54db4a2a7a3b30324e3"
@@ -3087,6 +3094,15 @@ __metadata:
     "@prisma/engines-version": "npm:5.19.1-2.69d742ee20b815d88e17e54db4a2a7a3b30324e3"
     "@prisma/get-platform": "npm:5.19.1"
   checksum: 670d3f604549c4778d32febe56d948896b5c16dad5b51814c5b168a6007c9782d453cebee43cb81ddd58c9e9538811ea1a793516420ecf2c84ae4c3b4ed34f6c
+  languageName: node
+  linkType: hard
+
+"@prisma/generator-helper@npm:5.20.0":
+  version: 5.20.0
+  resolution: "@prisma/generator-helper@npm:5.20.0"
+  dependencies:
+    "@prisma/debug": "npm:5.20.0"
+  checksum: 3628b960b0c3dad40b781e9f226d6bf79423fcb4708c408852e265735709346cf037ae42cad5624cae3ea3884e6919098a0dfeba70d8d379b8dd1049a7a59fb0
   languageName: node
   linkType: hard
 
@@ -5252,7 +5268,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.6.2":
+"axios@npm:^1.6.2, axios@npm:^1.7.7":
   version: 1.7.7
   resolution: "axios@npm:1.7.7"
   dependencies:
@@ -5388,6 +5404,7 @@ __metadata:
     jsonwebtoken: "npm:^9.0.2"
     pg: "npm:^8.12.0"
     prisma: "npm:^5.18.0"
+    prisma-json-types-generator: "npm:^3.1.1"
     supertest: "npm:^7.0.0"
     swagger-ui-express: "npm:^5.0.1"
     ts-jest: "npm:^29.1.5"
@@ -6090,6 +6107,7 @@ __metadata:
   dependencies:
     "@types/winston": "npm:^2.4.4"
     dotenv: "npm:^16.4.5"
+    jest: "npm:^29.7.0"
     typescript: "npm:^5.3.3"
     winston: "npm:^3.13.1"
   languageName: unknown
@@ -11413,6 +11431,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"prisma-json-types-generator@npm:^3.1.1":
+  version: 3.1.1
+  resolution: "prisma-json-types-generator@npm:3.1.1"
+  dependencies:
+    "@prisma/generator-helper": "npm:5.20.0"
+    tslib: "npm:2.7.0"
+  peerDependencies:
+    prisma: ^5.20
+    typescript: ^5.6.2
+  bin:
+    prisma-json-types-generator: index.js
+  checksum: d319343fb0611dbe1da269f3a7ea1b795498fabc948522f04fb2f8ee558c3c27620240dd0d71464337fab450b721c7ebdcd5cd58fca5a1a75edf73d5a8980e6b
+  languageName: node
+  linkType: hard
+
 "prisma@npm:^5.18.0":
   version: 5.19.1
   resolution: "prisma@npm:5.19.1"
@@ -13070,17 +13103,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tslib@npm:2.7.0, tslib@npm:^2.0.1, tslib@npm:^2.1.0, tslib@npm:^2.4.0, tslib@npm:^2.6.2":
+  version: 2.7.0
+  resolution: "tslib@npm:2.7.0"
+  checksum: 469e1d5bf1af585742128827000711efa61010b699cb040ab1800bcd3ccdd37f63ec30642c9e07c4439c1db6e46345582614275daca3e0f4abae29b0083f04a6
+  languageName: node
+  linkType: hard
+
 "tslib@npm:^1.8.1":
   version: 1.14.1
   resolution: "tslib@npm:1.14.1"
   checksum: 69ae09c49eea644bc5ebe1bca4fa4cc2c82b7b3e02f43b84bd891504edf66dbc6b2ec0eef31a957042de2269139e4acff911e6d186a258fb14069cd7f6febce2
-  languageName: node
-  linkType: hard
-
-"tslib@npm:^2.0.1, tslib@npm:^2.1.0, tslib@npm:^2.4.0, tslib@npm:^2.6.2":
-  version: 2.7.0
-  resolution: "tslib@npm:2.7.0"
-  checksum: 469e1d5bf1af585742128827000711efa61010b699cb040ab1800bcd3ccdd37f63ec30642c9e07c4439c1db6e46345582614275daca3e0f4abae29b0083f04a6
   languageName: node
   linkType: hard
 
@@ -13451,6 +13484,7 @@ __metadata:
     "@types/react": "npm:^18.3.3"
     "@types/react-dom": "npm:^18.3.0"
     "@vitejs/plugin-react-swc": "npm:^3.5.0"
+    axios: "npm:^1.7.7"
     cypress: "npm:^13.14.2"
     eslint: "npm:^9.9.0"
     eslint-plugin-cypress: "npm:^3.5.0"
