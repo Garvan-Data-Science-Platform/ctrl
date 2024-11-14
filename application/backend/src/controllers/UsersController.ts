@@ -21,6 +21,8 @@ import type {
   CreateUserResponse,
   UpdateUserRequest,
   UpdateUserResponse,
+  UpdateUserRoleRequest,
+  UpdateUserRoleResponse,
 } from 'common/types/api/users'
 import { User } from '@prisma/client'
 import prisma from '../PrismaClient'
@@ -143,6 +145,39 @@ export class UsersController extends Controller {
       const deletedUser = await this.userRepo.delete({ where: { id: userID } })
       const responseData = { message: `Deleted user with ID: ${userID}` }
       logger.info({ ...responseData, deletedUser })
+      return responseData
+    } catch (err) {
+      const errorMessage: string = `User with ID: ${userID} not found`
+      logger.error({ errorMessage, err })
+      throw new NotFoundError(errorMessage)
+    }
+  }
+
+  /**
+   * Update a users role.
+   *
+   * @summary Update a Users Role
+   */
+  @Patch('/{userID}/role')
+  @SuccessResponse('200', 'OK')
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
+  public async updateUserRole(
+    @Path() userID: number,
+    @Body() bodyRequest: UpdateUserRoleRequest,
+  ): Promise<UpdateUserRoleResponse> {
+    try {
+      const updatedUser = await this.userRepo.update({
+        where: { id: userID },
+        data: {
+          role: bodyRequest.newRole,
+        },
+      })
+
+      const responseData = {
+        message: `Updated user with ID: ${userID} to role: ${bodyRequest.newRole}`,
+      }
+
+      logger.info({ ...responseData, updatedUser })
       return responseData
     } catch (err) {
       const errorMessage: string = `User with ID: ${userID} not found`
