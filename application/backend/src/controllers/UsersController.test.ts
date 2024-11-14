@@ -10,7 +10,10 @@ import {
   GetAllUsersResponse,
   GetUserByIdResponse,
   UpdateUserResponse,
+  UpdateUserRoleRequest,
+  UpdateUserRoleResponse,
 } from 'common/types/api/users'
+import { Role } from '@prisma/client'
 
 const api = new Api()
 const app = api.app
@@ -24,7 +27,7 @@ describe('UsersController', () => {
     lastName: 'User',
     email: 'test@user.com',
     password: 'Password123',
-    role: 'test',
+    role: Role.Participant,
   }
 
   beforeAll(async () => {
@@ -108,7 +111,7 @@ describe('UsersController', () => {
         lastName: 'Doe',
         email: 'jane@example.com',
         password: 'password123',
-        role: 'user',
+        role: Role.OperatorAdmin,
       }
 
       // Check that the user does not already exist
@@ -222,14 +225,102 @@ describe('UsersController', () => {
   })
 
   describe('PATCH /users/:id/role', () => {
-    it('should update a users role to the role provided', async () => {})
+    let adminToken: string
+    beforeAll(async () => {
+      // Register Admin User
+      const adminUserRegisterRequest: RegisterRequest = {
+        firstName: 'Admin',
+        lastName: 'User',
+        email: 'admin@example.com',
+        password: 'Admin123',
+        role: Role.OperatorAdmin,
+      }
 
-    it('should keep the same role if the provided role is invalid', async () => {})
+      const adminResponse = await request(app).post('/auth/register').send(adminUserRegisterRequest)
 
-    it('should return an error for an invalid role', async () => {})
+      adminToken = adminResponse.body.token
+    })
 
-    it('should return an error for a non-existent user', async () => {})
+    it('should update a users role to the role provided', async () => {
+      const userID: number = registeredUserID
 
-    it('should return an error if the', async () => {})
+      // Check user role
+      const existingUser = await prisma.user.findFirst({ where: { id: userID } })
+
+      expect(existingUser?.role).toBe(Role.Participant)
+
+      // Change user role
+      const newRole: Role = Role.OperatorAdmin
+      const newRoleRequest: UpdateUserRoleRequest = { newRole }
+
+      const updateUserRoleResponse = await request(app)
+        .patch(`/users/${userID}/role`)
+        .send(newRoleRequest)
+        .set({ Authorization: `Bearer ${adminToken}` })
+
+      const responseBody: UpdateUserRoleResponse = updateUserRoleResponse.body
+
+      expect(responseBody.message).toBe(`Updated user with ID: ${userID} to role: ${newRole}`)
+
+      // Check user role
+      const updatedUser = await prisma.user.findFirst({ where: { id: userID } })
+
+      expect(updatedUser?.role).toBe(newRole)
+    })
+
+    it('should return a Validation Error and keep the same role if the provided role is invalid', async () => {
+      const userID: number = registeredUserID
+
+      // Check user role
+      const existingUser = await prisma.user.findFirst({ where: { id: userID } })
+
+      const currentRole: Role | undefined = existingUser?.role
+
+      expect(currentRole).toBe(Role.Participant)
+
+      // Change user role to something invalid
+      const newInvalidRole: string = 'InvalidRole'
+
+      const updateUserRoleResponse = await request(app)
+        .patch(`/users/${userID}/role`)
+        .send({ newRole: newInvalidRole })
+        .set({ Authorization: `Bearer ${adminToken}` })
+
+      expect(updateUserRoleResponse.status).toBe(422)
+
+      const responseBody = updateUserRoleResponse.body
+
+      expect(responseBody).toEqual({
+        details: {
+          'bodyRequest.newRole': {
+            message:
+              'Could not match the union against any of the items. Issues: [{"bodyRequest.newRole":{"message":"should be one of the following; [\'OperatorAdmin\']","value":"InvalidRole"}},{"bodyRequest.newRole":{"message":"should be one of the following; [\'Participant\']","value":"InvalidRole"}},{"bodyRequest.newRole":{"message":"should be one of the following; [\'OrganisationAdmin\']","value":"InvalidRole"}}]',
+            value: 'InvalidRole',
+          },
+        },
+        message: 'Validation Failed',
+      })
+
+      // Check user role hasn't changed
+      const updatedUser = await prisma.user.findFirst({ where: { id: userID } })
+
+      expect(updatedUser?.role).toBe(currentRole)
+    })
+
+    it('should return an error for a non-existent user', async () => {
+      const userID: number = 999
+      const newRole: Role = Role.OperatorAdmin
+
+      const updateUserRoleResponse = await request(app)
+        .patch(`/users/${userID}/role`)
+        .send({ newRole })
+        .set({ Authorization: `Bearer ${adminToken}` })
+
+      expect(updateUserRoleResponse.status).toBe(404)
+
+      const responseBody: UpdateUserRoleResponse = updateUserRoleResponse.body
+
+      expect(responseBody.message).toBe('Not Found')
+    })
   })
 })
