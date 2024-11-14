@@ -1,5 +1,5 @@
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
-import { DeleteButton, EditButton, List, ShowButton, useDataGrid } from '@refinedev/mui'
+import { EditButton, List, ShowButton, useDataGrid } from '@refinedev/mui'
 import React from 'react'
 
 export const CategoryList = () => {

@@ -18,7 +18,7 @@ export async function resetDB(): Promise<void> {
   try {
     await prisma.$executeRawUnsafe(`TRUNCATE TABLE ${tables} CASCADE;`)
     await seedTests(prisma)
-    await prisma.$disconnect()
+    //await prisma.$disconnect()
   } catch (error) {
     logger.error({ error })
     prisma.$disconnect()

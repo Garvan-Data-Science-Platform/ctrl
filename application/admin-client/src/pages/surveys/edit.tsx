@@ -14,7 +14,6 @@ import {
   ListItemText,
   ListSubheader,
   TextField,
-  Typography,
 } from '@mui/material'
 import { SurveyElementType } from '@common/types/survey'
 import { useEffect, useState } from 'react'
@@ -24,7 +23,7 @@ import { SurveyElementCard, SurveyDropSpace } from '../../components/SurveyEleme
 import { useSurveyStore } from '../../surveyStore'
 import { axiosInstance } from '../../providers/dataProvider'
 import { API_URL } from '../../App'
-import { useOnError, useResource, useShow, useUpdate, useNavigation } from '@refinedev/core'
+import { useResource, useShow, useUpdate, useNavigation } from '@refinedev/core'
 
 export const SurveyEditor = () => {
   const {

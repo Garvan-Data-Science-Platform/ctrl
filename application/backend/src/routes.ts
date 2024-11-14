@@ -133,13 +133,18 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "SurveyVersionStatus": {
+        "dataType": "refAlias",
+        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["PUBLISHED"]},{"dataType":"enum","enums":["DRAFT"]}],"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "SurveyVersionBasic": {
         "dataType": "refObject",
         "properties": {
             "id": {"dataType":"double"},
             "versionNumber": {"dataType":"double"},
             "published_date": {"dataType":"string"},
-            "status": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["DRAFT"]},{"dataType":"enum","enums":["PUBLISHED"]}],"required":true},
+            "status": {"ref":"SurveyVersionStatus","required":true},
         },
         "additionalProperties": false,
     },
@@ -218,7 +223,7 @@ const models: TsoaRoute.Models = {
             "id": {"dataType":"double"},
             "version_number": {"dataType":"double"},
             "published_date": {"dataType":"string"},
-            "status": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["PUBLISHED"]},{"dataType":"enum","enums":["DRAFT"]}],"required":true},
+            "status": {"ref":"SurveyVersionStatus","required":true},
             "data": {"dataType":"array","array":{"dataType":"refObject","ref":"SurveyStep"},"required":true},
         },
         "additionalProperties": false,
@@ -228,6 +233,14 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "data": {"ref":"SurveyVersion","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "UpdateSurveyResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "message": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },
@@ -263,14 +276,6 @@ const models: TsoaRoute.Models = {
             "surveyVersionId": {"dataType":"double","required":true},
             "step": {"dataType":"double","required":true},
             "data": {"dataType":"array","array":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"boolean"}]},"required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "UpdateSurveyResponse": {
-        "dataType": "refObject",
-        "properties": {
-            "message": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },
@@ -715,6 +720,38 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'getSurveyVersionById',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/surveys/participant/:surveyId',
+            authenticateMiddleware([{"jwt":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(SurveysController)),
+            ...(fetchMiddlewares<RequestHandler>(SurveysController.prototype.addParticipant)),
+
+            async function SurveysController_addParticipant(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    request: {"in":"request","name":"request","required":true,"dataType":"object"},
+                    surveyId: {"in":"path","name":"surveyId","required":true,"dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new SurveysController();
+
+              await templateService.apiHandler({
+                methodName: 'addParticipant',
                 controller,
                 response,
                 next,

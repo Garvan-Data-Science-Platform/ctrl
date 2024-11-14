@@ -1,5 +1,5 @@
 [
-  { "title": "", "text": "", "elements": [] },
+  { "title": "", "text": "", "elements": [{ "type": "video", "link": "www.google.com" }] },
   {
     "title": "",
     "text": "",

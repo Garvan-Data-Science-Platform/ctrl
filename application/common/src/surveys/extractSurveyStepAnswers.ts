@@ -1,4 +1,4 @@
-import { SurveyElement, SurveyStep, SurveyStepAnswerArray } from 'common/types/survey'
+import { SurveyElement, SurveyStepAnswerArray } from 'common/types/survey'
 
 export function extractSurveyStepAnswers(elements: SurveyElement[]): SurveyStepAnswerArray {
   const answers: SurveyStepAnswerArray = []

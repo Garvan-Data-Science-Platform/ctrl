@@ -104,5 +104,7 @@ export function ErrorHandler(
     return res.status(500).json(error)
   }
 
+  console.log('ERROR')
+
   next()
 }

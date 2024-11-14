@@ -1,7 +1,7 @@
 import { SurveyStep, SurveyStepAnswerArray } from 'common/types/survey'
 
 export function validateAnswers(surveyStep: SurveyStep, answers: SurveyStepAnswerArray): boolean {
-  var counter = 0
+  let counter = 0
 
   if (
     answers.length !==

@@ -11,6 +11,7 @@ import {
   Controller,
   Security,
   Patch,
+  ValidateError,
 } from 'tsoa'
 import logger from 'common/src/logger'
 import type {
@@ -27,14 +28,12 @@ import {
   SurveyStep,
   UserSurveyStepState,
   SurveyStepStatus,
-  SurveyElement,
-  SurveyStepAnswerArray,
 } from 'common/types/survey'
 import prisma from '../PrismaClient'
 import '../jsontypes'
 import { GetSurveyVersionByIdResponse } from 'common/types/api/surveys/getSurveyVersionById'
 import { validateAnswers } from 'common/src/surveys/validateSurveyAnswers'
-import { createEmptyAnswers } from 'common/src/surveys/createEmptyAnswers'
+import { createDefaultAnswers } from 'common/src/surveys/createDefaultAnswers'
 import { populateSurveyStepAnswers } from 'common/src/surveys/populateSurveyStepAnswers'
 
 @Route('surveys')
@@ -43,7 +42,8 @@ import { populateSurveyStepAnswers } from 'common/src/surveys/populateSurveyStep
 export class SurveysController extends Controller {
   surveyRepo = prisma.surveyVersion
   answersRepo = prisma.surveyAnswers
-  spRepo = prisma.studyParticipant
+  spRepo = prisma.surveyParticipant
+  profileRepo = prisma.participantProfile
 
   /**
    * Get all Surveys
@@ -59,7 +59,7 @@ export class SurveysController extends Controller {
       orderBy: [{ id: 'desc' }],
     })
     if (surveys.length == 0) {
-      let initial_survey = await this.surveyRepo.create({
+      const initial_survey = await this.surveyRepo.create({
         data: { versionNumber: 1, data: [], status: 'DRAFT' },
       })
       surveys.push(initial_survey)
@@ -99,6 +99,45 @@ export class SurveysController extends Controller {
   }
 
   /**
+   *
+   * @summary Add participant to survey
+   */
+
+  @Post('/participant/{surveyId}')
+  @SuccessResponse('200', 'OK')
+  @Response('500', 'Internal Server Error')
+  @Response('404', 'Not Found')
+  @Response('401', 'Unauthorized')
+  public async addParticipant(
+    @Request() request: any,
+    @Path() surveyId: number,
+  ): Promise<UpdateSurveyResponse> {
+    const survey = await this.surveyRepo.findUniqueOrThrow({ where: { id: surveyId } })
+
+    if (survey.status != 'PUBLISHED') {
+      throw Error('Can only add to a published survey')
+    }
+
+    const participant = await this.spRepo.create({
+      data: {
+        userId: request.user.userId,
+        versionId: survey.id,
+      },
+    })
+
+    const defaultAnswers = createDefaultAnswers(survey.data)
+    await this.answersRepo.create({
+      data: { data: defaultAnswers, participantId: participant.id },
+    })
+
+    const responseData = {
+      message: `Added user as participant to survey: ${surveyId}`,
+    }
+    logger.info({ ...responseData })
+    return responseData
+  }
+
+  /**
    * Get user survey step
    *
    * @summary Get questions and current answers for step of a survey
@@ -113,22 +152,25 @@ export class SurveysController extends Controller {
     @Path() study: number,
     @Path() step: number,
   ): Promise<GetUserSurveyStepResponse> {
-    const studyParticipant = await this.spRepo.findFirstOrThrow({
-      where: { studyId: study, participantProfile: { userID: request.user.userId } },
+    const surveyParticipant = await this.spRepo.findFirstOrThrow({
+      where: { userId: request.user.userId },
     })
 
-    const surveyVersionId = studyParticipant.versionId
+    const surveyVersionId = surveyParticipant.versionId
 
     const survey = await this.surveyRepo.findUniqueOrThrow({ where: { id: surveyVersionId } })
 
-    var currentAnswers = await this.answersRepo.findFirst({
-      where: { versionId: surveyVersionId, userId: request.user.userId },
+    const currentAnswers = await this.answersRepo.findFirst({
+      where: { participantId: surveyParticipant.id },
     })
 
-    let stepData = survey.data
+    const stepData = survey.data
+    if (stepData.length < step || step < 0) {
+      throw new ValidateError({}, 'Invalid step')
+    }
 
     if (currentAnswers) {
-      var ans = currentAnswers.data
+      const ans = currentAnswers.data
       stepData[step] = populateSurveyStepAnswers(stepData[step], ans[step].answers)
     }
 
@@ -150,11 +192,22 @@ export class SurveysController extends Controller {
     @Body() body: UpdateSurveyAnswersRequest,
   ): Promise<UpdateSurveyAnswersResponse> {
     const { step, data, surveyVersionId } = body
-    var currentAnswers = await this.answersRepo.findFirst({
+
+    let participant = await this.spRepo.findFirst({
       where: { versionId: surveyVersionId, userId: request.user.userId },
     })
 
-    var answers: UserSurveyStepState[]
+    if (!participant) {
+      participant = await this.spRepo.create({
+        data: { versionId: surveyVersionId, userId: request.user.userId },
+      })
+    }
+
+    const currentAnswers = await this.answersRepo.findFirst({
+      where: { participant: participant },
+    })
+
+    let answers: UserSurveyStepState[]
 
     const survey = await this.surveyRepo.findUniqueOrThrow({
       where: { id: surveyVersionId },
@@ -164,12 +217,12 @@ export class SurveysController extends Controller {
       throw Error('Cannot submit answers for unpublished survey version')
     }
 
-    const surveySteps = survey?.data as unknown as SurveyStep[]
+    const surveySteps = survey?.data
 
     if (currentAnswers === null) {
-      answers = createEmptyAnswers(surveySteps)
+      answers = createDefaultAnswers(surveySteps)
     } else {
-      answers = currentAnswers.data as unknown as UserSurveyStepState[]
+      answers = currentAnswers.data
     }
 
     type StatusMap = {
@@ -187,13 +240,13 @@ export class SurveysController extends Controller {
     const status = statusMap[surveySteps[step].elements[0].type]
 
     if (!validateAnswers(surveySteps[step], data)) {
-      throw Error('Answers did not match survey question structure')
+      throw new ValidateError({}, 'Answers did not match survey question structure')
     }
 
     answers[step].status = status
     answers[step].answers = data
 
-    var responseData = {
+    const responseData = {
       message: 'Updated Answers',
     }
 
@@ -204,7 +257,7 @@ export class SurveysController extends Controller {
       })
     } else {
       await this.answersRepo.create({
-        data: { data: answers as any, userId: request.user.userId, versionId: surveyVersionId },
+        data: { data: answers as any, participantId: participant.id },
       })
       responseData.message = 'Created new answers'
     }

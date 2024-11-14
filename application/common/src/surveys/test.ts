@@ -1,5 +1,5 @@
 import { SurveyStep, UserSurveyStepState } from 'types/survey'
-import { createEmptyAnswers } from './createEmptyAnswers'
+import { createDefaultAnswers } from './createDefaultAnswers'
 import { extractSurveyStepAnswers } from './extractSurveyStepAnswers'
 import { populateSurveyStepAnswers } from './populateSurveyStepAnswers'
 import { validateAnswers } from './validateSurveyAnswers'
@@ -10,21 +10,21 @@ describe('Survey utility tests', () => {
 
   describe('createEmptyAnswers', () => {
     it('Creates empty answers to match shape of questions', () => {
-      let emptyanswers = createEmptyAnswers(sampleSurveySteps)
-      let answer1: UserSurveyStepState = { status: 'review_required', answers: [] }
-      let answer2: UserSurveyStepState = {
+      const defaultanswers = createDefaultAnswers(sampleSurveySteps)
+      const answer1: UserSurveyStepState = { status: 'review_required', answers: [] }
+      const answer2: UserSurveyStepState = {
         status: 'review_required',
-        answers: [undefined, undefined],
+        answers: [true, 'Choice 2'],
       }
-      expect(emptyanswers[0]).toStrictEqual(answer1)
-      expect(emptyanswers[1]).toStrictEqual(answer2)
+      expect(defaultanswers[0]).toStrictEqual(answer1)
+      expect(defaultanswers[1]).toStrictEqual(answer2)
     })
   })
 
   describe('extractSurveyStepAnswers', () => {
     it('Extracts answers correctly', () => {
-      let answers1 = extractSurveyStepAnswers(sampleSurveySteps[0].elements)
-      let answers2 = extractSurveyStepAnswers(sampleSurveySteps[1].elements)
+      const answers1 = extractSurveyStepAnswers(sampleSurveySteps[0].elements)
+      const answers2 = extractSurveyStepAnswers(sampleSurveySteps[1].elements)
       expect(answers1).toEqual([])
       expect(answers2).toEqual([true, 'Choice 2'])
     })
@@ -32,8 +32,8 @@ describe('Survey utility tests', () => {
 
   describe('populateSurveyStepAnswers', () => {
     it('Populates answers correctly', () => {
-      let answers1 = populateSurveyStepAnswers(sampleSurveySteps[0], [])
-      let answers2 = populateSurveyStepAnswers(sampleSurveySteps[1], [false, 'Choice 1'])
+      const answers1 = populateSurveyStepAnswers(sampleSurveySteps[0], [])
+      const answers2 = populateSurveyStepAnswers(sampleSurveySteps[1], [false, 'Choice 1'])
       expect(answers1).toStrictEqual(sampleSurveySteps[0])
       expect(answers2.elements[0].data.value).toBe(false)
       expect(answers2.elements[2].data.value).toBe('Choice 1')

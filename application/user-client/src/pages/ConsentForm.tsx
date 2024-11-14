@@ -44,10 +44,11 @@ export default function ConsentForm() {
     //queryFn: () => fetch('/api/user/profile').then((res) => res.json()) as Promise<UserProfile>,
     queryFn: async () => {
       try {
-        let surveyStep = await apiClient.get(`/surveys/step/1/${currentStep}`, {
+        const surveyStep = await apiClient.get(`/surveys/step/1/${currentStep}`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         return surveyStep.data.data as GetUserSurveyStepResponse['data']
+        // eslint-disable-next-line
       } catch (error: any) {
         if (error.response?.status == 401) {
           nav('/login')
