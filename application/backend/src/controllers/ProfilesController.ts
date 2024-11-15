@@ -52,32 +52,7 @@ export class ProfilesController extends Controller {
     }
 
     const userId: number = getUserIdFromToken(token)
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const data = await this.participantProfileRepo.findUnique({
-      where: { userId },
-      include: {
-        user: {
-          select: { firstName: true, lastName: true, email: true, middleName: true },
-        },
-      },
-    })
-
-    if (!data) {
-      const errorMessage: string = `Participant Profile with userId: ${userId} not found`
-      logger.error({ errorMessage })
-      throw new NotFoundError(errorMessage)
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { user, ...profile }: any = data
-
-    const responseData: GetParticipantProfileResponse = {
-      message: `Got Participant Profile with userId: ${userId}`,
-      data: { ...profile, user },
-    }
-    logger.info({ ...responseData })
-    return responseData
+    return this.getParticipantProfile(userId)
   }
 
   /**
@@ -91,6 +66,10 @@ export class ProfilesController extends Controller {
   public async getParticipantProfileByID(
     @Path() userId: number,
   ): Promise<GetParticipantProfileResponse> {
+    return this.getParticipantProfile(userId)
+  }
+
+  private async getParticipantProfile(userId: number): Promise<GetParticipantProfileResponse> {
     const data = await this.participantProfileRepo.findUnique({
       where: { userId },
       include: {
