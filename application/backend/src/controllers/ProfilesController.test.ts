@@ -1,13 +1,6 @@
 import request from 'supertest'
-import {
-  RegisterParticipantRequest,
-  RegisterParticipantResponse,
-  RegisterRequest,
-  RegisterResponse,
-} from 'common/types/api/auth'
-import { ContactMethod, StateTerritory } from 'common/types/api/users/ParticipantProfile'
 import { GetParticipantProfileResponse } from 'common/types/api/users'
-import { getUserIdFromToken } from '../authentication'
+import { generateToken } from '../authentication'
 import { Api } from '../Api'
 import { resetDB } from '../../tests/TestHelpers'
 
@@ -15,57 +8,17 @@ const api = new Api()
 const app = api.app
 
 describe('ProfilesController', () => {
-  let registeredParticipantUserID: number
-  let registeredParticipantToken: string
-
-  let registeredUserToken: string
-
+  let registeredUserToken: string, registeredParticipantToken: string
+  const registeredUserId: number = 97
+  const registeredParticipantUserId: number = 99
   beforeAll(async () => {
+    registeredUserToken = await generateToken(registeredUserId)
+    registeredParticipantToken = await generateToken(registeredParticipantUserId)
     api.run()
   })
 
   beforeEach(async () => {
     await resetDB()
-
-    // Register Participant
-    const registerParticipantRequest: RegisterParticipantRequest = {
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'johndoe@example.com',
-      password: 'GooD02Password',
-      mobile: '0411111111',
-      addressLine: '123 Some Street',
-      suburb: 'Sydney',
-      postcode: '2000',
-      state: StateTerritory.NSW,
-      preferredContact: ContactMethod.MOBILE,
-      dob: '1990-01-02',
-      studyId: 'S12345',
-      participantID: 'P12345',
-      isParentOrGuardian: true,
-    }
-
-    const registerParticipantResponse = await request(app)
-      .post('/auth/register/participant')
-      .send(registerParticipantRequest)
-
-    const body: RegisterParticipantResponse = registerParticipantResponse.body
-    registeredParticipantToken = body.token
-    registeredParticipantUserID = getUserIdFromToken(registeredParticipantToken)
-
-    // Register User
-    const registerUserRequest: RegisterRequest = {
-      firstName: 'Jimmy',
-      lastName: 'Smith',
-      email: 'jimmy.smith@email.com',
-      password: 'GooD02Password',
-      role: 'Administrator',
-    }
-
-    const registerUserResponse = await request(app).post('/auth/register').send(registerUserRequest)
-
-    const userBody: RegisterResponse = registerUserResponse.body
-    registeredUserToken = userBody.token
   })
 
   afterAll(async () => {
@@ -76,26 +29,26 @@ describe('ProfilesController', () => {
     it('should return the profile of a user if they exist', async () => {
       // Get user profile
       const response = await request(app)
-        .get(`/profiles/${registeredParticipantUserID}`)
+        .get(`/profiles/${registeredParticipantUserId}`)
         .set({ Authorization: `Bearer ${registeredParticipantToken}` })
 
       expect(response.status).toBe(200)
 
       const expectedProfileData = expect.objectContaining({
-        addressLine: '123 Some Street',
-        dob: '1990-01-02T00:00:00.000Z',
+        addressLine: '123 smith st',
+        dob: '1980-01-23T00:00:00.000Z',
         id: expect.any(Number),
-        isParentOrGuardian: true,
-        mobile: '0411111111',
-        participantID: 'P12345',
-        postcode: '2000',
-        preferredContact: 'MOBILE',
-        state: 'NSW',
-        suburb: 'Sydney',
+        isParentOrGuardian: false,
+        mobile: '0412345678',
+        participantID: 'ABC123',
+        postcode: '1234',
+        preferredContact: 'EMAIL',
+        state: 'VIC',
+        suburb: 'Melbourne',
         user: {
-          email: 'johndoe@example.com',
-          firstName: 'John',
-          lastName: 'Doe',
+          email: 'test3@example.com',
+          firstName: 'Test',
+          lastName: 'User',
           middleName: null,
         },
         userId: expect.any(Number),
@@ -103,7 +56,7 @@ describe('ProfilesController', () => {
 
       const body: GetParticipantProfileResponse = response.body
       expect(body.message).toBe(
-        `Got Participant Profile with userId: ${registeredParticipantUserID}`,
+        `Got Participant Profile with userId: ${registeredParticipantUserId}`,
       )
       expect(body.data).toEqual(expectedProfileData)
     })
@@ -129,20 +82,20 @@ describe('ProfilesController', () => {
       expect(response.status).toBe(200)
 
       const expectedProfileData = expect.objectContaining({
-        addressLine: '123 Some Street',
-        dob: '1990-01-02T00:00:00.000Z',
+        addressLine: '123 smith st',
+        dob: '1980-01-23T00:00:00.000Z',
         id: expect.any(Number),
-        isParentOrGuardian: true,
-        mobile: '0411111111',
-        participantID: 'P12345',
-        postcode: '2000',
-        preferredContact: 'MOBILE',
-        state: 'NSW',
-        suburb: 'Sydney',
+        isParentOrGuardian: false,
+        mobile: '0412345678',
+        participantID: 'ABC123',
+        postcode: '1234',
+        preferredContact: 'EMAIL',
+        state: 'VIC',
+        suburb: 'Melbourne',
         user: {
-          email: 'johndoe@example.com',
-          firstName: 'John',
-          lastName: 'Doe',
+          email: 'test3@example.com',
+          firstName: 'Test',
+          lastName: 'User',
           middleName: null,
         },
         userId: expect.any(Number),
@@ -150,7 +103,7 @@ describe('ProfilesController', () => {
 
       const body: GetParticipantProfileResponse = response.body
       expect(body.message).toBe(
-        `Got Participant Profile with userId: ${registeredParticipantUserID}`,
+        `Got Participant Profile with userId: ${registeredParticipantUserId}`,
       )
       expect(body.data).toEqual(expectedProfileData)
     })
@@ -173,7 +126,7 @@ describe('ProfilesController', () => {
         .set({ Authorization: `Bearer ${registeredParticipantToken}` })
 
       const participantProfileByIDResponse = await request(app)
-        .get(`/profiles/${registeredParticipantUserID}`)
+        .get(`/profiles/${registeredParticipantUserId}`)
         .set({ Authorization: `Bearer ${registeredParticipantToken}` })
 
       expect(currentParticipantProfileResponse.status).toBe(200)
