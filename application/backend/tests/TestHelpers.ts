@@ -17,8 +17,18 @@ export async function resetDB(): Promise<void> {
 
   try {
     await prisma.$executeRawUnsafe(`TRUNCATE TABLE ${tables} CASCADE;`)
+
+    // Reset all sequences
+    const sequences = await prisma.$queryRaw<
+      Array<{ sequencename: string }>
+    >`SELECT sequencename FROM pg_sequences WHERE schemaname='public'`
+
+    for (const { sequencename } of sequences) {
+      await prisma.$executeRawUnsafe(`ALTER SEQUENCE "public"."${sequencename}" RESTART WITH 1`)
+    }
+
     await seedTests(prisma)
-    //await prisma.$disconnect()
+    await prisma.$disconnect()
   } catch (error) {
     logger.error({ error })
     prisma.$disconnect()
