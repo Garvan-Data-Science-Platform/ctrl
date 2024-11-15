@@ -83,10 +83,6 @@ export interface RegisterParticipantRequest {
   /**
    * @minLength 1
    */
-  studyId: string
-  /**
-   * @minLength 1
-   */
   participantID: string
   /**
    * @isBool
