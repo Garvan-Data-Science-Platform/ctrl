@@ -1,5 +1,6 @@
 import prisma from '../src/PrismaClient'
 import logger from 'common/src/logger'
+import { seedTests } from './seed'
 
 // Function to reset DB state
 export async function resetDB(): Promise<void> {
@@ -16,7 +17,21 @@ export async function resetDB(): Promise<void> {
 
   try {
     await prisma.$executeRawUnsafe(`TRUNCATE TABLE ${tables} CASCADE;`)
+
+    // Reset all sequences
+    const sequences = await prisma.$queryRaw<
+      Array<{ sequencename: string }>
+    >`SELECT sequencename FROM pg_sequences WHERE schemaname='public'`
+
+    for (const { sequencename } of sequences) {
+      await prisma.$executeRawUnsafe(`ALTER SEQUENCE "public"."${sequencename}" RESTART WITH 1`)
+    }
+
+    await seedTests(prisma)
+    await prisma.$disconnect()
   } catch (error) {
     logger.error({ error })
+    prisma.$disconnect()
+    throw error
   }
 }

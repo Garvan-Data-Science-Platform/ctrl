@@ -1,0 +1,204 @@
+import request from 'supertest'
+import { Api } from '../Api'
+import prisma from '../PrismaClient'
+import { resetDB } from '../../tests/TestHelpers'
+import { generateToken } from '../authentication'
+
+import {
+  GetSurveyVersionsResponse,
+  GetUserSurveyStepResponse,
+  UpdateSurveyAnswersRequest,
+  UpdateSurveyRequest,
+} from 'common/types/api/surveys'
+import { GetSurveyVersionByIdResponse } from 'common/types/api/surveys/getSurveyVersionById'
+
+const api = new Api()
+const app = api.app
+let token: string, tokenNoAnswers: string, tokenNoProfile: string
+
+describe('SurveysController', () => {
+  beforeAll(async () => {
+    token = await generateToken(99)
+    tokenNoAnswers = await generateToken(98)
+    tokenNoProfile = await generateToken(97)
+    api.run()
+  })
+
+  beforeEach(async () => {
+    await resetDB()
+  })
+
+  afterAll(async () => {
+    api.stop()
+  })
+
+  describe('GET /surveys', () => {
+    it('should return a list of surveys', async () => {
+      const response = await request(app)
+        .get('/surveys')
+        .set({ Authorization: `Bearer ${token}` })
+      expect(response.status).toBe(200)
+
+      const body: GetSurveyVersionsResponse = response.body
+      expect(body.data[0].status).toBe('DRAFT')
+      expect(body.data[1].versionNumber).toBe(1)
+    })
+  })
+
+  describe('GET /surveys/{surveyId}', () => {
+    it('should return a survey version', async () => {
+      const response = await request(app)
+        .get('/surveys/1')
+        .set({ Authorization: `Bearer ${token}` })
+      expect(response.status).toBe(200)
+      const body: GetSurveyVersionByIdResponse = response.body
+      expect(body.data.status).toBe('PUBLISHED')
+      expect(body.data.data.length).toBeGreaterThan(0)
+    })
+  })
+
+  describe('GET /surveys/step/:study/:step', () => {
+    it('should return questions and current answers for a survey step', async () => {
+      const response = await request(app)
+        .get('/surveys/step/1/1')
+        .set({ Authorization: `Bearer ${token}` })
+      expect(response.status).toBe(200)
+      const body: GetUserSurveyStepResponse = response.body
+      expect(body.data.current_step).toBe(1)
+      expect(body.data.total_steps).toBe(2)
+      expect(body.data.elements[0].data.value).toBe(false)
+      expect(body.data.elements[3].type).toBe('video')
+    })
+    it('should return default answers when the user has not answered yet', async () => {
+      const response = await request(app)
+        .get('/surveys/step/1/1')
+        .set({ Authorization: `Bearer ${tokenNoAnswers}` })
+      expect(response.status).toBe(200)
+      const body: GetUserSurveyStepResponse = response.body
+      expect(body.data.elements[0].data.value).toBe(true)
+    })
+
+    it('should fail if step does not exist', async () => {
+      const response = await request(app)
+        .get('/surveys/step/1/3')
+        .set({ Authorization: `Bearer ${token}` })
+      expect(response.status).toBe(422)
+    })
+    it('should fail if user is not assigned to a study', async () => {
+      const response = await request(app)
+        .get('/surveys/step/1/2')
+        .set({ Authorization: `Bearer ${tokenNoProfile}` })
+      expect(response.status).toBe(404)
+    })
+  })
+
+  describe('POST /surveys/answers', () => {
+    it('should update survey answers successfully when answers match questions', async () => {
+      const reqBody: UpdateSurveyAnswersRequest = {
+        step: 1,
+        surveyVersionId: 1,
+        data: [true, 'Choice 1'],
+      }
+      const response = await request(app)
+        .post('/surveys/answers')
+        .set({ Authorization: `Bearer ${token}` })
+        .send(reqBody)
+      expect(response.status).toBe(200)
+      const answers = await prisma.surveyAnswers.findUnique({ where: { id: 1 } })
+      expect(answers?.data[1].answers).toEqual([true, 'Choice 1'])
+    })
+
+    it('should change status from requires_review after submission', async () => {
+      const answersBefore = await prisma.surveyAnswers.findUnique({ where: { id: 2 } })
+      expect(answersBefore?.data[0].status).toBe('review_required')
+      const reqBody: UpdateSurveyAnswersRequest = {
+        step: 0,
+        surveyVersionId: 1,
+        data: [],
+      }
+      const response = await request(app)
+        .post('/surveys/answers')
+        .set({ Authorization: `Bearer ${tokenNoAnswers}` })
+        .send(reqBody)
+      expect(response.status).toBe(200)
+      const answersAfter = await prisma.surveyAnswers.findUnique({ where: { id: 2 } })
+      expect(answersAfter?.data[0].status).toBe('viewed')
+    })
+    it('should fail to update answers if they dont match the survey questions', async () => {
+      const reqBody: UpdateSurveyAnswersRequest = {
+        step: 1,
+        surveyVersionId: 1,
+        data: ['Choic3e', false],
+      }
+      const response = await request(app)
+        .post('/surveys/answers')
+        .set({ Authorization: `Bearer ${token}` })
+        .send(reqBody)
+      expect(response.status).toBe(422)
+    })
+  })
+
+  describe('POST /surveys/participant/{surveyId}', () => {
+    it('should add the current user as a survey participant', async () => {
+      await prisma.surveyParticipant.deleteMany({})
+      const response = await request(app)
+        .post('/surveys/participant/1')
+        .set({ Authorization: `Bearer ${token}` })
+      expect(response.status).toBe(200)
+      const answers = await prisma.surveyAnswers.findFirstOrThrow({
+        where: { participant: { userId: 99 } },
+      })
+      expect(answers.data[1].answers[0]).toBe(true)
+    })
+  })
+
+  describe('PATCH /surveys/{surveyId}', () => {
+    it('should successfully update a draft survey', async () => {
+      const reqBody: UpdateSurveyRequest = {
+        data: [
+          {
+            text: 'Hello',
+            title: 'Title',
+            elements: [
+              { type: 'subheading', data: { text: 'Subheading text' } },
+              { type: 'question-checkbox', data: { text: 'Question 1' } },
+            ],
+          },
+        ],
+      }
+      const response = await request(app)
+        .patch('/surveys/2')
+        .set({ Authorization: `Bearer ${token}` })
+        .send(reqBody)
+      expect(response.status).toBe(200)
+      const survey = await prisma.surveyVersion.findFirst({ where: { id: 2 } })
+      expect(survey?.data[0].elements[1].data.text).toBe('Question 1')
+    })
+
+    it('should fail to update a published survey', async () => {
+      const response = await request(app)
+        .patch('/surveys/1')
+        .set({ Authorization: `Bearer ${token}` })
+        .send({ data: [] })
+      expect(response.status).toBe(500)
+    })
+  })
+
+  describe('POST /surveys/publish/{surveyId}', () => {
+    it('should successfully publish a draft survey', async () => {
+      const response = await request(app)
+        .post('/surveys/publish/2')
+        .set({ Authorization: `Bearer ${token}` })
+
+      expect(response.status).toBe(200)
+      const survey = await prisma.surveyVersion.findFirst({ where: { id: 2 } })
+      expect(survey?.status).toBe('PUBLISHED')
+    })
+    it('should fail to publish an already published survey', async () => {
+      const response = await request(app)
+        .post('/surveys/publish/1')
+        .set({ Authorization: `Bearer ${token}` })
+      expect(response.status).toBe(500)
+    })
+  })
+})

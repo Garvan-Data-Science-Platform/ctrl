@@ -47,10 +47,13 @@ export interface SurveyStep {
   //refusal_text: RefusalText
 }
 
+export type SurveyVersionStatus = 'PUBLISHED' | 'DRAFT'
+
 export interface SurveyVersion {
   id?: number
   version_number?: number
   published_date?: string
+  status: SurveyVersionStatus
   data: SurveyStep[]
 }
 

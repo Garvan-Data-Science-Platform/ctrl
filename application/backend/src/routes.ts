@@ -160,12 +160,18 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "SurveyVersionStatus": {
+        "dataType": "refAlias",
+        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["PUBLISHED"]},{"dataType":"enum","enums":["DRAFT"]}],"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "SurveyVersionBasic": {
         "dataType": "refObject",
         "properties": {
             "id": {"dataType":"double"},
-            "version_number": {"dataType":"double"},
+            "versionNumber": {"dataType":"double"},
             "published_date": {"dataType":"string"},
+            "status": {"ref":"SurveyVersionStatus","required":true},
         },
         "additionalProperties": false,
     },
@@ -244,6 +250,7 @@ const models: TsoaRoute.Models = {
             "id": {"dataType":"double"},
             "version_number": {"dataType":"double"},
             "published_date": {"dataType":"string"},
+            "status": {"ref":"SurveyVersionStatus","required":true},
             "data": {"dataType":"array","array":{"dataType":"refObject","ref":"SurveyStep"},"required":true},
         },
         "additionalProperties": false,
@@ -253,6 +260,31 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "data": {"ref":"SurveyVersion","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "UpdateSurveyResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "message": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "UserStepContext": {
+        "dataType": "refObject",
+        "properties": {
+            "current_step": {"dataType":"double","required":true},
+            "total_steps": {"dataType":"double","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GetUserSurveyStepResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "data": {"dataType":"intersection","subSchemas":[{"ref":"SurveyStep"},{"ref":"UserStepContext"}],"required":true},
         },
         "additionalProperties": false,
     },
@@ -271,14 +303,6 @@ const models: TsoaRoute.Models = {
             "surveyVersionId": {"dataType":"double","required":true},
             "step": {"dataType":"double","required":true},
             "data": {"dataType":"array","array":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"boolean"}]},"required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "UpdateSurveyResponse": {
-        "dataType": "refObject",
-        "properties": {
-            "message": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },
@@ -303,7 +327,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "DefaultSelection_Prisma._36_ParticipantProfilePayload_": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"userID":{"dataType":"double","required":true},"preferredContact":{"ref":"_36_Enums.ContactMethod","required":true},"isParentOrGuardian":{"dataType":"boolean","required":true},"postcode":{"dataType":"string","required":true},"state":{"ref":"_36_Enums.StateTerritory","required":true},"suburb":{"dataType":"string","required":true},"addressLine":{"dataType":"string","required":true},"mobile":{"dataType":"string","required":true},"participantID":{"dataType":"string","required":true},"dob":{"dataType":"datetime","required":true},"id":{"dataType":"double","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"userId":{"dataType":"double","required":true},"preferredContact":{"ref":"_36_Enums.ContactMethod","required":true},"isParentOrGuardian":{"dataType":"boolean","required":true},"postcode":{"dataType":"string","required":true},"state":{"ref":"_36_Enums.StateTerritory","required":true},"suburb":{"dataType":"string","required":true},"addressLine":{"dataType":"string","required":true},"mobile":{"dataType":"string","required":true},"participantID":{"dataType":"string","required":true},"dob":{"dataType":"datetime","required":true},"id":{"dataType":"double","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "ParticipantProfile": {
@@ -322,7 +346,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "DefaultSelection_Prisma._36_OrganisationPayload_": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"updatedAt":{"dataType":"datetime","required":true},"createdAt":{"dataType":"datetime","required":true},"name":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"updatedAt":{"dataType":"datetime","required":true},"createdAt":{"dataType":"datetime","required":true},"id":{"dataType":"double","required":true},"name":{"dataType":"string","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Organisation": {
@@ -503,7 +527,6 @@ const models: TsoaRoute.Models = {
             "state": {"ref":"StateTerritory","required":true},
             "password": {"dataType":"string","required":true,"validators":{"minLength":{"errorMsg":"Password must be at least 8 characters","value":8}}},
             "dob": {"dataType":"string","required":true,"validators":{"isDate":{"errorMsg":"Date of birth must be of date format"}}},
-            "studyID": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
             "participantID": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
             "isParentOrGuardian": {"dataType":"boolean","required":true},
             "nextOfKin": {"ref":"AlternativeContact"},
@@ -577,14 +600,14 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.get('/users/:userID',
+        app.get('/users/:userId',
             authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(UsersController)),
             ...(fetchMiddlewares<RequestHandler>(UsersController.prototype.getUserById)),
 
             async function UsersController_getUserById(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
-                    userID: {"in":"path","name":"userID","required":true,"dataType":"double"},
+                    userId: {"in":"path","name":"userId","required":true,"dataType":"double"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -639,14 +662,14 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.patch('/users/:userID',
+        app.patch('/users/:userId',
             authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(UsersController)),
             ...(fetchMiddlewares<RequestHandler>(UsersController.prototype.updateUser)),
 
             async function UsersController_updateUser(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
-                    userID: {"in":"path","name":"userID","required":true,"dataType":"double"},
+                    userId: {"in":"path","name":"userId","required":true,"dataType":"double"},
                     bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"UpdateUserRequest"},
             };
 
@@ -671,14 +694,14 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.delete('/users/:userID',
+        app.delete('/users/:userId',
             authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(UsersController)),
             ...(fetchMiddlewares<RequestHandler>(UsersController.prototype.deleteUser)),
 
             async function UsersController_deleteUser(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
-                    userID: {"in":"path","name":"userID","required":true,"dataType":"double"},
+                    userId: {"in":"path","name":"userId","required":true,"dataType":"double"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -795,6 +818,71 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/surveys/participant/:surveyId',
+            authenticateMiddleware([{"jwt":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(SurveysController)),
+            ...(fetchMiddlewares<RequestHandler>(SurveysController.prototype.addParticipant)),
+
+            async function SurveysController_addParticipant(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    request: {"in":"request","name":"request","required":true,"dataType":"object"},
+                    surveyId: {"in":"path","name":"surveyId","required":true,"dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new SurveysController();
+
+              await templateService.apiHandler({
+                methodName: 'addParticipant',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/surveys/step/:study/:step',
+            authenticateMiddleware([{"jwt":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(SurveysController)),
+            ...(fetchMiddlewares<RequestHandler>(SurveysController.prototype.getUserSurveyStep)),
+
+            async function SurveysController_getUserSurveyStep(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    request: {"in":"request","name":"request","required":true,"dataType":"object"},
+                    study: {"in":"path","name":"study","required":true,"dataType":"double"},
+                    step: {"in":"path","name":"step","required":true,"dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new SurveysController();
+
+              await templateService.apiHandler({
+                methodName: 'getUserSurveyStep',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.post('/surveys/answers',
             authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(SurveysController)),
@@ -803,7 +891,7 @@ export function RegisterRoutes(app: Router) {
             async function SurveysController_updateSurveyAnswers(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
                     request: {"in":"request","name":"request","required":true,"dataType":"object"},
-                    bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"UpdateSurveyAnswersRequest"},
+                    body: {"in":"body","name":"body","required":true,"ref":"UpdateSurveyAnswersRequest"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -859,6 +947,37 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/surveys/publish/:surveyId',
+            authenticateMiddleware([{"jwt":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(SurveysController)),
+            ...(fetchMiddlewares<RequestHandler>(SurveysController.prototype.publishSurvey)),
+
+            async function SurveysController_publishSurvey(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    surveyId: {"in":"path","name":"surveyId","required":true,"dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new SurveysController();
+
+              await templateService.apiHandler({
+                methodName: 'publishSurvey',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/profiles/current',
             authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(ProfilesController)),
@@ -890,14 +1009,14 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.get('/profiles/:userID',
+        app.get('/profiles/:userId',
             authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(ProfilesController)),
             ...(fetchMiddlewares<RequestHandler>(ProfilesController.prototype.getParticipantProfileByID)),
 
             async function ProfilesController_getParticipantProfileByID(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
-                    userID: {"in":"path","name":"userID","required":true,"dataType":"double"},
+                    userId: {"in":"path","name":"userId","required":true,"dataType":"double"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -1107,7 +1226,7 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/organisations/:orgID/users/:userID',
+        app.post('/organisations/:orgID/users/:userId',
             authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(OrganisationsController)),
             ...(fetchMiddlewares<RequestHandler>(OrganisationsController.prototype.addUserToOrganisation)),
@@ -1115,7 +1234,7 @@ export function RegisterRoutes(app: Router) {
             async function OrganisationsController_addUserToOrganisation(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
                     orgID: {"in":"path","name":"orgID","required":true,"dataType":"double"},
-                    userID: {"in":"path","name":"userID","required":true,"dataType":"double"},
+                    userId: {"in":"path","name":"userId","required":true,"dataType":"double"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -1139,7 +1258,7 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.delete('/organisations/:orgID/users/:userID',
+        app.delete('/organisations/:orgID/users/:userId',
             authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(OrganisationsController)),
             ...(fetchMiddlewares<RequestHandler>(OrganisationsController.prototype.removeUserFromOrganisation)),
@@ -1147,7 +1266,7 @@ export function RegisterRoutes(app: Router) {
             async function OrganisationsController_removeUserFromOrganisation(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
                     orgID: {"in":"path","name":"orgID","required":true,"dataType":"double"},
-                    userID: {"in":"path","name":"userID","required":true,"dataType":"double"},
+                    userId: {"in":"path","name":"userId","required":true,"dataType":"double"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa

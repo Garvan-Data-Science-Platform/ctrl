@@ -41,7 +41,7 @@ export class ProfilesController extends Controller {
   ): Promise<GetParticipantProfileResponse> {
     /**
      * This endpoint (GET /profiles/current) is ordered above
-     * the endpoint (GET /profile/{userID}) in order to avoid collisions
+     * the endpoint (GET /profile/{userId}) in order to avoid collisions
      */
 
     // Get the user ID from the token
@@ -51,33 +51,8 @@ export class ProfilesController extends Controller {
       throw new NoTokenError()
     }
 
-    const userID: number = getUserIdFromToken(token)
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const data = await this.participantProfileRepo.findUnique({
-      where: { userID },
-      include: {
-        user: {
-          select: { firstName: true, lastName: true, email: true, middleName: true },
-        },
-      },
-    })
-
-    if (!data) {
-      const errorMessage: string = `Participant Profile with userID: ${userID} not found`
-      logger.error({ errorMessage })
-      throw new NotFoundError(errorMessage)
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { user, ...profile }: any = data
-
-    const responseData: GetParticipantProfileResponse = {
-      message: `Got Participant Profile with userID: ${userID}`,
-      data: { ...profile, user },
-    }
-    logger.info({ ...responseData })
-    return responseData
+    const userId: number = getUserIdFromToken(token)
+    return this.getParticipantProfile(userId)
   }
 
   /**
@@ -85,14 +60,18 @@ export class ProfilesController extends Controller {
    *
    * @summary Get a Participants Profile by ID
    */
-  @Get('/{userID}')
+  @Get('/{userId}')
   @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async getParticipantProfileByID(
-    @Path() userID: number,
+    @Path() userId: number,
   ): Promise<GetParticipantProfileResponse> {
+    return this.getParticipantProfile(userId)
+  }
+
+  private async getParticipantProfile(userId: number): Promise<GetParticipantProfileResponse> {
     const data = await this.participantProfileRepo.findUnique({
-      where: { userID },
+      where: { userId },
       include: {
         user: {
           select: { firstName: true, lastName: true, email: true, middleName: true },
@@ -101,7 +80,7 @@ export class ProfilesController extends Controller {
     })
 
     if (!data) {
-      const errorMessage: string = `Participant Profile with userID: ${userID} not found`
+      const errorMessage: string = `Participant Profile with userId: ${userId} not found`
       logger.error({ errorMessage })
       throw new NotFoundError(errorMessage)
     }
@@ -110,7 +89,7 @@ export class ProfilesController extends Controller {
     const { user, ...profile }: any = data
 
     const responseData: GetParticipantProfileResponse = {
-      message: `Got Participant Profile with userID: ${userID}`,
+      message: `Got Participant Profile with userId: ${userId}`,
       data: { ...profile, user },
     }
     logger.info({ ...responseData })

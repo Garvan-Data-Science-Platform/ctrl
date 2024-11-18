@@ -20,11 +20,13 @@ import {
 import { useNavigate, useParams } from 'react-router-dom'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { GetUserSurveyStepResponse } from '@common/types/api/surveys'
-import surveyStep from '@common/example_responses/getUserSurveyStep.json'
+import { apiClient } from '../apiClient'
 import { Info } from '@mui/icons-material'
 
 import { useEffect, useState } from 'react'
 import { SurveyElement } from '@common/types/survey'
+import { useAuth } from '../auth'
+import { extractSurveyStepAnswers } from '@common/src/surveys/extractSurveyStepAnswers'
 
 export default function ConsentForm() {
   const nav = useNavigate()
@@ -35,24 +37,51 @@ export default function ConsentForm() {
   const [formState, setFormState] = useState<SurveyElement[]>([])
   const [modalOpen, setModalOpen] = useState(false)
 
+  const { token } = useAuth()
+
   const { isPending, data } = useQuery({
     queryKey: ['form_step', currentStep],
     //queryFn: () => fetch('/api/user/profile').then((res) => res.json()) as Promise<UserProfile>,
-    queryFn: () => {
-      return surveyStep as GetUserSurveyStepResponse
+    queryFn: async () => {
+      try {
+        const surveyStep = await apiClient.get(`/surveys/step/1/${currentStep}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        return surveyStep.data.data as GetUserSurveyStepResponse['data']
+        // eslint-disable-next-line
+      } catch (error: any) {
+        if (error.response?.status == 401) {
+          nav('/login')
+        }
+      }
     },
     placeholderData: keepPreviousData,
   })
 
-  const handleNext = () => {
-    for (const i in data?.data.elements || []) {
-      if (data?.data.elements[i].data.required && !data?.data.elements[i].data.value) {
+  const handleNext = async () => {
+    for (const i in data?.elements || []) {
+      if (data?.elements[i].data.required && !data?.elements[i].data.value) {
         setModalOpen(true)
         return
       }
     }
-    console.log('SENDING TO SERVER')
-    nav('/consent_form/' + String(currentStep + 1))
+    console.log('FORMSTATE', formState)
+    console.log('ANSWERS', extractSurveyStepAnswers(formState))
+    try {
+      await apiClient.post(
+        `/surveys/answers`,
+        {
+          surveyVersionId: 1,
+          step: currentStep,
+          data: extractSurveyStepAnswers(formState),
+        },
+        { headers: { Authorization: `Bearer ${token}` } },
+      )
+      nav('/consent_form/' + String(currentStep + 1))
+    } catch {
+      console.log('ERROR SAVING ANSWERS')
+      alert('Error saving answers') //TODO: Show proper alert
+    }
   }
   const handleBack = () => {
     console.log('SENDING TO SERVER')
@@ -60,7 +89,8 @@ export default function ConsentForm() {
   }
 
   useEffect(() => {
-    setFormState(data?.data.elements || [])
+    console.log('GOT DATA', data)
+    setFormState(data?.elements || [])
   }, [data])
 
   const renderElements = (elements: SurveyElement[]) => {
@@ -187,7 +217,7 @@ export default function ConsentForm() {
         />
       </Box>
       <Stepper activeStep={Number(params.step)} sx={{ mt: 6, mb: 4 }}>
-        {Array(data?.data.total_steps)
+        {Array(data?.total_steps)
           .fill(0)
           .map((_, idx) => (
             <Step key={idx}>
@@ -200,8 +230,8 @@ export default function ConsentForm() {
           <CircularProgress />
         ) : (
           <>
-            <Typography variant="h4">{data?.data.title}</Typography>
-            <Typography sx={{ mt: 3, mb: 3 }}>{data?.data.text}</Typography>
+            <Typography variant="h4">{data?.title}</Typography>
+            <Typography sx={{ mt: 3, mb: 3 }}>{data?.text}</Typography>
             {renderElements(formState)}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
               {currentStep == 0 ? (
@@ -212,7 +242,7 @@ export default function ConsentForm() {
                 </Button>
               )}
               <Button variant="contained">Save and Exit</Button>
-              {currentStep + 1 == data?.data.total_steps ? (
+              {currentStep + 1 == data?.total_steps ? (
                 <Box width={70} />
               ) : (
                 <Button onClick={handleNext} variant="contained" color="secondary">

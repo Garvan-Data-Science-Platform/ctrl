@@ -29,6 +29,7 @@ interface SurveyElementCardProps {
   handleDeleteChoice?: (choice: number) => void
   handleUpdateChoice?: (choice: number, value: string) => void
   handleUpdateField: (field: string, value: any) => void
+  disabled?: boolean
 }
 
 interface DropResult {
@@ -43,6 +44,7 @@ export function SurveyElementCard({
   handleDeleteChoice,
   handleUpdateChoice,
   handleUpdateField,
+  disabled,
 }: SurveyElementCardProps) {
   const [{ opacity }, dragRef] = useDrag(
     () => ({
@@ -70,6 +72,7 @@ export function SurveyElementCard({
           sx={{ mt: 2 }}
           label="Subheading text"
           value={data.text}
+          disabled={disabled}
           onChange={(e) => {
             handleUpdateField('text', e.target.value)
           }}
@@ -86,6 +89,7 @@ export function SurveyElementCard({
           control={
             <Checkbox
               checked={data.required}
+              disabled={disabled}
               onChange={() => handleUpdateField('required', !data.required)}
             />
           }
@@ -97,6 +101,7 @@ export function SurveyElementCard({
           sx={{ mt: 2 }}
           label="Question Text"
           value={data.text}
+          disabled={disabled}
           onChange={(e) => {
             handleUpdateField('text', e.target.value)
           }}
@@ -107,6 +112,7 @@ export function SurveyElementCard({
           sx={{ mt: 2 }}
           label="Tooltip (optional)"
           value={data.tooltip}
+          disabled={disabled}
           onChange={(e) => {
             handleUpdateField('tooltip', e.target.value)
           }}
@@ -125,6 +131,7 @@ export function SurveyElementCard({
           sx={{ mt: 2 }}
           label="Question Text"
           value={data.text}
+          disabled={disabled}
           onChange={(e) => {
             handleUpdateField('text', e.target.value)
           }}
@@ -135,6 +142,7 @@ export function SurveyElementCard({
           sx={{ mt: 2 }}
           label="Tooltip (optional)"
           value={data.tooltip}
+          disabled={disabled}
           onChange={(e) => {
             handleUpdateField('tooltip', e.target.value)
           }}
@@ -145,12 +153,16 @@ export function SurveyElementCard({
             <Box key={`choice_${idx}`}>
               <TextField
                 value={val}
+                disabled={disabled}
                 onChange={(e) => handleUpdateChoice && handleUpdateChoice(idx, e.target.value)}
                 slotProps={{
                   input: {
                     endAdornment: (
                       <InputAdornment position="end">
-                        <IconButton onClick={() => handleDeleteChoice && handleDeleteChoice(idx)}>
+                        <IconButton
+                          disabled={disabled}
+                          onClick={() => handleDeleteChoice && handleDeleteChoice(idx)}
+                        >
                           <Close />
                         </IconButton>
                       </InputAdornment>
@@ -178,6 +190,7 @@ export function SurveyElementCard({
           sx={{ mt: 2 }}
           label="URL"
           value={data.link}
+          disabled={disabled}
           onChange={(e) => {
             handleUpdateField('link', e.target.value)
           }}
@@ -213,7 +226,7 @@ export function SurveyElementCard({
       </Box>
       {contentRenderer[element.type]()}
       <Box sx={{ flexGrow: 1 }} />
-      <IconButton sx={{ width: 50, height: 50 }} onClick={handleDelete}>
+      <IconButton disabled={disabled} sx={{ width: 50, height: 50 }} onClick={handleDelete}>
         <Delete />
       </IconButton>
     </Box>

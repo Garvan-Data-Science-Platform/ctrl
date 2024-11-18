@@ -24,7 +24,7 @@ interface FormValues {
   password: string
   confirm_password: string
   dob: string
-  studyID: string
+  studyId: string
   nok_first: string
   nok_surname: string
   nok_email: string
@@ -72,7 +72,7 @@ export default function ProfileEdit() {
       email: data.email,
       password: data.password,
       dob: data.dob,
-      studyID: data.studyID,
+      studyId: data.studyId,
     }
 
     let reqData: UpdateProfileRequest

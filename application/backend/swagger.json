@@ -320,20 +320,33 @@
           "newRole": "OperatorAdmin"
         }
       },
+      "SurveyVersionStatus": {
+        "type": "string",
+        "enum": [
+          "PUBLISHED",
+          "DRAFT"
+        ]
+      },
       "SurveyVersionBasic": {
         "properties": {
           "id": {
             "type": "number",
             "format": "double"
           },
-          "version_number": {
+          "versionNumber": {
             "type": "number",
             "format": "double"
           },
           "published_date": {
             "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SurveyVersionStatus"
           }
         },
+        "required": [
+          "status"
+        ],
         "type": "object",
         "additionalProperties": false
       },
@@ -570,6 +583,9 @@
           "published_date": {
             "type": "string"
           },
+          "status": {
+            "$ref": "#/components/schemas/SurveyVersionStatus"
+          },
           "data": {
             "items": {
               "$ref": "#/components/schemas/SurveyStep"
@@ -578,6 +594,7 @@
           }
         },
         "required": [
+          "status",
           "data"
         ],
         "type": "object",
@@ -587,6 +604,55 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/SurveyVersion"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UpdateSurveyResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UserStepContext": {
+        "properties": {
+          "current_step": {
+            "type": "number",
+            "format": "double"
+          },
+          "total_steps": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": [
+          "current_step",
+          "total_steps"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "GetUserSurveyStepResponse": {
+        "properties": {
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SurveyStep"
+              },
+              {
+                "$ref": "#/components/schemas/UserStepContext"
+              }
+            ]
           }
         },
         "required": [
@@ -639,18 +705,6 @@
         "type": "object",
         "additionalProperties": false
       },
-      "UpdateSurveyResponse": {
-        "properties": {
-          "message": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "message"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
       "UpdateSurveyRequest": {
         "properties": {
           "data": {
@@ -690,7 +744,7 @@
       "ParticipantProfile": {
         "description": "Model ParticipantProfile",
         "properties": {
-          "userID": {
+          "userId": {
             "type": "number",
             "format": "double"
           },
@@ -728,7 +782,7 @@
           }
         },
         "required": [
-          "userID",
+          "userId",
           "preferredContact",
           "isParentOrGuardian",
           "postcode",
@@ -803,19 +857,19 @@
             "type": "string",
             "format": "date-time"
           },
-          "name": {
-            "type": "string"
-          },
           "id": {
             "type": "number",
             "format": "double"
+          },
+          "name": {
+            "type": "string"
           }
         },
         "required": [
           "updatedAt",
           "createdAt",
-          "name",
-          "id"
+          "id",
+          "name"
         ],
         "type": "object"
       },
@@ -1178,10 +1232,6 @@
           "dob": {
             "type": "string"
           },
-          "studyID": {
-            "type": "string",
-            "minLength": 1
-          },
           "participantID": {
             "type": "string",
             "minLength": 1
@@ -1208,7 +1258,6 @@
           "state",
           "password",
           "dob",
-          "studyID",
           "participantID",
           "isParentOrGuardian"
         ],
@@ -1222,7 +1271,6 @@
           "password": "Password123",
           "dob": "2000-05-21",
           "participantID": "P12345678",
-          "studyID": "S12345678",
           "mobile": "0412341234",
           "addressLine": "123 Sydney Street",
           "suburb": "Sydney",
@@ -1401,7 +1449,7 @@
         }
       }
     },
-    "/users/{userID}": {
+    "/users/{userId}": {
       "get": {
         "operationId": "GetUserById",
         "responses": {
@@ -1462,7 +1510,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "userID",
+            "name": "userId",
             "required": true,
             "schema": {
               "format": "double",
@@ -1531,7 +1579,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "userID",
+            "name": "userId",
             "required": true,
             "schema": {
               "format": "double",
@@ -1610,7 +1658,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "userID",
+            "name": "userId",
             "required": true,
             "schema": {
               "format": "double",
@@ -1782,6 +1830,108 @@
         ]
       }
     },
+    "/surveys/participant/{surveyId}": {
+      "post": {
+        "operationId": "AddParticipant",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateSurveyResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Add participant to survey",
+        "tags": [
+          "Surveys"
+        ],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "surveyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/surveys/step/{study}/{step}": {
+      "get": {
+        "operationId": "GetUserSurveyStep",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetUserSurveyStepResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Get user survey step",
+        "summary": "Get questions and current answers for step of a survey",
+        "tags": [
+          "Surveys"
+        ],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "study",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "step",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
     "/surveys/answers": {
       "post": {
         "operationId": "UpdateSurveyAnswers",
@@ -1885,6 +2035,52 @@
         }
       }
     },
+    "/surveys/publish/{surveyId}": {
+      "post": {
+        "operationId": "PublishSurvey",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateSurveyResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Publish a draft survey",
+        "tags": [
+          "Surveys"
+        ],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "surveyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
     "/profiles/current": {
       "get": {
         "operationId": "GetParticipantProfileByToken",
@@ -1933,7 +2129,7 @@
         "parameters": []
       }
     },
-    "/profiles/{userID}": {
+    "/profiles/{userId}": {
       "get": {
         "operationId": "GetParticipantProfileByID",
         "responses": {
@@ -1994,7 +2190,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "userID",
+            "name": "userId",
             "required": true,
             "schema": {
               "format": "double",
@@ -2398,7 +2594,7 @@
         ]
       }
     },
-    "/organisations/{orgID}/users/{userID}": {
+    "/organisations/{orgID}/users/{userId}": {
       "post": {
         "operationId": "AddUserToOrganisation",
         "responses": {
@@ -2468,7 +2664,7 @@
           },
           {
             "in": "path",
-            "name": "userID",
+            "name": "userId",
             "required": true,
             "schema": {
               "format": "double",
@@ -2546,7 +2742,7 @@
           },
           {
             "in": "path",
-            "name": "userID",
+            "name": "userId",
             "required": true,
             "schema": {
               "format": "double",

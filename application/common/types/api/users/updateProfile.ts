@@ -6,7 +6,6 @@ export interface UpdateProfileRequest {
   email: string
   password: string
   dob: string
-  studyID: string
   isParentOrGuardian: boolean
   nextOfKin?: AlternativeContact
   onBehalfOf?: OnBehalf
