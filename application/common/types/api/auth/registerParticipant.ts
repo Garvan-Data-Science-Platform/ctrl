@@ -14,9 +14,11 @@ import type {
  *  "password": "Password123",
  *  "dob": "2000-05-21",
  *  "participantID": "P12345678",
- *  "studyID": "S12345678",
  *  "mobile": "0412341234",
- *  "addressLine": "123 Sydney Street, Sydney NSW 2000",
+ *  "addressLine": "123 Sydney Street",
+ *  "suburb": "Sydney",
+ *  "postcode": "2000",
+ *  "state": "NSW",
  *  "isParentOrGuardian": false,
  *  "preferredContact": "MOBILE",
  *  "nextOfKin": {
@@ -77,10 +79,6 @@ export interface RegisterParticipantRequest {
    * @isDate Date of birth must be of date format
    */
   dob: string
-  /**
-   * @minLength 1
-   */
-  studyID: string
   /**
    * @minLength 1
    */

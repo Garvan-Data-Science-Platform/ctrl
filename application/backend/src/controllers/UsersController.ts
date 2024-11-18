@@ -58,19 +58,19 @@ export class UsersController extends Controller {
    *
    * @summary Get Specific User
    */
-  @Get('/{userID}')
+  @Get('/{userId}')
   @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  public async getUserById(@Path() userID: number): Promise<GetUserByIdResponse> {
+  public async getUserById(@Path() userId: number): Promise<GetUserByIdResponse> {
     const user: User | null = await this.userRepo.findUnique({
-      where: { id: userID },
+      where: { id: userId },
     })
     if (!user) {
-      const errorMessage: string = `User with ID: ${userID} not found`
+      const errorMessage: string = `User with ID: ${userId} not found`
       logger.error({ errorMessage })
       throw new NotFoundError(errorMessage)
     }
-    const responseData = { message: `Got user with ID: ${userID}`, data: user }
+    const responseData = { message: `Got user with ID: ${userId}`, data: user }
     logger.info({ ...responseData })
     return responseData
   }
@@ -105,26 +105,26 @@ export class UsersController extends Controller {
    *
    * @summary Update a User
    */
-  @Patch('/{userID}')
+  @Patch('/{userId}')
   @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async updateUser(
-    @Path() userID: number,
+    @Path() userId: number,
     @Body() bodyRequest: UpdateUserRequest,
   ): Promise<UpdateUserResponse> {
     try {
       const updatedUser = await this.userRepo.update({
-        where: { id: userID },
+        where: { id: userId },
         data: bodyRequest,
       })
       const responseData = {
-        message: `Updated user with ID: ${userID}`,
+        message: `Updated user with ID: ${userId}`,
         updatedUser,
       }
       logger.info({ ...responseData })
       return responseData
     } catch (err) {
-      const errorMessage: string = `User with ID: ${userID} not found`
+      const errorMessage: string = `User with ID: ${userId} not found`
       logger.error({ errorMessage, err })
       throw new NotFoundError(errorMessage)
     }
@@ -135,17 +135,17 @@ export class UsersController extends Controller {
    *
    * @summary Delete a User
    */
-  @Delete('/{userID}')
+  @Delete('/{userId}')
   @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  public async deleteUser(@Path() userID: number): Promise<DeleteUserResponse> {
+  public async deleteUser(@Path() userId: number): Promise<DeleteUserResponse> {
     try {
-      const deletedUser = await this.userRepo.delete({ where: { id: userID } })
-      const responseData = { message: `Deleted user with ID: ${userID}` }
+      const deletedUser = await this.userRepo.delete({ where: { id: userId } })
+      const responseData = { message: `Deleted user with ID: ${userId}` }
       logger.info({ ...responseData, deletedUser })
       return responseData
     } catch (err) {
-      const errorMessage: string = `User with ID: ${userID} not found`
+      const errorMessage: string = `User with ID: ${userId} not found`
       logger.error({ errorMessage, err })
       throw new NotFoundError(errorMessage)
     }

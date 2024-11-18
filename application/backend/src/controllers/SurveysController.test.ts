@@ -189,6 +189,7 @@ describe('SurveysController', () => {
       const response = await request(app)
         .post('/surveys/publish/2')
         .set({ Authorization: `Bearer ${token}` })
+
       expect(response.status).toBe(200)
       const survey = await prisma.surveyVersion.findFirst({ where: { id: 2 } })
       expect(survey?.status).toBe('PUBLISHED')
