@@ -87,7 +87,6 @@ export async function seedTests(prisma: PrismaClient) {
   await prisma.study.create({ data: { id: 1 } })
   await prisma.surveyVersion.create({
     data: {
-      id: 1,
       versionNumber: 1,
       status: 'PUBLISHED',
       data: ExampleSurveyStepData as SurveyStep[],
@@ -95,7 +94,6 @@ export async function seedTests(prisma: PrismaClient) {
   })
   await prisma.surveyVersion.create({
     data: {
-      id: 2,
       versionNumber: 2,
       status: 'DRAFT',
       data: ExampleSurveyStepData as SurveyStep[],
