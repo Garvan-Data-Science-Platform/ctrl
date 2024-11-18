@@ -285,6 +285,532 @@
         "type": "object",
         "additionalProperties": false
       },
+      "SurveyVersionStatus": {
+        "type": "string",
+        "enum": [
+          "PUBLISHED",
+          "DRAFT"
+        ]
+      },
+      "SurveyVersionBasic": {
+        "properties": {
+          "id": {
+            "type": "number",
+            "format": "double"
+          },
+          "versionNumber": {
+            "type": "number",
+            "format": "double"
+          },
+          "published_date": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SurveyVersionStatus"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "GetSurveyVersionsResponse": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/SurveyVersionBasic"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "SurveyQuestionChoices": {
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "tooltip": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "choices": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "text",
+          "value",
+          "required",
+          "choices"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "SurveyQuestionCheckbox": {
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "tooltip": {
+            "type": "string"
+          },
+          "value": {
+            "type": "boolean"
+          },
+          "required": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "text",
+          "value",
+          "required"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "SurveyVideo": {
+        "properties": {
+          "link": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "link"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "SurveySubHeading": {
+        "properties": {
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "SurveyElementType": {
+        "type": "string",
+        "enum": [
+          "question-choices",
+          "question-checkbox",
+          "subheading",
+          "video"
+        ]
+      },
+      "SurveyElement": {
+        "anyOf": [
+          {
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SurveyQuestionChoices"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "question-choices"
+                ],
+                "nullable": false
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SurveyQuestionCheckbox"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "question-checkbox"
+                ],
+                "nullable": false
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SurveyVideo"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "video"
+                ],
+                "nullable": false
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SurveySubHeading"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "subheading"
+                ],
+                "nullable": false
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "properties": {
+              "data": {},
+              "type": {
+                "$ref": "#/components/schemas/SurveyElementType"
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "SurveyStep": {
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "last_updated": {
+            "type": "string"
+          },
+          "elements": {
+            "items": {
+              "$ref": "#/components/schemas/SurveyElement"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "title",
+          "text",
+          "elements"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "SurveyVersion": {
+        "properties": {
+          "id": {
+            "type": "number",
+            "format": "double"
+          },
+          "version_number": {
+            "type": "number",
+            "format": "double"
+          },
+          "published_date": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SurveyVersionStatus"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/SurveyStep"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "status",
+          "data"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "GetSurveyVersionByIdResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/SurveyVersion"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UpdateSurveyResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UserStepContext": {
+        "properties": {
+          "current_step": {
+            "type": "number",
+            "format": "double"
+          },
+          "total_steps": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": [
+          "current_step",
+          "total_steps"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "GetUserSurveyStepResponse": {
+        "properties": {
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SurveyStep"
+              },
+              {
+                "$ref": "#/components/schemas/UserStepContext"
+              }
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UpdateSurveyAnswersResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UpdateSurveyAnswersRequest": {
+        "properties": {
+          "surveyVersionId": {
+            "type": "number",
+            "format": "double"
+          },
+          "step": {
+            "type": "number",
+            "format": "double"
+          },
+          "data": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "boolean"
+                }
+              ]
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "surveyVersionId",
+          "step",
+          "data"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UpdateSurveyRequest": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/SurveyStep"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "_36_Enums.StateTerritory": {
+        "type": "string",
+        "enum": [
+          "ACT",
+          "NSW",
+          "NT",
+          "QLD",
+          "SA",
+          "TAS",
+          "VIC",
+          "WA"
+        ]
+      },
+      "_36_Enums.ContactMethod": {
+        "type": "string",
+        "enum": [
+          "EMAIL",
+          "MOBILE",
+          "MAIL"
+        ]
+      },
+      "ParticipantProfile": {
+        "description": "Model ParticipantProfile",
+        "properties": {
+          "userId": {
+            "type": "number",
+            "format": "double"
+          },
+          "preferredContact": {
+            "$ref": "#/components/schemas/_36_Enums.ContactMethod"
+          },
+          "isParentOrGuardian": {
+            "type": "boolean"
+          },
+          "postcode": {
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/_36_Enums.StateTerritory"
+          },
+          "suburb": {
+            "type": "string"
+          },
+          "addressLine": {
+            "type": "string"
+          },
+          "mobile": {
+            "type": "string"
+          },
+          "participantID": {
+            "type": "string"
+          },
+          "dob": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": [
+          "userId",
+          "preferredContact",
+          "isParentOrGuardian",
+          "postcode",
+          "state",
+          "suburb",
+          "addressLine",
+          "mobile",
+          "participantID",
+          "dob",
+          "id"
+        ],
+        "type": "object"
+      },
+      "GetParticipantProfileResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ParticipantProfile"
+              },
+              {
+                "properties": {
+                  "user": {
+                    "properties": {
+                      "email": {
+                        "type": "string"
+                      },
+                      "lastName": {
+                        "type": "string"
+                      },
+                      "middleName": {
+                        "type": "string"
+                      },
+                      "firstName": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "email",
+                      "lastName",
+                      "firstName"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "user"
+                ],
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "required": [
+          "message",
+          "data"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
       "Organisation": {
         "description": "Model Organisation",
         "properties": {
@@ -296,19 +822,19 @@
             "type": "string",
             "format": "date-time"
           },
-          "name": {
-            "type": "string"
-          },
           "id": {
             "type": "number",
             "format": "double"
+          },
+          "name": {
+            "type": "string"
           }
         },
         "required": [
           "updatedAt",
           "createdAt",
-          "name",
-          "id"
+          "id",
+          "name"
         ],
         "type": "object"
       },
@@ -613,8 +1139,7 @@
             "type": "string"
           },
           "dob": {
-            "type": "string",
-            "format": "date-time"
+            "type": "string"
           }
         },
         "required": [
@@ -672,10 +1197,6 @@
           "dob": {
             "type": "string"
           },
-          "studyID": {
-            "type": "string",
-            "minLength": 1
-          },
           "participantID": {
             "type": "string",
             "minLength": 1
@@ -702,7 +1223,6 @@
           "state",
           "password",
           "dob",
-          "studyID",
           "participantID",
           "isParentOrGuardian"
         ],
@@ -716,9 +1236,11 @@
           "password": "Password123",
           "dob": "2000-05-21",
           "participantID": "P12345678",
-          "studyID": "S12345678",
           "mobile": "0412341234",
-          "addressLine": "123 Sydney Street, Sydney NSW 2000",
+          "addressLine": "123 Sydney Street",
+          "suburb": "Sydney",
+          "postcode": "2000",
+          "state": "NSW",
           "isParentOrGuardian": false,
           "preferredContact": "MOBILE",
           "nextOfKin": {
@@ -892,7 +1414,7 @@
         }
       }
     },
-    "/users/{userID}": {
+    "/users/{userId}": {
       "get": {
         "operationId": "GetUserById",
         "responses": {
@@ -953,7 +1475,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "userID",
+            "name": "userId",
             "required": true,
             "schema": {
               "format": "double",
@@ -1022,7 +1544,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "userID",
+            "name": "userId",
             "required": true,
             "schema": {
               "format": "double",
@@ -1101,7 +1623,458 @@
         "parameters": [
           {
             "in": "path",
-            "name": "userID",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/surveys": {
+      "get": {
+        "operationId": "GetAllSurveys",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetSurveyVersionsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Get all Surveys",
+        "summary": "Get all Surveys",
+        "tags": [
+          "Surveys"
+        ],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": []
+      }
+    },
+    "/surveys/{surveyID}": {
+      "get": {
+        "operationId": "GetSurveyVersionById",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetSurveyVersionByIdResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Gets a Specific Survey using their ID",
+        "summary": "Get Specific Survey",
+        "tags": [
+          "Surveys"
+        ],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "surveyID",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/surveys/participant/{surveyId}": {
+      "post": {
+        "operationId": "AddParticipant",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateSurveyResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Add participant to survey",
+        "tags": [
+          "Surveys"
+        ],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "surveyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/surveys/step/{study}/{step}": {
+      "get": {
+        "operationId": "GetUserSurveyStep",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetUserSurveyStepResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Get user survey step",
+        "summary": "Get questions and current answers for step of a survey",
+        "tags": [
+          "Surveys"
+        ],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "study",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "step",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/surveys/answers": {
+      "post": {
+        "operationId": "UpdateSurveyAnswers",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateSurveyAnswersResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Update survey answers",
+        "summary": "Update a Survey",
+        "tags": [
+          "Surveys"
+        ],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSurveyAnswersRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/surveys/{surveyId}": {
+      "patch": {
+        "operationId": "UpdateSurvey",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateSurveyResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Update draft survey",
+        "tags": [
+          "Surveys"
+        ],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "surveyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSurveyRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/surveys/publish/{surveyId}": {
+      "post": {
+        "operationId": "PublishSurvey",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateSurveyResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Publish a draft survey",
+        "tags": [
+          "Surveys"
+        ],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "surveyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/profiles/current": {
+      "get": {
+        "operationId": "GetParticipantProfileByToken",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetParticipantProfileResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Get a Participants Profile by token",
+        "summary": "Get a Participants Profile by token",
+        "tags": [
+          "Profiles"
+        ],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": []
+      }
+    },
+    "/profiles/{userId}": {
+      "get": {
+        "operationId": "GetParticipantProfileByID",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetParticipantProfileResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Get a Participants Profile by ID",
+        "summary": "Get a Participants Profile by ID",
+        "tags": [
+          "Profiles"
+        ],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
             "required": true,
             "schema": {
               "format": "double",
@@ -1505,7 +2478,7 @@
         ]
       }
     },
-    "/organisations/{orgID}/users/{userID}": {
+    "/organisations/{orgID}/users/{userId}": {
       "post": {
         "operationId": "AddUserToOrganisation",
         "responses": {
@@ -1575,7 +2548,7 @@
           },
           {
             "in": "path",
-            "name": "userID",
+            "name": "userId",
             "required": true,
             "schema": {
               "format": "double",
@@ -1653,7 +2626,7 @@
           },
           {
             "in": "path",
-            "name": "userID",
+            "name": "userId",
             "required": true,
             "schema": {
               "format": "double",

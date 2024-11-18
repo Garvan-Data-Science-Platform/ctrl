@@ -14,74 +14,31 @@ import {
   GetOrganisationUsersResponse,
 } from 'common/types/api/organisations'
 import { resetDB } from '../../tests/TestHelpers'
-import { getUserIdFromToken } from '../authentication'
-import { RegisterRequest, RegisterResponse } from 'common/types/api/auth'
+import { generateToken, getUserIdFromToken } from '../authentication'
 
 const api = new Api()
 const app = api.app
 
 describe('OrganisationsController', () => {
   let token: string
-  let token2: string
-  let testOrganisationID: number
-  let testUserID: number
-  let testUserInOrgID: number
+  let tokenInOrganisation: string
 
-  const testUser: RegisterRequest = {
-    firstName: 'Test',
-    lastName: 'User',
-    email: 'test@user.com',
-    password: 'Password123',
-    role: 'test',
-  }
-
-  const testUserInOrg: RegisterRequest = {
-    firstName: 'Test',
-    lastName: 'UserInOrg',
-    email: 'test@org.com',
-    password: 'Password123',
-    role: 'test',
-  }
+  const testOrganisationId: number = 99
+  let testUserId: number
+  let testUserInOrgId: number
 
   beforeAll(async () => {
+    token = await generateToken(99)
+    tokenInOrganisation = await generateToken(97)
+
+    testUserId = await getUserIdFromToken(token)
+    testUserInOrgId = await getUserIdFromToken(tokenInOrganisation)
+
     api.run()
   })
 
   beforeEach(async () => {
     await resetDB()
-
-    // Register user
-    const registerResponse1 = await request(app).post('/auth/register').send(testUser)
-    const body1: RegisterResponse = registerResponse1.body
-    token = body1.token
-    testUserID = getUserIdFromToken(token)
-
-    // Register user
-    const registerResponse2 = await request(app).post('/auth/register').send(testUserInOrg)
-    const body2: RegisterResponse = registerResponse2.body
-    token2 = body2.token
-    testUserInOrgID = getUserIdFromToken(token2)
-
-    // Create organisation
-    const createOrganisationResponse = await request(app)
-      .post('/organisations')
-      .set({ Authorization: `Bearer ${token}` })
-      .send({ name: 'Test Organisation' } as CreateOrganisationRequest)
-    if (createOrganisationResponse.status !== 201)
-      throw new Error('Organisation could not be created')
-    const createOrganisationBody: CreateOrganisationResponse = createOrganisationResponse.body
-
-    if (!createOrganisationBody.organisationID) throw new Error('Organisation could not be created')
-
-    testOrganisationID = createOrganisationBody.organisationID
-
-    // Add user to organisation
-    const addUserToOrganisationResponse = await request(app)
-      .post(`/organisations/${testOrganisationID}/users/${testUserInOrgID}`)
-      .set({ Authorization: `Bearer ${token2}` })
-
-    if (addUserToOrganisationResponse.status !== 200)
-      throw new Error('User could not be added to organisation')
   })
 
   afterAll(async () => {
@@ -114,13 +71,13 @@ describe('OrganisationsController', () => {
   describe('GET /organisations/:OrgID', () => {
     it('should return an organisation by ID', async () => {
       const response = await request(app)
-        .get(`/organisations/${testOrganisationID}`)
+        .get(`/organisations/${testOrganisationId}`)
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(200)
 
       const body: GetOrganisationByIdResponse = response.body
       expect(body.organisation).not.toBeNull()
-      expect(body.organisation?.id).toBe(testOrganisationID)
+      expect(body.organisation?.id).toBe(testOrganisationId)
     })
 
     it('should return a 404 error if the organisation does not exist', async () => {
@@ -140,7 +97,7 @@ describe('OrganisationsController', () => {
         throw new Error('Internal Server Error')
       })
       const response = await request(app)
-        .get(`/organisations/${testOrganisationID}`)
+        .get(`/organisations/${testOrganisationId}`)
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(500)
     })
@@ -202,14 +159,14 @@ describe('OrganisationsController', () => {
       const updatedOrganisationName = 'Updated Test Organisation'
 
       const response = await request(app)
-        .patch(`/organisations/${testOrganisationID}`)
+        .patch(`/organisations/${testOrganisationId}`)
         .set({ Authorization: `Bearer ${token}` })
         .send({ name: updatedOrganisationName } as UpdateOrganisationRequest)
       expect(response.status).toBe(200)
 
       // Check updated organisation in db
       const updatedOrg = await prisma.organisation.findFirst({
-        where: { id: testOrganisationID },
+        where: { id: testOrganisationId },
       })
       expect(updatedOrg).not.toBeNull()
       expect(updatedOrg?.name).toBe(updatedOrganisationName)
@@ -232,13 +189,13 @@ describe('OrganisationsController', () => {
   describe('DELETE /organisations/:OrgID', () => {
     it('should delete an existing organisation', async () => {
       const response = await request(app)
-        .delete(`/organisations/${testOrganisationID}`)
+        .delete(`/organisations/${testOrganisationId}`)
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(200)
 
       // Check deleted organisation in db
       const deletedOrg = await prisma.organisation.findFirst({
-        where: { id: testOrganisationID },
+        where: { id: testOrganisationId },
       })
       expect(deletedOrg).toBeNull()
     })
@@ -259,13 +216,13 @@ describe('OrganisationsController', () => {
   describe('GET /organisations/:OrgID/users', () => {
     it('should return a list of users for an organisation', async () => {
       const response = await request(app)
-        .get(`/organisations/${testOrganisationID}/users`)
+        .get('/organisations/99/users')
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(200)
 
       const body: GetOrganisationUsersResponse = response.body
       expect(body.users?.length).toBe(1)
-      expect(body.users?.[0].id).toBe(testUserInOrgID)
+      expect(body.users?.[0].id).toBe(testUserInOrgId)
     })
 
     it('should return a 404 error if the organisation is not found', async () => {
@@ -283,20 +240,20 @@ describe('OrganisationsController', () => {
   describe('POST /organisations/:OrgID/users/:UserID', () => {
     it('should add a user to an organisation', async () => {
       const response = await request(app)
-        .post(`/organisations/${testOrganisationID}/users/${testUserID}`)
+        .post(`/organisations/${testOrganisationId}/users/${testUserId}`)
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(200)
 
       const body: AddUserToOrganisationResponse = response.body
       expect(body.message).toBe(
-        `User with ID: ${testUserID} added to organisation with ID: ${testOrganisationID}`,
+        `User with ID: ${testUserId} added to organisation with ID: ${testOrganisationId}`,
       )
     })
 
     it('should return a 404 error if the user is not found', async () => {
       const notExistingUserId: number = 1234567890
       const response = await request(app)
-        .post(`/organisations/${testOrganisationID}/users/${notExistingUserId}`)
+        .post(`/organisations/${testOrganisationId}/users/${notExistingUserId}`)
         .set({ Authorization: `Bearer ${token}` })
 
       expect(response.status).toBe(404)
@@ -308,7 +265,7 @@ describe('OrganisationsController', () => {
     it('should return a 404 error if the organisation is not found', async () => {
       const notExistingOrganisationId: number = 1234567890
       const response = await request(app)
-        .post(`/organisations/${notExistingOrganisationId}/users/${testUserID}`)
+        .post(`/organisations/${notExistingOrganisationId}/users/${testUserId}`)
         .set({ Authorization: `Bearer ${token}` })
 
       expect(response.status).toBe(404)
@@ -321,20 +278,21 @@ describe('OrganisationsController', () => {
   describe('DELETE /organisations/:OrgID/users/:UserID', () => {
     it('should remove a user from an organisation', async () => {
       const response = await request(app)
-        .delete(`/organisations/${testOrganisationID}/users/${testUserInOrgID}`)
+        .delete(`/organisations/${testOrganisationId}/users/${testUserInOrgId}`)
         .set({ Authorization: `Bearer ${token}` })
+
       expect(response.status).toBe(200)
 
       const body: RemoveUserFromOrganisationResponse = response.body
       expect(body.message).toBe(
-        `User with ID: ${testUserInOrgID} removed from organisation with ID: ${testOrganisationID}`,
+        `User with ID: ${testUserInOrgId} removed from organisation with ID: ${testOrganisationId}`,
       )
     })
 
     it('should return a 404 error if the user is not found', async () => {
       const notExistingUserId: number = 1234567890
       const response = await request(app)
-        .delete(`/organisations/${testOrganisationID}/users/${notExistingUserId}`)
+        .delete(`/organisations/${testOrganisationId}/users/${notExistingUserId}`)
         .set({ Authorization: `Bearer ${token}` })
 
       expect(response.status).toBe(404)
@@ -346,7 +304,7 @@ describe('OrganisationsController', () => {
     it('should return a 404 error if the organisation is not found', async () => {
       const notExistingOrganisationId: number = 1234567890
       const response = await request(app)
-        .delete(`/organisations/${notExistingOrganisationId}/users/${testUserID}`)
+        .delete(`/organisations/${notExistingOrganisationId}/users/${testUserId}`)
         .set({ Authorization: `Bearer ${token}` })
 
       expect(response.status).toBe(404)

@@ -18,7 +18,9 @@
     "jsx": "preserve",
     "paths": {
       "common/*": ["../../common/*"]
-    }
+    },
+    "sourceMap": true,
+    "outDir": "./dist"
   },
   "include": [
     "./src",

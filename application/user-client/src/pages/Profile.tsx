@@ -2,7 +2,7 @@ import { Button, Card, Container, Typography } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import NavBar from '../components/NavBar'
 import { useQuery } from '@tanstack/react-query'
-import type { GetUserProfileResponse } from '@common/types/api/users'
+import type { GetParticipantProfileResponse } from '@common/types/api/users'
 import ProfileData from '@common/example_responses/getUserProfile.json'
 import { Link } from 'react-router-dom'
 
@@ -10,7 +10,7 @@ export default function Profile() {
   const { isPending, error, data } = useQuery({
     queryKey: ['profile', 'get'],
     //queryFn: () => fetch('/api/user/profile').then((res) => res.json()) as Promise<UserProfile>,
-    queryFn: () => ProfileData as GetUserProfileResponse,
+    queryFn: () => (ProfileData as unknown as GetParticipantProfileResponse).data,
   })
 
   if (isPending) return 'Loading'
@@ -36,7 +36,7 @@ export default function Profile() {
                       </Typography>
                     </td>
                     <td>
-                      <Typography>{data.firstName}</Typography>
+                      <Typography>{data.user.firstName}</Typography>
                     </td>
                   </tr>
                   <tr>
@@ -46,7 +46,7 @@ export default function Profile() {
                       </Typography>
                     </td>
                     <td>
-                      <Typography>{data.middleName}</Typography>
+                      <Typography>{data.user.middleName}</Typography>
                     </td>
                   </tr>
                   <tr>
@@ -56,7 +56,7 @@ export default function Profile() {
                       </Typography>
                     </td>
                     <td>
-                      <Typography>{data.lastName}</Typography>
+                      <Typography>{data.user.lastName}</Typography>
                     </td>
                   </tr>
                   <tr>
@@ -66,7 +66,7 @@ export default function Profile() {
                       </Typography>
                     </td>
                     <td>
-                      <Typography>{data.dob}</Typography>
+                      <Typography>{data.dob.toISOString()}</Typography>
                     </td>
                   </tr>
                 </tbody>
@@ -84,7 +84,7 @@ export default function Profile() {
                       </Typography>
                     </td>
                     <td>
-                      <Typography>{data.email}</Typography>
+                      <Typography>{data.user.email}</Typography>
                     </td>
                   </tr>
                   <tr>

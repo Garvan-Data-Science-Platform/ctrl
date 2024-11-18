@@ -39,8 +39,8 @@ model ParticipantProfile {
   nextOfKin          AlternativeContact?
   onBehalfOf         OnBehalf?
   preferredContact   ContactMethod
-  userID             Int                 @unique
-  user               User                @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId             Int                 @unique
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model OnBehalf {
@@ -97,8 +97,8 @@ model Organisation {
 }
 
 model Study {
-  id           Int                @id @default(autoincrement())
-  surveys      SurveyVersion[]
+  id      Int             @id @default(autoincrement())
+  surveys SurveyVersion[]
 }
 
 enum SurveyVersionStatus {
@@ -107,33 +107,33 @@ enum SurveyVersionStatus {
 }
 
 model SurveyVersion {
-  id                Int                 @id @default(autoincrement())
-  versionNumber     Int                 
+  id                 Int                 @id @default(autoincrement())
+  versionNumber      Int
   /// ![PrismaJson.SurveyVersionData]
-  data              Json
-  status            SurveyVersionStatus @default(DRAFT)
+  data               Json
+  status             SurveyVersionStatus @default(DRAFT)
   surveyParticipants SurveyParticipant[]
-  study              Study              @relation(fields: [studyId], references: [id], onDelete: Cascade)
-  studyId            Int @default(1)
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
+  study              Study               @relation(fields: [studyId], references: [id], onDelete: Cascade)
+  studyId            Int                 @default(1)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
 }
 
 model SurveyAnswers {
-  id              Int           @id @default(autoincrement())
-  participant     SurveyParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
-  participantId   Int
+  id            Int               @id @default(autoincrement())
+  participant   SurveyParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  participantId Int
   /// ![PrismaJson.SurveyAnswerData]
-  data      Json
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  data          Json
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
 }
 
 model SurveyParticipant {
-  id                 Int                @id @default(autoincrement())
-  version            SurveyVersion      @relation(fields: [versionId], references: [id], onDelete: Cascade)
-  versionId          Int
-  user               User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId             Int
-  answers            SurveyAnswers[]
+  id        Int             @id @default(autoincrement())
+  version   SurveyVersion   @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  versionId Int
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  answers   SurveyAnswers[]
 }

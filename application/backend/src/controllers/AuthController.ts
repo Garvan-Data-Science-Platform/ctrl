@@ -92,28 +92,29 @@ export class AuthController extends Controller {
     let onBehalfOfDOB
     if (onBehalfOf) {
       onBehalfOfDOB = new Date(onBehalfOf.dob)
-      onBehalfOfCreateData = { create: { ...onBehalfOf, dob: onBehalfOfDOB } }
+      onBehalfOfCreateData = { onBehalfOf: { create: { ...onBehalfOf, dob: onBehalfOfDOB } } }
     }
 
     let nextOfKinCreateData
     if (nextOfKin) {
-      nextOfKinCreateData = { create: { ...nextOfKin } }
+      nextOfKinCreateData = { nextOfKin: { create: { ...nextOfKin } } }
     }
 
-    const insertedUser = await this.userRepo.create({
-      data: {
-        ...userDetails,
-        role: 'participant', // TODO: This should be an enum
-        password: hashedPassword,
-        profile: {
-          create: {
-            dob: new Date(dob),
-            ...noNextOfKinProfileData,
-            onBehalfOf: onBehalfOfCreateData,
-            nextOfKin: nextOfKinCreateData,
-          },
+    const data = {
+      ...userDetails,
+      role: 'participant', // TODO: This should be an enum
+      password: hashedPassword,
+      profile: {
+        create: {
+          dob: new Date(dob),
+          ...noNextOfKinProfileData,
+          ...onBehalfOfCreateData,
+          ...nextOfKinCreateData,
         },
       },
+    }
+    const insertedUser = await this.userRepo.create({
+      data,
     })
 
     const token = await generateToken(insertedUser.id)

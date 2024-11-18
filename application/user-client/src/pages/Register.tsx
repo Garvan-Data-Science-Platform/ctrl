@@ -187,7 +187,7 @@ export default function Register() {
                 fullWidth
                 sx={{ m: 1 }}
                 label="Study ID"
-                {...register('studyID', { required: true })}
+                {...register('studyId', { required: true })}
               />
               <TextField
                 sx={{ m: 1, flexGrow: 1 }}
