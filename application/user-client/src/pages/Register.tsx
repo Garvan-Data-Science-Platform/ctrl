@@ -1,9 +1,27 @@
-import { Alert, Box, Button, Card, Container, Switch, TextField, Typography } from '@mui/material'
+import {
+  Alert,
+  Box,
+  Button,
+  Card,
+  Container,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Switch,
+  TextField,
+  Typography,
+} from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth'
 import { RegisterParticipantRequest, RegisterParticipantResponse } from '@common/types/api/auth'
 import { useState } from 'react'
+import {
+  ContactMethod,
+  RelationshipType,
+  StateTerritory,
+} from '@common/types/api/users/ParticipantProfile'
 
 interface FormValues {
   firstName: string
@@ -13,9 +31,16 @@ interface FormValues {
   confirm_password: string
   dob: string
   studyId: string
+  addressLine: string
+  suburb: string
+  state: StateTerritory
+  postcode: string
+  mobile: string
+  preferredContact: ContactMethod
   nok_first: string
   nok_surname: string
   nok_email: string
+  nok_relationship: RelationshipType
   on_behalf_first: string
   on_behalf_surname: string
   on_behalf_dob: string
@@ -44,7 +69,13 @@ export default function Register() {
       email: data.email,
       password: data.password,
       dob: data.dob,
-      studyId: data.studyId,
+      addressLine: data.addressLine,
+      suburb: data.suburb,
+      state: data.state,
+      postcode: data.postcode,
+      mobile: data.mobile,
+      preferredContact: data.preferredContact,
+      participantID: data.studyId,
     }
 
     let reqData: RegisterParticipantRequest
@@ -67,11 +98,12 @@ export default function Register() {
           firstName: data['nok_first'],
           lastName: data['nok_surname'],
           email: data['nok_email'],
+          relationship: data['nok_relationship'],
         },
       }
     }
 
-    fetch(import.meta.env.VITE_BACKEND_URL + '/auth/register-participant', {
+    fetch(import.meta.env.VITE_BACKEND_URL + '/auth/register/participant', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(reqData),
@@ -157,7 +189,56 @@ export default function Register() {
                 label="Study ID"
                 {...register('studyId', { required: true })}
               />
+              <TextField
+                sx={{ m: 1, flexGrow: 1 }}
+                label="Address Line"
+                {...register('addressLine', { required: true })}
+              />
+              <TextField sx={{ m: 1 }} label="Suburb" {...register('suburb', { required: true })} />
+              <FormControl sx={{ m: 1, flexGrow: 1 }}>
+                <InputLabel id="state-select-label">State</InputLabel>
+                <Select
+                  labelId="state-select-label"
+                  label="State"
+                  {...register('state', { required: true })}
+                >
+                  {Object.keys(StateTerritory).map((val, idx) => {
+                    return (
+                      <MenuItem value={val} key={`state_${idx}`}>
+                        {val}
+                      </MenuItem>
+                    )
+                  })}
+                </Select>
+              </FormControl>
 
+              <TextField
+                sx={{ m: 1, flexGrow: 1 }}
+                label="Postcode"
+                {...register('postcode', { required: true })}
+              />
+              <TextField
+                fullWidth
+                sx={{ m: 1 }}
+                label="Mobile"
+                {...register('mobile', { required: true })}
+              />
+              <FormControl sx={{ m: 1 }} fullWidth>
+                <InputLabel id="pref-select-label">Preferred Contact Method</InputLabel>
+                <Select
+                  labelId="pref-select-label"
+                  label="Preferred Contact Method"
+                  {...register('preferredContact', { required: true })}
+                >
+                  {Object.keys(ContactMethod).map((val, idx) => {
+                    return (
+                      <MenuItem value={val} key={`contact_${idx}`}>
+                        {val}
+                      </MenuItem>
+                    )
+                  })}
+                </Select>
+              </FormControl>
               <Typography sx={{ m: 1 }}>
                 Are you registering as a parent, guardian or carer?
               </Typography>
@@ -219,6 +300,22 @@ export default function Register() {
                       required: true,
                     })}
                   />
+                  <FormControl sx={{ m: 1 }} fullWidth>
+                    <InputLabel id="state-select-label">Relationship</InputLabel>
+                    <Select
+                      labelId="rel-select-label"
+                      label="Relationship"
+                      {...register('nok_relationship', { required: true })}
+                    >
+                      {Object.keys(RelationshipType).map((val, idx) => {
+                        return (
+                          <MenuItem value={val} key={`rel_${idx}`}>
+                            {val}
+                          </MenuItem>
+                        )
+                      })}
+                    </Select>
+                  </FormControl>
                 </>
               )}
               {errors.root ? (

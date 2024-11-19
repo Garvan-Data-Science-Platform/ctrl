@@ -16,6 +16,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { GetParticipantProfileResponse, UpdateProfileRequest } from '@common/types/api/users'
 import ProfileData from '@common/example_responses/getUserProfile.json'
 import NavBar from '../components/NavBar'
+import { RelationshipType } from '@common/types/api/users/ParticipantProfile'
 
 interface FormValues {
   firstName: string
@@ -28,6 +29,7 @@ interface FormValues {
   nok_first: string
   nok_surname: string
   nok_email: string
+  nok_relationship: RelationshipType
   on_behalf_first: string
   on_behalf_surname: string
   on_behalf_dob: string
@@ -48,7 +50,7 @@ export default function ProfileEdit() {
     //queryFn: () => fetch('/api/user/profile').then((res) => res.json()) as Promise<UserProfile>,
     queryFn: async () => {
       await new Promise((r) => setTimeout(r, 2000))
-      return ProfileData as GetParticipantProfileResponse
+      return (ProfileData as GetParticipantProfileResponse).data
     },
   })
 
@@ -95,6 +97,7 @@ export default function ProfileEdit() {
           firstName: data['nok_first'],
           lastName: data['nok_surname'],
           email: data['nok_email'],
+          relationship: data['nok_relationship'],
         },
       }
     }

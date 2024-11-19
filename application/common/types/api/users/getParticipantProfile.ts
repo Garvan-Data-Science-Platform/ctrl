@@ -1,13 +1,22 @@
-import { ParticipantProfile } from '@prisma/client'
+import { AlternativeContact, ContactMethod, OnBehalf, StateTerritory } from './ParticipantProfile'
 
 export interface GetParticipantProfileResponse {
   message: string
-  data: ParticipantProfile & {
-    user: {
-      firstName: string
-      middleName?: string
-      lastName: string
-      email: string
-    }
+  data: {
+    firstName: string
+    middleName?: string
+    lastName: string
+    dob: string
+    participantID: string
+    email: string
+    mobile: string
+    addressLine?: string
+    suburb?: string
+    state?: StateTerritory
+    postcode?: string
+    preferredContact: ContactMethod
+    isParentOrGuardian: boolean
+    alternativeContact?: AlternativeContact
+    onBehalfOf?: OnBehalf
   }
 }

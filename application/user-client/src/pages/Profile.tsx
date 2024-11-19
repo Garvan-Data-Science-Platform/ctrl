@@ -10,7 +10,7 @@ export default function Profile() {
   const { isPending, error, data } = useQuery({
     queryKey: ['profile', 'get'],
     //queryFn: () => fetch('/api/user/profile').then((res) => res.json()) as Promise<UserProfile>,
-    queryFn: () => (ProfileData as unknown as GetParticipantProfileResponse).data,
+    queryFn: () => (ProfileData as GetParticipantProfileResponse).data,
   })
 
   if (isPending) return 'Loading'
@@ -36,7 +36,7 @@ export default function Profile() {
                       </Typography>
                     </td>
                     <td>
-                      <Typography>{data.user.firstName}</Typography>
+                      <Typography>{data.firstName}</Typography>
                     </td>
                   </tr>
                   <tr>
@@ -46,7 +46,7 @@ export default function Profile() {
                       </Typography>
                     </td>
                     <td>
-                      <Typography>{data.user.middleName}</Typography>
+                      <Typography>{data.middleName}</Typography>
                     </td>
                   </tr>
                   <tr>
@@ -56,7 +56,7 @@ export default function Profile() {
                       </Typography>
                     </td>
                     <td>
-                      <Typography>{data.user.lastName}</Typography>
+                      <Typography>{data.lastName}</Typography>
                     </td>
                   </tr>
                   <tr>
@@ -66,7 +66,7 @@ export default function Profile() {
                       </Typography>
                     </td>
                     <td>
-                      <Typography>{data.dob.toISOString()}</Typography>
+                      <Typography>{data.dob}</Typography>
                     </td>
                   </tr>
                 </tbody>
@@ -84,7 +84,7 @@ export default function Profile() {
                       </Typography>
                     </td>
                     <td>
-                      <Typography>{data.user.email}</Typography>
+                      <Typography>{data.email}</Typography>
                     </td>
                   </tr>
                   <tr>
