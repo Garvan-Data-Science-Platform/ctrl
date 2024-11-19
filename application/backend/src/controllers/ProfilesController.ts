@@ -20,6 +20,7 @@ import {
   Request,
 } from 'tsoa'
 import * as express from 'express'
+import { ContactMethod, StateTerritory } from 'common/types/api/users/ParticipantProfile'
 
 @Route('profiles')
 @Tags('Profiles')
@@ -86,11 +87,29 @@ export class ProfilesController extends Controller {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { user, ...profile }: any = data
+    const { user, ...profile } = data
+    const { firstName, lastName, email } = user
+    const { mobile, isParentOrGuardian, addressLine, postcode, suburb, participantID } = profile
+    const dob = profile.dob.toISOString()
+    const state = profile.state as StateTerritory
+    const preferredContact = profile.preferredContact as ContactMethod
 
     const responseData: GetParticipantProfileResponse = {
       message: `Got Participant Profile with userId: ${userId}`,
-      data: { ...profile, user },
+      data: {
+        addressLine,
+        postcode,
+        suburb,
+        state,
+        preferredContact,
+        dob,
+        firstName,
+        lastName,
+        email,
+        mobile,
+        isParentOrGuardian,
+        participantID,
+      },
     }
     logger.info({ ...responseData })
     return responseData

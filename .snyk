@@ -1,0 +1,10 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.25.0
+# ignores vulnerabilities until expiry date; change duration by modifying expiry date
+ignore:
+  SNYK-JS-CROSSSPAWN-8303230:
+    - '*':
+        reason: no direct upgrade or patch
+        expires: 2024-12-19T01:18:03.489Z
+        created: 2024-11-19T01:18:03.493Z
+patch: {}

@@ -1,4 +1,4 @@
-import type { GetUserByIdResponse } from './getUserByID'
+import type { GetUserByIdResponse } from './getUserById'
 import type { GetParticipantProfileResponse } from './getParticipantProfile'
 import type { GetAllUsersResponse } from './getAllUsers'
 import type { CreateUserRequest, CreateUserResponse } from './createUser'
