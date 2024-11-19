@@ -30,7 +30,7 @@ interface FormValues {
   password: string
   confirm_password: string
   dob: string
-  studyID: string
+  studyId: string
   addressLine: string
   suburb: string
   state: StateTerritory
@@ -75,7 +75,7 @@ export default function Register() {
       postcode: data.postcode,
       mobile: data.mobile,
       preferredContact: data.preferredContact,
-      participantID: data.studyID,
+      participantID: data.studyId,
     }
 
     let reqData: RegisterParticipantRequest

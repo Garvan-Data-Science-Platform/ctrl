@@ -37,7 +37,6 @@ describe('ProfilesController', () => {
       const expectedProfileData = expect.objectContaining({
         addressLine: '123 smith st',
         dob: '1980-01-23T00:00:00.000Z',
-        id: expect.any(Number),
         isParentOrGuardian: false,
         mobile: '0412345678',
         participantID: 'ABC123',
@@ -45,13 +44,9 @@ describe('ProfilesController', () => {
         preferredContact: 'EMAIL',
         state: 'VIC',
         suburb: 'Melbourne',
-        user: {
-          email: 'test3@example.com',
-          firstName: 'Test',
-          lastName: 'User',
-          middleName: null,
-        },
-        userId: expect.any(Number),
+        email: 'test3@example.com',
+        firstName: 'Test',
+        lastName: 'User',
       })
 
       const body: GetParticipantProfileResponse = response.body
@@ -84,7 +79,6 @@ describe('ProfilesController', () => {
       const expectedProfileData = expect.objectContaining({
         addressLine: '123 smith st',
         dob: '1980-01-23T00:00:00.000Z',
-        id: expect.any(Number),
         isParentOrGuardian: false,
         mobile: '0412345678',
         participantID: 'ABC123',
@@ -92,13 +86,9 @@ describe('ProfilesController', () => {
         preferredContact: 'EMAIL',
         state: 'VIC',
         suburb: 'Melbourne',
-        user: {
-          email: 'test3@example.com',
-          firstName: 'Test',
-          lastName: 'User',
-          middleName: null,
-        },
-        userId: expect.any(Number),
+        email: 'test3@example.com',
+        firstName: 'Test',
+        lastName: 'User',
       })
 
       const body: GetParticipantProfileResponse = response.body
