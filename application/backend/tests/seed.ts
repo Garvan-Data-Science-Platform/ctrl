@@ -11,15 +11,27 @@ export async function seedTests(prisma: PrismaClient) {
     },
   })
 
-  //User in Test Organisation with no profile
+  // OperatorAdminUser
+  await prisma.user.create({
+    data: {
+      id: 96,
+      email: 'operatoradmin@example.com',
+      firstName: 'Operator',
+      lastName: 'Admin',
+      password: 'password',
+      role: Role.OperatorAdmin,
+    },
+  })
+
+  //OrganisationAdminUser
   await prisma.user.create({
     data: {
       id: 97,
       email: 'test1@example.com',
-      firstName: 'Test',
-      lastName: 'User',
+      firstName: 'Organisation',
+      lastName: 'Admin',
       password: 'password',
-      role: Role.Participant,
+      role: Role.OrganisationAdmin,
       organisations: {
         connect: {
           id: 99,
@@ -27,6 +39,7 @@ export async function seedTests(prisma: PrismaClient) {
       },
     },
   })
+
   //User with unanswered survey
   await prisma.user.create({
     data: {
