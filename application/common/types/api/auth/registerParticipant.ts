@@ -3,6 +3,7 @@ import type {
   AlternativeContact,
   ContactMethod,
   StateTerritory,
+  ParticipantType,
 } from '../users/ParticipantProfile'
 
 /**
@@ -19,7 +20,7 @@ import type {
  *  "suburb": "Sydney",
  *  "postcode": "2000",
  *  "state": "NSW",
- *  "isParentOrGuardian": false,
+ *  "participantType": "STANDARD",
  *  "preferredContact": "MOBILE",
  *  "nextOfKin": {
  *    "firstName": "Jeremy",
@@ -27,13 +28,7 @@ import type {
  *    "lastName": "Doe",
  *    "mobile": "0412341432",
  *    "email": "jeremydoe@email.com",
- *    "relationship": "PARENT"
  *  },
- *  "onBehalfOf": {
- *    "firstName": "Timothy",
- *    "lastName": "Doe",
- *    "dob": "1963-05-27"
- *  }
  * }
  */
 export interface RegisterParticipantRequest {
@@ -80,15 +75,10 @@ export interface RegisterParticipantRequest {
    */
   dob: string
   /**
-   * @minLength 1
-   */
-  participantID: string
-  /**
    * @isBool
    */
-  isParentOrGuardian: boolean
-  nextOfKin?: AlternativeContact
-  onBehalfOf?: OnBehalf
+  participantType: ParticipantType
+  nextOfKin: AlternativeContact
 }
 
 export interface RegisterParticipantResponse {

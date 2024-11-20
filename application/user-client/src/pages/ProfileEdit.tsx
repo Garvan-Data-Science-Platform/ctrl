@@ -16,7 +16,6 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { GetParticipantProfileResponse, UpdateProfileRequest } from '@common/types/api/users'
 import ProfileData from '@common/example_responses/getUserProfile.json'
 import NavBar from '../components/NavBar'
-import { RelationshipType } from '@common/types/api/users/ParticipantProfile'
 
 interface FormValues {
   firstName: string
@@ -29,7 +28,6 @@ interface FormValues {
   nok_first: string
   nok_surname: string
   nok_email: string
-  nok_relationship: RelationshipType
   on_behalf_first: string
   on_behalf_surname: string
   on_behalf_dob: string
@@ -54,12 +52,6 @@ export default function ProfileEdit() {
     },
   })
 
-  const [isParentOrGuardian, setIsParentOrGuardian] = useState(false)
-
-  useEffect(() => {
-    setIsParentOrGuardian(data?.isParentOrGuardian || false)
-  }, [data])
-
   useEffect(() => {
     if (error) setError('root.serverError', error)
   }, [error])
@@ -79,27 +71,13 @@ export default function ProfileEdit() {
 
     let reqData: UpdateProfileRequest
 
-    if (isParentOrGuardian) {
-      reqData = {
-        ...partialData,
-        isParentOrGuardian,
-        onBehalfOf: {
-          firstName: data['on_behalf_first'],
-          lastName: data['on_behalf_surname'],
-          dob: data['on_behalf_dob'],
-        },
-      }
-    } else {
-      reqData = {
-        ...partialData,
-        isParentOrGuardian,
-        nextOfKin: {
-          firstName: data['nok_first'],
-          lastName: data['nok_surname'],
-          email: data['nok_email'],
-          relationship: data['nok_relationship'],
-        },
-      }
+    reqData = {
+      ...partialData,
+      nextOfKin: {
+        firstName: data['nok_first'],
+        lastName: data['nok_surname'],
+        email: data['nok_email'],
+      },
     }
 
     fetch(import.meta.env.VITE_BACKEND_URL + '/users/profile', {
@@ -164,91 +142,40 @@ export default function ProfileEdit() {
                   slotProps={{ inputLabel: { shrink: true } }}
                   {...register('dob', { required: true, value: data?.dob })}
                 />
-                <Typography sx={{ m: 1 }}>
-                  Are you registering as a parent, guardian or carer?
+
+                <Typography sx={{ m: 1, width: '100%', fontWeight: 'bold' }}>
+                  Alternative Contact
                 </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                  <Typography>No</Typography>
-                  <Switch
-                    checked={isParentOrGuardian}
-                    onChange={() => {
-                      setIsParentOrGuardian(!isParentOrGuardian)
-                    }}
-                  />
-                  <Typography>Yes</Typography>
-                </Box>
-                {isParentOrGuardian ? (
-                  <>
-                    <Typography sx={{ m: 1, width: '100%', fontWeight: 'bold' }}>
-                      Registering on behalf of:
-                    </Typography>
-                    <TextField
-                      sx={{ m: 1, flexGrow: 1 }}
-                      label="First Name"
-                      key="on_behalf_first"
-                      {...register('on_behalf_first', {
-                        required: true,
-                        value: data?.onBehalfOf?.firstName,
-                      })}
-                    />
-                    <TextField
-                      sx={{ m: 1, flexGrow: 1 }}
-                      label="Family Name"
-                      key="on_behalf_surname"
-                      {...register('on_behalf_surname', {
-                        required: true,
-                        value: data?.onBehalfOf?.lastName,
-                      })}
-                    />
-                    <TextField
-                      fullWidth
-                      type="date"
-                      key="on_behalf_dob"
-                      sx={{ m: 1 }}
-                      label="Date of Birth"
-                      slotProps={{ inputLabel: { shrink: true } }}
-                      {...register('on_behalf_dob', {
-                        required: true,
-                        value: data?.onBehalfOf?.dob,
-                      })}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <Typography sx={{ m: 1, width: '100%', fontWeight: 'bold' }}>
-                      Next of Kin
-                    </Typography>
-                    <TextField
-                      sx={{ m: 1, flexGrow: 1 }}
-                      key="nok_first"
-                      label="First Name"
-                      {...register('nok_first', {
-                        required: true,
-                        value: data?.alternativeContact?.firstName,
-                      })}
-                    />
-                    <TextField
-                      sx={{ m: 1, flexGrow: 1 }}
-                      label="Family Name"
-                      key="nok_surname"
-                      {...register('nok_surname', {
-                        required: true,
-                        value: data?.alternativeContact?.lastName,
-                      })}
-                    />
-                    <TextField
-                      type="email"
-                      fullWidth
-                      sx={{ m: 1 }}
-                      label="Email"
-                      key="nok_email"
-                      {...register('nok_email', {
-                        required: true,
-                        value: data?.alternativeContact?.email,
-                      })}
-                    />
-                  </>
-                )}
+                <TextField
+                  sx={{ m: 1, flexGrow: 1 }}
+                  key="nok_first"
+                  label="First Name"
+                  {...register('nok_first', {
+                    required: true,
+                    value: data?.alternativeContact?.firstName,
+                  })}
+                />
+                <TextField
+                  sx={{ m: 1, flexGrow: 1 }}
+                  label="Family Name"
+                  key="nok_surname"
+                  {...register('nok_surname', {
+                    required: true,
+                    value: data?.alternativeContact?.lastName,
+                  })}
+                />
+                <TextField
+                  type="email"
+                  fullWidth
+                  sx={{ m: 1 }}
+                  label="Email"
+                  key="nok_email"
+                  {...register('nok_email', {
+                    required: true,
+                    value: data?.alternativeContact?.email,
+                  })}
+                />
+
                 {errors.root ? (
                   <Alert sx={{ flexGrow: 1, m: 1 }} severity="error">
                     {errors.root?.serverError?.message}

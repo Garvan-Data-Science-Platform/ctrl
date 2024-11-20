@@ -7,7 +7,11 @@ import {
   RegisterResponse,
 } from 'common/types/api/auth'
 import { resetDB } from '../TestHelpers'
-import { ContactMethod, StateTerritory } from 'common/types/api/users/ParticipantProfile'
+import {
+  ContactMethod,
+  ParticipantType,
+  StateTerritory,
+} from 'common/types/api/users/ParticipantProfile'
 import { GetAllOrganisationsResponse } from 'common/types/api/organisations'
 
 const api = new Api()
@@ -104,8 +108,12 @@ describe('Auth', () => {
       state: StateTerritory.NSW,
       preferredContact: ContactMethod.MOBILE,
       dob: '1990-01-01',
-      participantID: 'PARTICIPANT123',
-      isParentOrGuardian: true,
+      participantType: ParticipantType.STANDARD,
+      nextOfKin: {
+        firstName: 'JOHN',
+        lastName: 'SMITH',
+        email: 'jonny@smith.com',
+      },
     }
 
     const participantResponse = await request(app)

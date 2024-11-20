@@ -11,7 +11,11 @@ import type {
 import type { GetAllUsersResponse } from 'common/types/api/users'
 import prisma from '../PrismaClient'
 import { resetDB } from '../../tests/TestHelpers'
-import { ContactMethod, StateTerritory } from '../../../common/types/api/users/ParticipantProfile'
+import {
+  ContactMethod,
+  ParticipantType,
+  StateTerritory,
+} from '../../../common/types/api/users/ParticipantProfile'
 
 const api = new Api()
 const app = api.app
@@ -228,8 +232,8 @@ describe('AuthController', () => {
         state: StateTerritory.NSW,
         preferredContact: ContactMethod.MOBILE,
         dob: '1990-01-01',
-        participantID: 'PARTICIPANT123',
-        isParentOrGuardian: true,
+        participantType: ParticipantType.STANDARD,
+        nextOfKin: { firstName: 'John', lastName: 'Smith', email: 'john@smith.com' },
       }
 
       const participantResponse = await request(app)
@@ -255,8 +259,8 @@ describe('AuthController', () => {
         state: StateTerritory.NSW,
         preferredContact: ContactMethod.MOBILE,
         dob: '1990-01-01',
-        participantID: 'PARTICIPANT123',
-        isParentOrGuardian: true,
+        participantType: ParticipantType.STANDARD,
+        nextOfKin: { firstName: 'John', lastName: 'Smith', email: 'john@smith.com' },
       }
 
       const registerParticipantResponse = await request(app)
@@ -286,8 +290,8 @@ describe('AuthController', () => {
         state: StateTerritory.NSW,
         preferredContact: ContactMethod.MOBILE,
         dob: '1990-01-01',
-        participantID: '',
-        isParentOrGuardian: true,
+        participantType: ParticipantType.STANDARD,
+        nextOfKin: { firstName: 'John', lastName: 'Smith', email: 'john@smith.com' },
       }
 
       const registerParticipantResponse = await request(app)
@@ -300,10 +304,6 @@ describe('AuthController', () => {
       expect(registerParticipantBody.token).toBe(undefined)
       expect(registerParticipantBody.details).toEqual({
         'bodyRequest.lastName': {
-          message: 'minLength 1',
-          value: '',
-        },
-        'bodyRequest.participantID': {
           message: 'minLength 1',
           value: '',
         },

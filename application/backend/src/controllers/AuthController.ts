@@ -25,6 +25,7 @@ import { IncorrectPasswordError, NotFoundError } from '../middlewares/ErrorHandl
 @Response<ValidateErrorResponse>('422', 'Validation Failed')
 export class AuthController extends Controller {
   userRepo = prisma.user
+  profileRepo = prisma.participantProfile
 
   /**
    * register
@@ -86,35 +87,28 @@ export class AuthController extends Controller {
     const { firstName, middleName, lastName, email, dob, ...profileData } = participantData
     const userDetails = { firstName, middleName, lastName, email }
 
-    const { nextOfKin, onBehalfOf, ...noNextOfKinProfileData } = profileData
+    const { nextOfKin, ...noNextOfKinProfileData } = profileData
 
-    let onBehalfOfCreateData
-    let onBehalfOfDOB
-    if (onBehalfOf) {
-      onBehalfOfDOB = new Date(onBehalfOf.dob)
-      onBehalfOfCreateData = { onBehalfOf: { create: { ...onBehalfOf, dob: onBehalfOfDOB } } }
-    }
-
-    let nextOfKinCreateData
-    if (nextOfKin) {
-      nextOfKinCreateData = { nextOfKin: { create: { ...nextOfKin } } }
-    }
+    let nextOfKinCreateData = { nextOfKin: { create: { ...nextOfKin } } }
 
     const data = {
       ...userDetails,
       role: 'participant', // TODO: This should be an enum
       password: hashedPassword,
-      profile: {
-        create: {
-          dob: new Date(dob),
-          ...noNextOfKinProfileData,
-          ...onBehalfOfCreateData,
-          ...nextOfKinCreateData,
-        },
-      },
     }
     const insertedUser = await this.userRepo.create({
       data,
+    })
+
+    await this.profileRepo.create({
+      data: {
+        userId: insertedUser.id,
+        ...noNextOfKinProfileData,
+        ...nextOfKinCreateData,
+        firstName: insertedUser.firstName,
+        lastName: insertedUser.lastName,
+        dob: new Date(dob),
+      },
     })
 
     const token = await generateToken(insertedUser.id)

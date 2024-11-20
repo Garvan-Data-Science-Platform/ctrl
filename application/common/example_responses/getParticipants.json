@@ -1,0 +1,22 @@
+{
+  "data": [
+    {
+      "id": 1,
+      "email": "user@example.com",
+      "firstName": "John",
+      "lastName": "Smith",
+      "surveyVersion": 5,
+      "surveyStatus": "complete",
+      "lastUpdated": "2024-11-16"
+    },
+    {
+      "id": 2,
+      "email": "user2@example.com",
+      "firstName": "Jenny",
+      "lastName": "Smith",
+      "surveyVersion": 3,
+      "surveyStatus": "incomplete",
+      "lastUpdated": "2024-11-14"
+    }
+  ]
+}

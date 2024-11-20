@@ -1,4 +1,10 @@
-import { AlternativeContact, ContactMethod, OnBehalf, StateTerritory } from './ParticipantProfile'
+import {
+  AlternativeContact,
+  ContactMethod,
+  OnBehalf,
+  ParticipantType,
+  StateTerritory,
+} from './ParticipantProfile'
 
 export interface GetParticipantProfileResponse {
   message: string
@@ -7,16 +13,14 @@ export interface GetParticipantProfileResponse {
     middleName?: string
     lastName: string
     dob: string
-    participantID: string
-    email: string
+    email?: string
     mobile: string
     addressLine?: string
     suburb?: string
     state?: StateTerritory
     postcode?: string
     preferredContact: ContactMethod
-    isParentOrGuardian: boolean
+    participantType: ParticipantType
     alternativeContact?: AlternativeContact
-    onBehalfOf?: OnBehalf
   }
 }

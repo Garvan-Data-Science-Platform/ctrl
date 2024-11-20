@@ -104,13 +104,14 @@ describe('SurveysController', () => {
         .set({ Authorization: `Bearer ${token}` })
         .send(reqBody)
       expect(response.status).toBe(200)
-      const answers = await prisma.surveyAnswers.findUnique({ where: { id: 1 } })
-      expect(answers?.data[1].answers).toEqual([true, 'Choice 1'])
+      const participant = await prisma.surveyParticipant.findFirst({ where: { id: 1 } })
+      expect(participant?.answers[1].answers).toEqual([true, 'Choice 1'])
     })
 
     it('should change status from requires_review after submission', async () => {
-      const answersBefore = await prisma.surveyAnswers.findUnique({ where: { id: 2 } })
-      expect(answersBefore?.data[0].status).toBe('review_required')
+      let participant = await prisma.surveyParticipant.findUniqueOrThrow({ where: { id: 1 } })
+      const answersBefore = participant.answers
+      expect(answersBefore[0].status).toBe('review_required')
       const reqBody: UpdateSurveyAnswersRequest = {
         step: 0,
         surveyVersionId: 1,
@@ -121,8 +122,10 @@ describe('SurveysController', () => {
         .set({ Authorization: `Bearer ${tokenNoAnswers}` })
         .send(reqBody)
       expect(response.status).toBe(200)
-      const answersAfter = await prisma.surveyAnswers.findUnique({ where: { id: 2 } })
-      expect(answersAfter?.data[0].status).toBe('viewed')
+
+      participant = await prisma.surveyParticipant.findUniqueOrThrow({ where: { id: 1 } })
+      const answersAfter = participant.answers
+      expect(answersAfter[0].status).toBe('viewed')
     })
     it('should fail to update answers if they dont match the survey questions', async () => {
       const reqBody: UpdateSurveyAnswersRequest = {
@@ -145,10 +148,10 @@ describe('SurveysController', () => {
         .post('/surveys/participant/1')
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(200)
-      const answers = await prisma.surveyAnswers.findFirstOrThrow({
-        where: { participant: { userId: 99 } },
+      const participant = await prisma.surveyParticipant.findFirstOrThrow({
+        where: { profileId: 99 },
       })
-      expect(answers.data[1].answers[0]).toBe(true)
+      expect(participant.answers[1].answers[0]).toBe(true)
     })
   })
 

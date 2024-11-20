@@ -10,6 +10,7 @@ export async function seedTests(prisma: PrismaClient) {
       name: 'Test Organisation',
     },
   })
+  await prisma.study.create({ data: { id: 1 } })
 
   //User in Test Organisation with no profile
   await prisma.user.create({
@@ -56,35 +57,37 @@ export async function seedTests(prisma: PrismaClient) {
   })
   await prisma.participantProfile.create({
     data: {
-      id: 99,
+      id: 98,
+      firstName: 'Test',
+      lastName: 'User',
       addressLine: '123 smith st',
       dob: new Date('1980-01-23'),
-      isParentOrGuardian: false,
       mobile: '0412345678',
-      participantID: 'ABC123',
       postcode: '1234',
       preferredContact: 'EMAIL',
       state: 'VIC',
       suburb: 'M',
       userId: 98,
+      participantType: 'STANDARD',
     },
   })
   await prisma.participantProfile.create({
     data: {
-      id: 100,
+      id: 99,
+      firstName: 'Test',
+      lastName: 'User',
       addressLine: '123 smith st',
       dob: new Date('1980-01-23'),
-      isParentOrGuardian: false,
       mobile: '0412345678',
-      participantID: 'ABC123',
       postcode: '1234',
       preferredContact: 'EMAIL',
       state: 'VIC',
       suburb: 'Melbourne',
       userId: 99,
+      participantType: 'STANDARD',
     },
   })
-  await prisma.study.create({ data: { id: 1 } })
+
   await prisma.surveyVersion.create({
     data: {
       versionNumber: 1,
@@ -99,25 +102,25 @@ export async function seedTests(prisma: PrismaClient) {
       data: ExampleSurveyStepData as SurveyStep[],
     },
   })
-  await prisma.surveyParticipant.create({ data: { id: 1, versionId: 1, userId: 98 } })
-  await prisma.surveyParticipant.create({ data: { id: 2, versionId: 1, userId: 99 } })
-  await prisma.surveyAnswers.create({
+  await prisma.surveyParticipant.create({
     data: {
-      participantId: 2,
       id: 1,
-      data: [
-        { status: 'viewed', answers: [] },
-        { status: 'completed', answers: [false, 'Choice 2'] },
+      versionId: 1,
+      profileId: 98,
+      answers: [
+        { status: 'review_required', answers: [] },
+        { status: 'review_required', answers: [true, 'Choice 1'] },
       ],
     },
   })
-  await prisma.surveyAnswers.create({
+  await prisma.surveyParticipant.create({
     data: {
-      participantId: 1,
       id: 2,
-      data: [
-        { status: 'review_required', answers: [] },
-        { status: 'review_required', answers: [true, 'Choice 1'] },
+      versionId: 1,
+      profileId: 99,
+      answers: [
+        { status: 'viewed', answers: [] },
+        { status: 'completed', answers: [false, 'Choice 2'] },
       ],
     },
   })
