@@ -28,7 +28,6 @@ export async function resetDB(): Promise<void> {
     }
 
     await seedTests(prisma)
-    await prisma.$disconnect()
   } catch (error) {
     logger.error({ error })
     prisma.$disconnect()
