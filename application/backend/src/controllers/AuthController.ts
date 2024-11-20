@@ -50,7 +50,7 @@ export class AuthController extends Controller {
       },
     })
 
-    const token = await generateToken(insertedUser.id)
+    const token = await generateToken({ userId: insertedUser.id, roles: [insertedUser.role] })
 
     const responseData = {
       message: `Registered user with ID: ${insertedUser.id}`,
@@ -117,7 +117,7 @@ export class AuthController extends Controller {
       data,
     })
 
-    const token = await generateToken(insertedUser.id)
+    const token = await generateToken({ userId: insertedUser.id, roles: [insertedUser.role] })
 
     const responseData = {
       message: `Created participant with user ID: ${insertedUser.id}`,
@@ -147,7 +147,7 @@ export class AuthController extends Controller {
       throw new IncorrectPasswordError()
     }
 
-    const token = await generateToken(user.id)
+    const token = await generateToken({ userId: user.id, roles: [user.role] })
     const responseData = {
       message: 'Logged in Successfully!',
       token,

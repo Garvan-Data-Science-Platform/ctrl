@@ -22,7 +22,6 @@ const app = api.app
 describe('OrganisationsController', () => {
   let orgAdmintoken: string
   let tokenInOrganisation: string
-  let opAdminToken: string
 
   const testOrganisationId: number = 99
   let orgAdminTestUserId: number
@@ -36,7 +35,6 @@ describe('OrganisationsController', () => {
     await resetDB()
 
     orgAdmintoken = await generateToken({ userId: 99, roles: ['OrganisationAdmin'] })
-    opAdminToken = await generateToken({ userId: 96, roles: ['OperatorAdmin'] })
     tokenInOrganisation = await generateToken({ userId: 97, roles: ['OrganisationAdmin'] })
 
     orgAdminTestUserId = await getUserIdFromToken(orgAdmintoken)

@@ -3,7 +3,7 @@ import * as express from 'express'
 import * as jwt from 'jsonwebtoken'
 import logger from 'common/src/logger'
 import crypto from 'crypto'
-import { NoTokenError } from './middlewares/ErrorHandler'
+import { NoTokenError, IncorrectPermissionsError } from './middlewares/ErrorHandler'
 
 export function expressAuthentication(
   request: express.Request,
@@ -34,7 +34,12 @@ export function expressAuthentication(
             let scope: string
             for (scope of scopes) {
               if (!decoded.scopes.includes(scope)) {
-                reject(new Error('JWT does not contain required scope.'))
+                reject(
+                  new IncorrectPermissionsError({
+                    message: 'JWT does not contain required scope.',
+                    scopes,
+                  }),
+                )
                 return
               }
             }
@@ -78,14 +83,14 @@ export async function verifyPassword(hashedPassword: string, password: string): 
   })
 }
 
-export async function generateToken(userId: number): Promise<string> {
+export async function generateToken(user: { userId: number; roles: string[] }): Promise<string> {
   if (!process.env.JWT_SECRET) {
     logger.error({ message: 'JWT_SECRET environment variable not set' })
     throw new Error('JWT_SECRET environment variable not set')
   }
 
   // Generate JWT token
-  return jwt.sign({ userId }, process.env.JWT_SECRET, {
+  return jwt.sign({ userId: user.userId, scopes: user.roles }, process.env.JWT_SECRET, {
     algorithm: 'HS256',
     expiresIn: process.env.JWT_EXPIRY || '1h',
   })

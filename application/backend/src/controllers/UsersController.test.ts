@@ -3,7 +3,7 @@ import { Api } from '../Api'
 import prisma from '../PrismaClient'
 import { resetDB } from '../../tests/TestHelpers'
 import { generateToken } from '../authentication'
-import type { RegisterRequest, RegisterResponse } from 'common/types/api/auth'
+import type { RegisterRequest } from 'common/types/api/auth'
 import {
   CreateUserResponse,
   DeleteUserResponse,
@@ -23,7 +23,7 @@ describe('UsersController', () => {
   let opAdminToken: string
   let orgAdminToken: string
 
-  let registeredParticipantUserID: number = 98
+  const registeredParticipantUserID: number = 98
 
   beforeAll(async () => {
     opAdminToken = await generateToken({ userId: 96, roles: ['OperatorAdmin'] })
