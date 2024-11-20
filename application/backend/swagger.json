@@ -720,8 +720,7 @@
         "type": "object",
         "additionalProperties": false
       },
-      "_36_Enums.StateTerritory": {
-        "type": "string",
+      "StateTerritory": {
         "enum": [
           "ACT",
           "NSW",
@@ -731,70 +730,75 @@
           "TAS",
           "VIC",
           "WA"
-        ]
+        ],
+        "type": "string"
       },
-      "_36_Enums.ContactMethod": {
-        "type": "string",
+      "ContactMethod": {
         "enum": [
-          "EMAIL",
           "MOBILE",
+          "EMAIL",
           "MAIL"
-        ]
+        ],
+        "type": "string"
       },
-      "ParticipantProfile": {
-        "description": "Model ParticipantProfile",
+      "RelationshipType": {
+        "enum": [
+          "PARENT",
+          "GUARDIAN",
+          "CHILD",
+          "OTHER"
+        ],
+        "type": "string"
+      },
+      "AlternativeContact": {
         "properties": {
-          "userId": {
-            "type": "number",
-            "format": "double"
-          },
-          "preferredContact": {
-            "$ref": "#/components/schemas/_36_Enums.ContactMethod"
-          },
-          "isParentOrGuardian": {
-            "type": "boolean"
-          },
-          "postcode": {
+          "firstName": {
             "type": "string"
           },
-          "state": {
-            "$ref": "#/components/schemas/_36_Enums.StateTerritory"
-          },
-          "suburb": {
+          "middleName": {
             "type": "string"
           },
-          "addressLine": {
+          "lastName": {
             "type": "string"
           },
           "mobile": {
             "type": "string"
           },
-          "participantID": {
+          "email": {
             "type": "string"
           },
-          "dob": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "id": {
-            "type": "number",
-            "format": "double"
+          "relationship": {
+            "$ref": "#/components/schemas/RelationshipType"
           }
         },
         "required": [
-          "userId",
-          "preferredContact",
-          "isParentOrGuardian",
-          "postcode",
-          "state",
-          "suburb",
-          "addressLine",
-          "mobile",
-          "participantID",
-          "dob",
-          "id"
+          "firstName",
+          "lastName",
+          "email",
+          "relationship"
         ],
-        "type": "object"
+        "type": "object",
+        "additionalProperties": false
+      },
+      "OnBehalf": {
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "dob": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "dob"
+        ],
+        "type": "object",
+        "additionalProperties": false
       },
       "GetParticipantProfileResponse": {
         "properties": {
@@ -802,41 +806,64 @@
             "type": "string"
           },
           "data": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ParticipantProfile"
+            "properties": {
+              "onBehalfOf": {
+                "$ref": "#/components/schemas/OnBehalf"
               },
-              {
-                "properties": {
-                  "user": {
-                    "properties": {
-                      "email": {
-                        "type": "string"
-                      },
-                      "lastName": {
-                        "type": "string"
-                      },
-                      "middleName": {
-                        "type": "string"
-                      },
-                      "firstName": {
-                        "type": "string"
-                      }
-                    },
-                    "required": [
-                      "email",
-                      "lastName",
-                      "firstName"
-                    ],
-                    "type": "object"
-                  }
-                },
-                "required": [
-                  "user"
-                ],
-                "type": "object"
+              "alternativeContact": {
+                "$ref": "#/components/schemas/AlternativeContact"
+              },
+              "isParentOrGuardian": {
+                "type": "boolean"
+              },
+              "preferredContact": {
+                "$ref": "#/components/schemas/ContactMethod"
+              },
+              "postcode": {
+                "type": "string"
+              },
+              "state": {
+                "$ref": "#/components/schemas/StateTerritory"
+              },
+              "suburb": {
+                "type": "string"
+              },
+              "addressLine": {
+                "type": "string"
+              },
+              "mobile": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "participantID": {
+                "type": "string"
+              },
+              "dob": {
+                "type": "string"
+              },
+              "lastName": {
+                "type": "string"
+              },
+              "middleName": {
+                "type": "string"
+              },
+              "firstName": {
+                "type": "string"
               }
-            ]
+            },
+            "required": [
+              "isParentOrGuardian",
+              "preferredContact",
+              "mobile",
+              "email",
+              "participantID",
+              "dob",
+              "lastName",
+              "firstName"
+            ],
+            "type": "object"
           }
         },
         "required": [
@@ -1105,86 +1132,6 @@
         "type": "object",
         "additionalProperties": false
       },
-      "ContactMethod": {
-        "enum": [
-          "MOBILE",
-          "EMAIL",
-          "MAIL"
-        ],
-        "type": "string"
-      },
-      "StateTerritory": {
-        "enum": [
-          "ACT",
-          "NSW",
-          "NT",
-          "QLD",
-          "SA",
-          "TAS",
-          "VIC",
-          "WA"
-        ],
-        "type": "string"
-      },
-      "RelationshipType": {
-        "enum": [
-          "PARENT",
-          "GUARDIAN",
-          "CHILD",
-          "OTHER"
-        ],
-        "type": "string"
-      },
-      "AlternativeContact": {
-        "properties": {
-          "firstName": {
-            "type": "string"
-          },
-          "middleName": {
-            "type": "string"
-          },
-          "lastName": {
-            "type": "string"
-          },
-          "mobile": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          },
-          "relationship": {
-            "$ref": "#/components/schemas/RelationshipType"
-          }
-        },
-        "required": [
-          "firstName",
-          "lastName",
-          "email",
-          "relationship"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "OnBehalf": {
-        "properties": {
-          "firstName": {
-            "type": "string"
-          },
-          "lastName": {
-            "type": "string"
-          },
-          "dob": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "firstName",
-          "lastName",
-          "dob"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
       "RegisterParticipantRequest": {
         "properties": {
           "firstName": {
@@ -1336,7 +1283,12 @@
       "jwt": {
         "type": "http",
         "scheme": "bearer",
-        "bearerFormat": "JWT"
+        "bearerFormat": "JWT",
+        "scopes": {
+          "Participant": "Access to participant level resources",
+          "OperatorAdmin": "Access to operator admin level resources",
+          "OrganisationAdmin": "Access to organisation admin level resources"
+        }
       }
     }
   },
@@ -1387,7 +1339,9 @@
         ],
         "security": [
           {
-            "jwt": []
+            "jwt": [
+              "OrganisationAdmin"
+            ]
           }
         ],
         "parameters": []
@@ -1433,7 +1387,9 @@
         ],
         "security": [
           {
-            "jwt": []
+            "jwt": [
+              "OrganisationAdmin"
+            ]
           }
         ],
         "parameters": [],
@@ -1723,7 +1679,9 @@
         ],
         "security": [
           {
-            "jwt": []
+            "jwt": [
+              "OperatorAdmin"
+            ]
           }
         ],
         "parameters": [
@@ -1777,7 +1735,9 @@
         ],
         "security": [
           {
-            "jwt": []
+            "jwt": [
+              "OrganisationAdmin"
+            ]
           }
         ],
         "parameters": []
@@ -1860,7 +1820,9 @@
         ],
         "security": [
           {
-            "jwt": []
+            "jwt": [
+              "OrganisationAdmin"
+            ]
           }
         ],
         "parameters": [
@@ -2009,7 +1971,9 @@
         ],
         "security": [
           {
-            "jwt": []
+            "jwt": [
+              "OrganisationAdmin"
+            ]
           }
         ],
         "parameters": [
@@ -2065,7 +2029,9 @@
         ],
         "security": [
           {
-            "jwt": []
+            "jwt": [
+              "OrganisationAdmin"
+            ]
           }
         ],
         "parameters": [
@@ -2242,7 +2208,9 @@
         ],
         "security": [
           {
-            "jwt": []
+            "jwt": [
+              "OrganisationAdmin"
+            ]
           }
         ],
         "parameters": []
@@ -2288,7 +2256,9 @@
         ],
         "security": [
           {
-            "jwt": []
+            "jwt": [
+              "OrganisationAdmin"
+            ]
           }
         ],
         "parameters": [],
@@ -2359,7 +2329,9 @@
         ],
         "security": [
           {
-            "jwt": []
+            "jwt": [
+              "OrganisationAdmin"
+            ]
           }
         ],
         "parameters": [
@@ -2428,7 +2400,9 @@
         ],
         "security": [
           {
-            "jwt": []
+            "jwt": [
+              "OrganisationAdmin"
+            ]
           }
         ],
         "parameters": [
@@ -2507,7 +2481,9 @@
         ],
         "security": [
           {
-            "jwt": []
+            "jwt": [
+              "OrganisationAdmin"
+            ]
           }
         ],
         "parameters": [
@@ -2578,7 +2554,9 @@
         ],
         "security": [
           {
-            "jwt": []
+            "jwt": [
+              "OrganisationAdmin"
+            ]
           }
         ],
         "parameters": [
@@ -2649,7 +2627,9 @@
         ],
         "security": [
           {
-            "jwt": []
+            "jwt": [
+              "OrganisationAdmin"
+            ]
           }
         ],
         "parameters": [
@@ -2727,7 +2707,9 @@
         ],
         "security": [
           {
-            "jwt": []
+            "jwt": [
+              "OrganisationAdmin"
+            ]
           }
         ],
         "parameters": [

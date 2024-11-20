@@ -9,7 +9,12 @@
       "jwt": {
         "type": "http",
         "scheme": "bearer",
-        "bearerFormat": "JWT"
+        "bearerFormat": "JWT",
+        "scopes": {
+          "Participant": "Access to participant level resources",
+          "OperatorAdmin": "Access to operator admin level resources",
+          "OrganisationAdmin": "Access to organisation admin level resources"
+        }
       }
     }
   },
