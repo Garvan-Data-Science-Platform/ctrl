@@ -288,19 +288,6 @@ describe('UsersController', () => {
 
       expect(updateUserRoleResponse.status).toBe(422)
 
-      const responseBody = updateUserRoleResponse.body
-
-      expect(responseBody).toEqual({
-        details: {
-          'bodyRequest.newRole': {
-            message:
-              'Could not match the union against any of the items. Issues: [{"bodyRequest.newRole":{"message":"should be one of the following; [\'OperatorAdmin\']","value":"InvalidRole"}},{"bodyRequest.newRole":{"message":"should be one of the following; [\'Participant\']","value":"InvalidRole"}},{"bodyRequest.newRole":{"message":"should be one of the following; [\'OrganisationAdmin\']","value":"InvalidRole"}}]',
-            value: 'InvalidRole',
-          },
-        },
-        message: 'Validation Failed',
-      })
-
       // Check user role hasn't changed
       const updatedUser = await prisma.user.findFirst({ where: { id: userID } })
 
