@@ -8,7 +8,6 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  Switch,
   TextField,
   Typography,
 } from '@mui/material'
@@ -16,11 +15,9 @@ import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth'
 import { RegisterParticipantRequest, RegisterParticipantResponse } from '@common/types/api/auth'
-import { useState } from 'react'
 import {
   ContactMethod,
   ParticipantType,
-  RelationshipType,
   StateTerritory,
 } from '@common/types/api/users/ParticipantProfile'
 

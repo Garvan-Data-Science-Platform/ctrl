@@ -1,7 +1,6 @@
 import {
   AlternativeContact,
   ContactMethod,
-  OnBehalf,
   ParticipantType,
   StateTerritory,
 } from './ParticipantProfile'

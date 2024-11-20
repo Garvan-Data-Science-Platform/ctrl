@@ -5,13 +5,12 @@ import {
   Card,
   CircularProgress,
   Container,
-  Switch,
   TextField,
   Typography,
 } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { GetParticipantProfileResponse, UpdateProfileRequest } from '@common/types/api/users'
 import ProfileData from '@common/example_responses/getUserProfile.json'
@@ -69,9 +68,7 @@ export default function ProfileEdit() {
       studyId: data.studyId,
     }
 
-    let reqData: UpdateProfileRequest
-
-    reqData = {
+    const reqData: UpdateProfileRequest = {
       ...partialData,
       nextOfKin: {
         firstName: data['nok_first'],

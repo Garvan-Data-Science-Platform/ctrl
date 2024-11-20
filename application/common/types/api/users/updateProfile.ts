@@ -1,4 +1,4 @@
-import type { OnBehalf, AlternativeContact, ParticipantType } from './ParticipantProfile'
+import type { AlternativeContact } from './ParticipantProfile'
 
 export interface UpdateProfileRequest {
   firstName: string

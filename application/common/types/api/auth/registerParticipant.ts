@@ -1,5 +1,4 @@
 import type {
-  OnBehalf,
   AlternativeContact,
   ContactMethod,
   StateTerritory,

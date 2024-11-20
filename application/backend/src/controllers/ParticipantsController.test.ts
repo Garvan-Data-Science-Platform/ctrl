@@ -1,11 +1,8 @@
-import request from 'supertest'
-import { GetParticipantProfileResponse } from 'common/types/api/users'
 import { generateToken } from '../authentication'
 import { Api } from '../Api'
 import { resetDB } from '../../tests/TestHelpers'
 
 const api = new Api()
-const app = api.app
 
 describe('ParticipantsController', () => {
   let registeredUserToken: string, registeredParticipantToken: string
@@ -26,6 +23,9 @@ describe('ParticipantsController', () => {
   })
 
   describe('GET /participants', () => {
-    it('Test', async () => {})
+    it('Test', async () => {
+      console.log(registeredUserToken)
+      console.log(registeredParticipantToken)
+    })
   })
 })

@@ -89,7 +89,7 @@ export class AuthController extends Controller {
 
     const { nextOfKin, ...noNextOfKinProfileData } = profileData
 
-    let nextOfKinCreateData = { nextOfKin: { create: { ...nextOfKin } } }
+    const nextOfKinCreateData = { nextOfKin: { create: { ...nextOfKin } } }
 
     const data = {
       ...userDetails,

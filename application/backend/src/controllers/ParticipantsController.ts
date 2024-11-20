@@ -1,5 +1,3 @@
-import { getUserIdFromToken } from '../authentication'
-import logger from 'common/src/logger'
 import prisma from '../PrismaClient'
 import {
   UnauthorizedErrorResponse,
@@ -7,19 +5,7 @@ import {
   NotFoundErrorResponse,
 } from 'common/types/api/errors'
 import { GetParticipantByIdResponse, GetParticipantsResponse } from 'common/types/api/participants'
-import { NotFoundError, NoTokenError } from '../middlewares/ErrorHandler'
-import {
-  Route,
-  Tags,
-  Security,
-  Controller,
-  Get,
-  SuccessResponse,
-  Path,
-  Response,
-  Request,
-} from 'tsoa'
-import * as express from 'express'
+import { Route, Tags, Security, Controller, Get, SuccessResponse, Path, Response } from 'tsoa'
 import Participants from 'common/example_responses/getParticipants.json'
 import Participant from 'common/example_responses/getParticipant.json'
 
@@ -53,6 +39,7 @@ export class ParticipantsController extends Controller {
   public async getParticipantById(
     @Path() participantId: number,
   ): Promise<GetParticipantByIdResponse> {
+    console.log(participantId)
     return Participant as GetParticipantByIdResponse
   }
 }

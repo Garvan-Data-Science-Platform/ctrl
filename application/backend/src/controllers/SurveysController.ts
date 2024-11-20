@@ -25,12 +25,7 @@ import type {
   UpdateSurveyResponse,
 } from 'common/types/api/surveys'
 import { SurveyVersion as SurveyVersionPrisma } from '@prisma/client'
-import {
-  SurveyElementType,
-  SurveyStep,
-  UserSurveyStepState,
-  SurveyStepStatus,
-} from 'common/types/survey'
+import { SurveyElementType, SurveyStep, SurveyStepStatus } from 'common/types/survey'
 import prisma from '../PrismaClient'
 import '../jsontypes'
 import { GetSurveyVersionByIdResponse } from 'common/types/api/surveys/getSurveyVersionById'
@@ -201,7 +196,7 @@ export class SurveysController extends Controller {
       where: { userId: request.user.userId },
     })
 
-    let participant = await this.spRepo.findFirstOrThrow({
+    const participant = await this.spRepo.findFirstOrThrow({
       where: { versionId: surveyVersionId, profileId: profile.id },
     })
 
@@ -215,9 +210,7 @@ export class SurveysController extends Controller {
 
     const surveySteps = survey.data
 
-    const currentAnswers = participant.answers
-
-    let answers = currentAnswers
+    const answers = participant.answers
 
     type StatusMap = {
       [key in SurveyElementType]: SurveyStepStatus
