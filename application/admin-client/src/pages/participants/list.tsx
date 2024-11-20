@@ -19,12 +19,6 @@ export const ParticipantList = () => {
   const columns = React.useMemo<GridColDef[]>(
     () => [
       {
-        field: 'surveyVersion',
-        headerName: 'Survey Version',
-        type: 'number',
-        minWidth: 100,
-      },
-      {
         field: 'firstName',
         flex: 1,
         headerName: 'First Name',
@@ -42,7 +36,12 @@ export const ParticipantList = () => {
         headerName: 'Email',
         minWidth: 200,
       },
-
+      {
+        field: 'surveyVersion',
+        headerName: 'Survey Version',
+        type: 'number',
+        minWidth: 120,
+      },
       {
         field: 'lastUpdated',
         flex: 1,
