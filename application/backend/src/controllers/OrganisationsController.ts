@@ -36,9 +36,9 @@ import { NotFoundError } from '../middlewares/ErrorHandler'
 
 @Route('organisations')
 @Tags('Organisations')
-@Security('jwt')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
+@Security('jwt', ['OrganisationAdmin'])
 export class OrganisationsController extends Controller {
   organisationRepo = prisma.organisation
   userRepo = prisma.user
