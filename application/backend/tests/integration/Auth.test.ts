@@ -127,12 +127,4 @@ describe('Auth', () => {
     expect(protectedRouteResponse2.status).toEqual(200)
     expect(getAllOrganisationsBody2.message).toMatch(/Got Participant Profile with userId: \d+/)
   })
-
-  it('should return a 401 unauthorized error when accessing protected routes with without the correct role', async () => {
-    // TODO: Implement roles check for testing here
-  })
-
-  it('should return a 401 unauthorized error if the Authenticated user is not Authorised to change a users roles', async () => {
-    // TODO: Implement roles check for testing here
-  })
 })
