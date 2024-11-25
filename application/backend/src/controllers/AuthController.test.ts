@@ -46,7 +46,7 @@ describe('AuthController', () => {
         lastName: 'Doe',
         email: 'testregister@example.com',
         password: 'Password123',
-        role: Role.Participant,
+        role: Role.OrganisationAdmin,
       }
 
       // Register user
@@ -324,7 +324,7 @@ describe('AuthController', () => {
         lastName: 'Doe',
         email: 'johndoe@email.com',
         password: 'johnDoesP@ssword123',
-        role: Role.Participant,
+        role: Role.OrganisationAdmin,
       }
 
       const response = await request(app).post('/auth/register').send(registerRequest)

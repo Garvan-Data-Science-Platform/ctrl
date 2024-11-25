@@ -2,8 +2,8 @@ import request from 'supertest'
 import { Api } from '../Api'
 import prisma from '../PrismaClient'
 import { resetDB } from '../../tests/TestHelpers'
-import { getUserIdFromToken } from '../authentication'
-import type { RegisterRequest, RegisterResponse } from 'common/types/api/auth'
+import { generateToken } from '../authentication'
+import type { RegisterRequest } from 'common/types/api/auth'
 import {
   CreateUserResponse,
   DeleteUserResponse,
@@ -20,29 +20,25 @@ const app = api.app
 
 describe('UsersController', () => {
   let token: string
-  let registeredUserID: number
+  let opAdminToken: string
+  let orgAdminToken: string
 
-  const testUser: RegisterRequest = {
-    firstName: 'Test',
-    lastName: 'User',
-    email: 'test@user.com',
-    password: 'Password123',
-    role: Role.Participant,
-  }
+  const registeredParticipantUserID: number = 98
 
   beforeAll(async () => {
+    opAdminToken = await generateToken({ userId: 96, roles: ['OperatorAdmin'] })
+    orgAdminToken = await generateToken({ userId: 97, roles: ['OrganisationAdmin'] })
+
+    token = await generateToken({
+      userId: registeredParticipantUserID,
+      roles: ['Participant'],
+    })
+
     api.run()
   })
 
   beforeEach(async () => {
     await resetDB()
-
-    // Register user
-    const registerResponse = await request(app).post('/auth/register').send(testUser)
-    const body: RegisterResponse = registerResponse.body
-    if (!body.token) throw new Error('User could not be registered')
-    token = body.token
-    registeredUserID = getUserIdFromToken(token)
   })
 
   afterAll(async () => {
@@ -53,7 +49,7 @@ describe('UsersController', () => {
     it('should return a list of users', async () => {
       const response = await request(app)
         .get('/users')
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
       expect(response.status).toBe(200)
 
       const body: GetAllUsersResponse = response.body
@@ -66,7 +62,7 @@ describe('UsersController', () => {
       })
       const response = await request(app)
         .get('/users')
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
 
       expect(response.status).toBe(500)
 
@@ -77,7 +73,7 @@ describe('UsersController', () => {
 
   describe('GET /users/:id', () => {
     it('should return a user by ID', async () => {
-      const userId = registeredUserID
+      const userId = registeredParticipantUserID
       const response = await request(app)
         .get(`/users/${userId}`)
         .set({ Authorization: `Bearer ${token}` })
@@ -123,7 +119,7 @@ describe('UsersController', () => {
       // Create a new user
       const response = await request(app)
         .post('/users')
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
         .send(newUser)
       expect(response.status).toBe(201)
 
@@ -140,12 +136,20 @@ describe('UsersController', () => {
 
   describe('PATCH /users/:id', () => {
     it('should update a user by ID', async () => {
-      const userId: number = registeredUserID
+      const userId: number = registeredParticipantUserID
 
       const newFirstName: string = 'Updated'
 
       // Get existing user details
       const existingUser = await prisma.user.findFirst({ where: { id: userId } })
+
+      const testUser: RegisterRequest = {
+        firstName: 'Test',
+        lastName: 'User',
+        email: 'test2@example.com',
+        password: 'Password123',
+        role: Role.Participant,
+      }
 
       expect(existingUser?.email).toBe(testUser.email)
       expect(existingUser?.firstName).toBe(testUser.firstName)
@@ -187,7 +191,7 @@ describe('UsersController', () => {
 
   describe('DELETE /users/:id', () => {
     it('should delete a user by ID', async () => {
-      const userId: number = registeredUserID
+      const userId: number = registeredParticipantUserID
 
       // Check that user exists in db
       const existingUser = await prisma.user.findFirst({ where: { id: userId } })
@@ -225,24 +229,8 @@ describe('UsersController', () => {
   })
 
   describe('PATCH /users/:id/role', () => {
-    let adminToken: string
-    beforeAll(async () => {
-      // Register Admin User
-      const adminUserRegisterRequest: RegisterRequest = {
-        firstName: 'Admin',
-        lastName: 'User',
-        email: 'admin@example.com',
-        password: 'Admin123',
-        role: Role.OperatorAdmin,
-      }
-
-      const adminResponse = await request(app).post('/auth/register').send(adminUserRegisterRequest)
-
-      adminToken = adminResponse.body.token
-    })
-
     it('should update a users role to the role provided', async () => {
-      const userID: number = registeredUserID
+      const userID: number = registeredParticipantUserID
 
       // Check user role
       const existingUser = await prisma.user.findFirst({ where: { id: userID } })
@@ -256,7 +244,7 @@ describe('UsersController', () => {
       const updateUserRoleResponse = await request(app)
         .patch(`/users/${userID}/role`)
         .send(newRoleRequest)
-        .set({ Authorization: `Bearer ${adminToken}` })
+        .set({ Authorization: `Bearer ${opAdminToken}` })
 
       const responseBody: UpdateUserRoleResponse = updateUserRoleResponse.body
 
@@ -269,7 +257,7 @@ describe('UsersController', () => {
     })
 
     it('should return a Validation Error and keep the same role if the provided role is invalid', async () => {
-      const userID: number = registeredUserID
+      const userID: number = registeredParticipantUserID
 
       // Check user role
       const existingUser = await prisma.user.findFirst({ where: { id: userID } })
@@ -284,7 +272,7 @@ describe('UsersController', () => {
       const updateUserRoleResponse = await request(app)
         .patch(`/users/${userID}/role`)
         .send({ newRole: newInvalidRole })
-        .set({ Authorization: `Bearer ${adminToken}` })
+        .set({ Authorization: `Bearer ${opAdminToken}` })
 
       expect(updateUserRoleResponse.status).toBe(422)
 
@@ -301,7 +289,7 @@ describe('UsersController', () => {
       const updateUserRoleResponse = await request(app)
         .patch(`/users/${userID}/role`)
         .send({ newRole })
-        .set({ Authorization: `Bearer ${adminToken}` })
+        .set({ Authorization: `Bearer ${opAdminToken}` })
 
       expect(updateUserRoleResponse.status).toBe(404)
 

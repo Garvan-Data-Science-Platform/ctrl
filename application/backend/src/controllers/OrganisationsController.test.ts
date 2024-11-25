@@ -20,25 +20,25 @@ const api = new Api()
 const app = api.app
 
 describe('OrganisationsController', () => {
-  let token: string
+  let orgAdmintoken: string
   let tokenInOrganisation: string
 
   const testOrganisationId: number = 99
-  let testUserId: number
+  let orgAdminTestUserId: number
   let testUserInOrgId: number
 
   beforeAll(async () => {
-    token = await generateToken(99)
-    tokenInOrganisation = await generateToken(97)
-
-    testUserId = await getUserIdFromToken(token)
-    testUserInOrgId = await getUserIdFromToken(tokenInOrganisation)
-
     api.run()
   })
 
   beforeEach(async () => {
     await resetDB()
+
+    orgAdmintoken = await generateToken({ userId: 99, roles: ['OrganisationAdmin'] })
+    tokenInOrganisation = await generateToken({ userId: 97, roles: ['OrganisationAdmin'] })
+
+    orgAdminTestUserId = await getUserIdFromToken(orgAdmintoken)
+    testUserInOrgId = await getUserIdFromToken(tokenInOrganisation)
   })
 
   afterAll(async () => {
@@ -49,7 +49,7 @@ describe('OrganisationsController', () => {
     it('should return a list of organisations', async () => {
       const response = await request(app)
         .get('/organisations')
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${orgAdmintoken}` })
       expect(response.status).toBe(200)
 
       const body: GetAllOrganisationsResponse = response.body
@@ -63,7 +63,7 @@ describe('OrganisationsController', () => {
       })
       const response = await request(app)
         .get('/organisations')
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${orgAdmintoken}` })
       expect(response.status).toBe(500)
     })
   })
@@ -72,7 +72,7 @@ describe('OrganisationsController', () => {
     it('should return an organisation by ID', async () => {
       const response = await request(app)
         .get(`/organisations/${testOrganisationId}`)
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${orgAdmintoken}` })
       expect(response.status).toBe(200)
 
       const body: GetOrganisationByIdResponse = response.body
@@ -84,7 +84,7 @@ describe('OrganisationsController', () => {
       const notExistingOrganisationId: number = 1234567890
       const response = await request(app)
         .get(`/organisations/${notExistingOrganisationId}`)
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${orgAdmintoken}` })
 
       expect(response.status).toBe(404)
 
@@ -98,7 +98,7 @@ describe('OrganisationsController', () => {
       })
       const response = await request(app)
         .get(`/organisations/${testOrganisationId}`)
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${orgAdmintoken}` })
       expect(response.status).toBe(500)
     })
   })
@@ -109,7 +109,7 @@ describe('OrganisationsController', () => {
 
       const response = await request(app)
         .post('/organisations')
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${orgAdmintoken}` })
         .send({ name: newOrganisationName } as CreateOrganisationRequest)
       expect(response.status).toBe(201)
 
@@ -124,7 +124,7 @@ describe('OrganisationsController', () => {
       const organisationNameAlreadyExists = 'Test Organisation'
       const response = await request(app)
         .post('/organisations')
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${orgAdmintoken}` })
         .send({ name: organisationNameAlreadyExists } as CreateOrganisationRequest)
       expect(response.status).toBe(500)
     })
@@ -136,7 +136,7 @@ describe('OrganisationsController', () => {
 
       const response = await request(app)
         .post('/organisations')
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${orgAdmintoken}` })
         .send({ name: 'New Testing Organisation' } as CreateOrganisationRequest)
 
       expect(response.status).toBe(500)
@@ -160,7 +160,7 @@ describe('OrganisationsController', () => {
 
       const response = await request(app)
         .patch(`/organisations/${testOrganisationId}`)
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${orgAdmintoken}` })
         .send({ name: updatedOrganisationName } as UpdateOrganisationRequest)
       expect(response.status).toBe(200)
 
@@ -176,7 +176,7 @@ describe('OrganisationsController', () => {
       const notExistingOrganisationId: number = 1234567890
       const response = await request(app)
         .patch(`/organisations/${notExistingOrganisationId}`)
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${orgAdmintoken}` })
         .send({ name: 'Updated Test Organisation' } as UpdateOrganisationRequest)
 
       expect(response.status).toBe(404)
@@ -190,7 +190,7 @@ describe('OrganisationsController', () => {
     it('should delete an existing organisation', async () => {
       const response = await request(app)
         .delete(`/organisations/${testOrganisationId}`)
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${orgAdmintoken}` })
       expect(response.status).toBe(200)
 
       // Check deleted organisation in db
@@ -204,7 +204,7 @@ describe('OrganisationsController', () => {
       const notExistingOrganisationId: number = 1234567890
       const response = await request(app)
         .delete(`/organisations/${notExistingOrganisationId}`)
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${orgAdmintoken}` })
 
       expect(response.status).toBe(404)
 
@@ -217,10 +217,11 @@ describe('OrganisationsController', () => {
     it('should return a list of users for an organisation', async () => {
       const response = await request(app)
         .get('/organisations/99/users')
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${orgAdmintoken}` })
       expect(response.status).toBe(200)
 
       const body: GetOrganisationUsersResponse = response.body
+      console.log(body)
       expect(body.users?.length).toBe(1)
       expect(body.users?.[0].id).toBe(testUserInOrgId)
     })
@@ -229,7 +230,7 @@ describe('OrganisationsController', () => {
       const notExistingOrganisationId: number = 1234567890
       const response = await request(app)
         .get(`/organisations/${notExistingOrganisationId}/users`)
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${orgAdmintoken}` })
 
       expect(response.status).toBe(404)
       const body: GetOrganisationUsersResponse = response.body
@@ -240,13 +241,13 @@ describe('OrganisationsController', () => {
   describe('POST /organisations/:OrgID/users/:UserID', () => {
     it('should add a user to an organisation', async () => {
       const response = await request(app)
-        .post(`/organisations/${testOrganisationId}/users/${testUserId}`)
-        .set({ Authorization: `Bearer ${token}` })
+        .post(`/organisations/${testOrganisationId}/users/${orgAdminTestUserId}`)
+        .set({ Authorization: `Bearer ${orgAdmintoken}` })
       expect(response.status).toBe(200)
 
       const body: AddUserToOrganisationResponse = response.body
       expect(body.message).toBe(
-        `User with ID: ${testUserId} added to organisation with ID: ${testOrganisationId}`,
+        `User with ID: ${orgAdminTestUserId} added to organisation with ID: ${testOrganisationId}`,
       )
     })
 
@@ -254,7 +255,7 @@ describe('OrganisationsController', () => {
       const notExistingUserId: number = 1234567890
       const response = await request(app)
         .post(`/organisations/${testOrganisationId}/users/${notExistingUserId}`)
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${orgAdmintoken}` })
 
       expect(response.status).toBe(404)
 
@@ -265,8 +266,8 @@ describe('OrganisationsController', () => {
     it('should return a 404 error if the organisation is not found', async () => {
       const notExistingOrganisationId: number = 1234567890
       const response = await request(app)
-        .post(`/organisations/${notExistingOrganisationId}/users/${testUserId}`)
-        .set({ Authorization: `Bearer ${token}` })
+        .post(`/organisations/${notExistingOrganisationId}/users/${orgAdminTestUserId}`)
+        .set({ Authorization: `Bearer ${orgAdmintoken}` })
 
       expect(response.status).toBe(404)
 
@@ -279,7 +280,7 @@ describe('OrganisationsController', () => {
     it('should remove a user from an organisation', async () => {
       const response = await request(app)
         .delete(`/organisations/${testOrganisationId}/users/${testUserInOrgId}`)
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${orgAdmintoken}` })
 
       expect(response.status).toBe(200)
 
@@ -293,7 +294,7 @@ describe('OrganisationsController', () => {
       const notExistingUserId: number = 1234567890
       const response = await request(app)
         .delete(`/organisations/${testOrganisationId}/users/${notExistingUserId}`)
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${orgAdmintoken}` })
 
       expect(response.status).toBe(404)
 
@@ -304,8 +305,8 @@ describe('OrganisationsController', () => {
     it('should return a 404 error if the organisation is not found', async () => {
       const notExistingOrganisationId: number = 1234567890
       const response = await request(app)
-        .delete(`/organisations/${notExistingOrganisationId}/users/${testUserId}`)
-        .set({ Authorization: `Bearer ${token}` })
+        .delete(`/organisations/${notExistingOrganisationId}/users/${orgAdminTestUserId}`)
+        .set({ Authorization: `Bearer ${orgAdmintoken}` })
 
       expect(response.status).toBe(404)
 

@@ -35,7 +35,6 @@ import { NotFoundError } from '../middlewares/ErrorHandler'
 
 @Route('users')
 @Tags('Users')
-@Security('jwt')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 export class UsersController extends Controller {
@@ -48,6 +47,7 @@ export class UsersController extends Controller {
    */
   @Get('/')
   @SuccessResponse('200', 'OK')
+  @Security('jwt', ['OrganisationAdmin'])
   public async getAllUsers(): Promise<GetAllUsersResponse> {
     const users: User[] = await this.userRepo.findMany({})
     const responseData = { message: 'Got all users', data: users }
@@ -63,6 +63,7 @@ export class UsersController extends Controller {
   @Get('/{userId}')
   @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
+  @Security('jwt')
   public async getUserById(@Path() userId: number): Promise<GetUserByIdResponse> {
     const user: User | null = await this.userRepo.findUnique({
       where: { id: userId },
@@ -84,6 +85,7 @@ export class UsersController extends Controller {
    */
   @Post('/')
   @SuccessResponse('201', 'Created')
+  @Security('jwt', ['OrganisationAdmin'])
   public async createUser(@Body() bodyRequest: CreateUserRequest): Promise<CreateUserResponse> {
     try {
       const insertedUser = await this.userRepo.create({
@@ -110,6 +112,7 @@ export class UsersController extends Controller {
   @Patch('/{userId}')
   @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
+  @Security('jwt')
   public async updateUser(
     @Path() userId: number,
     @Body() bodyRequest: UpdateUserRequest,
@@ -140,6 +143,7 @@ export class UsersController extends Controller {
   @Delete('/{userId}')
   @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
+  @Security('jwt')
   public async deleteUser(@Path() userId: number): Promise<DeleteUserResponse> {
     try {
       const deletedUser = await this.userRepo.delete({ where: { id: userId } })
@@ -161,6 +165,7 @@ export class UsersController extends Controller {
   @Patch('/{userID}/role')
   @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
+  @Security('jwt', ['OperatorAdmin'])
   public async updateUserRole(
     @Path() userID: number,
     @Body() bodyRequest: UpdateUserRoleRequest,

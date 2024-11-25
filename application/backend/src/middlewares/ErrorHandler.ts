@@ -34,6 +34,15 @@ export class IncorrectPasswordError extends Error {
   }
 }
 
+export class IncorrectPermissionsError extends Error {
+  details: unknown
+  constructor(details?: unknown) {
+    super('Incorrect Permissions')
+    this.name = 'IncorrectPermissionsError'
+    this.details = details
+  }
+}
+
 export function ErrorHandler(
   err: unknown,
   req: Request,
@@ -55,10 +64,12 @@ export function ErrorHandler(
     err instanceof NoTokenError ||
     err instanceof TokenExpiredError ||
     err instanceof JsonWebTokenError ||
-    err instanceof IncorrectPasswordError
+    err instanceof IncorrectPasswordError ||
+    err instanceof IncorrectPermissionsError
   ) {
     const errorResponse: UnauthorizedErrorResponse = {
       message: err.message,
+      details: err,
     }
     logger.error({ ...errorResponse })
     return res.status(401).json(errorResponse)
