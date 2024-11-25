@@ -71,7 +71,6 @@ export default function ConsentForm() {
       await apiClient.post(
         `/surveys/answers`,
         {
-          surveyVersionId: 1,
           step: currentStep,
           data: extractSurveyStepAnswers(formState),
         },
@@ -123,7 +122,7 @@ export default function ConsentForm() {
           boxShadow: '0',
         }}
       >
-        <Typography>{data.text}</Typography>
+        <Typography sx={{ flexGrow: 1, textAlign: 'left' }}>{data.text}</Typography>
         {data.tooltip ? (
           <Tooltip title={<Typography fontSize={13}>{data.tooltip}</Typography>}>
             <Info />
@@ -145,7 +144,7 @@ export default function ConsentForm() {
           />
         )}
         {type == 'question-choices' && (
-          <Box sx={{ width: 800 }}>
+          <Box>
             <RadioGroup value={data.value} row>
               {data.choices?.map((val: string, i: number) => {
                 return (

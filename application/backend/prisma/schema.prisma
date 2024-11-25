@@ -123,3 +123,9 @@ model SurveyParticipant {
   /// ![PrismaJson.SurveyAnswerData]
   answers   Json
 }
+
+model Invite {
+  id        Int      @id @default(autoincrement())
+  email     String
+  createdAt DateTime @default(now())
+}

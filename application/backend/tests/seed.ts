@@ -104,7 +104,6 @@ export async function seedTests(prisma: PrismaClient) {
   })
   await prisma.surveyParticipant.create({
     data: {
-      id: 1,
       versionId: 1,
       profileId: 98,
       answers: [
@@ -115,7 +114,6 @@ export async function seedTests(prisma: PrismaClient) {
   })
   await prisma.surveyParticipant.create({
     data: {
-      id: 2,
       versionId: 1,
       profileId: 99,
       answers: [

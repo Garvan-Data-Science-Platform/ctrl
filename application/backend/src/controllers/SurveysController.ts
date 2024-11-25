@@ -17,6 +17,7 @@ import {
 } from 'tsoa'
 import logger from 'common/src/logger'
 import type {
+  GetResponsesByIdResponse,
   GetSurveyVersionsResponse,
   GetUserSurveyStepResponse,
   UpdateSurveyAnswersRequest,
@@ -32,6 +33,7 @@ import { GetSurveyVersionByIdResponse } from 'common/types/api/surveys/getSurvey
 import { validateAnswers } from 'common/src/surveys/validateSurveyAnswers'
 import { createDefaultAnswers } from 'common/src/surveys/createDefaultAnswers'
 import { populateSurveyStepAnswers } from 'common/src/surveys/populateSurveyStepAnswers'
+import SurveyResponses from 'common/example_responses/getResponsesById.json'
 
 @Route('surveys')
 @Tags('Surveys')
@@ -115,7 +117,7 @@ export class SurveysController extends Controller {
     }
 
     const profile = await this.profileRepo.findFirstOrThrow({
-      where: { userId: request.user.userId },
+      where: { userId: request.user.userId }, //TODO: STUDYID
     })
 
     const defaultAnswers = createDefaultAnswers(survey.data)
@@ -156,6 +158,7 @@ export class SurveysController extends Controller {
 
     const surveyParticipant = await this.spRepo.findFirstOrThrow({
       where: { profileId: profile.id },
+      orderBy: { versionId: 'desc' },
     })
 
     const surveyVersionId = surveyParticipant.versionId
@@ -177,6 +180,22 @@ export class SurveysController extends Controller {
   }
 
   /**
+   * Get responses
+   *
+   * @summary Get all responses for a survey participant
+   */
+  @Get('/responses/:participantId')
+  @SuccessResponse('200', 'OK')
+  @Response('500', 'Internal Server Error')
+  @Response('404', 'Not Found')
+  @Response('401', 'Unauthorized')
+  public async getResponsesById() //@Request() request: any,
+  //@Path() participantId: number,
+  : Promise<GetResponsesByIdResponse> {
+    return SurveyResponses as GetResponsesByIdResponse
+  }
+
+  /**
    * Update survey answers
    *
    * @summary Update a Survey
@@ -190,18 +209,20 @@ export class SurveysController extends Controller {
     @Request() request: any,
     @Body() body: UpdateSurveyAnswersRequest,
   ): Promise<UpdateSurveyAnswersResponse> {
-    const { step, data, surveyVersionId } = body
+    const { step, data } = body
 
     const profile = await this.profileRepo.findFirstOrThrow({
+      //TODO STUDY ID
       where: { userId: request.user.userId },
     })
 
     const participant = await this.spRepo.findFirstOrThrow({
-      where: { versionId: surveyVersionId, profileId: profile.id },
+      where: { profileId: profile.id },
+      orderBy: { versionId: 'desc' },
     })
 
     const survey = await this.surveyRepo.findUniqueOrThrow({
-      where: { id: surveyVersionId },
+      where: { id: participant.versionId },
     })
 
     if (survey.status !== 'PUBLISHED') {
@@ -301,6 +322,16 @@ export class SurveysController extends Controller {
       where: { id: surveyId },
       data: { status: 'PUBLISHED' },
     })
+
+    const profiles = await this.profileRepo.findMany({})
+
+    const participants = profiles.map((val) => ({
+      versionId: survey.id,
+      profileId: val.id,
+      answers: createDefaultAnswers(survey.data),
+    }))
+
+    await this.spRepo.createMany({ data: participants })
 
     const responseData = {
       message: `Published survey with ID: ${surveyId}`,
