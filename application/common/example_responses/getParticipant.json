@@ -6,6 +6,7 @@
     "lastName": "Smith",
     "surveyVersion": 5,
     "surveyStatus": "complete",
-    "lastUpdated": "2024-11-16"
+    "lastUpdated": "2024-11-16",
+    "answers": []
   }
 }

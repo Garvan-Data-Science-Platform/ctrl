@@ -2,7 +2,7 @@ import { useShow } from '@refinedev/core'
 import { GetResponsesByIdResponse } from '@common/types/api/surveys'
 import { Box, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material'
 
-export const ResponsesView = ({}) => {
+export const ResponsesView = () => {
   const { queryResult } = useShow({ resource: 'surveys/responses' })
 
   const data = (queryResult.data?.data || []) as GetResponsesByIdResponse['data']

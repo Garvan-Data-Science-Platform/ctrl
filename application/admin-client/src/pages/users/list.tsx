@@ -1,9 +1,7 @@
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import { useMany } from '@refinedev/core'
 import { DateField, DeleteButton, EditButton, List, ShowButton, useDataGrid } from '@refinedev/mui'
-import { ParticipantAnswer } from '@common/types/api/participants/participant'
 import React from 'react'
-import { Link } from 'react-router-dom'
 
 export const UserList = () => {
   const { dataGridProps } = useDataGrid({

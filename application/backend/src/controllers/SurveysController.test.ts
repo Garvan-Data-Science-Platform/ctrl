@@ -96,7 +96,6 @@ describe('SurveysController', () => {
     it('should update survey answers successfully when answers match questions', async () => {
       const reqBody: UpdateSurveyAnswersRequest = {
         step: 1,
-        surveyVersionId: 1,
         data: [true, 'Choice 1'],
       }
       const response = await request(app)
@@ -114,7 +113,6 @@ describe('SurveysController', () => {
       expect(answersBefore[0].status).toBe('review_required')
       const reqBody: UpdateSurveyAnswersRequest = {
         step: 0,
-        surveyVersionId: 1,
         data: [],
       }
       const response = await request(app)
@@ -130,7 +128,6 @@ describe('SurveysController', () => {
     it('should fail to update answers if they dont match the survey questions', async () => {
       const reqBody: UpdateSurveyAnswersRequest = {
         step: 1,
-        surveyVersionId: 1,
         data: ['Choic3e', false],
       }
       const response = await request(app)
@@ -197,6 +194,7 @@ describe('SurveysController', () => {
       const survey = await prisma.surveyVersion.findFirst({ where: { id: 2 } })
       expect(survey?.status).toBe('PUBLISHED')
     })
+
     it('should fail to publish an already published survey', async () => {
       const response = await request(app)
         .post('/surveys/publish/1')

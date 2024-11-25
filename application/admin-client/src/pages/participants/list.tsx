@@ -1,7 +1,6 @@
 import { ParticipantAnswer } from '@common/types/api/participants/participant'
 import { Box, Button, Tooltip } from '@mui/material'
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
-import { useMany } from '@refinedev/core'
 import { DateField, List, ShowButton, useDataGrid } from '@refinedev/mui'
 import React from 'react'
 import { Link } from 'react-router-dom'

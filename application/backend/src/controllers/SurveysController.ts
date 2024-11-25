@@ -189,10 +189,9 @@ export class SurveysController extends Controller {
   @Response('500', 'Internal Server Error')
   @Response('404', 'Not Found')
   @Response('401', 'Unauthorized')
-  public async getResponsesById(
-    @Request() request: any,
-    @Path() participantId: number,
-  ): Promise<GetResponsesByIdResponse> {
+  public async getResponsesById() //@Request() request: any,
+  //@Path() participantId: number,
+  : Promise<GetResponsesByIdResponse> {
     return SurveyResponses as GetResponsesByIdResponse
   }
 
@@ -326,7 +325,7 @@ export class SurveysController extends Controller {
 
     const profiles = await this.profileRepo.findMany({})
 
-    const participants = profiles.map((val, idx) => ({
+    const participants = profiles.map((val) => ({
       versionId: survey.id,
       profileId: val.id,
       answers: createDefaultAnswers(survey.data),
