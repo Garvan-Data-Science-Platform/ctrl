@@ -43,6 +43,7 @@ export const SurveyEditor = () => {
   const [savePending, setSavePending] = useState(false)
   const [publishDialogOpen, setPublishDialogOpen] = useState(false)
   const [justLoaded, setJustLoaded] = useState(true)
+  const [timeoutObject, setTimeoutObject] = useState()
 
   const { list } = useNavigation()
 
@@ -57,7 +58,7 @@ export const SurveyEditor = () => {
       message: 'Error reaching server, could not save your changes',
       type: 'error',
     },
-    invalidates: [],
+    invalidates: ['resourceAll'],
   })
 
   const { data: queryData, isLoading } = queryResult
@@ -78,12 +79,14 @@ export const SurveyEditor = () => {
       }, 500)
       return
     }
-    if (!savePending && surveyData && !justLoaded) {
+    if (surveyData && !justLoaded) {
       setSavePending(true)
-      setTimeout(() => {
+      clearTimeout(timeoutObject)
+      const t = setTimeout(() => {
         mutate({ id, values: { data: surveyData } })
         setSavePending(false)
-      }, 4000)
+      }, 2000)
+      setTimeoutObject(t as any)
     }
   }, [surveyData])
 
@@ -155,8 +158,8 @@ export const SurveyEditor = () => {
             <Dialog open={publishDialogOpen} onClose={() => setPublishDialogOpen(false)}>
               <DialogTitle>Publish new version</DialogTitle>
               <DialogContent>
-                A published survey version can be used for a study. Once you publish a version it
-                can't be edited. You can continue editing this survey in draft mode after
+                Only a published survey can be viewed/answered by participants. Once you publish a
+                version it can't be edited. You can continue editing this survey in draft mode after
                 publishing.
               </DialogContent>
               <DialogActions>

@@ -84,9 +84,9 @@ export default function Register() {
     })
       .then((res) => {
         if (res.ok) {
-          res.json().then((data: RegisterParticipantResponse) => {
-            if (!data.token) throw new Error('No token provided')
-            login(data.token)
+          res.json().then((rdata: RegisterParticipantResponse) => {
+            if (!rdata.token) throw new Error('No token provided')
+            login(rdata.token)
             nav('/')
           })
         } else {

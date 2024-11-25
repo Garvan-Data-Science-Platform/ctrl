@@ -1,16 +1,18 @@
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import { useMany } from '@refinedev/core'
 import { DateField, DeleteButton, EditButton, List, ShowButton, useDataGrid } from '@refinedev/mui'
+import { ParticipantAnswer } from '@common/types/api/participants/participant'
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 export const UserList = () => {
   const { dataGridProps } = useDataGrid({
     syncWithLocation: true,
   })
 
-  const { data: categoryData } = useMany({
-    resource: 'categories',
-    ids: dataGridProps?.rows?.map((item: any) => item?.category?.id).filter(Boolean) ?? [],
+  const { data: userData } = useMany({
+    resource: 'users',
+    ids: dataGridProps?.rows?.map((item: any) => item?.user?.id).filter(Boolean) ?? [],
     queryOptions: {
       enabled: !!dataGridProps?.rows,
     },
@@ -28,13 +30,13 @@ export const UserList = () => {
         field: 'firstName',
         flex: 1,
         headerName: 'First Name',
-        minWidth: 200,
+        minWidth: 100,
       },
       {
         field: 'lastName',
         flex: 1,
         headerName: 'Last Name',
-        minWidth: 200,
+        minWidth: 100,
       },
       {
         field: 'email',
@@ -46,13 +48,13 @@ export const UserList = () => {
         field: 'role',
         flex: 1,
         headerName: 'Role',
-        minWidth: 200,
+        minWidth: 100,
       },
       {
         field: 'createdAt',
         flex: 1,
         headerName: 'Created at',
-        minWidth: 250,
+        minWidth: 100,
         renderCell: function render({ value }) {
           return <DateField value={value} />
         },
@@ -75,7 +77,7 @@ export const UserList = () => {
         minWidth: 80,
       },
     ],
-    [categoryData],
+    [userData],
   )
 
   return (
