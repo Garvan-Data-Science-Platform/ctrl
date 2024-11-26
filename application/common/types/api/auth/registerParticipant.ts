@@ -14,7 +14,6 @@ import type {
  *  "email": "john.doe@email.com",
  *  "password": "Password123",
  *  "dob": "2000-05-21",
- *  "participantID": "P12345678",
  *  "mobile": "0412341234",
  *  "addressLine": "123 Sydney Street",
  *  "suburb": "Sydney",
@@ -27,8 +26,8 @@ import type {
  *    "middleName": "Jimmy",
  *    "lastName": "Doe",
  *    "mobile": "0412341432",
- *    "email": "jeremydoe@email.com",
- *  },
+ *    "email": "jeremydoe@email.com"
+ *  }
  * }
  */
 export interface RegisterParticipantRequest {
