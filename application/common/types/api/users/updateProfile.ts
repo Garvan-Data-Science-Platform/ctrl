@@ -1,4 +1,4 @@
-import type { OnBehalf, AlternativeContact } from './ParticipantProfile'
+import type { AlternativeContact } from './ParticipantProfile'
 
 export interface UpdateProfileRequest {
   firstName: string
@@ -6,9 +6,7 @@ export interface UpdateProfileRequest {
   email: string
   password: string
   dob: string
-  isParentOrGuardian: boolean
   nextOfKin?: AlternativeContact
-  onBehalfOf?: OnBehalf
 }
 
 export interface UpdateProfileResponse {

@@ -1,5 +1,4 @@
 export interface UpdateSurveyAnswersRequest {
-  surveyVersionId: number
   step: number
   data: (string | boolean)[]
 }

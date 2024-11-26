@@ -8,7 +8,6 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  Switch,
   TextField,
   Typography,
 } from '@mui/material'
@@ -16,10 +15,9 @@ import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth'
 import { RegisterParticipantRequest, RegisterParticipantResponse } from '@common/types/api/auth'
-import { useState } from 'react'
 import {
   ContactMethod,
-  RelationshipType,
+  ParticipantType,
   StateTerritory,
 } from '@common/types/api/users/ParticipantProfile'
 
@@ -30,7 +28,6 @@ interface FormValues {
   password: string
   confirm_password: string
   dob: string
-  studyId: string
   addressLine: string
   suburb: string
   state: StateTerritory
@@ -40,7 +37,6 @@ interface FormValues {
   nok_first: string
   nok_surname: string
   nok_email: string
-  nok_relationship: RelationshipType
   on_behalf_first: string
   on_behalf_surname: string
   on_behalf_dob: string
@@ -57,13 +53,11 @@ export default function Register() {
   const { login } = useAuth()
   const nav = useNavigate()
 
-  const [isParentOrGuardian, setIsParentOrGuardian] = useState(false)
-
   const onSubmit = (data: FormValues) => {
     //login('TOKEN')
     //nav('/')
 
-    const partialData = {
+    const reqData: RegisterParticipantRequest = {
       firstName: data.firstName,
       lastName: data.lastName,
       email: data.email,
@@ -75,32 +69,12 @@ export default function Register() {
       postcode: data.postcode,
       mobile: data.mobile,
       preferredContact: data.preferredContact,
-      participantID: data.studyId,
-    }
-
-    let reqData: RegisterParticipantRequest
-
-    if (isParentOrGuardian) {
-      reqData = {
-        ...partialData,
-        isParentOrGuardian,
-        onBehalfOf: {
-          firstName: data['on_behalf_first'],
-          lastName: data['on_behalf_surname'],
-          dob: data['on_behalf_dob'],
-        },
-      }
-    } else {
-      reqData = {
-        ...partialData,
-        isParentOrGuardian,
-        nextOfKin: {
-          firstName: data['nok_first'],
-          lastName: data['nok_surname'],
-          email: data['nok_email'],
-          relationship: data['nok_relationship'],
-        },
-      }
+      participantType: ParticipantType.STANDARD,
+      nextOfKin: {
+        firstName: data['nok_first'],
+        lastName: data['nok_surname'],
+        email: data['nok_email'],
+      },
     }
 
     fetch(import.meta.env.VITE_BACKEND_URL + '/auth/register/participant', {
@@ -110,9 +84,9 @@ export default function Register() {
     })
       .then((res) => {
         if (res.ok) {
-          res.json().then((data: RegisterParticipantResponse) => {
-            if (!data.token) throw new Error('No token provided')
-            login(data.token)
+          res.json().then((rdata: RegisterParticipantResponse) => {
+            if (!rdata.token) throw new Error('No token provided')
+            login(rdata.token)
             nav('/')
           })
         } else {
@@ -184,12 +158,6 @@ export default function Register() {
                 {...register('dob', { required: true })}
               />
               <TextField
-                fullWidth
-                sx={{ m: 1 }}
-                label="Study ID"
-                {...register('studyId', { required: true })}
-              />
-              <TextField
                 sx={{ m: 1, flexGrow: 1 }}
                 label="Address Line"
                 {...register('addressLine', { required: true })}
@@ -218,12 +186,11 @@ export default function Register() {
                 {...register('postcode', { required: true })}
               />
               <TextField
-                fullWidth
-                sx={{ m: 1 }}
+                sx={{ m: 1, flexGrow: 1 }}
                 label="Mobile"
                 {...register('mobile', { required: true })}
               />
-              <FormControl sx={{ m: 1 }} fullWidth>
+              <FormControl sx={{ m: 1, flexGrow: 1, minWidth: 240 }}>
                 <InputLabel id="pref-select-label">Preferred Contact Method</InputLabel>
                 <Select
                   labelId="pref-select-label"
@@ -239,85 +206,32 @@ export default function Register() {
                   })}
                 </Select>
               </FormControl>
-              <Typography sx={{ m: 1 }}>
-                Are you registering as a parent, guardian or carer?
-              </Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                <Typography>No</Typography>
-                <Switch
-                  value={isParentOrGuardian}
-                  onChange={() => {
-                    setIsParentOrGuardian(!isParentOrGuardian)
-                  }}
+
+              <>
+                <Typography sx={{ m: 1, width: '100%', fontWeight: 'bold' }}>
+                  Alternative Contact
+                </Typography>
+                <TextField
+                  sx={{ m: 1, flexGrow: 1 }}
+                  label="First Name"
+                  {...register('nok_first', { required: true })}
                 />
-                <Typography>Yes</Typography>
-              </Box>
-              {isParentOrGuardian ? (
-                <>
-                  <Typography sx={{ m: 1, width: '100%', fontWeight: 'bold' }}>
-                    Registering on behalf of:
-                  </Typography>
-                  <TextField
-                    sx={{ m: 1, flexGrow: 1 }}
-                    label="First Name"
-                    {...register('on_behalf_first', { required: true })}
-                  />
-                  <TextField
-                    sx={{ m: 1, flexGrow: 1 }}
-                    label="Family Name"
-                    {...register('on_behalf_surname', { required: true })}
-                  />
-                  <TextField
-                    fullWidth
-                    type="date"
-                    sx={{ m: 1 }}
-                    label="Date of Birth"
-                    slotProps={{ inputLabel: { shrink: true } }}
-                    {...register('on_behalf_dob', { required: true })}
-                  />
-                </>
-              ) : (
-                <>
-                  <Typography sx={{ m: 1, width: '100%', fontWeight: 'bold' }}>
-                    Next of Kin
-                  </Typography>
-                  <TextField
-                    sx={{ m: 1, flexGrow: 1 }}
-                    label="First Name"
-                    {...register('nok_first', { required: true })}
-                  />
-                  <TextField
-                    sx={{ m: 1, flexGrow: 1 }}
-                    label="Family Name"
-                    {...register('nok_surname', { required: true })}
-                  />
-                  <TextField
-                    type="email"
-                    fullWidth
-                    sx={{ m: 1 }}
-                    label="Email"
-                    {...register('nok_email', {
-                      required: true,
-                    })}
-                  />
-                  <FormControl sx={{ m: 1 }} fullWidth>
-                    <InputLabel id="state-select-label">Relationship</InputLabel>
-                    <Select
-                      labelId="rel-select-label"
-                      label="Relationship"
-                      {...register('nok_relationship', { required: true })}
-                    >
-                      {Object.keys(RelationshipType).map((val, idx) => {
-                        return (
-                          <MenuItem value={val} key={`rel_${idx}`}>
-                            {val}
-                          </MenuItem>
-                        )
-                      })}
-                    </Select>
-                  </FormControl>
-                </>
-              )}
+                <TextField
+                  sx={{ m: 1, flexGrow: 1 }}
+                  label="Family Name"
+                  {...register('nok_surname', { required: true })}
+                />
+                <TextField
+                  type="email"
+                  fullWidth
+                  sx={{ m: 1 }}
+                  label="Email"
+                  {...register('nok_email', {
+                    required: true,
+                  })}
+                />
+              </>
+
               {errors.root ? (
                 <Alert sx={{ flexGrow: 1, m: 1 }} severity="error">
                   {errors.root?.serverError?.message}

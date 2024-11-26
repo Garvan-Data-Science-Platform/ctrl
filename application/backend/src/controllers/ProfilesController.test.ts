@@ -43,9 +43,8 @@ describe('ProfilesController', () => {
       const expectedProfileData = expect.objectContaining({
         addressLine: '123 smith st',
         dob: '1980-01-23T00:00:00.000Z',
-        isParentOrGuardian: false,
         mobile: '0412345678',
-        participantID: 'ABC123',
+        participantType: 'STANDARD',
         postcode: '1234',
         preferredContact: 'EMAIL',
         state: 'VIC',
@@ -85,9 +84,8 @@ describe('ProfilesController', () => {
       const expectedProfileData = expect.objectContaining({
         addressLine: '123 smith st',
         dob: '1980-01-23T00:00:00.000Z',
-        isParentOrGuardian: false,
         mobile: '0412345678',
-        participantID: 'ABC123',
+        participantType: 'STANDARD',
         postcode: '1234',
         preferredContact: 'EMAIL',
         state: 'VIC',

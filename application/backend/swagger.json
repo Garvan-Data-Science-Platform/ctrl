@@ -661,6 +661,21 @@
         "type": "object",
         "additionalProperties": false
       },
+      "GetResponsesByIdResponse": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/SurveyStep"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
       "UpdateSurveyAnswersResponse": {
         "properties": {
           "message": {
@@ -675,10 +690,6 @@
       },
       "UpdateSurveyAnswersRequest": {
         "properties": {
-          "surveyVersionId": {
-            "type": "number",
-            "format": "double"
-          },
           "step": {
             "type": "number",
             "format": "double"
@@ -698,7 +709,6 @@
           }
         },
         "required": [
-          "surveyVersionId",
           "step",
           "data"
         ],
@@ -741,12 +751,12 @@
         ],
         "type": "string"
       },
-      "RelationshipType": {
+      "ParticipantType": {
         "enum": [
-          "PARENT",
+          "STANDARD",
           "GUARDIAN",
-          "CHILD",
-          "OTHER"
+          "DEPENDENT_AGE",
+          "DEPENDENT_OTHER"
         ],
         "type": "string"
       },
@@ -766,36 +776,12 @@
           },
           "email": {
             "type": "string"
-          },
-          "relationship": {
-            "$ref": "#/components/schemas/RelationshipType"
           }
         },
         "required": [
           "firstName",
           "lastName",
-          "email",
-          "relationship"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "OnBehalf": {
-        "properties": {
-          "firstName": {
-            "type": "string"
-          },
-          "lastName": {
-            "type": "string"
-          },
-          "dob": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "firstName",
-          "lastName",
-          "dob"
+          "email"
         ],
         "type": "object",
         "additionalProperties": false
@@ -807,14 +793,11 @@
           },
           "data": {
             "properties": {
-              "onBehalfOf": {
-                "$ref": "#/components/schemas/OnBehalf"
-              },
               "alternativeContact": {
                 "$ref": "#/components/schemas/AlternativeContact"
               },
-              "isParentOrGuardian": {
-                "type": "boolean"
+              "participantType": {
+                "$ref": "#/components/schemas/ParticipantType"
               },
               "preferredContact": {
                 "$ref": "#/components/schemas/ContactMethod"
@@ -837,9 +820,6 @@
               "email": {
                 "type": "string"
               },
-              "participantID": {
-                "type": "string"
-              },
               "dob": {
                 "type": "string"
               },
@@ -854,11 +834,9 @@
               }
             },
             "required": [
-              "isParentOrGuardian",
+              "participantType",
               "preferredContact",
               "mobile",
-              "email",
-              "participantID",
               "dob",
               "lastName",
               "firstName"
@@ -868,6 +846,128 @@
         },
         "required": [
           "message",
+          "data"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "ParticipantAnswer": {
+        "properties": {
+          "surveyVersion": {
+            "type": "number",
+            "format": "double"
+          },
+          "participantId": {
+            "type": "number",
+            "format": "double"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "complete",
+              "partially_complete",
+              "incomplete"
+            ]
+          }
+        },
+        "required": [
+          "surveyVersion",
+          "participantId",
+          "status"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "Participant": {
+        "properties": {
+          "id": {
+            "type": "number",
+            "format": "double"
+          },
+          "email": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "answers": {
+            "items": {
+              "$ref": "#/components/schemas/ParticipantAnswer"
+            },
+            "type": "array"
+          },
+          "lastUpdated": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "firstName",
+          "lastName",
+          "answers",
+          "lastUpdated"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "GetParticipantsResponse": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/Participant"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "GetParticipantByIdResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Participant"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "GetInvitedResponse": {
+        "properties": {
+          "data": {
+            "items": {
+              "properties": {
+                "date": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "number",
+                  "format": "double"
+                }
+              },
+              "required": [
+                "date",
+                "email",
+                "id"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
           "data"
         ],
         "type": "object",
@@ -1179,18 +1279,11 @@
           "dob": {
             "type": "string"
           },
-          "participantID": {
-            "type": "string",
-            "minLength": 1
-          },
-          "isParentOrGuardian": {
-            "type": "boolean"
+          "participantType": {
+            "$ref": "#/components/schemas/ParticipantType"
           },
           "nextOfKin": {
             "$ref": "#/components/schemas/AlternativeContact"
-          },
-          "onBehalfOf": {
-            "$ref": "#/components/schemas/OnBehalf"
           }
         },
         "required": [
@@ -1205,40 +1298,11 @@
           "state",
           "password",
           "dob",
-          "participantID",
-          "isParentOrGuardian"
+          "participantType",
+          "nextOfKin"
         ],
         "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "firstName": "John",
-          "middleName": "James",
-          "lastName": "Doe",
-          "email": "john.doe@email.com",
-          "password": "Password123",
-          "dob": "2000-05-21",
-          "participantID": "P12345678",
-          "mobile": "0412341234",
-          "addressLine": "123 Sydney Street",
-          "suburb": "Sydney",
-          "postcode": "2000",
-          "state": "NSW",
-          "isParentOrGuardian": false,
-          "preferredContact": "MOBILE",
-          "nextOfKin": {
-            "firstName": "Jeremy",
-            "middleName": "Jimmy",
-            "lastName": "Doe",
-            "mobile": "0412341432",
-            "email": "jeremydoe@email.com",
-            "relationship": "PARENT"
-          },
-          "onBehalfOf": {
-            "firstName": "Timothy",
-            "lastName": "Doe",
-            "dob": "1963-05-27"
-          }
-        }
+        "additionalProperties": false
       },
       "LoginResponse": {
         "properties": {
@@ -1894,6 +1958,39 @@
         ]
       }
     },
+    "/surveys/responses/{participantId}": {
+      "get": {
+        "operationId": "GetResponsesById",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetResponsesByIdResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Get responses",
+        "summary": "Get all responses for a survey participant",
+        "tags": [
+          "Surveys"
+        ],
+        "security": [],
+        "parameters": []
+      }
+    },
     "/surveys/answers": {
       "post": {
         "operationId": "UpdateSurveyAnswers",
@@ -2164,6 +2261,199 @@
             }
           }
         ]
+      }
+    },
+    "/participants": {
+      "get": {
+        "operationId": "GetParticipants",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetParticipantsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "List participants",
+        "summary": "List participants",
+        "tags": [
+          "Participants"
+        ],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": []
+      }
+    },
+    "/participants/{participantId}": {
+      "get": {
+        "operationId": "GetParticipantById",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetParticipantByIdResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Get participant by ID",
+        "summary": "Get a  Participant by ID",
+        "tags": [
+          "Participants"
+        ],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "participantId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/invites": {
+      "get": {
+        "operationId": "GetInvites",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetInvitedResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "List invites",
+        "summary": "List participants",
+        "tags": [
+          "Invites"
+        ],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": []
       }
     },
     "/organisations": {

@@ -17,6 +17,7 @@ import {
 } from 'tsoa'
 import logger from 'common/src/logger'
 import type {
+  GetResponsesByIdResponse,
   GetSurveyVersionsResponse,
   GetUserSurveyStepResponse,
   UpdateSurveyAnswersRequest,
@@ -25,24 +26,19 @@ import type {
   UpdateSurveyResponse,
 } from 'common/types/api/surveys'
 import { SurveyVersion as SurveyVersionPrisma } from '@prisma/client'
-import {
-  SurveyElementType,
-  SurveyStep,
-  UserSurveyStepState,
-  SurveyStepStatus,
-} from 'common/types/survey'
+import { SurveyElementType, SurveyStep, SurveyStepStatus } from 'common/types/survey'
 import prisma from '../PrismaClient'
 import '../jsontypes'
 import { GetSurveyVersionByIdResponse } from 'common/types/api/surveys/getSurveyVersionById'
 import { validateAnswers } from 'common/src/surveys/validateSurveyAnswers'
 import { createDefaultAnswers } from 'common/src/surveys/createDefaultAnswers'
 import { populateSurveyStepAnswers } from 'common/src/surveys/populateSurveyStepAnswers'
+import SurveyResponses from 'common/example_responses/getResponsesById.json'
 
 @Route('surveys')
 @Tags('Surveys')
 export class SurveysController extends Controller {
   surveyRepo = prisma.surveyVersion
-  answersRepo = prisma.surveyAnswers
   spRepo = prisma.surveyParticipant
   profileRepo = prisma.participantProfile
 
@@ -121,16 +117,18 @@ export class SurveysController extends Controller {
       throw Error('Can only add to a published survey')
     }
 
-    const participant = await this.spRepo.create({
-      data: {
-        userId: request.user.userId,
-        versionId: survey.id,
-      },
+    const profile = await this.profileRepo.findFirstOrThrow({
+      where: { userId: request.user.userId }, //TODO: STUDYID
     })
 
     const defaultAnswers = createDefaultAnswers(survey.data)
-    await this.answersRepo.create({
-      data: { data: defaultAnswers, participantId: participant.id },
+
+    await this.spRepo.create({
+      data: {
+        profileId: profile.id,
+        versionId: survey.id,
+        answers: defaultAnswers,
+      },
     })
 
     const responseData = {
@@ -156,17 +154,20 @@ export class SurveysController extends Controller {
     @Path() study: number,
     @Path() step: number,
   ): Promise<GetUserSurveyStepResponse> {
-    const surveyParticipant = await this.spRepo.findFirstOrThrow({
+    const profile = await this.profileRepo.findFirstOrThrow({
       where: { userId: request.user.userId },
+    })
+
+    const surveyParticipant = await this.spRepo.findFirstOrThrow({
+      where: { profileId: profile.id },
+      orderBy: { versionId: 'desc' },
     })
 
     const surveyVersionId = surveyParticipant.versionId
 
     const survey = await this.surveyRepo.findUniqueOrThrow({ where: { id: surveyVersionId } })
 
-    const currentAnswers = await this.answersRepo.findFirst({
-      where: { participantId: surveyParticipant.id },
-    })
+    const currentAnswers = surveyParticipant.answers
 
     const stepData = survey.data
     if (stepData.length < step || step < 0) {
@@ -174,11 +175,26 @@ export class SurveysController extends Controller {
     }
 
     if (currentAnswers) {
-      const ans = currentAnswers.data
-      stepData[step] = populateSurveyStepAnswers(stepData[step], ans[step].answers)
+      stepData[step] = populateSurveyStepAnswers(stepData[step], currentAnswers[step].answers)
     }
 
     return { data: { ...stepData[step], current_step: step, total_steps: stepData.length } }
+  }
+
+  /**
+   * Get responses
+   *
+   * @summary Get all responses for a survey participant
+   */
+  @Get('/responses/:participantId')
+  @SuccessResponse('200', 'OK')
+  @Response('500', 'Internal Server Error')
+  @Response('404', 'Not Found')
+  @Response('401', 'Unauthorized')
+  public async getResponsesById() //@Request() request: any,
+  //@Path() participantId: number,
+  : Promise<GetResponsesByIdResponse> {
+    return SurveyResponses as GetResponsesByIdResponse
   }
 
   /**
@@ -196,39 +212,29 @@ export class SurveysController extends Controller {
     @Request() request: any,
     @Body() body: UpdateSurveyAnswersRequest,
   ): Promise<UpdateSurveyAnswersResponse> {
-    const { step, data, surveyVersionId } = body
+    const { step, data } = body
 
-    let participant = await this.spRepo.findFirst({
-      where: { versionId: surveyVersionId, userId: request.user.userId },
+    const profile = await this.profileRepo.findFirstOrThrow({
+      //TODO STUDY ID
+      where: { userId: request.user.userId },
     })
 
-    if (!participant) {
-      participant = await this.spRepo.create({
-        data: { versionId: surveyVersionId, userId: request.user.userId },
-      })
-    }
-
-    const currentAnswers = await this.answersRepo.findFirst({
-      where: { participant: participant },
+    const participant = await this.spRepo.findFirstOrThrow({
+      where: { profileId: profile.id },
+      orderBy: { versionId: 'desc' },
     })
-
-    let answers: UserSurveyStepState[]
 
     const survey = await this.surveyRepo.findUniqueOrThrow({
-      where: { id: surveyVersionId },
+      where: { id: participant.versionId },
     })
 
     if (survey.status !== 'PUBLISHED') {
       throw Error('Cannot submit answers for unpublished survey version')
     }
 
-    const surveySteps = survey?.data
+    const surveySteps = survey.data
 
-    if (currentAnswers === null) {
-      answers = createDefaultAnswers(surveySteps)
-    } else {
-      answers = currentAnswers.data
-    }
+    const answers = participant.answers
 
     type StatusMap = {
       [key in SurveyElementType]: SurveyStepStatus
@@ -255,17 +261,10 @@ export class SurveysController extends Controller {
       message: 'Updated Answers',
     }
 
-    if (currentAnswers) {
-      await this.answersRepo.update({
-        where: { id: currentAnswers.id }, //
-        data: { data: answers as any },
-      })
-    } else {
-      await this.answersRepo.create({
-        data: { data: answers as any, participantId: participant.id },
-      })
-      responseData.message = 'Created new answers'
-    }
+    await this.spRepo.update({
+      where: { id: participant.id }, //
+      data: { answers },
+    })
 
     logger.info({ ...responseData })
     return responseData
@@ -328,6 +327,16 @@ export class SurveysController extends Controller {
       where: { id: surveyId },
       data: { status: 'PUBLISHED' },
     })
+
+    const profiles = await this.profileRepo.findMany({})
+
+    const participants = profiles.map((val) => ({
+      versionId: survey.id,
+      profileId: val.id,
+      answers: createDefaultAnswers(survey.data),
+    }))
+
+    await this.spRepo.createMany({ data: participants })
 
     const responseData = {
       message: `Published survey with ID: ${surveyId}`,

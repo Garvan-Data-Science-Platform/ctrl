@@ -13,7 +13,6 @@ function App() {
   const bears = useAppStore((state) => state.bears)
   const theme = customTheme({ primary: bears >= 3 ? red : blue, secondary: blue })
   const queryClient = new QueryClient()
-  console.log('APP RENDER')
 
   return (
     <QueryClientProvider client={queryClient}>

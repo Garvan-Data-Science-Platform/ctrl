@@ -1,0 +1,42 @@
+{
+  "data": [
+    {
+      "id": 1,
+      "email": "user@example.com",
+      "firstName": "John",
+      "lastName": "Smith",
+      "answers": [
+        { "surveyVersion": 0, "participantId": 7, "status": "complete" },
+        { "surveyVersion": 1, "participantId": 1, "status": "complete" },
+        { "surveyVersion": 2, "participantId": 2, "status": "incomplete" },
+        { "surveyVersion": 3, "participantId": 6, "status": "partially_complete" }
+      ],
+      "lastUpdated": "2024-11-16"
+    },
+    {
+      "id": 2,
+      "email": "user2@example.com",
+      "firstName": "Jenny",
+      "lastName": "Smith",
+      "answers": [
+        { "surveyVersion": 1, "participantId": 3, "status": "incomplete" },
+        { "surveyVersion": 2, "participantId": 4, "status": "partially_complete" },
+        { "surveyVersion": 3, "participantId": 5, "status": "complete" }
+      ],
+      "lastUpdated": "2024-11-14"
+    },
+    {
+      "id": 3,
+      "email": "user3@example.com",
+      "firstName": "Mike",
+      "lastName": "Smith",
+      "answers": [
+        { "surveyVersion": 0, "participantId": 8, "status": "incomplete" },
+        { "surveyVersion": 1, "participantId": 9, "status": "partially_complete" },
+        { "surveyVersion": 2, "participantId": 10, "status": "complete" },
+        { "surveyVersion": 3, "participantId": 11, "status": "incomplete" }
+      ],
+      "lastUpdated": "2024-11-14"
+    }
+  ]
+}

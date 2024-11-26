@@ -15,11 +15,11 @@ export enum StateTerritory {
   WA = 'WA',
 }
 
-export enum RelationshipType {
-  PARENT = 'PARENT',
+export enum ParticipantType {
+  STANDARD = 'STANDARD',
   GUARDIAN = 'GUARDIAN',
-  CHILD = 'CHILD',
-  OTHER = 'OTHER',
+  DEPENDENT_AGE = 'DEPENDENT_AGE',
+  DEPENDENT_OTHER = 'DEPENDENT_OTHER',
 }
 
 export interface AlternativeContact {
@@ -28,7 +28,6 @@ export interface AlternativeContact {
   lastName: string
   mobile?: string
   email: string
-  relationship: RelationshipType
 }
 
 export interface OnBehalf {

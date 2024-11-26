@@ -16,6 +16,8 @@ const main = async () => {
 
   console.log(`Added ${createdOrganisations.count} organisations`)
 
+  await prisma.study.create({})
+
   // Create a map of organisation names to their ID
   const savedOrganisations = await prisma.organisation.findMany({
     where: { name: { in: organisations.map((o) => o.name) } },
