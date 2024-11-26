@@ -2,44 +2,43 @@ import request from 'supertest'
 import { Api } from '../Api'
 import prisma from '../PrismaClient'
 import { resetDB } from '../../tests/TestHelpers'
-import { getUserIdFromToken } from '../authentication'
-import type { RegisterRequest, RegisterResponse } from 'common/types/api/auth'
+import { generateToken } from '../authentication'
+import type { RegisterRequest } from 'common/types/api/auth'
 import {
   CreateUserResponse,
   DeleteUserResponse,
   GetAllUsersResponse,
   GetUserByIdResponse,
   UpdateUserResponse,
+  UpdateUserRoleRequest,
+  UpdateUserRoleResponse,
 } from 'common/types/api/users'
+import { Role } from '@prisma/client'
 
 const api = new Api()
 const app = api.app
 
 describe('UsersController', () => {
   let token: string
-  let registeredUserID: number
+  let opAdminToken: string
+  let orgAdminToken: string
 
-  const testUser: RegisterRequest = {
-    firstName: 'Test',
-    lastName: 'User',
-    email: 'test@user.com',
-    password: 'Password123',
-    role: 'test',
-  }
+  const registeredParticipantUserID: number = 98
 
   beforeAll(async () => {
+    opAdminToken = await generateToken({ userId: 96, roles: ['OperatorAdmin'] })
+    orgAdminToken = await generateToken({ userId: 97, roles: ['OrganisationAdmin'] })
+
+    token = await generateToken({
+      userId: registeredParticipantUserID,
+      roles: ['Participant'],
+    })
+
     api.run()
   })
 
   beforeEach(async () => {
     await resetDB()
-
-    // Register user
-    const registerResponse = await request(app).post('/auth/register').send(testUser)
-    const body: RegisterResponse = registerResponse.body
-    if (!body.token) throw new Error('User could not be registered')
-    token = body.token
-    registeredUserID = getUserIdFromToken(token)
   })
 
   afterAll(async () => {
@@ -50,7 +49,7 @@ describe('UsersController', () => {
     it('should return a list of users', async () => {
       const response = await request(app)
         .get('/users')
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
       expect(response.status).toBe(200)
 
       const body: GetAllUsersResponse = response.body
@@ -63,7 +62,7 @@ describe('UsersController', () => {
       })
       const response = await request(app)
         .get('/users')
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
 
       expect(response.status).toBe(500)
 
@@ -74,7 +73,7 @@ describe('UsersController', () => {
 
   describe('GET /users/:id', () => {
     it('should return a user by ID', async () => {
-      const userId = registeredUserID
+      const userId = registeredParticipantUserID
       const response = await request(app)
         .get(`/users/${userId}`)
         .set({ Authorization: `Bearer ${token}` })
@@ -108,7 +107,7 @@ describe('UsersController', () => {
         lastName: 'Doe',
         email: 'jane@example.com',
         password: 'password123',
-        role: 'user',
+        role: Role.OperatorAdmin,
       }
 
       // Check that the user does not already exist
@@ -120,7 +119,7 @@ describe('UsersController', () => {
       // Create a new user
       const response = await request(app)
         .post('/users')
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
         .send(newUser)
       expect(response.status).toBe(201)
 
@@ -137,12 +136,20 @@ describe('UsersController', () => {
 
   describe('PATCH /users/:id', () => {
     it('should update a user by ID', async () => {
-      const userId: number = registeredUserID
+      const userId: number = registeredParticipantUserID
 
       const newFirstName: string = 'Updated'
 
       // Get existing user details
       const existingUser = await prisma.user.findFirst({ where: { id: userId } })
+
+      const testUser: RegisterRequest = {
+        firstName: 'Test',
+        lastName: 'User',
+        email: 'test2@example.com',
+        password: 'Password123',
+        role: Role.Participant,
+      }
 
       expect(existingUser?.email).toBe(testUser.email)
       expect(existingUser?.firstName).toBe(testUser.firstName)
@@ -184,7 +191,7 @@ describe('UsersController', () => {
 
   describe('DELETE /users/:id', () => {
     it('should delete a user by ID', async () => {
-      const userId: number = registeredUserID
+      const userId: number = registeredParticipantUserID
 
       // Check that user exists in db
       const existingUser = await prisma.user.findFirst({ where: { id: userId } })
@@ -218,6 +225,77 @@ describe('UsersController', () => {
 
       const body: DeleteUserResponse = response.body
       expect(body.message).toBe('Not Found')
+    })
+  })
+
+  describe('PATCH /users/:id/role', () => {
+    it('should update a users role to the role provided', async () => {
+      const userID: number = registeredParticipantUserID
+
+      // Check user role
+      const existingUser = await prisma.user.findFirst({ where: { id: userID } })
+
+      expect(existingUser?.role).toBe(Role.Participant)
+
+      // Change user role
+      const newRole: Role = Role.OperatorAdmin
+      const newRoleRequest: UpdateUserRoleRequest = { newRole }
+
+      const updateUserRoleResponse = await request(app)
+        .patch(`/users/${userID}/role`)
+        .send(newRoleRequest)
+        .set({ Authorization: `Bearer ${opAdminToken}` })
+
+      const responseBody: UpdateUserRoleResponse = updateUserRoleResponse.body
+
+      expect(responseBody.message).toBe(`Updated user with ID: ${userID} to role: ${newRole}`)
+
+      // Check user role
+      const updatedUser = await prisma.user.findFirst({ where: { id: userID } })
+
+      expect(updatedUser?.role).toBe(newRole)
+    })
+
+    it('should return a Validation Error and keep the same role if the provided role is invalid', async () => {
+      const userID: number = registeredParticipantUserID
+
+      // Check user role
+      const existingUser = await prisma.user.findFirst({ where: { id: userID } })
+
+      const currentRole: Role | undefined = existingUser?.role
+
+      expect(currentRole).toBe(Role.Participant)
+
+      // Change user role to something invalid
+      const newInvalidRole: string = 'InvalidRole'
+
+      const updateUserRoleResponse = await request(app)
+        .patch(`/users/${userID}/role`)
+        .send({ newRole: newInvalidRole })
+        .set({ Authorization: `Bearer ${opAdminToken}` })
+
+      expect(updateUserRoleResponse.status).toBe(422)
+
+      // Check user role hasn't changed
+      const updatedUser = await prisma.user.findFirst({ where: { id: userID } })
+
+      expect(updatedUser?.role).toBe(currentRole)
+    })
+
+    it('should return an error for a non-existent user', async () => {
+      const userID: number = 999
+      const newRole: Role = Role.OperatorAdmin
+
+      const updateUserRoleResponse = await request(app)
+        .patch(`/users/${userID}/role`)
+        .send({ newRole })
+        .set({ Authorization: `Bearer ${opAdminToken}` })
+
+      expect(updateUserRoleResponse.status).toBe(404)
+
+      const responseBody: UpdateUserRoleResponse = updateUserRoleResponse.body
+
+      expect(responseBody.message).toBe('Not Found')
     })
   })
 })

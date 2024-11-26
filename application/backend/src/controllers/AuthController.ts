@@ -10,7 +10,7 @@ import { Route, Tags, Controller, Body, Post, SuccessResponse, Response, Validat
 import prisma from '../PrismaClient'
 import logger from 'common/src/logger'
 import { checkPasswordStrength } from 'common/src/PasswordStrength'
-import { User } from '@prisma/client'
+import { User, Role } from '@prisma/client'
 import { generateToken, hashPassword, verifyPassword } from '../authentication'
 import type {
   InternalErrorResponse,
@@ -51,7 +51,7 @@ export class AuthController extends Controller {
       },
     })
 
-    const token = await generateToken(insertedUser.id)
+    const token = await generateToken({ userId: insertedUser.id, roles: [insertedUser.role] })
 
     const responseData = {
       message: `Registered user with ID: ${insertedUser.id}`,
@@ -93,7 +93,7 @@ export class AuthController extends Controller {
 
     const data = {
       ...userDetails,
-      role: 'participant', // TODO: This should be an enum
+      role: Role.Participant,
       password: hashedPassword,
     }
     const insertedUser = await this.userRepo.create({
@@ -111,7 +111,7 @@ export class AuthController extends Controller {
       },
     })
 
-    const token = await generateToken(insertedUser.id)
+    const token = await generateToken({ userId: insertedUser.id, roles: [insertedUser.role] })
 
     const responseData = {
       message: `Created participant with user ID: ${insertedUser.id}`,
@@ -141,7 +141,7 @@ export class AuthController extends Controller {
       throw new IncorrectPasswordError()
     }
 
-    const token = await generateToken(user.id)
+    const token = await generateToken({ userId: user.id, roles: [user.role] })
     const responseData = {
       message: 'Logged in Successfully!',
       token,

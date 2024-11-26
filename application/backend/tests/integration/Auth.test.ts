@@ -13,6 +13,7 @@ import {
   StateTerritory,
 } from 'common/types/api/users/ParticipantProfile'
 import { GetAllOrganisationsResponse } from 'common/types/api/organisations'
+import { Role } from '@prisma/client'
 
 const api = new Api()
 const app = api.app
@@ -23,7 +24,7 @@ describe('Auth', () => {
     lastName: 'User',
     email: 'test@user.com',
     password: 'Password123',
-    role: 'test',
+    role: Role.OrganisationAdmin,
   }
 
   beforeAll(async () => {
@@ -127,15 +128,11 @@ describe('Auth', () => {
 
     // Add token to protected route request
     const protectedRouteResponse2 = await request(app)
-      .get('/organisations')
+      .get('/profiles/current')
       .set({ Authorization: `Bearer ${participantBody.token}` })
 
     const getAllOrganisationsBody2: GetAllOrganisationsResponse = protectedRouteResponse2.body
     expect(protectedRouteResponse2.status).toEqual(200)
-    expect(getAllOrganisationsBody2.message).toEqual('Got all organisations')
-  })
-
-  it('should return a 401 unauthorized error when accessing protected routes with without the correct role', async () => {
-    // TODO: Implement roles check and test here
+    expect(getAllOrganisationsBody2.message).toMatch(/Got Participant Profile with userId: \d+/)
   })
 })

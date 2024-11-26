@@ -18,7 +18,7 @@ model User {
   lastName      String
   email         String              @unique
   password      String
-  role          String
+  role          Role                @default(Participant)
   organisations Organisation[]
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
@@ -30,6 +30,12 @@ enum ParticipantType {
   GUARDIAN
   DEPENDENT_AGE
   DEPENDENT_OTHER
+}
+
+enum Role {
+  OperatorAdmin
+  Participant
+  OrganisationAdmin
 }
 
 model ParticipantProfile {

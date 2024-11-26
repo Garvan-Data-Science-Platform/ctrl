@@ -5,6 +5,7 @@ import type { CreateUserRequest, CreateUserResponse } from './createUser'
 import type { UpdateUserRequest, UpdateUserResponse } from './updateUser'
 import type { UpdateProfileRequest, UpdateProfileResponse } from './updateProfile'
 import type { DeleteUserResponse } from './deleteUser'
+import type { UpdateUserRoleRequest, UpdateUserRoleResponse } from './updateUserRole'
 
 export {
   GetUserByIdResponse,
@@ -17,4 +18,6 @@ export {
   DeleteUserResponse,
   UpdateProfileRequest,
   UpdateProfileResponse,
+  UpdateUserRoleRequest,
+  UpdateUserRoleResponse,
 }

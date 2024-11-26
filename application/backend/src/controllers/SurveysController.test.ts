@@ -18,9 +18,9 @@ let token: string, tokenNoAnswers: string, tokenNoProfile: string
 
 describe('SurveysController', () => {
   beforeAll(async () => {
-    token = await generateToken(99)
-    tokenNoAnswers = await generateToken(98)
-    tokenNoProfile = await generateToken(97)
+    token = await generateToken({ userId: 99, roles: ['OrganisationAdmin'] })
+    tokenNoAnswers = await generateToken({ userId: 98, roles: ['OrganisationAdmin'] })
+    tokenNoProfile = await generateToken({ userId: 97, roles: ['OrganisationAdmin'] })
     api.run()
   })
 

@@ -28,7 +28,6 @@ import {
 
 @Route('profiles')
 @Tags('Profiles')
-@Security('jwt')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 export class ProfilesController extends Controller {
@@ -41,6 +40,7 @@ export class ProfilesController extends Controller {
    */
   @Get('/current')
   @SuccessResponse('200', 'OK')
+  @Security('jwt')
   public async getParticipantProfileByToken(
     @Request() request: express.Request,
   ): Promise<GetParticipantProfileResponse> {
@@ -68,6 +68,7 @@ export class ProfilesController extends Controller {
   @Get('/{userId}')
   @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
+  @Security('jwt')
   public async getParticipantProfileByID(
     @Path() userId: number,
   ): Promise<GetParticipantProfileResponse> {

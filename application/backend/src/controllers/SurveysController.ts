@@ -37,7 +37,6 @@ import SurveyResponses from 'common/example_responses/getResponsesById.json'
 
 @Route('surveys')
 @Tags('Surveys')
-@Security('jwt')
 export class SurveysController extends Controller {
   surveyRepo = prisma.surveyVersion
   spRepo = prisma.surveyParticipant
@@ -52,6 +51,7 @@ export class SurveysController extends Controller {
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
   @Response('401', 'Unauthorized')
+  @Security('jwt', ['OrganisationAdmin'])
   public async getAllSurveys(): Promise<GetSurveyVersionsResponse> {
     const surveys: SurveyVersionPrisma[] = await this.surveyRepo.findMany({
       orderBy: [{ id: 'desc' }],
@@ -77,6 +77,7 @@ export class SurveysController extends Controller {
   @Response('500', 'Internal Server Error')
   @Response('404', 'Not Found')
   @Response('401', 'Unauthorized')
+  @Security('jwt')
   public async getSurveyVersionById(
     @Path() surveyID: number,
   ): Promise<GetSurveyVersionByIdResponse> {
@@ -100,12 +101,12 @@ export class SurveysController extends Controller {
    *
    * @summary Add participant to survey
    */
-
   @Post('/participant/{surveyId}')
   @SuccessResponse('200', 'OK')
   @Response('500', 'Internal Server Error')
   @Response('404', 'Not Found')
   @Response('401', 'Unauthorized')
+  @Security('jwt', ['OrganisationAdmin'])
   public async addParticipant(
     @Request() request: any,
     @Path() surveyId: number,
@@ -147,6 +148,7 @@ export class SurveysController extends Controller {
   @Response('500', 'Internal Server Error')
   @Response('404', 'Not Found')
   @Response('401', 'Unauthorized')
+  @Security('jwt')
   public async getUserSurveyStep(
     @Request() request: any,
     @Path() study: number,
@@ -205,6 +207,7 @@ export class SurveysController extends Controller {
   @Response('500', 'Internal Server Error')
   @Response('404', 'Not Found')
   @Response('401', 'Unauthorized')
+  @Security('jwt')
   public async updateSurveyAnswers(
     @Request() request: any,
     @Body() body: UpdateSurveyAnswersRequest,
@@ -276,6 +279,7 @@ export class SurveysController extends Controller {
   @Response('500', 'Internal Server Error')
   @Response('404', 'Not Found')
   @Response('401', 'Unauthorized')
+  @Security('jwt', ['OrganisationAdmin'])
   public async updateSurvey(
     @Path() surveyId: number,
     @Body() bodyRequest: UpdateSurveyRequest,
@@ -307,6 +311,7 @@ export class SurveysController extends Controller {
   @Response('500', 'Internal Server Error')
   @Response('404', 'Not Found')
   @Response('401', 'Unauthorized')
+  @Security('jwt', ['OrganisationAdmin'])
   public async publishSurvey(@Path() surveyId: number): Promise<UpdateSurveyResponse> {
     const survey = await this.surveyRepo.findUniqueOrThrow({ where: { id: surveyId } })
 

@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Role } from '@prisma/client'
 import '../../backend/src/jsontypes'
 import ExampleSurveyStepData from 'common/src/surveys/exampleSurveyStepData.json'
 import { SurveyStep } from 'common/types/survey'
@@ -12,15 +12,27 @@ export async function seedTests(prisma: PrismaClient) {
   })
   await prisma.study.create({ data: { id: 1 } })
 
-  //User in Test Organisation with no profile
+  // OperatorAdminUser
+  await prisma.user.create({
+    data: {
+      id: 96,
+      email: 'operatoradmin@example.com',
+      firstName: 'Operator',
+      lastName: 'Admin',
+      password: 'password',
+      role: Role.OperatorAdmin,
+    },
+  })
+
+  //OrganisationAdminUser
   await prisma.user.create({
     data: {
       id: 97,
       email: 'test1@example.com',
-      firstName: 'Test',
-      lastName: 'User',
+      firstName: 'Organisation',
+      lastName: 'Admin',
       password: 'password',
-      role: 'participant',
+      role: Role.OrganisationAdmin,
       organisations: {
         connect: {
           id: 99,
@@ -28,6 +40,7 @@ export async function seedTests(prisma: PrismaClient) {
       },
     },
   })
+
   //User with unanswered survey
   await prisma.user.create({
     data: {
@@ -36,7 +49,7 @@ export async function seedTests(prisma: PrismaClient) {
       firstName: 'Test',
       lastName: 'User',
       password: 'password',
-      role: 'participant',
+      role: Role.Participant,
       organisations: {
         create: {
           name: 'Another Organisation',
@@ -52,7 +65,7 @@ export async function seedTests(prisma: PrismaClient) {
       firstName: 'Test',
       lastName: 'User',
       password: 'password',
-      role: 'participant',
+      role: Role.Participant,
     },
   })
   await prisma.participantProfile.create({

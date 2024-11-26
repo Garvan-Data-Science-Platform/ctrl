@@ -12,8 +12,14 @@ describe('ProfilesController', () => {
   const registeredUserId: number = 97
   const registeredParticipantUserId: number = 99
   beforeAll(async () => {
-    registeredUserToken = await generateToken(registeredUserId)
-    registeredParticipantToken = await generateToken(registeredParticipantUserId)
+    registeredUserToken = await generateToken({
+      userId: registeredUserId,
+      roles: ['OrganisationAdmin'],
+    })
+    registeredParticipantToken = await generateToken({
+      userId: registeredParticipantUserId,
+      roles: ['Participant'],
+    })
     api.run()
   })
 
