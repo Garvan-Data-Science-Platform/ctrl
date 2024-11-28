@@ -1,4 +1,4 @@
-import { Add, AddCircle } from '@mui/icons-material'
+import { Add, AddCircle, Settings } from '@mui/icons-material'
 import {
   Box,
   Button,
@@ -13,6 +13,8 @@ import {
   ListItemIcon,
   ListItemText,
   ListSubheader,
+  Menu,
+  MenuItem,
   TextField,
 } from '@mui/material'
 import { SurveyElementType } from '@common/types/survey'
@@ -33,6 +35,8 @@ export const SurveyEditor = () => {
     addElement,
     deleteElement,
     moveElement,
+    moveStep,
+    deleteStep,
     addChoice,
     deleteChoice,
     updateChoice,
@@ -44,6 +48,15 @@ export const SurveyEditor = () => {
   const [publishDialogOpen, setPublishDialogOpen] = useState(false)
   const [justLoaded, setJustLoaded] = useState(true)
   const [timeoutObject, setTimeoutObject] = useState()
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const optionsOpen = Boolean(anchorEl)
+  const handleOptionsClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget)
+  }
+  const handleOptionsClose = () => {
+    setAnchorEl(null)
+  }
 
   const { list } = useNavigation()
 
@@ -146,7 +159,7 @@ export const SurveyEditor = () => {
       {surveyData.length > 0 ? (
         <DndProvider backend={HTML5Backend}>
           <Box sx={{ flexGrow: 1, ml: 3 }}>
-            <Box sx={{ mb: 3, display: 'flex', flexDirection: 'row' }}>
+            <Box sx={{ mb: 3, display: 'flex', flexDirection: 'row', gap: 1 }}>
               <Button
                 variant="outlined"
                 disabled={savePending || disabled}
@@ -154,6 +167,46 @@ export const SurveyEditor = () => {
               >
                 Publish
               </Button>
+              <Button variant="outlined" onClick={handleOptionsClick}>
+                <Settings />
+              </Button>
+              <Menu
+                id="basic-menu"
+                anchorEl={anchorEl}
+                open={optionsOpen}
+                onClose={handleOptionsClose}
+              >
+                <MenuItem
+                  disabled={activeStep == 0}
+                  onClick={() => {
+                    moveStep(activeStep, 'up')
+                    setActiveStep(activeStep - 1)
+                    handleOptionsClose()
+                  }}
+                >
+                  Move survey step up
+                </MenuItem>
+                <MenuItem
+                  disabled={activeStep == surveyData.length - 1}
+                  onClick={() => {
+                    moveStep(activeStep, 'down')
+                    setActiveStep(activeStep + 1)
+                    handleOptionsClose()
+                  }}
+                >
+                  Move survey step down
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    const to_del = activeStep
+                    setActiveStep(Math.max(0, activeStep - 1))
+                    deleteStep(to_del)
+                    handleOptionsClose()
+                  }}
+                >
+                  Delete survey step
+                </MenuItem>
+              </Menu>
             </Box>
             <Dialog open={publishDialogOpen} onClose={() => setPublishDialogOpen(false)}>
               <DialogTitle>Publish new version</DialogTitle>
