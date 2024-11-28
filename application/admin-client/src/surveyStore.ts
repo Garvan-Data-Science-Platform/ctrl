@@ -9,6 +9,8 @@ interface SurveyState {
   addElement: (type: SurveyElementType, step: number) => void
   deleteElement: (step: number, index: number) => void
   moveElement: (step: number, index: number, destination: number) => void
+  moveStep: (index: number, direction: 'up' | 'down') => void
+  deleteStep: (index: number) => void
   addChoice: (step: number, element: number) => void
   deleteChoice: (step: number, element: number, choice: number) => void
   updateChoice: (step: number, element: number, choice: number, value: string) => void
@@ -56,6 +58,12 @@ export const useSurveyStore = create<SurveyState>((set) => ({
         state.data[step].elements.splice(index, 1)
       }),
     ),
+  deleteStep: (index: number) =>
+    set(
+      produce((state) => {
+        state.data.splice(index, 1)
+      }),
+    ),
   moveElement: (step: number, index: number, destination: number) =>
     set(
       produce((state) => {
@@ -68,6 +76,21 @@ export const useSurveyStore = create<SurveyState>((set) => ({
           const a = state.data[step].elements[index]
           state.data[step].elements[index] = state.data[step].elements[destination]
           state.data[step].elements[destination] = a
+        }
+      }),
+    ),
+  moveStep: (index: number, direction: 'up' | 'down') =>
+    set(
+      produce((state) => {
+        if (direction == 'up' && index >= 0) {
+          const a = state.data[index]
+          state.data[index] = state.data[index - 1]
+          state.data[index - 1] = a
+        }
+        if (direction == 'down') {
+          const a = state.data[index]
+          state.data[index] = state.data[index + 1]
+          state.data[index + 1] = a
         }
       }),
     ),
