@@ -12,6 +12,7 @@ export const authProvider: AuthProvider = {
         body: JSON.stringify({ email, password }),
         headers: { 'Content-Type': 'application/json' },
       })
+
       if (res.ok) {
         const data = await res.json()
         localStorage.setItem(TOKEN_KEY, data.token)
