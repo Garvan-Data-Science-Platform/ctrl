@@ -152,6 +152,7 @@ export class SurveysController extends Controller {
   @Security('jwt')
   public async getUserSurveySteps(
     @Request() request: any,
+    //eslint-disable-next-line
     @Path() study: number,
   ): Promise<GetUserSurveyStepsResponse> {
     const profile = await this.profileRepo.findFirstOrThrow({

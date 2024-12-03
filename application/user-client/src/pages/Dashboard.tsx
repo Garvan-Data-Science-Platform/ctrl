@@ -10,7 +10,6 @@ import {
   Typography,
 } from '@mui/material'
 import NavBar from '../components/NavBar'
-import surveySteps from '@common/example_responses/getUserSurveySteps.json'
 import type { GetUserSurveyStepsResponse } from '@common/types/api/surveys'
 import { useQuery } from '@tanstack/react-query'
 import CheckCircle from '@mui/icons-material/CheckCircle'

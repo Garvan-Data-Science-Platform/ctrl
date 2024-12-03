@@ -25,7 +25,6 @@ import { Info } from '@mui/icons-material'
 
 import { useEffect, useState } from 'react'
 import { SurveyElement } from '@common/types/survey'
-import { useAuth } from '../auth'
 import { extractSurveyStepAnswers } from '@common/src/surveys/extractSurveyStepAnswers'
 
 export default function ConsentForm() {
@@ -38,16 +37,11 @@ export default function ConsentForm() {
   const [modalOpen, setModalOpen] = useState(false)
   const [modalAction, setModalAction] = useState<'save' | 'next'>('save')
 
-  const { token } = useAuth()
-
   const { isPending, data } = useQuery({
     queryKey: ['form_step', currentStep],
-    //queryFn: () => fetch('/api/user/profile').then((res) => res.json()) as Promise<UserProfile>,
     queryFn: async () => {
       try {
-        const surveyStep = await apiClient.get(`/surveys/step/1/${currentStep}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+        const surveyStep = await apiClient.get(`/surveys/step/1/${currentStep}`)
         return surveyStep.data.data as GetUserSurveyStepResponse['data']
         // eslint-disable-next-line
       } catch (error: any) {
@@ -68,14 +62,10 @@ export default function ConsentForm() {
       }
     }
     try {
-      await apiClient.post(
-        `/surveys/answers`,
-        {
-          step: currentStep,
-          data: extractSurveyStepAnswers(formState),
-        },
-        { headers: { Authorization: `Bearer ${token}` } },
-      )
+      await apiClient.post(`/surveys/answers`, {
+        step: currentStep,
+        data: extractSurveyStepAnswers(formState),
+      })
       if (action == 'next') {
         nav('/consent_form/' + String(currentStep + 1))
       } else {

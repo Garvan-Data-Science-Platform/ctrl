@@ -3,16 +3,11 @@ import Grid from '@mui/material/Grid2'
 import NavBar from '../components/NavBar'
 import { useQuery } from '@tanstack/react-query'
 import type { GetParticipantProfileResponse } from '@common/types/api/users'
-import ProfileData from '@common/example_responses/getUserProfile.json'
 import { Link } from 'react-router-dom'
 import { apiClient } from '../apiClient'
 
 export default function Profile() {
-  const {
-    data: pdata,
-    isPending,
-    error,
-  } = useQuery({
+  const { data: pdata, error } = useQuery({
     queryKey: ['profile', 'get'],
     queryFn: () =>
       apiClient
