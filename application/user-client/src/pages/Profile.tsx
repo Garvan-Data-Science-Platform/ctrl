@@ -5,15 +5,23 @@ import { useQuery } from '@tanstack/react-query'
 import type { GetParticipantProfileResponse } from '@common/types/api/users'
 import ProfileData from '@common/example_responses/getUserProfile.json'
 import { Link } from 'react-router-dom'
+import { apiClient } from '../apiClient'
 
 export default function Profile() {
-  const { isPending, error, data } = useQuery({
+  const {
+    data: pdata,
+    isPending,
+    error,
+  } = useQuery({
     queryKey: ['profile', 'get'],
-    //queryFn: () => fetch('/api/user/profile').then((res) => res.json()) as Promise<UserProfile>,
-    queryFn: () => (ProfileData as GetParticipantProfileResponse).data,
+    queryFn: () =>
+      apiClient
+        .get('/profiles/current')
+        .then((res) => res.data) as Promise<GetParticipantProfileResponse>,
   })
+  const data = pdata?.data
 
-  if (isPending) return 'Loading'
+  if (!data) return 'Loading'
 
   if (error) return <Typography>Error loading user profile: {error.message}</Typography>
 
@@ -66,7 +74,7 @@ export default function Profile() {
                       </Typography>
                     </td>
                     <td>
-                      <Typography>{data.dob}</Typography>
+                      <Typography>{new Date(data.dob).toLocaleDateString()}</Typography>
                     </td>
                   </tr>
                 </tbody>

@@ -7,6 +7,7 @@ import { generateToken } from '../authentication'
 import {
   GetSurveyVersionsResponse,
   GetUserSurveyStepResponse,
+  GetUserSurveyStepsResponse,
   UpdateSurveyAnswersRequest,
   UpdateSurveyRequest,
 } from 'common/types/api/surveys'
@@ -89,6 +90,20 @@ describe('SurveysController', () => {
         .get('/surveys/step/1/2')
         .set({ Authorization: `Bearer ${tokenNoProfile}` })
       expect(response.status).toBe(404)
+    })
+  })
+
+  describe('GET /surveys/steps/:study', () => {
+    it('should get a list of survey steps with state and last updated date for current user', async () => {
+      const response = await request(app)
+        .get('/surveys/steps/1')
+        .set({ Authorization: `Bearer ${token}` })
+      const body: GetUserSurveyStepsResponse = response.body
+      expect(response.status).toBe(200)
+      expect(body.data[0].status).toBe('viewed')
+      expect(body.data[0].last_updated).toBeUndefined()
+      expect(body.data[1].last_updated).toBe('2024-12-02T23:45:27.815Z')
+      expect(body.data[1].title).toBe('Step 2')
     })
   })
 

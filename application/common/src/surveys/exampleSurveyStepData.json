@@ -1,7 +1,7 @@
 [
   { "title": "", "text": "", "elements": [{ "type": "video", "link": "www.google.com" }] },
   {
-    "title": "",
+    "title": "Step 2",
     "text": "",
     "elements": [
       { "type": "question-checkbox", "data": { "text": "Question 1", "value": true } },

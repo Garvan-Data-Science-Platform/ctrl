@@ -36,6 +36,7 @@ export default function ConsentForm() {
 
   const [formState, setFormState] = useState<SurveyElement[]>([])
   const [modalOpen, setModalOpen] = useState(false)
+  const [modalAction, setModalAction] = useState<'save' | 'next'>('save')
 
   const { token } = useAuth()
 
@@ -58,15 +59,14 @@ export default function ConsentForm() {
     placeholderData: keepPreviousData,
   })
 
-  const handleNext = async () => {
+  const saveForm = async (action: 'save' | 'next', isModal?: boolean) => {
     for (const i in data?.elements || []) {
-      if (data?.elements[i].data.required && !data?.elements[i].data.value) {
+      if (!isModal && data?.elements[i].data.required && !data?.elements[i].data.value) {
         setModalOpen(true)
+        setModalAction(action)
         return
       }
     }
-    console.log('FORMSTATE', formState)
-    console.log('ANSWERS', extractSurveyStepAnswers(formState))
     try {
       await apiClient.post(
         `/surveys/answers`,
@@ -76,15 +76,24 @@ export default function ConsentForm() {
         },
         { headers: { Authorization: `Bearer ${token}` } },
       )
-      nav('/consent_form/' + String(currentStep + 1))
+      if (action == 'next') {
+        nav('/consent_form/' + String(currentStep + 1))
+      } else {
+        nav('/')
+      }
     } catch {
       console.log('ERROR SAVING ANSWERS')
       alert('Error saving answers') //TODO: Show proper alert
     }
   }
+  const handleNext = async () => {
+    await saveForm('next')
+  }
   const handleBack = () => {
-    console.log('SENDING TO SERVER')
     nav('/consent_form/' + String(currentStep - 1))
+  }
+  const handleSave = async () => {
+    await saveForm('save')
   }
 
   useEffect(() => {
@@ -194,7 +203,7 @@ export default function ConsentForm() {
             sx={{ mt: 3 }}
           >{`If you choose "Proceed", an Australian Genomics Genetic Counsellor will contact you to talk about your options. It may take 7 days for the study genetic counsellor to contact you.`}</Typography>
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-            <Button sx={{ mr: 1 }} variant="outlined">
+            <Button sx={{ mr: 1 }} variant="outlined" onClick={() => saveForm(modalAction, true)}>
               Proceed
             </Button>
             <Button variant="contained" onClick={() => setModalOpen(false)}>
@@ -240,7 +249,9 @@ export default function ConsentForm() {
                   Back
                 </Button>
               )}
-              <Button variant="contained">Save and Exit</Button>
+              <Button variant="contained" onClick={handleSave}>
+                Save and Exit
+              </Button>
               {currentStep + 1 == data?.total_steps ? (
                 <Box width={70} />
               ) : (
