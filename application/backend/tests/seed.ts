@@ -131,7 +131,11 @@ export async function seedTests(prisma: PrismaClient) {
       profileId: 99,
       answers: [
         { status: 'viewed', answers: [] },
-        { status: 'completed', answers: [false, 'Choice 2'] },
+        {
+          status: 'completed',
+          answers: [false, 'Choice 2'],
+          last_updated: '2024-12-02T23:45:27.815Z',
+        },
       ],
     },
   })

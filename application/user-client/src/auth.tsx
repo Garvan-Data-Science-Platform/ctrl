@@ -5,21 +5,22 @@ const AuthContext = createContext({
   isAuthenticated: true,
   login: (_: string) => {}, // eslint-disable-line
   logout: () => {},
-  token: null as string | null,
 })
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [token, setToken] = useState<string | null>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('access_token'))
+
   const login = (userToken: string) => {
-    setToken(userToken)
+    localStorage.setItem('access_token', userToken)
+    setIsAuthenticated(true)
   }
   const logout = () => {
-    setToken(null)
+    localStorage.removeItem('access_token')
+    setIsAuthenticated(false)
   }
 
-  const isAuthenticated = !!token
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, token }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
       {children}
     </AuthContext.Provider>
   )

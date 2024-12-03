@@ -20,6 +20,7 @@ import type {
   GetResponsesByIdResponse,
   GetSurveyVersionsResponse,
   GetUserSurveyStepResponse,
+  GetUserSurveyStepsResponse,
   UpdateSurveyAnswersRequest,
   UpdateSurveyAnswersResponse,
   UpdateSurveyRequest,
@@ -136,6 +137,47 @@ export class SurveysController extends Controller {
     }
     logger.info({ ...responseData })
     return responseData
+  }
+
+  /**
+   * Get user survey steps
+   *
+   * @summary Get survey steps for current user
+   */
+  @Get('/steps/:study')
+  @SuccessResponse('200', 'OK')
+  @Response('500', 'Internal Server Error')
+  @Response('404', 'Not Found')
+  @Response('401', 'Unauthorized')
+  @Security('jwt')
+  public async getUserSurveySteps(
+    @Request() request: any,
+    //eslint-disable-next-line
+    @Path() study: number,
+  ): Promise<GetUserSurveyStepsResponse> {
+    const profile = await this.profileRepo.findFirstOrThrow({
+      where: { userId: request.user.userId },
+    })
+
+    const surveyParticipant = await this.spRepo.findFirstOrThrow({
+      where: { profileId: profile.id },
+      orderBy: { versionId: 'desc' },
+    })
+
+    const surveyVersionId = surveyParticipant.versionId
+
+    const survey = await this.surveyRepo.findUniqueOrThrow({ where: { id: surveyVersionId } })
+
+    const responseData: GetUserSurveyStepsResponse['data'] = survey.data.map((val, idx) => {
+      return {
+        status: surveyParticipant.answers[idx].status,
+        last_updated: surveyParticipant.answers[idx].last_updated,
+        title: val.title,
+        tooltip: val.text,
+      }
+    })
+
+    return { data: responseData }
   }
 
   /**
@@ -256,6 +298,7 @@ export class SurveysController extends Controller {
 
     answers[step].status = status
     answers[step].answers = data
+    answers[step].last_updated = new Date().toISOString()
 
     const responseData = {
       message: 'Updated Answers',

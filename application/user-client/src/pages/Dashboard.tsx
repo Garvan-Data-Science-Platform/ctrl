@@ -10,27 +10,30 @@ import {
   Typography,
 } from '@mui/material'
 import NavBar from '../components/NavBar'
-import surveySteps from '@common/example_responses/getUserSurveySteps.json'
 import type { GetUserSurveyStepsResponse } from '@common/types/api/surveys'
 import { useQuery } from '@tanstack/react-query'
 import CheckCircle from '@mui/icons-material/CheckCircle'
 import InfoOutlined from '@mui/icons-material/InfoOutlined'
 import Circle from '@mui/icons-material/Circle'
 import { Link } from 'react-router-dom'
-import ProfileData from '@common/example_responses/getUserProfile.json'
 import { GetParticipantProfileResponse } from '@common/types/api/users'
+import { apiClient } from '../apiClient'
 
 export default function Dashboard() {
   const { isPending, error, data } = useQuery({
     queryKey: ['consent_forms'],
-    //queryFn: () => fetch('/api/user/profile').then((res) => res.json()) as Promise<UserProfile>,
-    queryFn: () => surveySteps as GetUserSurveyStepsResponse,
+    queryFn: () =>
+      apiClient
+        .get('/surveys/steps/1')
+        .then((res) => res.data) as Promise<GetUserSurveyStepsResponse>,
   })
 
   const { data: pdata } = useQuery({
     queryKey: ['profile', 'get'],
-    //queryFn: () => fetch('/api/user/profile').then((res) => res.json()) as Promise<UserProfile>,
-    queryFn: () => (ProfileData as GetParticipantProfileResponse).data,
+    queryFn: () =>
+      apiClient
+        .get('/profiles/current')
+        .then((res) => res.data) as Promise<GetParticipantProfileResponse>,
   })
 
   const renderReviewStatus = (status: 'completed' | 'viewed' | 'review_required') => {
@@ -78,7 +81,7 @@ export default function Dashboard() {
       <NavBar />
       <Container maxWidth="md">
         <Typography variant="h3" textAlign="left" sx={{ mt: 3, mb: 3 }}>
-          Welcome {pdata?.firstName}
+          Welcome {pdata?.data?.firstName}
         </Typography>
         {data?.data.map((val, idx) => (
           <Card

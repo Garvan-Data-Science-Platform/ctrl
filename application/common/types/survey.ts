@@ -64,4 +64,5 @@ export type SurveyStepAnswerArray = (string | boolean | undefined)[]
 export interface UserSurveyStepState {
   status: SurveyStepStatus
   answers: SurveyStepAnswerArray
+  last_updated?: string
 }

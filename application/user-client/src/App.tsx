@@ -1,17 +1,15 @@
 import './App.css'
 import { ThemeProvider } from '@mui/material'
 import customTheme from './theme'
-import { blue, red } from '@mui/material/colors'
+import { blue } from '@mui/material/colors'
 
 import { RouterProvider } from 'react-router-dom'
 import router from './router.tsx'
 import { AuthProvider } from './auth'
-import { useAppStore } from './store.ts'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 function App() {
-  const bears = useAppStore((state) => state.bears)
-  const theme = customTheme({ primary: bears >= 3 ? red : blue, secondary: blue })
+  const theme = customTheme({ primary: blue, secondary: blue })
   const queryClient = new QueryClient()
 
   return (
