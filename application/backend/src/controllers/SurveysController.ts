@@ -168,8 +168,6 @@ export class SurveysController extends Controller {
 
     const survey = await this.surveyRepo.findUniqueOrThrow({ where: { id: surveyVersionId } })
 
-    surveyParticipant.answers[0].status
-
     const responseData: GetUserSurveyStepsResponse['data'] = survey.data.map((val, idx) => {
       return {
         status: surveyParticipant.answers[idx].status,
