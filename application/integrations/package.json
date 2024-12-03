@@ -1,0 +1,19 @@
+{
+  "name": "integrations",
+  "packageManager": "yarn@4.0.2",
+  "main": "./src/index.ts",
+  "common": "./src/index.ts",
+  "scripts": {
+    "type-check": "tsc",
+    "build": "true",
+    "dev": "true",
+    "test": "jest"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "typescript": "^5.7.2"
+  }
+}
