@@ -6,6 +6,7 @@ jobs:
   build-checks:
     name: build checks
     runs-on: ubuntu-latest
+    environment: test
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
