@@ -12,6 +12,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Enable Corepack
         run: corepack enable
+      - name: Copy Test Dot Env
+        run: cp /application/backend/.env.test /application/backend/.env
       - name: Setup Nodejs and npm
         uses: actions/setup-node@v4
         with:
