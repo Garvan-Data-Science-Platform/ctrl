@@ -6,13 +6,12 @@ jobs:
   build-checks:
     name: build checks
     runs-on: ubuntu-latest
-    environment: test
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
       - name: Enable Corepack
         run: corepack enable
-      - name: Copy Test Dot Env
+      - name: Configure Environment
         run: cp ./application/backend/.env.test ./application/backend/.env
       - name: Setup Nodejs and npm
         uses: actions/setup-node@v4
