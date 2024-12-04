@@ -1,13 +1,13 @@
 export interface Participant {
   id: number
-  email: string
+  email?: string
   firstName: string
   lastName: string
-  answers: ParticipantAnswer[]
-  lastUpdated: string
+  answers: ParticipantAnswerStatus[]
+  lastUpdated?: string
 }
 
-export interface ParticipantAnswer {
+export interface ParticipantAnswerStatus {
   surveyVersion: number
   participantId: number
   status: 'complete' | 'partially_complete' | 'incomplete'

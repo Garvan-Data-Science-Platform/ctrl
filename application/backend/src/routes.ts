@@ -375,7 +375,7 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "ParticipantAnswer": {
+    "ParticipantAnswerStatus": {
         "dataType": "refObject",
         "properties": {
             "surveyVersion": {"dataType":"double","required":true},
@@ -389,10 +389,10 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "id": {"dataType":"double","required":true},
-            "email": {"dataType":"string","required":true},
+            "email": {"dataType":"string"},
             "firstName": {"dataType":"string","required":true},
             "lastName": {"dataType":"string","required":true},
-            "answers": {"dataType":"array","array":{"dataType":"refObject","ref":"ParticipantAnswer"},"required":true},
+            "answers": {"dataType":"array","array":{"dataType":"refObject","ref":"ParticipantAnswerStatus"},"required":true},
             "lastUpdated": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
@@ -402,14 +402,6 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "data": {"dataType":"array","array":{"dataType":"refObject","ref":"Participant"},"required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "GetParticipantByIdResponse": {
-        "dataType": "refObject",
-        "properties": {
-            "data": {"ref":"Participant","required":true},
         },
         "additionalProperties": false,
     },
@@ -959,6 +951,7 @@ export function RegisterRoutes(app: Router) {
 
             async function SurveysController_getResponsesById(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    participantId: {"in":"path","name":"participantId","required":true,"dataType":"double"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -1158,37 +1151,6 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'getParticipants',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: 200,
-              });
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.get('/participants/:participantId',
-            authenticateMiddleware([{"jwt":[]}]),
-            ...(fetchMiddlewares<RequestHandler>(ParticipantsController)),
-            ...(fetchMiddlewares<RequestHandler>(ParticipantsController.prototype.getParticipantById)),
-
-            async function ParticipantsController_getParticipantById(request: ExRequest, response: ExResponse, next: any) {
-            const args: Record<string, TsoaRoute.ParameterSchema> = {
-                    participantId: {"in":"path","name":"participantId","required":true,"dataType":"double"},
-            };
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args, request, response });
-
-                const controller = new ParticipantsController();
-
-              await templateService.apiHandler({
-                methodName: 'getParticipantById',
                 controller,
                 response,
                 next,

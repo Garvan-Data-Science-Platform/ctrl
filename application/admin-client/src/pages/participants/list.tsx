@@ -1,4 +1,4 @@
-import { ParticipantAnswer } from '@common/types/api/participants/participant'
+import { ParticipantAnswerStatus } from '@common/types/api/participants/participant'
 import { Box, Button, Tooltip } from '@mui/material'
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import { DateField, List, ShowButton, useDataGrid } from '@refinedev/mui'
@@ -14,7 +14,7 @@ export const ParticipantList = () => {
     resource: 'invites',
   })
 
-  const renderAnswers = (answers: ParticipantAnswer[]) => {
+  const renderAnswers = (answers: ParticipantAnswerStatus[]) => {
     const filled = answers.filter((val) => val.status == 'complete')
 
     if (filled && filled[filled.length - 1] == answers[answers.length - 1]) {

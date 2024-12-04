@@ -34,7 +34,6 @@ import { GetSurveyVersionByIdResponse } from 'common/types/api/surveys/getSurvey
 import { validateAnswers } from 'common/src/surveys/validateSurveyAnswers'
 import { createDefaultAnswers } from 'common/src/surveys/createDefaultAnswers'
 import { populateSurveyStepAnswers } from 'common/src/surveys/populateSurveyStepAnswers'
-import SurveyResponses from 'common/example_responses/getResponsesById.json'
 
 @Route('surveys')
 @Tags('Surveys')
@@ -233,10 +232,24 @@ export class SurveysController extends Controller {
   @Response('500', 'Internal Server Error')
   @Response('404', 'Not Found')
   @Response('401', 'Unauthorized')
-  public async getResponsesById() //@Request() request: any,
-  //@Path() participantId: number,
-  : Promise<GetResponsesByIdResponse> {
-    return SurveyResponses as GetResponsesByIdResponse
+  public async getResponsesById(@Path() participantId: number): Promise<GetResponsesByIdResponse> {
+    const surveyParticipant = await this.spRepo.findUniqueOrThrow({
+      where: { id: participantId },
+    })
+
+    const survey = await this.surveyRepo.findUniqueOrThrow({
+      where: { id: surveyParticipant.versionId },
+    })
+
+    const currentAnswers = surveyParticipant.answers
+
+    const stepData = survey.data
+
+    for (const step in stepData) {
+      stepData[step] = populateSurveyStepAnswers(stepData[step], currentAnswers[step].answers)
+    }
+
+    return { data: stepData }
   }
 
   /**
