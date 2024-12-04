@@ -11,7 +11,7 @@ import {
 } from 'tsoa'
 import { getUserIdFromToken } from '../authentication'
 import { InternalErrorResponse, UnauthorizedErrorResponse } from 'common/types/api/errors'
-import { type ContactUsRequest } from 'common/types/api/mailer'
+import { ContactUsResponse, type ContactUsRequest } from 'common/types/api/mailer'
 import nodemailer from 'nodemailer'
 import logger from 'common/src/logger'
 import * as express from 'express'
@@ -25,6 +25,7 @@ import { NoTokenError } from '../middlewares/ErrorHandler'
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 export class MailerController extends Controller {
   userRepo = prisma.user
+
   /**
    * Sends a contact us email to the admin and users account.
    *
@@ -35,7 +36,7 @@ export class MailerController extends Controller {
   public async contactUs(
     @Body() bodyRequest: ContactUsRequest,
     @Request() request: express.Request,
-  ): Promise<void> {
+  ): Promise<ContactUsResponse> {
     // Get user details
     const token = request.headers.authorization?.split(' ')[1]
 
@@ -53,59 +54,54 @@ export class MailerController extends Controller {
       },
     })
 
-    let mailConfig
-    if (process.env.NODE_ENV === 'production') {
-      // all emails are delivered to destination
-      mailConfig = {
-        host: process.env.MAILER_HOST || 'smtp.gmail.com',
-        port: process.env.MAILER_PORT || 465,
-        auth: {
-          user: process.env.MAILER_USERNAME,
-          pass: process.env.MAILER_PASSWORD,
-        },
-      }
-    } else {
-      // all emails are catched by ethereal.email
-      mailConfig = {
-        host: 'smtp.ethereal.email',
-        port: 587,
-        auth: {
-          user: 'ethereal.user@ethereal.email',
-          pass: 'verysecret',
-        },
-      }
+    if (!user) {
+      throw new Error('User not found')
     }
-    const transporter = nodemailer.createTransport(mailConfig)
 
-    // Verify Connection
-    transporter.verify(function (error, success) {
-      if (error) {
-        logger.error('Connection error:', error)
-      } else {
-        logger.info('Mailer service is ready to send messages...', success)
-      }
+    const transporter = nodemailer.createTransport({
+      host: process.env.MAILER_HOST || 'smtp.gmail.com',
+      port: Number(process.env.MAILER_PORT) || 465,
+      auth: {
+        user: process.env.MAILER_USERNAME,
+        pass: process.env.MAILER_PASSWORD,
+      },
     })
 
-    // Send email to admin
-    const mailToAdminOptions = {
-      from: process.env.CTRL_ADMIN_EMAIL,
-      to: process.env.CTRL_ADMIN_EMAIL,
-      subject: `New Contact Us Request RE:${bodyRequest.subject}`,
-      text: bodyRequest.content,
+    try {
+      // Verify Connection
+      await transporter.verify()
+      logger.info('Mailer service is ready to send messages...')
+
+      // Send email to admin
+      const mailToAdminOptions = {
+        from: process.env.MAILER_USERNAME,
+        to: process.env.CTRL_ADMIN_EMAIL,
+        subject: `New Contact Us Request RE:${bodyRequest.subject}`,
+        text: bodyRequest.content,
+      }
+
+      await transporter.sendMail(mailToAdminOptions)
+      logger.info('Email sent to admin', mailToAdminOptions)
+
+      // Send email to user
+      const mailToUserOptions = {
+        from: process.env.MAILER_USERNAME,
+        to: user?.email,
+        subject: `Copy of your message submitted to CTRL Administration Team RE: ${bodyRequest.subject}`,
+        text: bodyRequest.content,
+      }
+
+      await transporter.sendMail(mailToUserOptions)
+      logger.info('Email sent to user', mailToUserOptions)
+    } catch (error) {
+      logger.error('Error sending email:', error)
+      throw new Error('Failed to send email')
+    } finally {
+      transporter.close()
     }
 
-    transporter.sendMail(mailToAdminOptions)
-    logger.info('Email sent to admin', mailToAdminOptions)
-
-    // Send email to user
-    const mailToUserOptions = {
-      from: process.env.CTRL_ADMIN_EMAIL,
-      to: user?.email,
-      subject: `Copy of your message submitted to CTRL Administration Team RE:${bodyRequest.subject}`,
-      text: bodyRequest.content,
-    }
-
-    transporter.sendMail(mailToUserOptions)
-    logger.info('Email sent to user', mailToUserOptions)
+    return {
+      message: 'Contact us request successfully sent to admin team.',
+    } as ContactUsResponse
   }
 }
