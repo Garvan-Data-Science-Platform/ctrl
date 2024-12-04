@@ -36,9 +36,13 @@ describe('MailerController', () => {
         .set({ Authorization: `Bearer ${participantToken}` })
 
       console.log(
+        'var=',
         process.env.MAILER_HOST,
+        'var=',
         process.env.MAILER_PORT,
+        'var=',
         process.env.MAILER_USERNAME,
+        'var=',
         process.env.MAILER_PASSWORD,
       )
       expect(response.status).toBe(200)
