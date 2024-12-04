@@ -1172,19 +1172,23 @@
       },
       "ContactUsRequest": {
         "properties": {
-          "content": {
+          "subject": {
             "type": "string"
           },
-          "subject": {
+          "content": {
             "type": "string"
           }
         },
         "required": [
-          "content",
-          "subject"
+          "subject",
+          "content"
         ],
         "type": "object",
-        "additionalProperties": false
+        "additionalProperties": false,
+        "example": {
+          "subject": "Somethings Wrong!",
+          "content": "There was some problem with this thing that I was doing.\nBut I don't know why?\n\nCheers,\nJohn Doe"
+        }
       },
       "Workspace": {
         "properties": {

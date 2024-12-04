@@ -513,8 +513,8 @@ const models: TsoaRoute.Models = {
     "ContactUsRequest": {
         "dataType": "refObject",
         "properties": {
-            "content": {"dataType":"string","required":true},
             "subject": {"dataType":"string","required":true},
+            "content": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },
