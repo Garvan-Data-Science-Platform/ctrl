@@ -35,6 +35,12 @@ describe('MailerController', () => {
         .send({ subject: 'Test Subject', content: 'Test Content' })
         .set({ Authorization: `Bearer ${participantToken}` })
 
+      console.log(
+        process.env.MAILER_HOST,
+        process.env.MAILER_PORT,
+        process.env.MAILER_USERNAME,
+        process.env.MAILER_PASSWORD,
+      )
       expect(response.status).toBe(200)
       expect(response.body).toEqual({
         message: 'Contact us request successfully sent to admin team.',
