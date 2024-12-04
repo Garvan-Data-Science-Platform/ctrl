@@ -1170,6 +1170,18 @@
         "type": "object",
         "additionalProperties": false
       },
+      "ContactUsResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
       "ContactUsRequest": {
         "properties": {
           "subject": {
@@ -3085,7 +3097,14 @@
         "operationId": "ContactUs",
         "responses": {
           "200": {
-            "description": "Email sent"
+            "description": "Email sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactUsResponse"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized",
