@@ -1,4 +1,3 @@
-
 export class Integrations {
-    // a series of methods for integrations
+  // a series of methods for integrations
 }
