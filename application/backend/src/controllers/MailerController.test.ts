@@ -29,26 +29,40 @@ describe('MailerController', () => {
   })
 
   describe('POST /mailer/contact-us', () => {
-    it('should', async () => {
+    it('should successfully send emails', async () => {
       const response = await request(app)
         .post('/mailer/contact-us')
         .send({ subject: 'Test Subject', content: 'Test Content' })
         .set({ Authorization: `Bearer ${participantToken}` })
 
-      console.log(
-        'var=',
-        process.env.MAILER_HOST,
-        'var=',
-        process.env.MAILER_PORT,
-        'var=',
-        process.env.MAILER_USERNAME,
-        'var=',
-        process.env.MAILER_PASSWORD,
-      )
       expect(response.status).toBe(200)
       expect(response.body).toEqual({
         message: 'Contact us request successfully sent to admin team.',
       })
+    }, 100000)
+
+    it('should throw NoTokenError if no token is provided', async () => {
+      const response = await request(app)
+        .post('/mailer/contact-us')
+        .send({ subject: 'Test Subject', content: 'Test Content' })
+
+      expect(response.status).toBe(401)
+      expect(response.body.message).toBe('No token provided')
+    }, 100000)
+
+    it('should ensure that the user exists before sending email', async () => {
+      const invalidToken = await generateToken({
+        userId: -1, // Non-existent user ID
+        roles: [Role.Participant],
+      })
+
+      const response = await request(app)
+        .post('/mailer/contact-us')
+        .send({ subject: 'Test Subject', content: 'Test Content' })
+        .set({ Authorization: `Bearer ${invalidToken}` })
+
+      expect(response.status).toBe(404)
+      expect(response.body.message).toBe('User not found')
     }, 100000)
   })
 })

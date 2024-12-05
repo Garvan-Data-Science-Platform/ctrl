@@ -19,11 +19,13 @@ export class NoTokenError extends Error {
 }
 
 export class NotFoundError extends Error {
+  message: string
   details: unknown
-  constructor(details?: unknown) {
-    super('Not Found')
+  constructor(message: string, details?: unknown) {
+    super(message)
     this.name = 'NotFoundError'
     this.details = details
+    this.message = message
   }
 }
 
@@ -98,7 +100,7 @@ export function ErrorHandler(
   // Not Found Error
   if (err instanceof NotFoundError) {
     const errorResponse: NotFoundErrorResponse = {
-      message: 'Not Found',
+      message: err.message,
     }
     logger.error({ ...errorResponse })
     return res.status(404).json(errorResponse)

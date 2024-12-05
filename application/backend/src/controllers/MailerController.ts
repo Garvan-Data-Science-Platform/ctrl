@@ -16,7 +16,7 @@ import nodemailer from 'nodemailer'
 import logger from 'common/src/logger'
 import * as express from 'express'
 import prisma from '../PrismaClient'
-import { NoTokenError } from '../middlewares/ErrorHandler'
+import { NotFoundError, NoTokenError } from '../middlewares/ErrorHandler'
 
 @Route('mailer')
 @Tags('Mailer')
@@ -55,7 +55,7 @@ export class MailerController extends Controller {
     })
 
     if (!user) {
-      throw new Error('User not found')
+      throw new NotFoundError('User not found')
     }
 
     const transporter = nodemailer.createTransport({
