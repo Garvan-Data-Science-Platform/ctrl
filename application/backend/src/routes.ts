@@ -393,7 +393,7 @@ const models: TsoaRoute.Models = {
             "firstName": {"dataType":"string","required":true},
             "lastName": {"dataType":"string","required":true},
             "answers": {"dataType":"array","array":{"dataType":"refObject","ref":"ParticipantAnswerStatus"},"required":true},
-            "lastUpdated": {"dataType":"string","required":true},
+            "lastUpdated": {"dataType":"string"},
         },
         "additionalProperties": false,
     },

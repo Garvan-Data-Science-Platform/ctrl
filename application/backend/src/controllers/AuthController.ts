@@ -18,6 +18,7 @@ import type {
   ValidateErrorResponse,
 } from 'common/types/api/errors'
 import { IncorrectPasswordError, NotFoundError } from '../middlewares/ErrorHandler'
+import { createDefaultAnswers } from 'common/src/surveys/createDefaultAnswers'
 
 @Route('auth')
 @Tags('Auth')
@@ -26,6 +27,8 @@ import { IncorrectPasswordError, NotFoundError } from '../middlewares/ErrorHandl
 export class AuthController extends Controller {
   userRepo = prisma.user
   profileRepo = prisma.participantProfile
+  surveyRepo = prisma.surveyVersion
+  spRepo = prisma.surveyParticipant
 
   /**
    * register
@@ -100,7 +103,7 @@ export class AuthController extends Controller {
       data,
     })
 
-    await this.profileRepo.create({
+    const profile = await this.profileRepo.create({
       data: {
         userId: insertedUser.id,
         ...noNextOfKinProfileData,
@@ -110,6 +113,21 @@ export class AuthController extends Controller {
         dob: new Date(dob),
       },
     })
+
+    const currentSurvey = await this.surveyRepo.findFirst({
+      where: { status: 'PUBLISHED' },
+      orderBy: { versionNumber: 'desc' },
+    })
+
+    if (currentSurvey) {
+      await this.spRepo.create({
+        data: {
+          profileId: profile.id,
+          versionId: currentSurvey.id,
+          answers: createDefaultAnswers(currentSurvey.data),
+        },
+      })
+    }
 
     const token = await generateToken({ userId: insertedUser.id, roles: [insertedUser.role] })
 

@@ -247,6 +247,7 @@ export class SurveysController extends Controller {
 
     for (const step in stepData) {
       stepData[step] = populateSurveyStepAnswers(stepData[step], currentAnswers[step].answers)
+      stepData[step].last_updated = currentAnswers[step].last_updated
     }
 
     return { data: stepData }

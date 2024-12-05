@@ -624,6 +624,48 @@
         "type": "object",
         "additionalProperties": false
       },
+      "SurveyStepStatus": {
+        "type": "string",
+        "enum": [
+          "completed",
+          "review_required",
+          "viewed"
+        ]
+      },
+      "GetUserSurveyStepsResponse": {
+        "properties": {
+          "data": {
+            "items": {
+              "properties": {
+                "last_updated": {
+                  "type": "string"
+                },
+                "status": {
+                  "$ref": "#/components/schemas/SurveyStepStatus"
+                },
+                "tooltip": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "status",
+                "tooltip",
+                "title"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
       "UserStepContext": {
         "properties": {
           "current_step": {
@@ -851,7 +893,7 @@
         "type": "object",
         "additionalProperties": false
       },
-      "ParticipantAnswer": {
+      "ParticipantAnswerStatus": {
         "properties": {
           "surveyVersion": {
             "type": "number",
@@ -895,7 +937,7 @@
           },
           "answers": {
             "items": {
-              "$ref": "#/components/schemas/ParticipantAnswer"
+              "$ref": "#/components/schemas/ParticipantAnswerStatus"
             },
             "type": "array"
           },
@@ -905,11 +947,9 @@
         },
         "required": [
           "id",
-          "email",
           "firstName",
           "lastName",
-          "answers",
-          "lastUpdated"
+          "answers"
         ],
         "type": "object",
         "additionalProperties": false
@@ -921,18 +961,6 @@
               "$ref": "#/components/schemas/Participant"
             },
             "type": "array"
-          }
-        },
-        "required": [
-          "data"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "GetParticipantByIdResponse": {
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/Participant"
           }
         },
         "required": [
@@ -1902,6 +1930,53 @@
         ]
       }
     },
+    "/surveys/steps/{study}": {
+      "get": {
+        "operationId": "GetUserSurveySteps",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetUserSurveyStepsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Get user survey steps",
+        "summary": "Get survey steps for current user",
+        "tags": [
+          "Surveys"
+        ],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "study",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
     "/surveys/step/{study}/{step}": {
       "get": {
         "operationId": "GetUserSurveyStep",
@@ -1988,7 +2063,17 @@
           "Surveys"
         ],
         "security": [],
-        "parameters": []
+        "parameters": [
+          {
+            "in": "path",
+            "name": "participantId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
       }
     },
     "/surveys/answers": {
@@ -2322,77 +2407,6 @@
           }
         ],
         "parameters": []
-      }
-    },
-    "/participants/{participantId}": {
-      "get": {
-        "operationId": "GetParticipantById",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetParticipantByIdResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NotFoundErrorResponse"
-                },
-                "examples": {
-                  "Example 1": {}
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "description": "Get participant by ID",
-        "summary": "Get a  Participant by ID",
-        "tags": [
-          "Participants"
-        ],
-        "security": [
-          {
-            "jwt": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "participantId",
-            "required": true,
-            "schema": {
-              "format": "double",
-              "type": "number"
-            }
-          }
-        ]
       }
     },
     "/invites": {

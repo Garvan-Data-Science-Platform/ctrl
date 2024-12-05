@@ -8,18 +8,12 @@ const api = new Api()
 const app = api.app
 
 describe('ParticipantsController', () => {
-  let registeredUserToken: string, registeredParticipantToken: string
+  let registeredUserToken: string
   const registeredUserId: number = 97
-  const registeredParticipantUserId: number = 99
   beforeAll(async () => {
     registeredUserToken = await generateToken({
       userId: registeredUserId,
       roles: ['OrganisationAdmin'],
-    })
-
-    registeredParticipantToken = await generateToken({
-      userId: registeredParticipantUserId,
-      roles: ['Participant'],
     })
 
     api.run()
