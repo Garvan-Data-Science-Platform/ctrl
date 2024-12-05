@@ -27,8 +27,8 @@ jobs:
         run: yarn lint
       - name: Run Unit Testing
         env:
-          MAILER_USERNAME: ${{ secrets.MAILER_USERNAME }}
-          MAILER_PASSWORD: ${{ secrets.MAILER_PASSWORD }}
+          MAILER_USERNAME: ${{ secrets.TEST_MAILER_USERNAME }}
+          MAILER_PASSWORD: ${{ secrets.TEST_MAILER_PASSWORD }}
         run: yarn test MailerController
       - name: e2e tests
         run: make e2e
