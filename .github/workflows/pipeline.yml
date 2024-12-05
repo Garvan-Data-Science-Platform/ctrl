@@ -29,7 +29,7 @@ jobs:
         env:
           MAILER_USERNAME: ${{ secrets.TEST_MAILER_USERNAME }}
           MAILER_PASSWORD: ${{ secrets.TEST_MAILER_PASSWORD }}
-        run: yarn test MailerController
+        run: yarn test
       - name: e2e tests
         run: make e2e
 
