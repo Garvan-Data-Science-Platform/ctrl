@@ -2,6 +2,7 @@ import { mapToParticipantRequest } from './mapData'
 import { RegisterParticipantRequest } from '../../common/types/api/auth'
 
 export class Integrations {
+  [x: string]: any
   mapping: Record<string, any>
   // a series of methods for integrations
   constructor(mapping: Record<string, any>) {

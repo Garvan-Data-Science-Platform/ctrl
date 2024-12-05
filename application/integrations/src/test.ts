@@ -8,6 +8,6 @@ const exampleMultipleProfiles = require('./test_data/exampleMultipleProfiles.jso
 
 const int = new Integrations(mapping)
 
-int.addUsersFromCSV(exampleMultipleProfiles)
+int.mapCSVToParticipantRequests(exampleMultipleProfiles)
 
 
