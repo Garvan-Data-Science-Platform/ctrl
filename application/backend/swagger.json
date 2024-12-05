@@ -171,11 +171,7 @@
       "NotFoundErrorResponse": {
         "properties": {
           "message": {
-            "type": "string",
-            "enum": [
-              "Not Found"
-            ],
-            "nullable": false
+            "type": "string"
           },
           "details": {}
         },
