@@ -93,7 +93,7 @@ const models: TsoaRoute.Models = {
     "NotFoundErrorResponse": {
         "dataType": "refObject",
         "properties": {
-            "message": {"dataType":"enum","enums":["Not Found"],"required":true},
+            "message": {"dataType":"string","required":true},
             "details": {"dataType":"any"},
         },
         "additionalProperties": false,
