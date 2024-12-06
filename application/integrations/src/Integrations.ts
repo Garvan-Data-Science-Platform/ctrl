@@ -10,7 +10,7 @@ export class Integrations {
     this.mapping = mapping
   }
 
-  // record types
+  // returns a list of participant request to create users
   mapCSVToParticipantRequests(csv: Record<string, string>[]): RegisterParticipantRequest[] {
     const res: RegisterParticipantRequest[] = []
     for (const userData of csv) {

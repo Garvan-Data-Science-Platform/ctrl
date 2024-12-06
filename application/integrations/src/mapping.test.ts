@@ -1,5 +1,5 @@
 import { mapToParticipantRequest } from './mapData';
-import { Integrations } from './integrations'
+import { Integrations } from './Integrations'
 import testMapping from './test_data/testMapping.json'
 import exampleREDCapProfile from './test_data/exampleREDCapProfile.json'
 import exampleMultipleProfiles from './test_data/exampleMultipleProfiles.json'
