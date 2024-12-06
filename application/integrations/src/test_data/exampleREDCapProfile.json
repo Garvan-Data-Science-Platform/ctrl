@@ -1,4 +1,5 @@
-{
+[
+  {
     "ctrl_pers_name": "John",
     "ctrl_study_id": "997",
     "ctrl_pers_surname": "Smith",
@@ -41,3 +42,4 @@
     "ctrl_gc_notes": "",
     "ctrl_complete": "1"
   }
+]

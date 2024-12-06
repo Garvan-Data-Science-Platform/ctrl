@@ -5,14 +5,12 @@
     "dob": "ctrl_dob",
     "mobile": "ctrl_phone_no",
     "preferredContact": "ctrl_pref_contact_meth",
-    "addressLine": "ctrl_email",
+    "addressLine": "ctrl_address",
     "suburb": "ctrl_suburb",
     "postcode": "ctrl_postcode",
     "state": "ctrl_state",
-    "nextOfKin": {
-        "firstName": "ctrl_kin_name",
-        "lastName": "ctrl_kin_surname",
-        "mobile": "ctrl_kin_contactno",
-        "email": "ctrl_kin_email"
-    }
+    "nokFirstName": "ctrl_kin_name",
+    "nokLastName": "ctrl_kin_surname",
+    "nokMobile": "ctrl_kin_contactno",
+    "nokEmail": "ctrl_kin_email"
 }

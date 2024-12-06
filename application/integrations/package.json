@@ -6,7 +6,11 @@
     "type-check": "tsc",
     "build": "true",
     "dev": "true",
+<<<<<<< HEAD
     "test": "jest --passWithNoTests"
+=======
+    "test": "jest" 
+>>>>>>> ff2532f (testing and linting)
   },
   "workspaces": [
     "packages/*"
