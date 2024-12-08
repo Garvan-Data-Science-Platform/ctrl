@@ -19,7 +19,7 @@ export function mapToParticipantRequest(
     lastName: getField('lastName'),
     email: getField('email'),
     mobile: getField('mobile'),
-    preferredContact: Object.values(ContactMethod)[Number(getField('preferredContact'))], // this is wrong - indexing error discussed in meeting
+    preferredContact: Object.values(ContactMethod)[Number(getField('preferredContact'))], // potential indexing error
     addressLine: getField('addressLine'),
     suburb: getField('suburb'),
     postcode: getField('postcode'),

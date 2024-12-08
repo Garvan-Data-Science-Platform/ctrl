@@ -1,6 +1,6 @@
 export enum ContactMethod {
-  MOBILE = 'MOBILE',
   EMAIL = 'EMAIL',
+  MOBILE = 'MOBILE',
   MAIL = 'MAIL',
 }
 
