@@ -9,14 +9,13 @@ import {
   Body,
   Request,
 } from 'tsoa'
-import { getUserIdFromToken } from '../authentication'
 import { InternalErrorResponse, UnauthorizedErrorResponse } from 'common/types/api/errors'
 import { ContactUsResponse, type ContactUsRequest } from 'common/types/api/mailer'
 import nodemailer from 'nodemailer'
 import logger from 'common/src/logger'
 import * as express from 'express'
 import prisma from '../PrismaClient'
-import { NotFoundError, NoTokenError } from '../middlewares/ErrorHandler'
+import { NotFoundError } from '../middlewares/ErrorHandler'
 
 @Route('mailer')
 @Tags('Mailer')
@@ -37,14 +36,11 @@ export class MailerController extends Controller {
     @Body() bodyRequest: ContactUsRequest,
     @Request() request: express.Request,
   ): Promise<ContactUsResponse> {
-    // Get user details
-    const token = request.headers.authorization?.split(' ')[1]
-
-    if (!token) {
-      throw new NoTokenError()
+    if (!request.user) {
+      throw new NotFoundError('User not found')
     }
 
-    const userId: number = getUserIdFromToken(token)
+    const userId: number = request.user.userId
 
     // Check if user exists
     const user = await this.userRepo.findUnique({
