@@ -27,7 +27,8 @@ import type {
  *    "lastName": "Doe",
  *    "mobile": "0412341432",
  *    "email": "jeremydoe@email.com"
- *  }
+ *  },
+ *  "dependents": []
  * }
  */
 export interface RegisterParticipantRequest {

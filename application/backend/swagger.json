@@ -1288,6 +1288,30 @@
         "type": "object",
         "additionalProperties": false
       },
+      "OnBehalf": {
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "dob": {
+            "type": "string"
+          },
+          "permanent": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "dob",
+          "permanent"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
       "RegisterParticipantRequest": {
         "properties": {
           "firstName": {
@@ -1340,6 +1364,12 @@
           },
           "nextOfKin": {
             "$ref": "#/components/schemas/AlternativeContact"
+          },
+          "dependents": {
+            "items": {
+              "$ref": "#/components/schemas/OnBehalf"
+            },
+            "type": "array"
           }
         },
         "required": [
@@ -1355,7 +1385,8 @@
           "password",
           "dob",
           "participantType",
-          "nextOfKin"
+          "nextOfKin",
+          "dependents"
         ],
         "type": "object",
         "additionalProperties": false,
@@ -1379,7 +1410,8 @@
             "lastName": "Doe",
             "mobile": "0412341432",
             "email": "jeremydoe@email.com"
-          }
+          },
+          "dependents": []
         }
       },
       "LoginResponse": {
