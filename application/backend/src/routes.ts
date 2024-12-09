@@ -544,6 +544,17 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "OnBehalf": {
+        "dataType": "refObject",
+        "properties": {
+            "firstName": {"dataType":"string","required":true},
+            "lastName": {"dataType":"string","required":true},
+            "dob": {"dataType":"string","required":true},
+            "permanent": {"dataType":"boolean","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "RegisterParticipantRequest": {
         "dataType": "refObject",
         "properties": {
@@ -561,6 +572,7 @@ const models: TsoaRoute.Models = {
             "dob": {"dataType":"string","required":true,"validators":{"isDate":{"errorMsg":"Date of birth must be of date format"}}},
             "participantType": {"ref":"ParticipantType","required":true},
             "nextOfKin": {"ref":"AlternativeContact","required":true},
+            "dependents": {"dataType":"array","array":{"dataType":"refObject","ref":"OnBehalf"},"required":true},
         },
         "additionalProperties": false,
     },

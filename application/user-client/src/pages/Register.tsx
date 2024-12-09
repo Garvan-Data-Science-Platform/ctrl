@@ -3,23 +3,27 @@ import {
   Box,
   Button,
   Card,
+  Checkbox,
   Container,
   FormControl,
+  IconButton,
   InputLabel,
   MenuItem,
   Select,
   TextField,
   Typography,
 } from '@mui/material'
-import { useForm } from 'react-hook-form'
+import { useForm, useFieldArray } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth'
 import { RegisterParticipantRequest, RegisterParticipantResponse } from '@common/types/api/auth'
 import {
   ContactMethod,
+  OnBehalf,
   ParticipantType,
   StateTerritory,
 } from '@common/types/api/users/ParticipantProfile'
+import { AddCircle, Close } from '@mui/icons-material'
 
 interface FormValues {
   firstName: string
@@ -37,26 +41,28 @@ interface FormValues {
   nok_first: string
   nok_surname: string
   nok_email: string
-  on_behalf_first: string
-  on_behalf_surname: string
-  on_behalf_dob: string
+  dependents: OnBehalf[]
 }
 
 export default function Register() {
   const {
     register,
+    control,
     handleSubmit,
     setError,
     watch,
     formState: { errors },
   } = useForm<FormValues>()
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'dependents',
+  })
+
   const { login } = useAuth()
   const nav = useNavigate()
 
   const onSubmit = (data: FormValues) => {
-    //login('TOKEN')
-    //nav('/')
-
     const reqData: RegisterParticipantRequest = {
       firstName: data.firstName,
       lastName: data.lastName,
@@ -75,6 +81,7 @@ export default function Register() {
         lastName: data['nok_surname'],
         email: data['nok_email'],
       },
+      dependents: data['dependents'],
     }
 
     fetch(import.meta.env.VITE_BACKEND_URL + '/auth/register/participant', {
@@ -230,6 +237,81 @@ export default function Register() {
                     required: true,
                   })}
                 />
+              </>
+              <>
+                <Typography sx={{ m: 1, width: '100%', fontWeight: 'bold' }}>
+                  Dependents you are consenting on behalf of:
+                </Typography>
+
+                {fields.map((val, idx) => (
+                  <Box key={`dep_${val.id}`} sx={{ display: 'flex', flexWrap: 'wrap' }}>
+                    <Box
+                      sx={{
+                        m: 1,
+                        mt: 2,
+                        width: '100%',
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <Box sx={{ width: 40 }} />
+                      <Typography>Dependent {idx + 1}</Typography>
+                      <IconButton
+                        onClick={() => {
+                          remove(idx)
+                        }}
+                      >
+                        <Close />
+                      </IconButton>
+                    </Box>
+
+                    <TextField
+                      sx={{ m: 1, flexGrow: 1 }}
+                      label="First Name"
+                      {...register(`dependents.${idx}.firstName`, { required: true })}
+                      required
+                    />
+                    <TextField
+                      sx={{ m: 1, flexGrow: 1 }}
+                      label="Family Name"
+                      {...register(`dependents.${idx}.lastName`, { required: true })}
+                      required
+                    />
+                    <TextField
+                      type="date"
+                      fullWidth
+                      sx={{ m: 1 }}
+                      label="Date of Birth"
+                      {...register(`dependents.${idx}.dob`, { required: true })}
+                      slotProps={{ inputLabel: { shrink: true } }}
+                    />
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        flexGrow: 1,
+                        ml: 1,
+                      }}
+                    >
+                      <Typography>This person is permanently incapacitated.</Typography>
+                      <Checkbox
+                        defaultChecked={false}
+                        {...register(`dependents.${idx}.permanent`)}
+                      />
+                    </Box>
+                  </Box>
+                ))}
+
+                <Button
+                  sx={{ ml: 'auto', mr: 'auto', mt: 2, mb: 2 }}
+                  startIcon={<AddCircle />}
+                  onClick={() => append({ firstName: '', lastName: '', dob: '', permanent: false })}
+                >
+                  Add Dependent
+                </Button>
               </>
 
               {errors.root ? (

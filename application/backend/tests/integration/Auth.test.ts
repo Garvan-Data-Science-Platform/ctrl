@@ -116,6 +116,7 @@ describe('Auth', () => {
         lastName: 'SMITH',
         email: 'jonny@smith.com',
       },
+      dependents: [],
     }
 
     const participantResponse = await request(app)

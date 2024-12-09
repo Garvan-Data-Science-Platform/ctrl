@@ -3,6 +3,7 @@ import type {
   ContactMethod,
   StateTerritory,
   ParticipantType,
+  OnBehalf,
 } from '../users/ParticipantProfile'
 
 /**
@@ -78,6 +79,7 @@ export interface RegisterParticipantRequest {
    */
   participantType: ParticipantType
   nextOfKin: AlternativeContact
+  dependents: OnBehalf[]
 }
 
 export interface RegisterParticipantResponse {

@@ -34,4 +34,5 @@ export interface OnBehalf {
   firstName: string
   lastName: string
   dob: string
+  permanent: boolean
 }

@@ -220,26 +220,27 @@ describe('AuthController', () => {
   })
 
   describe('POST /auth/register/participant', () => {
-    it('should register a new user returning a token', async () => {
-      const registerParticipantRequest: RegisterParticipantRequest = {
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'johndoe@example.com',
-        password: 'johnDoesP@ssword123',
-        mobile: '+61477777777',
-        addressLine: '123 Some Street',
-        suburb: 'Sydney',
-        postcode: '2000',
-        state: StateTerritory.NSW,
-        preferredContact: ContactMethod.MOBILE,
-        dob: '1990-01-01',
-        participantType: ParticipantType.STANDARD,
-        nextOfKin: { firstName: 'John', lastName: 'Smith', email: 'john@smith.com' },
-      }
+    const registerParticipantRequestBase: RegisterParticipantRequest = {
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'johndoe@example.com',
+      password: 'johnDoesP@ssword123',
+      mobile: '+61477777777',
+      addressLine: '123 Some Street',
+      suburb: 'Sydney',
+      postcode: '2000',
+      state: StateTerritory.NSW,
+      preferredContact: ContactMethod.MOBILE,
+      dob: '1990-01-01',
+      participantType: ParticipantType.STANDARD,
+      nextOfKin: { firstName: 'John', lastName: 'Smith', email: 'john@smith.com' },
+      dependents: [],
+    }
 
+    it('should register a new user returning a token', async () => {
       const participantResponse = await request(app)
         .post('/auth/register/participant')
-        .send(registerParticipantRequest)
+        .send(registerParticipantRequestBase)
 
       expect(participantResponse.status).toEqual(201)
 
@@ -249,19 +250,8 @@ describe('AuthController', () => {
     })
     it('should fail validation if the password is not strong', async () => {
       const registerParticipantRequest: RegisterParticipantRequest = {
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'johndoe@example.com',
+        ...registerParticipantRequestBase,
         password: 'weakpassword',
-        mobile: '+61477777777',
-        addressLine: '123 Some Street',
-        suburb: 'Sydney',
-        postcode: '2000',
-        state: StateTerritory.NSW,
-        preferredContact: ContactMethod.MOBILE,
-        dob: '1990-01-01',
-        participantType: ParticipantType.STANDARD,
-        nextOfKin: { firstName: 'John', lastName: 'Smith', email: 'john@smith.com' },
       }
 
       const registerParticipantResponse = await request(app)
@@ -280,19 +270,9 @@ describe('AuthController', () => {
 
     it('should fail validation if provided with empty values', async () => {
       const registerParticipantRequest: RegisterParticipantRequest = {
-        firstName: 'John',
+        ...registerParticipantRequestBase,
         lastName: '',
-        email: 'johndoe@example.com',
-        password: 'GooD02Password',
         mobile: '12341234',
-        addressLine: '123 Some Street',
-        suburb: 'Sydney',
-        postcode: '2000',
-        state: StateTerritory.NSW,
-        preferredContact: ContactMethod.MOBILE,
-        dob: '1990-01-01',
-        participantType: ParticipantType.STANDARD,
-        nextOfKin: { firstName: 'John', lastName: 'Smith', email: 'john@smith.com' },
       }
 
       const registerParticipantResponse = await request(app)
@@ -313,6 +293,58 @@ describe('AuthController', () => {
           value: '12341234',
         },
       })
+    })
+    it('Should add dependent profiles if provided, should have same family id', async () => {
+      const registerParticipantRequest: RegisterParticipantRequest = {
+        ...registerParticipantRequestBase,
+        dependents: [
+          { firstName: 'A', lastName: 'B', dob: '2020-01-01', permanent: false },
+          { firstName: 'B', lastName: 'B', dob: '2020-01-01', permanent: false },
+        ],
+      }
+      await request(app).post('/auth/register/participant').send(registerParticipantRequest)
+
+      const registered = await prisma.participantProfile.findFirstOrThrow({
+        where: { firstName: 'John', lastName: 'Doe' },
+      })
+      const dep1 = await prisma.participantProfile.findFirstOrThrow({
+        where: { firstName: 'A', lastName: 'B' },
+      })
+      const dep2 = await prisma.participantProfile.findFirstOrThrow({
+        where: { firstName: 'B', lastName: 'B' },
+      })
+      expect(registered.familyId).toEqual(dep1.familyId)
+      expect(registered.familyId).toEqual(dep2.familyId)
+    })
+
+    it('Two parents with the same child receive same family ID, dependent is not re-registered', async () => {
+      const registerParticipantRequest1: RegisterParticipantRequest = {
+        ...registerParticipantRequestBase,
+        dependents: [{ firstName: 'A', lastName: 'B', dob: '2020-01-01', permanent: false }],
+      }
+      const registerParticipantRequest2: RegisterParticipantRequest = {
+        ...registerParticipantRequestBase,
+        firstName: 'Jenny',
+        email: 'jenny@gmail.com',
+        dependents: [{ firstName: 'A', lastName: 'B', dob: '2020-01-01', permanent: false }],
+      }
+      await request(app).post('/auth/register/participant').send(registerParticipantRequest1)
+      await request(app).post('/auth/register/participant').send(registerParticipantRequest2)
+
+      const registered1 = await prisma.participantProfile.findFirstOrThrow({
+        where: { firstName: 'John', lastName: 'Doe' },
+      })
+      const registered2 = await prisma.participantProfile.findFirstOrThrow({
+        where: { firstName: 'Jenny', lastName: 'Doe' },
+      })
+
+      const dependents = await prisma.participantProfile.findMany({
+        where: { firstName: 'A', lastName: 'B' },
+      })
+
+      expect(dependents.length).toEqual(1)
+
+      expect(registered1.familyId).toEqual(registered2.familyId)
     })
   })
 
