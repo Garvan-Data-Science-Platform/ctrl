@@ -7,4 +7,9 @@ ignore:
         reason: no direct upgrade or patch
         expires: 2024-12-19T01:18:03.489Z
         created: 2024-11-19T01:18:03.493Z
+  SNYK-JS-PATHTOREGEXP-8482416:
+    - '*':
+        reason: no direct upgrade or patch
+        expires: 2025-01-08T22:01:19.115Z
+        created: 2024-12-09T22:01:19.122Z
 patch: {}
