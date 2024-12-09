@@ -49,6 +49,7 @@ describe('Survey tests', () => {
       preferredContact: ContactMethod.MOBILE,
       state: StateTerritory.ACT,
       suburb: 'ABCKDF',
+      dependents: [],
     }
     const regRes = await request(app).post('/auth/register/participant').send(reqBody)
     expect(regRes.statusCode).toBe(201)

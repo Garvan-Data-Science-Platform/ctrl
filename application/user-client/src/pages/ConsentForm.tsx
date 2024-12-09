@@ -136,7 +136,6 @@ export default function ConsentForm() {
               setFormState((state) => {
                 const s = [...state]
                 s[idx].data.value = !s[idx].data.value
-                console.log('SETTING FORM STATE', s)
                 return s
               })
             }

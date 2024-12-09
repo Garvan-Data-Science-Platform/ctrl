@@ -10,7 +10,7 @@ import { Route, Tags, Controller, Body, Post, SuccessResponse, Response, Validat
 import prisma from '../PrismaClient'
 import logger from 'common/src/logger'
 import { checkPasswordStrength } from 'common/src/PasswordStrength'
-import { User, Role } from '@prisma/client'
+import { User, Role, ParticipantType } from '@prisma/client'
 import { generateToken, hashPassword, verifyPassword } from '../authentication'
 import type {
   InternalErrorResponse,
@@ -90,7 +90,7 @@ export class AuthController extends Controller {
     const { firstName, middleName, lastName, email, dob, ...profileData } = participantData
     const userDetails = { firstName, middleName, lastName, email }
 
-    const { nextOfKin, ...noNextOfKinProfileData } = profileData
+    const { nextOfKin, dependents, ...noNextOfKinProfileData } = profileData
 
     const nextOfKinCreateData = { nextOfKin: { create: { ...nextOfKin } } }
 
@@ -103,6 +103,21 @@ export class AuthController extends Controller {
       data,
     })
 
+    //Check if dependents already exist
+    let familyId
+    if (dependents.length > 0) {
+      const existingDep = await this.profileRepo.findFirst({
+        where: {
+          firstName: dependents[0].firstName,
+          lastName: dependents[0].lastName,
+          dob: new Date(dependents[0].dob),
+        },
+      })
+      if (existingDep) {
+        familyId = existingDep.familyId
+      }
+    }
+
     const profile = await this.profileRepo.create({
       data: {
         userId: insertedUser.id,
@@ -111,6 +126,9 @@ export class AuthController extends Controller {
         firstName: insertedUser.firstName,
         lastName: insertedUser.lastName,
         dob: new Date(dob),
+        familyId,
+        participantType:
+          dependents.length > 0 ? ParticipantType.GUARDIAN : ParticipantType.STANDARD,
       },
     })
 
@@ -118,6 +136,33 @@ export class AuthController extends Controller {
       where: { status: 'PUBLISHED' },
       orderBy: { versionNumber: 'desc' },
     })
+
+    //familyId only defined when dependent profile already existed
+    if (!familyId) {
+      for (const dep of dependents) {
+        const res = await this.profileRepo.create({
+          data: {
+            ...noNextOfKinProfileData,
+            firstName: dep.firstName,
+            lastName: dep.lastName,
+            dob: new Date(dep.dob),
+            familyId: profile.familyId,
+            participantType: dep.permanent
+              ? ParticipantType.DEPENDENT_OTHER
+              : ParticipantType.DEPENDENT_AGE,
+          },
+        })
+        if (currentSurvey) {
+          await this.spRepo.create({
+            data: {
+              profileId: res.id,
+              versionId: currentSurvey.id,
+              answers: createDefaultAnswers(currentSurvey.data),
+            },
+          })
+        }
+      }
+    }
 
     if (currentSurvey) {
       await this.spRepo.create({
