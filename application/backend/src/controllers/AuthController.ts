@@ -19,6 +19,7 @@ import type {
 } from 'common/types/api/errors'
 import { IncorrectPasswordError, NotFoundError } from '../middlewares/ErrorHandler'
 import { createDefaultAnswers } from 'common/src/surveys/createDefaultAnswers'
+import { createParticipant } from '../createParticipant'
 
 @Route('auth')
 @Tags('Auth')
@@ -75,7 +76,7 @@ export class AuthController extends Controller {
   public async registerParticipant(
     @Body() bodyRequest: RegisterParticipantRequest,
   ): Promise<RegisterParticipantResponse> {
-    const { password, ...participantData } = bodyRequest
+    /**const { password, ...participantData } = bodyRequest
 
     // Check Password
     const { isValid, fields } = await checkPasswordStrength(password)
@@ -182,7 +183,8 @@ export class AuthController extends Controller {
     }
 
     logger.info({ ...responseData })
-    return responseData
+    return responseData**/
+    return createParticipant(bodyRequest, this.userRepo, this.surveyRepo, this.profileRepo, this.spRepo)
   }
 
   /**

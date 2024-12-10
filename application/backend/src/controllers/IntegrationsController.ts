@@ -5,21 +5,26 @@ import { Integrations } from '../../../integrations/src/Integrations';
 import exampleREDCapMapping from '../../../integrations/src/exampleREDCapMapping.json';
 import prisma from 'PrismaClient';
 import { RegisterParticipantRequest } from 'common/types/api/auth';
+import { createParticipant } from '../createParticipant';
+import { create } from 'domain';
+import {uploadRedCapParticipantsResponse} from 'common/types/api/integrations/redcap/uploadParticipant'
 
 
 @Route('integrations')
 @Tags('Integrations')
 @Security('jwt', ['OrganisationAdmin'])
 export class IntegrationsController extends Controller {
-  //test
   userRepo = prisma.user
+  profileRepo = prisma.participantProfile
+  surveyRepo = prisma.surveyVersion
+  spRepo = prisma.surveyParticipant
 
   // assumptions:
   // - passwords are strong enough (they are created in Integrations so should be strong enough)
   @Post('/redcap/participant/upload')
-  public async uploadRedCapPariticipant(
+  public async uploadRedCapParticipant(
       @UploadedFile() file: Express.Multer.File
-  ): Promise<{message: string}> {
+  ): Promise<uploadRedCapParticipantsResponse> {
     if (!file || !file.buffer) {
       throw new Error("No file uploaded or file is empty.");
     }
@@ -34,7 +39,12 @@ export class IntegrationsController extends Controller {
     const data: RegisterParticipantRequest[] = integrationService.mapCSVToParticipantRequests(csvData)
     console.log(data)
 
-    return {message:"default"}
+    const tokens = []
+    for (const participant of data) {
+      tokens.push(createParticipant(participant, this.userRepo, this.surveyRepo, this.profileRepo, this.spRepo))
+    }
+
+    return {message:`created ${tokens.length} participants`}
   }
 
   private async parseCSV(stream: Readable): Promise<Record<string, string>[]> {
