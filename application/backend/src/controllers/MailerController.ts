@@ -16,6 +16,7 @@ import logger from 'common/src/logger'
 import * as express from 'express'
 import prisma from '../PrismaClient'
 import { NotFoundError } from '../middlewares/ErrorHandler'
+import { Role } from '@prisma/client'
 
 @Route('mailer')
 @Tags('Mailer')
@@ -64,10 +65,27 @@ export class MailerController extends Controller {
       await transporter.verify()
       logger.info('Mailer service is ready to send messages...')
 
-      // Send email to admin
+      const organisationAdminEmails = await this.userRepo.findMany({
+        where: {
+          role: Role.OrganisationAdmin,
+        },
+        select: {
+          email: true,
+        },
+      })
+
+      // Use CTRL_ADMIN_EMAIL if set, otherwise use all organisation admins' emails.
+      let maillist: string[]
+      if (!process.env.CTRL_ADMIN_EMAIL) {
+        maillist = organisationAdminEmails.map((orgAdmin) => orgAdmin.email)
+      } else {
+        maillist = [process.env.CTRL_ADMIN_EMAIL]
+      }
+
+      // Send email to all organisation admins
       const mailToAdminOptions: nodemailer.SendMailOptions = {
         from: `CTRL <noreply@${process.env.HOSTNAME}>`,
-        to: process.env.CTRL_ADMIN_EMAIL,
+        to: maillist,
         subject: `New Contact Us Request RE:${bodyRequest.subject}`,
         text: bodyRequest.content,
       }
