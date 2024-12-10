@@ -43,16 +43,12 @@ export class MailerController extends Controller {
     const userId: number = request.user.userId
 
     // Check if user exists
-    const user = await this.userRepo.findUnique({
+    const user = await this.userRepo.findUniqueOrThrow({
       where: { id: userId },
       select: {
         email: true,
       },
     })
-
-    if (!user) {
-      throw new NotFoundError('User not found')
-    }
 
     const transporter = nodemailer.createTransport({
       host: process.env.MAILER_HOST,
@@ -70,7 +66,7 @@ export class MailerController extends Controller {
 
       // Send email to admin
       const mailToAdminOptions: nodemailer.SendMailOptions = {
-        from: process.env.MAILER_USERNAME,
+        from: `CTRL <noreply@${process.env.HOSTNAME}>`,
         to: process.env.CTRL_ADMIN_EMAIL,
         subject: `New Contact Us Request RE:${bodyRequest.subject}`,
         text: bodyRequest.content,
@@ -81,8 +77,8 @@ export class MailerController extends Controller {
 
       // Send email to user
       const mailToUserOptions: nodemailer.SendMailOptions = {
-        from: process.env.MAILER_USERNAME,
-        to: user?.email,
+        from: `CTRL <noreply@${process.env.HOSTNAME}>`,
+        to: user.email,
         subject: `Copy of your message submitted to CTRL Administration Team RE: ${bodyRequest.subject}`,
         text: bodyRequest.content,
       }
