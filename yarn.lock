@@ -3903,9 +3903,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tsoa/cli@npm:^6.4.0":
-  version: 6.4.0
-  resolution: "@tsoa/cli@npm:6.4.0"
+"@tsoa/cli@npm:^6.6.0":
+  version: 6.6.0
+  resolution: "@tsoa/cli@npm:6.6.0"
   dependencies:
     "@tsoa/runtime": "npm:^6.6.0"
     "@types/multer": "npm:^1.4.12"
@@ -5521,7 +5521,7 @@ __metadata:
     swagger-ui-express: "npm:^5.0.1"
     ts-jest: "npm:^29.1.5"
     ts-node: "npm:^10.9.2"
-    tsoa: "npm:^6.1.5"
+    tsoa: "npm:^6.6.0"
     tsx: "npm:^4.7.0"
     typescript: "npm:^5.3.3"
   languageName: unknown
