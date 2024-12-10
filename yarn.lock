@@ -5441,6 +5441,7 @@ __metadata:
     jest-mock-extended: "npm:^3.0.7"
     jsonwebtoken: "npm:^9.0.2"
     nodemailer: "npm:^6.9.16"
+    nodemailer-mock: "npm:^2.0.6"
     pg: "npm:^8.12.0"
     prisma: "npm:^5.20.0"
     prisma-json-types-generator: "npm:^3.1.1"
@@ -10745,6 +10746,17 @@ __metadata:
   version: 2.0.18
   resolution: "node-releases@npm:2.0.18"
   checksum: 786ac9db9d7226339e1dc84bbb42007cb054a346bd9257e6aa154d294f01bc6a6cddb1348fa099f079be6580acbb470e3c048effd5f719325abd0179e566fd27
+  languageName: node
+  linkType: hard
+
+"nodemailer-mock@npm:^2.0.6":
+  version: 2.0.6
+  resolution: "nodemailer-mock@npm:2.0.6"
+  dependencies:
+    debug: "npm:^4.3.4"
+  peerDependencies:
+    nodemailer: ^6.x
+  checksum: dc8ec255d7bbbb2678592d24168e5ecd64ba7be1f2d6bf28879ab7f554b07e26aa3eef8335202f8f6a2c84f19542c1f737d5f82fa5377957b694385fe6add63e
   languageName: node
   linkType: hard
 
