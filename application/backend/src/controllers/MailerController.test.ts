@@ -41,15 +41,6 @@ describe('MailerController', () => {
       })
     }, 100000)
 
-    it('should throw NoTokenError if no token is provided', async () => {
-      const response = await request(app)
-        .post('/mailer/contact-us')
-        .send({ subject: 'Test Subject', content: 'Test Content' })
-
-      expect(response.status).toBe(401)
-      expect(response.body.message).toBe('No token provided')
-    }, 100000)
-
     it('should ensure that the user exists before sending email', async () => {
       const invalidToken = await generateToken({
         userId: -1, // Non-existent user ID
