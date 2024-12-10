@@ -15,6 +15,8 @@ import { InvitesController } from './controllers/ParticipantsController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { OrganisationsController } from './controllers/OrganisationsController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { MailerController } from './controllers/MailerController';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { HealthCheckController } from './controllers/HealthCheckController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { AuthController } from './controllers/AuthController';
@@ -91,7 +93,7 @@ const models: TsoaRoute.Models = {
     "NotFoundErrorResponse": {
         "dataType": "refObject",
         "properties": {
-            "message": {"dataType":"enum","enums":["Not Found"],"required":true},
+            "message": {"dataType":"string","required":true},
             "details": {"dataType":"any"},
         },
         "additionalProperties": false,
@@ -504,6 +506,23 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "message": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ContactUsResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "message": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ContactUsRequest": {
+        "dataType": "refObject",
+        "properties": {
+            "subject": {"dataType":"string","required":true},
+            "content": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },
@@ -1443,6 +1462,38 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'removeUserFromOrganisation',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/mailer/contact-us',
+            authenticateMiddleware([{"jwt":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(MailerController)),
+            ...(fetchMiddlewares<RequestHandler>(MailerController.prototype.contactUs)),
+
+            async function MailerController_contactUs(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"ContactUsRequest"},
+                    request: {"in":"request","name":"request","required":true,"dataType":"object"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new MailerController();
+
+              await templateService.apiHandler({
+                methodName: 'contactUs',
                 controller,
                 response,
                 next,

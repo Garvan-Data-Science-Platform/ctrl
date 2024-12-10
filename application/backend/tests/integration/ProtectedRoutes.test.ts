@@ -48,9 +48,6 @@ describe('Protected Routes', () => {
 
       const response = await request(app)[route.method](route.url).set(headers)
 
-      console.log(
-        route.rolesWhitelisted.length == 0 || route.rolesWhitelisted.includes(role as Role),
-      )
       // Check if role is whitelisted
       if (route.rolesWhitelisted.length == 0 || route.rolesWhitelisted.includes(role as Role)) {
         expect(response.status).not.toBe(401)

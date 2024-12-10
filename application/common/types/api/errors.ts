@@ -59,6 +59,6 @@ export interface PrismaErrorResponse {
  * }
  */
 export interface NotFoundErrorResponse {
-  message: 'Not Found'
+  message: string
   details?: unknown
 }
