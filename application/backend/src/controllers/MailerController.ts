@@ -69,7 +69,7 @@ export class MailerController extends Controller {
       logger.info('Mailer service is ready to send messages...')
 
       // Send email to admin
-      const mailToAdminOptions = {
+      const mailToAdminOptions: nodemailer.SendMailOptions = {
         from: process.env.MAILER_USERNAME,
         to: process.env.CTRL_ADMIN_EMAIL,
         subject: `New Contact Us Request RE:${bodyRequest.subject}`,
@@ -80,7 +80,7 @@ export class MailerController extends Controller {
       logger.info('Email sent to admin', mailToAdminOptions)
 
       // Send email to user
-      const mailToUserOptions = {
+      const mailToUserOptions: nodemailer.SendMailOptions = {
         from: process.env.MAILER_USERNAME,
         to: user?.email,
         subject: `Copy of your message submitted to CTRL Administration Team RE: ${bodyRequest.subject}`,
