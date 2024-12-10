@@ -12,7 +12,10 @@ export const sourceData = {
     ctrl_kin_name: 'Jane',
     ctrl_kin_surname: 'Doe',
     ctrl_kin_email: 'jane.doe@example.com',
-    ctrl_kin_contactno: '0987654321'
+    ctrl_kin_contactno: '0987654321',
+    ctrl_pg_register_for_child_yn: "TRUE",
+    ctrl_child_name: "test",
+    ctrl_child_surname: "child",
 }
 
 export const sourceDataNoDOB = {
@@ -28,7 +31,10 @@ export const sourceDataNoDOB = {
     ctrl_kin_name: 'Jane',
     ctrl_kin_surname: 'Doe',
     ctrl_kin_email: 'jane.doe@example.com',
-    ctrl_kin_contactno: '0987654321'
+    ctrl_kin_contactno: '0987654321',
+    ctrl_pg_register_for_child_yn: "TRUE",
+    ctrl_child_name: "test",
+    ctrl_child_surname: "child"
 }
 
 export const sourceDataNoNOKMobile = {
@@ -45,4 +51,7 @@ export const sourceDataNoNOKMobile = {
     ctrl_kin_name: 'Jane',
     ctrl_kin_surname: 'Doe',
     ctrl_kin_email: 'jane.doe@example.com',
+    ctrl_pg_register_for_child_yn: "TRUE",
+    ctrl_child_name: "test",
+    ctrl_child_surname: "child"
 }

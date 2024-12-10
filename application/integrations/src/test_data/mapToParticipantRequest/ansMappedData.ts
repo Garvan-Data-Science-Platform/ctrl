@@ -18,5 +18,11 @@ export const expectedMappedData = {
       lastName: 'Doe',
       email: 'jane.doe@example.com',
       mobile: '0987654321'
-    }
+    },
+    dependents: [{
+      firstName: 'test',
+      lastName: 'child',
+      dob: '1990-01-01',
+      permanent: false
+    }]
 };

@@ -6,8 +6,12 @@ export function mapToParticipantRequest(
   mapping: Record<string, string>
 ): RegisterParticipantRequest {
   // Helper function to throw error if a field is missing
-  const getField = (field: string, isNextOfKin = false): string => {
-    const fieldName = isNextOfKin ? `nextOfKin.${field}` : field;
+  const getField = (field: string, isNextOfKin = false, isDep = false): string => {
+    const fieldName = isNextOfKin 
+      ? `nextOfKin.${field}` 
+      : isDep 
+        ? `dependents.${field}` 
+        : field;
     if (!sourceData[mapping[field]]) {
       throw new Error(`Missing required field: ${fieldName}`);
     }
@@ -31,7 +35,13 @@ export function mapToParticipantRequest(
       firstName: getField('nokFirstName', true),
       lastName: getField('nokLastName', true),  
       email: getField('nokEmail', true)
-    }
+    },
+    dependents: [{
+      firstName: getField('depFirstName', false, true),
+      lastName: getField('depLastName', false, true),
+      dob: getField('depDOB', false, true),
+      permanent: false // REDCap example surveys currently don't support permanent dependents so this is always false - can be changed by users post export
+    }]
   };
 
   // Optionally, check and add 'nextOfKin.mobile' if exists

@@ -1,6 +1,7 @@
 [
     {
         "addressLine": "2 fake st", 
+        "dependents": [{"dob": "1984-01-10", "firstName": "test", "lastName": "child", "permanent": false}],
         "dob": "1984-01-10", 
         "email": "example@example.com", 
         "firstName": "John", 
@@ -16,6 +17,7 @@
     },
     {
         "addressLine": "2 fake st", 
+        "dependents": [{"dob": "1984-01-10", "firstName": "test", "lastName": "child", "permanent": false}],
         "dob": "1984-01-10", 
         "email": "example@example.com", 
         "firstName": "Test", 
@@ -31,6 +33,7 @@
     },
     {
         "addressLine": "2 fake st", 
+        "dependents": [{"dob": "1984-01-10", "firstName": "test", "lastName": "child", "permanent": false}],
         "dob": "1984-01-10", 
         "email": "example@example.com", 
         "firstName": "Fake", 
