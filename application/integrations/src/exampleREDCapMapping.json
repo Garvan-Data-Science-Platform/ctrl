@@ -1,0 +1,19 @@
+{
+    "firstName": "ctrl_pers_name",
+    "lastName": "ctrl_pers_surname",
+    "email": "ctrl_email",
+    "dob": "ctrl_dob",
+    "mobile": "ctrl_phone_no",
+    "preferredContact": "ctrl_pref_contact_meth",
+    "addressLine": "ctrl_address",
+    "suburb": "ctrl_suburb",
+    "postcode": "ctrl_postcode",
+    "state": "ctrl_state",
+    "nokFirstName": "ctrl_kin_name",
+    "nokLastName": "ctrl_kin_surname",
+    "nokMobile": "ctrl_kin_contactno",
+    "nokEmail": "ctrl_kin_email",
+    "depFirstName": "ctrl_child_name",
+    "depLastName": "ctrl_child_surname",
+    "depDOB": "ctrl_dob"
+}
