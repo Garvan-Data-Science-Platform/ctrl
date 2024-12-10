@@ -6,7 +6,7 @@
     "type-check": "tsc",
     "build": "true",
     "dev": "true",
-    "test": "jest --passWithNoTests"
+    "test": "jest"
   },
   "workspaces": [
     "packages/*"

@@ -1,0 +1,16 @@
+[{
+    "addressLine": "2 fake st", 
+    "dependents": [{"dob": "1984-01-10", "firstName": "test", "lastName": "child", "permanent": false}],
+    "dob": "1984-01-10", 
+    "email": "example@example.com", 
+    "firstName": "John", 
+    "lastName": "Smith", 
+    "mobile": "0448434946", 
+    "nextOfKin": {"email": "example2@example.com", "firstName": "fake", "lastName": "fakerson", "mobile": "0448434946"}, 
+    "participantType": "STANDARD", 
+    "password": "temporary_password", 
+    "postcode": "2010", 
+    "preferredContact": "EMAIL", 
+    "state": "ACT", 
+    "suburb": "fakie"
+}]

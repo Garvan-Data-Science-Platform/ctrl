@@ -1,8 +1,8 @@
 export enum ContactMethod {
-  MOBILE = 'MOBILE',
   EMAIL = 'EMAIL',
+  MOBILE = 'MOBILE',
   MAIL = 'MAIL',
-}
+} // ordering here is important, must be identical order to REDCap survey for exports to function correctly
 
 export enum StateTerritory {
   ACT = 'ACT',
@@ -13,7 +13,7 @@ export enum StateTerritory {
   TAS = 'TAS',
   VIC = 'VIC',
   WA = 'WA',
-}
+} // ordering here is important, must be identical order to REDCap survey for exports to function correctly
 
 export enum ParticipantType {
   STANDARD = 'STANDARD',
