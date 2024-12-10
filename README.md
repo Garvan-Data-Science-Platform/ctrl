@@ -76,7 +76,7 @@ docker build \
   -f Dockerfile .
 ```
 
-**Note**: an [alternative Dockerfile](Dockerfile_with_nvm) is provided, that install Node.js through `nvm`.
+_**NOTE**: an [alternative Dockerfile](Dockerfile_with_nvm) is provided, that install Node.js through `nvm`._
 
 To run `ctrl-next` once the image has been built and its Postgres DB a [docker-compose.yml](docker-compose.yml) file is provided. The following commands are supported:
 
@@ -116,6 +116,36 @@ yarn prisma:generate
 # Run migrations
 yarn prisma:migrate
 ```
+
+### Mailer
+
+As part of the ctrl-next app, a mailer can be configured for users to submit a contact us request.
+
+#### Setup
+
+Environemnt variables involved in setting up the mailer are as follows:
+
+```bash
+MAILER_HOST=
+MAILER_PORT=
+MAILER_USERNAME=
+MAILER_PASSWORD=
+```
+
+#### Testing Mailer Service
+
+To test the mailer, we can use [ethereal](ethereal.email) which is a fake SMTP service which is an anti-transactional email service meaning that messages are never delivered. This allows us to preview the sent message whilst no emails are actually delivered.
+
+To use [ethereal](ethereal.email), we need to setup the related environment variables as follows:
+
+```bash
+MAILER_HOST=smtp.ethereal.email
+MAILER_PORT=587
+MAILER_USERNAME={generated username from ethereal}
+MAILER_PASSWORD={generated password from ethereal}
+```
+
+_**NOTE**: You can generate an account by clicking 'Create Ethereal Account' and copy pasting the account details into the related environment variables above._
 
 ### Migrations
 
@@ -159,5 +189,5 @@ As software is developed, previous decisions around schema design are often reco
    ALTER TABLE "User" ADD COLUMN "middleName" TEXT;
    ```
 
-5. Apply the new migration to our database by running: `yarn prisma:migrate`.
-6. Now our database is up to date with our prisma schema, we can ensure data safety.
+4. Apply the new migration to our database by running: `yarn prisma:migrate`.
+5. Now our database is up to date with our prisma schema, we can ensure data safety.

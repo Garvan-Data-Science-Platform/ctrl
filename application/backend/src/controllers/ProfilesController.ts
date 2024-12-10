@@ -1,4 +1,3 @@
-import { getUserIdFromToken } from '../authentication'
 import logger from 'common/src/logger'
 import prisma from '../PrismaClient'
 import {
@@ -7,7 +6,7 @@ import {
   NotFoundErrorResponse,
 } from 'common/types/api/errors'
 import { GetParticipantProfileResponse } from 'common/types/api/users'
-import { NotFoundError, NoTokenError } from '../middlewares/ErrorHandler'
+import { NotFoundError } from '../middlewares/ErrorHandler'
 import {
   Route,
   Tags,
@@ -49,14 +48,11 @@ export class ProfilesController extends Controller {
      * the endpoint (GET /profile/{userId}) in order to avoid collisions
      */
 
-    // Get the user ID from the token
-    const token = request.headers.authorization?.split(' ')[1]
-
-    if (!token) {
-      throw new NoTokenError()
+    if (!request.user) {
+      throw new NotFoundError('User not found')
     }
 
-    const userId: number = getUserIdFromToken(token)
+    const userId: number = request.user.userId
     return this.getParticipantProfile(userId)
   }
 

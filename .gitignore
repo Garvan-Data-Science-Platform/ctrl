@@ -8,6 +8,7 @@
 
 .DS_Store
 .vscode
+application/*/.env
 
 # Dependency directories
 node_modules/

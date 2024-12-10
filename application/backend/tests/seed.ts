@@ -41,6 +41,23 @@ export async function seedTests(prisma: PrismaClient) {
     },
   })
 
+  //OrganisationAdminUser
+  await prisma.user.create({
+    data: {
+      id: 101,
+      email: 'testOrgAdmin2@example.com',
+      firstName: 'Organisation2',
+      lastName: 'Admin2',
+      password: 'password',
+      role: Role.OrganisationAdmin,
+      organisations: {
+        connect: {
+          id: 99,
+        },
+      },
+    },
+  })
+
   //User with unanswered survey
   await prisma.user.create({
     data: {
