@@ -11,7 +11,7 @@ import { RegisterParticipantRequest } from 'common/types/api/auth';
 @Tags('Integrations')
 @Security('jwt', ['OrganisationAdmin'])
 export class IntegrationsController extends Controller {
-
+  //test
   userRepo = prisma.user
 
   // assumptions:
