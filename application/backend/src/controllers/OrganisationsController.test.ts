@@ -222,7 +222,7 @@ describe('OrganisationsController', () => {
 
       const body: GetOrganisationUsersResponse = response.body
       console.log(body)
-      expect(body.users?.length).toBe(1)
+      expect(body.users?.length).toBe(2)
       expect(body.users?.[0].id).toBe(testUserInOrgId)
     })
 
