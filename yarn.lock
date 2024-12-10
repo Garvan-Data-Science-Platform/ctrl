@@ -1930,7 +1930,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hapi/accept@npm:^6.0.1":
+"@hapi/accept@npm:^6.0.3":
   version: 6.0.3
   resolution: "@hapi/accept@npm:6.0.3"
   dependencies:
@@ -1974,6 +1974,16 @@ __metadata:
     "@hapi/boom": "npm:^10.0.1"
     "@hapi/hoek": "npm:^11.0.2"
   checksum: c0c1bd43adf04a5b952fd26d2248584a9b2a81bf012bb027260bf407977e88172982fac85d08be7c9ea76aa89b179785a00a7c7d7e8d530cfee2155607202627
+  languageName: node
+  linkType: hard
+
+"@hapi/bounce@npm:^3.0.2":
+  version: 3.0.2
+  resolution: "@hapi/bounce@npm:3.0.2"
+  dependencies:
+    "@hapi/boom": "npm:^10.0.1"
+    "@hapi/hoek": "npm:^11.0.2"
+  checksum: 358cf994dde3e335e36bfdc0d5a3fdc4389c5524218500a90655690845fd7388997c203a06bbf6b41e86872ba543d5743274f0d63df49af8aa8b90ecf4dd03d0
   languageName: node
   linkType: hard
 
@@ -2041,19 +2051,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hapi/hapi@npm:^21.3.3":
-  version: 21.3.10
-  resolution: "@hapi/hapi@npm:21.3.10"
+"@hapi/hapi@npm:^21.3.12":
+  version: 21.3.12
+  resolution: "@hapi/hapi@npm:21.3.12"
   dependencies:
-    "@hapi/accept": "npm:^6.0.1"
+    "@hapi/accept": "npm:^6.0.3"
     "@hapi/ammo": "npm:^6.0.1"
     "@hapi/boom": "npm:^10.0.1"
-    "@hapi/bounce": "npm:^3.0.1"
+    "@hapi/bounce": "npm:^3.0.2"
     "@hapi/call": "npm:^9.0.1"
     "@hapi/catbox": "npm:^12.1.1"
     "@hapi/catbox-memory": "npm:^6.0.2"
     "@hapi/heavy": "npm:^8.0.1"
-    "@hapi/hoek": "npm:^11.0.2"
+    "@hapi/hoek": "npm:^11.0.6"
     "@hapi/mimos": "npm:^7.0.1"
     "@hapi/podium": "npm:^5.0.1"
     "@hapi/shot": "npm:^6.0.1"
@@ -2061,9 +2071,9 @@ __metadata:
     "@hapi/statehood": "npm:^8.1.1"
     "@hapi/subtext": "npm:^8.1.0"
     "@hapi/teamwork": "npm:^6.0.0"
-    "@hapi/topo": "npm:^6.0.1"
+    "@hapi/topo": "npm:^6.0.2"
     "@hapi/validate": "npm:^2.0.1"
-  checksum: 4b682562bcf1073004e74c95082d5bd95d3233bcd631ac85136fed6fef39682d8a6b785c03d8a665cc54db437370b388beaf0d81922dbcb37795ec18bfa7a766
+  checksum: 758203cb73c167f4de15bb19771bd55433aed201e9d771cb420fd88107d9eec208631222c21000488841eed2764e488a76e92d5288a6f194fed852c898b1153e
   languageName: node
   linkType: hard
 
@@ -2082,6 +2092,13 @@ __metadata:
   version: 11.0.4
   resolution: "@hapi/hoek@npm:11.0.4"
   checksum: 3c0e487824daaf3af4c29e46fd57b0c5801ce9164fef2417c70e271cd970e13cc542b196f70ba1cfc9ef944eed825fcac261085ab5e2928c6017428bf576b363
+  languageName: node
+  linkType: hard
+
+"@hapi/hoek@npm:^11.0.6":
+  version: 11.0.7
+  resolution: "@hapi/hoek@npm:11.0.7"
+  checksum: 39a4a3ae9526ed66509f6d03c6eb43179a2590df6e98443328c966cfa5e7cbb9d340f61fdbe0afe092662d5377d5a611c3303c808fee26a9c9cfd6bd3737dc1c
   languageName: node
   linkType: hard
 
@@ -2199,7 +2216,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hapi/topo@npm:^6.0.1":
+"@hapi/topo@npm:^6.0.1, @hapi/topo@npm:^6.0.2":
   version: 6.0.2
   resolution: "@hapi/topo@npm:6.0.2"
   dependencies:
@@ -3890,36 +3907,36 @@ __metadata:
   version: 6.4.0
   resolution: "@tsoa/cli@npm:6.4.0"
   dependencies:
-    "@tsoa/runtime": "npm:^6.4.0"
-    "@types/multer": "npm:^1.4.11"
+    "@tsoa/runtime": "npm:^6.6.0"
+    "@types/multer": "npm:^1.4.12"
     fs-extra: "npm:^11.2.0"
     glob: "npm:^10.3.10"
     handlebars: "npm:^4.7.8"
-    merge-anything: "npm:^5.1.4"
+    merge-anything: "npm:^5.1.7"
     minimatch: "npm:^9.0.1"
-    ts-deepmerge: "npm:^7.0.0"
-    typescript: "npm:^5.3.3"
-    validator: "npm:^13.11.0"
-    yaml: "npm:^2.4.1"
+    ts-deepmerge: "npm:^7.0.2"
+    typescript: "npm:^5.7.2"
+    validator: "npm:^13.12.0"
+    yaml: "npm:^2.6.1"
     yargs: "npm:^17.7.1"
   bin:
     tsoa: dist/cli.js
-  checksum: c0d3797c32ebec80bc11d1afb495c94ab4c9b133d308c5cb0eb65e4a34cdcc9cfc941977a6ed37b9b6f81e0d3d116e185cc6219cd72019138aa4cb416e511986
+  checksum: 852c6a374a8741d24d71b8dd2a22127c5a012c083a3301ab81cf4b745d2a529bc87d29cf62cca42b57c0aaac3b890970f7bfafd9994ea508343f2006f9126977
   languageName: node
   linkType: hard
 
-"@tsoa/runtime@npm:^6.1.5, @tsoa/runtime@npm:^6.4.0":
-  version: 6.4.0
-  resolution: "@tsoa/runtime@npm:6.4.0"
+"@tsoa/runtime@npm:^6.6.0":
+  version: 6.6.0
+  resolution: "@tsoa/runtime@npm:6.6.0"
   dependencies:
     "@hapi/boom": "npm:^10.0.1"
-    "@hapi/hapi": "npm:^21.3.3"
+    "@hapi/hapi": "npm:^21.3.12"
     "@types/koa": "npm:^2.15.0"
-    "@types/multer": "npm:^1.4.11"
-    express: "npm:^4.18.3"
-    reflect-metadata: "npm:^0.2.1"
-    validator: "npm:^13.11.0"
-  checksum: a776703edf4a04e0fb0a9de8b84efed503d6c714abdac02bbb5769d2000fb227fb234eb03da4dabcbabf2f3ef16a82a5276618d61be2a30d645dfce43926f6fa
+    "@types/multer": "npm:^1.4.12"
+    express: "npm:^4.21.2"
+    reflect-metadata: "npm:^0.2.2"
+    validator: "npm:^13.12.0"
+  checksum: d66a1096cc20b181466ba0e2d870977faac0f6fe749056aea6012981f9445b38b56a10a846bbba530d47812cc67251351ed464db876079006a5149a8f9f62544
   languageName: node
   linkType: hard
 
@@ -4240,7 +4257,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/multer@npm:^1.4.11":
+"@types/multer@npm:^1.4.12":
   version: 1.4.12
   resolution: "@types/multer@npm:1.4.12"
   dependencies:
@@ -5340,7 +5357,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.6.2, axios@npm:^1.7.7":
+"axios@npm:^1.6.2":
   version: 1.7.7
   resolution: "axios@npm:1.7.7"
   dependencies:
@@ -5348,6 +5365,17 @@ __metadata:
     form-data: "npm:^4.0.0"
     proxy-from-env: "npm:^1.1.0"
   checksum: 4499efc89e86b0b49ffddc018798de05fab26e3bf57913818266be73279a6418c3ce8f9e934c7d2d707ab8c095e837fc6c90608fb7715b94d357720b5f568af7
+  languageName: node
+  linkType: hard
+
+"axios@npm:^1.7.8":
+  version: 1.7.9
+  resolution: "axios@npm:1.7.9"
+  dependencies:
+    follow-redirects: "npm:^1.15.6"
+    form-data: "npm:^4.0.0"
+    proxy-from-env: "npm:^1.1.0"
+  checksum: b7a41e24b59fee5f0f26c1fc844b45b17442832eb3a0fb42dd4f1430eb4abc571fe168e67913e8a1d91c993232bd1d1ab03e20e4d1fee8c6147649b576fc1b0b
   languageName: node
   linkType: hard
 
@@ -5456,7 +5484,7 @@ __metadata:
   dependencies:
     "@jest/globals": "npm:^29.7.0"
     "@prisma/client": "npm:^5.20.0"
-    "@tsoa/runtime": "npm:^6.1.5"
+    "@tsoa/runtime": "npm:^6.6.0"
     "@types/cors": "npm:^2.8.17"
     "@types/express": "npm:^4.17.21"
     "@types/jest": "npm:^29.5.12"
@@ -5470,7 +5498,7 @@ __metadata:
     dotenv: "npm:^16.4.5"
     dotenv-cli: "npm:^7.4.2"
     esbuild: "npm:^0.20.0"
-    express: "npm:^4.21.0"
+    express: "npm:^4.21.2"
     jest: "npm:^29.7.0"
     jest-mock-extended: "npm:^3.0.7"
     jsonwebtoken: "npm:^9.0.2"
@@ -6259,13 +6287,6 @@ __metadata:
   version: 1.0.6
   resolution: "cookie-signature@npm:1.0.6"
   checksum: b36fd0d4e3fef8456915fcf7742e58fbfcc12a17a018e0eb9501c9d5ef6893b596466f03b0564b81af29ff2538fd0aa4b9d54fe5ccbfb4c90ea50ad29fe2d221
-  languageName: node
-  linkType: hard
-
-"cookie@npm:0.6.0":
-  version: 0.6.0
-  resolution: "cookie@npm:0.6.0"
-  checksum: f2318b31af7a31b4ddb4a678d024514df5e705f9be5909a192d7f116cfb6d45cbacf96a473fa733faa95050e7cff26e7832bb3ef94751592f1387b71c8956686
   languageName: node
   linkType: hard
 
@@ -7657,16 +7678,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"express@npm:^4.18.3, express@npm:^4.21.0":
-  version: 4.21.0
-  resolution: "express@npm:4.21.0"
+"express@npm:^4.21.2":
+  version: 4.21.2
+  resolution: "express@npm:4.21.2"
   dependencies:
     accepts: "npm:~1.3.8"
     array-flatten: "npm:1.1.1"
     body-parser: "npm:1.20.3"
     content-disposition: "npm:0.5.4"
     content-type: "npm:~1.0.4"
-    cookie: "npm:0.6.0"
+    cookie: "npm:0.7.1"
     cookie-signature: "npm:1.0.6"
     debug: "npm:2.6.9"
     depd: "npm:2.0.0"
@@ -7680,7 +7701,7 @@ __metadata:
     methods: "npm:~1.1.2"
     on-finished: "npm:2.4.1"
     parseurl: "npm:~1.3.3"
-    path-to-regexp: "npm:0.1.10"
+    path-to-regexp: "npm:0.1.12"
     proxy-addr: "npm:~2.0.7"
     qs: "npm:6.13.0"
     range-parser: "npm:~1.2.1"
@@ -7692,7 +7713,7 @@ __metadata:
     type-is: "npm:~1.6.18"
     utils-merge: "npm:1.0.1"
     vary: "npm:~1.1.2"
-  checksum: 4cf7ca328f3fdeb720f30ccb2ea7708bfa7d345f9cc460b64a82bf1b2c91e5b5852ba15a9a11b2a165d6089acf83457fc477dc904d59cd71ed34c7a91762c6cc
+  checksum: 38168fd0a32756600b56e6214afecf4fc79ec28eca7f7a91c2ab8d50df4f47562ca3f9dee412da7f5cea6b1a1544b33b40f9f8586dbacfbdada0fe90dbb10a1f
   languageName: node
   linkType: hard
 
@@ -10346,7 +10367,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"merge-anything@npm:^5.1.4":
+"merge-anything@npm:^5.1.7":
   version: 5.1.7
   resolution: "merge-anything@npm:5.1.7"
   dependencies:
@@ -11201,6 +11222,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"path-to-regexp@npm:0.1.12":
+  version: 0.1.12
+  resolution: "path-to-regexp@npm:0.1.12"
+  checksum: 1c6ff10ca169b773f3bba943bbc6a07182e332464704572962d277b900aeee81ac6aa5d060ff9e01149636c30b1f63af6e69dd7786ba6e0ddb39d4dee1f0645b
+  languageName: node
+  linkType: hard
+
 "path-type@npm:^4.0.0":
   version: 4.0.0
   resolution: "path-type@npm:4.0.0"
@@ -11978,7 +12006,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"reflect-metadata@npm:^0.2.1":
+"reflect-metadata@npm:^0.2.2":
   version: 0.2.2
   resolution: "reflect-metadata@npm:0.2.2"
   checksum: 1cd93a15ea291e420204955544637c264c216e7aac527470e393d54b4bb075f10a17e60d8168ec96600c7e0b9fcc0cb0bb6e91c3fbf5b0d8c9056f04e6ac1ec2
@@ -13143,10 +13171,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-deepmerge@npm:^7.0.0":
-  version: 7.0.1
-  resolution: "ts-deepmerge@npm:7.0.1"
-  checksum: 33267d87d412d5f8f7f2cd024e435c4f5c721b74d10abcf2271329737b305196e8558ff17579631f17f89289afc1689601c5e0f91352a35ba4dd6dc923893c01
+"ts-deepmerge@npm:^7.0.2":
+  version: 7.0.2
+  resolution: "ts-deepmerge@npm:7.0.2"
+  checksum: fd46cf217004020979d6fa628b38a2cf8a689180a8ecde319e76806fb4a61e9e1896b4ba8b805dc75662d2a777983b8e7b5c49666952369dc8cc4e3a0a7d13d0
   languageName: node
   linkType: hard
 
@@ -13251,15 +13279,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsoa@npm:^6.1.5":
-  version: 6.4.0
-  resolution: "tsoa@npm:6.4.0"
+"tsoa@npm:^6.6.0":
+  version: 6.6.0
+  resolution: "tsoa@npm:6.6.0"
   dependencies:
-    "@tsoa/cli": "npm:^6.4.0"
-    "@tsoa/runtime": "npm:^6.4.0"
+    "@tsoa/cli": "npm:^6.6.0"
+    "@tsoa/runtime": "npm:^6.6.0"
   bin:
     tsoa: dist/cli.js
-  checksum: 54b97d1380882b3e9e4b9c39de050fa4b3f5cb649ab3f84e5a847bdb66729c53788a58328e2b8b0c71200ab370335e597d0cd6872e5c695a590dc9815b0a4053
+  checksum: 19ab1cff06754248dfb3eeb8f6541ccde6b5e331a962a68b69640c26a17d1a14ee6ce8bbfbe635bb338382f64e4a6a86d8e8572850eaa2a7f4f01b052a655d43
   languageName: node
   linkType: hard
 
@@ -13638,7 +13666,7 @@ __metadata:
     "@types/react": "npm:^18.3.3"
     "@types/react-dom": "npm:^18.3.0"
     "@vitejs/plugin-react-swc": "npm:^3.5.0"
-    axios: "npm:^1.7.7"
+    axios: "npm:^1.7.8"
     cypress: "npm:^13.14.2"
     eslint: "npm:^9.9.0"
     eslint-plugin-cypress: "npm:^3.5.0"
@@ -13714,7 +13742,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"validator@npm:^13.11.0":
+"validator@npm:^13.12.0":
   version: 13.12.0
   resolution: "validator@npm:13.12.0"
   checksum: 21d48a7947c9e8498790550f56cd7971e0e3d724c73388226b109c1bac2728f4f88caddfc2f7ed4b076f9b0d004316263ac786a17e9c4edf075741200718cd32
@@ -14082,12 +14110,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yaml@npm:^2.4.1":
-  version: 2.5.1
-  resolution: "yaml@npm:2.5.1"
+"yaml@npm:^2.6.1":
+  version: 2.6.1
+  resolution: "yaml@npm:2.6.1"
   bin:
     yaml: bin.mjs
-  checksum: 40fba5682898dbeeb3319e358a968fe886509fab6f58725732a15f8dda3abac509f91e76817c708c9959a15f786f38ff863c1b88062d7c1162c5334a7d09cb4a
+  checksum: aebf07f61c72b38c74d2b60c3a3ccf89ee4da45bcd94b2bfb7899ba07a5257625a7c9f717c65a6fc511563d48001e01deb1d9e55f0133f3e2edf86039c8c1be7
   languageName: node
   linkType: hard
 
