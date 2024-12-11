@@ -22,6 +22,11 @@
     "sourceMap": true,
     "outDir": "./dist"
   },
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs"
+    }
+  },
   "include": [
     "./src",
     "../common/src/surveys/validateSurveyAnswers.ts",
