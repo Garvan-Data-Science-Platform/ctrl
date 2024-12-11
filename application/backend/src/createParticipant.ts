@@ -120,7 +120,7 @@ export async function createParticipant(
       message: `Created participant with user ID: ${insertedUser.id}`,
       token,
     };
-  
+
     logger.info({ ...responseData });
     return responseData;
 }

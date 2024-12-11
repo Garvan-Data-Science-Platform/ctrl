@@ -1,3 +1,3 @@
-export interface uploadRedCapParticipantsResponse {
+export interface UploadRedCapParticipantsResponse {
     message: string
 }

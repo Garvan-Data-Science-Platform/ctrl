@@ -783,8 +783,8 @@
       },
       "ContactMethod": {
         "enum": [
-          "MOBILE",
           "EMAIL",
+          "MOBILE",
           "MAIL"
         ],
         "type": "string"
@@ -1166,7 +1166,7 @@
         "type": "object",
         "additionalProperties": false
       },
-      "ContactUsResponse": {
+      "uploadRedCapParticipantsResponse": {
         "properties": {
           "message": {
             "type": "string"
@@ -1177,26 +1177,6 @@
         ],
         "type": "object",
         "additionalProperties": false
-      },
-      "ContactUsRequest": {
-        "properties": {
-          "subject": {
-            "type": "string"
-          },
-          "content": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "subject",
-          "content"
-        ],
-        "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "subject": "Somethings Wrong!",
-          "content": "There was some problem with this thing that I was doing.\nBut I don't know why?\n\nCheers,\nJohn Doe"
-        }
       },
       "Workspace": {
         "properties": {
@@ -1609,9 +1589,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundErrorResponse"
-                },
-                "examples": {
-                  "Example 1": {}
                 }
               }
             }
@@ -1678,9 +1655,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundErrorResponse"
-                },
-                "examples": {
-                  "Example 1": {}
                 }
               }
             }
@@ -1757,9 +1731,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundErrorResponse"
-                },
-                "examples": {
-                  "Example 1": {}
                 }
               }
             }
@@ -1828,9 +1799,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundErrorResponse"
-                },
-                "examples": {
-                  "Example 1": {}
                 }
               }
             }
@@ -2389,9 +2357,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundErrorResponse"
-                },
-                "examples": {
-                  "Example 1": {}
                 }
               }
             }
@@ -2460,9 +2425,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundErrorResponse"
-                },
-                "examples": {
-                  "Example 1": {}
                 }
               }
             }
@@ -2521,9 +2483,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundErrorResponse"
-                },
-                "examples": {
-                  "Example 1": {}
                 }
               }
             }
@@ -2690,9 +2649,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundErrorResponse"
-                },
-                "examples": {
-                  "Example 1": {}
                 }
               }
             }
@@ -2761,9 +2717,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundErrorResponse"
-                },
-                "examples": {
-                  "Example 1": {}
                 }
               }
             }
@@ -2842,9 +2795,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundErrorResponse"
-                },
-                "examples": {
-                  "Example 1": {}
                 }
               }
             }
@@ -2915,9 +2865,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundErrorResponse"
-                },
-                "examples": {
-                  "Example 1": {}
                 }
               }
             }
@@ -2988,9 +2935,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundErrorResponse"
-                },
-                "examples": {
-                  "Example 1": {}
                 }
               }
             }
@@ -3068,9 +3012,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundErrorResponse"
-                },
-                "examples": {
-                  "Example 1": {}
                 }
               }
             }
@@ -3120,58 +3061,47 @@
         ]
       }
     },
-    "/mailer/contact-us": {
+    "/integrations/redcap/participant/upload": {
       "post": {
-        "operationId": "ContactUs",
+        "operationId": "UploadRedCapParticipant",
         "responses": {
           "200": {
-            "description": "Email sent",
+            "description": "Ok",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ContactUsResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
+                  "$ref": "#/components/schemas/uploadRedCapParticipantsResponse"
                 }
               }
             }
           }
         },
-        "description": "Sends a contact us email to the admin and users account.",
-        "summary": "ContactUs",
         "tags": [
-          "Mailer"
+          "Integrations"
         ],
         "security": [
           {
-            "jwt": []
+            "jwt": [
+              "OrganisationAdmin"
+            ]
           }
         ],
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/ContactUsRequest"
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
               }
             }
           }
@@ -3383,9 +3313,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                },
-                "examples": {
-                  "Example 1": {}
                 }
               }
             }

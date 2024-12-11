@@ -3,16 +3,17 @@ import csv from "csv-parser"
 import { Post, Route, Tags, Security, Controller, Get, SuccessResponse, Response, UploadedFile } from 'tsoa'
 import { Integrations } from '../../../integrations/src/Integrations';
 import exampleREDCapMapping from '../../../integrations/src/exampleREDCapMapping.json';
-import prisma from 'PrismaClient';
+import prisma from '../PrismaClient';
 import { RegisterParticipantRequest } from 'common/types/api/auth';
 import { createParticipant } from '../createParticipant';
-import { create } from 'domain';
-import {uploadRedCapParticipantsResponse} from 'common/types/api/integrations/redcap/uploadParticipant'
+import {UploadRedCapParticipantsResponse} from 'common/types/api/integrations/redcap'
+import { NotFoundError } from '../middlewares/ErrorHandler'
 
 
 @Route('integrations')
 @Tags('Integrations')
 @Security('jwt', ['OrganisationAdmin'])
+// TODO: add response types
 export class IntegrationsController extends Controller {
   userRepo = prisma.user
   profileRepo = prisma.participantProfile
@@ -22,26 +23,27 @@ export class IntegrationsController extends Controller {
   // assumptions:
   // - passwords are strong enough (they are created in Integrations so should be strong enough)
   @Post('/redcap/participant/upload')
+  @SuccessResponse('200', 'Created Participants from CSV')
   public async uploadRedCapParticipant(
-      @UploadedFile() file: Express.Multer.File
-  ): Promise<uploadRedCapParticipantsResponse> {
+      @UploadedFile() file?: Express.Multer.File
+  ): Promise<UploadRedCapParticipantsResponse> {
+    console.log("HELP")
+    console.log(file)
+    console.log("HELP")
+
     if (!file || !file.buffer) {
-      throw new Error("No file uploaded or file is empty.");
+      throw new NotFoundError("No file uploaded or file is empty.");
     }
 
     // Create a readable stream from the buffer
     const readableStream = Readable.from(file.buffer.toString());
-
     const csvData: Record<string, string>[] = await this.parseCSV(readableStream);
-
     const integrationService = new Integrations(exampleREDCapMapping)
-
     const data: RegisterParticipantRequest[] = integrationService.mapCSVToParticipantRequests(csvData)
-    console.log(data)
 
     const tokens = []
     for (const participant of data) {
-      tokens.push(createParticipant(participant, this.userRepo, this.surveyRepo, this.profileRepo, this.spRepo))
+      tokens.push(await createParticipant(participant, this.userRepo, this.surveyRepo, this.profileRepo, this.spRepo))
     }
 
     return {message:`created ${tokens.length} participants`}
@@ -58,6 +60,4 @@ export class IntegrationsController extends Controller {
         .on('end', () => resolve(res))
     })
   }
-
-  //private async createParticipant(request: RegisterParticipantRequest)
 }
