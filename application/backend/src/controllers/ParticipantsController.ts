@@ -66,6 +66,7 @@ export class ParticipantsController extends Controller {
       const p_answers = await this.participantRepo.findMany({
         where: { profileId: p.profile.id },
         select: { answers: true, version: { select: { id: true, updatedAt: true } }, id: true },
+        orderBy: { versionId: 'asc' },
       })
       const lastUpdated = Math.max(
         ...(p_answers.map((val) => determineLastUpdated(val.answers)) as unknown as number[]),
