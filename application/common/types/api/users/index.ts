@@ -5,6 +5,7 @@ import type { CreateUserRequest, CreateUserResponse } from './createUser'
 import type { UpdateUserRequest } from './updateUser'
 import type { UpdateProfileRequest } from './updateProfile'
 import type { UpdateUserRoleRequest } from './updateUserRole'
+import type { GeneratePasswordResetLinkResponse } from './passwordResetLink'
 
 export {
   GetUserByIdResponse,
@@ -15,4 +16,5 @@ export {
   UpdateUserRequest,
   UpdateProfileRequest,
   UpdateUserRoleRequest,
+  GeneratePasswordResetLinkResponse,
 }
