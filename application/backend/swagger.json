@@ -1166,6 +1166,38 @@
         "type": "object",
         "additionalProperties": false
       },
+      "ContactUsResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "ContactUsRequest": {
+        "properties": {
+          "subject": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "subject",
+          "content"
+        ],
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "subject": "Somethings Wrong!",
+          "content": "There was some problem with this thing that I was doing.\nBut I don't know why?\n\nCheers,\nJohn Doe"
+        }
+      },
       "UploadRedCapParticipantsResponse": {
         "properties": {
           "message": {
@@ -3061,6 +3093,64 @@
         ]
       }
     },
+    "/mailer/contact-us": {
+      "post": {
+        "operationId": "ContactUs",
+        "responses": {
+          "200": {
+            "description": "Email sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactUsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Sends a contact us email to the admin and users account.",
+        "summary": "ContactUs",
+        "tags": [
+          "Mailer"
+        ],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactUsRequest"
+              }
+            }
+          }
+        }
+      }
+    },
     "/integrations/redcap/participant/upload": {
       "post": {
         "operationId": "UploadRedCapParticipant",
@@ -3071,6 +3161,26 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UploadRedCapParticipantsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
                 }
               }
             }

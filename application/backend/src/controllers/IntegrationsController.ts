@@ -26,7 +26,6 @@ export class IntegrationsController extends Controller {
   spRepo = prisma.surveyParticipant
 
 
-  
   // assumptions:
   // - passwords are strong enough (they are created in Integrations so should be strong enough)
   @Post('/redcap/participant/upload')
