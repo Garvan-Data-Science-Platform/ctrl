@@ -24,8 +24,6 @@ import { AuthController } from './controllers/AuthController';
 import { expressAuthentication } from './authentication';
 // @ts-ignore - no great way to install types from subpackage
 import type { Request as ExRequest, Response as ExResponse, RequestHandler, Router } from 'express';
-const multer = require('multer');
-
 
 const expressAuthenticationRecasted = expressAuthentication as (req: ExRequest, securityName: string, scopes?: string[], res?: ExResponse) => Promise<any>;
 
@@ -625,14 +623,13 @@ const templateService = new ExpressTemplateService(models, {"noImplicitAdditiona
 
 
 
-export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof multer>}) {
+export function RegisterRoutes(app: Router) {
 
     // ###########################################################################################################
     //  NOTE: If you do not see routes for all of your controllers in this file, then you might not have informed tsoa of where to look
     //      Please look into the "controllerPathGlobs" config option described in the readme: https://github.com/lukeautry/tsoa
     // ###########################################################################################################
 
-    const upload = opts?.multer ||  multer({"limits":{"fileSize":8388608}});
 
     
         const argsUsersController_getAllUsers: Record<string, TsoaRoute.ParameterSchema> = {
@@ -1529,7 +1526,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 response,
                 next,
                 validatedArgs,
-                successStatus: undefined,
+                successStatus: 200,
               });
             } catch (err) {
                 return next(err);

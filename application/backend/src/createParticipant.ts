@@ -1,7 +1,6 @@
 
 import { RegisterParticipantRequest } from 'common/types/api/auth'
 import prisma from './PrismaClient'
-import logger from 'common/src/logger'
 import { checkPasswordStrength } from 'common/src/PasswordStrength';
 import { ParticipantType, Role } from '@prisma/client';
 import { generateToken, hashPassword } from './authentication';
@@ -121,7 +120,6 @@ export async function createParticipant(
       token,
     };
 
-    logger.info({ ...responseData });
     return responseData;
 }
   

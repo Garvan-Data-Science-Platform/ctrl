@@ -14,21 +14,20 @@ export const expectedMappedData = {
   suburb: 'Somewhere',
   postcode: '12345',
   state: Object.values(StateTerritory)[1], // assuming '1' maps to a valid StateTerritory
-  password: 'temporary_password',
+  password: 'temporaryPassword123',
   dob: '1990-01-01',
   participantType: ParticipantType.STANDARD,
   nextOfKin: {
     firstName: 'Jane',
     lastName: 'Doe',
     email: 'jane.doe@example.com',
-    mobile: '0987654321',
+    mobile: '0987654321'
   },
-  dependents: [
-    {
-      firstName: 'test',
-      lastName: 'child',
-      dob: '1990-01-01',
-      permanent: false,
-    },
+  dependents: [{
+    firstName: 'test',
+    lastName: 'child',
+    dob: '1990-01-01',
+    permanent: false,
+  },
   ],
 }

@@ -1166,7 +1166,7 @@
         "type": "object",
         "additionalProperties": false
       },
-      "uploadRedCapParticipantsResponse": {
+      "UploadRedCapParticipantsResponse": {
         "properties": {
           "message": {
             "type": "string"
@@ -3066,11 +3066,11 @@
         "operationId": "UploadRedCapParticipant",
         "responses": {
           "200": {
-            "description": "Ok",
+            "description": "Created Participants from CSV",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/uploadRedCapParticipantsResponse"
+                  "$ref": "#/components/schemas/UploadRedCapParticipantsResponse"
                 }
               }
             }
@@ -3086,26 +3086,7 @@
             ]
           }
         ],
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary"
-                  }
-                },
-                "required": [
-                  "file"
-                ]
-              }
-            }
-          }
-        }
+        "parameters": []
       }
     },
     "/healthcheck": {
