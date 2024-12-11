@@ -10,7 +10,7 @@ import { Route, Tags, Controller, Body, Post, SuccessResponse, Response, Validat
 import prisma from '../PrismaClient'
 import logger from 'common/src/logger'
 import { checkPasswordStrength } from 'common/src/PasswordStrength'
-import { User, Role, ParticipantType } from '@prisma/client'
+import { User } from '@prisma/client'
 import { generateToken, hashPassword, verifyPassword } from '../authentication'
 import type {
   InternalErrorResponse,
@@ -18,7 +18,6 @@ import type {
   ValidateErrorResponse,
 } from 'common/types/api/errors'
 import { IncorrectPasswordError, NotFoundError } from '../middlewares/ErrorHandler'
-import { createDefaultAnswers } from 'common/src/surveys/createDefaultAnswers'
 import { createParticipant } from '../createParticipant'
 
 @Route('auth')
