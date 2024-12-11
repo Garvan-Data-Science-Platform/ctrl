@@ -304,7 +304,7 @@ export class SurveysController extends Controller {
     }
 
     //Maps the type of the first element to the updated status
-    const status = statusMap[surveySteps[step].elements[0].type]
+    const status = statusMap[surveySteps[step].elements[0]?.type || 'subheading']
 
     if (!validateAnswers(surveySteps[step], data)) {
       throw new ValidateError({}, 'Answers did not match survey question structure')
