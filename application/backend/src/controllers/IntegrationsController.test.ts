@@ -74,7 +74,7 @@ describe('IntegrationsController', () => {
                 .set({ Authorization: `Bearer ${token}` })
             expect(response.status).toBe(404)
             const body: UploadRedCapParticipantsResponse = response.body
-            expect(body.message).toBe('File is empty')
+            expect(body.message).toBe('No file uploaded')
         })
 
         it('should throw a 404 error if given an empty file', async () => {
@@ -85,7 +85,7 @@ describe('IntegrationsController', () => {
                 .attach('file', csvPath); 
             expect(response.status).toBe(404)
             const body: UploadRedCapParticipantsResponse = response.body
-            expect(body.message).toBe('Not Found')
+            expect(body.message).toBe('File is empty')
         })
 
         it('should throw an error if the file is not a csv', async () => {
