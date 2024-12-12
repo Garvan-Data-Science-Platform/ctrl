@@ -8,13 +8,13 @@ import { ValidateError } from 'tsoa';
 import { createDefaultAnswers } from 'common/src/surveys/createDefaultAnswers';
 
 export async function createParticipant(
-    bodyRequest: RegisterParticipantRequest, 
+    participantData: RegisterParticipantRequest, 
     userRepo: typeof prisma.user, 
     surveyRepo: typeof prisma.surveyVersion,
     profileRepo: typeof prisma.participantProfile,
     spRepo: typeof prisma.surveyParticipant
 ) {
-    const { password, ...participantData } = bodyRequest;
+    const { password, ...participantInfo } = participantData;
   
     // Check Password
     const { isValid, fields } = await checkPasswordStrength(password);
@@ -25,7 +25,7 @@ export async function createParticipant(
     const hashedPassword = await hashPassword(password);
   
     // Extract user and profile data
-    const { firstName, middleName, lastName, email, dob, ...profileData } = participantData;
+    const { firstName, middleName, lastName, email, dob, ...profileData } = participantInfo;
     const userDetails = { firstName, middleName, lastName, email };
   
     const { nextOfKin, dependents, ...noNextOfKinProfileData } = profileData;
