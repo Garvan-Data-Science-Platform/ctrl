@@ -33,7 +33,7 @@ export function mapToParticipantRequest(
     participantType: ParticipantType.STANDARD, // temporary
     nextOfKin: {
       firstName: getField('nokFirstName', true),
-      lastName: getField('nokLastName', true),  
+      lastName: getField('nokLastName', true),
       email: getField('nokEmail', true),
     },
     dependents: [] // Initialize as empty array by default

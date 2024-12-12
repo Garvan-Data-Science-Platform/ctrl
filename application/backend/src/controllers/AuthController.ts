@@ -18,7 +18,7 @@ import type {
   ValidateErrorResponse,
 } from 'common/types/api/errors'
 import { IncorrectPasswordError, NotFoundError } from '../middlewares/ErrorHandler'
-import { createParticipant } from '../createParticipant'
+import { createParticipant } from '../helperFunctions'
 
 @Route('auth')
 @Tags('Auth')

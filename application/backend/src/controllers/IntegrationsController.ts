@@ -3,10 +3,10 @@ import { Post, Route, Tags, Security, Controller, SuccessResponse, Response, Req
 import { Integrations } from '../../../integrations/src/Integrations';
 import exampleREDCapMapping from '../../../integrations/src/exampleREDCapMapping.json';
 import prisma from '../PrismaClient';
-import { createParticipant } from '../createParticipant';
+import { createParticipant } from '../helperFunctions';
 import { NotFoundError } from '../middlewares/ErrorHandler'
 import { Readable } from 'stream';
-import csv from "csv-parser"
+import { parse } from "fast-csv"
 import multer from 'multer';
 import * as express from 'express'
 import {UploadRedCapParticipantsResponse} from 'common/types/api/integrations/redcap'
@@ -46,6 +46,8 @@ export class IntegrationsController extends Controller {
     // Create a readable stream from the buffer
     const readableStream = Readable.from(file.buffer.toString());
     const csvData: Record<string, string>[] = await this.parseCSV(readableStream);
+
+    console.log(csvData)
     const integrationService = new Integrations(exampleREDCapMapping)
     const data: RegisterParticipantRequest[] = integrationService.mapCSVToParticipantRequests(csvData)
 
@@ -62,8 +64,10 @@ export class IntegrationsController extends Controller {
 
     return new Promise((resolve, reject) => {
       stream
-        .pipe(csv())
-        .on('data', (data) => res.push(data))
+        .pipe(parse({headers: true}))
+        .on('data', (data) => {
+          res.push(data)
+        })
         .on('error', (error) => reject(error))
         .on('end', () => resolve(res))
     })
@@ -81,3 +85,4 @@ export class IntegrationsController extends Controller {
     });
   }
 }
+
