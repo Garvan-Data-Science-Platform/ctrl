@@ -10,4 +10,5 @@ module.exports = {
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
   },
+  reporters: [['github-actions', { silent: false }], 'summary'],
 }
