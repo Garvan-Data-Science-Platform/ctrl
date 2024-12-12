@@ -75,7 +75,7 @@ export class AuthController extends Controller {
   public async registerParticipant(
     @Body() bodyRequest: RegisterParticipantRequest,
   ): Promise<RegisterParticipantResponse> {
-    return createParticipant(bodyRequest, this.userRepo, this.surveyRepo, this.profileRepo, this.spRepo)
+    return createParticipant(bodyRequest)
   }
 
   /**
