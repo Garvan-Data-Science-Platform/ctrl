@@ -18,7 +18,7 @@ import type {
   ValidateErrorResponse,
 } from 'common/types/api/errors'
 import { IncorrectPasswordError, NotFoundError } from '../middlewares/ErrorHandler'
-import { createParticipant } from '../helperFunctions'
+import { AuthService } from '../services/AuthService'
 
 @Route('auth')
 @Tags('Auth')
@@ -29,6 +29,7 @@ export class AuthController extends Controller {
   profileRepo = prisma.participantProfile
   surveyRepo = prisma.surveyVersion
   spRepo = prisma.surveyParticipant
+  authService = new AuthService()
 
   /**
    * register
@@ -75,7 +76,7 @@ export class AuthController extends Controller {
   public async registerParticipant(
     @Body() bodyRequest: RegisterParticipantRequest,
   ): Promise<RegisterParticipantResponse> {
-    return createParticipant(bodyRequest)
+    return this.authService.createParticipant(bodyRequest)
   }
 
   /**

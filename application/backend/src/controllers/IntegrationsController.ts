@@ -2,7 +2,7 @@ import { Post, Route, Tags, Security, Controller, SuccessResponse, Response, Req
 import { Integrations } from '../../../integrations/src/Integrations'
 import exampleREDCapMapping from '../../../integrations/src/exampleREDCapMapping.json'
 import prisma from '../PrismaClient'
-import { createParticipant, parseCSV } from '../helperFunctions'
+import { parseCSV } from '../HelperFunctions'
 import { NotFoundError } from '../middlewares/ErrorHandler'
 import { Readable } from 'stream'
 import multer from 'multer'
@@ -10,6 +10,7 @@ import * as express from 'express'
 import { UploadRedCapParticipantsResponse } from 'common/types/api/integrations/redcap'
 import { RegisterParticipantRequest } from 'common/types/api/auth'
 import { UnauthorizedErrorResponse, InternalErrorResponse } from 'common/types/api/errors'
+import { AuthService } from '../services/AuthService'
 
 @Route('integrations')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
@@ -21,6 +22,7 @@ export class IntegrationsController extends Controller {
   profileRepo = prisma.participantProfile
   surveyRepo = prisma.surveyVersion
   spRepo = prisma.surveyParticipant
+  authService = new AuthService()
 
   // assumptions:
   // - passwords are strong enough (they are created in Integrations so should be strong enough)
@@ -50,7 +52,7 @@ export class IntegrationsController extends Controller {
 
     const tokens = []
     for (const participant of data) {
-      tokens.push(await createParticipant(participant))
+      tokens.push(await this.authService.createParticipant(participant))
     }
 
     return { message: `created ${tokens.length} participants` }
