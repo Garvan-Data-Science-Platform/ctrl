@@ -2,7 +2,7 @@ import { Post, Route, Tags, Security, Controller, SuccessResponse, Response, Req
 import { Integrations } from '../../../integrations/src/Integrations'
 import exampleREDCapMapping from '../../../integrations/src/exampleREDCapMapping.json'
 import prisma from '../PrismaClient'
-import { parseCSV } from '../HelperFunctions'
+import { parseCSV } from '../helperFunctions'
 import { NotFoundError } from '../middlewares/ErrorHandler'
 import { Readable } from 'stream'
 import multer from 'multer'
