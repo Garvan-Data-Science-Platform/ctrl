@@ -213,7 +213,7 @@ describe('OrganisationsController', () => {
       expect(response.status).toBe(200)
 
       const body: GetOrganisationUsersResponse = response.body
-      console.log(body)
+
       expect(body.data.length).toBe(2)
       expect(body.data[0].id).toBe(ORG_ADMIN_ID)
     })

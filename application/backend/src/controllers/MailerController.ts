@@ -7,6 +7,7 @@ import {
 import { ContactUsResponse, type ContactUsRequest } from 'common/types/api/mailer'
 import * as express from 'express'
 import prisma from '../PrismaClient'
+import { Role } from '@prisma/client'
 import { NotFoundError } from '../middlewares/ErrorHandler'
 import { MailerService } from '../services/MailerService'
 
@@ -42,8 +43,26 @@ export class MailerController extends Controller {
       select: { email: true },
     })
 
+    // Check the mailer is available
     await this.mailerService.verifyConnection()
-    await this.mailerService.sendContactUsEmail(bodyRequest, user.email)
+
+    // Get the organisation admins email(s)
+    const organisationAdminEmails = await prisma.user.findMany({
+      where: { role: Role.OrganisationAdmin },
+      select: { email: true },
+    })
+
+    const mailList: string[] | string = process.env.CTRL_ADMIN_EMAIL
+      ? [process.env.CTRL_ADMIN_EMAIL]
+      : organisationAdminEmails.map((admin) => admin.email)
+
+    // Send the email to admin(s)
+    const subjectToAdmin: string = `New Contact Us Request RE: ${bodyRequest.subject}`
+    await this.mailerService.sendEmail(mailList, subjectToAdmin, bodyRequest.content)
+
+    // Send the email to the user
+    const subjectToUser: string = `Copy of your message submitted to CTRL Administration Team RE: ${bodyRequest.subject}`
+    await this.mailerService.sendEmail(user.email, subjectToUser, bodyRequest.content)
 
     return {
       message: 'Contact us request successfully sent to admin team.',
