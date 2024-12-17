@@ -3,11 +3,11 @@ import { Integrations } from '../../../integrations/src/Integrations'
 import exampleREDCapMapping from '../../../integrations/src/exampleREDCapMapping.json'
 import prisma from '../PrismaClient'
 import { parseCSV } from '../utils/parseCsv'
-import { NotFoundError } from '../middlewares/ErrorHandler'
+import { FileUploadError } from '../middlewares/ErrorHandler'
 import { Readable } from 'stream'
 import * as express from 'express'
 import { UploadRedCapParticipantsResponse } from 'common/types/api/integrations/redcap'
-import { CreateParticipantRequest, RegisterParticipantRequest } from 'common/types/api/auth'
+import { RegisterParticipantRequest } from 'common/types/api/auth'
 import { UnauthorizedErrorResponse, InternalErrorResponse } from 'common/types/api/errors'
 import { AuthController } from './AuthController'
 
@@ -31,11 +31,11 @@ export class IntegrationsController extends Controller {
   ): Promise<UploadRedCapParticipantsResponse> {
     const file = request.file
     if (!file) {
-      throw new NotFoundError('No file uploaded')
+      throw new FileUploadError('No file uploaded')
     } else if (!file.buffer || file.buffer.length === 0) {
-      throw new NotFoundError('File is empty')
+      throw new FileUploadError('File is empty')
     } else if (file.mimetype !== 'text/csv') {
-      throw new Error('Invalid file type. Please upload a CSV file.')
+      throw new FileUploadError('Invalid file type. Please upload a CSV file.')
     }
 
     // Create a readable stream from the buffer
@@ -50,6 +50,7 @@ export class IntegrationsController extends Controller {
     for (const participant of data) {
       // Since we are not creating a user anymore we don't need all the data from RegisterParticipantRequest, fields may be needed later in dev tho
       // specifically these fields might be required to create a new account for the person and send them an email for it
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { email, password, middleName, ...participantData } = participant
       participants.push(await authController.createParticipant(participantData))
     }

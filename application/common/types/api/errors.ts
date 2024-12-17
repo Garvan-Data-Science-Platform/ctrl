@@ -62,3 +62,14 @@ export interface NotFoundErrorResponse {
   message: string
   details?: unknown
 }
+
+/**
+ * @example {
+ *  "message": "Bad Request",
+ *  "details": { "message": "File is of incorrect type" }
+ * }
+ */
+export interface BadRequestErrorResponse {
+  message: string
+  details?: unknown
+}

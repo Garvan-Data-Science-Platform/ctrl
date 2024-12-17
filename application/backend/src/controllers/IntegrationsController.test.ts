@@ -62,7 +62,7 @@ describe('IntegrationsController', () => {
       const response = await request(app)
         .post('/integrations/redcap/participant/upload')
         .set({ Authorization: `Bearer ${token}` })
-      expect(response.status).toBe(404)
+      expect(response.status).toBe(400)
       const body: UploadRedCapParticipantsResponse = response.body
       expect(body.message).toBe('No file uploaded')
     })
@@ -73,7 +73,7 @@ describe('IntegrationsController', () => {
         .post('/integrations/redcap/participant/upload')
         .set({ Authorization: `Bearer ${token}` })
         .attach('file', csvPath)
-      expect(response.status).toBe(404)
+      expect(response.status).toBe(400)
       const body: UploadRedCapParticipantsResponse = response.body
       expect(body.message).toBe('File is empty')
     })
@@ -84,7 +84,7 @@ describe('IntegrationsController', () => {
         .post('/integrations/redcap/participant/upload')
         .set({ Authorization: `Bearer ${token}` })
         .attach('file', csvPath)
-      expect(response.status).toBe(500)
+      expect(response.status).toBe(400)
     })
   })
 })
