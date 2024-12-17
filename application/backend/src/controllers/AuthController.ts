@@ -5,12 +5,14 @@ import type {
   LoginResponse,
   RegisterParticipantRequest,
   RegisterParticipantResponse,
+  CreateParticipantResponse,
+  CreateParticipantRequest,
 } from 'common/types/api/auth'
 import { Route, Tags, Controller, Body, Post, SuccessResponse, Response, ValidateError } from 'tsoa'
 import prisma from '../PrismaClient'
 import logger from 'common/src/logger'
 import { checkPasswordStrength } from 'common/src/PasswordStrength'
-import { User } from '@prisma/client'
+import { Role, User } from '@prisma/client'
 import { generateToken, hashPassword, verifyPassword } from '../authentication'
 import type {
   InternalErrorResponse,
@@ -18,7 +20,8 @@ import type {
   ValidateErrorResponse,
 } from 'common/types/api/errors'
 import { IncorrectPasswordError, NotFoundError } from '../middlewares/ErrorHandler'
-import { AuthService } from '../services/AuthService'
+import { createDefaultAnswers } from 'common/src/surveys/createDefaultAnswers'
+import { ParticipantType } from 'common/types/api/users/ParticipantProfile'
 
 @Route('auth')
 @Tags('Auth')
@@ -29,7 +32,6 @@ export class AuthController extends Controller {
   profileRepo = prisma.participantProfile
   surveyRepo = prisma.surveyVersion
   spRepo = prisma.surveyParticipant
-  authService = new AuthService()
 
   /**
    * register
@@ -76,7 +78,40 @@ export class AuthController extends Controller {
   public async registerParticipant(
     @Body() bodyRequest: RegisterParticipantRequest,
   ): Promise<RegisterParticipantResponse> {
-    return this.authService.createParticipant(bodyRequest)
+    // Extract info for user creation
+    const { firstName, middleName, lastName, email, password, ...participantInfo } = bodyRequest
+
+    // Check and hash Password
+    const { isValid, fields } = await checkPasswordStrength(password)
+    if (!isValid) {
+      throw new ValidateError(fields, 'Password does not meet strength requirements')
+    }
+    const hashedPassword = await hashPassword(password)
+
+    // Create User
+    const data = {
+      firstName: firstName,
+      middleName: middleName,
+      lastName: lastName,
+      email: email,
+      role: Role.Participant,
+      password: hashedPassword,
+    }
+    const insertedUser = await this.userRepo.create({ data })
+
+    // Extract info for participant creation
+    const participantData: CreateParticipantRequest = { firstName, lastName, ...participantInfo }
+    await this.createParticipant(participantData, insertedUser)
+
+    // Generate token
+    const token = await generateToken({ userId: insertedUser.id, roles: [insertedUser.role] })
+
+    const responseData = {
+      message: `Created participant with user ID: ${insertedUser.id}`,
+      token,
+    }
+
+    return responseData
   }
 
   /**
@@ -107,5 +142,82 @@ export class AuthController extends Controller {
     logger.info({ ...responseData })
 
     return responseData
+  }
+
+  public async createParticipant(
+    participantData: CreateParticipantRequest,
+    user?: User,
+  ): Promise<CreateParticipantResponse> {
+    // Extract user and profile data
+    const { firstName, lastName, dob, ...profileData } = participantData
+    const { nextOfKin, dependents, ...noNextOfKinProfileData } = profileData
+    const nextOfKinCreateData = { nextOfKin: { create: { ...nextOfKin } } }
+
+    // Check for existing dependents
+    let familyId
+    if (dependents.length > 0) {
+      const existingDep = await this.profileRepo.findFirst({
+        where: {
+          firstName: dependents[0].firstName,
+          lastName: dependents[0].lastName,
+          dob: new Date(dependents[0].dob),
+        },
+      })
+      if (existingDep) {
+        familyId = existingDep.familyId
+      }
+    }
+
+    // Create Profile
+    const profile = await this.profileRepo.create({
+      data: {
+        ...(user ? { user: { connect: { id: user.id } } } : {}),
+        ...noNextOfKinProfileData,
+        ...nextOfKinCreateData,
+        firstName: firstName,
+        lastName: lastName,
+        dob: new Date(dob),
+        familyId,
+        participantType:
+          dependents.length > 0 ? ParticipantType.GUARDIAN : ParticipantType.STANDARD,
+      },
+    })
+
+    // Fetch current survey
+    const currentSurvey = await this.surveyRepo.findFirstOrThrow({
+      where: { status: 'PUBLISHED' },
+      orderBy: { versionNumber: 'desc' },
+    })
+
+    // Create profiles for dependents if no existing family ID
+    if (!familyId) {
+      for (const dep of dependents) {
+        await this.profileRepo.create({
+          data: {
+            ...noNextOfKinProfileData,
+            firstName: dep.firstName,
+            lastName: dep.lastName,
+            dob: new Date(dep.dob),
+            familyId: profile.familyId,
+            participantType: dep.permanent
+              ? ParticipantType.DEPENDENT_OTHER
+              : ParticipantType.DEPENDENT_AGE,
+          },
+        })
+      }
+    }
+
+    // Assign survey to the main profile
+    if (currentSurvey) {
+      await this.spRepo.create({
+        data: {
+          profileId: profile.id,
+          versionId: currentSurvey.id,
+          answers: createDefaultAnswers(currentSurvey.data),
+        },
+      })
+    }
+
+    return { message: `Created participant with ID: ${profile.id} ` }
   }
 }

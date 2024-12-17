@@ -4,6 +4,7 @@ import { Api } from '../Api'
 import path from 'path'
 import { generateToken } from '../authentication'
 import { UploadRedCapParticipantsResponse } from 'common/types/api/integrations/redcap'
+import prisma from '../PrismaClient'
 
 const api = new Api()
 const app = api.app
@@ -24,7 +25,7 @@ describe('IntegrationsController', () => {
   })
 
   describe('POST /integrations/redcap/participant/upload', () => {
-    it('should register a new user from a given csv', async () => {
+    it('should create a new participant from a given csv', async () => {
       const csvPath = path.resolve(__dirname, '../../tests/test_data/one_user.csv')
       const response = await request(app)
         .post('/integrations/redcap/participant/upload')
@@ -34,20 +35,14 @@ describe('IntegrationsController', () => {
       expect(response.status).toBe(200)
       expect(response.body.message).toBe('created 1 participants')
 
-      const list = await request(app)
-        .get('/participants')
-        .set({ Authorization: `Bearer ${token}` })
+      const createdParticipant = await prisma.participantProfile.findFirst({
+        where: { firstName: 'John' },
+      })
 
-      // user is actually added
-      expect(list.body.data[3].firstName).toBe('John')
-      expect(list.body.data[3].lastName).toBe('Smith')
+      expect(createdParticipant).not.toBe(null)
     })
-
     it('should register multiple users from one csv', async () => {
-      const initialList = await request(app)
-        .get('/participants')
-        .set({ Authorization: `Bearer ${token}` })
-      const initialLen = initialList.body.data.length
+      const initialLen = await prisma.participantProfile.count()
 
       const csvPath = path.resolve(__dirname, '../../tests/test_data/90_users.csv')
       const response = await request(app)
@@ -58,10 +53,7 @@ describe('IntegrationsController', () => {
       expect(response.status).toBe(200)
       expect(response.body.message).toBe('created 90 participants')
 
-      const postCreationList = await request(app)
-        .get('/participants')
-        .set({ Authorization: `Bearer ${token}` })
-      const postCreationLen = postCreationList.body.data.length
+      const postCreationLen = await prisma.participantProfile.count()
 
       expect(postCreationLen - initialLen).toBe(90) // test still passes if db seed changes
     }, 15000)

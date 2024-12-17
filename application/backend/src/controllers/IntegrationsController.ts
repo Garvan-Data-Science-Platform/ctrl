@@ -2,15 +2,14 @@ import { Post, Route, Tags, Security, Controller, SuccessResponse, Response, Req
 import { Integrations } from '../../../integrations/src/Integrations'
 import exampleREDCapMapping from '../../../integrations/src/exampleREDCapMapping.json'
 import prisma from '../PrismaClient'
-import { parseCSV } from '../helperFunctions'
+import { parseCSV } from '../utils/parseCsv'
 import { NotFoundError } from '../middlewares/ErrorHandler'
 import { Readable } from 'stream'
-import multer from 'multer'
 import * as express from 'express'
 import { UploadRedCapParticipantsResponse } from 'common/types/api/integrations/redcap'
-import { RegisterParticipantRequest } from 'common/types/api/auth'
+import { CreateParticipantRequest, RegisterParticipantRequest } from 'common/types/api/auth'
 import { UnauthorizedErrorResponse, InternalErrorResponse } from 'common/types/api/errors'
-import { AuthService } from '../services/AuthService'
+import { AuthController } from './AuthController'
 
 @Route('integrations')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
@@ -22,7 +21,6 @@ export class IntegrationsController extends Controller {
   profileRepo = prisma.participantProfile
   surveyRepo = prisma.surveyVersion
   spRepo = prisma.surveyParticipant
-  authService = new AuthService()
 
   // assumptions:
   // - passwords are strong enough (they are created in Integrations so should be strong enough)
@@ -31,10 +29,7 @@ export class IntegrationsController extends Controller {
   public async uploadRedCapParticipant(
     @Request() request: express.Request,
   ): Promise<UploadRedCapParticipantsResponse> {
-    await this.handleFile(request)
     const file = request.file
-
-    // error checking
     if (!file) {
       throw new NotFoundError('No file uploaded')
     } else if (!file.buffer || file.buffer.length === 0) {
@@ -50,23 +45,15 @@ export class IntegrationsController extends Controller {
     const data: RegisterParticipantRequest[] =
       integrationService.mapCSVToParticipantRequests(csvData)
 
-    const tokens = []
+    const participants = []
+    const authController: AuthController = new AuthController()
     for (const participant of data) {
-      tokens.push(await this.authService.createParticipant(participant))
+      // Since we are not creating a user anymore we don't need all the data from RegisterParticipantRequest, fields may be needed later in dev tho
+      // specifically these fields might be required to create a new account for the person and send them an email for it
+      const { email, password, middleName, ...participantData } = participant
+      participants.push(await authController.createParticipant(participantData))
     }
 
-    return { message: `created ${tokens.length} participants` }
-  }
-
-  private handleFile(request: express.Request): Promise<void> {
-    const multerSingle = multer().single('file')
-    return new Promise((resolve, reject) => {
-      multerSingle(request, undefined as any, async (error) => {
-        if (error) {
-          reject(error)
-        }
-        resolve()
-      })
-    })
+    return { message: `created ${participants.length} participants` }
   }
 }
