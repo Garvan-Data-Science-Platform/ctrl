@@ -245,6 +245,18 @@
           "newRole": "OperatorAdmin"
         }
       },
+      "GeneratePasswordResetLinkResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
       "SurveyVersionStatus": {
         "type": "string",
         "enum": ["PUBLISHED", "DRAFT"]
@@ -1592,6 +1604,64 @@
             }
           }
         }
+      }
+    },
+    "/users/password/generate-reset-link": {
+      "post": {
+        "operationId": "GeneratePasswordResetLink",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneratePasswordResetLinkResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Generate Password Reset Link",
+        "summary": "Generate and send a password reset link to the user",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": []
       }
     },
     "/surveys": {
