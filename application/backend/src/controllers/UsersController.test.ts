@@ -11,6 +11,10 @@ import {
 } from 'common/types/api/users'
 import { Role } from '@prisma/client'
 import { OPERATOR_ADMIN_ID, ORG_ADMIN_ID, PARTICIPANT_UNANSWERED_ID } from '../../tests/seed'
+import { NodemailerMock } from 'nodemailer-mock'
+import * as nodemailer from 'nodemailer'
+
+const mockNodeMailer = nodemailer as unknown as NodemailerMock
 
 const api = new Api()
 const app = api.app
@@ -266,6 +270,40 @@ describe('UsersController', () => {
       expect(response.status).toBe(404)
 
       expect(response.body.message).toBe(`User with ID: ${userID} not found`)
+    })
+  })
+
+  describe('POST /users/password/generate-reset-link', () => {
+    afterEach(async () => {
+      mockNodeMailer.mock.reset()
+    })
+
+    it('should generate and send a password reset link to the logged in user', async () => {
+      const generatePasswordResetLinkResponse = await request(app)
+        .post('/users/password/generate-reset-link')
+        .set({ Authorization: `Bearer ${token}` })
+
+      console.log(generatePasswordResetLinkResponse)
+
+      expect(generatePasswordResetLinkResponse.status).toBe(200)
+
+      const sentEmails = mockNodeMailer.mock.getSentMail()
+
+      expect(sentEmails).toHaveLength(1)
+      expect(sentEmails[0]).toMatchObject({
+        from: 'CTRL <noreply@ctrl.garvan.org.au>',
+        subject: 'CTRL - Password Reset Link',
+        to: 'test2@example.com',
+      })
+
+      // Validate the URL structure
+      const emailText = sentEmails[0].text
+      const hostname = process.env.HOSTNAME || 'ctrl.garvan.org.au'
+      const urlRegex = new RegExp(
+        `${hostname.replace(/\./g, '\\.')}/reset-password\\?token=[a-f0-9]{64}`,
+      )
+
+      expect(emailText).toMatch(urlRegex)
     })
   })
 })
