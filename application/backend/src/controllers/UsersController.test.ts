@@ -2,12 +2,13 @@ import request from 'supertest'
 import { Api } from '../Api'
 import prisma from '../PrismaClient'
 import { resetDB } from '../../tests/TestHelpers'
-import { generateToken } from '../authentication'
+import { generateToken, verifyPassword } from '../authentication'
 import type { RegisterRequest } from 'common/types/api/auth'
 import {
   GetAllUsersResponse,
   GetUserByIdResponse,
   UpdateUserRoleRequest,
+  ResetPasswordRequest,
 } from 'common/types/api/users'
 import { Role } from '@prisma/client'
 import { OPERATOR_ADMIN_ID, ORG_ADMIN_ID, PARTICIPANT_UNANSWERED_ID } from '../../tests/seed'
@@ -283,8 +284,6 @@ describe('UsersController', () => {
         .post('/users/password/generate-reset-link')
         .set({ Authorization: `Bearer ${token}` })
 
-      console.log(generatePasswordResetLinkResponse)
-
       expect(generatePasswordResetLinkResponse.status).toBe(200)
 
       const sentEmails = mockNodeMailer.mock.getSentMail()
@@ -304,6 +303,118 @@ describe('UsersController', () => {
       )
 
       expect(emailText).toMatch(urlRegex)
+    })
+  })
+  describe('POST /users/password/reset', () => {
+    const userId = 105
+    const resetToken = 'valid-reset-token'
+    let userToken: string
+
+    beforeAll(async () => {
+      userToken = await generateToken({
+        userId: userId,
+        roles: ['Participant'],
+      })
+    })
+
+    it('should reset the password when given a valid reset token and new password', async () => {
+      const requestBody: ResetPasswordRequest = {
+        token: resetToken,
+        newPassword: 'NewPassword123!',
+      }
+
+      const response = await request(app)
+        .post('/users/password/reset')
+        .send(requestBody)
+        .set({ Authorization: `Bearer ${userToken}` })
+
+      console.log(response)
+
+      expect(response.status).toBe(200)
+      expect(response.body).toEqual({
+        message: 'Password reset successfully',
+      })
+
+      // Check that the user's password was updated
+      const updatedUser = await prisma.user.findUnique({ where: { id: userId } })
+      expect(updatedUser).not.toBeNull()
+      expect(await verifyPassword(updatedUser!.password, 'OldPassword123')).toBe(false)
+      expect(await verifyPassword(updatedUser!.password, requestBody.newPassword)).toBe(true)
+
+      // Check that the reset token was marked as used
+      const usedToken = await prisma.passwordResetToken.findUnique({
+        where: { token: resetToken },
+      })
+      expect(usedToken?.used).toBe(true)
+    })
+
+    it('should return 401 for an invalid token', async () => {
+      const invalidToken = 'invalid-reset-token'
+
+      const response = await request(app)
+        .post('/users/password/reset')
+        .send({ token: invalidToken, newPassword: 'NewPassword123!' })
+        .set({ Authorization: `Bearer ${userToken}` })
+
+      expect(response.status).toBe(401)
+      expect(response.body.message).toBe('Reset token invalid')
+    })
+
+    it('should return 401 for an already used token', async () => {
+      // Mark token as used
+      await prisma.passwordResetToken.update({
+        where: { token: resetToken },
+        data: { used: true },
+      })
+
+      const requestBody: ResetPasswordRequest = {
+        token: resetToken,
+        newPassword: 'AnotherPassword123!',
+      }
+
+      const response = await request(app)
+        .post('/users/password/reset')
+        .send(requestBody)
+        .set({ Authorization: `Bearer ${userToken}` })
+
+      expect(response.status).toBe(401)
+      expect(response.body.message).toBe('Reset token has already been used')
+    })
+
+    it('should return 401 for an expired reset token', async () => {
+      // Expire the token
+      await prisma.passwordResetToken.update({
+        where: { token: resetToken },
+        data: { expiresAt: new Date(Date.now() - 1000) }, // 1 second in the past
+      })
+
+      const requestBody: ResetPasswordRequest = {
+        token: resetToken,
+        newPassword: 'NewPassword123!',
+      }
+
+      const response = await request(app)
+        .post('/users/password/reset')
+        .send(requestBody)
+        .set({ Authorization: `Bearer ${userToken}` })
+
+      expect(response.status).toBe(401)
+      expect(response.body.message).toBe('Reset token expired')
+    })
+
+    it('should return 422 for a weak new password', async () => {
+      const requestBody: ResetPasswordRequest = {
+        token: resetToken,
+        newPassword: 'weak',
+      }
+
+      const response = await request(app)
+        .post('/users/password/reset')
+        .send(requestBody)
+        .set({ Authorization: `Bearer ${userToken}` })
+
+      expect(response.status).toBe(422)
+      expect(response.body.message).toBe('Validation Failed')
     })
   })
 })
