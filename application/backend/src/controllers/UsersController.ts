@@ -12,6 +12,7 @@ import {
   Request,
   Controller,
   Security,
+  ValidateError,
 } from 'tsoa'
 import logger from 'common/src/logger'
 import type {
@@ -21,6 +22,9 @@ import type {
   CreateUserResponse,
   UpdateUserRequest,
   UpdateUserRoleRequest,
+  GeneratePasswordResetLinkResponse,
+  ResetPasswordRequest,
+  ResetPasswordResponse,
 } from 'common/types/api/users'
 import { User } from '@prisma/client'
 import prisma from '../PrismaClient'
@@ -32,6 +36,8 @@ import {
 } from 'common/types/api/errors'
 import { NotFoundError } from '../middlewares/ErrorHandler'
 import { MailerService } from '../services/MailerService'
+import { hashPassword } from '../authentication'
+import { checkPasswordStrength } from 'common/src/PasswordStrength'
 import express from 'express'
 import crypto from 'crypto'
 
@@ -210,5 +216,52 @@ export class UsersController extends Controller {
     await this.mailerService.sendEmail(user.email, 'CTRL - Password Reset Link', resetLink)
 
     return { message: `Password Reset Link has been sent to ${user.email}` }
+  }
+
+  @Post('/password/reset')
+  @SuccessResponse('200', 'OK')
+  @Security('jwt')
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
+  public async resetPassword(
+    @Body() bodyRequest: ResetPasswordRequest,
+  ): Promise<ResetPasswordResponse> {
+    const { token, newPassword } = bodyRequest
+    const passwordResetToken = await prisma.passwordResetToken.findUnique({
+      where: { token },
+      include: { user: true },
+    })
+
+    if (!passwordResetToken || passwordResetToken.used) {
+      throw new Error('Invalid or used reset token')
+    }
+
+    if (passwordResetToken.expiresAt < new Date()) {
+      throw new Error('Reset token expired')
+    }
+
+    // Validate the new password against the strength requirements
+    const { isValid, fields } = await checkPasswordStrength(newPassword)
+
+    if (!isValid) {
+      throw new ValidateError(fields, 'New password does not meet strength requirements')
+    }
+
+    const hashedPassword = await hashPassword(newPassword)
+
+    // Update the user's password
+    await prisma.user.update({
+      where: { id: passwordResetToken.userId },
+      data: { password: hashedPassword },
+    })
+
+    // Mark the token as used
+    await prisma.passwordResetToken.update({
+      where: { id: passwordResetToken.id },
+      data: { used: true },
+    })
+
+    return {
+      message: 'Password reset successfully',
+    }
   }
 }
