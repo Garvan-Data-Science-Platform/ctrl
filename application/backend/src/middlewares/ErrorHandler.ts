@@ -9,6 +9,7 @@ import {
   PrismaErrorResponse,
   UnauthorizedErrorResponse,
   ValidateErrorResponse,
+  BadRequestErrorResponse,
 } from 'common/types/api/errors'
 
 export class NoTokenError extends Error {
@@ -45,12 +46,30 @@ export class IncorrectPermissionsError extends Error {
   }
 }
 
+export class FileUploadError extends Error {
+  details: unknown
+  constructor(message: string, details?: unknown) {
+    super(message)
+    this.name = 'FileUploadError'
+    this.details = details
+  }
+}
+
 export function ErrorHandler(
   err: unknown,
   req: Request,
   res: Response,
   next: NextFunction,
 ): Response | void {
+  // Bad Request Errors
+  if (err instanceof FileUploadError) {
+    const errorResponse: BadRequestErrorResponse = {
+      message: err.message,
+      details: err,
+    }
+    return res.status(400).json(errorResponse)
+  }
+
   // Validation Errors
   if (err instanceof ValidateError) {
     const errorResponse: ValidateErrorResponse = {
@@ -116,6 +135,5 @@ export function ErrorHandler(
     logger.error({ ...error })
     return res.status(500).json(error)
   }
-
   next()
 }
