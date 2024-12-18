@@ -1198,33 +1198,6 @@
           "content": "There was some problem with this thing that I was doing.\nBut I don't know why?\n\nCheers,\nJohn Doe"
         }
       },
-      "UploadRedCapParticipantsResponse": {
-        "properties": {
-          "message": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "message"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "Workspace": {
-        "properties": {
-          "version": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "version",
-          "name"
-        ],
-        "type": "object"
-      },
       "RegisterResponse": {
         "properties": {
           "message": {
@@ -1463,6 +1436,33 @@
           "email": "john.doe@email.com",
           "password": "Password123"
         }
+      },
+      "UploadRedCapParticipantsResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "Workspace": {
+        "properties": {
+          "version": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "version",
+          "name"
+        ],
+        "type": "object"
       }
     },
     "securitySchemes": {
@@ -3151,131 +3151,6 @@
         }
       }
     },
-    "/integrations/redcap/participant/upload": {
-      "post": {
-        "operationId": "UploadRedCapParticipant",
-        "responses": {
-          "200": {
-            "description": "Created Participants from CSV",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UploadRedCapParticipantsResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Integrations"
-        ],
-        "security": [
-          {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
-          }
-        ],
-        "parameters": []
-      }
-    },
-    "/healthcheck": {
-      "get": {
-        "operationId": "HealthCheck",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "message"
-                  ],
-                  "type": "object"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "description": "Health check to ensure server is up and running",
-        "summary": "Health Check",
-        "tags": [
-          "Healthcheck"
-        ],
-        "security": [],
-        "parameters": []
-      }
-    },
-    "/healthcheck/workspaces": {
-      "get": {
-        "operationId": "GetAllWorkspaces",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "data": {
-                      "items": {
-                        "$ref": "#/components/schemas/Workspace"
-                      },
-                      "type": "array"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "data",
-                    "message"
-                  ],
-                  "type": "object"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "description": "Get all Workspaces",
-        "summary": "Get all Workspaces",
-        "tags": [
-          "Healthcheck"
-        ],
-        "security": [],
-        "parameters": []
-      }
-    },
     "/auth/register": {
       "post": {
         "operationId": "RegisterUser",
@@ -3446,6 +3321,131 @@
             }
           }
         }
+      }
+    },
+    "/integrations/redcap/participant/upload": {
+      "post": {
+        "operationId": "UploadRedCapParticipant",
+        "responses": {
+          "200": {
+            "description": "Created Participants from CSV",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadRedCapParticipantsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Integrations"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": []
+      }
+    },
+    "/healthcheck": {
+      "get": {
+        "operationId": "HealthCheck",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Health check to ensure server is up and running",
+        "summary": "Health Check",
+        "tags": [
+          "Healthcheck"
+        ],
+        "security": [],
+        "parameters": []
+      }
+    },
+    "/healthcheck/workspaces": {
+      "get": {
+        "operationId": "GetAllWorkspaces",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/Workspace"
+                      },
+                      "type": "array"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "message"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Get all Workspaces",
+        "summary": "Get all Workspaces",
+        "tags": [
+          "Healthcheck"
+        ],
+        "security": [],
+        "parameters": []
       }
     }
   },

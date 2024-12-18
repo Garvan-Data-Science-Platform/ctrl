@@ -135,6 +135,5 @@ export function ErrorHandler(
     logger.error({ ...error })
     return res.status(500).json(error)
   }
-  logger.info('help')
   next()
 }

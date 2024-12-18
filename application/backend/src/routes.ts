@@ -18,11 +18,11 @@ import { OrganisationsController } from './controllers/OrganisationsController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { MailerController } from './controllers/MailerController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { AuthController } from './controllers/AuthController';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { IntegrationsController } from './controllers/IntegrationsController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { HealthCheckController } from './controllers/HealthCheckController';
-// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import { AuthController } from './controllers/AuthController';
 import { expressAuthentication } from './authentication';
 // @ts-ignore - no great way to install types from subpackage
 import type { Request as ExRequest, Response as ExResponse, RequestHandler, Router } from 'express';
@@ -530,19 +530,6 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "UploadRedCapParticipantsResponse": {
-        "dataType": "refObject",
-        "properties": {
-            "message": {"dataType":"string","required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Workspace": {
-        "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"version":{"dataType":"string","required":true},"name":{"dataType":"string","required":true}},"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "RegisterResponse": {
         "dataType": "refObject",
         "properties": {
@@ -623,6 +610,19 @@ const models: TsoaRoute.Models = {
             "password": {"dataType":"string","required":true,"validators":{"minLength":{"errorMsg":"Password must be at least 8 characters","value":8}}},
         },
         "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "UploadRedCapParticipantsResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "message": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Workspace": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"version":{"dataType":"string","required":true},"name":{"dataType":"string","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 };
@@ -1516,95 +1516,6 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsIntegrationsController_uploadRedCapParticipant: Record<string, TsoaRoute.ParameterSchema> = {
-                request: {"in":"request","name":"request","required":true,"dataType":"object"},
-        };
-        app.post('/integrations/redcap/participant/upload',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
-            ...(fetchMiddlewares<RequestHandler>(IntegrationsController)),
-            ...(fetchMiddlewares<RequestHandler>(IntegrationsController.prototype.uploadRedCapParticipant)),
-
-            async function IntegrationsController_uploadRedCapParticipant(request: ExRequest, response: ExResponse, next: any) {
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsIntegrationsController_uploadRedCapParticipant, request, response });
-
-                const controller = new IntegrationsController();
-
-              await templateService.apiHandler({
-                methodName: 'uploadRedCapParticipant',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: 200,
-              });
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsHealthCheckController_HealthCheck: Record<string, TsoaRoute.ParameterSchema> = {
-        };
-        app.get('/healthcheck',
-            ...(fetchMiddlewares<RequestHandler>(HealthCheckController)),
-            ...(fetchMiddlewares<RequestHandler>(HealthCheckController.prototype.HealthCheck)),
-
-            async function HealthCheckController_HealthCheck(request: ExRequest, response: ExResponse, next: any) {
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsHealthCheckController_HealthCheck, request, response });
-
-                const controller = new HealthCheckController();
-
-              await templateService.apiHandler({
-                methodName: 'HealthCheck',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: 200,
-              });
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsHealthCheckController_getAllWorkspaces: Record<string, TsoaRoute.ParameterSchema> = {
-        };
-        app.get('/healthcheck/workspaces',
-            ...(fetchMiddlewares<RequestHandler>(HealthCheckController)),
-            ...(fetchMiddlewares<RequestHandler>(HealthCheckController.prototype.getAllWorkspaces)),
-
-            async function HealthCheckController_getAllWorkspaces(request: ExRequest, response: ExResponse, next: any) {
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsHealthCheckController_getAllWorkspaces, request, response });
-
-                const controller = new HealthCheckController();
-
-              await templateService.apiHandler({
-                methodName: 'getAllWorkspaces',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: 200,
-              });
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsAuthController_registerUser: Record<string, TsoaRoute.ParameterSchema> = {
                 bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"RegisterRequest"},
         };
@@ -1684,6 +1595,95 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'login',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsIntegrationsController_uploadRedCapParticipant: Record<string, TsoaRoute.ParameterSchema> = {
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
+        };
+        app.post('/integrations/redcap/participant/upload',
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(IntegrationsController)),
+            ...(fetchMiddlewares<RequestHandler>(IntegrationsController.prototype.uploadRedCapParticipant)),
+
+            async function IntegrationsController_uploadRedCapParticipant(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsIntegrationsController_uploadRedCapParticipant, request, response });
+
+                const controller = new IntegrationsController();
+
+              await templateService.apiHandler({
+                methodName: 'uploadRedCapParticipant',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsHealthCheckController_HealthCheck: Record<string, TsoaRoute.ParameterSchema> = {
+        };
+        app.get('/healthcheck',
+            ...(fetchMiddlewares<RequestHandler>(HealthCheckController)),
+            ...(fetchMiddlewares<RequestHandler>(HealthCheckController.prototype.HealthCheck)),
+
+            async function HealthCheckController_HealthCheck(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsHealthCheckController_HealthCheck, request, response });
+
+                const controller = new HealthCheckController();
+
+              await templateService.apiHandler({
+                methodName: 'HealthCheck',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsHealthCheckController_getAllWorkspaces: Record<string, TsoaRoute.ParameterSchema> = {
+        };
+        app.get('/healthcheck/workspaces',
+            ...(fetchMiddlewares<RequestHandler>(HealthCheckController)),
+            ...(fetchMiddlewares<RequestHandler>(HealthCheckController.prototype.getAllWorkspaces)),
+
+            async function HealthCheckController_getAllWorkspaces(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsHealthCheckController_getAllWorkspaces, request, response });
+
+                const controller = new HealthCheckController();
+
+              await templateService.apiHandler({
+                methodName: 'getAllWorkspaces',
                 controller,
                 response,
                 next,

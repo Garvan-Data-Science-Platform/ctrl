@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import multer from 'multer'
 
 // Configure Multer
-const multerConfig = multer({
+const MulterInstance = multer({
   storage: multer.memoryStorage(),
   fileFilter: (req, file, cb) => {
     if (!file) {
@@ -13,7 +13,7 @@ const multerConfig = multer({
 })
 
 export function uploadSingleFile(req: Request, res: Response, next: NextFunction): void {
-  const uploadSingle = multerConfig.single('file')
+  const uploadSingle = MulterInstance.single('file')
 
   uploadSingle(req, res, (error) => {
     if (error) {
