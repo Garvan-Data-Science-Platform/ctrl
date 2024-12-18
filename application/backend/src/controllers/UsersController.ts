@@ -9,6 +9,7 @@ import {
   Body,
   SuccessResponse,
   Response,
+  Request,
   Controller,
   Security,
 } from 'tsoa'
@@ -30,6 +31,9 @@ import {
   ValidateErrorResponse,
 } from 'common/types/api/errors'
 import { NotFoundError } from '../middlewares/ErrorHandler'
+import { MailerService } from '../services/MailerService'
+import express from 'express'
+import crypto from 'crypto'
 
 @Route('users')
 @Tags('Users')
@@ -37,6 +41,7 @@ import { NotFoundError } from '../middlewares/ErrorHandler'
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 export class UsersController extends Controller {
   userRepo = prisma.user
+  mailerService = new MailerService()
 
   /**
    * Get all Users
@@ -163,5 +168,47 @@ export class UsersController extends Controller {
       logger.error({ errorMessage, err })
       throw new NotFoundError(errorMessage)
     }
+  }
+  /**
+   * Generate Password Reset Link
+   *
+   * @summary Generate and send a password reset link to the user
+   */
+  @Post('/password/generate-reset-link')
+  @SuccessResponse('200', 'OK')
+  @Security('jwt')
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
+  public async generatePasswordResetLink(
+    @Request() request: express.Request,
+  ): Promise<GeneratePasswordResetLinkResponse> {
+    if (!request.user) {
+      throw new NotFoundError('User not found')
+    }
+
+    const userId: number = request.user.userId
+    const user = await prisma.user.findUnique({ where: { id: userId } })
+
+    if (!user) {
+      throw new NotFoundError('User not found')
+    }
+
+    // Generate a secure random token
+    const token = crypto.randomBytes(32).toString('hex')
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000) // 15 Minutes expiration
+
+    // Save token to database
+    await prisma.passwordResetToken.create({
+      data: {
+        token,
+        userId: user.id,
+        expiresAt,
+      },
+    })
+
+    const resetLink = `${process.env.HOSTNAME}/reset-password?token=${token}`
+
+    await this.mailerService.sendEmail(user.email, 'CTRL - Password Reset Link', resetLink)
+
+    return { message: `Password Reset Link has been sent to ${user.email}` }
   }
 }
