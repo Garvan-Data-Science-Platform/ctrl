@@ -1,7 +1,8 @@
 import { PrismaClient, Role } from '@prisma/client'
-import '../../backend/src/jsontypes'
+import '../src/jsontypes'
 import ExampleSurveyStepData from 'common/src/surveys/exampleSurveyStepData.json'
 import { SurveyStep } from 'common/types/survey'
+import { hashPassword } from '../src/authentication'
 
 export const OPERATOR_ADMIN_ID = 96
 export const ORG_ADMIN_ID = 97
@@ -179,6 +180,27 @@ export async function seedTests(prisma: PrismaClient) {
           last_updated: '2024-12-02T23:45:27.815Z',
         },
       ],
+    },
+  })
+
+  // Seed a user and password reset token
+  await prisma.user.create({
+    data: {
+      id: 105,
+      email: 'test-reset-password@example.com',
+      firstName: 'Test',
+      lastName: 'User',
+      password: await hashPassword('OldPassword123'),
+      role: Role.Participant,
+    },
+  })
+
+  await prisma.passwordResetToken.create({
+    data: {
+      token: 'valid-reset-token',
+      userId: 105,
+      expiresAt: new Date(Date.now() + 2 * 60 * 1000), // 2 minutes in the future
+      used: false,
     },
   })
 }
