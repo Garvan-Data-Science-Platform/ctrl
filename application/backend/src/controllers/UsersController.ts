@@ -34,7 +34,7 @@ import {
   UnauthorizedErrorResponse,
   ValidateErrorResponse,
 } from 'common/types/api/errors'
-import { NotFoundError } from '../middlewares/ErrorHandler'
+import { NotFoundError, PasswordResetTokenInvalidError } from '../middlewares/ErrorHandler'
 import { MailerService } from '../services/MailerService'
 import { hashPassword } from '../authentication'
 import { checkPasswordStrength } from 'common/src/PasswordStrength'
@@ -222,6 +222,7 @@ export class UsersController extends Controller {
   @SuccessResponse('200', 'OK')
   @Security('jwt')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
+  @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
   public async resetPassword(
     @Body() bodyRequest: ResetPasswordRequest,
   ): Promise<ResetPasswordResponse> {
@@ -231,12 +232,16 @@ export class UsersController extends Controller {
       include: { user: true },
     })
 
-    if (!passwordResetToken || passwordResetToken.used) {
-      throw new Error('Invalid or used reset token')
+    if (!passwordResetToken) {
+      throw new PasswordResetTokenInvalidError('Reset token invalid')
+    }
+
+    if (passwordResetToken.used) {
+      throw new PasswordResetTokenInvalidError('Reset token has already been used')
     }
 
     if (passwordResetToken.expiresAt < new Date()) {
-      throw new Error('Reset token expired')
+      throw new PasswordResetTokenInvalidError('Reset token expired')
     }
 
     // Validate the new password against the strength requirements
