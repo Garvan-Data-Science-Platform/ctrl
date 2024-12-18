@@ -1,4 +1,14 @@
-import { Post, Route, Tags, Security, Controller, SuccessResponse, Response, Request } from 'tsoa'
+import {
+  Post,
+  Route,
+  Tags,
+  Security,
+  Controller,
+  SuccessResponse,
+  Response,
+  Request,
+  Middlewares,
+} from 'tsoa'
 import { Integrations } from '../../../integrations/src/Integrations'
 import exampleREDCapMapping from '../../../integrations/src/exampleREDCapMapping.json'
 import prisma from '../PrismaClient'
@@ -10,6 +20,9 @@ import { UploadRedCapParticipantsResponse } from 'common/types/api/integrations/
 import { RegisterParticipantRequest } from 'common/types/api/auth'
 import { UnauthorizedErrorResponse, InternalErrorResponse } from 'common/types/api/errors'
 import { AuthController } from './AuthController'
+import multer from 'multer'
+
+const upload = multer({ storage: multer.memoryStorage() })
 
 @Route('integrations')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
@@ -25,6 +38,7 @@ export class IntegrationsController extends Controller {
   // assumptions:
   // - passwords are strong enough (they are created in Integrations so should be strong enough)
   @Post('/redcap/participant/upload')
+  @Middlewares(upload.single('file'))
   @SuccessResponse('200', 'Created Participants from CSV')
   public async uploadRedCapParticipant(
     @Request() request: express.Request,

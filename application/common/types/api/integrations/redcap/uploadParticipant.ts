@@ -1,3 +1,3 @@
 export interface UploadRedCapParticipantsResponse {
-    message: string
+  message: string
 }

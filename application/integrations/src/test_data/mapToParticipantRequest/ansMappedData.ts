@@ -21,13 +21,14 @@ export const expectedMappedData = {
     firstName: 'Jane',
     lastName: 'Doe',
     email: 'jane.doe@example.com',
-    mobile: '0987654321'
+    mobile: '0987654321',
   },
-  dependents: [{
-    firstName: 'test',
-    lastName: 'child',
-    dob: '1990-01-01',
-    permanent: false,
-  },
+  dependents: [
+    {
+      firstName: 'test',
+      lastName: 'child',
+      dob: '1990-01-01',
+      permanent: false,
+    },
   ],
 }

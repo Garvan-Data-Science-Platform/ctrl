@@ -1,3 +1,3 @@
-import type {UploadRedCapParticipantsResponse} from './uploadParticipant'
+import type { UploadRedCapParticipantsResponse } from './uploadParticipant'
 
-export {UploadRedCapParticipantsResponse}
+export { UploadRedCapParticipantsResponse }

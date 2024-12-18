@@ -28,7 +28,7 @@ export function mapToParticipantRequest(
     suburb: getField('suburb'),
     postcode: getField('postcode'),
     state: Object.values(StateTerritory)[Number(getField('state'))],
-    password: "temporaryPassword123", // temporary
+    password: 'temporaryPassword123', // temporary
     dob: getField('dob'),
     participantType: ParticipantType.STANDARD, // temporary
     nextOfKin: {
@@ -36,26 +36,23 @@ export function mapToParticipantRequest(
       lastName: getField('nokLastName', true),
       email: getField('nokEmail', true),
     },
-    dependents: [] // Initialize as empty array by default
-  };
+    dependents: [], // Initialize as empty array by default
+  }
 
   // Optionally, check and add 'nextOfKin.mobile' if exists
   if (sourceData[mapping['nokMobile']]) {
-    mappedData['nextOfKin']['mobile'] = sourceData[mapping['nokMobile']];
+    mappedData['nextOfKin']['mobile'] = sourceData[mapping['nokMobile']]
   }
 
   // Populate dependents if all dependent fields are present
-  if (
-    sourceData[mapping['depFirstName']] ||
-    sourceData[mapping['depLastName']]
-  ) {
+  if (sourceData[mapping['depFirstName']] || sourceData[mapping['depLastName']]) {
     mappedData.dependents.push({
       firstName: getField('depFirstName', false, true),
       lastName: getField('depLastName', false, true),
       dob: getField('depDOB', false, true),
-      permanent: false // REDCap example surveys currently don't support permanent dependents so this is always false - can be changed by users post export
-    });
+      permanent: false, // REDCap example surveys currently don't support permanent dependents so this is always false - can be changed by users post export
+    })
   }
- 
-  return mappedData;
+
+  return mappedData
 }
