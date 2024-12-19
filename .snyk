@@ -5,7 +5,7 @@ ignore:
   SNYK-JS-CROSSSPAWN-8303230:
     - '*':
         reason: no direct upgrade or patch
-        expires: 2024-12-19T01:18:03.489Z
+        expires: 2025-01-19T01:18:03.489Z
         created: 2024-11-19T01:18:03.493Z
   SNYK-JS-PATHTOREGEXP-8482416:
     - '*':
