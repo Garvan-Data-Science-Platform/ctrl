@@ -175,6 +175,7 @@ export class UsersController extends Controller {
       throw new NotFoundError(errorMessage)
     }
   }
+
   /**
    * Generate Password Reset Link
    *

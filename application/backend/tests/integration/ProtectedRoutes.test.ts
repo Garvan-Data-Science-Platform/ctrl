@@ -96,6 +96,16 @@ describe('Protected Routes', () => {
       url: '/users/1',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
+    {
+      method: HttpMethod.POST,
+      url: '/users/password/reset',
+      rolesWhitelisted: [],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/users/password/generate-reset-link',
+      rolesWhitelisted: [],
+    },
   ]
 
   const organisationRoutes: Route[] = [
