@@ -9,7 +9,6 @@ import {
   Body,
   SuccessResponse,
   Response,
-  Request,
   Controller,
   Security,
   ValidateError,
@@ -38,7 +37,6 @@ import { NotFoundError, PasswordResetTokenInvalidError } from '../middlewares/Er
 import { MailerService } from '../services/MailerService'
 import { hashPassword } from '../authentication'
 import { checkPasswordStrength } from 'common/src/PasswordStrength'
-import express from 'express'
 import crypto from 'crypto'
 
 @Route('users')
@@ -47,6 +45,7 @@ import crypto from 'crypto'
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 export class UsersController extends Controller {
   userRepo = prisma.user
+  passwordResetTokenRepo = prisma.passwordResetToken
   mailerService = new MailerService()
 
   /**
@@ -183,17 +182,11 @@ export class UsersController extends Controller {
    */
   @Post('/password/generate-reset-link')
   @SuccessResponse('200', 'OK')
-  @Security('jwt')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async generatePasswordResetLink(
-    @Request() request: express.Request,
+    @Body() bodyRequest: GeneratePasswordResetLinkRequest,
   ): Promise<GeneratePasswordResetLinkResponse> {
-    if (!request.user) {
-      throw new NotFoundError('User not found')
-    }
-
-    const userId: number = request.user.userId
-    const user = await prisma.user.findUnique({ where: { id: userId } })
+    const user = await prisma.user.findUnique({ where: { email: bodyRequest.email } })
 
     if (!user) {
       throw new NotFoundError('User not found')
@@ -223,14 +216,13 @@ export class UsersController extends Controller {
 
   @Post('/password/reset')
   @SuccessResponse('200', 'OK')
-  @Security('jwt')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
   public async resetPassword(
     @Body() bodyRequest: ResetPasswordRequest,
   ): Promise<ResetPasswordResponse> {
     const { token, newPassword } = bodyRequest
-    const passwordResetToken = await prisma.passwordResetToken.findUnique({
+    const passwordResetToken = await this.passwordResetTokenRepo.findUnique({
       where: { token },
       include: { user: true },
     })

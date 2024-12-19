@@ -151,6 +151,14 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GeneratePasswordResetLinkRequest": {
+        "dataType": "refObject",
+        "properties": {
+            "email": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "ResetPasswordResponse": {
         "dataType": "refObject",
         "properties": {
@@ -778,10 +786,9 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsUsersController_generatePasswordResetLink: Record<string, TsoaRoute.ParameterSchema> = {
-                request: {"in":"request","name":"request","required":true,"dataType":"object"},
+                bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"GeneratePasswordResetLinkRequest"},
         };
         app.post('/users/password/generate-reset-link',
-            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(UsersController)),
             ...(fetchMiddlewares<RequestHandler>(UsersController.prototype.generatePasswordResetLink)),
 
@@ -812,7 +819,6 @@ export function RegisterRoutes(app: Router) {
                 bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"ResetPasswordRequest"},
         };
         app.post('/users/password/reset',
-            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(UsersController)),
             ...(fetchMiddlewares<RequestHandler>(UsersController.prototype.resetPassword)),
 

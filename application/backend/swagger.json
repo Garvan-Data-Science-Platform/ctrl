@@ -257,6 +257,18 @@
         "type": "object",
         "additionalProperties": false
       },
+      "GeneratePasswordResetLinkRequest": {
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
       "ResetPasswordResponse": {
         "properties": {
           "message": {
@@ -283,7 +295,11 @@
           "newPassword"
         ],
         "type": "object",
-        "additionalProperties": false
+        "additionalProperties": false,
+        "example": {
+          "token": "some-valid-token",
+          "newPassword": "NewPassword123"
+        }
       },
       "SurveyVersionStatus": {
         "type": "string",
@@ -1684,12 +1700,18 @@
         "tags": [
           "Users"
         ],
-        "security": [
-          {
-            "jwt": []
+        "security": [],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GeneratePasswordResetLinkRequest"
+              }
+            }
           }
-        ],
-        "parameters": []
+        }
       }
     },
     "/users/password/reset": {
@@ -1740,11 +1762,7 @@
         "tags": [
           "Users"
         ],
-        "security": [
-          {
-            "jwt": []
-          }
-        ],
+        "security": [],
         "parameters": [],
         "requestBody": {
           "required": true,

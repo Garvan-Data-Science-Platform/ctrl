@@ -275,14 +275,15 @@ describe('UsersController', () => {
   })
 
   describe('POST /users/password/generate-reset-link', () => {
+    const userEmail: string = 'test2@example.com'
     afterEach(async () => {
       mockNodeMailer.mock.reset()
     })
 
-    it('should generate and send a password reset link to the logged in user', async () => {
+    it('should generate and send a password reset link to the users email', async () => {
       const generatePasswordResetLinkResponse = await request(app)
         .post('/users/password/generate-reset-link')
-        .set({ Authorization: `Bearer ${token}` })
+        .send({ email: userEmail })
 
       expect(generatePasswordResetLinkResponse.status).toBe(200)
 
@@ -292,7 +293,7 @@ describe('UsersController', () => {
       expect(sentEmails[0]).toMatchObject({
         from: 'CTRL <noreply@ctrl.garvan.org.au>',
         subject: 'CTRL - Password Reset Link',
-        to: 'test2@example.com',
+        to: userEmail,
       })
 
       // Validate the URL structure
@@ -305,17 +306,12 @@ describe('UsersController', () => {
       expect(emailText).toMatch(urlRegex)
     })
   })
+
   describe('POST /users/password/reset', () => {
     const userId = 105
     const resetToken = 'valid-reset-token'
-    let userToken: string
 
-    beforeAll(async () => {
-      userToken = await generateToken({
-        userId: userId,
-        roles: ['Participant'],
-      })
-    })
+    beforeAll(async () => {})
 
     it('should reset the password when given a valid reset token and new password', async () => {
       const requestBody: ResetPasswordRequest = {
@@ -323,10 +319,7 @@ describe('UsersController', () => {
         newPassword: 'NewPassword123!',
       }
 
-      const response = await request(app)
-        .post('/users/password/reset')
-        .send(requestBody)
-        .set({ Authorization: `Bearer ${userToken}` })
+      const response = await request(app).post('/users/password/reset').send(requestBody)
 
       console.log(response)
 
@@ -354,7 +347,6 @@ describe('UsersController', () => {
       const response = await request(app)
         .post('/users/password/reset')
         .send({ token: invalidToken, newPassword: 'NewPassword123!' })
-        .set({ Authorization: `Bearer ${userToken}` })
 
       expect(response.status).toBe(401)
       expect(response.body.message).toBe('Reset token invalid')
@@ -372,10 +364,7 @@ describe('UsersController', () => {
         newPassword: 'AnotherPassword123!',
       }
 
-      const response = await request(app)
-        .post('/users/password/reset')
-        .send(requestBody)
-        .set({ Authorization: `Bearer ${userToken}` })
+      const response = await request(app).post('/users/password/reset').send(requestBody)
 
       expect(response.status).toBe(401)
       expect(response.body.message).toBe('Reset token has already been used')
@@ -393,10 +382,7 @@ describe('UsersController', () => {
         newPassword: 'NewPassword123!',
       }
 
-      const response = await request(app)
-        .post('/users/password/reset')
-        .send(requestBody)
-        .set({ Authorization: `Bearer ${userToken}` })
+      const response = await request(app).post('/users/password/reset').send(requestBody)
 
       expect(response.status).toBe(401)
       expect(response.body.message).toBe('Reset token expired')
@@ -408,10 +394,7 @@ describe('UsersController', () => {
         newPassword: 'weak',
       }
 
-      const response = await request(app)
-        .post('/users/password/reset')
-        .send(requestBody)
-        .set({ Authorization: `Bearer ${userToken}` })
+      const response = await request(app).post('/users/password/reset').send(requestBody)
 
       expect(response.status).toBe(422)
       expect(response.body.message).toBe('Validation Failed')
