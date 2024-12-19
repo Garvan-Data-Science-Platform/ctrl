@@ -1,7 +1,7 @@
 import request from 'supertest'
 import { Api } from '../../src/Api'
 import { resetDB } from '../TestHelpers'
-import { generateToken, verifyPassword } from '../../src/authentication'
+import { verifyPassword } from '../../src/authentication'
 import prisma from '../../src/PrismaClient'
 import { NodemailerMock } from 'nodemailer-mock'
 import * as nodemailer from 'nodemailer'
@@ -12,7 +12,6 @@ const api = new Api()
 const app = api.app
 
 describe('Password Reset', () => {
-  let userToken: string
   let resetToken: string
   const userId = 105
   const userEmail = 'test-reset-password@example.com'
@@ -22,8 +21,6 @@ describe('Password Reset', () => {
   beforeAll(async () => {
     api.run()
     await resetDB()
-
-    userToken = await generateToken({ userId, roles: ['Participant'] })
   })
 
   afterEach(async () => {
@@ -46,7 +43,7 @@ describe('Password Reset', () => {
   it('should generate a password reset link and send an email', async () => {
     const response = await request(app)
       .post('/users/password/generate-reset-link')
-      .set('Authorization', `Bearer ${userToken}`)
+      .send({ email: userEmail })
 
     // Check the response
     expect(response.status).toBe(200)
@@ -81,13 +78,10 @@ describe('Password Reset', () => {
   })
 
   it('should reset the password successfully', async () => {
-    const response = await request(app)
-      .post('/users/password/reset')
-      .send({
-        token: resetToken,
-        newPassword,
-      })
-      .set('Authorization', `Bearer ${userToken}`)
+    const response = await request(app).post('/users/password/reset').send({
+      token: resetToken,
+      newPassword,
+    })
 
     // Check the response
     expect(response.status).toBe(200)
@@ -128,13 +122,10 @@ describe('Password Reset', () => {
   })
 
   it('should fail to reset the password with an already used token', async () => {
-    const response = await request(app)
-      .post('/users/password/reset')
-      .send({
-        token: resetToken,
-        newPassword: 'Another@Password123',
-      })
-      .set('Authorization', `Bearer ${userToken}`)
+    const response = await request(app).post('/users/password/reset').send({
+      token: resetToken,
+      newPassword: 'Another@Password123',
+    })
 
     expect(response.status).toBe(401)
     expect(response.body.message).toBe('Reset token has already been used')
