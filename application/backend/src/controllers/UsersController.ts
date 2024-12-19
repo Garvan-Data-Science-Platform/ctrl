@@ -216,7 +216,9 @@ export class UsersController extends Controller {
 
     await this.mailerService.sendEmail(user.email, 'CTRL - Password Reset Link', resetLink)
 
-    return { message: `Password Reset Link has been sent to ${user.email}` }
+    return {
+      message: `Password Reset Link has been sent to ${user.email}`,
+    } as GeneratePasswordResetLinkResponse
   }
 
   @Post('/password/reset')
@@ -268,6 +270,6 @@ export class UsersController extends Controller {
 
     return {
       message: 'Password reset successfully',
-    }
+    } as ResetPasswordResponse
   }
 }
