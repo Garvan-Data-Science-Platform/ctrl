@@ -2,7 +2,7 @@ import {
   ContactMethod,
   ParticipantType,
   StateTerritory,
-} from '../../../../common/types/api/users/ParticipantProfile'
+} from 'common/types/api/users/ParticipantProfile'
 
 export const expectedMappedData = {
   firstName: 'John',

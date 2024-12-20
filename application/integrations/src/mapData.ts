@@ -4,6 +4,7 @@ import {
   ParticipantType,
   StateTerritory,
 } from '../../common/types/api/users/ParticipantProfile'
+import { SurveyElement } from 'common/types/survey'
 
 export function mapToParticipantRequest(
   sourceData: Record<string, string>,
@@ -55,4 +56,61 @@ export function mapToParticipantRequest(
   }
 
   return mappedData
+}
+
+// Maps a provided REDCap Instrument csv to a survey
+export function mapToSurveyElement(sourceQuestion: Record<string, string>): SurveyElement[] {
+  const requiredField = (fieldName: string) => {
+    const value = sourceQuestion[fieldName]
+    if (!value) throw new Error(`Missing required field: ${fieldName}`)
+    return value
+  }
+
+  const res: SurveyElement[] = []
+
+  // Extract required fields
+  const questionType = requiredField('Field Type')
+  const text = requiredField('Field Label')
+  const choices = sourceQuestion['Choices, Calculations, OR Slider Labels']
+
+  // if the question has a subheading - incorporate it as a new surveyElement
+  if (sourceQuestion['Section Header']) {
+    res.push({
+      type: 'subheading',
+      data: { text: sourceQuestion['Section Header'] },
+    })
+  }
+
+  // covers radio, dropdown and yesno questions - does not cover freetext('notes' or 'text' question types)
+  let element: SurveyElement
+  if (questionType === 'radio' || questionType === 'dropdown') {
+    const e = choices.split('|').map((item) => item.split(',')[1].trim())
+    element = {
+      type: 'question-choices',
+      data: {
+        text: text,
+        value: e[0],
+        choices: e,
+      },
+    }
+  } else if (questionType === 'yesno') {
+    element = {
+      type: 'question-checkbox',
+      data: {
+        text: text,
+        value: false,
+      },
+    }
+  } else {
+    element = {
+      type: 'subheading',
+      data: {
+        text: 'Unrecognized question type',
+      },
+    }
+  }
+
+  res.push(element)
+
+  return res
 }
