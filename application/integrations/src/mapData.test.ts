@@ -39,18 +39,18 @@ describe('mapToParticipantRequest', () => {
 
 describe('mapInstrumentToSurvey', () => {
   it('should map radio and dropdown buttons to a survey element', () => {
-    const result = mapInstrumentToSurvey(sourceDataRadio)
+    const result = mapToSurveyElement(sourceDataRadio)
     expect(result).toEqual(expectedRadioMapping)
   })
 
   it('should map the question to two questions if given a subheading', () => {
-    const result = mapInstrumentToSurvey(sourceDataAndSubheading)
+    const result = mapToSurveyElement(sourceDataAndSubheading)
     expect(result).toEqual(expectedSubheadingMapping)
   })
 
   it('should throw an error if missing a crucial field', () => {
     expect(() => {
-      mapInstrumentToSurvey(sourceDataMissingField)
+      mapToSurveyElement(sourceDataMissingField)
     }).toThrow('Missing required field')
   })
 })
