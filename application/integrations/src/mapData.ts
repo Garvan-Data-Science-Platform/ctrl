@@ -82,25 +82,36 @@ export function mapToSurveyElement(sourceQuestion: Record<string, string>): Surv
   }
 
   // covers radio, dropdown and yesno questions - does not cover freetext('notes' or 'text' question types)
+  let element: SurveyElement
+  // covers radio, dropdown and yesno questions - does not cover freetext('notes' or 'text' question types)
   if (questionType === 'radio' || questionType === 'dropdown') {
     const e = choices.split('|').map((item) => item.split(',')[1].trim())
-    res.push({
+    element = {
       type: 'question-choices',
       data: {
         text: text,
         value: e[0],
         choices: e,
       },
-    })
+    }
   } else if (questionType === 'yesno') {
-    res.push({
+    element = {
       type: 'question-checkbox',
       data: {
         text: text,
         value: false,
       },
-    })
+    }
+  } else {
+    element = {
+      type: 'subheading',
+      data: {
+        text: 'Unrecognized question type',
+      },
+    }
   }
+
+  res.push(element)
 
   return res
 }

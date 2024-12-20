@@ -9,15 +9,16 @@ import {
   ansQuestionData,
 } from './test_data/Integrations'
 
-const integrationProcessor = new Integrations(testMapping)
 describe('Integrations', () => {
+  const integrationProcessor = new Integrations(testMapping)
+
   describe('mapCSVToParticipantRequest', () => {
-    it('registers one user correctly', () => {
+    it('should register one user correctly', () => {
       const res = integrationProcessor.mapCSVToParticipantRequests(exampleSingleProfile)
       expect(res).toEqual(ansSingleProfile)
     })
 
-    it('registers multiple users correctly', () => {
+    it('should register multiple users correctly', () => {
       const res = integrationProcessor.mapCSVToParticipantRequests(exampleMultipleProfiles)
       expect(res).toEqual(ansMultipleProfilesMapping)
     })
