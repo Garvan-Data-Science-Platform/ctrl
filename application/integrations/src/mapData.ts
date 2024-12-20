@@ -83,7 +83,6 @@ export function mapToSurveyElement(sourceQuestion: Record<string, string>): Surv
 
   // covers radio, dropdown and yesno questions - does not cover freetext('notes' or 'text' question types)
   let element: SurveyElement
-  // covers radio, dropdown and yesno questions - does not cover freetext('notes' or 'text' question types)
   if (questionType === 'radio' || questionType === 'dropdown') {
     const e = choices.split('|').map((item) => item.split(',')[1].trim())
     element = {
