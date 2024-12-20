@@ -59,7 +59,7 @@ export function mapToParticipantRequest(
 }
 
 // Maps a provided REDCap Instrument csv to a survey
-export function mapInstrumentToSurvey(sourceQuestion: Record<string, string>): SurveyElement[] {
+export function mapToSurveyElement(sourceQuestion: Record<string, string>): SurveyElement[] {
   const requiredField = (fieldName: string) => {
     const value = sourceQuestion[fieldName]
     if (!value) throw new Error(`Missing required field: ${fieldName}`)

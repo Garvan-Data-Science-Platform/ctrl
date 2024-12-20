@@ -1,4 +1,4 @@
-import { mapInstrumentToSurvey, mapToParticipantRequest } from './mapData'
+import { mapToSurveyElement, mapToParticipantRequest } from './mapData'
 import { RegisterParticipantRequest } from '../../common/types/api/auth'
 import { SurveyElement } from '../../common/types/survey'
 
@@ -21,6 +21,6 @@ export class Integrations {
 
   // returns a list of survey elements to be created into a survey later
   mapInstrumentCSVToSurvey(csv: Record<string, string>[]): SurveyElement[] {
-    return csv.flatMap((surveyQuestion) => mapInstrumentToSurvey(surveyQuestion))
+    return csv.flatMap((surveyQuestion) => mapToSurveyElement(surveyQuestion))
   }
 }
