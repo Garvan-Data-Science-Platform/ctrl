@@ -1,4 +1,4 @@
-import { mapToParticipantRequest, mapInstrumentToSurvey } from './mapData'
+import { mapToParticipantRequest, mapToSurveyElement } from './mapData'
 import testMapping from './test_data/testMapping.json'
 import {
   sourceData,
