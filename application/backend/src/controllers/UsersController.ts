@@ -112,7 +112,7 @@ export class UsersController extends Controller {
   @Patch('/{userId}')
   @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  @Security('jwt')
+  @Security('jwt', ['OrganisationAdmin'])
   public async updateUser(
     @Path() userId: number,
     @Body() bodyRequest: UpdateUserRequest,
@@ -143,7 +143,7 @@ export class UsersController extends Controller {
   @Delete('/{userId}')
   @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  @Security('jwt')
+  @Security('jwt', ['OrganisationAdmin'])
   public async deleteUser(@Path() userId: number): Promise<DeleteUserResponse> {
     try {
       const deletedUser = await this.userRepo.delete({ where: { id: userId } })

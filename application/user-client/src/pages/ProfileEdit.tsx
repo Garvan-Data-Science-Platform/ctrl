@@ -5,6 +5,10 @@ import {
   Card,
   CircularProgress,
   Container,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
   TextField,
   Typography,
 } from '@mui/material'
@@ -13,23 +17,25 @@ import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { GetParticipantProfileResponse, UpdateProfileRequest } from '@common/types/api/users'
-import ProfileData from '@common/example_responses/getUserProfile.json'
 import NavBar from '../components/NavBar'
+import { apiClient } from '../apiClient'
+import { ContactMethod, StateTerritory } from '@common/types/api/users/ParticipantProfile'
 
 interface FormValues {
   firstName: string
   lastName: string
   email: string
-  password: string
-  confirm_password: string
   dob: string
-  studyId: string
+  addressLine: string
+  suburb: string
+  state: StateTerritory
+  postcode: string
+  mobile: string
+  preferredContact: ContactMethod
   nok_first: string
   nok_surname: string
   nok_email: string
-  on_behalf_first: string
-  on_behalf_surname: string
-  on_behalf_dob: string
+  nok_mobile: string
 }
 
 export default function ProfileEdit() {
@@ -42,14 +48,19 @@ export default function ProfileEdit() {
   const nav = useNavigate()
   const queryClient = useQueryClient()
 
-  const { isPending, error, data } = useQuery({
+  const {
+    isPending,
+    error,
+    data: pdata,
+  } = useQuery({
     queryKey: ['profile', 'get'],
-    //queryFn: () => fetch('/api/user/profile').then((res) => res.json()) as Promise<UserProfile>,
-    queryFn: async () => {
-      await new Promise((r) => setTimeout(r, 2000))
-      return (ProfileData as GetParticipantProfileResponse).data
-    },
+    queryFn: () =>
+      apiClient
+        .get('/profiles/current')
+        .then((res) => res.data) as Promise<GetParticipantProfileResponse>,
   })
+  if (!pdata) return 'Loading'
+  const data = pdata.data
 
   useEffect(() => {
     if (error) setError('root.serverError', error)
@@ -59,38 +70,33 @@ export default function ProfileEdit() {
     //login('TOKEN')
     //nav('/')
 
-    const partialData = {
+    const reqData: UpdateProfileRequest = {
       firstName: data.firstName,
       lastName: data.lastName,
-      email: data.email,
-      password: data.password,
       dob: data.dob,
-      studyId: data.studyId,
-    }
-
-    const reqData: UpdateProfileRequest = {
-      ...partialData,
+      mobile: data.mobile,
+      addressLine: data.addressLine,
+      suburb: data.suburb,
+      state: data.state,
+      postcode: data.postcode,
+      preferredContact: data.preferredContact,
       nextOfKin: {
         firstName: data['nok_first'],
         lastName: data['nok_surname'],
         email: data['nok_email'],
+        mobile: data['nok_mobile'],
       },
     }
 
-    fetch(import.meta.env.VITE_BACKEND_URL + '/users/profile', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(reqData),
-    })
+    apiClient
+      .patch('/profiles/current', reqData)
       .then((res) => {
-        if (res.ok) {
+        if (res.status == 200) {
           queryClient.invalidateQueries({ queryKey: ['profile'] })
           nav('/profile')
         } else {
-          res.json().then((data) => {
-            setError('root.serverError', {
-              message: `Error Updating Profile: ${JSON.stringify(data.message)}`,
-            })
+          setError('root.serverError', {
+            message: `Error Updating Profile: ${JSON.stringify(res.data.message)}`,
           })
         }
       })
@@ -137,8 +143,68 @@ export default function ProfileEdit() {
                   sx={{ m: 1 }}
                   label="Date of Birth"
                   slotProps={{ inputLabel: { shrink: true } }}
-                  {...register('dob', { required: true, value: data?.dob })}
+                  defaultValue={new Date(data.dob).toISOString().split('T')[0]}
+                  {...register('dob', { required: true })}
                 />
+
+                <TextField
+                  sx={{ m: 1, flexGrow: 1 }}
+                  label="Address Line"
+                  {...register('addressLine', { required: true, value: data.addressLine })}
+                />
+                <TextField
+                  sx={{ m: 1 }}
+                  label="Suburb"
+                  {...register('suburb', { required: true, value: data.suburb })}
+                />
+                <FormControl sx={{ m: 1, flexGrow: 1 }}>
+                  <InputLabel id="state-select-label">State</InputLabel>
+                  <Select
+                    labelId="state-select-label"
+                    label="State"
+                    defaultValue={data.state}
+                    {...register('state', { required: true, value: data.state })}
+                  >
+                    {Object.keys(StateTerritory).map((val, idx) => {
+                      return (
+                        <MenuItem value={val} key={`state_${idx}`}>
+                          {val}
+                        </MenuItem>
+                      )
+                    })}
+                  </Select>
+                </FormControl>
+
+                <TextField
+                  sx={{ m: 1, flexGrow: 1 }}
+                  label="Postcode"
+                  {...register('postcode', { required: true, value: data?.postcode })}
+                />
+                <TextField
+                  sx={{ m: 1, flexGrow: 1 }}
+                  label="Mobile"
+                  {...register('mobile', { required: true, value: data?.mobile })}
+                />
+                <FormControl sx={{ m: 1, flexGrow: 1, minWidth: 240 }}>
+                  <InputLabel id="pref-select-label">Preferred Contact Method</InputLabel>
+                  <Select
+                    labelId="pref-select-label"
+                    label="Preferred Contact Method"
+                    defaultValue={data.preferredContact}
+                    {...register('preferredContact', {
+                      required: true,
+                      value: data.preferredContact,
+                    })}
+                  >
+                    {Object.keys(ContactMethod).map((val, idx) => {
+                      return (
+                        <MenuItem value={val} key={`contact_${idx}`}>
+                          {val}
+                        </MenuItem>
+                      )
+                    })}
+                  </Select>
+                </FormControl>
 
                 <Typography sx={{ m: 1, width: '100%', fontWeight: 'bold' }}>
                   Alternative Contact
@@ -170,6 +236,13 @@ export default function ProfileEdit() {
                   {...register('nok_email', {
                     required: true,
                     value: data?.alternativeContact?.email,
+                  })}
+                />
+                <TextField
+                  sx={{ m: 1, flexGrow: 1 }}
+                  label="Mobile"
+                  {...register('nok_mobile', {
+                    value: data?.alternativeContact?.mobile,
                   })}
                 />
 
