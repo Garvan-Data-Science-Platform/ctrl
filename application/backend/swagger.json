@@ -71,8 +71,7 @@
         "type": "string",
         "enum": ["OperatorAdmin", "Participant", "OrganisationAdmin"]
       },
-      "User": {
-        "description": "Model User",
+      "DefaultSelection_Prisma._36_UserPayload_": {
         "properties": {
           "updatedAt": {
             "type": "string",
@@ -117,6 +116,10 @@
           "id"
         ],
         "type": "object"
+      },
+      "User": {
+        "$ref": "#/components/schemas/DefaultSelection_Prisma._36_UserPayload_",
+        "description": "Model User"
       },
       "GetAllUsersResponse": {
         "properties": {
@@ -979,6 +982,10 @@
         },
         "required": ["updatedAt", "createdAt", "id", "name"],
         "type": "object"
+      },
+      "Organisation": {
+        "$ref": "#/components/schemas/DefaultSelection_Prisma._36_OrganisationPayload_",
+        "description": "Model Organisation"
       },
       "GetAllOrganisationsResponse": {
         "properties": {
@@ -3175,7 +3182,7 @@
             }
           }
         },
-        "description": "Sends a contact us email to the admin and user's account.",
+        "description": "Sends a contact us email to the admin and users account.",
         "summary": "ContactUs",
         "tags": ["Mailer"],
         "security": [
