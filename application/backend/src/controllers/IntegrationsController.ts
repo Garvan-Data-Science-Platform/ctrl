@@ -123,4 +123,47 @@ export class IntegrationsController extends Controller {
 
     return { id: survey.id }
   }
+
+  @Post('/redcap/instrument/upload')
+  @Middlewares(upload.single('file'))
+  @SuccessResponse('200', 'Created Survey from Instrument CSV')
+  public async uploadRedcapInstrument(
+    @Request() request: express.Request,
+  ): Promise<UploadRedcapInstrumentResponse> {
+    const file = await this.validateFile(request)
+
+    // Create a readable stream from the buffer
+    const readableStream = Readable.from(file.buffer.toString())
+    const csvData: Record<string, string>[] = await parseCSV(readableStream)
+
+    const elements: SurveyElement[] = this.integrationService.mapInstrumentCSVToSurvey(csvData)
+    await this.surveyRepo.create({
+      data: {
+        status: 'DRAFT',
+        versionNumber: 1,
+        data: [
+          {
+            title: 'Imported Survey',
+            text: 'Survey Imported from Redcap Instrument',
+            elements: elements,
+          },
+        ],
+      },
+    })
+    return { message: 'created survey' }
+  }
+
+  private async validateFile(request: express.Request): Promise<Express.Multer.File> {
+    const file = request.file
+
+    if (!file) {
+      throw new FileUploadError('No file uploaded')
+    } else if (!file.buffer || file.buffer.length === 0) {
+      throw new FileUploadError('File is empty')
+    } else if (file.mimetype !== 'text/csv') {
+      throw new FileUploadError('Invalid file type. Please upload a CSV file.')
+    }
+
+    return file
+  }
 }
