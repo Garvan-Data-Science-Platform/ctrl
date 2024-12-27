@@ -16,11 +16,15 @@ import { parseCSV } from '../utils/parseCsv'
 import { FileUploadError } from '../middlewares/ErrorHandler'
 import { Readable } from 'stream'
 import * as express from 'express'
+import {
+  UploadRedcapParticipantResponse,
+  UploadRedcapInstrumentResponse,
+} from 'common/types/api/integrations/redcap'
 import { RegisterParticipantRequest } from 'common/types/api/auth'
 import { UnauthorizedErrorResponse, InternalErrorResponse } from 'common/types/api/errors'
 import { AuthController } from './AuthController'
 import multer from 'multer'
-
+import { SurveyElement } from 'common/types/survey'
 const upload = multer({ storage: multer.memoryStorage() })
 
 @Route('integrations')
@@ -33,28 +37,19 @@ export class IntegrationsController extends Controller {
   profileRepo = prisma.participantProfile
   surveyRepo = prisma.surveyVersion
   spRepo = prisma.surveyParticipant
+  integrationService = new Integrations(exampleREDCapMapping)
 
-  // assumptions:
-  // - passwords are strong enough (they are created in Integrations so should be strong enough)
   @Post('/redcap/participant/upload')
   @Middlewares(upload.single('file'))
   @SuccessResponse('201', 'Created Participants from CSV')
-  public async uploadRedCapParticipant(@Request() request: express.Request) {
-    const file = request.file
-    if (!file) {
-      throw new FileUploadError('No file uploaded')
-    } else if (!file.buffer || file.buffer.length === 0) {
-      throw new FileUploadError('File is empty')
-    } else if (file.mimetype !== 'text/csv') {
-      throw new FileUploadError('Invalid file type. Please upload a CSV file.')
-    }
+  public async uploadRedcapParticipant(@Request() request: express.Request) {
+    const file = await this.validateFile(request)
 
     // Create a readable stream from the buffer
     const readableStream = Readable.from(file.buffer.toString())
     const csvData: Record<string, string>[] = await parseCSV(readableStream)
-    const integrationService = new Integrations(exampleREDCapMapping)
     const data: RegisterParticipantRequest[] =
-      integrationService.mapCSVToParticipantRequests(csvData)
+      this.integrationService.mapCSVToParticipantRequests(csvData)
 
     const participants = []
     const authController: AuthController = new AuthController()
@@ -65,5 +60,48 @@ export class IntegrationsController extends Controller {
       const { email, password, middleName, ...participantData } = participant
       participants.push(await authController.createParticipant(participantData))
     }
+  }
+
+  @Post('/redcap/instrument/upload')
+  @Middlewares(upload.single('file'))
+  @SuccessResponse('200', 'Created Survey from Instrument CSV')
+  public async uploadRedcapInstrument(
+    @Request() request: express.Request,
+  ): Promise<UploadRedcapInstrumentResponse> {
+    const file = await this.validateFile(request)
+
+    // Create a readable stream from the buffer
+    const readableStream = Readable.from(file.buffer.toString())
+    const csvData: Record<string, string>[] = await parseCSV(readableStream)
+
+    const elements: SurveyElement[] = this.integrationService.mapInstrumentCSVToSurvey(csvData)
+    await this.surveyRepo.create({
+      data: {
+        status: 'DRAFT',
+        versionNumber: 1,
+        data: [
+          {
+            title: 'Imported Survey',
+            text: 'Survey Imported from Redcap Instrument',
+            elements: elements,
+          },
+        ],
+      },
+    })
+    return { message: 'created survey' }
+  }
+
+  private async validateFile(request: express.Request): Promise<Express.Multer.File> {
+    const file = request.file
+
+    if (!file) {
+      throw new FileUploadError('No file uploaded')
+    } else if (!file.buffer || file.buffer.length === 0) {
+      throw new FileUploadError('File is empty')
+    } else if (file.mimetype !== 'text/csv') {
+      throw new FileUploadError('Invalid file type. Please upload a CSV file.')
+    }
+
+    return file
   }
 }

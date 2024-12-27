@@ -3,7 +3,7 @@ import { resetDB } from 'common/testing/TestHelpers'
 import { Api } from '../Api'
 import path from 'path'
 import { generateToken } from '../authentication'
-import { UploadRedCapParticipantsResponse } from 'common/types/api/integrations/redcap'
+import { UploadRedcapParticipantResponse } from 'common/types/api/integrations/redcap'
 import prisma from '../PrismaClient'
 import { PARTICIPANT_COMPLETED_ID } from 'common/testing/seed'
 
@@ -62,7 +62,7 @@ describe('IntegrationsController', () => {
         .post('/integrations/redcap/participant/upload')
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(400)
-      const body: UploadRedCapParticipantsResponse = response.body
+      const body: UploadRedcapParticipantResponse = response.body
       expect(body.message).toBe('No file uploaded')
     })
 
@@ -73,7 +73,7 @@ describe('IntegrationsController', () => {
         .set({ Authorization: `Bearer ${token}` })
         .attach('file', csvPath)
       expect(response.status).toBe(400)
-      const body: UploadRedCapParticipantsResponse = response.body
+      const body: UploadRedcapParticipantResponse = response.body
       expect(body.message).toBe('File is empty')
     })
 
@@ -81,6 +81,54 @@ describe('IntegrationsController', () => {
       const csvPath = path.resolve(__dirname, '../../tests/test_data/not_a_csv.txt')
       const response = await request(app)
         .post('/integrations/redcap/participant/upload')
+        .set({ Authorization: `Bearer ${token}` })
+        .attach('file', csvPath)
+      expect(response.status).toBe(400)
+    })
+  })
+
+  describe('POST /redcap/instrument/upload', () => {
+    it('should be used for testing', async () => {
+      const csvPath = path.resolve(__dirname, '../../tests/test_data/instrument.csv')
+      const response = await request(app)
+        .post('/integrations/redcap/instrument/upload')
+        .set({ Authorization: `Bearer ${token}` })
+        .attach('file', csvPath)
+      expect(response.status).toBe(200)
+      const survey = await prisma.surveyVersion.findFirst({ where: { id: 3 } })
+      expect(survey?.data[0].elements[1]).toStrictEqual({
+        data: {
+          choices: ['Yes', 'No'],
+          text: 'Participant has requested no further contact about CTRL',
+          value: 'Yes',
+        },
+        type: 'question-choices',
+      })
+      expect(survey?.data[0].elements.length).toBe(25)
+    })
+
+    it('should throw a 404 error if no file is given', async () => {
+      const response = await request(app)
+        .post('/integrations/redcap/instrument/upload')
+        .set({ Authorization: `Bearer ${token}` })
+      expect(response.status).toBe(400)
+      expect(response.body.message).toBe('No file uploaded')
+    })
+
+    it('should throw a 404 error if given an empty file', async () => {
+      const csvPath = path.resolve(__dirname, '../../tests/test_data/empty_file.csv')
+      const response = await request(app)
+        .post('/integrations/redcap/instrument/upload')
+        .set({ Authorization: `Bearer ${token}` })
+        .attach('file', csvPath)
+      expect(response.status).toBe(400)
+      expect(response.body.message).toBe('File is empty')
+    })
+
+    it('should throw an error if the file is not a csv', async () => {
+      const csvPath = path.resolve(__dirname, '../../tests/test_data/not_a_csv.txt')
+      const response = await request(app)
+        .post('/integrations/redcap/instrument/upload')
         .set({ Authorization: `Bearer ${token}` })
         .attach('file', csvPath)
       expect(response.status).toBe(400)
