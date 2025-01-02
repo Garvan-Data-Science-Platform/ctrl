@@ -38,3 +38,4 @@ jobs:
     with:
       policy-path: .snyk
     secrets: inherit
+    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main'
