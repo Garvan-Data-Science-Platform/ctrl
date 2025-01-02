@@ -1,0 +1,16 @@
+name: Security Checks
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  workflow_dispatch:
+
+jobs:
+  security-checks:
+    name: Security Audit
+    uses: Garvan-Data-Science-Platform/reusable-ci-actions/.github/workflows/security-audit.yml@main
+    with:
+      policy-path: .snyk
+    secrets: inherit
