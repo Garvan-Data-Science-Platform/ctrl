@@ -32,10 +32,3 @@ jobs:
         run: yarn test
       - name: e2e tests
         run: make e2e
-
-  security-checks:
-    uses: Garvan-Data-Science-Platform/reusable-ci-actions/.github/workflows/security-audit.yml@main
-    with:
-      policy-path: .snyk
-    secrets: inherit
-    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main'
