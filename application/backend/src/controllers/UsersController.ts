@@ -22,6 +22,7 @@ import type {
   UpdateUserRequest,
   UpdateUserRoleRequest,
   GeneratePasswordResetLinkResponse,
+  GeneratePasswordResetLinkRequest,
   ResetPasswordRequest,
   ResetPasswordResponse,
 } from 'common/types/api/users'

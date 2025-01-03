@@ -4,7 +4,7 @@ import {
   UnauthorizedErrorResponse,
   ValidateErrorResponse,
 } from 'common/types/api/errors'
-import { ContactUsResponse, type ContactUsRequest } from 'common/types/api/mailer'
+import { type ContactUsRequest } from 'common/types/api/mailer'
 import * as express from 'express'
 import prisma from '../PrismaClient'
 import { Role } from '@prisma/client'
@@ -66,6 +66,6 @@ export class MailerController extends Controller {
 
     return {
       message: 'Contact us request successfully sent to admin team.',
-    } as ContactUsResponse
+    }
   }
 }
