@@ -4,7 +4,7 @@ import logger from 'common/src/logger'
 
 dotenv.config()
 
-const main = async (): Promise<void> => {
+const main = async () => {
   // Setup and run Api
   const api = new Api()
   api.run()

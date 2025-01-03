@@ -1,4 +1,4 @@
-import prisma from '../src/PrismaClient'
+import prisma from '../../backend/src/PrismaClient'
 import logger from 'common/src/logger'
 import { seedTests } from './seed'
 
