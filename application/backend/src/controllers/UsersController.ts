@@ -37,6 +37,7 @@ import { NotFoundError, PasswordResetTokenInvalidError } from '../middlewares/Er
 import { MailerService } from '../services/MailerService'
 import { hashPassword } from '../authentication'
 import { checkPasswordStrength } from 'common/src/PasswordStrength'
+import { generatePasswordResetEmail } from '../utils/passwordResetTemplate'
 import crypto from 'crypto'
 
 @Route('users')
@@ -205,9 +206,11 @@ export class UsersController extends Controller {
       },
     })
 
-    const resetLink = `${process.env.HOSTNAME}/reset-password?token=${token}`
+    const resetLink = `https://${process.env.HOSTNAME}/reset-password?token=${token}`
 
-    await this.mailerService.sendEmail(user.email, 'CTRL - Password Reset Link', resetLink)
+    const { html, text } = await generatePasswordResetEmail(resetLink, user.firstName)
+
+    await this.mailerService.sendEmail(user.email, 'CTRL - Password Reset Link', text, html)
 
     return {
       message: `Password Reset Link has been sent to ${user.email}`,

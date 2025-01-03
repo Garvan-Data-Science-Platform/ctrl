@@ -35,12 +35,18 @@ export class MailerService {
    * @param subject Email subject
    * @param content Email body content
    */
-  public async sendEmail(to: string | string[], subject: string, content: string): Promise<void> {
+  public async sendEmail(
+    to: string | string[],
+    subject: string,
+    text: string,
+    html?: string,
+  ): Promise<void> {
     const mailOptions: nodemailer.SendMailOptions = {
       from: `CTRL <noreply@${process.env.HOSTNAME}>`,
       to,
       subject,
-      text: content,
+      text: text,
+      html: html,
     }
 
     try {
