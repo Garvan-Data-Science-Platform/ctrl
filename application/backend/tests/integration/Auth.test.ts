@@ -2,7 +2,6 @@ import request from 'supertest'
 import { Api } from '../../src/Api'
 import {
   RegisterParticipantRequest,
-  RegisterParticipantResponse,
   RegisterRequest,
   RegisterResponse,
 } from 'common/types/api/auth'
@@ -12,7 +11,6 @@ import {
   ParticipantType,
   StateTerritory,
 } from 'common/types/api/users/ParticipantProfile'
-import { GetAllOrganisationsResponse } from 'common/types/api/organisations'
 import { Role } from '@prisma/client'
 
 const api = new Api()
@@ -90,7 +88,7 @@ describe('Auth', () => {
     // Try to make a protected route request
     const protectedRouteResponse1 = await request(app).get('/organisations')
 
-    const getAllOrganisationsBody1: GetAllOrganisationsResponse = protectedRouteResponse1.body
+    const getAllOrganisationsBody1 = protectedRouteResponse1.body
 
     // Should not allow access to protected routes without valid token
     expect(protectedRouteResponse1.status).toEqual(401)
@@ -124,8 +122,7 @@ describe('Auth', () => {
       .send(participantRequest)
     expect(participantResponse.status).toEqual(201)
 
-    const participantBody: RegisterParticipantResponse = participantResponse.body
-    expect(participantBody.message).toMatch(/Created participant with user ID: \d+/)
+    const participantBody = participantResponse.body
     expect(participantBody.token).not.toBeNull()
 
     // Add token to protected route request
@@ -133,8 +130,6 @@ describe('Auth', () => {
       .get('/profiles/current')
       .set({ Authorization: `Bearer ${participantBody.token}` })
 
-    const getAllOrganisationsBody2: GetAllOrganisationsResponse = protectedRouteResponse2.body
     expect(protectedRouteResponse2.status).toEqual(200)
-    expect(getAllOrganisationsBody2.message).toMatch(/Got Participant Profile with userId: \d+/)
   })
 })

@@ -16,6 +16,7 @@ import {
   StateTerritory,
 } from 'common/types/api/users/ParticipantProfile'
 import { GetParticipantsResponse } from 'common/types/api/participants'
+import { ORG_ADMIN_ID } from '../seed'
 
 const api = new Api()
 const app = api.app
@@ -27,7 +28,7 @@ describe('Survey tests', () => {
     await resetDB()
 
     participantToken = await generateToken({ userId: 1, roles: ['Participant'] })
-    adminToken = await generateToken({ userId: 98, roles: ['OrganisationAdmin'] })
+    adminToken = await generateToken({ userId: ORG_ADMIN_ID, roles: ['OrganisationAdmin'] })
   })
 
   afterAll(async () => {
@@ -79,7 +80,7 @@ describe('Survey tests', () => {
       .set({ authorization: `Bearer ${participantToken}` })
       .send(reqBody)
 
-    expect(res.statusCode).toBe(200)
+    expect(res.statusCode).toBe(204)
 
     const res2 = await request(app)
       .get('/surveys/steps/0')
@@ -140,12 +141,12 @@ describe('Survey tests', () => {
       .patch('/surveys/2')
       .set({ authorization: `Bearer ${adminToken}` })
       .send(reqBody)
-    expect(res1.statusCode).toBe(200)
+    expect(res1.statusCode).toBe(204)
 
     const resPublish = await request(app)
       .post('/surveys/publish/2')
       .set({ authorization: `Bearer ${adminToken}` })
-    expect(resPublish.statusCode).toBe(200)
+    expect(resPublish.statusCode).toBe(204)
 
     const res2 = await request(app)
       .get('/surveys/steps/0')

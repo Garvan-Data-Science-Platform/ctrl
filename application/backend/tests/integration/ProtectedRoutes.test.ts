@@ -84,7 +84,7 @@ describe('Protected Routes', () => {
     {
       method: HttpMethod.PATCH,
       url: '/users/1',
-      rolesWhitelisted: [],
+      rolesWhitelisted: [Role.OrganisationAdmin],
     },
     {
       method: HttpMethod.PATCH,
@@ -94,7 +94,7 @@ describe('Protected Routes', () => {
     {
       method: HttpMethod.DELETE,
       url: '/users/1',
-      rolesWhitelisted: [],
+      rolesWhitelisted: [Role.OrganisationAdmin],
     },
   ]
 

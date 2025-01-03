@@ -21,16 +21,13 @@ import type {
   CreateOrganisationRequest,
   CreateOrganisationResponse,
   UpdateOrganisationRequest,
-  UpdateOrganisationResponse,
-  DeleteOrganisationResponse,
-  AddUserToOrganisationResponse,
-  RemoveUserFromOrganisationResponse,
   GetOrganisationUsersResponse,
 } from 'common/types/api/organisations'
 import {
   InternalErrorResponse,
   NotFoundErrorResponse,
   UnauthorizedErrorResponse,
+  ValidateErrorResponse,
 } from 'common/types/api/errors'
 import { NotFoundError } from '../middlewares/ErrorHandler'
 
@@ -49,10 +46,9 @@ export class OrganisationsController extends Controller {
    * @summary Get all Organisations
    */
   @Get('/')
-  @SuccessResponse('200', 'OK')
   public async getAllOrganisations(): Promise<GetAllOrganisationsResponse> {
     const organisations: Organisation[] = await this.organisationRepo.findMany({})
-    const responseData = { message: 'Got all organisations', organisations }
+    const responseData = { data: organisations }
     logger.info({ ...responseData })
     return responseData
   }
@@ -63,7 +59,6 @@ export class OrganisationsController extends Controller {
    * @summary Get a specific Organisation
    */
   @Get('/{orgID}')
-  @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async getOrganisationById(@Path() orgID: number): Promise<GetOrganisationByIdResponse> {
     const organisation: Organisation | null = await this.organisationRepo.findUnique({
@@ -74,7 +69,7 @@ export class OrganisationsController extends Controller {
       logger.error({ errorMessage })
       throw new NotFoundError(errorMessage)
     }
-    const responseData = { message: `Get organisation with ID: ${orgID}`, organisation }
+    const responseData = { data: organisation }
     logger.info({ ...responseData })
     return responseData
   }
@@ -95,8 +90,7 @@ export class OrganisationsController extends Controller {
       })
 
       const responseData = {
-        message: 'Created new organisation',
-        organisationID: newOrganisation.id,
+        id: newOrganisation.id,
       }
 
       logger.info({ ...responseData, newOrganisation })
@@ -114,15 +108,14 @@ export class OrganisationsController extends Controller {
    * @summary Update an existing Organisation
    */
   @Patch('/{orgID}')
-  @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
+  @Response<ValidateErrorResponse>('422', 'Validation Failed')
   public async updateOrganisation(
     @Path() orgID: number,
     @Body() bodyRequest: UpdateOrganisationRequest,
-  ): Promise<UpdateOrganisationResponse> {
-    let updatedOrganisation: Organisation
+  ) {
     try {
-      updatedOrganisation = await this.organisationRepo.update({
+      await this.organisationRepo.update({
         where: { id: orgID },
         data: bodyRequest,
       })
@@ -131,13 +124,6 @@ export class OrganisationsController extends Controller {
       logger.error({ errorMessage, err })
       throw new NotFoundError(errorMessage)
     }
-
-    const responseData = {
-      message: `Updated organisation with ID: ${orgID}`,
-    }
-
-    logger.info({ ...responseData, updatedOrganisation })
-    return responseData
   }
 
   /**
@@ -146,12 +132,10 @@ export class OrganisationsController extends Controller {
    * @summary Delete an existing Organisation
    */
   @Delete('/{orgID}')
-  @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  public async deleteOrganisation(@Path() orgID: number): Promise<DeleteOrganisationResponse> {
-    let deletedOrganisation: Organisation
+  public async deleteOrganisation(@Path() orgID: number) {
     try {
-      deletedOrganisation = await this.organisationRepo.delete({
+      await this.organisationRepo.delete({
         where: { id: orgID },
         include: { users: true },
       })
@@ -160,11 +144,6 @@ export class OrganisationsController extends Controller {
       logger.error({ errorMessage, err })
       throw new NotFoundError(errorMessage)
     }
-    const responseData = {
-      message: `Deleted organisation with ID: ${orgID}`,
-    }
-    logger.info({ ...responseData, deletedOrganisation })
-    return responseData
   }
 
   /**
@@ -173,7 +152,6 @@ export class OrganisationsController extends Controller {
    * @summary Get all Users within a specific Organisation
    */
   @Get('/{orgID}/users')
-  @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async getOrganisationUsers(@Path() orgID: number): Promise<GetOrganisationUsersResponse> {
     const organisation = await this.organisationRepo.findUnique({
@@ -188,8 +166,7 @@ export class OrganisationsController extends Controller {
     }
 
     const responseData = {
-      message: `Got users of organisation with ID: ${orgID}`,
-      users: organisation.users,
+      data: organisation.users,
     }
     logger.info({ ...responseData })
     return responseData
@@ -201,12 +178,8 @@ export class OrganisationsController extends Controller {
    * @summary Add specific User to specific Organisation
    */
   @Post('/{orgID}/users/{userId}')
-  @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  public async addUserToOrganisation(
-    @Path() orgID: number,
-    @Path() userId: number,
-  ): Promise<AddUserToOrganisationResponse> {
+  public async addUserToOrganisation(@Path() orgID: number, @Path() userId: number) {
     // Check if user exists
     const user = await this.userRepo.findUnique({ where: { id: userId } })
 
@@ -244,13 +217,6 @@ export class OrganisationsController extends Controller {
       where: { id: orgID },
       data: { users: { connect: { id: userId } } },
     })
-
-    const responseData = {
-      message: `User with ID: ${userId} added to organisation with ID: ${orgID}`,
-    }
-
-    logger.info({ ...responseData })
-    return responseData
   }
 
   /**
@@ -259,12 +225,8 @@ export class OrganisationsController extends Controller {
    * @summary Removes a specific User from a specific Organisation
    */
   @Delete('/{orgID}/users/{userId}')
-  @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  public async removeUserFromOrganisation(
-    @Path() orgID: number,
-    @Path() userId: number,
-  ): Promise<RemoveUserFromOrganisationResponse> {
+  public async removeUserFromOrganisation(@Path() orgID: number, @Path() userId: number) {
     // Check if user exists
     const user = await this.userRepo.findUnique({ where: { id: userId } })
 
@@ -302,11 +264,5 @@ export class OrganisationsController extends Controller {
       where: { id: orgID },
       data: { users: { disconnect: { id: userId } } },
     })
-    const responseData = {
-      message: `User with ID: ${userId} removed from organisation with ID: ${orgID}`,
-    }
-
-    logger.info({ ...responseData })
-    return responseData
   }
 }

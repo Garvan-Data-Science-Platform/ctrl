@@ -5,7 +5,6 @@ import { useQuery } from '@tanstack/react-query'
 import type { GetParticipantProfileResponse } from '@common/types/api/users'
 import { Link } from 'react-router-dom'
 import { apiClient } from '../apiClient'
-import { FamilyMember } from '@common/types/api/users/getParticipantProfile'
 import { ParticipantType } from '@common/types/api/users/ParticipantProfile'
 
 export default function Profile() {

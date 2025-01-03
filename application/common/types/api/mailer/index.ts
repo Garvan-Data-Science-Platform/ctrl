@@ -8,7 +8,3 @@ export interface ContactUsRequest {
   subject: string
   content: string
 }
-
-export interface ContactUsResponse {
-  message: string
-}

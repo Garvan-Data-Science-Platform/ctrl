@@ -12,6 +12,7 @@ import {
   UpdateSurveyRequest,
 } from 'common/types/api/surveys'
 import { GetSurveyVersionByIdResponse } from 'common/types/api/surveys/getSurveyVersionById'
+import { ORG_ADMIN_ID, PARTICIPANT_COMPLETED_ID, PARTICIPANT_UNANSWERED_ID } from '../../tests/seed'
 
 const api = new Api()
 const app = api.app
@@ -19,9 +20,12 @@ let token: string, tokenNoAnswers: string, tokenNoProfile: string
 
 describe('SurveysController', () => {
   beforeAll(async () => {
-    token = await generateToken({ userId: 99, roles: ['OrganisationAdmin'] })
-    tokenNoAnswers = await generateToken({ userId: 98, roles: ['OrganisationAdmin'] })
-    tokenNoProfile = await generateToken({ userId: 97, roles: ['OrganisationAdmin'] })
+    token = await generateToken({ userId: PARTICIPANT_COMPLETED_ID, roles: ['OrganisationAdmin'] })
+    tokenNoAnswers = await generateToken({
+      userId: PARTICIPANT_UNANSWERED_ID,
+      roles: ['OrganisationAdmin'],
+    })
+    tokenNoProfile = await generateToken({ userId: ORG_ADMIN_ID, roles: ['OrganisationAdmin'] })
     api.run()
   })
 
@@ -117,7 +121,7 @@ describe('SurveysController', () => {
         .post('/surveys/answers')
         .set({ Authorization: `Bearer ${token}` })
         .send(reqBody)
-      expect(response.status).toBe(200)
+      expect(response.status).toBe(204)
       const participant = await prisma.surveyParticipant.findFirst({ where: { id: 1 } })
       expect(participant?.answers[1].answers).toEqual([true, 'Choice 1'])
     })
@@ -134,7 +138,7 @@ describe('SurveysController', () => {
         .post('/surveys/answers')
         .set({ Authorization: `Bearer ${tokenNoAnswers}` })
         .send(reqBody)
-      expect(response.status).toBe(200)
+      expect(response.status).toBe(204)
 
       participant = await prisma.surveyParticipant.findUniqueOrThrow({ where: { id: 1 } })
       const answersAfter = participant.answers
@@ -159,7 +163,7 @@ describe('SurveysController', () => {
       const response = await request(app)
         .post('/surveys/participant/1')
         .set({ Authorization: `Bearer ${token}` })
-      expect(response.status).toBe(200)
+      expect(response.status).toBe(204)
       const participant = await prisma.surveyParticipant.findFirstOrThrow({
         where: { profileId: 99 },
       })
@@ -185,7 +189,7 @@ describe('SurveysController', () => {
         .patch('/surveys/2')
         .set({ Authorization: `Bearer ${token}` })
         .send(reqBody)
-      expect(response.status).toBe(200)
+      expect(response.status).toBe(204)
       const survey = await prisma.surveyVersion.findFirst({ where: { id: 2 } })
       expect(survey?.data[0].elements[1].data.text).toBe('Question 1')
     })
@@ -205,7 +209,7 @@ describe('SurveysController', () => {
         .post('/surveys/publish/2')
         .set({ Authorization: `Bearer ${token}` })
 
-      expect(response.status).toBe(200)
+      expect(response.status).toBe(204)
       const survey = await prisma.surveyVersion.findFirst({ where: { id: 2 } })
       expect(survey?.status).toBe('PUBLISHED')
     })

@@ -15,14 +15,11 @@ import {
 import logger from 'common/src/logger'
 import type {
   GetUserByIdResponse,
-  DeleteUserResponse,
   GetAllUsersResponse,
   CreateUserRequest,
   CreateUserResponse,
   UpdateUserRequest,
-  UpdateUserResponse,
   UpdateUserRoleRequest,
-  UpdateUserRoleResponse,
 } from 'common/types/api/users'
 import { User } from '@prisma/client'
 import prisma from '../PrismaClient'
@@ -30,6 +27,7 @@ import {
   InternalErrorResponse,
   NotFoundErrorResponse,
   UnauthorizedErrorResponse,
+  ValidateErrorResponse,
 } from 'common/types/api/errors'
 import { NotFoundError } from '../middlewares/ErrorHandler'
 
@@ -46,11 +44,10 @@ export class UsersController extends Controller {
    * @summary Get all Users
    */
   @Get('/')
-  @SuccessResponse('200', 'OK')
   @Security('jwt', ['OrganisationAdmin'])
   public async getAllUsers(): Promise<GetAllUsersResponse> {
     const users: User[] = await this.userRepo.findMany({})
-    const responseData = { message: 'Got all users', data: users }
+    const responseData = { data: users }
     logger.info({ ...responseData })
     return responseData
   }
@@ -61,7 +58,6 @@ export class UsersController extends Controller {
    * @summary Get Specific User
    */
   @Get('/{userId}')
-  @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   @Security('jwt')
   public async getUserById(@Path() userId: number): Promise<GetUserByIdResponse> {
@@ -73,7 +69,7 @@ export class UsersController extends Controller {
       logger.error({ errorMessage })
       throw new NotFoundError(errorMessage)
     }
-    const responseData = { message: `Got user with ID: ${userId}`, data: user }
+    const responseData = { data: user }
     logger.info({ ...responseData })
     return responseData
   }
@@ -85,6 +81,7 @@ export class UsersController extends Controller {
    */
   @Post('/')
   @SuccessResponse('201', 'Created')
+  @Response<ValidateErrorResponse>('422', 'Validation Failed')
   @Security('jwt', ['OrganisationAdmin'])
   public async createUser(@Body() bodyRequest: CreateUserRequest): Promise<CreateUserResponse> {
     try {
@@ -92,8 +89,7 @@ export class UsersController extends Controller {
         data: { ...bodyRequest, password: 'temp_password_hash' },
       })
       const responseData = {
-        message: `Created user with ID: ${insertedUser.id}`,
-        newUser: insertedUser,
+        id: insertedUser.id,
       }
       logger.info({ ...responseData })
       return responseData
@@ -110,24 +106,15 @@ export class UsersController extends Controller {
    * @summary Update a User
    */
   @Patch('/{userId}')
-  @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
+  @Response<ValidateErrorResponse>('422', 'Validation Failed')
   @Security('jwt', ['OrganisationAdmin'])
-  public async updateUser(
-    @Path() userId: number,
-    @Body() bodyRequest: UpdateUserRequest,
-  ): Promise<UpdateUserResponse> {
+  public async updateUser(@Path() userId: number, @Body() bodyRequest: UpdateUserRequest) {
     try {
-      const updatedUser = await this.userRepo.update({
+      await this.userRepo.update({
         where: { id: userId },
         data: bodyRequest,
       })
-      const responseData = {
-        message: `Updated user with ID: ${userId}`,
-        updatedUser,
-      }
-      logger.info({ ...responseData })
-      return responseData
     } catch (err) {
       const errorMessage: string = `User with ID: ${userId} not found`
       logger.error({ errorMessage, err })
@@ -141,15 +128,12 @@ export class UsersController extends Controller {
    * @summary Delete a User
    */
   @Delete('/{userId}')
-  @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   @Security('jwt', ['OrganisationAdmin'])
-  public async deleteUser(@Path() userId: number): Promise<DeleteUserResponse> {
+  public async deleteUser(@Path() userId: number) {
     try {
-      const deletedUser = await this.userRepo.delete({ where: { id: userId } })
-      const responseData = { message: `Deleted user with ID: ${userId}` }
-      logger.info({ ...responseData, deletedUser })
-      return responseData
+      await this.userRepo.delete({ where: { id: userId } })
+      return
     } catch (err) {
       const errorMessage: string = `User with ID: ${userId} not found`
       logger.error({ errorMessage, err })
@@ -163,27 +147,17 @@ export class UsersController extends Controller {
    * @summary Update a Users Role
    */
   @Patch('/{userID}/role')
-  @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   @Security('jwt', ['OperatorAdmin'])
-  public async updateUserRole(
-    @Path() userID: number,
-    @Body() bodyRequest: UpdateUserRoleRequest,
-  ): Promise<UpdateUserRoleResponse> {
+  public async updateUserRole(@Path() userID: number, @Body() bodyRequest: UpdateUserRoleRequest) {
     try {
-      const updatedUser = await this.userRepo.update({
+      await this.userRepo.update({
         where: { id: userID },
         data: {
           role: bodyRequest.newRole,
         },
       })
-
-      const responseData = {
-        message: `Updated user with ID: ${userID} to role: ${bodyRequest.newRole}`,
-      }
-
-      logger.info({ ...responseData, updatedUser })
-      return responseData
+      return
     } catch (err) {
       const errorMessage: string = `User with ID: ${userID} not found`
       logger.error({ errorMessage, err })

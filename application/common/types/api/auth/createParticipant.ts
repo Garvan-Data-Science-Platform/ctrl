@@ -6,5 +6,5 @@ export type CreateParticipantRequest = Omit<
 >
 
 export interface CreateParticipantResponse {
-  message: string
+  id: number
 }

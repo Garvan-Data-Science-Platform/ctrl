@@ -1,23 +1,25 @@
 import request from 'supertest'
-import { GetParticipantProfileResponse } from 'common/types/api/users'
+import { GetParticipantProfileResponse, UpdateProfileRequest } from 'common/types/api/users'
 import { generateToken } from '../authentication'
 import { Api } from '../Api'
 import { resetDB } from '../../tests/TestHelpers'
+import { ORG_ADMIN_ID, PARTICIPANT_COMPLETED_ID } from '../../tests/seed'
+import { StateTerritory } from 'common/types/api/users/ParticipantProfile'
+import prisma from '../PrismaClient'
 
 const api = new Api()
 const app = api.app
 
 describe('ProfilesController', () => {
   let registeredUserToken: string, registeredParticipantToken: string
-  const registeredUserId: number = 97
-  const registeredParticipantUserId: number = 99
+
   beforeAll(async () => {
     registeredUserToken = await generateToken({
-      userId: registeredUserId,
+      userId: ORG_ADMIN_ID,
       roles: ['OrganisationAdmin'],
     })
     registeredParticipantToken = await generateToken({
-      userId: registeredParticipantUserId,
+      userId: PARTICIPANT_COMPLETED_ID,
       roles: ['Participant'],
     })
     api.run()
@@ -35,7 +37,7 @@ describe('ProfilesController', () => {
     it('should return the profile of a user if they exist', async () => {
       // Get user profile
       const response = await request(app)
-        .get(`/profiles/${registeredParticipantUserId}`)
+        .get(`/profiles/${PARTICIPANT_COMPLETED_ID}`)
         .set({ Authorization: `Bearer ${registeredParticipantToken}` })
 
       expect(response.status).toBe(200)
@@ -44,7 +46,7 @@ describe('ProfilesController', () => {
         addressLine: '123 smith st',
         dob: '1980-01-23T00:00:00.000Z',
         mobile: '0412345678',
-        participantType: 'STANDARD',
+        participantType: 'GUARDIAN',
         postcode: '1234',
         preferredContact: 'EMAIL',
         state: 'VIC',
@@ -52,12 +54,12 @@ describe('ProfilesController', () => {
         email: 'test3@example.com',
         firstName: 'Test',
         lastName: 'User',
+        familyMembers: [
+          { firstName: 'Test', lastName: 'Dependent', participantType: 'DEPENDENT_AGE' },
+        ],
       })
 
       const body: GetParticipantProfileResponse = response.body
-      expect(body.message).toBe(
-        `Got Participant Profile with userId: ${registeredParticipantUserId}`,
-      )
       expect(body.data).toEqual(expectedProfileData)
     })
 
@@ -85,7 +87,7 @@ describe('ProfilesController', () => {
         addressLine: '123 smith st',
         dob: '1980-01-23T00:00:00.000Z',
         mobile: '0412345678',
-        participantType: 'STANDARD',
+        participantType: 'GUARDIAN',
         postcode: '1234',
         preferredContact: 'EMAIL',
         state: 'VIC',
@@ -96,9 +98,6 @@ describe('ProfilesController', () => {
       })
 
       const body: GetParticipantProfileResponse = response.body
-      expect(body.message).toBe(
-        `Got Participant Profile with userId: ${registeredParticipantUserId}`,
-      )
       expect(body.data).toEqual(expectedProfileData)
     })
 
@@ -109,7 +108,7 @@ describe('ProfilesController', () => {
 
       expect(response.status).toBe(404)
       const body = response.body
-      expect(body.message).toBe(`Participant Profile with userId: ${registeredUserId} not found`)
+      expect(body.message).toBe(`Participant Profile with userId: ${ORG_ADMIN_ID} not found`)
     })
   })
 
@@ -120,7 +119,7 @@ describe('ProfilesController', () => {
         .set({ Authorization: `Bearer ${registeredParticipantToken}` })
 
       const participantProfileByIDResponse = await request(app)
-        .get(`/profiles/${registeredParticipantUserId}`)
+        .get(`/profiles/${PARTICIPANT_COMPLETED_ID}`)
         .set({ Authorization: `Bearer ${registeredParticipantToken}` })
 
       expect(currentParticipantProfileResponse.status).toBe(200)
@@ -133,6 +132,42 @@ describe('ProfilesController', () => {
         participantProfileByIDResponse.body
 
       expect(participantProfileByIDBody).toEqual(currentUserProfileBody)
+    })
+  })
+
+  describe('PATCH /profiles/current', () => {
+    it('should update an existing profile', async () => {
+      const reqBody: UpdateProfileRequest = {
+        lastName: 'Brown',
+        dob: '2010-12-12',
+        state: StateTerritory.QLD,
+      }
+
+      const response = await request(app)
+        .patch('/profiles/current')
+        .set({ authorization: `Bearer ${registeredParticipantToken}` })
+        .send(reqBody)
+      expect(response.status).toBe(204)
+
+      const user = await prisma.user.findUniqueOrThrow({ where: { id: PARTICIPANT_COMPLETED_ID } })
+      const profile = await prisma.participantProfile.findFirstOrThrow({
+        where: { userId: user.id },
+      })
+      expect(user.lastName).toBe('Brown')
+      expect(profile.lastName).toBe('Brown')
+      expect(profile.dob).toEqual(new Date('2010-12-12'))
+      expect(profile.state).toBe('QLD')
+    })
+
+    it('should reject invalid data', async () => {
+      for (const body of [{ state: 'ABC' }, { firstName: '' }, { mobile: 'ABC' }]) {
+        const response = await request(app)
+          .patch('/profiles/current')
+          .set({ authorization: `Bearer ${registeredParticipantToken}` })
+          .send(body)
+        expect(response.status).toBe(422)
+        expect(response.body.message).toBe('Validation Failed')
+      }
     })
   })
 })

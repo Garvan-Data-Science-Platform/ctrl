@@ -5,15 +5,12 @@ import { resetDB } from '../../tests/TestHelpers'
 import { generateToken } from '../authentication'
 import type { RegisterRequest } from 'common/types/api/auth'
 import {
-  CreateUserResponse,
-  DeleteUserResponse,
   GetAllUsersResponse,
   GetUserByIdResponse,
-  UpdateUserResponse,
   UpdateUserRoleRequest,
-  UpdateUserRoleResponse,
 } from 'common/types/api/users'
 import { Role } from '@prisma/client'
+import { OPERATOR_ADMIN_ID, ORG_ADMIN_ID, PARTICIPANT_UNANSWERED_ID } from '../../tests/seed'
 
 const api = new Api()
 const app = api.app
@@ -23,14 +20,12 @@ describe('UsersController', () => {
   let opAdminToken: string
   let orgAdminToken: string
 
-  const registeredParticipantUserID: number = 98
-
   beforeAll(async () => {
-    opAdminToken = await generateToken({ userId: 96, roles: ['OperatorAdmin'] })
-    orgAdminToken = await generateToken({ userId: 97, roles: ['OrganisationAdmin'] })
+    opAdminToken = await generateToken({ userId: OPERATOR_ADMIN_ID, roles: ['OperatorAdmin'] })
+    orgAdminToken = await generateToken({ userId: ORG_ADMIN_ID, roles: ['OrganisationAdmin'] })
 
     token = await generateToken({
-      userId: registeredParticipantUserID,
+      userId: PARTICIPANT_UNANSWERED_ID,
       roles: ['Participant'],
     })
 
@@ -73,7 +68,7 @@ describe('UsersController', () => {
 
   describe('GET /users/:id', () => {
     it('should return a user by ID', async () => {
-      const userId = registeredParticipantUserID
+      const userId = PARTICIPANT_UNANSWERED_ID
       const response = await request(app)
         .get(`/users/${userId}`)
         .set({ Authorization: `Bearer ${token}` })
@@ -81,7 +76,6 @@ describe('UsersController', () => {
       expect(response.status).toBe(200)
 
       const body: GetUserByIdResponse = response.body
-      expect(body.message).toBe(`Got user with ID: ${userId}`)
       expect(body).toHaveProperty('data')
     })
 
@@ -95,8 +89,7 @@ describe('UsersController', () => {
 
       expect(response.status).toBe(404)
 
-      const body: GetUserByIdResponse = response.body
-      expect(body.message).toBe(`User with ID: ${userId} not found`)
+      expect(response.body.message).toBe(`User with ID: ${userId} not found`)
     })
   })
 
@@ -110,21 +103,12 @@ describe('UsersController', () => {
         role: Role.OperatorAdmin,
       }
 
-      // Check that the user does not already exist
-      const existingUser = await prisma.user.findFirst({ where: { email: newUser.email } })
-      if (existingUser) {
-        throw new Error('User with email already exists')
-      }
-
       // Create a new user
       const response = await request(app)
         .post('/users')
         .set({ Authorization: `Bearer ${orgAdminToken}` })
         .send(newUser)
       expect(response.status).toBe(201)
-
-      const body: CreateUserResponse = response.body
-      expect(body.message).toMatch(/Created user with ID: \d+/)
 
       const createdUser = await prisma.user.findFirst({ where: { email: newUser.email } })
       if (!createdUser) {
@@ -136,7 +120,7 @@ describe('UsersController', () => {
 
   describe('PATCH /users/:id', () => {
     it('should update a user by ID', async () => {
-      const userId: number = registeredParticipantUserID
+      const userId: number = PARTICIPANT_UNANSWERED_ID
 
       const newFirstName: string = 'Updated'
 
@@ -158,13 +142,10 @@ describe('UsersController', () => {
 
       const response = await request(app)
         .patch(`/users/${userId}`)
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
         .send({ firstName: newFirstName })
 
-      expect(response.status).toBe(200)
-
-      const body: UpdateUserResponse = response.body
-      expect(body.message).toBe(`Updated user with ID: ${userId}`)
+      expect(response.status).toBe(204)
 
       // Check if the user is updated successfully
       const updatedUser = await prisma.user.findFirst({ where: { id: userId } })
@@ -178,20 +159,19 @@ describe('UsersController', () => {
       const response = await request(app)
         .patch(`/users/${userId}`)
         .set({
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${orgAdminToken}`,
         })
         .send({ firstName: newFirstName })
 
       expect(response.status).toBe(404)
 
-      const body: UpdateUserResponse = response.body
-      expect(body.message).toBe(`User with ID: ${userId} not found`)
+      expect(response.body.message).toBe(`User with ID: ${userId} not found`)
     })
   })
 
   describe('DELETE /users/:id', () => {
     it('should delete a user by ID', async () => {
-      const userId: number = registeredParticipantUserID
+      const userId: number = PARTICIPANT_UNANSWERED_ID
 
       // Check that user exists in db
       const existingUser = await prisma.user.findFirst({ where: { id: userId } })
@@ -202,12 +182,9 @@ describe('UsersController', () => {
       // Delete User
       const response = await request(app)
         .delete(`/users/${userId}`)
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
 
-      expect(response.status).toBe(200)
-
-      const body: DeleteUserResponse = response.body
-      expect(body.message).toBe(`Deleted user with ID: ${userId}`)
+      expect(response.status).toBe(204)
 
       // Check that user exists in db
       const deletedUser = await prisma.user.findFirst({ where: { id: userId } })
@@ -219,18 +196,17 @@ describe('UsersController', () => {
       const userId: number = 999
       const response = await request(app)
         .delete(`/users/${userId}`)
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
 
       expect(response.status).toBe(404)
 
-      const body: DeleteUserResponse = response.body
-      expect(body.message).toBe(`User with ID: ${userId} not found`)
+      expect(response.body.message).toBe(`User with ID: ${userId} not found`)
     })
   })
 
   describe('PATCH /users/:id/role', () => {
     it('should update a users role to the role provided', async () => {
-      const userID: number = registeredParticipantUserID
+      const userID: number = PARTICIPANT_UNANSWERED_ID
 
       // Check user role
       const existingUser = await prisma.user.findFirst({ where: { id: userID } })
@@ -241,14 +217,10 @@ describe('UsersController', () => {
       const newRole: Role = Role.OperatorAdmin
       const newRoleRequest: UpdateUserRoleRequest = { newRole }
 
-      const updateUserRoleResponse = await request(app)
+      await request(app)
         .patch(`/users/${userID}/role`)
         .send(newRoleRequest)
         .set({ Authorization: `Bearer ${opAdminToken}` })
-
-      const responseBody: UpdateUserRoleResponse = updateUserRoleResponse.body
-
-      expect(responseBody.message).toBe(`Updated user with ID: ${userID} to role: ${newRole}`)
 
       // Check user role
       const updatedUser = await prisma.user.findFirst({ where: { id: userID } })
@@ -257,7 +229,7 @@ describe('UsersController', () => {
     })
 
     it('should return a Validation Error and keep the same role if the provided role is invalid', async () => {
-      const userID: number = registeredParticipantUserID
+      const userID: number = PARTICIPANT_UNANSWERED_ID
 
       // Check user role
       const existingUser = await prisma.user.findFirst({ where: { id: userID } })
@@ -286,16 +258,14 @@ describe('UsersController', () => {
       const userID: number = 999
       const newRole: Role = Role.OperatorAdmin
 
-      const updateUserRoleResponse = await request(app)
+      const response = await request(app)
         .patch(`/users/${userID}/role`)
         .send({ newRole })
         .set({ Authorization: `Bearer ${opAdminToken}` })
 
-      expect(updateUserRoleResponse.status).toBe(404)
+      expect(response.status).toBe(404)
 
-      const responseBody: UpdateUserRoleResponse = updateUserRoleResponse.body
-
-      expect(responseBody.message).toBe(`User with ID: ${userID} not found`)
+      expect(response.body.message).toBe(`User with ID: ${userID} not found`)
     })
   })
 })

@@ -78,7 +78,6 @@ const models: TsoaRoute.Models = {
     "GetAllUsersResponse": {
         "dataType": "refObject",
         "properties": {
-            "message": {"dataType":"string","required":true},
             "data": {"dataType":"array","array":{"dataType":"refAlias","ref":"User"},"required":true},
         },
         "additionalProperties": false,
@@ -87,7 +86,6 @@ const models: TsoaRoute.Models = {
     "GetUserByIdResponse": {
         "dataType": "refObject",
         "properties": {
-            "message": {"dataType":"string","required":true},
             "data": {"ref":"User","required":true},
         },
         "additionalProperties": false,
@@ -105,7 +103,7 @@ const models: TsoaRoute.Models = {
     "CreateUserResponse": {
         "dataType": "refObject",
         "properties": {
-            "message": {"dataType":"string","required":true},
+            "id": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
     },
@@ -127,36 +125,12 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "UpdateUserResponse": {
-        "dataType": "refObject",
-        "properties": {
-            "message": {"dataType":"string","required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "UpdateUserRequest": {
         "dataType": "refObject",
         "properties": {
             "firstName": {"dataType":"string","validators":{"minLength":{"value":1}}},
             "lastName": {"dataType":"string","validators":{"minLength":{"value":1}}},
             "email": {"dataType":"string","validators":{"pattern":{"errorMsg":"please provide valid email","value":"^(.+)@(.+)$"}}},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "DeleteUserResponse": {
-        "dataType": "refObject",
-        "properties": {
-            "message": {"dataType":"string","required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "UpdateUserRoleResponse": {
-        "dataType": "refObject",
-        "properties": {
-            "message": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },
@@ -273,14 +247,6 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "UpdateSurveyResponse": {
-        "dataType": "refObject",
-        "properties": {
-            "message": {"dataType":"string","required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "SurveyStepStatus": {
         "dataType": "refAlias",
         "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["completed"]},{"dataType":"enum","enums":["review_required"]},{"dataType":"enum","enums":["viewed"]}],"validators":{}},
@@ -315,14 +281,6 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "data": {"dataType":"array","array":{"dataType":"refObject","ref":"SurveyStep"},"required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "UpdateSurveyAnswersResponse": {
-        "dataType": "refObject",
-        "properties": {
-            "message": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },
@@ -384,15 +342,7 @@ const models: TsoaRoute.Models = {
     "GetParticipantProfileResponse": {
         "dataType": "refObject",
         "properties": {
-            "message": {"dataType":"string","required":true},
             "data": {"dataType":"nestedObjectLiteral","nestedProperties":{"familyMembers":{"dataType":"array","array":{"dataType":"refObject","ref":"FamilyMember"},"required":true},"alternativeContact":{"ref":"AlternativeContact"},"participantType":{"ref":"ParticipantType","required":true},"preferredContact":{"ref":"ContactMethod","required":true},"postcode":{"dataType":"string"},"state":{"ref":"StateTerritory"},"suburb":{"dataType":"string"},"addressLine":{"dataType":"string"},"mobile":{"dataType":"string","required":true},"email":{"dataType":"string"},"dob":{"dataType":"string","required":true},"lastName":{"dataType":"string","required":true},"middleName":{"dataType":"string"},"firstName":{"dataType":"string","required":true}},"required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "DefaultResponse": {
-        "dataType": "refObject",
-        "properties": {
         },
         "additionalProperties": false,
     },
@@ -470,8 +420,7 @@ const models: TsoaRoute.Models = {
     "GetAllOrganisationsResponse": {
         "dataType": "refObject",
         "properties": {
-            "message": {"dataType":"string","required":true},
-            "organisations": {"dataType":"array","array":{"dataType":"refAlias","ref":"Organisation"},"required":true},
+            "data": {"dataType":"array","array":{"dataType":"refAlias","ref":"Organisation"},"required":true},
         },
         "additionalProperties": false,
     },
@@ -479,8 +428,7 @@ const models: TsoaRoute.Models = {
     "GetOrganisationByIdResponse": {
         "dataType": "refObject",
         "properties": {
-            "message": {"dataType":"string","required":true},
-            "organisation": {"ref":"Organisation","required":true},
+            "data": {"ref":"Organisation","required":true},
         },
         "additionalProperties": false,
     },
@@ -488,8 +436,7 @@ const models: TsoaRoute.Models = {
     "CreateOrganisationResponse": {
         "dataType": "refObject",
         "properties": {
-            "message": {"dataType":"string","required":true},
-            "organisationID": {"dataType":"double","required":true},
+            "id": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
     },
@@ -502,14 +449,6 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "UpdateOrganisationResponse": {
-        "dataType": "refObject",
-        "properties": {
-            "message": {"dataType":"string","required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "UpdateOrganisationRequest": {
         "dataType": "refObject",
         "properties": {
@@ -518,43 +457,10 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "DeleteOrganisationResponse": {
-        "dataType": "refObject",
-        "properties": {
-            "message": {"dataType":"string","required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "GetOrganisationUsersResponse": {
         "dataType": "refObject",
         "properties": {
-            "message": {"dataType":"string","required":true},
-            "users": {"dataType":"array","array":{"dataType":"refAlias","ref":"User"},"required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "AddUserToOrganisationResponse": {
-        "dataType": "refObject",
-        "properties": {
-            "message": {"dataType":"string","required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "RemoveUserFromOrganisationResponse": {
-        "dataType": "refObject",
-        "properties": {
-            "message": {"dataType":"string","required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "ContactUsResponse": {
-        "dataType": "refObject",
-        "properties": {
-            "message": {"dataType":"string","required":true},
+            "data": {"dataType":"array","array":{"dataType":"refAlias","ref":"User"},"required":true},
         },
         "additionalProperties": false,
     },
@@ -571,7 +477,6 @@ const models: TsoaRoute.Models = {
     "RegisterResponse": {
         "dataType": "refObject",
         "properties": {
-            "message": {"dataType":"string","required":true},
             "token": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
@@ -593,7 +498,7 @@ const models: TsoaRoute.Models = {
     "RegisterParticipantResponse": {
         "dataType": "refObject",
         "properties": {
-            "message": {"dataType":"string","required":true},
+            "id": {"dataType":"double","required":true},
             "token": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
@@ -624,7 +529,6 @@ const models: TsoaRoute.Models = {
     "LoginResponse": {
         "dataType": "refObject",
         "properties": {
-            "message": {"dataType":"string","required":true},
             "token": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
@@ -635,14 +539,6 @@ const models: TsoaRoute.Models = {
         "properties": {
             "email": {"dataType":"string","required":true,"validators":{"pattern":{"errorMsg":"Please provide valid email","value":"^(.+)@(.+)$"}}},
             "password": {"dataType":"string","required":true,"validators":{"minLength":{"errorMsg":"Password must be at least 8 characters","value":8}}},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "UploadRedCapParticipantsResponse": {
-        "dataType": "refObject",
-        "properties": {
-            "message": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },
@@ -692,7 +588,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -723,7 +619,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -786,7 +682,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -817,7 +713,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -849,7 +745,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -879,7 +775,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -910,7 +806,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -942,7 +838,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -974,7 +870,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -1007,7 +903,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -1037,7 +933,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -1069,7 +965,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -1101,7 +997,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -1132,7 +1028,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -1163,7 +1059,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -1194,7 +1090,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -1226,7 +1122,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -1256,7 +1152,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -1286,7 +1182,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -1316,7 +1212,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -1347,7 +1243,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -1410,7 +1306,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -1441,7 +1337,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -1472,7 +1368,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -1504,7 +1400,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -1536,7 +1432,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -1568,7 +1464,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -1658,7 +1554,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -1689,7 +1585,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: 201,
               });
             } catch (err) {
                 return next(err);
@@ -1718,7 +1614,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
@@ -1747,7 +1643,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);

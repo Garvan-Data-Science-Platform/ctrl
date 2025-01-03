@@ -121,9 +121,11 @@ export default function Dashboard() {
                     </Box>
                     <Typography lineHeight="24px">{val.title}</Typography>
                   </Box>
-                  <Tooltip title={val.tooltip}>
-                    <InfoOutlined />
-                  </Tooltip>
+                  {val.tooltip && (
+                    <Tooltip title={val.tooltip}>
+                      <InfoOutlined />
+                    </Tooltip>
+                  )}
                 </Box>
               </Grid>
               <Grid size={{ xs: 12, sm: 5 }}>

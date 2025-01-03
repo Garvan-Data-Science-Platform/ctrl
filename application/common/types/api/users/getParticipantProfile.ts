@@ -1,7 +1,6 @@
 import {
   AlternativeContact,
   ContactMethod,
-  OnBehalf,
   ParticipantType,
   StateTerritory,
 } from './ParticipantProfile'
@@ -13,7 +12,6 @@ export interface FamilyMember {
 }
 
 export interface GetParticipantProfileResponse {
-  message: string
   data: {
     firstName: string
     middleName?: string

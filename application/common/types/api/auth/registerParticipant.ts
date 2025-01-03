@@ -83,6 +83,6 @@ export interface RegisterParticipantRequest {
 }
 
 export interface RegisterParticipantResponse {
-  message: string
+  id: number
   token: string
 }
