@@ -5,7 +5,7 @@ import {
   NotFoundErrorResponse,
 } from 'common/types/api/errors'
 import { GetInvitedResponse, GetParticipantsResponse } from 'common/types/api/participants'
-import { Route, Tags, Security, Controller, Get, SuccessResponse, Response } from 'tsoa'
+import { Route, Tags, Security, Controller, Get, Response } from 'tsoa'
 import { Participant } from 'common/types/api/participants/participant'
 import Invites from 'common/example_responses/getInvites.json'
 
@@ -23,8 +23,6 @@ export class ParticipantsController extends Controller {
    * @summary List participants
    */
   @Get('/')
-  @SuccessResponse('200', 'OK')
-  @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async getParticipants(): Promise<GetParticipantsResponse> {
     function determineStatus(answers: PrismaJson.SurveyAnswerData, date_published: Date) {
       if (answers.every((val) => val.status == 'completed')) return 'complete'
@@ -117,7 +115,6 @@ export class InvitesController extends Controller {
    * @summary List participants
    */
   @Get('/')
-  @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async getInvites(): Promise<GetInvitedResponse> {
     return Invites

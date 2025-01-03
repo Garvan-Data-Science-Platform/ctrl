@@ -1,16 +1,10 @@
+import { Response, Controller, Security, Tags, Route, Post, Body, Request } from 'tsoa'
 import {
-  SuccessResponse,
-  Response,
-  Controller,
-  Security,
-  Tags,
-  Route,
-  Post,
-  Body,
-  Request,
-} from 'tsoa'
-import { InternalErrorResponse, UnauthorizedErrorResponse } from 'common/types/api/errors'
-import { ContactUsResponse, type ContactUsRequest } from 'common/types/api/mailer'
+  InternalErrorResponse,
+  UnauthorizedErrorResponse,
+  ValidateErrorResponse,
+} from 'common/types/api/errors'
+import type { ContactUsRequest } from 'common/types/api/mailer'
 import nodemailer from 'nodemailer'
 import logger from 'common/src/logger'
 import * as express from 'express'
@@ -32,11 +26,11 @@ export class MailerController extends Controller {
    * @summary ContactUs
    */
   @Post('/contact-us')
-  @SuccessResponse('200', 'Email sent')
+  @Response<ValidateErrorResponse>('422', 'Invalid Request')
   public async contactUs(
     @Body() bodyRequest: ContactUsRequest,
     @Request() request: express.Request,
-  ): Promise<ContactUsResponse> {
+  ) {
     if (!request.user) {
       throw new NotFoundError('User not found')
     }
@@ -109,9 +103,5 @@ export class MailerController extends Controller {
     } finally {
       transporter.close()
     }
-
-    return {
-      message: 'Contact us request successfully sent to admin team.',
-    } as ContactUsResponse
   }
 }

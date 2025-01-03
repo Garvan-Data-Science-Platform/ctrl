@@ -6,6 +6,7 @@ import { Role } from '@prisma/client'
 import { NodemailerMock } from 'nodemailer-mock'
 import * as nodemailer from 'nodemailer'
 import prisma from '../PrismaClient'
+import { PARTICIPANT_COMPLETED_ID } from '../../tests/seed'
 const mockNodeMailer = nodemailer as unknown as NodemailerMock
 
 const api = new Api()
@@ -13,11 +14,10 @@ const app = api.app
 
 describe('MailerController', () => {
   let participantToken: string
-  const registeredParticipantUserID: number = 99
 
   beforeAll(async () => {
     participantToken = await generateToken({
-      userId: registeredParticipantUserID,
+      userId: PARTICIPANT_COMPLETED_ID,
       roles: [Role.Participant],
     })
 

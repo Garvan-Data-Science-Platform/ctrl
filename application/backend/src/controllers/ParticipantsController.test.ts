@@ -3,16 +3,17 @@ import { Api } from '../Api'
 import { resetDB } from '../../tests/TestHelpers'
 import request from 'supertest'
 import { GetParticipantsResponse } from 'common/types/api/participants'
+import { ORG_ADMIN_ID } from '../../tests/seed'
 
 const api = new Api()
 const app = api.app
 
 describe('ParticipantsController', () => {
   let registeredUserToken: string
-  const registeredUserId: number = 97
+
   beforeAll(async () => {
     registeredUserToken = await generateToken({
-      userId: registeredUserId,
+      userId: ORG_ADMIN_ID,
       roles: ['OrganisationAdmin'],
     })
 

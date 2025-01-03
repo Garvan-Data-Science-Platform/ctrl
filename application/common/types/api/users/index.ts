@@ -2,10 +2,9 @@ import type { GetUserByIdResponse } from './getUserById'
 import type { GetParticipantProfileResponse } from './getParticipantProfile'
 import type { GetAllUsersResponse } from './getAllUsers'
 import type { CreateUserRequest, CreateUserResponse } from './createUser'
-import type { UpdateUserRequest, UpdateUserResponse } from './updateUser'
-import type { UpdateProfileRequest, UpdateProfileResponse } from './updateProfile'
-import type { DeleteUserResponse } from './deleteUser'
-import type { UpdateUserRoleRequest, UpdateUserRoleResponse } from './updateUserRole'
+import type { UpdateUserRequest } from './updateUser'
+import type { UpdateProfileRequest } from './updateProfile'
+import type { UpdateUserRoleRequest } from './updateUserRole'
 
 export {
   GetUserByIdResponse,
@@ -14,10 +13,6 @@ export {
   CreateUserRequest,
   CreateUserResponse,
   UpdateUserRequest,
-  UpdateUserResponse,
-  DeleteUserResponse,
   UpdateProfileRequest,
-  UpdateProfileResponse,
   UpdateUserRoleRequest,
-  UpdateUserRoleResponse,
 }

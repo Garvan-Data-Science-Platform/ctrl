@@ -16,7 +16,6 @@ import { parseCSV } from '../utils/parseCsv'
 import { FileUploadError } from '../middlewares/ErrorHandler'
 import { Readable } from 'stream'
 import * as express from 'express'
-import { UploadRedCapParticipantsResponse } from 'common/types/api/integrations/redcap'
 import { RegisterParticipantRequest } from 'common/types/api/auth'
 import { UnauthorizedErrorResponse, InternalErrorResponse } from 'common/types/api/errors'
 import { AuthController } from './AuthController'
@@ -39,10 +38,8 @@ export class IntegrationsController extends Controller {
   // - passwords are strong enough (they are created in Integrations so should be strong enough)
   @Post('/redcap/participant/upload')
   @Middlewares(upload.single('file'))
-  @SuccessResponse('200', 'Created Participants from CSV')
-  public async uploadRedCapParticipant(
-    @Request() request: express.Request,
-  ): Promise<UploadRedCapParticipantsResponse> {
+  @SuccessResponse('201', 'Created Participants from CSV')
+  public async uploadRedCapParticipant(@Request() request: express.Request) {
     const file = request.file
     if (!file) {
       throw new FileUploadError('No file uploaded')
@@ -68,7 +65,5 @@ export class IntegrationsController extends Controller {
       const { email, password, middleName, ...participantData } = participant
       participants.push(await authController.createParticipant(participantData))
     }
-
-    return { message: `created ${participants.length} participants` }
   }
 }

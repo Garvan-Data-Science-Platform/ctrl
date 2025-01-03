@@ -1,10 +1,8 @@
 import type { GetAllOrganisationsResponse } from './getAllOrganisations'
 import type { GetOrganisationByIdResponse } from './getOrganisationById'
 import type { CreateOrganisationRequest, CreateOrganisationResponse } from './createOrganisation'
-import type { UpdateOrganisationRequest, UpdateOrganisationResponse } from './updateOrganisation'
-import type { DeleteOrganisationResponse } from './deleteOrganisation'
+import type { UpdateOrganisationRequest } from './updateOrganisation'
 import type { AddUserToOrganisationResponse } from './addUserToOrganisation'
-import type { RemoveUserFromOrganisationResponse } from './removeUserFromOrganisation'
 import type { GetOrganisationUsersResponse } from './getOrganisationUsers'
 
 export {
@@ -13,9 +11,6 @@ export {
   CreateOrganisationRequest,
   CreateOrganisationResponse,
   UpdateOrganisationRequest,
-  UpdateOrganisationResponse,
-  DeleteOrganisationResponse,
   AddUserToOrganisationResponse,
-  RemoveUserFromOrganisationResponse,
   GetOrganisationUsersResponse,
 }

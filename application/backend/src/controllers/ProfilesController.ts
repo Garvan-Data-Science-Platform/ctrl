@@ -4,26 +4,19 @@ import {
   UnauthorizedErrorResponse,
   InternalErrorResponse,
   NotFoundErrorResponse,
+  ValidateErrorResponse,
 } from 'common/types/api/errors'
-import { GetParticipantProfileResponse } from 'common/types/api/users'
+import type { GetParticipantProfileResponse, UpdateProfileRequest } from 'common/types/api/users'
 import { NotFoundError } from '../middlewares/ErrorHandler'
-import {
-  Route,
-  Tags,
-  Security,
-  Controller,
-  Get,
-  SuccessResponse,
-  Path,
-  Response,
-  Request,
-} from 'tsoa'
+import { Route, Tags, Security, Controller, Get, Path, Response, Request, Patch, Body } from 'tsoa'
 import * as express from 'express'
 import {
+  AlternativeContact,
   ContactMethod,
   ParticipantType,
   StateTerritory,
 } from 'common/types/api/users/ParticipantProfile'
+import { FamilyMember } from 'common/types/api/users/getParticipantProfile'
 
 @Route('profiles')
 @Tags('Profiles')
@@ -31,6 +24,7 @@ import {
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 export class ProfilesController extends Controller {
   participantProfileRepo = prisma.participantProfile
+  userRepo = prisma.user
 
   /**
    * Get a Participants Profile by token
@@ -38,7 +32,6 @@ export class ProfilesController extends Controller {
    * @summary Get a Participants Profile by token
    */
   @Get('/current')
-  @SuccessResponse('200', 'OK')
   @Security('jwt')
   public async getParticipantProfileByToken(
     @Request() request: express.Request,
@@ -62,7 +55,6 @@ export class ProfilesController extends Controller {
    * @summary Get a Participants Profile by ID
    */
   @Get('/{userId}')
-  @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   @Security('jwt')
   public async getParticipantProfileByID(
@@ -78,6 +70,7 @@ export class ProfilesController extends Controller {
         user: {
           select: { firstName: true, lastName: true, email: true, middleName: true },
         },
+        nextOfKin: { select: { firstName: true, lastName: true, email: true, mobile: true } },
       },
     })
 
@@ -95,8 +88,12 @@ export class ProfilesController extends Controller {
     const participantType = profile.participantType as ParticipantType
     const preferredContact = profile.preferredContact as ContactMethod
 
+    const familyMembers = (await this.participantProfileRepo.findMany({
+      where: { familyId: data.familyId, OR: [{ userId: null }, { NOT: { userId: userId } }] },
+      select: { firstName: true, lastName: true, participantType: true },
+    })) as FamilyMember[]
+
     const responseData: GetParticipantProfileResponse = {
-      message: `Got Participant Profile with userId: ${userId}`,
       data: {
         firstName,
         lastName,
@@ -109,9 +106,37 @@ export class ProfilesController extends Controller {
         email: user?.email,
         mobile,
         participantType,
+        familyMembers,
+        alternativeContact: profile.nextOfKin as AlternativeContact,
       },
     }
     logger.info({ ...responseData })
     return responseData
+  }
+
+  @Patch('/current')
+  @Response<ValidateErrorResponse>('422', 'Validation Failed')
+  @Security('jwt')
+  public async updateCurrentProfile(
+    @Body() bodyRequest: UpdateProfileRequest,
+    @Request() request: express.Request,
+  ) {
+    const profile = await this.participantProfileRepo.findFirstOrThrow({
+      where: { userId: request.user?.userId },
+    })
+    const { nextOfKin, ...updateData } = { ...bodyRequest }
+    if (bodyRequest.dob) updateData.dob = new Date(bodyRequest.dob) as any
+
+    const hasNok = Boolean(nextOfKin)
+
+    await this.participantProfileRepo.update({
+      where: { id: profile.id },
+      data: { ...updateData, nextOfKin: hasNok ? { update: nextOfKin } : undefined },
+    })
+
+    await this.userRepo.update({
+      where: { id: request.user?.userId },
+      data: { firstName: bodyRequest.firstName, lastName: bodyRequest.lastName },
+    })
   }
 }

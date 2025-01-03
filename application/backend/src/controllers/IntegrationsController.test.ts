@@ -5,6 +5,7 @@ import path from 'path'
 import { generateToken } from '../authentication'
 import { UploadRedCapParticipantsResponse } from 'common/types/api/integrations/redcap'
 import prisma from '../PrismaClient'
+import { PARTICIPANT_COMPLETED_ID } from '../../tests/seed'
 
 const api = new Api()
 const app = api.app
@@ -12,7 +13,7 @@ let token: string
 
 describe('IntegrationsController', () => {
   beforeAll(async () => {
-    token = await generateToken({ userId: 99, roles: ['OrganisationAdmin'] })
+    token = await generateToken({ userId: PARTICIPANT_COMPLETED_ID, roles: ['OrganisationAdmin'] })
     api.run()
   })
 
@@ -32,8 +33,7 @@ describe('IntegrationsController', () => {
         .set({ Authorization: `Bearer ${token}` })
         .attach('file', csvPath) // Attach the file with the field name 'file'
 
-      expect(response.status).toBe(200)
-      expect(response.body.message).toBe('created 1 participants')
+      expect(response.status).toBe(201)
 
       const createdParticipant = await prisma.participantProfile.findFirst({
         where: { firstName: 'John' },
@@ -50,8 +50,7 @@ describe('IntegrationsController', () => {
         .set({ Authorization: `Bearer ${token}` })
         .attach('file', csvPath) // Attach the file with the field name 'file'
 
-      expect(response.status).toBe(200)
-      expect(response.body.message).toBe('created 90 participants')
+      expect(response.status).toBe(201)
 
       const postCreationLen = await prisma.participantProfile.count()
 

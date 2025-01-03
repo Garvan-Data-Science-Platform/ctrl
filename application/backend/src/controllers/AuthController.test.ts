@@ -8,7 +8,6 @@ import type {
   RegisterRequest,
   RegisterResponse,
 } from 'common/types/api/auth'
-import type { GetAllUsersResponse } from 'common/types/api/users'
 import prisma from '../PrismaClient'
 import { Role } from '@prisma/client'
 import { resetDB } from '../../tests/TestHelpers'
@@ -39,7 +38,7 @@ describe('AuthController', () => {
       // Try to make a protected route request
       const protectedRouteResponse1 = await request(app).get('/users')
 
-      const getAllUsersBody1: GetAllUsersResponse = protectedRouteResponse1.body
+      const getAllUsersBody1 = protectedRouteResponse1.body
 
       expect(protectedRouteResponse1.status).toEqual(401)
       expect(getAllUsersBody1.message).toEqual('No token provided')
@@ -59,7 +58,6 @@ describe('AuthController', () => {
 
       const registerBody: RegisterResponse = registerResponse.body
 
-      expect(registerBody.message).toMatch(/Registered user with ID: \d+/)
       expect(registerBody.token).not.toBeNull()
 
       // Add token to protected route request
@@ -67,10 +65,7 @@ describe('AuthController', () => {
         .get('/users')
         .set({ Authorization: `Bearer ${registerBody.token}` })
 
-      const getAllUsersBody2: GetAllUsersResponse = protectedRouteResponse2.body
-
       expect(protectedRouteResponse2.status).toEqual(200)
-      expect(getAllUsersBody2.message).toEqual('Got all users')
     })
 
     it('should register a new user returning a token', async () => {
@@ -90,7 +85,6 @@ describe('AuthController', () => {
       const response = await request(app).post('/auth/register').send(registerRequest)
       expect(response.status).toEqual(201)
       const body: RegisterResponse = response.body
-      expect(body.message).toMatch(/Registered user with ID: \d+/)
       expect(body.token).not.toBeNull()
 
       // Check if user is now registered
@@ -245,7 +239,6 @@ describe('AuthController', () => {
       expect(participantResponse.status).toEqual(201)
 
       const participantBody: RegisterParticipantResponse = participantResponse.body
-      expect(participantBody.message).toMatch(/Created participant with user ID: \d+/)
       expect(participantBody.token).not.toBeNull()
     })
     it('should fail validation if the password is not strong', async () => {
@@ -366,7 +359,7 @@ describe('AuthController', () => {
     it('should allow access to protected routes', async () => {
       // Try to make a protected route request
       const protectedRouteResponse1 = await request(app).get('/users')
-      const getAllUsersBody1: GetAllUsersResponse = protectedRouteResponse1.body
+      const getAllUsersBody1 = protectedRouteResponse1.body
 
       // Should not allow access to protected routes without valid token
       expect(protectedRouteResponse1.status).toEqual(401)
@@ -382,7 +375,6 @@ describe('AuthController', () => {
       expect(loginResponse.status).toEqual(200)
 
       const loginBody: LoginResponse = loginResponse.body
-      expect(loginBody.message).toEqual('Logged in Successfully!')
       expect(loginBody.token).not.toBeNull()
 
       // Add token to protected route request
@@ -391,10 +383,7 @@ describe('AuthController', () => {
         .get('/users')
         .set({ Authorization: `Bearer ${loginBody.token}` })
 
-      const getAllUsersBody2: GetAllUsersResponse = protectedRouteResponse2.body
-
       expect(protectedRouteResponse2.status).toEqual(200)
-      expect(getAllUsersBody2.message).toEqual('Got all users')
     })
 
     it("should return 401 and shouldn't allow the user to login with the incorrect password", async () => {

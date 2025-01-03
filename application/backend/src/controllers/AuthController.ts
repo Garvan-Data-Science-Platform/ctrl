@@ -60,7 +60,6 @@ export class AuthController extends Controller {
     const token = await generateToken({ userId: insertedUser.id, roles: [insertedUser.role] })
 
     const responseData = {
-      message: `Registered user with ID: ${insertedUser.id}`,
       token,
     }
 
@@ -107,7 +106,7 @@ export class AuthController extends Controller {
     const token = await generateToken({ userId: insertedUser.id, roles: [insertedUser.role] })
 
     const responseData = {
-      message: `Created participant with user ID: ${insertedUser.id}`,
+      id: insertedUser.id,
       token,
     }
 
@@ -120,7 +119,6 @@ export class AuthController extends Controller {
    * @summary Login a User
    */
   @Post('/login')
-  @SuccessResponse('200', 'Logged In')
   @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
   public async login(@Body() bodyRequest: LoginRequest): Promise<LoginResponse> {
     // Check if user exists and password matches
@@ -135,7 +133,6 @@ export class AuthController extends Controller {
 
     const token = await generateToken({ userId: user.id, roles: [user.role] })
     const responseData = {
-      message: 'Logged in Successfully!',
       token,
     }
 
@@ -217,7 +214,6 @@ export class AuthController extends Controller {
         },
       })
     }
-
-    return { message: `Created participant with ID: ${profile.id} ` }
+    return { id: profile.id }
   }
 }

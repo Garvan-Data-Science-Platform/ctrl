@@ -3,6 +3,11 @@ import '../../backend/src/jsontypes'
 import ExampleSurveyStepData from 'common/src/surveys/exampleSurveyStepData.json'
 import { SurveyStep } from 'common/types/survey'
 
+export const OPERATOR_ADMIN_ID = 96
+export const ORG_ADMIN_ID = 97
+export const PARTICIPANT_UNANSWERED_ID = 98
+export const PARTICIPANT_COMPLETED_ID = 99
+
 export async function seedTests(prisma: PrismaClient) {
   await prisma.organisation.create({
     data: {
@@ -15,7 +20,7 @@ export async function seedTests(prisma: PrismaClient) {
   // OperatorAdminUser
   await prisma.user.create({
     data: {
-      id: 96,
+      id: OPERATOR_ADMIN_ID,
       email: 'operatoradmin@example.com',
       firstName: 'Operator',
       lastName: 'Admin',
@@ -27,7 +32,7 @@ export async function seedTests(prisma: PrismaClient) {
   //OrganisationAdminUser
   await prisma.user.create({
     data: {
-      id: 97,
+      id: ORG_ADMIN_ID,
       email: 'test1@example.com',
       firstName: 'Organisation',
       lastName: 'Admin',
@@ -61,7 +66,7 @@ export async function seedTests(prisma: PrismaClient) {
   //User with unanswered survey
   await prisma.user.create({
     data: {
-      id: 98,
+      id: PARTICIPANT_UNANSWERED_ID,
       email: 'test2@example.com',
       firstName: 'Test',
       lastName: 'User',
@@ -77,7 +82,7 @@ export async function seedTests(prisma: PrismaClient) {
   //User with completed survey
   await prisma.user.create({
     data: {
-      id: 99,
+      id: PARTICIPANT_COMPLETED_ID,
       email: 'test3@example.com',
       firstName: 'Test',
       lastName: 'User',
@@ -97,7 +102,7 @@ export async function seedTests(prisma: PrismaClient) {
       preferredContact: 'EMAIL',
       state: 'VIC',
       suburb: 'M',
-      userId: 98,
+      userId: PARTICIPANT_UNANSWERED_ID,
       participantType: 'STANDARD',
     },
   })
@@ -113,8 +118,28 @@ export async function seedTests(prisma: PrismaClient) {
       preferredContact: 'EMAIL',
       state: 'VIC',
       suburb: 'Melbourne',
-      userId: 99,
-      participantType: 'STANDARD',
+      userId: PARTICIPANT_COMPLETED_ID,
+      familyId: 100,
+      participantType: 'GUARDIAN',
+    },
+  })
+
+  //Dependent Profile (no user)
+  await prisma.participantProfile.create({
+    data: {
+      id: 100,
+      firstName: 'Test',
+      lastName: 'Dependent',
+      addressLine: '123 smith st',
+      dob: new Date('1990-01-23'),
+      mobile: '0412345678',
+      postcode: '1234',
+      preferredContact: 'EMAIL',
+      state: 'VIC',
+      suburb: 'Melbourne',
+      familyId: 100,
+      userId: null,
+      participantType: 'DEPENDENT_AGE',
     },
   })
 

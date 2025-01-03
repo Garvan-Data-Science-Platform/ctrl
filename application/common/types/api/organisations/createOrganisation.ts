@@ -11,6 +11,5 @@ export interface CreateOrganisationRequest {
 }
 
 export interface CreateOrganisationResponse {
-  message: string
-  organisationID: number
+  id: number
 }

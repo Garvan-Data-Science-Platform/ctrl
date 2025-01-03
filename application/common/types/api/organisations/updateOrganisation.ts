@@ -9,7 +9,3 @@ export interface UpdateOrganisationRequest {
    */
   name?: string
 }
-
-export interface UpdateOrganisationResponse {
-  message: string
-}

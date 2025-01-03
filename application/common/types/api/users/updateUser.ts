@@ -20,7 +20,3 @@ export interface UpdateUserRequest {
    */
   email?: string
 }
-
-export interface UpdateUserResponse {
-  message: string
-}

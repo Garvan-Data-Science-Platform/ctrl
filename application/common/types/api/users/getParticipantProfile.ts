@@ -5,8 +5,13 @@ import {
   StateTerritory,
 } from './ParticipantProfile'
 
+export interface FamilyMember {
+  firstName: string
+  lastName: string
+  participantType: ParticipantType
+}
+
 export interface GetParticipantProfileResponse {
-  message: string
   data: {
     firstName: string
     middleName?: string
@@ -21,5 +26,6 @@ export interface GetParticipantProfileResponse {
     preferredContact: ContactMethod
     participantType: ParticipantType
     alternativeContact?: AlternativeContact
+    familyMembers: FamilyMember[]
   }
 }
