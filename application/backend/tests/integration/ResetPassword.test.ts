@@ -36,8 +36,10 @@ describe('Password Reset', () => {
       .post('/auth/login')
       .send({ email: userEmail, password: originalPassword })
 
+    console.log(response.body)
+
     expect(response.status).toBe(200)
-    expect(response.body.message).toBe('Logged in Successfully!')
+    expect(response.body.token).not.toBe(undefined)
   })
 
   it('should generate a password reset link and send an email', async () => {
