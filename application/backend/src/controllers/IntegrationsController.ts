@@ -16,10 +16,6 @@ import { parseCSV } from '../utils/parseCsv'
 import { FileUploadError } from '../middlewares/ErrorHandler'
 import { Readable } from 'stream'
 import * as express from 'express'
-import {
-  UploadRedcapParticipantResponse,
-  UploadRedcapInstrumentResponse,
-} from 'common/types/api/integrations/redcap'
 import { RegisterParticipantRequest } from 'common/types/api/auth'
 import { UnauthorizedErrorResponse, InternalErrorResponse } from 'common/types/api/errors'
 import { AuthController } from './AuthController'
@@ -65,9 +61,7 @@ export class IntegrationsController extends Controller {
   @Post('/redcap/instrument/upload')
   @Middlewares(upload.single('file'))
   @SuccessResponse('200', 'Created Survey from Instrument CSV')
-  public async uploadRedcapInstrument(
-    @Request() request: express.Request,
-  ): Promise<UploadRedcapInstrumentResponse> {
+  public async uploadRedcapInstrument(@Request() request: express.Request) {
     const file = await this.validateFile(request)
 
     // Create a readable stream from the buffer
@@ -88,7 +82,6 @@ export class IntegrationsController extends Controller {
         ],
       },
     })
-    return { message: 'created survey' }
   }
 
   private async validateFile(request: express.Request): Promise<Express.Multer.File> {

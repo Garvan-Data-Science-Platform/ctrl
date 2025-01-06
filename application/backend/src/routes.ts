@@ -560,14 +560,6 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "UploadRedcapParticipantResponse": {
-        "dataType": "refObject",
-        "properties": {
-            "message": {"dataType":"string","required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "UploadRedcapInstrumentResponse": {
         "dataType": "refObject",
         "properties": {
@@ -1678,7 +1670,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: 201,
               });
             } catch (err) {
                 return next(err);
@@ -1709,7 +1701,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 201,
+                successStatus: 200,
               });
             } catch (err) {
                 return next(err);
