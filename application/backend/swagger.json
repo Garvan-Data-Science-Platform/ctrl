@@ -71,7 +71,8 @@
         "type": "string",
         "enum": ["OperatorAdmin", "Participant", "OrganisationAdmin"]
       },
-      "DefaultSelection_Prisma._36_UserPayload_": {
+      "User": {
+        "description": "Model User",
         "properties": {
           "updatedAt": {
             "type": "string",
@@ -116,10 +117,6 @@
           "id"
         ],
         "type": "object"
-      },
-      "User": {
-        "$ref": "#/components/schemas/DefaultSelection_Prisma._36_UserPayload_",
-        "description": "Model User"
       },
       "GetAllUsersResponse": {
         "properties": {
@@ -983,10 +980,6 @@
         },
         "required": ["updatedAt", "createdAt", "id", "name"],
         "type": "object"
-      },
-      "Organisation": {
-        "$ref": "#/components/schemas/DefaultSelection_Prisma._36_OrganisationPayload_",
-        "description": "Model Organisation"
       },
       "GetAllOrganisationsResponse": {
         "properties": {
@@ -3430,6 +3423,50 @@
         "responses": {
           "200": {
             "description": "Upserted Survey from Instrument CSV",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadRedcapInstrumentResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Integrations"],
+        "security": [
+          {
+            "jwt": ["OrganisationAdmin"]
+          }
+        ],
+        "parameters": []
+      }
+    },
+    "/integrations/redcap/instrument/upload": {
+      "post": {
+        "operationId": "UploadRedcapInstrument",
+        "responses": {
+          "200": {
+            "description": "Created Survey from Instrument CSV",
             "content": {
               "application/json": {
                 "schema": {
