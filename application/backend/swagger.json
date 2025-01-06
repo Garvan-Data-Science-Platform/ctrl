@@ -71,7 +71,8 @@
         "type": "string",
         "enum": ["OperatorAdmin", "Participant", "OrganisationAdmin"]
       },
-      "DefaultSelection_Prisma._36_UserPayload_": {
+      "User": {
+        "description": "Model User",
         "properties": {
           "updatedAt": {
             "type": "string",
@@ -116,10 +117,6 @@
           "id"
         ],
         "type": "object"
-      },
-      "User": {
-        "$ref": "#/components/schemas/DefaultSelection_Prisma._36_UserPayload_",
-        "description": "Model User"
       },
       "GetAllUsersResponse": {
         "properties": {
@@ -982,10 +979,6 @@
         },
         "required": ["updatedAt", "createdAt", "id", "name"],
         "type": "object"
-      },
-      "Organisation": {
-        "$ref": "#/components/schemas/DefaultSelection_Prisma._36_OrganisationPayload_",
-        "description": "Model Organisation"
       },
       "GetAllOrganisationsResponse": {
         "properties": {
