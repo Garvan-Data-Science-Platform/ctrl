@@ -71,19 +71,22 @@ export function mapToSurveyElement(
 
   // The csv downloaded from the Redcap website vs the api uses different variable names in the csv and there is no way to change them...
   // so we switch the field mappings based on where the sourceQuestions are donwloaded from
-  const fieldMappings = rawFields
-    ? {
-        questionType: 'field_type',
-        text: 'field_label',
-        choices: 'select_choices_or_calculations',
-        sectionHeader: 'section_header',
-      }
-    : {
-        questionType: 'Field Type',
-        text: 'Field Label',
-        choices: 'Choices, Calculations, OR Slider Labels',
-        sectionHeader: 'Section Header',
-      }
+  let fieldMappings
+  if (rawFields) {
+    fieldMappings = {
+      questionType: 'field_type',
+      text: 'field_label',
+      choices: 'select_choices_or_calculations',
+      sectionHeader: 'section_header',
+    }
+  } else {
+    fieldMappings = {
+      questionType: 'Field Type',
+      text: 'Field Label',
+      choices: 'Choices, Calculations, OR Slider Labels',
+      sectionHeader: 'Section Header',
+    }
+  }
 
   // Extract required fields
   const questionType = requiredField(fieldMappings.questionType)

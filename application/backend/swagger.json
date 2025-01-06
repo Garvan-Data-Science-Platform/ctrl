@@ -1271,6 +1271,18 @@
         "type": "object",
         "additionalProperties": false
       },
+      "UploadRedcapParticipantAPIRequest": {
+        "description": "This is the name of the redcap instrument you are importing from.\nNOTE: These 'forms' are not the form label values that are seen on the webpages,\nbut instead they are the unique form names seen in Column B of the data dictionary.",
+        "properties": {
+          "form": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": ["form"],
+        "type": "object",
+        "additionalProperties": false
+      },
       "UploadRedcapInstrumentResponse": {
         "properties": {
           "id": {
@@ -1302,6 +1314,18 @@
           }
         },
         "required": ["id"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UploadRedcapInstrumentAPIRequest": {
+        "description": "This is the name of the redcap instrument you are importing from.\nNOTE: These 'forms' are not the form label values that are seen on the webpages,\nbut instead they are the unique form names seen in Column B of the data dictionary.",
+        "properties": {
+          "form": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": ["form"],
         "type": "object",
         "additionalProperties": false
       },
@@ -3443,9 +3467,63 @@
     },
     "/integrations/redcap/instrument/upload": {
       "post": {
-        "operationId": "UploadRedcapInstrument",
+        "operationId": "UploadRedcapParticipantAPI",
         "responses": {
-          "200": {
+          "201": {
+            "description": "Created Participants from CSV",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadRedcapParticipantResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Integrations"],
+        "security": [
+          {
+            "jwt": ["OrganisationAdmin"]
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadRedcapParticipantAPIRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integrations/redcap/instrument/upload/csv": {
+      "post": {
+        "operationId": "UploadRedcapInstrumentCSV",
+        "responses": {
+          "201": {
             "description": "Upserted Survey from Instrument CSV",
             "content": {
               "application/json": {
