@@ -8,7 +8,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "cy:open": "cypress open",
-    "cy:run": "cypress run --config baseUrl=http://localhost:4173"
+    "cypress": "docker compose up --build -d db-test backend-test && dotenv -e ../backend/.env.test start-server-and-test vite http://localhost:5173 cy:open",
+    "cy:run": "cypress run"
   },
   "dependencies": {
     "@emotion/react": "^11.13.3",
@@ -35,6 +36,7 @@
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.9",
     "globals": "^15.9.0",
+    "start-server-and-test": "^2.0.9",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
     "vite": "^5.4.1",
