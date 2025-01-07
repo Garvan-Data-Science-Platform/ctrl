@@ -123,47 +123,4 @@ export class IntegrationsController extends Controller {
 
     return { id: survey.id }
   }
-
-  @Post('/redcap/instrument/upload')
-  @Middlewares(upload.single('file'))
-  @SuccessResponse('200', 'Created Survey from Instrument CSV')
-  public async uploadRedcapInstrument(
-    @Request() request: express.Request,
-  ): Promise<UploadRedcapInstrumentResponse> {
-    const file = await validateFile(request)
-
-    // Create a readable stream from the buffer
-    const readableStream = Readable.from(file.buffer.toString())
-    const csvData: Record<string, string>[] = await parseCSV(readableStream)
-
-    // fetches elements from mapping
-    let elements: SurveyElement[] = []
-    try {
-      steps = this.integrationService.mapInstrumentCSVToSurvey(csvData)
-    } catch (error) {
-      throw new FileUploadError(
-        error instanceof Error ? error.message : 'Unknown Error: Failed to Map Data',
-      )
-    }
-
-    const existingSurvey = await this.surveyRepo.findFirst({
-      where: { status: 'DRAFT' },
-    })
-
-    // prisma doesn't let you use where to find a non-unique id here so we have to use find first in the previous ine
-    const survey = await this.surveyRepo.upsert({
-      where: { id: existingSurvey ? existingSurvey.id : -1 }, // Use a non-existent id for creation
-      update: {
-        versionNumber: { increment: 1 },
-        data: steps,
-      },
-      create: {
-        status: 'DRAFT',
-        versionNumber: 1,
-        data: steps,
-      },
-    })
-
-    return { id: survey.id }
-  }
 }
