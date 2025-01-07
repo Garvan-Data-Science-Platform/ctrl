@@ -3,7 +3,6 @@ import { resetDB } from 'common/testing/TestHelpers'
 import { Api } from '../Api'
 import path from 'path'
 import { generateToken } from '../authentication'
-import { UploadRedcapParticipantResponse } from 'common/types/api/integrations/redcap'
 import prisma from '../PrismaClient'
 import { PARTICIPANT_COMPLETED_ID } from 'common/testing/seed'
 
@@ -35,6 +34,8 @@ describe('IntegrationsController', () => {
 
       expect(response.status).toBe(201)
 
+      expect(response.body).toStrictEqual({ ids: [1] })
+
       const createdParticipant = await prisma.participantProfile.findFirst({
         where: { firstName: 'John' },
       })
@@ -62,7 +63,7 @@ describe('IntegrationsController', () => {
         .post('/integrations/redcap/participant/upload')
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(400)
-      const body: UploadRedcapParticipantResponse = response.body
+      const body = response.body
       expect(body.message).toBe('No file uploaded')
     })
 
@@ -73,7 +74,7 @@ describe('IntegrationsController', () => {
         .set({ Authorization: `Bearer ${token}` })
         .attach('file', csvPath)
       expect(response.status).toBe(400)
-      const body: UploadRedcapParticipantResponse = response.body
+      const body = response.body
       expect(body.message).toBe('File is empty')
     })
 
@@ -87,8 +88,8 @@ describe('IntegrationsController', () => {
     })
   })
 
-  describe('POST /redcap/instrument/upload', () => {
-    it('should be used for testing', async () => {
+  describe('POST integrations/redcap/instrument/upload', () => {
+    it('should add a valid survey', async () => {
       const csvPath = path.resolve(__dirname, '../../tests/test_data/instrument.csv')
       const response = await request(app)
         .post('/integrations/redcap/instrument/upload')

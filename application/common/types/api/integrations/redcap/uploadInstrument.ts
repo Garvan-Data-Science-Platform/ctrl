@@ -1,3 +1,3 @@
 export interface UploadRedcapInstrumentResponse {
-  message: string
+  id: number
 }
