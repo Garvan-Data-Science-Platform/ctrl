@@ -35,6 +35,7 @@ describe('IntegrationsController', () => {
 
       expect(response.status).toBe(201)
 
+      // check correct response message
       expect(response.body).toStrictEqual({ ids: [1] })
 
       const createdParticipant = await prisma.participantProfile.findFirst({
