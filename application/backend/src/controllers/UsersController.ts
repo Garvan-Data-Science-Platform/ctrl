@@ -33,11 +33,12 @@ import {
   ValidateErrorResponse,
 } from 'common/types/api/errors'
 import { NotFoundError, PasswordResetTokenInvalidError } from '../middlewares/ErrorHandler'
-import { MailerService } from '../services/MailerService'
 import { hashPassword } from '../authentication'
 import { checkPasswordStrength } from 'common/src/PasswordStrength'
 import { generatePasswordResetEmail } from '../utils/passwordResetTemplate'
 import crypto from 'crypto'
+import nodemailer from 'nodemailer'
+import MailerTransporter from '../utils/mailer'
 
 @Route('users')
 @Tags('Users')
@@ -46,7 +47,6 @@ import crypto from 'crypto'
 export class UsersController extends Controller {
   userRepo = prisma.user
   passwordResetTokenRepo = prisma.passwordResetToken
-  mailerService = new MailerService()
 
   /**
    * Get all Users
@@ -214,7 +214,14 @@ export class UsersController extends Controller {
 
     const { html, text } = generatePasswordResetEmail(resetLink, user.firstName)
 
-    await this.mailerService.sendEmail(user.email, 'CTRL - Password Reset Link', text, html)
+    const mailToUserOptions: nodemailer.SendMailOptions = {
+      to: user.email,
+      subject: 'CTRL - Password Reset Link',
+      text,
+      html,
+    }
+
+    await MailerTransporter.sendMail(mailToUserOptions)
   }
 
   @Post('/password/reset')

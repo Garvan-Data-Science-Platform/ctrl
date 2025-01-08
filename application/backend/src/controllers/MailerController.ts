@@ -9,7 +9,9 @@ import * as express from 'express'
 import prisma from '../PrismaClient'
 import { Role } from '@prisma/client'
 import { NotFoundError } from '../middlewares/ErrorHandler'
-import { MailerService } from '../services/MailerService'
+import MailerTransporter from '../utils/mailer'
+import nodemailer from 'nodemailer'
+import logger from 'common/src/logger'
 
 @Route('mailer')
 @Tags('Mailer')
@@ -18,7 +20,6 @@ import { MailerService } from '../services/MailerService'
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 export class MailerController extends Controller {
   userRepo = prisma.user
-  mailerService = new MailerService()
 
   /**
    * Sends a contact us email to the admin and user's account.
@@ -44,7 +45,7 @@ export class MailerController extends Controller {
     })
 
     // Check the mailer is available
-    await this.mailerService.verifyConnection()
+    await MailerTransporter.verify()
 
     // Get the organisation admins email(s)
     const organisationAdminEmails = await prisma.user.findMany({
@@ -52,20 +53,33 @@ export class MailerController extends Controller {
       select: { email: true },
     })
 
-    const mailList: string[] | string = process.env.CTRL_ADMIN_EMAIL
+    // Send the email to admin(s)
+    const mailListAdmins: string[] | string = process.env.CTRL_ADMIN_EMAIL
       ? [process.env.CTRL_ADMIN_EMAIL]
       : organisationAdminEmails.map((admin) => admin.email)
 
-    // Send the email to admin(s)
     const subjectToAdmin: string = `New Contact Us Request RE: ${bodyRequest.subject}`
-    await this.mailerService.sendEmail(mailList, subjectToAdmin, bodyRequest.content)
+
+    const mailToAdminsOptions: nodemailer.SendMailOptions = {
+      to: mailListAdmins,
+      subject: subjectToAdmin,
+      text: bodyRequest.content,
+    }
+
+    await MailerTransporter.sendMail(mailToAdminsOptions)
+    logger.info(`Email sent to ${mailToAdminsOptions.to}`, mailToAdminsOptions)
 
     // Send the email to the user
     const subjectToUser: string = `Copy of your message submitted to CTRL Administration Team RE: ${bodyRequest.subject}`
-    await this.mailerService.sendEmail(user.email, subjectToUser, bodyRequest.content)
 
-    return {
-      message: 'Contact us request successfully sent to admin team.',
+    const mailToUserOptions: nodemailer.SendMailOptions = {
+      to: user.email,
+      subject: subjectToUser,
+      text: bodyRequest.content,
     }
+
+    await MailerTransporter.sendMail(mailToUserOptions)
+
+    logger.info(`Email sent to ${mailToUserOptions.to}`, mailToUserOptions)
   }
 }
