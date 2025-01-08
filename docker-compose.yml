@@ -38,10 +38,12 @@ services:
       - '5001:5001'
 
   backend-test:
+    depends_on:
+      - db-test
     build:
       dockerfile: Dockerfile.backend
     env_file:
-      - ./application/backend/.env.test
+      - ./application/backend/.env.dockertest
     ports:
       - '5001:5001'
 
