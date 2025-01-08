@@ -34,6 +34,7 @@ describe('IntegrationsController', () => {
 
       expect(response.status).toBe(201)
 
+      // check correct response message
       expect(response.body).toStrictEqual({ ids: [1] })
 
       const createdParticipant = await prisma.participantProfile.findFirst({
@@ -56,6 +57,9 @@ describe('IntegrationsController', () => {
       const postCreationLen = await prisma.participantProfile.count()
 
       expect(postCreationLen - initialLen).toBe(90) // test still passes if db seed changes
+
+      // check correct response message
+      expect(response.body.ids.length).toBe(90)
     }, 15000)
 
     it('should throw a 404 error if no file is given', async () => {
@@ -96,6 +100,10 @@ describe('IntegrationsController', () => {
         .set({ Authorization: `Bearer ${token}` })
         .attach('file', csvPath)
       expect(response.status).toBe(200)
+
+      // check correct response message
+      expect(response.body.id).toBe(3)
+
       const survey = await prisma.surveyVersion.findFirst({ where: { id: 3 } })
       expect(survey?.data[0].elements[1]).toStrictEqual({
         data: {
