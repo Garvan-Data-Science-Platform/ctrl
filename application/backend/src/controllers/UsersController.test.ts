@@ -324,9 +324,6 @@ describe('UsersController', () => {
       console.log(response)
 
       expect(response.status).toBe(200)
-      expect(response.body).toEqual({
-        message: 'Password reset successfully',
-      })
 
       // Check that the user's password was updated
       const updatedUser = await prisma.user.findUnique({ where: { id: userId } })

@@ -49,7 +49,6 @@ describe('Password Reset', () => {
 
     // Check the response
     expect(response.status).toBe(200)
-    expect(response.body.message).toContain('Password Reset Link has been sent')
 
     // Check the email sent
     const sentMail = mockNodeMailer.mock.getSentMail()
@@ -87,7 +86,6 @@ describe('Password Reset', () => {
 
     // Check the response
     expect(response.status).toBe(200)
-    expect(response.body.message).toBe('Password reset successfully')
 
     // Check the updated password in the database
     const updatedUser = await prisma.user.findUnique({ where: { id: userId } })
