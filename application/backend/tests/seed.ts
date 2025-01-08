@@ -8,6 +8,7 @@ export const OPERATOR_ADMIN_ID = 96
 export const ORG_ADMIN_ID = 97
 export const PARTICIPANT_UNANSWERED_ID = 98
 export const PARTICIPANT_COMPLETED_ID = 99
+export const PASSWORD_RESET_USER_ID = 105
 
 export async function seedTests(prisma: PrismaClient) {
   await prisma.organisation.create({
@@ -186,7 +187,7 @@ export async function seedTests(prisma: PrismaClient) {
   // Seed a user and password reset token
   await prisma.user.create({
     data: {
-      id: 105,
+      id: PASSWORD_RESET_USER_ID,
       email: 'test-reset-password@example.com',
       firstName: 'Test',
       lastName: 'User',
@@ -198,7 +199,7 @@ export async function seedTests(prisma: PrismaClient) {
   await prisma.passwordResetToken.create({
     data: {
       token: 'valid-reset-token',
-      userId: 105,
+      userId: PASSWORD_RESET_USER_ID,
       expiresAt: new Date(Date.now() + 2 * 60 * 1000), // 2 minutes in the future
       used: false,
     },
