@@ -192,7 +192,9 @@ export class UsersController extends Controller {
     const user = await prisma.user.findUnique({ where: { email: bodyRequest.email } })
 
     if (!user) {
-      throw new NotFoundError('User not found')
+      // Not throwing here/returning error as a security precaution
+      logger.error('User not found')
+      return
     }
 
     // Generate a secure random token
