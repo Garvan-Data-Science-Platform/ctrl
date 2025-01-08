@@ -210,7 +210,7 @@ export class UsersController extends Controller {
 
     const resetLink = `https://${process.env.HOSTNAME}/reset-password?token=${token}`
 
-    const { html, text } = await generatePasswordResetEmail(resetLink, user.firstName)
+    const { html, text } = generatePasswordResetEmail(resetLink, user.firstName)
 
     await this.mailerService.sendEmail(user.email, 'CTRL - Password Reset Link', text, html)
   }

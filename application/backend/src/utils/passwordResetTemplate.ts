@@ -1,7 +1,7 @@
-export async function generatePasswordResetEmail(
+export function generatePasswordResetEmail(
   resetLink: string,
   firstName: string,
-): Promise<{ html: string; text: string }> {
+): { html: string; text: string } {
   const html = `
 <!DOCTYPE html>
 <html>
