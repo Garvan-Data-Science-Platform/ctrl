@@ -3,6 +3,8 @@ set -e
 # Spin-up db
 docker compose up -d db-test --wait
 
+docker compose down backend-test
+
 # migrate db
 dotenv -e .env.test -- yarn prisma migrate deploy
 

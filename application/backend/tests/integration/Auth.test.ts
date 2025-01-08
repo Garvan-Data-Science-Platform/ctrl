@@ -5,7 +5,7 @@ import {
   RegisterRequest,
   RegisterResponse,
 } from 'common/types/api/auth'
-import { resetDB } from '../TestHelpers'
+import { resetDB } from 'common/testing/TestHelpers'
 import {
   ContactMethod,
   ParticipantType,

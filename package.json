@@ -21,6 +21,7 @@
     "@typescript-eslint/parser": "^6.20.0",
     "eslint": "^8.56.0",
     "prettier": "^3.2.4",
+    "start-server-and-test": "^2.0.9",
     "typescript": "^5.3.3"
   }
 }

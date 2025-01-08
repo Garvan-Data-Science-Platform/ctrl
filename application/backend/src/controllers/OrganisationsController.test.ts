@@ -9,9 +9,9 @@ import {
   AddUserToOrganisationResponse,
   GetOrganisationUsersResponse,
 } from 'common/types/api/organisations'
-import { resetDB } from '../../tests/TestHelpers'
+import { resetDB } from 'common/testing/TestHelpers'
 import { generateToken } from '../authentication'
-import { ORG_ADMIN_ID, PARTICIPANT_COMPLETED_ID } from '../../tests/seed'
+import { ORG_ADMIN_ID, PARTICIPANT_COMPLETED_ID } from 'common/testing/seed'
 
 const api = new Api()
 const app = api.app

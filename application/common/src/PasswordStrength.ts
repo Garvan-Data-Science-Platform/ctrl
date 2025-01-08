@@ -11,7 +11,7 @@ interface PasswordStrengthResult {
   fields: FieldErrors
 }
 
-export async function checkPasswordStrength(password: string): Promise<PasswordStrengthResult> {
+export function checkPasswordStrength(password: string): PasswordStrengthResult {
   const fields: FieldErrors = {}
 
   if (password.length < 8) {

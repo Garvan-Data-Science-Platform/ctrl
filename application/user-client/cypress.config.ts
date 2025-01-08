@@ -10,7 +10,7 @@ export default defineConfig({
     // eslint-disable-next-line
     setupNodeEvents(on, config) {
       on('task', {
-        reset({}) {
+        reset() {
           return resetDB()
         },
       })

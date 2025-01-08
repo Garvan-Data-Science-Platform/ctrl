@@ -1,5 +1,5 @@
 import prisma from '../PrismaClient'
-import { resetDB } from '../../tests/TestHelpers'
+import { resetDB } from 'common/testing/TestHelpers'
 import createAdmin from './createAdmin'
 
 describe('Test create admin script', () => {

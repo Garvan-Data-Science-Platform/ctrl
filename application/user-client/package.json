@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "cy:open": "cypress open",
     "cypress": "docker compose up --build -d db-test backend-test && dotenv -e ../backend/.env.test start-server-and-test vite http://localhost:5173 cy:open",
+    "test": "docker compose up --build -d db-test backend-test && dotenv -e ../backend/.env.test start-server-and-test vite http://localhost:5173 cy:run",
     "cy:run": "cypress run"
   },
   "dependencies": {

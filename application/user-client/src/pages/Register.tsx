@@ -17,6 +17,7 @@ import { useForm, useFieldArray } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth'
 import { RegisterParticipantRequest, RegisterParticipantResponse } from '@common/types/api/auth'
+import { checkPasswordStrength } from '@common/src/PasswordStrength'
 import {
   ContactMethod,
   OnBehalf,
@@ -117,38 +118,66 @@ export default function Register() {
             <Box sx={{ mt: 5, mb: 2 }}>
               <img src="/australian-genomics-logo.png" height={40} />
             </Box>
+            {Object.keys(errors) && <Typography>{}</Typography>}
             <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
               <TextField
                 sx={{ m: 1, flexGrow: 1 }}
                 label="First Name"
-                {...register('firstName', { required: true })}
+                error={Boolean(errors.firstName)}
+                helperText={errors.firstName?.message}
+                data-cy="reg-first"
+                {...register('firstName', { required: 'This field is required' })}
               />
               <TextField
                 sx={{ m: 1, flexGrow: 1 }}
                 label="Family Name"
-                {...register('lastName', { required: true })}
+                error={Boolean(errors.lastName)}
+                helperText={errors.lastName?.message}
+                data-cy="reg-last"
+                {...register('lastName', { required: 'This field is required' })}
               />
               <TextField
                 type="email"
                 fullWidth
                 sx={{ m: 1 }}
                 label="Email"
+                error={Boolean(errors.email)}
+                helperText={errors.email?.message}
+                data-cy="reg-email"
                 {...register('email', {
-                  required: true,
+                  required: 'This field is required',
+                  pattern: {
+                    value: /\S+@\S+\.\S+/,
+                    message: 'Entered a valid email',
+                  },
                 })}
               />
               <TextField
                 sx={{ m: 1, flexGrow: 1 }}
                 type="password"
                 label="Password"
-                {...register('password', { required: true })}
+                error={Boolean(errors.password)}
+                helperText={errors.password?.message}
+                data-cy="reg-password"
+                {...register('password', {
+                  required: 'This field is required',
+                  validate: (val) => {
+                    const { isValid, fields } = checkPasswordStrength(val)
+                    if (!isValid) {
+                      return `Invalid password. ${Object.values(fields).map((f) => ' ' + f.message)}`
+                    }
+                  },
+                })}
               />
               <TextField
                 sx={{ m: 1, flexGrow: 1 }}
                 type="password"
                 label="Confirm Password"
+                error={Boolean(errors.confirm_password)}
+                helperText={errors.confirm_password?.message}
+                data-cy="reg-confirm-password"
                 {...register('confirm_password', {
-                  required: true,
+                  required: 'This field is required',
                   validate: (val: string) => {
                     if (watch('password') != val) {
                       return 'Your passwords do not match'
@@ -161,21 +190,36 @@ export default function Register() {
                 type="date"
                 sx={{ m: 1 }}
                 label="Date of Birth"
+                error={Boolean(errors.dob)}
+                helperText={errors.dob?.message}
+                data-cy="reg-dob"
                 slotProps={{ inputLabel: { shrink: true } }}
-                {...register('dob', { required: true })}
+                {...register('dob', { required: 'This field is required' })}
               />
               <TextField
                 sx={{ m: 1, flexGrow: 1 }}
                 label="Address Line"
-                {...register('addressLine', { required: true })}
+                error={Boolean(errors.addressLine)}
+                helperText={errors.addressLine?.message}
+                data-cy="reg-address-line"
+                {...register('addressLine', { required: 'This field is required' })}
               />
-              <TextField sx={{ m: 1 }} label="Suburb" {...register('suburb', { required: true })} />
+              <TextField
+                sx={{ m: 1 }}
+                label="Suburb"
+                data-cy="reg-suburb"
+                error={Boolean(errors.suburb)}
+                helperText={errors.suburb?.message}
+                {...register('suburb', { required: 'This field is required' })}
+              />
               <FormControl sx={{ m: 1, flexGrow: 1 }}>
                 <InputLabel id="state-select-label">State</InputLabel>
                 <Select
                   labelId="state-select-label"
                   label="State"
-                  {...register('state', { required: true })}
+                  error={Boolean(errors.state)}
+                  data-cy="reg-state"
+                  {...register('state', { required: 'This field is required' })}
                 >
                   {Object.keys(StateTerritory).map((val, idx) => {
                     return (
@@ -190,19 +234,39 @@ export default function Register() {
               <TextField
                 sx={{ m: 1, flexGrow: 1 }}
                 label="Postcode"
-                {...register('postcode', { required: true })}
+                error={Boolean(errors.postcode)}
+                helperText={errors.postcode?.message}
+                data-cy="reg-postcode"
+                {...register('postcode', {
+                  required: 'This field is required',
+                  pattern: {
+                    value: /\d{4}/,
+                    message: 'Invalid postcode',
+                  },
+                })}
               />
               <TextField
                 sx={{ m: 1, flexGrow: 1 }}
                 label="Mobile"
-                {...register('mobile', { required: true })}
+                error={Boolean(errors.mobile)}
+                helperText={errors.mobile?.message}
+                data-cy="reg-mobile"
+                {...register('mobile', {
+                  required: 'This field is required',
+                  pattern: {
+                    value: /04\d{8}/,
+                    message: 'Invalid mobile number',
+                  },
+                })}
               />
               <FormControl sx={{ m: 1, flexGrow: 1, minWidth: 240 }}>
                 <InputLabel id="pref-select-label">Preferred Contact Method</InputLabel>
                 <Select
                   labelId="pref-select-label"
                   label="Preferred Contact Method"
-                  {...register('preferredContact', { required: true })}
+                  error={Boolean(errors.preferredContact)}
+                  data-cy="reg-contact-method"
+                  {...register('preferredContact', { required: 'This field is required' })}
                 >
                   {Object.keys(ContactMethod).map((val, idx) => {
                     return (
@@ -221,20 +285,29 @@ export default function Register() {
                 <TextField
                   sx={{ m: 1, flexGrow: 1 }}
                   label="First Name"
-                  {...register('nok_first', { required: true })}
+                  error={Boolean(errors.nok_first)}
+                  helperText={errors.nok_first?.message}
+                  data-cy="nok-first"
+                  {...register('nok_first', { required: 'This field is required' })}
                 />
                 <TextField
                   sx={{ m: 1, flexGrow: 1 }}
                   label="Family Name"
-                  {...register('nok_surname', { required: true })}
+                  error={Boolean(errors.nok_surname)}
+                  helperText={errors.nok_surname?.message}
+                  data-cy="nok-surname"
+                  {...register('nok_surname', { required: 'This field is required' })}
                 />
                 <TextField
                   type="email"
                   fullWidth
                   sx={{ m: 1 }}
                   label="Email"
+                  error={Boolean(errors.nok_email)}
+                  helperText={errors.nok_email?.message}
+                  data-cy="nok-email"
                   {...register('nok_email', {
-                    required: true,
+                    required: 'This field is required',
                   })}
                 />
               </>
@@ -258,6 +331,7 @@ export default function Register() {
                       <Box sx={{ width: 40 }} />
                       <Typography>Dependent {idx + 1}</Typography>
                       <IconButton
+                        data-cy="dep-delete"
                         onClick={() => {
                           remove(idx)
                         }}
@@ -269,21 +343,32 @@ export default function Register() {
                     <TextField
                       sx={{ m: 1, flexGrow: 1 }}
                       label="First Name"
-                      {...register(`dependents.${idx}.firstName`, { required: true })}
-                      required
+                      data-cy="dep-first"
+                      error={Boolean(errors.dependents && errors.dependents[idx]?.firstName)}
+                      helperText={errors.dependents && errors.dependents[idx]?.firstName?.message}
+                      {...register(`dependents.${idx}.firstName`, {
+                        required: 'This field is required',
+                      })}
                     />
                     <TextField
                       sx={{ m: 1, flexGrow: 1 }}
                       label="Family Name"
-                      {...register(`dependents.${idx}.lastName`, { required: true })}
-                      required
+                      error={Boolean(errors.dependents && errors.dependents[idx]?.lastName)}
+                      helperText={errors.dependents && errors.dependents[idx]?.lastName?.message}
+                      data-cy="dep-surname"
+                      {...register(`dependents.${idx}.lastName`, {
+                        required: 'This field is required',
+                      })}
                     />
                     <TextField
                       type="date"
                       fullWidth
                       sx={{ m: 1 }}
                       label="Date of Birth"
-                      {...register(`dependents.${idx}.dob`, { required: true })}
+                      error={Boolean(errors.dependents && errors.dependents[idx]?.dob)}
+                      helperText={errors.dependents && errors.dependents[idx]?.dob?.message}
+                      data-cy="dep-dob"
+                      {...register(`dependents.${idx}.dob`, { required: 'This field is required' })}
                       slotProps={{ inputLabel: { shrink: true } }}
                     />
                     <Box
@@ -308,19 +393,19 @@ export default function Register() {
                 <Button
                   sx={{ ml: 'auto', mr: 'auto', mt: 2, mb: 2 }}
                   startIcon={<AddCircle />}
+                  data-cy="add-dependent"
                   onClick={() => append({ firstName: '', lastName: '', dob: '', permanent: false })}
                 >
                   Add Dependent
                 </Button>
               </>
-
-              {errors.root ? (
-                <Alert sx={{ flexGrow: 1, m: 1 }} severity="error">
-                  {errors.root?.serverError?.message}
-                </Alert>
-              ) : null}
             </Box>
-            <Button variant="contained" sx={{ mt: 3 }} type="submit">
+            {errors.root ? (
+              <Alert sx={{ flexGrow: 1, m: 1 }} severity="error">
+                {errors.root?.serverError?.message}
+              </Alert>
+            ) : null}
+            <Button variant="contained" sx={{ mt: 3 }} type="submit" data-cy="reg-button">
               Register
             </Button>
           </form>

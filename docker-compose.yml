@@ -17,21 +17,23 @@ services:
   db-test:
     image: postgres:16-alpine
     ports:
-      - '5433:5432'
+      - '5433:5433'
     env_file:
       - ./application/backend/.env.test
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      test: ['CMD-SHELL', 'pg_isready -U postgres -p 5433']
       interval: 1s
       timeout: 1s
       retries: 60
-    command: ['postgres', '-c', 'log_statement=all']
+    command: ['postgres', '-c', 'log_statement=all', '-p', '5433']
 
   backend-test:
+    depends_on:
+      - db-test
     build:
       dockerfile: Dockerfile.backend
     env_file:
-      - ./application/backend/.env.test
+      - ./application/backend/.env.dockertest
     ports:
       - '5001:5001'
 

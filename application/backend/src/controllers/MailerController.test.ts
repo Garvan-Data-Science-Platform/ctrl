@@ -1,12 +1,12 @@
 import request from 'supertest'
 import { Api } from '../Api'
 import { generateToken } from '../authentication'
-import { resetDB } from '../../tests/TestHelpers'
+import { resetDB } from 'common/testing/TestHelpers'
 import { Role } from '@prisma/client'
 import { NodemailerMock } from 'nodemailer-mock'
 import * as nodemailer from 'nodemailer'
 import prisma from '../PrismaClient'
-import { PARTICIPANT_COMPLETED_ID } from '../../tests/seed'
+import { PARTICIPANT_COMPLETED_ID } from 'common/testing/seed'
 const mockNodeMailer = nodemailer as unknown as NodemailerMock
 
 const api = new Api()
@@ -43,10 +43,7 @@ describe('MailerController', () => {
         .send({ subject: 'Test Subject', content: 'Test Content' })
         .set({ Authorization: `Bearer ${participantToken}` })
 
-      expect(response.status).toBe(200)
-      expect(response.body).toEqual({
-        message: 'Contact us request successfully sent to admin team.',
-      })
+      expect(response.status).toBe(204)
 
       const expectedSentEmails = [
         {
@@ -93,10 +90,7 @@ describe('MailerController', () => {
         .send({ subject: 'Test Subject', content: 'Test Content' })
         .set({ Authorization: `Bearer ${participantToken}` })
 
-      expect(response.status).toBe(200)
-      expect(response.body).toEqual({
-        message: 'Contact us request successfully sent to admin team.',
-      })
+      expect(response.status).toBe(204)
 
       const expectedSentEmails = [
         {
@@ -128,10 +122,7 @@ describe('MailerController', () => {
         .send({ subject: 'Test Subject', content: 'Test Content' })
         .set({ Authorization: `Bearer ${participantToken}` })
 
-      expect(response.status).toBe(200)
-      expect(response.body).toEqual({
-        message: 'Contact us request successfully sent to admin team.',
-      })
+      expect(response.status).toBe(204)
 
       const expectedSentEmails = [
         {

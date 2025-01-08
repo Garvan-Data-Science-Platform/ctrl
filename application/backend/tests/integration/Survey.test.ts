@@ -1,7 +1,7 @@
 import request from 'supertest'
 import { generateToken } from '../../src/authentication'
 import { Api } from '../../src/Api'
-import { resetDB } from '../TestHelpers'
+import { resetDB } from 'common/testing/TestHelpers'
 import {
   GetResponsesByIdResponse,
   GetUserSurveyStepResponse,
@@ -16,7 +16,7 @@ import {
   StateTerritory,
 } from 'common/types/api/users/ParticipantProfile'
 import { GetParticipantsResponse } from 'common/types/api/participants'
-import { ORG_ADMIN_ID } from '../seed'
+import { ORG_ADMIN_ID } from 'common/testing/seed'
 
 const api = new Api()
 const app = api.app

@@ -1,11 +1,11 @@
 import request from 'supertest'
-import { resetDB } from '../../tests/TestHelpers'
+import { resetDB } from 'common/testing/TestHelpers'
 import { Api } from '../Api'
 import path from 'path'
 import { generateToken } from '../authentication'
 import { UploadRedCapParticipantsResponse } from 'common/types/api/integrations/redcap'
 import prisma from '../PrismaClient'
-import { PARTICIPANT_COMPLETED_ID } from '../../tests/seed'
+import { PARTICIPANT_COMPLETED_ID } from 'common/testing/seed'
 
 const api = new Api()
 const app = api.app
