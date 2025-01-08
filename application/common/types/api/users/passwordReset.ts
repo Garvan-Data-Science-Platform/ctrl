@@ -7,10 +7,6 @@ export interface GeneratePasswordResetLinkRequest {
   email: string
 }
 
-export interface GeneratePasswordResetLinkResponse {
-  message: string
-}
-
 /**
  * @example {
  *  "token": "some-valid-token",
@@ -20,8 +16,4 @@ export interface GeneratePasswordResetLinkResponse {
 export interface ResetPasswordRequest {
   token: string
   newPassword: string
-}
-
-export interface ResetPasswordResponse {
-  message: string
 }

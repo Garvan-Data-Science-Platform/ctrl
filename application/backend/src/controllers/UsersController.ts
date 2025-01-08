@@ -21,10 +21,8 @@ import type {
   CreateUserResponse,
   UpdateUserRequest,
   UpdateUserRoleRequest,
-  GeneratePasswordResetLinkResponse,
   GeneratePasswordResetLinkRequest,
   ResetPasswordRequest,
-  ResetPasswordResponse,
 } from 'common/types/api/users'
 import { User } from '@prisma/client'
 import prisma from '../PrismaClient'
@@ -161,7 +159,10 @@ export class UsersController extends Controller {
   @Patch('/{userID}/role')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   @Security('jwt', ['OperatorAdmin'])
-  public async updateUserRole(@Path() userID: number, @Body() bodyRequest: UpdateUserRoleRequest) {
+  public async updateUserRole(
+    @Path() userID: number,
+    @Body() bodyRequest: UpdateUserRoleRequest,
+  ): Promise<void> {
     try {
       await this.userRepo.update({
         where: { id: userID },
@@ -187,7 +188,7 @@ export class UsersController extends Controller {
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async generatePasswordResetLink(
     @Body() bodyRequest: GeneratePasswordResetLinkRequest,
-  ): Promise<GeneratePasswordResetLinkResponse> {
+  ): Promise<void> {
     const user = await prisma.user.findUnique({ where: { email: bodyRequest.email } })
 
     if (!user) {
@@ -212,19 +213,13 @@ export class UsersController extends Controller {
     const { html, text } = await generatePasswordResetEmail(resetLink, user.firstName)
 
     await this.mailerService.sendEmail(user.email, 'CTRL - Password Reset Link', text, html)
-
-    return {
-      message: `Password Reset Link has been sent to ${user.email}`,
-    } as GeneratePasswordResetLinkResponse
   }
 
   @Post('/password/reset')
   @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
-  public async resetPassword(
-    @Body() bodyRequest: ResetPasswordRequest,
-  ): Promise<ResetPasswordResponse> {
+  public async resetPassword(@Body() bodyRequest: ResetPasswordRequest): Promise<void> {
     const { token, newPassword } = bodyRequest
     const passwordResetToken = await this.passwordResetTokenRepo.findUnique({
       where: { token },
@@ -263,9 +258,5 @@ export class UsersController extends Controller {
       where: { id: passwordResetToken.id },
       data: { used: true },
     })
-
-    return {
-      message: 'Password reset successfully',
-    } as ResetPasswordResponse
   }
 }

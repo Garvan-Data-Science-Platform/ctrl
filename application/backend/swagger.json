@@ -273,18 +273,6 @@
           "newRole": "OperatorAdmin"
         }
       },
-      "GeneratePasswordResetLinkResponse": {
-        "properties": {
-          "message": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "message"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
       "GeneratePasswordResetLinkRequest": {
         "properties": {
           "email": {
@@ -293,18 +281,6 @@
         },
         "required": [
           "email"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "ResetPasswordResponse": {
-        "properties": {
-          "message": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "message"
         ],
         "type": "object",
         "additionalProperties": false
@@ -1872,14 +1848,7 @@
         "operationId": "GeneratePasswordResetLink",
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GeneratePasswordResetLinkResponse"
-                }
-              }
-            }
+            "description": "OK"
           },
           "401": {
             "description": "Unauthorized",
@@ -1936,14 +1905,7 @@
         "operationId": "ResetPassword",
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResetPasswordResponse"
-                }
-              }
-            }
+            "description": "OK"
           },
           "401": {
             "description": "Unauthorized",
