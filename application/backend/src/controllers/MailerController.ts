@@ -9,7 +9,7 @@ import * as express from 'express'
 import prisma from '../PrismaClient'
 import { Role } from '@prisma/client'
 import { NotFoundError } from '../middlewares/ErrorHandler'
-import MailerTransporter, { fromAddress } from '../utils/mailer'
+import mailerTransporter, { fromAddress } from '../utils/mailer'
 import nodemailer from 'nodemailer'
 import logger from 'common/src/logger'
 
@@ -45,7 +45,7 @@ export class MailerController extends Controller {
     })
 
     // Check the mailer is available
-    await MailerTransporter.verify()
+    await mailerTransporter.verify()
 
     // Get the organisation admins email(s)
     const organisationAdminEmails = await prisma.user.findMany({
@@ -67,7 +67,7 @@ export class MailerController extends Controller {
       text: bodyRequest.content,
     }
 
-    await MailerTransporter.sendMail(mailToAdminsOptions)
+    await mailerTransporter.sendMail(mailToAdminsOptions)
     logger.info(`Email sent to ${mailToAdminsOptions.to}`, mailToAdminsOptions)
 
     // Send the email to the user
@@ -80,7 +80,7 @@ export class MailerController extends Controller {
       text: bodyRequest.content,
     }
 
-    await MailerTransporter.sendMail(mailToUserOptions)
+    await mailerTransporter.sendMail(mailToUserOptions)
 
     logger.info(`Email sent to ${mailToUserOptions.to}`, mailToUserOptions)
     return

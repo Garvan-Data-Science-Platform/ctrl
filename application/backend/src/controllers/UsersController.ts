@@ -38,7 +38,7 @@ import { checkPasswordStrength } from 'common/src/PasswordStrength'
 import { generatePasswordResetEmail } from '../utils/passwordResetTemplate'
 import crypto from 'crypto'
 import nodemailer from 'nodemailer'
-import MailerTransporter, { fromAddress } from '../utils/mailer'
+import mailerTransporter, { fromAddress } from '../utils/mailer'
 
 @Route('users')
 @Tags('Users')
@@ -222,7 +222,7 @@ export class UsersController extends Controller {
       html,
     }
 
-    await MailerTransporter.sendMail(mailToUserOptions)
+    await mailerTransporter.sendMail(mailToUserOptions)
   }
 
   @Post('/password/reset')
