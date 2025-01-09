@@ -43,10 +43,7 @@ describe('MailerController', () => {
         .send({ subject: 'Test Subject', content: 'Test Content' })
         .set({ Authorization: `Bearer ${participantToken}` })
 
-      expect(response.status).toBe(200)
-      expect(response.body).toEqual({
-        message: 'Contact us request successfully sent to admin team.',
-      })
+      expect(response.status).toBe(204)
 
       const expectedSentEmails = [
         {
@@ -93,10 +90,7 @@ describe('MailerController', () => {
         .send({ subject: 'Test Subject', content: 'Test Content' })
         .set({ Authorization: `Bearer ${participantToken}` })
 
-      expect(response.status).toBe(200)
-      expect(response.body).toEqual({
-        message: 'Contact us request successfully sent to admin team.',
-      })
+      expect(response.status).toBe(204)
 
       const expectedSentEmails = [
         {
@@ -128,10 +122,7 @@ describe('MailerController', () => {
         .send({ subject: 'Test Subject', content: 'Test Content' })
         .set({ Authorization: `Bearer ${participantToken}` })
 
-      expect(response.status).toBe(200)
-      expect(response.body).toEqual({
-        message: 'Contact us request successfully sent to admin team.',
-      })
+      expect(response.status).toBe(204)
 
       const expectedSentEmails = [
         {

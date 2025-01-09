@@ -3202,23 +3202,8 @@
       "post": {
         "operationId": "ContactUs",
         "responses": {
-          "200": {
-            "description": "Ok",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "message"
-                  ],
-                  "type": "object"
-                }
-              }
-            }
+          "204": {
+            "description": "No content"
           },
           "401": {
             "description": "Unauthorized",

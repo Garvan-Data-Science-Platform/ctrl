@@ -9,7 +9,7 @@ import * as express from 'express'
 import prisma from '../PrismaClient'
 import { Role } from '@prisma/client'
 import { NotFoundError } from '../middlewares/ErrorHandler'
-import MailerTransporter from '../utils/mailer'
+import MailerTransporter, { fromAddress } from '../utils/mailer'
 import nodemailer from 'nodemailer'
 import logger from 'common/src/logger'
 
@@ -61,6 +61,7 @@ export class MailerController extends Controller {
     const subjectToAdmin: string = `New Contact Us Request RE: ${bodyRequest.subject}`
 
     const mailToAdminsOptions: nodemailer.SendMailOptions = {
+      from: fromAddress,
       to: mailListAdmins,
       subject: subjectToAdmin,
       text: bodyRequest.content,
@@ -73,6 +74,7 @@ export class MailerController extends Controller {
     const subjectToUser: string = `Copy of your message submitted to CTRL Administration Team RE: ${bodyRequest.subject}`
 
     const mailToUserOptions: nodemailer.SendMailOptions = {
+      from: fromAddress,
       to: user.email,
       subject: subjectToUser,
       text: bodyRequest.content,
@@ -81,5 +83,6 @@ export class MailerController extends Controller {
     await MailerTransporter.sendMail(mailToUserOptions)
 
     logger.info(`Email sent to ${mailToUserOptions.to}`, mailToUserOptions)
+    return
   }
 }
