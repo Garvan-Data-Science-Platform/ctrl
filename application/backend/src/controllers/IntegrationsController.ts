@@ -131,7 +131,7 @@ export class IntegrationsController extends Controller {
   @Post('/redcap/participant/upload/api')
   @SuccessResponse('201', 'Created Participants from CSV')
   public async uploadRedcapParticipantAPI(
-    @Body() bodyRequest: UploadRedcapInstrumentAPIRequest,
+    @Body() bodyRequest: UploadRedcapParticipantAPIRequest,
   ): Promise<UploadRedcapParticipantResponse> {
     const { form } = bodyRequest
     const params = new URLSearchParams()
@@ -154,7 +154,7 @@ export class IntegrationsController extends Controller {
       .then((data) => {
         return data
       })
-      .catch((error) => {
+      .catch(() => {
         throw new BadGatewayError('Error communicating with REDCap API')
       })
 
@@ -200,7 +200,7 @@ export class IntegrationsController extends Controller {
       .then((data) => {
         return data
       })
-      .catch((error) => {
+      .catch(() => {
         throw new BadGatewayError('Error communicating with REDCap API')
       })
 
