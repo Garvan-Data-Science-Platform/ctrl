@@ -16,24 +16,24 @@ describe('Integrations', () => {
 
   describe('mapCSVToParticipantRequest', () => {
     it('should register one user correctly', () => {
-      const res = integrationProcessor.mapCSVToParticipantRequests(exampleSingleProfile)
+      const res = integrationProcessor.mapRecordToParticipantRequests(exampleSingleProfile)
       expect(res).toEqual(ansSingleProfile)
     })
 
     it('should register multiple users correctly', () => {
-      const res = integrationProcessor.mapCSVToParticipantRequests(exampleMultipleProfiles)
+      const res = integrationProcessor.mapRecordToParticipantRequests(exampleMultipleProfiles)
       expect(res).toEqual(ansMultipleProfilesMapping)
     })
   })
 
   describe('mapInstrumentCSVToSurvey', () => {
     it('should create a mapped list of survey elements from an instrument csv with no header', () => {
-      const res = integrationProcessor.mapInstrumentCSVToSurvey(exampleQuestionDataNoHeader)
+      const res = integrationProcessor.mapInstrumentCSVToSurvey(exampleQuestionDataNoHeader, false)
       expect(res).toEqual(ansQuestionDataNoHeader)
     })
 
     it('should create a mapped list of survey elements from an instrument csv with an initial header', () => {
-      const res = integrationProcessor.mapInstrumentCSVToSurvey(exampleQuestionDataHeader)
+      const res = integrationProcessor.mapInstrumentCSVToSurvey(exampleQuestionDataHeader, false)
       expect(res).toEqual(ansQuestionDataHeader)
     })
   })
