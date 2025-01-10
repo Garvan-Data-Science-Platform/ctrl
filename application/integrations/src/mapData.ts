@@ -58,9 +58,10 @@ export function mapToParticipantRequest(
   return mappedData
 }
 
-// Maps a provided REDCap Instrument csv to a survey
+// Maps a provided REDCap Instrument csv or API response to a survey
 export function mapToSurveyElement(
   sourceQuestion: Record<string, string>,
+  rawFields: boolean,
 ): [SurveyElement, string | null] {
   const requiredField = (fieldName: string) => {
     const value = sourceQuestion[fieldName]
@@ -68,14 +69,31 @@ export function mapToSurveyElement(
     return value
   }
 
-  // if there is a section header, get it and return it - will be turned into a step
-  const sectionHeader = sourceQuestion['Section Header'] || null
+  // The csv downloaded from the Redcap website vs the api uses different variable names in the csv and there is no way to change them...
+  // so we switch the field mappings based on where the sourceQuestions are donwloaded from
+  const fieldMappings = rawFields
+    ? {
+        questionType: 'field_type',
+        text: 'field_label',
+        choices: 'select_choices_or_calculations',
+        sectionHeader: 'section_header',
+      }
+    : {
+        questionType: 'Field Type',
+        text: 'Field Label',
+        choices: 'Choices, Calculations, OR Slider Labels',
+        sectionHeader: 'Section Header',
+      }
 
   // Extract required fields
-  const questionType = requiredField('Field Type')
-  const text = requiredField('Field Label')
+  const questionType = requiredField(fieldMappings.questionType)
+  const text = requiredField(fieldMappings.text)
+  const choices = sourceQuestion[fieldMappings.choices]
 
-  // Covers radio, dropdown and yesno questions - does not cover freetext('notes' or 'text' question types)
+  // if there is a section header, get it and return it - will be turned into a step
+  const sectionHeader = sourceQuestion[fieldMappings.sectionHeader] || null
+
+  // Covers radio, dropdown and yesno questions - does not cover freetext ('notes' or 'text' question types)
   let element: SurveyElement
   if (questionType === 'radio' || questionType === 'dropdown') {
     const choices = requiredField('Choices, Calculations, OR Slider Labels')
@@ -94,6 +112,13 @@ export function mapToSurveyElement(
       data: {
         text: text,
         value: false,
+      },
+    }
+  } else if (questionType === 'text' || questionType === 'notes') {
+    element = {
+      type: 'subheading',
+      data: {
+        text: 'Question is a text or notes field - not currently supported by CTRL',
       },
     }
   } else {

@@ -3380,9 +3380,9 @@
         }
       }
     },
-    "/integrations/redcap/participant/upload": {
+    "/integrations/redcap/participant/upload/csv": {
       "post": {
-        "operationId": "UploadRedcapParticipant",
+        "operationId": "UploadRedcapParticipantCSV",
         "responses": {
           "201": {
             "description": "Created Participants from CSV",
@@ -3468,9 +3468,9 @@
         "parameters": []
       }
     },
-    "/integrations/redcap/instrument/upload": {
+    "/integrations/redcap/instrument/upload/csv": {
       "post": {
-        "operationId": "UploadRedcapInstrument",
+        "operationId": "UploadRedcapInstrumentCSV",
         "responses": {
           "200": {
             "description": "Upserted Survey from Instrument CSV",
@@ -3510,6 +3510,114 @@
           }
         ],
         "parameters": []
+      }
+    },
+    "/integrations/redcap/participant/upload/api": {
+      "post": {
+        "operationId": "UploadRedcapParticipantAPI",
+        "responses": {
+          "201": {
+            "description": "Created Participants from CSV",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadRedcapParticipantResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Integrations"],
+        "security": [
+          {
+            "jwt": ["OrganisationAdmin"]
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadRedcapInstrumentAPIRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integrations/redcap/instrument/upload/api": {
+      "post": {
+        "operationId": "UploadRedcapInstrumentAPI",
+        "responses": {
+          "200": {
+            "description": "Created Survey using Redcap API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadRedcapInstrumentResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Integrations"],
+        "security": [
+          {
+            "jwt": ["OrganisationAdmin"]
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadRedcapInstrumentAPIRequest"
+              }
+            }
+          }
+        }
       }
     },
     "/healthcheck": {
