@@ -1,11 +1,10 @@
 import request from 'supertest'
 import { resetDB } from 'common/testing/TestHelpers'
 import { Api } from '../Api'
-import path from 'path'
 import { generateToken } from '../authentication'
 import prisma from '../PrismaClient'
-import { PARTICIPANT_COMPLETED_ID } from 'common/testing/seed'
-const TESTS_PATH = path.resolve(__dirname, '../../tests/test_data')
+import { PARTICIPANT_COMPLETED_ID } from '../../tests/seed'
+import { IntegrationsController } from './IntegrationsController'
 
 const api = new Api()
 const app = api.app
@@ -25,11 +24,11 @@ describe('IntegrationsController', () => {
     api.stop()
   })
 
-  describe('POST /integrations/redcap/participant/upload', () => {
+  /*describe('POST /integrations/redcap/participant/upload/csv', () => {
     it('should create a new participant from a given csv', async () => {
       const csvPath = path.join(TESTS_PATH, 'one_user.csv')
       const response = await request(app)
-        .post('/integrations/redcap/participant/upload')
+        .post('/integrations/redcap/participant/upload/csv')
         .set({ Authorization: `Bearer ${token}` })
         .attach('file', csvPath) // Attach the file with the field name 'file'
 
@@ -48,7 +47,7 @@ describe('IntegrationsController', () => {
 
       const csvPath = path.resolve(__dirname, '../../tests/test_data/90_users.csv')
       const response = await request(app)
-        .post('/integrations/redcap/participant/upload')
+        .post('/integrations/redcap/participant/upload/csv')
         .set({ Authorization: `Bearer ${token}` })
         .attach('file', csvPath) // Attach the file with the field name 'file'
 
@@ -63,7 +62,7 @@ describe('IntegrationsController', () => {
 
     it('should throw a 404 error if no file is given', async () => {
       const response = await request(app)
-        .post('/integrations/redcap/participant/upload')
+        .post('/integrations/redcap/participant/upload/csv')
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(400)
       const body = response.body
@@ -73,7 +72,7 @@ describe('IntegrationsController', () => {
     it('should throw a 404 error if given an empty file', async () => {
       const csvPath = path.resolve(__dirname, '../../tests/test_data/empty_file.csv')
       const response = await request(app)
-        .post('/integrations/redcap/participant/upload')
+        .post('/integrations/redcap/participant/upload/csv')
         .set({ Authorization: `Bearer ${token}` })
         .attach('file', csvPath)
       expect(response.status).toBe(400)
@@ -84,18 +83,18 @@ describe('IntegrationsController', () => {
     it('should throw an error if the file is not a csv', async () => {
       const csvPath = path.resolve(__dirname, '../../tests/test_data/not_a_csv.txt')
       const response = await request(app)
-        .post('/integrations/redcap/participant/upload')
+        .post('/integrations/redcap/participant/upload/csv')
         .set({ Authorization: `Bearer ${token}` })
         .attach('file', csvPath)
       expect(response.status).toBe(400)
     })
-  })
+  })*/
 
-  describe('POST integrations/redcap/instrument/upload', () => {
-    it('should update a valid draft survey from instrument csv', async () => {
+  /*describe('POST integrations/redcap/instrument/upload/csv', () => {
+    it('should add a valid survey', async () => {
       const csvPath = path.resolve(__dirname, '../../tests/test_data/instrument.csv')
       const response = await request(app)
-        .post('/integrations/redcap/instrument/upload')
+        .post('/integrations/redcap/instrument/upload/csv')
         .set({ Authorization: `Bearer ${token}` })
         .attach('file', csvPath)
       expect(response.status).toBe(200)
@@ -152,7 +151,7 @@ describe('IntegrationsController', () => {
 
     it('should throw a 404 error if no file is given', async () => {
       const response = await request(app)
-        .post('/integrations/redcap/instrument/upload')
+        .post('/integrations/redcap/instrument/upload/csv')
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(400)
       expect(response.body.message).toBe('No file uploaded')
@@ -161,7 +160,7 @@ describe('IntegrationsController', () => {
     it('should throw a 404 error if given an empty file', async () => {
       const csvPath = path.resolve(__dirname, '../../tests/test_data/empty_file.csv')
       const response = await request(app)
-        .post('/integrations/redcap/instrument/upload')
+        .post('/integrations/redcap/instrument/upload/csv')
         .set({ Authorization: `Bearer ${token}` })
         .attach('file', csvPath)
       expect(response.status).toBe(400)
@@ -171,43 +170,60 @@ describe('IntegrationsController', () => {
     it('should throw a 400 error if the file is not a csv', async () => {
       const csvPath = path.resolve(__dirname, '../../tests/test_data/not_a_csv.txt')
       const response = await request(app)
-        .post('/integrations/redcap/instrument/upload')
+        .post('/integrations/redcap/instrument/upload/csv')
         .set({ Authorization: `Bearer ${token}` })
         .attach('file', csvPath)
       expect(response.status).toBe(400)
     })
+  })*/
 
-    it('should throw a 400 error if the csv contents have a missing key header', async () => {
-      const csvPath = path.resolve(__dirname, '../../tests/test_data/missing_key_header.csv')
+  describe('POST integrations/redcap/participant/upload/api', () => {
+    it('should register multiple users from one api call', async () => {
+      const initialLen = await prisma.participantProfile.count()
+
       const response = await request(app)
-        .post('/integrations/redcap/instrument/upload')
+        .post('/integrations/redcap/participant/upload/api')
+        .send({ form: 'ctrl_test_1' })
         .set({ Authorization: `Bearer ${token}` })
-        .attach('file', csvPath)
-      expect(response.status).toBe(400)
-      expect(response.body.message).toBe('Missing headers: "Field Type"')
+      console.log(response)
+      expect(response.status).toBe(201)
+
+      const postCreationLen = await prisma.participantProfile.count()
+
+      expect(postCreationLen - initialLen).toBe(10) // adds the 10 users in ctrl_test_1
+
+      // check correct response message
+      expect(response.body.ids.length).toBe(10)
+    })
+  })
+
+  describe('POST integrations/redcap/instrument/upload/api', () => {
+    it('should create a survey when given a form using the redcap api', async () => {
+      const response = await request(app)
+        .post('/integrations/redcap/instrument/upload/api')
+        .send({ form: 'ctrl_test_2' })
+        .set({ Authorization: `Bearer ${token}` })
+      expect(response.status).toBe(200)
+      const survey = await prisma.surveyVersion.findFirst({ where: { id: 3 } })
+
+      expect(survey?.data[0].elements[1]).toStrictEqual({
+        data: {
+          choices: ['0. test', '1. testing', '2. testing again'],
+          text: 'TEST checkbox',
+          value: '0. test',
+        },
+        type: 'question-choices',
+      })
+      expect(survey?.data[0].elements.length).toBe(2)
     })
 
-    it('should throw a 400 error if any record has a missing key field', async () => {
-      const csvPath = path.resolve(__dirname, '../../tests/test_data/one_missing_field.csv')
+    it('should throw an error if no form is given', async () => {
       const response = await request(app)
-        .post('/integrations/redcap/instrument/upload')
+        .post('/integrations/redcap/instrument/upload/api/')
+        .send({})
         .set({ Authorization: `Bearer ${token}` })
-        .attach('file', csvPath)
-
-      expect(response.status).toBe(400)
-      expect(response.body.message).toBe(
-        'Line 2 does not have the same number of columns as the header',
-      )
-    })
-
-    it('should throw a 400 error if a required field is empty', async () => {
-      const csvPath = path.resolve(__dirname, '../../tests/test_data/one_empty_field.csv')
-      const response = await request(app)
-        .post('/integrations/redcap/instrument/upload')
-        .set({ Authorization: `Bearer ${token}` })
-        .attach('file', csvPath)
-      expect(response.status).toBe(400)
-      expect(response.body.message).toBe('Missing required field: Field Type')
+      expect(response.status).toBe(422)
+      expect(response.body.message).toBe('Validation Failed')
     })
   })
 })

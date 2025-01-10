@@ -3369,9 +3369,9 @@
         }
       }
     },
-    "/integrations/redcap/participant/upload": {
+    "/integrations/redcap/participant/upload/csv": {
       "post": {
-        "operationId": "UploadRedcapParticipant",
+        "operationId": "UploadRedcapParticipantCSV",
         "responses": {
           "201": {
             "description": "Created Participants from CSV",

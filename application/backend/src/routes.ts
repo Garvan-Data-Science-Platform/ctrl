@@ -1775,26 +1775,26 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsIntegrationsController_uploadRedcapParticipant: Record<string, TsoaRoute.ParameterSchema> = {
+        const argsIntegrationsController_uploadRedcapParticipantCSV: Record<string, TsoaRoute.ParameterSchema> = {
                 request: {"in":"request","name":"request","required":true,"dataType":"object"},
         };
-        app.post('/integrations/redcap/participant/upload',
+        app.post('/integrations/redcap/participant/upload/csv',
             authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(IntegrationsController)),
-            ...(fetchMiddlewares<RequestHandler>(IntegrationsController.prototype.uploadRedcapParticipant)),
+            ...(fetchMiddlewares<RequestHandler>(IntegrationsController.prototype.uploadRedcapParticipantCSV)),
 
-            async function IntegrationsController_uploadRedcapParticipant(request: ExRequest, response: ExResponse, next: any) {
+            async function IntegrationsController_uploadRedcapParticipantCSV(request: ExRequest, response: ExResponse, next: any) {
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsIntegrationsController_uploadRedcapParticipant, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args: argsIntegrationsController_uploadRedcapParticipantCSV, request, response });
 
                 const controller = new IntegrationsController();
 
               await templateService.apiHandler({
-                methodName: 'uploadRedcapParticipant',
+                methodName: 'uploadRedcapParticipantCSV',
                 controller,
                 response,
                 next,
@@ -1806,26 +1806,88 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsIntegrationsController_uploadRedcapInstrument: Record<string, TsoaRoute.ParameterSchema> = {
+        const argsIntegrationsController_uploadRedcapInstrumentCSV: Record<string, TsoaRoute.ParameterSchema> = {
                 request: {"in":"request","name":"request","required":true,"dataType":"object"},
         };
-        app.post('/integrations/redcap/instrument/upload',
+        app.post('/integrations/redcap/instrument/upload/csv',
             authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(IntegrationsController)),
-            ...(fetchMiddlewares<RequestHandler>(IntegrationsController.prototype.uploadRedcapInstrument)),
+            ...(fetchMiddlewares<RequestHandler>(IntegrationsController.prototype.uploadRedcapInstrumentCSV)),
 
-            async function IntegrationsController_uploadRedcapInstrument(request: ExRequest, response: ExResponse, next: any) {
+            async function IntegrationsController_uploadRedcapInstrumentCSV(request: ExRequest, response: ExResponse, next: any) {
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsIntegrationsController_uploadRedcapInstrument, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args: argsIntegrationsController_uploadRedcapInstrumentCSV, request, response });
 
                 const controller = new IntegrationsController();
 
               await templateService.apiHandler({
-                methodName: 'uploadRedcapInstrument',
+                methodName: 'uploadRedcapInstrumentCSV',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsIntegrationsController_uploadRedcapParticipantAPI: Record<string, TsoaRoute.ParameterSchema> = {
+                bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"UploadRedcapInstrumentAPIRequest"},
+        };
+        app.post('/integrations/redcap/participant/upload/api',
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(IntegrationsController)),
+            ...(fetchMiddlewares<RequestHandler>(IntegrationsController.prototype.uploadRedcapParticipantAPI)),
+
+            async function IntegrationsController_uploadRedcapParticipantAPI(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsIntegrationsController_uploadRedcapParticipantAPI, request, response });
+
+                const controller = new IntegrationsController();
+
+              await templateService.apiHandler({
+                methodName: 'uploadRedcapParticipantAPI',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 201,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsIntegrationsController_uploadRedcapInstrumentAPI: Record<string, TsoaRoute.ParameterSchema> = {
+                bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"UploadRedcapInstrumentAPIRequest"},
+        };
+        app.post('/integrations/redcap/instrument/upload/api',
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(IntegrationsController)),
+            ...(fetchMiddlewares<RequestHandler>(IntegrationsController.prototype.uploadRedcapInstrumentAPI)),
+
+            async function IntegrationsController_uploadRedcapInstrumentAPI(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsIntegrationsController_uploadRedcapInstrumentAPI, request, response });
+
+                const controller = new IntegrationsController();
+
+              await templateService.apiHandler({
+                methodName: 'uploadRedcapInstrumentAPI',
                 controller,
                 response,
                 next,

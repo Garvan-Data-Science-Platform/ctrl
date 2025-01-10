@@ -1,4 +1,15 @@
-import type { UploadRedcapParticipantResponse } from './uploadParticipant'
-import type { UploadRedcapInstrumentResponse } from './uploadInstrument'
+import type {
+  UploadRedcapParticipantResponse,
+  UploadRedcapParticipantAPIRequest,
+} from './uploadParticipant'
+import type {
+  UploadRedcapInstrumentResponse,
+  UploadRedcapInstrumentAPIRequest,
+} from './uploadInstrument'
 
-export { UploadRedcapParticipantResponse, UploadRedcapInstrumentResponse }
+export {
+  UploadRedcapInstrumentAPIRequest,
+  UploadRedcapParticipantAPIRequest,
+  UploadRedcapParticipantResponse,
+  UploadRedcapInstrumentResponse,
+}
