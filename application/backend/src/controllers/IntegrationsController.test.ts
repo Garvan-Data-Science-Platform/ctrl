@@ -5,6 +5,7 @@ import { generateToken } from '../authentication'
 import prisma from '../PrismaClient'
 import { PARTICIPANT_COMPLETED_ID } from '../../tests/seed'
 import { IntegrationsController } from './IntegrationsController'
+import path from 'path'
 
 const api = new Api()
 const app = api.app
@@ -24,7 +25,7 @@ describe('IntegrationsController', () => {
     api.stop()
   })
 
-  /*describe('POST /integrations/redcap/participant/upload/csv', () => {
+  describe('POST /integrations/redcap/participant/upload/csv', () => {
     it('should create a new participant from a given csv', async () => {
       const csvPath = path.join(TESTS_PATH, 'one_user.csv')
       const response = await request(app)
@@ -88,9 +89,9 @@ describe('IntegrationsController', () => {
         .attach('file', csvPath)
       expect(response.status).toBe(400)
     })
-  })*/
+  })
 
-  /*describe('POST integrations/redcap/instrument/upload/csv', () => {
+  describe('POST integrations/redcap/instrument/upload/csv', () => {
     it('should add a valid survey', async () => {
       const csvPath = path.resolve(__dirname, '../../tests/test_data/instrument.csv')
       const response = await request(app)
@@ -175,7 +176,7 @@ describe('IntegrationsController', () => {
         .attach('file', csvPath)
       expect(response.status).toBe(400)
     })
-  })*/
+  })
 
   describe('POST integrations/redcap/participant/upload/api', () => {
     it('should register multiple users from one api call', async () => {
