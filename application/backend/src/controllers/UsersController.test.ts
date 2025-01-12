@@ -2,15 +2,20 @@ import request from 'supertest'
 import { Api } from '../Api'
 import prisma from '../PrismaClient'
 import { resetDB } from '../../tests/TestHelpers'
-import { generateToken } from '../authentication'
+import { generateToken, verifyPassword } from '../authentication'
 import type { RegisterRequest } from 'common/types/api/auth'
 import {
   GetAllUsersResponse,
   GetUserByIdResponse,
   UpdateUserRoleRequest,
+  ResetPasswordRequest,
 } from 'common/types/api/users'
 import { Role } from '@prisma/client'
 import { OPERATOR_ADMIN_ID, ORG_ADMIN_ID, PARTICIPANT_UNANSWERED_ID } from '../../tests/seed'
+import { NodemailerMock } from 'nodemailer-mock'
+import * as nodemailer from 'nodemailer'
+
+const mockNodeMailer = nodemailer as unknown as NodemailerMock
 
 const api = new Api()
 const app = api.app
@@ -266,6 +271,130 @@ describe('UsersController', () => {
       expect(response.status).toBe(404)
 
       expect(response.body.message).toBe(`User with ID: ${userID} not found`)
+    })
+  })
+
+  describe('POST /users/password/generate-reset-link', () => {
+    const userEmail: string = 'test2@example.com'
+    afterEach(async () => {
+      mockNodeMailer.mock.reset()
+    })
+
+    it('should generate and send a password reset link to the users email', async () => {
+      const generatePasswordResetLinkResponse = await request(app)
+        .post('/users/password/generate-reset-link')
+        .send({ email: userEmail })
+
+      expect(generatePasswordResetLinkResponse.status).toBe(200)
+
+      const sentEmails = mockNodeMailer.mock.getSentMail()
+
+      expect(sentEmails).toHaveLength(1)
+      expect(sentEmails[0]).toMatchObject({
+        from: 'CTRL <noreply@ctrl.garvan.org.au>',
+        subject: 'CTRL - Password Reset Link',
+        to: userEmail,
+      })
+
+      // Validate the URL structure
+      const emailText = sentEmails[0].text
+      const hostname = process.env.HOSTNAME || 'ctrl.garvan.org.au'
+      const urlRegex = new RegExp(
+        `${hostname.replace(/\./g, '\\.')}/reset-password\\?token=[a-f0-9]{64}`,
+      )
+
+      expect(emailText).toMatch(urlRegex)
+    })
+  })
+
+  describe('POST /users/password/reset', () => {
+    const userId = 105
+    const resetToken = 'valid-reset-token'
+
+    beforeAll(async () => {})
+
+    it('should reset the password when given a valid reset token and new password', async () => {
+      const requestBody: ResetPasswordRequest = {
+        token: resetToken,
+        newPassword: 'NewPassword123!',
+      }
+
+      const response = await request(app).post('/users/password/reset').send(requestBody)
+
+      console.log(response)
+
+      expect(response.status).toBe(200)
+
+      // Check that the user's password was updated
+      const updatedUser = await prisma.user.findUnique({ where: { id: userId } })
+      expect(updatedUser).not.toBeNull()
+      expect(await verifyPassword(updatedUser!.password, 'OldPassword123')).toBe(false)
+      expect(await verifyPassword(updatedUser!.password, requestBody.newPassword)).toBe(true)
+
+      // Check that the reset token was marked as used
+      const usedToken = await prisma.passwordResetToken.findUnique({
+        where: { token: resetToken },
+      })
+      expect(usedToken?.used).toBe(true)
+    })
+
+    it('should return 401 for an invalid token', async () => {
+      const invalidToken = 'invalid-reset-token'
+
+      const response = await request(app)
+        .post('/users/password/reset')
+        .send({ token: invalidToken, newPassword: 'NewPassword123!' })
+
+      expect(response.status).toBe(401)
+      expect(response.body.message).toBe('Reset token invalid')
+    })
+
+    it('should return 401 for an already used token', async () => {
+      // Mark token as used
+      await prisma.passwordResetToken.update({
+        where: { token: resetToken },
+        data: { used: true },
+      })
+
+      const requestBody: ResetPasswordRequest = {
+        token: resetToken,
+        newPassword: 'AnotherPassword123!',
+      }
+
+      const response = await request(app).post('/users/password/reset').send(requestBody)
+
+      expect(response.status).toBe(401)
+      expect(response.body.message).toBe('Reset token has already been used')
+    })
+
+    it('should return 401 for an expired reset token', async () => {
+      // Expire the token
+      await prisma.passwordResetToken.update({
+        where: { token: resetToken },
+        data: { expiresAt: new Date(Date.now() - 1000) }, // 1 second in the past
+      })
+
+      const requestBody: ResetPasswordRequest = {
+        token: resetToken,
+        newPassword: 'NewPassword123!',
+      }
+
+      const response = await request(app).post('/users/password/reset').send(requestBody)
+
+      expect(response.status).toBe(401)
+      expect(response.body.message).toBe('Reset token expired')
+    })
+
+    it('should return 422 for a weak new password', async () => {
+      const requestBody: ResetPasswordRequest = {
+        token: resetToken,
+        newPassword: 'weak',
+      }
+
+      const response = await request(app).post('/users/password/reset').send(requestBody)
+
+      expect(response.status).toBe(422)
+      expect(response.body.message).toBe('Validation Failed')
     })
   })
 })

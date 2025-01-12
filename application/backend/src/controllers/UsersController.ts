@@ -11,6 +11,7 @@ import {
   Response,
   Controller,
   Security,
+  ValidateError,
 } from 'tsoa'
 import logger from 'common/src/logger'
 import type {
@@ -20,6 +21,8 @@ import type {
   CreateUserResponse,
   UpdateUserRequest,
   UpdateUserRoleRequest,
+  GeneratePasswordResetLinkRequest,
+  ResetPasswordRequest,
 } from 'common/types/api/users'
 import { User } from '@prisma/client'
 import prisma from '../PrismaClient'
@@ -29,7 +32,13 @@ import {
   UnauthorizedErrorResponse,
   ValidateErrorResponse,
 } from 'common/types/api/errors'
-import { NotFoundError } from '../middlewares/ErrorHandler'
+import { NotFoundError, PasswordResetTokenInvalidError } from '../middlewares/ErrorHandler'
+import { hashPassword } from '../authentication'
+import { checkPasswordStrength } from 'common/src/PasswordStrength'
+import { generatePasswordResetEmail } from '../utils/passwordResetTemplate'
+import crypto from 'crypto'
+import nodemailer from 'nodemailer'
+import mailerTransporter, { fromAddress } from '../utils/mailer'
 
 @Route('users')
 @Tags('Users')
@@ -37,6 +46,7 @@ import { NotFoundError } from '../middlewares/ErrorHandler'
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 export class UsersController extends Controller {
   userRepo = prisma.user
+  passwordResetTokenRepo = prisma.passwordResetToken
 
   /**
    * Get all Users
@@ -149,7 +159,10 @@ export class UsersController extends Controller {
   @Patch('/{userID}/role')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   @Security('jwt', ['OperatorAdmin'])
-  public async updateUserRole(@Path() userID: number, @Body() bodyRequest: UpdateUserRoleRequest) {
+  public async updateUserRole(
+    @Path() userID: number,
+    @Body() bodyRequest: UpdateUserRoleRequest,
+  ): Promise<void> {
     try {
       await this.userRepo.update({
         where: { id: userID },
@@ -163,5 +176,97 @@ export class UsersController extends Controller {
       logger.error({ errorMessage, err })
       throw new NotFoundError(errorMessage)
     }
+  }
+
+  /**
+   * Generate Password Reset Link
+   *
+   * @summary Generate and send a password reset link to the user
+   */
+  @Post('/password/generate-reset-link')
+  @SuccessResponse('200', 'OK')
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
+  public async generatePasswordResetLink(
+    @Body() bodyRequest: GeneratePasswordResetLinkRequest,
+  ): Promise<void> {
+    const user = await prisma.user.findUnique({ where: { email: bodyRequest.email } })
+
+    if (!user) {
+      // Not throwing here/returning error as a security precaution
+      logger.error('User not found')
+      return
+    }
+
+    // Generate a secure random token
+    const token = crypto.randomBytes(32).toString('hex')
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000) // 15 Minutes expiration
+
+    // Save token to database
+    await prisma.passwordResetToken.create({
+      data: {
+        token,
+        userId: user.id,
+        expiresAt,
+      },
+    })
+
+    const resetLink = `https://${process.env.HOSTNAME}/reset-password?token=${token}`
+
+    const { html, text } = generatePasswordResetEmail(resetLink, user.firstName)
+
+    const mailToUserOptions: nodemailer.SendMailOptions = {
+      from: fromAddress,
+      to: user.email,
+      subject: 'CTRL - Password Reset Link',
+      text,
+      html,
+    }
+
+    await mailerTransporter.sendMail(mailToUserOptions)
+  }
+
+  @Post('/password/reset')
+  @SuccessResponse('200', 'OK')
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
+  @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
+  public async resetPassword(@Body() bodyRequest: ResetPasswordRequest): Promise<void> {
+    const { token, newPassword } = bodyRequest
+    const passwordResetToken = await this.passwordResetTokenRepo.findUnique({
+      where: { token },
+      include: { user: true },
+    })
+
+    if (!passwordResetToken) {
+      throw new PasswordResetTokenInvalidError('Reset token invalid')
+    }
+
+    if (passwordResetToken.used) {
+      throw new PasswordResetTokenInvalidError('Reset token has already been used')
+    }
+
+    if (passwordResetToken.expiresAt < new Date()) {
+      throw new PasswordResetTokenInvalidError('Reset token expired')
+    }
+
+    // Validate the new password against the strength requirements
+    const { isValid, fields } = await checkPasswordStrength(newPassword)
+
+    if (!isValid) {
+      throw new ValidateError(fields, 'New password does not meet strength requirements')
+    }
+
+    const hashedPassword = await hashPassword(newPassword)
+
+    // Update the user's password
+    await prisma.user.update({
+      where: { id: passwordResetToken.userId },
+      data: { password: hashedPassword },
+    })
+
+    // Mark the token as used
+    await prisma.passwordResetToken.update({
+      where: { id: passwordResetToken.id },
+      data: { used: true },
+    })
   }
 }

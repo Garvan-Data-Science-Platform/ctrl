@@ -10,4 +10,8 @@ module.exports = {
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
   },
+  reporters:
+    process.env.GITHUB_ACTIONS === 'true'
+      ? ['github-actions']
+      : [['default', { summaryThreshold: 10 }]],
 }

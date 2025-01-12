@@ -4,13 +4,14 @@ import {
   UnauthorizedErrorResponse,
   ValidateErrorResponse,
 } from 'common/types/api/errors'
-import type { ContactUsRequest } from 'common/types/api/mailer'
-import nodemailer from 'nodemailer'
-import logger from 'common/src/logger'
+import { type ContactUsRequest } from 'common/types/api/mailer'
 import * as express from 'express'
 import prisma from '../PrismaClient'
-import { NotFoundError } from '../middlewares/ErrorHandler'
 import { Role } from '@prisma/client'
+import { NotFoundError } from '../middlewares/ErrorHandler'
+import mailerTransporter, { fromAddress } from '../utils/mailer'
+import nodemailer from 'nodemailer'
+import logger from 'common/src/logger'
 
 @Route('mailer')
 @Tags('Mailer')
@@ -21,7 +22,7 @@ export class MailerController extends Controller {
   userRepo = prisma.user
 
   /**
-   * Sends a contact us email to the admin and users account.
+   * Sends a contact us email to the admin and user's account.
    *
    * @summary ContactUs
    */
@@ -40,68 +41,48 @@ export class MailerController extends Controller {
     // Check if user exists
     const user = await this.userRepo.findUniqueOrThrow({
       where: { id: userId },
-      select: {
-        email: true,
-      },
+      select: { email: true },
     })
 
-    const transporter = nodemailer.createTransport({
-      host: process.env.MAILER_HOST,
-      port: Number(process.env.MAILER_PORT),
-      auth: {
-        user: process.env.MAILER_USERNAME,
-        pass: process.env.MAILER_PASSWORD,
-      },
+    // Check the mailer is available
+    await mailerTransporter.verify()
+
+    // Get the organisation admins email(s)
+    const organisationAdminEmails = await prisma.user.findMany({
+      where: { role: Role.OrganisationAdmin },
+      select: { email: true },
     })
 
-    try {
-      // Verify Connection
-      await transporter.verify()
-      logger.info('Mailer service is ready to send messages...')
+    // Send the email to admin(s)
+    const mailListAdmins: string[] | string = process.env.CTRL_ADMIN_EMAIL
+      ? [process.env.CTRL_ADMIN_EMAIL]
+      : organisationAdminEmails.map((admin) => admin.email)
 
-      const organisationAdminEmails = await this.userRepo.findMany({
-        where: {
-          role: Role.OrganisationAdmin,
-        },
-        select: {
-          email: true,
-        },
-      })
+    const subjectToAdmin: string = `New Contact Us Request RE: ${bodyRequest.subject}`
 
-      // Use CTRL_ADMIN_EMAIL if set, otherwise use all organisation admins' emails.
-      let maillist: string[]
-      if (!process.env.CTRL_ADMIN_EMAIL) {
-        maillist = organisationAdminEmails.map((orgAdmin) => orgAdmin.email)
-      } else {
-        maillist = [process.env.CTRL_ADMIN_EMAIL]
-      }
-
-      // Send email to all organisation admins
-      const mailToAdminOptions: nodemailer.SendMailOptions = {
-        from: `CTRL <noreply@${process.env.HOSTNAME}>`,
-        to: maillist,
-        subject: `New Contact Us Request RE:${bodyRequest.subject}`,
-        text: bodyRequest.content,
-      }
-
-      await transporter.sendMail(mailToAdminOptions)
-      logger.info('Email sent to admin', mailToAdminOptions)
-
-      // Send email to user
-      const mailToUserOptions: nodemailer.SendMailOptions = {
-        from: `CTRL <noreply@${process.env.HOSTNAME}>`,
-        to: user.email,
-        subject: `Copy of your message submitted to CTRL Administration Team RE: ${bodyRequest.subject}`,
-        text: bodyRequest.content,
-      }
-
-      await transporter.sendMail(mailToUserOptions)
-      logger.info('Email sent to user', mailToUserOptions)
-    } catch (error) {
-      logger.error('Error sending email:', error)
-      throw new Error('Failed to send email')
-    } finally {
-      transporter.close()
+    const mailToAdminsOptions: nodemailer.SendMailOptions = {
+      from: fromAddress,
+      to: mailListAdmins,
+      subject: subjectToAdmin,
+      text: bodyRequest.content,
     }
+
+    await mailerTransporter.sendMail(mailToAdminsOptions)
+    logger.info(`Email sent to ${mailToAdminsOptions.to}`, mailToAdminsOptions)
+
+    // Send the email to the user
+    const subjectToUser: string = `Copy of your message submitted to CTRL Administration Team RE: ${bodyRequest.subject}`
+
+    const mailToUserOptions: nodemailer.SendMailOptions = {
+      from: fromAddress,
+      to: user.email,
+      subject: subjectToUser,
+      text: bodyRequest.content,
+    }
+
+    await mailerTransporter.sendMail(mailToUserOptions)
+
+    logger.info(`Email sent to ${mailToUserOptions.to}`, mailToUserOptions)
+    return
   }
 }

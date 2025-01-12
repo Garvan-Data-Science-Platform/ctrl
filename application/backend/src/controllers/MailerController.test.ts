@@ -5,8 +5,8 @@ import { resetDB } from '../../tests/TestHelpers'
 import { Role } from '@prisma/client'
 import { NodemailerMock } from 'nodemailer-mock'
 import * as nodemailer from 'nodemailer'
-import prisma from '../PrismaClient'
 import { PARTICIPANT_COMPLETED_ID } from '../../tests/seed'
+
 const mockNodeMailer = nodemailer as unknown as NodemailerMock
 
 const api = new Api()
@@ -43,16 +43,13 @@ describe('MailerController', () => {
         .send({ subject: 'Test Subject', content: 'Test Content' })
         .set({ Authorization: `Bearer ${participantToken}` })
 
-      expect(response.status).toBe(200)
-      expect(response.body).toEqual({
-        message: 'Contact us request successfully sent to admin team.',
-      })
+      expect(response.status).toBe(204)
 
       const expectedSentEmails = [
         {
           from: 'CTRL <noreply@ctrl.garvan.org.au>',
           headers: {},
-          subject: 'New Contact Us Request RE:Test Subject',
+          subject: 'New Contact Us Request RE: Test Subject',
           text: 'Test Content',
           to: ['testorg-admin@testorg.org.au'],
         },
@@ -93,16 +90,13 @@ describe('MailerController', () => {
         .send({ subject: 'Test Subject', content: 'Test Content' })
         .set({ Authorization: `Bearer ${participantToken}` })
 
-      expect(response.status).toBe(200)
-      expect(response.body).toEqual({
-        message: 'Contact us request successfully sent to admin team.',
-      })
+      expect(response.status).toBe(204)
 
       const expectedSentEmails = [
         {
           from: 'CTRL <noreply@ctrl.garvan.org.au>',
           headers: {},
-          subject: 'New Contact Us Request RE:Test Subject',
+          subject: 'New Contact Us Request RE: Test Subject',
           text: 'Test Content',
           to: ['testorg-admin@testorg.org.au'],
         },
@@ -128,16 +122,13 @@ describe('MailerController', () => {
         .send({ subject: 'Test Subject', content: 'Test Content' })
         .set({ Authorization: `Bearer ${participantToken}` })
 
-      expect(response.status).toBe(200)
-      expect(response.body).toEqual({
-        message: 'Contact us request successfully sent to admin team.',
-      })
+      expect(response.status).toBe(204)
 
       const expectedSentEmails = [
         {
           from: 'CTRL <noreply@ctrl.garvan.org.au>',
           headers: {},
-          subject: 'New Contact Us Request RE:Test Subject',
+          subject: 'New Contact Us Request RE: Test Subject',
           text: 'Test Content',
           to: ['test1@example.com', 'testOrgAdmin2@example.com'],
         },
@@ -149,17 +140,6 @@ describe('MailerController', () => {
           to: 'test3@example.com',
         },
       ]
-
-      console.log(
-        await prisma.user.findMany({
-          where: {
-            role: Role.OrganisationAdmin,
-          },
-          select: {
-            email: true,
-          },
-        }),
-      )
 
       const sentEmails = mockNodeMailer.mock.getSentMail()
       expect(sentEmails.length).toBe(2) // 1 to admin, 1 to user
