@@ -1,12 +1,14 @@
 import { PrismaClient, Role } from '@prisma/client'
-import '../../backend/src/jsontypes'
-//import ExampleSurveyStepData from '../src/surveys/exampleSurveyStepData.json'
-import { SurveyStep } from '../types/survey'
+import '../src/jsontypes'
+import ExampleSurveyStepData from 'common/src/surveys/exampleSurveyStepData.json'
+import { SurveyStep } from 'common/types/survey'
+import { hashPassword } from '../../backend/src/authentication'
 
 export const OPERATOR_ADMIN_ID = 96
 export const ORG_ADMIN_ID = 97
 export const PARTICIPANT_UNANSWERED_ID = 98
 export const PARTICIPANT_COMPLETED_ID = 99
+export const PASSWORD_RESET_USER_ID = 105
 
 export async function seedTests(prisma: PrismaClient) {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -181,6 +183,27 @@ export async function seedTests(prisma: PrismaClient) {
           last_updated: '2024-12-02T23:45:27.815Z',
         },
       ],
+    },
+  })
+
+  // Seed a user and password reset token
+  await prisma.user.create({
+    data: {
+      id: PASSWORD_RESET_USER_ID,
+      email: 'test-reset-password@example.com',
+      firstName: 'Test',
+      lastName: 'User',
+      password: await hashPassword('OldPassword123'),
+      role: Role.Participant,
+    },
+  })
+
+  await prisma.passwordResetToken.create({
+    data: {
+      token: 'valid-reset-token',
+      userId: PASSWORD_RESET_USER_ID,
+      expiresAt: new Date(Date.now() + 2 * 60 * 1000), // 2 minutes in the future
+      used: false,
     },
   })
 }

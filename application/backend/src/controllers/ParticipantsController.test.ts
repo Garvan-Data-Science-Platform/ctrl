@@ -36,7 +36,6 @@ describe('ParticipantsController', () => {
       const body: GetParticipantsResponse = response.body
       expect(response.status).toBe(200)
 
-      console.log('BODY', body)
       expect(body.data).toHaveLength(2)
       expect(body.data[0]).not.toHaveProperty('lastUpdated')
       expect(['12/3/2024', '12/2/2024']).toContain(body.data[1].lastUpdated)

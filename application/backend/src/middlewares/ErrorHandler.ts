@@ -46,6 +46,17 @@ export class IncorrectPermissionsError extends Error {
   }
 }
 
+export class PasswordResetTokenInvalidError extends Error {
+  message: string
+  details: unknown
+  constructor(message: string, details?: unknown) {
+    super(message)
+    this.name = 'PasswordResetTokenInvalidError'
+    this.message = message
+    this.details = details
+  }
+}
+
 export class FileUploadError extends Error {
   details: unknown
   constructor(message: string, details?: unknown) {
@@ -86,7 +97,8 @@ export function ErrorHandler(
     err instanceof TokenExpiredError ||
     err instanceof JsonWebTokenError ||
     err instanceof IncorrectPasswordError ||
-    err instanceof IncorrectPermissionsError
+    err instanceof IncorrectPermissionsError ||
+    err instanceof PasswordResetTokenInvalidError
   ) {
     const errorResponse: UnauthorizedErrorResponse = {
       message: err.message,
