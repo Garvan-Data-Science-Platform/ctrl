@@ -10,12 +10,12 @@ import type {
 } from 'common/types/api/auth'
 import prisma from '../PrismaClient'
 import { Role } from '@prisma/client'
-import { resetDB } from '../../tests/TestHelpers'
+import { resetDB } from 'common/testing/TestHelpers'
 import {
   ContactMethod,
   ParticipantType,
   StateTerritory,
-} from '../../../common/types/api/users/ParticipantProfile'
+} from 'common/types/api/users/ParticipantProfile'
 
 const api = new Api()
 const app = api.app

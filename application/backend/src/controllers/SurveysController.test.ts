@@ -1,7 +1,7 @@
 import request from 'supertest'
 import { Api } from '../Api'
 import prisma from '../PrismaClient'
-import { resetDB } from '../../tests/TestHelpers'
+import { resetDB } from 'common/testing/TestHelpers'
 import { generateToken } from '../authentication'
 
 import {
@@ -12,7 +12,11 @@ import {
   UpdateSurveyRequest,
 } from 'common/types/api/surveys'
 import { GetSurveyVersionByIdResponse } from 'common/types/api/surveys/getSurveyVersionById'
-import { ORG_ADMIN_ID, PARTICIPANT_COMPLETED_ID, PARTICIPANT_UNANSWERED_ID } from '../../tests/seed'
+import {
+  ORG_ADMIN_ID,
+  PARTICIPANT_COMPLETED_ID,
+  PARTICIPANT_UNANSWERED_ID,
+} from 'common/testing/seed'
 
 const api = new Api()
 const app = api.app

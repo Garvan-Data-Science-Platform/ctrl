@@ -1,7 +1,7 @@
 import request from 'supertest'
 import { Api } from '../Api'
 import prisma from '../PrismaClient'
-import { resetDB } from '../../tests/TestHelpers'
+import { resetDB } from 'common/testing/TestHelpers'
 import { generateToken, verifyPassword } from '../authentication'
 import type { RegisterRequest } from 'common/types/api/auth'
 import {
@@ -11,7 +11,7 @@ import {
   ResetPasswordRequest,
 } from 'common/types/api/users'
 import { Role } from '@prisma/client'
-import { OPERATOR_ADMIN_ID, ORG_ADMIN_ID, PARTICIPANT_UNANSWERED_ID } from '../../tests/seed'
+import { OPERATOR_ADMIN_ID, ORG_ADMIN_ID, PARTICIPANT_UNANSWERED_ID } from 'common/testing/seed'
 import { NodemailerMock } from 'nodemailer-mock'
 import * as nodemailer from 'nodemailer'
 

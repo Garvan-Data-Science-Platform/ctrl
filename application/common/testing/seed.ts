@@ -1,8 +1,7 @@
 import { PrismaClient, Role } from '@prisma/client'
-import '../src/jsontypes'
-import ExampleSurveyStepData from 'common/src/surveys/exampleSurveyStepData.json'
+import '../../backend/src/jsontypes'
 import { SurveyStep } from 'common/types/survey'
-import { hashPassword } from '../src/authentication'
+import { hashPassword } from '../../backend/src/authentication'
 
 export const OPERATOR_ADMIN_ID = 96
 export const ORG_ADMIN_ID = 97
@@ -11,6 +10,8 @@ export const PARTICIPANT_COMPLETED_ID = 99
 export const PASSWORD_RESET_USER_ID = 105
 
 export async function seedTests(prisma: PrismaClient) {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const ExampleSurveyStepData = require('../src/surveys/exampleSurveyStepData.json')
   await prisma.organisation.create({
     data: {
       id: 99,

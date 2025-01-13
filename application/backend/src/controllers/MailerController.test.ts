@@ -1,12 +1,11 @@
 import request from 'supertest'
 import { Api } from '../Api'
 import { generateToken } from '../authentication'
-import { resetDB } from '../../tests/TestHelpers'
+import { resetDB } from 'common/testing/TestHelpers'
 import { Role } from '@prisma/client'
 import { NodemailerMock } from 'nodemailer-mock'
 import * as nodemailer from 'nodemailer'
-import { PARTICIPANT_COMPLETED_ID } from '../../tests/seed'
-
+import { PARTICIPANT_COMPLETED_ID } from 'common/testing/seed'
 const mockNodeMailer = nodemailer as unknown as NodemailerMock
 
 const api = new Api()

@@ -1,6 +1,6 @@
 import request from 'supertest'
 import { Api } from '../../src/Api'
-import { resetDB } from '../TestHelpers'
+import { resetDB } from 'common/testing/TestHelpers'
 import { verifyPassword } from '../../src/authentication'
 import prisma from '../../src/PrismaClient'
 import { NodemailerMock } from 'nodemailer-mock'

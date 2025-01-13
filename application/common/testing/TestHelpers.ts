@@ -1,10 +1,9 @@
-import prisma from '../src/PrismaClient'
+import prisma from '../../backend/src/PrismaClient'
 import logger from 'common/src/logger'
 import { seedTests } from './seed'
 
 // Function to reset DB state
-export async function resetDB(): Promise<void> {
-  logger.info('Resetting database...')
+export async function resetDB(): Promise<null> {
   const tablenames = await prisma.$queryRaw<
     Array<{ tablename: string }>
   >`SELECT tablename FROM pg_tables WHERE schemaname='public'`
@@ -28,6 +27,7 @@ export async function resetDB(): Promise<void> {
     }
 
     await seedTests(prisma)
+    return null
   } catch (error) {
     logger.error({ error })
     prisma.$disconnect()

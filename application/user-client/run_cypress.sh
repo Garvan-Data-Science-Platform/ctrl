@@ -3,12 +3,10 @@ set -e
 # Spin-up db
 docker compose up -d db-test --wait
 
-docker compose down backend-test
-
 # migrate db
 dotenv -e .env.test -- yarn prisma migrate deploy
 
 # run tests
-dotenv -e .env.test -- jest --detectOpenHandles --runInBand --coverage $1
+dotenv -e .env.test -- cypress open
 
 docker compose down db-test
