@@ -104,8 +104,6 @@ describe('IntegrationsController', () => {
 
       const survey = await prisma.surveyVersion.findFirst({ where: { id: 2 } })
 
-      console.log(survey?.data)
-
       // test subheading survey type
       expect(survey?.data[0].elements[0]).toStrictEqual({
         data: { text: 'Contact' },
@@ -151,7 +149,7 @@ describe('IntegrationsController', () => {
       // should create a new draft survey!
       const survey = await prisma.surveyVersion.findFirst({ where: { id: 3 } })
 
-      expect(response.status).toBe(200)
+      expect(survey?.data[0].elements.length).toBe(25)
     })
 
     it('should throw a 404 error if no file is given', async () => {
