@@ -46,7 +46,7 @@ describe('IntegrationsController', () => {
     it('should register multiple users from one csv', async () => {
       const initialLen = await prisma.participantProfile.count()
 
-      const csvPath = path.join(TESTS_PATH, '90_users.csv')
+      const csvPath = path.resolve(__dirname, '../../tests/test_data/90_users.csv')
       const response = await request(app)
         .post('/integrations/redcap/participant/upload')
         .set({ Authorization: `Bearer ${token}` })
@@ -71,7 +71,7 @@ describe('IntegrationsController', () => {
     })
 
     it('should throw a 404 error if given an empty file', async () => {
-      const csvPath = path.join(TESTS_PATH, 'empty_file.csv')
+      const csvPath = path.resolve(__dirname, '../../tests/test_data/empty_file.csv')
       const response = await request(app)
         .post('/integrations/redcap/participant/upload')
         .set({ Authorization: `Bearer ${token}` })
@@ -82,7 +82,7 @@ describe('IntegrationsController', () => {
     })
 
     it('should throw an error if the file is not a csv', async () => {
-      const csvPath = path.join(TESTS_PATH, 'not_a_csv.txt')
+      const csvPath = path.resolve(__dirname, '../../tests/test_data/not_a_csv.txt')
       const response = await request(app)
         .post('/integrations/redcap/participant/upload')
         .set({ Authorization: `Bearer ${token}` })
@@ -93,7 +93,7 @@ describe('IntegrationsController', () => {
 
   describe('POST integrations/redcap/instrument/upload', () => {
     it('should update a valid draft survey from instrument csv', async () => {
-      const csvPath = path.join(TESTS_PATH, 'instrument.csv')
+      const csvPath = path.resolve(__dirname, '../../tests/test_data/instrument.csv')
       const response = await request(app)
         .post('/integrations/redcap/instrument/upload')
         .set({ Authorization: `Bearer ${token}` })
@@ -154,7 +154,7 @@ describe('IntegrationsController', () => {
       // In the seed data the second seed is the draft survey - we remove it to test creating a new survey
       await prisma.surveyVersion.update({ where: { id: 2 }, data: { status: 'PUBLISHED' } })
 
-      const csvPath = path.join(TESTS_PATH, 'instrument.csv')
+      const csvPath = path.resolve(__dirname, '../../tests/test_data/instrument.csv')
       const response = await request(app)
         .post('/integrations/redcap/instrument/upload')
         .set({ Authorization: `Bearer ${token}` })
@@ -179,7 +179,7 @@ describe('IntegrationsController', () => {
     })
 
     it('should throw a 404 error if given an empty file', async () => {
-      const csvPath = path.join(TESTS_PATH, 'empty_file.csv')
+      const csvPath = path.resolve(__dirname, '../../tests/test_data/empty_file.csv')
       const response = await request(app)
         .post('/integrations/redcap/instrument/upload')
         .set({ Authorization: `Bearer ${token}` })
