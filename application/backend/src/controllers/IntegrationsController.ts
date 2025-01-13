@@ -23,6 +23,7 @@ import { UnauthorizedErrorResponse, InternalErrorResponse } from 'common/types/a
 import { SurveyElement, SurveyStep } from 'common/types/survey'
 import exampleREDCapMapping from '../../../integrations/src/exampleREDCapMapping.json'
 import { parseCSV, validateFile } from '../utils/parseCsv'
+import { FileUploadError } from '../middlewares/ErrorHandler'
 import { AuthController } from './AuthController'
 const upload = multer({ storage: multer.memoryStorage() })
 
@@ -44,13 +45,21 @@ export class IntegrationsController extends Controller {
   public async uploadRedcapParticipant(
     @Request() request: express.Request,
   ): Promise<UploadRedcapParticipantResponse> {
-    const file = await validateFile(request)
+    const file = await validateFile(request, []) // no required headers here so we pass none to the headers checker
 
     // Create a readable stream from the buffer
     const readableStream = Readable.from(file.buffer.toString())
     const csvData: Record<string, string>[] = await parseCSV(readableStream)
-    const data: RegisterParticipantRequest[] =
-      this.integrationService.mapCSVToParticipantRequests(csvData)
+
+    // fetches data from mapping
+    let data: RegisterParticipantRequest[] = []
+    try {
+      data = this.integrationService.mapCSVToParticipantRequests(csvData)
+    } catch (error) {
+      throw new FileUploadError(
+        error instanceof Error ? error.message : 'Unknown Error: Failed to Map Data',
+      )
+    }
 
     const participants = []
     const ids = []
@@ -74,13 +83,27 @@ export class IntegrationsController extends Controller {
   public async uploadRedcapInstrument(
     @Request() request: express.Request,
   ): Promise<UploadRedcapInstrumentResponse> {
-    const file = await validateFile(request)
+    const file = await validateFile(request, [
+      '"Field Type"',
+      '"Field Label"',
+      '"Section Header"',
+      '"Choices, Calculations, OR Slider Labels"',
+    ]) // list required fields
 
     // Create a readable stream from the buffer
     const readableStream = Readable.from(file.buffer.toString())
     const csvData: Record<string, string>[] = await parseCSV(readableStream)
 
-    const elements: SurveyElement[] = this.integrationService.mapInstrumentCSVToSurvey(csvData)
+    // fetches elements from mapping
+    let elements: SurveyElement[] = []
+    try {
+      elements = this.integrationService.mapInstrumentCSVToSurvey(csvData)
+    } catch (error) {
+      throw new FileUploadError(
+        error instanceof Error ? error.message : 'Unknown Error: Failed to Map Data',
+      )
+    }
+
     const steps: SurveyStep[] = [
       {
         title: 'Imported Survey',

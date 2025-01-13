@@ -62,7 +62,7 @@ export function mapToParticipantRequest(
 export function mapToSurveyElement(sourceQuestion: Record<string, string>): SurveyElement[] {
   const requiredField = (fieldName: string) => {
     const value = sourceQuestion[fieldName]
-    if (!value) throw new Error(`Missing required field: ${fieldName}`)
+    if (!value || value == '') throw new Error(`Missing required field: ${fieldName}`)
     return value
   }
 
@@ -71,7 +71,6 @@ export function mapToSurveyElement(sourceQuestion: Record<string, string>): Surv
   // Extract required fields
   const questionType = requiredField('Field Type')
   const text = requiredField('Field Label')
-  const choices = sourceQuestion['Choices, Calculations, OR Slider Labels']
 
   // if the question has a subheading - incorporate it as a new surveyElement
   if (sourceQuestion['Section Header']) {
@@ -84,13 +83,14 @@ export function mapToSurveyElement(sourceQuestion: Record<string, string>): Surv
   // covers radio, dropdown and yesno questions - does not cover freetext('notes' or 'text' question types)
   let element: SurveyElement
   if (questionType === 'radio' || questionType === 'dropdown') {
-    const e = choices.split('|').map((item) => item.split(',')[1].trim())
+    const choices = requiredField('Choices, Calculations, OR Slider Labels')
+    const values = choices.split('|').map((item) => item.split(',')[1].trim())
     element = {
       type: 'question-choices',
       data: {
         text: text,
-        value: e[0],
-        choices: e,
+        value: values[0],
+        choices: values,
       },
     }
   } else if (questionType === 'yesno') {
