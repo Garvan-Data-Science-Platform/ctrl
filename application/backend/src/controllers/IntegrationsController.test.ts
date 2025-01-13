@@ -4,7 +4,6 @@ import { Api } from '../Api'
 import { generateToken } from '../authentication'
 import prisma from '../PrismaClient'
 import { PARTICIPANT_COMPLETED_ID } from '../../tests/seed'
-import { IntegrationsController } from './IntegrationsController'
 import path from 'path'
 
 const api = new Api()
