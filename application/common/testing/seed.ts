@@ -1,6 +1,5 @@
 import { PrismaClient, Role } from '@prisma/client'
-import '../src/jsontypes'
-import ExampleSurveyStepData from 'common/src/surveys/exampleSurveyStepData.json'
+import '../../backend/src/jsontypes'
 import { SurveyStep } from 'common/types/survey'
 import { hashPassword } from '../../backend/src/authentication'
 

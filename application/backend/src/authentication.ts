@@ -2,7 +2,7 @@
 import * as express from 'express'
 import * as jwt from 'jsonwebtoken'
 import logger from 'common/src/logger'
-import crypto from 'crypto'
+import * as crypto from 'crypto'
 import { NoTokenError, IncorrectPermissionsError } from './middlewares/ErrorHandler'
 
 export function expressAuthentication(

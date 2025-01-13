@@ -5,7 +5,6 @@ import { resetDB } from 'common/testing/TestHelpers'
 import { Role } from '@prisma/client'
 import { NodemailerMock } from 'nodemailer-mock'
 import * as nodemailer from 'nodemailer'
-import prisma from '../PrismaClient'
 import { PARTICIPANT_COMPLETED_ID } from 'common/testing/seed'
 const mockNodeMailer = nodemailer as unknown as NodemailerMock
 
