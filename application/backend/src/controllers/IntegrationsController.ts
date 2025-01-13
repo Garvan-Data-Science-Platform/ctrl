@@ -137,19 +137,40 @@ export class IntegrationsController extends Controller {
     const csvData: Record<string, string>[] = await parseCSV(readableStream)
 
     const elements: SurveyElement[] = this.integrationService.mapInstrumentCSVToSurvey(csvData)
-    const survey = await this.surveyRepo.create({
-      data: {
-        status: 'DRAFT',
-        versionNumber: 1,
-        data: [
-          {
-            title: 'Imported Survey',
-            text: 'Survey Imported from Redcap Instrument',
-            elements: elements,
-          },
-        ],
+    const steps: SurveyStep[] = [
+      {
+        title: 'Imported Survey',
+        text: 'Survey Imported from Redcap Instrument',
+        elements: elements,
       },
+    ]
+
+    // Check if a draft survey already exists
+    const existingSurvey = await this.surveyRepo.findFirst({
+      where: { status: 'DRAFT' },
     })
+
+    let survey
+    if (existingSurvey) {
+      // Update the existing survey
+      survey = await this.surveyRepo.update({
+        where: { id: existingSurvey.id },
+        data: {
+          versionNumber: existingSurvey.versionNumber + 1,
+          data: steps,
+        },
+      })
+    } else {
+      // Create a new survey
+      survey = await this.surveyRepo.create({
+        data: {
+          status: 'DRAFT',
+          versionNumber: 1,
+          data: steps,
+        },
+      })
+    }
+
     return { id: survey.id }
   }
 }

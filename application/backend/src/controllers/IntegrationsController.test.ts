@@ -150,6 +150,26 @@ describe('IntegrationsController', () => {
       expect(survey?.data.length).toBe(4)
     })
 
+    it('should create a new draft survey if one doesnt already exist', async () => {
+      // In the seed data the second seed is the draft survey - we remove it to test creating a new survey
+      await prisma.surveyVersion.update({ where: { id: 2 }, data: { status: 'PUBLISHED' } })
+
+      const csvPath = path.resolve(__dirname, '../../tests/test_data/instrument.csv')
+      const response = await request(app)
+        .post('/integrations/redcap/instrument/upload')
+        .set({ Authorization: `Bearer ${token}` })
+        .attach('file', csvPath)
+      expect(response.status).toBe(200)
+
+      // creates a new draft survey
+      expect(response.body.id).toBe(3)
+
+      // should create a new draft survey!
+      const survey = await prisma.surveyVersion.findFirst({ where: { id: 3 } })
+
+      expect(response.status).toBe(200)
+    })
+
     it('should throw a 404 error if no file is given', async () => {
       const response = await request(app)
         .post('/integrations/redcap/instrument/upload')
