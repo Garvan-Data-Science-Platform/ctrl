@@ -136,7 +136,16 @@ export class IntegrationsController extends Controller {
     const readableStream = Readable.from(file.buffer.toString())
     const csvData: Record<string, string>[] = await parseCSV(readableStream)
 
-    const elements: SurveyElement[] = this.integrationService.mapInstrumentCSVToSurvey(csvData)
+    // fetches elements from mapping
+    let elements: SurveyElement[] = []
+    try {
+      elements = this.integrationService.mapInstrumentCSVToSurvey(csvData)
+    } catch (error) {
+      throw new FileUploadError(
+        error instanceof Error ? error.message : 'Unknown Error: Failed to Map Data',
+      )
+    }
+
     const steps: SurveyStep[] = [
       {
         title: 'Imported Survey',
