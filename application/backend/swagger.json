@@ -273,6 +273,38 @@
           "newRole": "OperatorAdmin"
         }
       },
+      "GeneratePasswordResetLinkRequest": {
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "ResetPasswordRequest": {
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "newPassword": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "newPassword"
+        ],
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "token": "some-valid-token",
+          "newPassword": "NewPassword123"
+        }
+      },
       "SurveyVersionStatus": {
         "type": "string",
         "enum": [
@@ -1376,14 +1408,31 @@
           "password": "Password123"
         }
       },
-      "UploadRedcapInstrumentResponse": {
+      "UploadRedcapParticipantResponse": {
         "properties": {
-          "message": {
-            "type": "string"
+          "ids": {
+            "items": {
+              "type": "number",
+              "format": "double"
+            },
+            "type": "array"
           }
         },
         "required": [
-          "message"
+          "ids"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UploadRedcapInstrumentResponse": {
+        "properties": {
+          "id": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": [
+          "id"
         ],
         "type": "object",
         "additionalProperties": false
@@ -1817,6 +1866,118 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/UpdateUserRoleRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/password/generate-reset-link": {
+      "post": {
+        "operationId": "GeneratePasswordResetLink",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Generate Password Reset Link",
+        "summary": "Generate and send a password reset link to the user",
+        "tags": [
+          "Users"
+        ],
+        "security": [],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GeneratePasswordResetLinkRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/password/reset": {
+      "post": {
+        "operationId": "ResetPassword",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Users"
+        ],
+        "security": [],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequest"
               }
             }
           }
@@ -3104,7 +3265,7 @@
             }
           }
         },
-        "description": "Sends a contact us email to the admin and users account.",
+        "description": "Sends a contact us email to the admin and user's account.",
         "summary": "ContactUs",
         "tags": [
           "Mailer"
@@ -3304,7 +3465,14 @@
         "operationId": "UploadRedcapParticipant",
         "responses": {
           "201": {
-            "description": "Created Participants from CSV"
+            "description": "Created Participants from CSV",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadRedcapParticipantResponse"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized",
