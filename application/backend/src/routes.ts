@@ -1838,7 +1838,7 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsIntegrationsController_uploadRedcapParticipantAPI: Record<string, TsoaRoute.ParameterSchema> = {
-                bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"UploadRedcapInstrumentAPIRequest"},
+                bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"UploadRedcapParticipantAPIRequest"},
         };
         app.post('/integrations/redcap/participant/upload/api',
             authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),

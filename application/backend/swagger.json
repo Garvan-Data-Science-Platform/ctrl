@@ -3193,7 +3193,7 @@
             }
           }
         },
-        "description": "Sends a contact us email to the admin and users account.",
+        "description": "Sends a contact us email to the admin and user's account.",
         "summary": "ContactUs",
         "tags": ["Mailer"],
         "security": [
@@ -3559,7 +3559,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UploadRedcapInstrumentAPIRequest"
+                "$ref": "#/components/schemas/UploadRedcapParticipantAPIRequest"
               }
             }
           }
