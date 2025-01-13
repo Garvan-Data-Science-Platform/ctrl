@@ -91,7 +91,7 @@ describe('IntegrationsController', () => {
   })
 
   describe('POST integrations/redcap/instrument/upload', () => {
-    it('should add a valid survey', async () => {
+    it('should update a valid draft survey from instrument csv', async () => {
       const csvPath = path.resolve(__dirname, '../../tests/test_data/instrument.csv')
       const response = await request(app)
         .post('/integrations/redcap/instrument/upload')
@@ -99,9 +99,20 @@ describe('IntegrationsController', () => {
         .attach('file', csvPath)
       expect(response.status).toBe(200)
 
-      expect(response.body.id).toBe(3)
+      // updates the pre-existing draft survey
+      expect(response.body.id).toBe(2)
 
-      const survey = await prisma.surveyVersion.findFirst({ where: { id: 3 } })
+      const survey = await prisma.surveyVersion.findFirst({ where: { id: 2 } })
+
+      console.log(survey?.data)
+
+      // test subheading survey type
+      expect(survey?.data[0].elements[0]).toStrictEqual({
+        data: { text: 'Contact' },
+        type: 'subheading',
+      })
+
+      // test question-choices survey type
       expect(survey?.data[0].elements[1]).toStrictEqual({
         data: {
           choices: ['Yes', 'No'],
@@ -110,7 +121,37 @@ describe('IntegrationsController', () => {
         },
         type: 'question-choices',
       })
+
+      // text question-checkbox survey type
+      expect(survey?.data[0].elements[20]).toStrictEqual({
+        data: {
+          text: 'I agree to Australian Genomics sharing my contact details with other research projects and clinical trials doing studies I am eligible for.',
+          value: false,
+        },
+        type: 'question-checkbox',
+      })
+
       expect(survey?.data[0].elements.length).toBe(25)
+    })
+
+    it('should create a new draft survey if one doesnt already exist', async () => {
+      // In the seed data the second seed is the draft survey - we remove it to test creating a new survey
+      await prisma.surveyVersion.update({ where: { id: 2 }, data: { status: 'PUBLISHED' } })
+
+      const csvPath = path.resolve(__dirname, '../../tests/test_data/instrument.csv')
+      const response = await request(app)
+        .post('/integrations/redcap/instrument/upload')
+        .set({ Authorization: `Bearer ${token}` })
+        .attach('file', csvPath)
+      expect(response.status).toBe(200)
+
+      // creates a new draft survey
+      expect(response.body.id).toBe(3)
+
+      // should create a new draft survey!
+      const survey = await prisma.surveyVersion.findFirst({ where: { id: 3 } })
+
+      expect(response.status).toBe(200)
     })
 
     it('should throw a 404 error if no file is given', async () => {

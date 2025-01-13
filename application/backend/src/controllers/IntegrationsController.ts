@@ -20,7 +20,7 @@ import {
   UploadRedcapParticipantResponse,
 } from 'common/types/api/integrations/redcap'
 import { UnauthorizedErrorResponse, InternalErrorResponse } from 'common/types/api/errors'
-import { SurveyElement } from 'common/types/survey'
+import { SurveyElement, SurveyStep } from 'common/types/survey'
 import exampleREDCapMapping from '../../../integrations/src/exampleREDCapMapping.json'
 import { parseCSV, validateFile } from '../utils/parseCsv'
 import { AuthController } from './AuthController'
@@ -70,7 +70,7 @@ export class IntegrationsController extends Controller {
 
   @Post('/redcap/instrument/upload')
   @Middlewares(upload.single('file'))
-  @SuccessResponse('200', 'Created Survey from Instrument CSV')
+  @SuccessResponse('200', 'Upserted Survey from Instrument CSV')
   public async uploadRedcapInstrument(
     @Request() request: express.Request,
   ): Promise<UploadRedcapInstrumentResponse> {
@@ -81,19 +81,40 @@ export class IntegrationsController extends Controller {
     const csvData: Record<string, string>[] = await parseCSV(readableStream)
 
     const elements: SurveyElement[] = this.integrationService.mapInstrumentCSVToSurvey(csvData)
-    const survey = await this.surveyRepo.create({
-      data: {
-        status: 'DRAFT',
-        versionNumber: 1,
-        data: [
-          {
-            title: 'Imported Survey',
-            text: 'Survey Imported from Redcap Instrument',
-            elements: elements,
-          },
-        ],
+    const steps: SurveyStep[] = [
+      {
+        title: 'Imported Survey',
+        text: 'Survey Imported from Redcap Instrument',
+        elements: elements,
       },
+    ]
+
+    // Check if a draft survey already exists
+    const existingSurvey = await this.surveyRepo.findFirst({
+      where: { status: 'DRAFT' },
     })
+
+    let survey
+    if (existingSurvey) {
+      // Update the existing survey
+      survey = await this.surveyRepo.update({
+        where: { id: existingSurvey.id },
+        data: {
+          versionNumber: existingSurvey.versionNumber + 1,
+          data: steps,
+        },
+      })
+    } else {
+      // Create a new survey
+      survey = await this.surveyRepo.create({
+        data: {
+          status: 'DRAFT',
+          versionNumber: 1,
+          data: steps,
+        },
+      })
+    }
+
     return { id: survey.id }
   }
 }
