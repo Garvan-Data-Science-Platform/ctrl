@@ -3466,7 +3466,7 @@
         "operationId": "UploadRedcapInstrument",
         "responses": {
           "200": {
-            "description": "Created Survey from Instrument CSV",
+            "description": "Upserted Survey from Instrument CSV",
             "content": {
               "application/json": {
                 "schema": {
