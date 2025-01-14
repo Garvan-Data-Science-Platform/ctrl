@@ -1,5 +1,16 @@
 [
-  { "title": "", "text": "", "elements": [{ "type": "video", "link": "www.google.com" }] },
+  {
+    "title": "Intro",
+    "text": "This is an introduction video",
+    "elements": [
+      {
+        "type": "video",
+        "data": {
+          "link": "www.google.com"
+        }
+      }
+    ]
+  },
   {
     "title": "Step 2",
     "text": "",

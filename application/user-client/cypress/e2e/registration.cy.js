@@ -74,5 +74,6 @@ describe('registration', () => {
     cy.get('[data-cy="dep-delete"]').first().click()
     cy.get('[data-cy="reg-button"]').click()
     cy.contains('Welcome FIRST').should('exist')
+    cy.contains('Step 2').should('exist')
   })
 })

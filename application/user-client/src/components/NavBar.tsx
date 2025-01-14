@@ -60,6 +60,7 @@ export default function NavBar() {
               aria-controls="menu-appbar"
               aria-haspopup="true"
               onClick={handleOpenNavMenu}
+              data-cy="hamburger"
             >
               <MenuIcon color="inherit" />
             </IconButton>

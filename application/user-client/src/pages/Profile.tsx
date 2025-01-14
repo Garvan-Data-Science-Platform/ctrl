@@ -13,7 +13,7 @@ export default function Profile() {
     error,
     isLoading,
   } = useQuery({
-    queryKey: ['profile', 'get'],
+    queryKey: ['profile'],
     queryFn: () =>
       apiClient
         .get('/profiles/current')
@@ -23,8 +23,6 @@ export default function Profile() {
   if (isLoading || !pdata) return 'Loading'
 
   const data = pdata.data
-
-  console.log('DATA', data)
 
   if (error) return <Typography>Error loading user profile: {error.message}</Typography>
 
@@ -49,7 +47,7 @@ export default function Profile() {
                 <tbody>
                   <tr>
                     <td>
-                      <Typography fontWeight="bold" lineHeight={2.5}>
+                      <Typography fontWeight="bold" lineHeight={2.5} data-cy="profile-first">
                         First Name
                       </Typography>
                     </td>
@@ -177,53 +175,45 @@ export default function Profile() {
                         <Typography>{data.alternativeContact?.email}</Typography>
                       </td>
                     </tr>
-                    <tr>
-                      <td>
-                        <Typography fontWeight="bold" lineHeight={2.5}>
-                          Mobile
-                        </Typography>
-                      </td>
-                      <td>
-                        <Typography>{data.alternativeContact?.mobile}</Typography>
-                      </td>
-                    </tr>
                   </>
                 </tbody>
               </table>
             </Card>
           </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Card sx={{ boxShadow: '0', p: 2 }} raised={false}>
-              <table width={'100%'} style={{ textAlign: 'left', tableLayout: 'fixed' }}>
-                <tbody>
-                  <>
-                    <tr>
-                      <td>
-                        <Typography fontWeight="bold" sx={{ mt: 1, mb: 1 }}>
-                          Family Members
-                        </Typography>
-                      </td>
-                    </tr>
-                    {data.familyMembers.map((val, idx) => {
-                      return (
-                        <tr key={`fam_${idx}`}>
-                          <td>
-                            <Typography>
-                              {val.firstName} {val.lastName}
-                            </Typography>
-                          </td>
+          {data.familyMembers.length > 0 ? (
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Card sx={{ boxShadow: '0', p: 2 }} raised={false}>
+                <table width={'100%'} style={{ textAlign: 'left', tableLayout: 'fixed' }}>
+                  <tbody>
+                    <>
+                      <tr>
+                        <td>
+                          <Typography fontWeight="bold" sx={{ mt: 1, mb: 1 }}>
+                            Family Members
+                          </Typography>
+                        </td>
+                      </tr>
+                      {data.familyMembers.map((val, idx) => {
+                        return (
+                          <tr key={`fam_${idx}`}>
+                            <td>
+                              <Typography>
+                                {val.firstName} {val.lastName}
+                              </Typography>
+                            </td>
 
-                          <td>
-                            <Typography>{familyMap(val.participantType)}</Typography>
-                          </td>
-                        </tr>
-                      )
-                    })}
-                  </>
-                </tbody>
-              </table>
-            </Card>
-          </Grid>
+                            <td>
+                              <Typography>{familyMap(val.participantType)}</Typography>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </>
+                  </tbody>
+                </table>
+              </Card>
+            </Grid>
+          ) : null}
         </Grid>
       </Container>
 

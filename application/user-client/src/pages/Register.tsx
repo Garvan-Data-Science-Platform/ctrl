@@ -240,7 +240,7 @@ export default function Register() {
                 {...register('postcode', {
                   required: 'This field is required',
                   pattern: {
-                    value: /\d{4}/,
+                    value: /^\d{4}$/,
                     message: 'Invalid postcode',
                   },
                 })}
@@ -254,7 +254,7 @@ export default function Register() {
                 {...register('mobile', {
                   required: 'This field is required',
                   pattern: {
-                    value: /04\d{8}/,
+                    value: /04\d{8}$/,
                     message: 'Invalid mobile number',
                   },
                 })}

@@ -27,7 +27,7 @@ export async function seedTests(prisma: PrismaClient) {
       email: 'operatoradmin@example.com',
       firstName: 'Operator',
       lastName: 'Admin',
-      password: 'password',
+      password: hashPassword('password'),
       role: Role.OperatorAdmin,
     },
   })
@@ -39,7 +39,7 @@ export async function seedTests(prisma: PrismaClient) {
       email: 'test1@example.com',
       firstName: 'Organisation',
       lastName: 'Admin',
-      password: 'password',
+      password: hashPassword('password'),
       role: Role.OrganisationAdmin,
       organisations: {
         connect: {
@@ -56,7 +56,7 @@ export async function seedTests(prisma: PrismaClient) {
       email: 'testOrgAdmin2@example.com',
       firstName: 'Organisation2',
       lastName: 'Admin2',
-      password: 'password',
+      password: hashPassword('password'),
       role: Role.OrganisationAdmin,
       organisations: {
         connect: {
@@ -73,7 +73,7 @@ export async function seedTests(prisma: PrismaClient) {
       email: 'test2@example.com',
       firstName: 'Test',
       lastName: 'User',
-      password: 'password',
+      password: hashPassword('password'),
       role: Role.Participant,
       organisations: {
         create: {
@@ -89,7 +89,7 @@ export async function seedTests(prisma: PrismaClient) {
       email: 'test3@example.com',
       firstName: 'Test',
       lastName: 'User',
-      password: 'password',
+      password: hashPassword('password'),
       role: Role.Participant,
     },
   })
@@ -109,6 +109,16 @@ export async function seedTests(prisma: PrismaClient) {
       participantType: 'STANDARD',
     },
   })
+
+  await prisma.alternativeContact.create({
+    data: {
+      participantProfileId: 98,
+      email: 'alt@email.com',
+      firstName: 'Alt',
+      lastName: 'Cont',
+    },
+  })
+
   await prisma.participantProfile.create({
     data: {
       id: 99,
