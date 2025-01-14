@@ -20,7 +20,7 @@ import {
   UploadRedcapParticipantResponse,
 } from 'common/types/api/integrations/redcap'
 import { UnauthorizedErrorResponse, InternalErrorResponse } from 'common/types/api/errors'
-import { SurveyElement, SurveyStep } from 'common/types/survey'
+import { SurveyStep } from 'common/types/survey'
 import exampleREDCapMapping from '../../../integrations/src/exampleREDCapMapping.json'
 import { parseCSV, validateFile } from '../utils/parseCsv'
 import { FileUploadError } from '../middlewares/ErrorHandler'
@@ -46,7 +46,6 @@ export class IntegrationsController extends Controller {
     @Request() request: express.Request,
   ): Promise<UploadRedcapParticipantResponse> {
     const file = await validateFile(request, []) // no required headers here so we pass none to the headers checker
-
     // Create a readable stream from the buffer
     const readableStream = Readable.from(file.buffer.toString())
     const csvData: Record<string, string>[] = await parseCSV(readableStream)
@@ -95,48 +94,32 @@ export class IntegrationsController extends Controller {
     const csvData: Record<string, string>[] = await parseCSV(readableStream)
 
     // fetches elements from mapping
-    let elements: SurveyElement[] = []
+    let steps: SurveyStep[] = []
     try {
-      elements = this.integrationService.mapInstrumentCSVToSurvey(csvData)
+      steps = this.integrationService.mapInstrumentCSVToSurvey(csvData)
     } catch (error) {
       throw new FileUploadError(
         error instanceof Error ? error.message : 'Unknown Error: Failed to Map Data',
       )
     }
 
-    const steps: SurveyStep[] = [
-      {
-        title: 'Imported Survey',
-        text: 'Survey Imported from Redcap Instrument',
-        elements: elements,
-      },
-    ]
-
-    // Check if a draft survey already exists
     const existingSurvey = await this.surveyRepo.findFirst({
       where: { status: 'DRAFT' },
     })
 
-    let survey
-    if (existingSurvey) {
-      // Update the existing survey
-      survey = await this.surveyRepo.update({
-        where: { id: existingSurvey.id },
-        data: {
-          versionNumber: existingSurvey.versionNumber + 1,
-          data: steps,
-        },
-      })
-    } else {
-      // Create a new survey
-      survey = await this.surveyRepo.create({
-        data: {
-          status: 'DRAFT',
-          versionNumber: 1,
-          data: steps,
-        },
-      })
-    }
+    // prisma doesn't let you use where to find a non-unique id here so we have to use find first in the previous ine
+    const survey = await this.surveyRepo.upsert({
+      where: { id: existingSurvey ? existingSurvey.id : -1 }, // Use a non-existent id for creation
+      update: {
+        versionNumber: { increment: 1 },
+        data: steps,
+      },
+      create: {
+        status: 'DRAFT',
+        versionNumber: 1,
+        data: steps,
+      },
+    })
 
     return { id: survey.id }
   }
