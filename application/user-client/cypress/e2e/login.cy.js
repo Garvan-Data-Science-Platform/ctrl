@@ -1,7 +1,5 @@
 /// <reference types="cypress" />
 
-const { UserType } = require('../support/commands')
-
 describe('Login', () => {
   it('Can log in', () => {
     cy.visit('/')

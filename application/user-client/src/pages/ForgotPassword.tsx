@@ -1,6 +1,6 @@
 import { Alert, Box, Button, Card, Container, TextField, Typography } from '@mui/material'
 import { useForm } from 'react-hook-form'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { apiClient } from '../apiClient'
 import { useState } from 'react'
 
@@ -11,7 +11,6 @@ export default function ForgotPassword() {
     setError,
     formState: { errors },
   } = useForm()
-  const nav = useNavigate()
 
   const [sent, setSent] = useState(false)
 
@@ -21,7 +20,7 @@ export default function ForgotPassword() {
     console.log('DATA', data)
     apiClient
       .post('/users/password/generate-reset-link', data)
-      .then((res: any) => {
+      .then((res) => {
         if (res.status == 200) {
           setSent(true)
         } else {

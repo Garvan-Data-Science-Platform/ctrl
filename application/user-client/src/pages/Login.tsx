@@ -80,7 +80,7 @@ export default function Login() {
             <Button component={Link} to="/register">
               Register
             </Button>
-            <Button component={Link} to="/forgot">
+            <Button component={Link} to="/forgot" data-cy="forgot">
               Forgot Password
             </Button>
           </Box>
