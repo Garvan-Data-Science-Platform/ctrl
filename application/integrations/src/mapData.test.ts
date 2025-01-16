@@ -13,7 +13,7 @@ import {
 } from './test_data/MapData/mapToSurvey/exampleSourceData'
 import {
   expectedRadioMapping,
-  expectedSubheadingMapping,
+  expectedSectionHeader,
 } from './test_data/MapData/mapToSurvey/ansMappedData'
 
 describe('mapToParticipantRequest', () => {
@@ -38,14 +38,14 @@ describe('mapToParticipantRequest', () => {
 })
 
 describe('mapInstrumentToSurvey', () => {
-  it('should map radio and dropdown buttons to a survey element', () => {
+  it('should map radio and dropdown buttons to a survey element with section header', () => {
     const result = mapToSurveyElement(sourceDataRadio)
     expect(result).toEqual(expectedRadioMapping)
   })
 
-  it('should map the question to two questions if given a subheading', () => {
+  it('should map the question to a question and a section header', () => {
     const result = mapToSurveyElement(sourceDataAndSubheading)
-    expect(result).toEqual(expectedSubheadingMapping)
+    expect(result).toEqual(expectedSectionHeader)
   })
 
   it('should throw an error if missing a crucial field', () => {

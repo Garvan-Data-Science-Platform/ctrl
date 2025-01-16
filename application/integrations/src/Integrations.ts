@@ -21,29 +21,33 @@ export class Integrations {
 
   // returns a list of survey elements to be created into a survey later
   mapInstrumentCSVToSurvey(csv: Record<string, string>[]): SurveyStep[] {
-    const elements = csv.flatMap((surveyQuestion) => mapToSurveyElement(surveyQuestion))
-
-    // take the list of survey elements - convert it into a series of survey steps seperated on subheadings
     const steps: SurveyStep[] = []
     let currentStep: SurveyStep = {
       title: 'Imported Survey',
       text: 'Survey Imported from Redcap Instrument',
       elements: [],
     }
-    elements.forEach((element) => {
-      if (element.type === 'subheading' && element.data.text != 'Unrecognized question type') {
-        steps.push(currentStep)
+
+    csv.forEach((surveyQuestion) => {
+      const [element, sectionHeader] = mapToSurveyElement(surveyQuestion)
+
+      // Handle the section header
+      if (sectionHeader) {
+        if (currentStep.elements.length > 0) {
+          steps.push(currentStep)
+        }
 
         currentStep = {
-          title: element.data.text,
+          title: sectionHeader,
           text: '',
           elements: [],
         }
-      } else {
-        currentStep.elements.push(element)
       }
+
+      currentStep.elements.push(element)
     })
 
+    // Add the last step if it contains any elements
     if (currentStep.elements.length > 0) {
       steps.push(currentStep)
     }

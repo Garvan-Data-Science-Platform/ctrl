@@ -59,28 +59,23 @@ export function mapToParticipantRequest(
 }
 
 // Maps a provided REDCap Instrument csv to a survey
-export function mapToSurveyElement(sourceQuestion: Record<string, string>): SurveyElement[] {
+export function mapToSurveyElement(
+  sourceQuestion: Record<string, string>,
+): [SurveyElement, string | null] {
   const requiredField = (fieldName: string) => {
     const value = sourceQuestion[fieldName]
-    if (!value || value == '') throw new Error(`Missing required field: ${fieldName}`)
+    if (!value || value === '') throw new Error(`Missing required field: ${fieldName}`)
     return value
   }
 
-  const res: SurveyElement[] = []
+  // if there is a section header, get it and return it - will be turned into a step
+  const sectionHeader = sourceQuestion['Section Header'] || null
 
   // Extract required fields
   const questionType = requiredField('Field Type')
   const text = requiredField('Field Label')
 
-  // if the question has a subheading - incorporate it as a new surveyElement
-  if (sourceQuestion['Section Header']) {
-    res.push({
-      type: 'subheading',
-      data: { text: sourceQuestion['Section Header'] },
-    })
-  }
-
-  // covers radio, dropdown and yesno questions - does not cover freetext('notes' or 'text' question types)
+  // Covers radio, dropdown and yesno questions - does not cover freetext('notes' or 'text' question types)
   let element: SurveyElement
   if (questionType === 'radio' || questionType === 'dropdown') {
     const choices = requiredField('Choices, Calculations, OR Slider Labels')
@@ -110,7 +105,5 @@ export function mapToSurveyElement(sourceQuestion: Record<string, string>): Surv
     }
   }
 
-  res.push(element)
-
-  return res
+  return [element, sectionHeader]
 }

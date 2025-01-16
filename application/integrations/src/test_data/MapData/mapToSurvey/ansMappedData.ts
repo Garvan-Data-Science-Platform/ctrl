@@ -7,10 +7,10 @@ export const expectedRadioMapping = [
     },
     type: 'question-choices',
   },
+  null, // no section header
 ]
 
-export const expectedSubheadingMapping = [
-  { data: { text: 'test subheading' }, type: 'subheading' },
+export const expectedSectionHeader = [
   {
     data: {
       text: 'I agree to Australian Genomics sharing my contact details with other research projects and clinical trials doing studies I am eligible for.',
@@ -18,4 +18,5 @@ export const expectedSubheadingMapping = [
     },
     type: 'question-checkbox',
   },
+  'test section header',
 ]

@@ -23,7 +23,7 @@ export const sourceDataRadio = {
 export const sourceDataAndSubheading = {
   'Variable/Field Name': 'ctrl_samp_data_share12',
   'Form Name': 'ctrl',
-  'Section Header': 'test subheading',
+  'Section Header': 'test section header',
   'Field Type': 'yesno',
   'Field Label':
     'I agree to Australian Genomics sharing my contact details with other research projects and clinical trials doing studies I am eligible for.',
