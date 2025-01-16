@@ -6,4 +6,5 @@
   "rules": {
     "no-unused-vars": "off",
   },
+  "ignorePatterns": ["**/cypress/"],
 }
