@@ -56,6 +56,7 @@ export default function Login() {
                 type="email"
                 fullWidth
                 label="Email"
+                data-cy="login-email"
                 {...register('email', {
                   required: true,
                 })}
@@ -64,6 +65,7 @@ export default function Login() {
                 type="password"
                 fullWidth
                 label="Password"
+                data-cy="login-password"
                 {...register('password', { required: true })}
               />
               {errors.root ? (

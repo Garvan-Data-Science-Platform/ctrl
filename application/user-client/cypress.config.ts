@@ -1,4 +1,4 @@
-import { resetDB } from 'common/testing/TestHelpers'
+import { publishNewVersion, resetDB } from 'common/testing/TestHelpers'
 import { defineConfig } from 'cypress'
 import { generateToken } from '../backend/src/authentication'
 import { PARTICIPANT_UNANSWERED_ID } from 'common/testing/seed'
@@ -14,6 +14,9 @@ export default defineConfig({
       on('task', {
         reset() {
           return resetDB()
+        },
+        publish() {
+          return publishNewVersion()
         },
       })
     },

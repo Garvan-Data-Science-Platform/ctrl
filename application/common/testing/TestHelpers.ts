@@ -1,4 +1,5 @@
 import prisma from '../../backend/src/PrismaClient'
+import { SurveysController } from '../../backend/src/controllers/SurveysController'
 import logger from 'common/src/logger'
 import { seedTests } from './seed'
 
@@ -33,4 +34,10 @@ export async function resetDB(): Promise<null> {
     prisma.$disconnect()
     throw error
   }
+}
+
+export async function publishNewVersion() {
+  const sc = new SurveysController()
+  await sc.publishSurvey(2)
+  return null
 }

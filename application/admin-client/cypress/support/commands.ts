@@ -1,5 +1,4 @@
 /// <reference types="cypress" />
-
 // ***********************************************
 // This example commands.ts shows you how to
 // create various custom commands and overwrite
@@ -14,19 +13,6 @@
 // -- This is a parent command --
 // Cypress.Commands.add('login', (email, password) => { ... })
 //
-export enum UserType {
-  PARTICIPANT_COMPLETED = 'test3@example.com',
-  PARTICIPANT_UNANSWERED = 'test2@example.com',
-}
-Cypress.Commands.add('login', (type: UserType) => {
-  cy.request({
-    method: 'POST',
-    url: `localhost:5001/auth/login`,
-    body: { email: type, password: 'password' },
-  }).then((res) => {
-    window.localStorage.setItem('access_token', res.body.token)
-  })
-})
 //
 // -- This is a child command --
 // Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })

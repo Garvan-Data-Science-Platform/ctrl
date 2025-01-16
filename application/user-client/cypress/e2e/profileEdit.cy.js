@@ -46,4 +46,15 @@ describe('Profile Edit', () => {
     cy.get('[data-cy="update-button"]').click()
     cy.contains('Invalid mobile').should('exist')
   })
+
+  it('Shows family members correctly', () => {
+    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.visit('/profile')
+    cy.contains('Family').should('not.exist')
+    cy.login(UserType.PARTICIPANT_COMPLETED)
+    cy.visit('/profile')
+    cy.contains('Family').should('exist')
+    cy.contains('Test Dependent').should('exist')
+    cy.contains('Dependent child').should('exist')
+  })
 })
