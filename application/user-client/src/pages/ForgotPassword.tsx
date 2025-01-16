@@ -25,7 +25,7 @@ export default function ForgotPassword() {
           setSent(true)
         } else {
           setError('root.serverError', {
-            message: `Error: ${JSON.stringify(res.message)}`,
+            message: `Error: ${JSON.stringify((res as any).message)}`,
           })
         }
       })

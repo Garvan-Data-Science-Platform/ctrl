@@ -95,7 +95,7 @@ export default function ProfileEdit() {
           nav('/profile')
         } else {
           setError('root.serverError', {
-            message: `Error Updating Profile: ${JSON.stringify(res.response.data.message)}`,
+            message: `Error Updating Profile: ${JSON.stringify((res as any).response.data.message)}`,
           })
         }
       })
