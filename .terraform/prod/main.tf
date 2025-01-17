@@ -23,7 +23,7 @@ module "base" {
   project_id = "peters-playground-427505"
   region     = "australia-southeast1"
   location   = "australia-southeast1-a"
-  sa_email   = "ctrl-sa@garvan-ctrl.iam.gserviceaccount.com"
+  sa_email   = "ctrl-sa@peters-playground-427505.iam.gserviceaccount.com"
   env        = "prod"
   subdomain  = "ctrl.dsp"
 }
