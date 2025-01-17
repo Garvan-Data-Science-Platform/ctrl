@@ -12,7 +12,7 @@ IMAGE_PATH=${LOCATION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${IMAGE}:${TAG
 
 # Build Docker image
 echo "Building Docker image..."
-docker build -t ${IMAGE_PATH} .
+docker build -f ./Dockerfile.backend -t ${IMAGE_PATH} .
 
 # Push to Artifact Registry
 echo "Pushing to ${LOCATION} Artifact Registry..."
