@@ -28,17 +28,13 @@ export class Integrations {
         acc.push({
           title: sectionHeader,
           text: '',
-          elements: [],
+          elements: [element],
         })
+      } else if (acc) {
+        acc[acc.length-1].elements.push(element)
+      } else {
+        acc.push({ title: 'Introduction', text: '', elements: [element] }
       }
-
-      // Get the current step (the last one in the array)
-      const currentStep =
-        acc[acc.length - 1] ??
-        (acc.push({ title: '', text: '', elements: [] }) && acc[acc.length - 1])
-
-      currentStep.elements.push(element)
-
       return acc
     }, [])
     return steps
