@@ -1915,37 +1915,6 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsIntegrationsController_uploadRedcapInstrument: Record<string, TsoaRoute.ParameterSchema> = {
-                request: {"in":"request","name":"request","required":true,"dataType":"object"},
-        };
-        app.post('/integrations/redcap/instrument/upload',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
-            ...(fetchMiddlewares<RequestHandler>(IntegrationsController)),
-            ...(fetchMiddlewares<RequestHandler>(IntegrationsController.prototype.uploadRedcapInstrument)),
-
-            async function IntegrationsController_uploadRedcapInstrument(request: ExRequest, response: ExResponse, next: any) {
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsIntegrationsController_uploadRedcapInstrument, request, response });
-
-                const controller = new IntegrationsController();
-
-              await templateService.apiHandler({
-                methodName: 'uploadRedcapInstrument',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: 200,
-              });
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsHealthCheckController_HealthCheck: Record<string, TsoaRoute.ParameterSchema> = {
         };
         app.get('/',

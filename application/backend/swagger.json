@@ -3441,50 +3441,6 @@
         "parameters": []
       }
     },
-    "/integrations/redcap/instrument/upload": {
-      "post": {
-        "operationId": "UploadRedcapInstrument",
-        "responses": {
-          "200": {
-            "description": "Upserted Survey from Instrument CSV",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UploadRedcapInstrumentResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "tags": ["Integrations"],
-        "security": [
-          {
-            "jwt": ["OrganisationAdmin"]
-          }
-        ],
-        "parameters": []
-      }
-    },
     "/integrations/redcap/instrument/upload/csv": {
       "post": {
         "operationId": "UploadRedcapInstrument",
