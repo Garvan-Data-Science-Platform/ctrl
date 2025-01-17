@@ -13,7 +13,7 @@ describe('HealthCheckController', () => {
   describe('HealthCheck', () => {
     it('should return healthy message', async () => {
       const response = await request(app).get('/healthcheck')
-      expect(response.status).toBe(204)
+      expect(response.status).toBe(200)
     })
   })
 
