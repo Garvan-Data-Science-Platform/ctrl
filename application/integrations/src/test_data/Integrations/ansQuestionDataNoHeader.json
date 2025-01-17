@@ -6,7 +6,7 @@
       {
         "type": "subheading",
         "data": {
-          "text": "Unrecognized question type"
+          "text": "Question is a text or notes field - not currently supported by CTRL"
         }
       }
     ]
@@ -187,13 +187,13 @@
       {
         "type": "subheading",
         "data": {
-          "text": "Unrecognized question type"
+          "text": "Question is a text or notes field - not currently supported by CTRL"
         }
       },
       {
         "type": "subheading",
         "data": {
-          "text": "Unrecognized question type"
+          "text": "Question is a text or notes field - not currently supported by CTRL"
         }
       }
     ]

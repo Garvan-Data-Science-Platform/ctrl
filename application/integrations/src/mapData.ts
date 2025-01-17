@@ -88,7 +88,6 @@ export function mapToSurveyElement(
   // Extract required fields
   const questionType = requiredField(fieldMappings.questionType)
   const text = requiredField(fieldMappings.text)
-  const choices = sourceQuestion[fieldMappings.choices]
 
   // if there is a section header, get it and return it - will be turned into a step
   const sectionHeader = sourceQuestion[fieldMappings.sectionHeader] || null
@@ -96,7 +95,7 @@ export function mapToSurveyElement(
   // Covers radio, dropdown and yesno questions - does not cover freetext ('notes' or 'text' question types)
   let element: SurveyElement
   if (questionType === 'radio' || questionType === 'dropdown') {
-    const choices = requiredField('Choices, Calculations, OR Slider Labels')
+    const choices = sourceQuestion[fieldMappings.choices]
     const values = choices.split('|').map((item) => item.split(',')[1].trim())
     element = {
       type: 'question-choices',
