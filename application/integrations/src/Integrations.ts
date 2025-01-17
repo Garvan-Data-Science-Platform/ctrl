@@ -33,7 +33,7 @@ export class Integrations {
       } else if (acc) {
         acc[acc.length-1].elements.push(element)
       } else {
-        acc.push({ title: 'Introduction', text: '', elements: [element] }
+        acc.push({ title: 'Introduction', text: '', elements: [element] })
       }
       return acc
     }, [])
