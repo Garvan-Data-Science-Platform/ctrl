@@ -1,5 +1,9 @@
 /// <reference types="cypress" />
 
+beforeEach(() => {
+  cy.task('reset')
+})
+
 describe('Login', () => {
   it('Can log in', () => {
     cy.visit('/')

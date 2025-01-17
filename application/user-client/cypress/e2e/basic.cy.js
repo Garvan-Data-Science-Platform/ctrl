@@ -2,6 +2,10 @@
 
 const { UserType } = require('../support/commands')
 
+beforeEach(() => {
+  cy.task('reset')
+})
+
 describe('basic', () => {
   it('renders homepage', () => {
     cy.visit('/')
