@@ -1,0 +1,201 @@
+[
+  {
+    "title": "First Header",
+    "text": "",
+    "elements": [
+      {
+        "type": "subheading",
+        "data": {
+          "text": "Unrecognized question type"
+        }
+      }
+    ]
+  },
+  {
+    "title": "Contact",
+    "text": "",
+    "elements": [
+      {
+        "type": "question-choices",
+        "data": {
+          "text": "Participant has requested no further contact about CTRL",
+          "value": "Yes",
+          "choices": ["Yes", "No"]
+        }
+      }
+    ]
+  },
+  {
+    "title": "Preferences about your results:",
+    "text": "",
+    "elements": [
+      {
+        "type": "question-choices",
+        "data": {
+          "text": "I want to know about the genetic change if it is medically actionable (can alter my health management or treatment).",
+          "value": "Yes",
+          "choices": ["Yes", "No", "Not sure"]
+        }
+      },
+      {
+        "type": "question-choices",
+        "data": {
+          "text": "I want to know about the genetic change if it is non-medically actionable (will not alter my health management or treatment).",
+          "value": "Yes",
+          "choices": ["Yes", "No", "Not sure"]
+        }
+      },
+      {
+        "type": "question-choices",
+        "data": {
+          "text": "I want to know if I am a carrier of a genetic change that can cause disease (it might affect decisions I make about having children, or for my grandchildren).",
+          "value": "Yes",
+          "choices": ["Yes", "No", "Not sure"]
+        }
+      },
+      {
+        "type": "question-choices",
+        "data": {
+          "text": "I'd like my medical team and the testing laboratory to decide whether I should be told about medically actionable, non-medically actionable and carrier status findings on a case by case basis.",
+          "value": "Yes",
+          "choices": ["Yes", "No", "Not sure"]
+        }
+      },
+      {
+        "type": "question-choices",
+        "data": {
+          "text": "I would like a summary of the main findings of my genomic testing report securely stored in CTRL, so I can access it at any time.",
+          "value": "Yes",
+          "choices": ["Yes", "No", "Not sure"]
+        }
+      }
+    ]
+  },
+  {
+    "title": "Sample and information sharing:",
+    "text": "",
+    "elements": [
+      {
+        "type": "question-choices",
+        "data": {
+          "text": "Not-for-profit research organisations (eg Murdoch Children's Research Institute)",
+          "value": "Yes",
+          "choices": ["Yes", "No", "Not sure"]
+        }
+      },
+      {
+        "type": "question-choices",
+        "data": {
+          "text": "Universities and research institutes (eg The University of Queensland)",
+          "value": "Yes",
+          "choices": ["Yes", "No", "Not sure"]
+        }
+      },
+      {
+        "type": "question-choices",
+        "data": {
+          "text": "Government (eg Australian Government Department of Health)",
+          "value": "Yes",
+          "choices": ["Yes", "No", "Not sure"]
+        }
+      },
+      {
+        "type": "question-choices",
+        "data": {
+          "text": "Commercial companies (eg pharmaceutical companies)",
+          "value": "Yes",
+          "choices": ["Yes", "No", "Not sure"]
+        }
+      },
+      {
+        "type": "question-choices",
+        "data": {
+          "text": "General research use and clinical care",
+          "value": "Yes",
+          "choices": ["Yes", "No", "Not sure"]
+        }
+      },
+      {
+        "type": "question-choices",
+        "data": {
+          "text": "Health/medical/biomedical research",
+          "value": "Yes",
+          "choices": ["Yes", "No", "Not sure"]
+        }
+      },
+      {
+        "type": "question-choices",
+        "data": {
+          "text": "Research must be specifically related to my condition",
+          "value": "Yes",
+          "choices": ["Yes", "No", "Not sure"]
+        }
+      },
+      {
+        "type": "question-choices",
+        "data": {
+          "text": "Population and ancestry research",
+          "value": "Yes",
+          "choices": ["Yes", "No", "Not sure"]
+        }
+      },
+      {
+        "type": "question-choices",
+        "data": {
+          "text": "I agree to my general health information (eg just my MRIs, blood test or other results) being shared with other research studies that don't need my genomic information.",
+          "value": "Yes",
+          "choices": ["Yes", "No", "Not sure"]
+        }
+      },
+      {
+        "type": "question-choices",
+        "data": {
+          "text": "I want to be contacted every time my de-identified DNA sample, genomic, health or self-reported information is shared.",
+          "value": "Yes",
+          "choices": ["Yes", "No", "Not sure"]
+        }
+      },
+      {
+        "type": "question-choices",
+        "data": {
+          "text": "I agree to my self-reported information (eg questionnaire responses) being shared with other research studies that don't need my genomic information.",
+          "value": "Yes",
+          "choices": ["Yes", "No", "Not sure"]
+        }
+      },
+      {
+        "type": "question-checkbox",
+        "data": {
+          "text": "I agree to Australian Genomics sharing my contact details with other research projects and clinical trials doing studies I am eligible for.",
+          "value": false
+        }
+      }
+    ]
+  },
+  {
+    "title": "Genetic Counsellor Follow Up",
+    "text": "",
+    "elements": [
+      {
+        "type": "question-choices",
+        "data": {
+          "text": "Follow up mode",
+          "value": "E-mail",
+          "choices": ["E-mail", "Phone", "Not needed"]
+        }
+      },
+      {
+        "type": "subheading",
+        "data": {
+          "text": "Unrecognized question type"
+        }
+      },
+      {
+        "type": "subheading",
+        "data": {
+          "text": "Unrecognized question type"
+        }
+      }
+    ]
+  }
+]

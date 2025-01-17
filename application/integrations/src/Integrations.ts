@@ -30,8 +30,8 @@ export class Integrations {
           text: '',
           elements: [element],
         })
-      } else if (acc) {
-        acc[acc.length-1].elements.push(element)
+      } else if (acc.length > 0) {
+        acc[acc.length - 1].elements.push(element)
       } else {
         acc.push({ title: 'Introduction', text: '', elements: [element] })
       }
