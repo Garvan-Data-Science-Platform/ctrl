@@ -33,7 +33,10 @@ export class Integrations {
       }
 
       // Get the current step (the last one in the array)
-      const currentStep = acc[acc.length - 1]
+      const currentStep =
+        acc[acc.length - 1] ??
+        (acc.push({ title: '', text: '', elements: [] }) && acc[acc.length - 1])
+
       currentStep.elements.push(element)
 
       return acc
