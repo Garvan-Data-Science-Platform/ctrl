@@ -106,10 +106,10 @@ describe('IntegrationsController', () => {
       const survey = await prisma.surveyVersion.findFirst({ where: { id: 2 } })
 
       // test that subheading type converts into the heading of a survey step
-      expect(survey?.data[0].title).toStrictEqual('Contact')
+      expect(survey?.data[1].title).toStrictEqual('Contact')
 
       // test question-choices survey type
-      expect(survey?.data[0].elements[0]).toStrictEqual({
+      expect(survey?.data[1].elements[0]).toStrictEqual({
         data: {
           choices: ['Yes', 'No'],
           text: 'Participant has requested no further contact about CTRL',
@@ -119,7 +119,7 @@ describe('IntegrationsController', () => {
       })
 
       // text question-checkbox survey type
-      expect(survey?.data[2].elements[11]).toStrictEqual({
+      expect(survey?.data[3].elements[11]).toStrictEqual({
         data: {
           text: 'I agree to Australian Genomics sharing my contact details with other research projects and clinical trials doing studies I am eligible for.',
           value: false,
@@ -127,7 +127,7 @@ describe('IntegrationsController', () => {
         type: 'question-checkbox',
       })
 
-      expect(survey?.data.length).toBe(4)
+      expect(survey?.data.length).toBe(5)
     })
 
     it('should create a new draft survey if one doesnt already exist', async () => {
@@ -147,7 +147,7 @@ describe('IntegrationsController', () => {
       // should create a new draft survey!
       const survey = await prisma.surveyVersion.findFirst({ where: { id: 3 } })
 
-      expect(survey?.data.length).toBe(4)
+      expect(survey?.data.length).toBe(5)
     })
 
     it('should throw a 404 error if no file is given', async () => {

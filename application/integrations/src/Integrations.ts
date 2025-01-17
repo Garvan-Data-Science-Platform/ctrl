@@ -21,37 +21,32 @@ export class Integrations {
 
   // returns a list of survey elements to be created into a survey later
   mapInstrumentCSVToSurvey(csv: Record<string, string>[]): SurveyStep[] {
-    const steps: SurveyStep[] = []
-    let currentStep: SurveyStep = {
-      title: 'Imported Survey',
-      text: 'Survey Imported from Redcap Instrument',
-      elements: [],
-    }
+    const steps: SurveyStep[] = csv.reduce(
+      (acc, surveyQuestion) => {
+        const [element, sectionHeader] = mapToSurveyElement(surveyQuestion)
 
-    csv.forEach((surveyQuestion) => {
-      const [element, sectionHeader] = mapToSurveyElement(surveyQuestion)
-
-      // Handle the section header
-      if (sectionHeader) {
-        if (currentStep.elements.length > 0) {
-          steps.push(currentStep)
+        if (sectionHeader) {
+          acc.push({
+            title: sectionHeader,
+            text: '',
+            elements: [],
+          })
         }
 
-        currentStep = {
-          title: sectionHeader,
-          text: '',
+        // Get the current step (the last one in the array)
+        const currentStep = acc[acc.length - 1]
+        currentStep.elements.push(element)
+
+        return acc
+      },
+      [
+        {
+          title: 'Imported Survey',
+          text: 'Survey Imported from Redcap Instrument',
           elements: [],
-        }
-      }
-
-      currentStep.elements.push(element)
-    })
-
-    // Add the last step if it contains any elements
-    if (currentStep.elements.length > 0) {
-      steps.push(currentStep)
-    }
-
+        } as SurveyStep,
+      ],
+    )
     return steps
   }
 }
