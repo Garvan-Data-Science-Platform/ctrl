@@ -1408,6 +1408,35 @@
           "password": "Password123"
         }
       },
+      "UploadRedcapParticipantResponse": {
+        "properties": {
+          "ids": {
+            "items": {
+              "type": "number",
+              "format": "double"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "ids"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UploadRedcapInstrumentResponse": {
+        "properties": {
+          "id": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
       "Workspace": {
         "properties": {
           "version": {
@@ -3433,10 +3462,65 @@
     },
     "/integrations/redcap/participant/upload": {
       "post": {
-        "operationId": "UploadRedCapParticipant",
+        "operationId": "UploadRedcapParticipant",
         "responses": {
           "201": {
-            "description": "Created Participants from CSV"
+            "description": "Created Participants from CSV",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadRedcapParticipantResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Integrations"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": []
+      }
+    },
+    "/integrations/redcap/instrument/upload": {
+      "post": {
+        "operationId": "UploadRedcapInstrument",
+        "responses": {
+          "200": {
+            "description": "Upserted Survey from Instrument CSV",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadRedcapInstrumentResponse"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized",

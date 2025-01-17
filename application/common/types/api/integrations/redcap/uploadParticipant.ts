@@ -1,3 +1,3 @@
-export interface UploadRedCapParticipantsResponse {
-  message: string
+export interface UploadRedcapParticipantResponse {
+  ids: number[]
 }

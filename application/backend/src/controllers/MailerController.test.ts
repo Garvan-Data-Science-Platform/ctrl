@@ -122,7 +122,6 @@ describe('MailerController', () => {
         .set({ Authorization: `Bearer ${participantToken}` })
 
       expect(response.status).toBe(204)
-
       const expectedSentEmails = [
         {
           from: 'CTRL <noreply@ctrl.garvan.org.au>',

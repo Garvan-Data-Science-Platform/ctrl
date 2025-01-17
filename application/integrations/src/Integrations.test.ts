@@ -3,10 +3,12 @@ import testMapping from './test_data/testMapping.json'
 import {
   exampleSingleProfile,
   exampleMultipleProfiles,
-  exampleQuestionData,
+  exampleQuestionDataNoHeader,
+  exampleQuestionDataHeader,
   ansSingleProfile,
   ansMultipleProfilesMapping,
-  ansQuestionData,
+  ansQuestionDataNoHeader,
+  ansQuestionDataHeader,
 } from './test_data/Integrations'
 
 describe('Integrations', () => {
@@ -25,9 +27,14 @@ describe('Integrations', () => {
   })
 
   describe('mapInstrumentCSVToSurvey', () => {
-    it('should create a mapped list of survey elements from an instrument csv', () => {
-      const res = integrationProcessor.mapInstrumentCSVToSurvey(exampleQuestionData)
-      expect(res).toEqual(ansQuestionData)
+    it('should create a mapped list of survey elements from an instrument csv with no header', () => {
+      const res = integrationProcessor.mapInstrumentCSVToSurvey(exampleQuestionDataNoHeader)
+      expect(res).toEqual(ansQuestionDataNoHeader)
+    })
+
+    it('should create a mapped list of survey elements from an instrument csv with an initial header', () => {
+      const res = integrationProcessor.mapInstrumentCSVToSurvey(exampleQuestionDataHeader)
+      expect(res).toEqual(ansQuestionDataHeader)
     })
   })
 })
