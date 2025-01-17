@@ -3,7 +3,7 @@ import { resetDB } from 'common/testing/TestHelpers'
 import { Api } from '../Api'
 import { generateToken } from '../authentication'
 import prisma from '../PrismaClient'
-import { PARTICIPANT_COMPLETED_ID } from '../../tests/seed'
+import { PARTICIPANT_COMPLETED_ID } from 'common/testing/seed'
 import path from 'path'
 
 const api = new Api()
@@ -26,7 +26,7 @@ describe('IntegrationsController', () => {
 
   describe('POST /integrations/redcap/participant/upload/csv', () => {
     it('should create a new participant from a given csv', async () => {
-      const csvPath = path.join(TESTS_PATH, 'one_user.csv')
+      const csvPath = path.resolve(__dirname, '../../tests/test_data/one_user.csv')
       const response = await request(app)
         .post('/integrations/redcap/participant/upload/csv')
         .set({ Authorization: `Bearer ${token}` })
@@ -91,7 +91,7 @@ describe('IntegrationsController', () => {
   })
 
   describe('POST integrations/redcap/instrument/upload/csv', () => {
-    it('should add a valid survey', async () => {
+    it('should update a valid draft survey from instrument csv', async () => {
       const csvPath = path.resolve(__dirname, '../../tests/test_data/instrument.csv')
       const response = await request(app)
         .post('/integrations/redcap/instrument/upload/csv')
@@ -135,7 +135,7 @@ describe('IntegrationsController', () => {
 
       const csvPath = path.resolve(__dirname, '../../tests/test_data/instrument.csv')
       const response = await request(app)
-        .post('/integrations/redcap/instrument/upload')
+        .post('/integrations/redcap/instrument/upload/csv')
         .set({ Authorization: `Bearer ${token}` })
         .attach('file', csvPath)
       expect(response.status).toBe(200)
@@ -185,7 +185,6 @@ describe('IntegrationsController', () => {
         .post('/integrations/redcap/participant/upload/api')
         .send({ form: 'ctrl_test_1' })
         .set({ Authorization: `Bearer ${token}` })
-      console.log(response)
       expect(response.status).toBe(201)
 
       const postCreationLen = await prisma.participantProfile.count()
@@ -203,6 +202,7 @@ describe('IntegrationsController', () => {
         .post('/integrations/redcap/instrument/upload/api')
         .send({ form: 'ctrl_test_2' })
         .set({ Authorization: `Bearer ${token}` })
+      console.log(response.body)
       expect(response.status).toBe(200)
       const survey = await prisma.surveyVersion.findFirst({ where: { id: 3 } })
 
