@@ -26,7 +26,6 @@ resource "kubernetes_deployment" "ctrl" {
             container_port = 8000
           }
         }
-
       }
     }
   }
@@ -34,42 +33,49 @@ resource "kubernetes_deployment" "ctrl" {
 
 resource "kubernetes_service" "ctrl" {
   metadata {
+    annotations = {
+      "cloud.google.com/neg" : "{\"ingress\": true}",
+    }
     name = "ctrl-${var.env}"
     labels = {
       App = "ctrl-${var.env}"
     }
   }
+
   spec {
     selector = {
-      App = "ctrl-${var.env}"
+      App = "ctrl-${var.env}" #This should match the kubernetes deployment
     }
+
     port {
       port        = 80
       target_port = 8000
     }
-    type = "LoadBalancer"
+
+    type = "NodePort"
   }
 }
 
-#Optional: Autoscaler
-/*
-resource "kubernetes_horizontal_pod_autoscaler" "**CHANGE_THIS**" {
-  metadata {
-    name = "hpa"
-  }
+# resource "kubernetes_ingress_v1" "gke-ingress" {
+#   wait_for_load_balancer = true
+#   metadata {
+#     name = "gke-ingress"
+#     annotations = {
+#       "kubernetes.io/ingress.global-static-ip-name" = google_compute_global_address.static.name
+#       "kubernetes.io/ingress.class"                 = "gce"
+#       "ingress.gcp.kubernetes.io/pre-shared-cert"   = google_compute_managed_ssl_certificate.lb_default.name
+#     }
+#   }
 
-  depends_on = [kubernetes_deployment.**CHANGE_THIS**] #Pod to autoscale
+#   spec {
+#     default_backend {
+#       service {
+#         name = "primary"
+#         port {
+#           number = 80
+#         }
+#       }
+#     }
+#   }
+# }
 
-  spec {
-    min_replicas = 1
-    max_replicas = 50
-
-    scale_target_ref {
-      api_version = "apps/v1"
-      kind = "Deployment"
-      name = "**CHANGE_THIS**" #Change to name of deployment to autoscale
-    }
-    target_cpu_utilization_percentage = 50
-  }
-}
-*/

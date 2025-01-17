@@ -4,7 +4,6 @@ resource "helm_release" "postgres" {
 
   #repository       = "https://helm.elastic.co"
   chart = "oci://registry-1.docker.io/bitnamicharts/postgresql"
-  #version          = "7.16.3"
 
   depends_on = [google_container_node_pool.primary_nodes]
 
@@ -12,19 +11,23 @@ resource "helm_release" "postgres" {
     name  = "auth.password"
     value = data.google_secret_manager_secret_version.postgres_password.secret_data
   }
+
   set {
-    name  = "auth.database"
-    value = "django"
+    name  = "image.tag"
+    value = "14"
   }
+
   set {
     name  = "auth.username"
-    value = "pg-user"
+    value = "ctrl-user"
   }
 
   set {
     name  = "master.service.type"
     value = "ClusterIP"
   }
+
+  timeout = 600
 
 }
 
