@@ -202,9 +202,10 @@ describe('IntegrationsController', () => {
         .post('/integrations/redcap/instrument/upload/api')
         .send({ form: 'ctrl_test_2' })
         .set({ Authorization: `Bearer ${token}` })
-      console.log(response.body)
       expect(response.status).toBe(200)
-      const survey = await prisma.surveyVersion.findFirst({ where: { id: 3 } })
+      const survey = await prisma.surveyVersion.findFirst({ where: { id: 2 } })
+
+      console.log(survey)
 
       expect(survey?.data[0].elements[1]).toStrictEqual({
         data: {
