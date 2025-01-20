@@ -3554,7 +3554,7 @@
       "post": {
         "operationId": "UploadRedcapInstrumentCSV",
         "responses": {
-          "200": {
+          "201": {
             "description": "Upserted Survey from Instrument CSV",
             "content": {
               "application/json": {
@@ -3598,7 +3598,7 @@
       "post": {
         "operationId": "UploadRedcapInstrumentAPI",
         "responses": {
-          "200": {
+          "201": {
             "description": "Created Survey using Redcap API",
             "content": {
               "application/json": {

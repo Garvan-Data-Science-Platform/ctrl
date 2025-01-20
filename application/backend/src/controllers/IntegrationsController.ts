@@ -66,10 +66,8 @@ export class IntegrationsController extends Controller {
     const params = new URLSearchParams()
     params.append('token', '012745DC3FC14683910C3CCF233DD616')
     params.append('content', 'record')
-    params.append('action', 'export')
     params.append('format', 'json')
     params.append('type', 'flat')
-    params.append('returnFormat', 'json')
     params.append('form[0]', form)
 
     const participantData = await fetch('https://redcap.gimr.garvan.org.au/api/', {
@@ -92,7 +90,7 @@ export class IntegrationsController extends Controller {
 
   @Post('/redcap/instrument/upload/csv')
   @Middlewares(upload.single('file'))
-  @SuccessResponse('200', 'Upserted Survey from Instrument CSV')
+  @SuccessResponse('201', 'Upserted Survey from Instrument CSV')
   public async uploadRedcapInstrumentCSV(
     @Request() request: express.Request,
   ): Promise<UploadRedcapInstrumentResponse> {
@@ -111,7 +109,7 @@ export class IntegrationsController extends Controller {
   }
 
   @Post('/redcap/instrument/upload/api')
-  @SuccessResponse('200', 'Created Survey using Redcap API')
+  @SuccessResponse('201', 'Created Survey using Redcap API')
   public async uploadRedcapInstrumentAPI(
     @Body() bodyRequest: UploadRedcapInstrumentAPIRequest,
   ): Promise<UploadRedcapInstrumentResponse> {
@@ -156,6 +154,7 @@ export class IntegrationsController extends Controller {
 
     for (const participant of data) {
       // Exclude email, password, middleName as these may be used later for account creation
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { email, password, middleName, ...participantData } = participant
       const addedParticipant = participants.push(
         await authController.createParticipant(participantData),
