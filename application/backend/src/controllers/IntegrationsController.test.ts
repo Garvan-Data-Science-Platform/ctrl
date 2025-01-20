@@ -4,6 +4,7 @@ import { Api } from '../Api'
 import { generateToken } from '../authentication'
 import prisma from '../PrismaClient'
 import { PARTICIPANT_COMPLETED_ID } from 'common/testing/seed'
+import { redcapFetch } from '../../tests/__mocks__/RedcapFetch'
 import path from 'path'
 
 const api = new Api()
@@ -12,6 +13,8 @@ let token: string
 
 describe('IntegrationsController', () => {
   beforeAll(async () => {
+    // mock implementation for fetch - specifically for calls to the redcap api
+    jest.spyOn(global, 'fetch').mockImplementation(redcapFetch)
     token = await generateToken({ userId: PARTICIPANT_COMPLETED_ID, roles: ['OrganisationAdmin'] })
     api.run()
   })
@@ -97,7 +100,7 @@ describe('IntegrationsController', () => {
         .post('/integrations/redcap/instrument/upload/csv')
         .set({ Authorization: `Bearer ${token}` })
         .attach('file', csvPath)
-      expect(response.status).toBe(200)
+      expect(response.status).toBe(201)
 
       // updates the pre-existing draft survey
       expect(response.body.id).toBe(2)
@@ -138,7 +141,7 @@ describe('IntegrationsController', () => {
         .post('/integrations/redcap/instrument/upload/csv')
         .set({ Authorization: `Bearer ${token}` })
         .attach('file', csvPath)
-      expect(response.status).toBe(200)
+      expect(response.status).toBe(201)
 
       // creates a new draft survey
       expect(response.body.id).toBe(3)
@@ -185,6 +188,7 @@ describe('IntegrationsController', () => {
         .post('/integrations/redcap/participant/upload/api')
         .send({ form: 'ctrl_test_1' })
         .set({ Authorization: `Bearer ${token}` })
+
       expect(response.status).toBe(201)
 
       const postCreationLen = await prisma.participantProfile.count()
@@ -194,6 +198,22 @@ describe('IntegrationsController', () => {
       // check correct response message
       expect(response.body.ids.length).toBe(10)
     })
+
+    it('should return a BadGatewayErorr if the api is offline, or unavailable', async () => {
+      ;(global.fetch as jest.Mock).mockImplementationOnce(() =>
+        Promise.reject({
+          message: 'API offline or unavailable',
+          status: 500,
+        }),
+      )
+
+      const response = await request(app)
+        .post('/integrations/redcap/participant/upload/api')
+        .send({ form: 'ctrl_test_1' })
+        .set({ Authorization: `Bearer ${token}` })
+
+      expect(response.status).toBe(502)
+    })
   })
 
   describe('POST integrations/redcap/instrument/upload/api', () => {
@@ -202,10 +222,8 @@ describe('IntegrationsController', () => {
         .post('/integrations/redcap/instrument/upload/api')
         .send({ form: 'ctrl_test_2' })
         .set({ Authorization: `Bearer ${token}` })
-      expect(response.status).toBe(200)
+      expect(response.status).toBe(201)
       const survey = await prisma.surveyVersion.findFirst({ where: { id: 2 } })
-
-      console.log(survey)
 
       expect(survey?.data[0].elements[1]).toStrictEqual({
         data: {
