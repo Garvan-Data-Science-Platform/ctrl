@@ -167,7 +167,11 @@ export const SurveyEditor = () => {
               >
                 Publish
               </Button>
-              <Button variant="outlined" onClick={handleOptionsClick}>
+              <Button
+                variant="outlined"
+                onClick={handleOptionsClick}
+                disabled={savePending || disabled}
+              >
                 <Settings />
               </Button>
               <Menu

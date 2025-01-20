@@ -2,7 +2,7 @@ import type { AuthProvider } from '@refinedev/core'
 
 export const TOKEN_KEY = 'refine-auth'
 
-const BACKEND_URL = 'http://localhost:5000'
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
 export const authProvider: AuthProvider = {
   login: async ({ email, password }) => {

@@ -1,4 +1,5 @@
 /// <reference types="cypress" />
+
 // ***********************************************
 // This example commands.ts shows you how to
 // create various custom commands and overwrite
@@ -13,6 +14,27 @@
 // -- This is a parent command --
 // Cypress.Commands.add('login', (email, password) => { ... })
 //
+export enum UserType {
+  PARTICIPANT_COMPLETED = 'test3@example.com',
+  PARTICIPANT_UNANSWERED = 'test2@example.com',
+  ADMIN = 'test1@example.com',
+}
+Cypress.Commands.add('login', (type: UserType) => {
+  cy.request({
+    method: 'POST',
+    url: `localhost:5001/auth/login`,
+    body: { email: type, password: 'password' },
+  }).then((res) => {
+    console.log('TOKEN', res.body.token)
+    window.localStorage.setItem('refine-auth', res.body.token)
+  })
+})
+Cypress.Commands.add('login_expired', () => {
+  window.localStorage.setItem(
+    'refine-auth',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjk3LCJzY29wZXMiOlsiT3JnYW5pc2F0aW9uQWRtaW4iXSwiaWF0IjoxNzM3MzQ3OTAyLCJleHAiOjE3MzczNTE1MDJ9.RmKfHb3SX-RRyue7tJ46Nkg-KcQOceDIiWCNSqlV4wc',
+  )
+})
 //
 // -- This is a child command --
 // Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })

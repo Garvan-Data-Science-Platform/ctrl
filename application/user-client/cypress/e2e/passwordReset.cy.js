@@ -1,5 +1,9 @@
 /// <reference types="cypress" />
 
+beforeEach(() => {
+  cy.task('reset')
+})
+
 describe('Password Reset', () => {
   it('Can generate a reset link', () => {
     cy.visit('/')

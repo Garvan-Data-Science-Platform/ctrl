@@ -32,4 +32,10 @@ describe('basic', () => {
     cy.get('ul li').eq(2).click()
     cy.contains('message').should('exist')
   })
+  it('Is redirected to login when attempting to use expired token', () => {
+    expect(true).to('be', 'Not implemented')
+  })
+  it('Can log out', () => {
+    expect(true).to('be', 'Not implemented')
+  })
 })
