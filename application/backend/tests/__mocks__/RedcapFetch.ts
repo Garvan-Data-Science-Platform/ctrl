@@ -1,5 +1,6 @@
-const { recordDataOne } = require('./RedCapFetchData/CtrlTestOne')
-const { instrumentDataTwo } = require('./RedCapFetchData/CtrlTestTwo')
+import recordDataOne from './RedCapFetchData/recordDataOne.json'
+import recordDataTwo from './RedCapFetchData/recordDataTwo.json'
+import instrumentDataTwo from './RedCapFetchData/instrumentDataTwo.json'
 
 export const redcapFetch = jest.fn((url, options) => {
   if (url === 'https://redcap.gimr.garvan.org.au/api/' && options.method === 'POST') {
@@ -8,10 +9,13 @@ export const redcapFetch = jest.fn((url, options) => {
     if (
       params.get('token') === '012745DC3FC14683910C3CCF233DD616' &&
       params.get('content') === 'record' &&
-      params.get('format') === 'json' &&
-      params.get('form[0]') === 'ctrl_test_1'
+      params.get('format') === 'json'
     ) {
-      return Promise.resolve({ json: () => Promise.resolve(recordDataOne) })
+      if (params.get('form[0]') === 'ctrl_test_1') {
+        return Promise.resolve({ json: () => Promise.resolve(recordDataOne) })
+      } else if (params.get('form[0]') === 'ctrl_test_2') {
+        return Promise.resolve({ json: () => Promise.resolve(recordDataTwo) })
+      }
     } else if (
       params.get('token') === '012745DC3FC14683910C3CCF233DD616' &&
       params.get('content') === 'metadata' &&
@@ -21,5 +25,6 @@ export const redcapFetch = jest.fn((url, options) => {
       return Promise.resolve({ json: () => Promise.resolve(instrumentDataTwo) })
     }
   }
-  return Promise.resolve({ json: () => Promise.resolve({ data: 100 }) })
+
+  return Promise.resolve({ json: () => Promise.resolve({ data: 'no other case' }) })
 }) as jest.Mock
