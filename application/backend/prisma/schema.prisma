@@ -132,9 +132,18 @@ model SurveyParticipant {
 }
 
 model Invite {
-  id        Int      @id @default(autoincrement())
-  email     String
-  createdAt DateTime @default(now())
+  id        Int          @id @default(autoincrement())
+  email     String       @unique
+  status    InviteStatus @default(PENDING)
+  expiresAt DateTime
+  createdAt DateTime     @default(now())
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  REVOKED
 }
 
 model PasswordResetToken {
