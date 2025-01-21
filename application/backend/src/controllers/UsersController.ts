@@ -42,7 +42,6 @@ import mailerTransporter, { fromAddress } from '../utils/mailer'
 
 @Route('users')
 @Tags('Users')
-@Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 export class UsersController extends Controller {
   userRepo = prisma.user
@@ -55,6 +54,7 @@ export class UsersController extends Controller {
    */
   @Get('/')
   @Security('jwt', ['OrganisationAdmin'])
+  @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
   public async getAllUsers(): Promise<GetAllUsersResponse> {
     const users: User[] = await this.userRepo.findMany({})
     const responseData = { data: users }
@@ -68,8 +68,9 @@ export class UsersController extends Controller {
    * @summary Get Specific User
    */
   @Get('/{userId}')
-  @Response<NotFoundErrorResponse>('404', 'Not Found')
   @Security('jwt')
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
+  @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
   public async getUserById(@Path() userId: number): Promise<GetUserByIdResponse> {
     const user: User | null = await this.userRepo.findUnique({
       where: { id: userId },
@@ -91,8 +92,9 @@ export class UsersController extends Controller {
    */
   @Post('/')
   @SuccessResponse('201', 'Created')
-  @Response<ValidateErrorResponse>('422', 'Validation Failed')
   @Security('jwt', ['OrganisationAdmin'])
+  @Response<ValidateErrorResponse>('422', 'Validation Failed')
+  @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
   public async createUser(@Body() bodyRequest: CreateUserRequest): Promise<CreateUserResponse> {
     try {
       const insertedUser = await this.userRepo.create({
@@ -116,9 +118,10 @@ export class UsersController extends Controller {
    * @summary Update a User
    */
   @Patch('/{userId}')
+  @Security('jwt', ['OrganisationAdmin'])
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
-  @Security('jwt', ['OrganisationAdmin'])
+  @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
   public async updateUser(@Path() userId: number, @Body() bodyRequest: UpdateUserRequest) {
     try {
       await this.userRepo.update({
@@ -138,8 +141,9 @@ export class UsersController extends Controller {
    * @summary Delete a User
    */
   @Delete('/{userId}')
-  @Response<NotFoundErrorResponse>('404', 'Not Found')
   @Security('jwt', ['OrganisationAdmin'])
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
+  @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
   public async deleteUser(@Path() userId: number) {
     try {
       await this.userRepo.delete({ where: { id: userId } })
@@ -157,8 +161,9 @@ export class UsersController extends Controller {
    * @summary Update a Users Role
    */
   @Patch('/{userID}/role')
-  @Response<NotFoundErrorResponse>('404', 'Not Found')
   @Security('jwt', ['OperatorAdmin'])
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
+  @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
   public async updateUserRole(
     @Path() userID: number,
     @Body() bodyRequest: UpdateUserRoleRequest,

@@ -33,19 +33,19 @@ const expressAuthenticationRecasted = expressAuthentication as (req: ExRequest, 
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
 const models: TsoaRoute.Models = {
-    "UnauthorizedErrorResponse": {
+    "InternalErrorResponse": {
         "dataType": "refObject",
         "properties": {
-            "message": {"dataType":"string","required":true},
+            "message": {"dataType":"enum","enums":["Internal Server Error"],"required":true},
             "details": {"dataType":"any"},
         },
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "InternalErrorResponse": {
+    "UnauthorizedErrorResponse": {
         "dataType": "refObject",
         "properties": {
-            "message": {"dataType":"enum","enums":["Internal Server Error"],"required":true},
+            "message": {"dataType":"string","required":true},
             "details": {"dataType":"any"},
         },
         "additionalProperties": false,
@@ -416,10 +416,31 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "GetInvitedResponse": {
+    "InviteStatus": {
+        "dataType": "refEnum",
+        "enums": ["PENDING","ACCEPTED","EXPIRED","REVOKED"],
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GetInvitesResponse": {
         "dataType": "refObject",
         "properties": {
-            "data": {"dataType":"array","array":{"dataType":"nestedObjectLiteral","nestedProperties":{"date":{"dataType":"string","required":true},"email":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}}},"required":true},
+            "data": {"dataType":"array","array":{"dataType":"nestedObjectLiteral","nestedProperties":{"inviteStatus":{"ref":"InviteStatus","required":true},"expiresAt":{"dataType":"string","required":true},"createdAt":{"dataType":"string","required":true},"email":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}}},"required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "InviteParticipantsRequest": {
+        "dataType": "refObject",
+        "properties": {
+            "emails": {"dataType":"array","array":{"dataType":"string"},"required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "RevokeInviteRequest": {
+        "dataType": "refObject",
+        "properties": {
+            "email": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },
@@ -1255,7 +1276,7 @@ export function RegisterRoutes(app: Router) {
         const argsInvitesController_getInvites: Record<string, TsoaRoute.ParameterSchema> = {
         };
         app.get('/invites',
-            authenticateMiddleware([{"jwt":[]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(InvitesController)),
             ...(fetchMiddlewares<RequestHandler>(InvitesController.prototype.getInvites)),
 
@@ -1271,6 +1292,98 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'getInvites',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsInvitesController_createInvites: Record<string, TsoaRoute.ParameterSchema> = {
+                bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"InviteParticipantsRequest"},
+        };
+        app.post('/invites',
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(InvitesController)),
+            ...(fetchMiddlewares<RequestHandler>(InvitesController.prototype.createInvites)),
+
+            async function InvitesController_createInvites(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsInvitesController_createInvites, request, response });
+
+                const controller = new InvitesController();
+
+              await templateService.apiHandler({
+                methodName: 'createInvites',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsInvitesController_resendPendingInvites: Record<string, TsoaRoute.ParameterSchema> = {
+        };
+        app.post('/invites/resend',
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(InvitesController)),
+            ...(fetchMiddlewares<RequestHandler>(InvitesController.prototype.resendPendingInvites)),
+
+            async function InvitesController_resendPendingInvites(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsInvitesController_resendPendingInvites, request, response });
+
+                const controller = new InvitesController();
+
+              await templateService.apiHandler({
+                methodName: 'resendPendingInvites',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsInvitesController_revokeInvite: Record<string, TsoaRoute.ParameterSchema> = {
+                bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"RevokeInviteRequest"},
+        };
+        app.post('/invites/revoke',
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(InvitesController)),
+            ...(fetchMiddlewares<RequestHandler>(InvitesController.prototype.revokeInvite)),
+
+            async function InvitesController_revokeInvite(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsInvitesController_revokeInvite, request, response });
+
+                const controller = new InvitesController();
+
+              await templateService.apiHandler({
+                methodName: 'revokeInvite',
                 controller,
                 response,
                 next,
