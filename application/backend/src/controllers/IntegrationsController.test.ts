@@ -13,14 +13,18 @@ let token: string
 
 describe('IntegrationsController', () => {
   beforeAll(async () => {
-    // mock implementation for fetch - specifically for calls to the redcap api
-    jest.spyOn(global, 'fetch').mockImplementation(redcapFetch)
     token = await generateToken({ userId: PARTICIPANT_COMPLETED_ID, roles: ['OrganisationAdmin'] })
     api.run()
   })
 
   beforeEach(async () => {
+    // mock implementation for fetch - specifically for calls to the redcap api
+    jest.spyOn(global, 'fetch').mockImplementation(redcapFetch)
     await resetDB()
+  })
+
+  afterEach(async () => {
+    jest.restoreAllMocks()
   })
 
   afterAll(async () => {
@@ -199,13 +203,10 @@ describe('IntegrationsController', () => {
       expect(response.body.ids.length).toBe(10)
     })
 
-    it('should return a BadGatewayErorr if the api is offline, or unavailable', async () => {
-      ;(global.fetch as jest.Mock).mockImplementationOnce(() =>
-        Promise.reject({
-          message: 'API offline or unavailable',
-          status: 500,
-        }),
-      )
+    it('should return a BadGatewayErorr if the api is offline, or unavailable when adding participants', async () => {
+      jest
+        .spyOn(global, 'fetch')
+        .mockRejectedValueOnce({ message: 'API offline or unavailable', status: 500 })
 
       const response = await request(app)
         .post('/integrations/redcap/participant/upload/api')
@@ -236,6 +237,32 @@ describe('IntegrationsController', () => {
       expect(survey?.data[0].elements.length).toBe(2)
     })
 
+    it('should create a new draft survey if one doesnt already exist using the redcap api', async () => {
+      // In the seed data the second seed is the draft survey - we remove it to test creating a new survey
+      await prisma.surveyVersion.update({ where: { id: 2 }, data: { status: 'PUBLISHED' } })
+
+      const response = await request(app)
+        .post('/integrations/redcap/instrument/upload/api')
+        .send({ form: 'ctrl_test_2' })
+        .set({ Authorization: `Bearer ${token}` })
+      expect(response.status).toBe(201)
+
+      // creates a new draft survey
+      expect(response.body.id).toBe(3)
+
+      // should create a new draft survey!
+      const survey = await prisma.surveyVersion.findFirst({ where: { id: 3 } })
+
+      expect(survey?.data[0].elements[1]).toStrictEqual({
+        data: {
+          choices: ['0. test', '1. testing', '2. testing again'],
+          text: 'TEST checkbox',
+          value: '0. test',
+        },
+        type: 'question-choices',
+      })
+    })
+
     it('should throw an error if no form is given', async () => {
       const response = await request(app)
         .post('/integrations/redcap/instrument/upload/api/')
@@ -243,6 +270,19 @@ describe('IntegrationsController', () => {
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(422)
       expect(response.body.message).toBe('Validation Failed')
+    })
+
+    it('should return a BadGatewayErorr if the api is offline, or unavailable when creating a survey', async () => {
+      jest
+        .spyOn(global, 'fetch')
+        .mockRejectedValueOnce({ message: 'API offline or unavailable', status: 500 })
+
+      const response = await request(app)
+        .post('/integrations/redcap/instrument/upload/api')
+        .send({ form: 'ctrl_test_1' })
+        .set({ Authorization: `Bearer ${token}` })
+
+      expect(response.status).toBe(502)
     })
   })
 })
