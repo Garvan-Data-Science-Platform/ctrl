@@ -1975,16 +1975,6 @@
           "200": {
             "description": "OK"
           },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
           "403": {
             "description": "Forbidden",
             "content": {
