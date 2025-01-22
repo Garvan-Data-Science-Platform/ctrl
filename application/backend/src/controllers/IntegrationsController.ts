@@ -29,6 +29,7 @@ import exampleREDCapMapping from '../../../integrations/src/exampleREDCapMapping
 import { parseCSV, validateFile } from '../utils/parseCsv'
 import { FileUploadError } from '../middlewares/ErrorHandler'
 import { AuthController } from './AuthController'
+import { env } from 'process'
 const upload = multer({ storage: multer.memoryStorage() })
 
 @Route('integrations')
@@ -64,7 +65,7 @@ export class IntegrationsController extends Controller {
   ): Promise<UploadRedcapParticipantResponse> {
     const { form } = bodyRequest
     const params = new URLSearchParams()
-    params.append('token', '012745DC3FC14683910C3CCF233DD616')
+    params.append('token', process.env.REDCAP_API_KEY as string)
     params.append('content', 'record')
     params.append('format', 'json')
     params.append('type', 'flat')
@@ -115,7 +116,7 @@ export class IntegrationsController extends Controller {
   ): Promise<UploadRedcapInstrumentResponse> {
     const { form } = bodyRequest
     const params = new URLSearchParams()
-    params.append('token', '012745DC3FC14683910C3CCF233DD616')
+    params.append('token', process.env.REDCAP_API_KEY as string)
     params.append('content', 'metadata')
     params.append('format', 'json')
     params.append('forms[0]', form)
