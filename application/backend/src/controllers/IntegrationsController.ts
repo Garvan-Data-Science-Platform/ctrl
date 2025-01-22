@@ -29,7 +29,6 @@ import exampleREDCapMapping from '../../../integrations/src/exampleREDCapMapping
 import { parseCSV, validateFile } from '../utils/parseCsv'
 import { FileUploadError } from '../middlewares/ErrorHandler'
 import { AuthController } from './AuthController'
-import { env } from 'process'
 const upload = multer({ storage: multer.memoryStorage() })
 
 @Route('integrations')
