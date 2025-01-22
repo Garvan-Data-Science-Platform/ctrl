@@ -11,5 +11,7 @@ export interface UploadRedcapParticipantAPIRequest {
 }
 
 export interface UploadRedcapParticipantResponse {
+  profilesCreatedCount: number
+  profilesAlreadyExistedCount: number
   ids: number[]
 }

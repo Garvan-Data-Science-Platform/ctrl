@@ -41,7 +41,11 @@ describe('IntegrationsController', () => {
 
       expect(response.status).toBe(201)
 
-      expect(response.body).toStrictEqual({ ids: [1] })
+      expect(response.body).toStrictEqual({
+        profilesCreatedCount: 1,
+        ids: [1],
+        profilesAlreadyExistedCount: 0,
+      })
 
       const createdParticipant = await prisma.participantProfile.findFirst({
         where: { firstName: 'John' },
@@ -65,6 +69,44 @@ describe('IntegrationsController', () => {
       expect(postCreationLen - initialLen).toBe(90) // test still passes if db seed changes
 
       expect(response.body.ids.length).toBe(90)
+    }, 15000)
+
+    it('should not create a profile for details that already have a user', async () => {
+      const user = await prisma.user.create({
+        data: {
+          firstName: 'John',
+          lastName: 'Smith',
+          email: 'example@example.com',
+          password: 'password',
+        },
+      })
+
+      await prisma.participantProfile.create({
+        data: {
+          firstName: 'John',
+          lastName: 'Smith',
+          dob: new Date('1990-01-01'),
+          mobile: '1234567890',
+          addressLine: '123 Main St',
+          suburb: 'Anytown',
+          state: 'NSW',
+          postcode: '12345',
+          participantType: 'STANDARD',
+          preferredContact: 'EMAIL',
+          user: { connect: { id: user.id } },
+        },
+      })
+
+      const csvPath = path.resolve(__dirname, '../../tests/test_data/one_user.csv')
+
+      const response = await request(app)
+        .post('/integrations/redcap/participant/upload/csv')
+        .set({ Authorization: `Bearer ${token}` })
+        .attach('file', csvPath)
+
+      expect(response.status).toBe(201)
+
+      expect(response.body.profilesAlreadyExistedCount).toBe(1)
     }, 15000)
 
     it('should throw a 404 error if no file is given', async () => {
