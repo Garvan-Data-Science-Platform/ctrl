@@ -148,21 +148,47 @@ export class IntegrationsController extends Controller {
       )
     }
 
-    const participants = []
-    const ids = []
     const authController = new AuthController()
+    const ids: number[] = []
+    let profilesCreatedCount = 0
+    let profilesAlreadyExistedCount = 0
 
     for (const participant of data) {
-      // Exclude email, password, middleName as these may be used later for account creation
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { email, password, middleName, ...participantData } = participant
-      const addedParticipant = participants.push(
-        await authController.createParticipant(participantData),
-      )
-      ids.push(addedParticipant)
+      const user = await this.userRepo.findFirst({
+        where: { email: email },
+        select: { id: true, profiles: true },
+      })
+
+      if (!user) {
+        const participantResponse = await authController.createParticipant(participantData)
+        ids.push(participantResponse.id)
+        profilesCreatedCount++
+      } else {
+        if (user.profiles.length === 0) {
+          const participantProfile = await prisma.participantProfile.create({
+            data: {
+              ...participantData,
+              user: {
+                connect: { id: user.id },
+              },
+              nextOfKin: participantData.nextOfKin
+                ? {
+                    create: participantData.nextOfKin,
+                  }
+                : undefined,
+            },
+          })
+          ids.push(participantProfile.id)
+          profilesCreatedCount++
+        } else {
+          profilesAlreadyExistedCount++
+        }
+      }
     }
 
-    return { ids: ids }
+    return { profilesCreatedCount, profilesAlreadyExistedCount, ids }
   }
 
   private async processInstrumentData(data: Record<string, string>[], isRawData: boolean) {
