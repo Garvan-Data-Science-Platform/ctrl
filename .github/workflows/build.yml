@@ -29,4 +29,4 @@ jobs:
         env:
           MAILER_USERNAME: ${{ secrets.TEST_MAILER_USERNAME }}
           MAILER_PASSWORD: ${{ secrets.TEST_MAILER_PASSWORD }}
-        run: yarn test
+        run: yarn test --parallel
