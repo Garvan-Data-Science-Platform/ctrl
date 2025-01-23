@@ -14,7 +14,7 @@ describe('Survey utility tests', () => {
       const answer1: UserSurveyStepState = { status: 'review_required', answers: [] }
       const answer2: UserSurveyStepState = {
         status: 'review_required',
-        answers: [true, 'Choice 2'],
+        answers: [true, 'Choice 1'],
       }
       expect(defaultanswers[0]).toStrictEqual(answer1)
       expect(defaultanswers[1]).toStrictEqual(answer2)
@@ -26,7 +26,7 @@ describe('Survey utility tests', () => {
       const answers1 = extractSurveyStepAnswers(sampleSurveySteps[0].elements)
       const answers2 = extractSurveyStepAnswers(sampleSurveySteps[1].elements)
       expect(answers1).toEqual([])
-      expect(answers2).toEqual([true, 'Choice 2'])
+      expect(answers2).toEqual([true, 'Choice 1'])
     })
   })
 

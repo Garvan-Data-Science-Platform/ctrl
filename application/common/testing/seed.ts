@@ -27,7 +27,7 @@ export async function seedTests(prisma: PrismaClient) {
       email: 'operatoradmin@example.com',
       firstName: 'Operator',
       lastName: 'Admin',
-      password: 'password',
+      password: hashPassword('password'),
       role: Role.OperatorAdmin,
     },
   })
@@ -39,7 +39,7 @@ export async function seedTests(prisma: PrismaClient) {
       email: 'test1@example.com',
       firstName: 'Organisation',
       lastName: 'Admin',
-      password: 'password',
+      password: hashPassword('password'),
       role: Role.OrganisationAdmin,
       organisations: {
         connect: {
@@ -56,7 +56,7 @@ export async function seedTests(prisma: PrismaClient) {
       email: 'testOrgAdmin2@example.com',
       firstName: 'Organisation2',
       lastName: 'Admin2',
-      password: 'password',
+      password: hashPassword('password'),
       role: Role.OrganisationAdmin,
       organisations: {
         connect: {
@@ -73,7 +73,7 @@ export async function seedTests(prisma: PrismaClient) {
       email: 'test2@example.com',
       firstName: 'Test',
       lastName: 'User',
-      password: 'password',
+      password: hashPassword('password'),
       role: Role.Participant,
       organisations: {
         create: {
@@ -89,13 +89,13 @@ export async function seedTests(prisma: PrismaClient) {
       email: 'test3@example.com',
       firstName: 'Test',
       lastName: 'User',
-      password: 'password',
+      password: hashPassword('password'),
       role: Role.Participant,
     },
   })
   await prisma.participantProfile.create({
     data: {
-      id: 98,
+      id: PARTICIPANT_UNANSWERED_ID,
       firstName: 'Test',
       lastName: 'User',
       addressLine: '123 smith st',
@@ -109,9 +109,19 @@ export async function seedTests(prisma: PrismaClient) {
       participantType: 'STANDARD',
     },
   })
+
+  await prisma.alternativeContact.create({
+    data: {
+      participantProfileId: PARTICIPANT_UNANSWERED_ID,
+      email: 'alt@email.com',
+      firstName: 'Alt',
+      lastName: 'Cont',
+    },
+  })
+
   await prisma.participantProfile.create({
     data: {
-      id: 99,
+      id: PARTICIPANT_COMPLETED_ID,
       firstName: 'Test',
       lastName: 'User',
       addressLine: '123 smith st',
@@ -163,7 +173,7 @@ export async function seedTests(prisma: PrismaClient) {
   await prisma.surveyParticipant.create({
     data: {
       versionId: 1,
-      profileId: 98,
+      profileId: PARTICIPANT_UNANSWERED_ID,
       answers: [
         { status: 'review_required', answers: [] },
         { status: 'review_required', answers: [true, 'Choice 1'] },
@@ -173,7 +183,22 @@ export async function seedTests(prisma: PrismaClient) {
   await prisma.surveyParticipant.create({
     data: {
       versionId: 1,
-      profileId: 99,
+      profileId: PARTICIPANT_COMPLETED_ID,
+      answers: [
+        { status: 'viewed', answers: [] },
+        {
+          status: 'completed',
+          answers: [false, 'Choice 2'],
+          last_updated: '2024-12-02T23:45:27.815Z',
+        },
+      ],
+    },
+  })
+
+  await prisma.surveyParticipant.create({
+    data: {
+      versionId: 1,
+      profileId: 100,
       answers: [
         { status: 'viewed', answers: [] },
         {

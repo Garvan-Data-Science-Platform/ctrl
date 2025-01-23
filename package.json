@@ -7,7 +7,7 @@
     "dev": "make db && yarn workspaces foreach --all --parallel --interlaced run dev",
     "type-check": "yarn workspaces foreach --all run type-check",
     "format": "yarn run prettier --write './application/**/*.(js|ts|jsx|tsx)'",
-    "test": "yarn workspaces foreach --all --parallel run test",
+    "test": "yarn workspaces foreach --all run test",
     "lint": "eslint .",
     "build-docs": "yarn workspaces foreach --all run build-docs"
   },

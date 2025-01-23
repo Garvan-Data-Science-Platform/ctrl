@@ -100,6 +100,14 @@ export default function ConsentForm() {
             {elements[i].data.text}
           </Typography>,
         )
+      } else if (elements[i].type == 'video') {
+        results.push(
+          <iframe
+            width="100%"
+            height="500"
+            src={`https://${elements[i].data.link.replace('https://', '')}`}
+          />,
+        )
       } else {
         results.push(renderQuestion(elements[i], Number(i)))
       }
@@ -132,6 +140,7 @@ export default function ConsentForm() {
         {type == 'question-checkbox' && (
           <Checkbox
             checked={!!formState[idx].data.value}
+            data-cy={`checkbox-${idx}`}
             onClick={() =>
               setFormState((state) => {
                 const s = [...state]
@@ -192,7 +201,12 @@ export default function ConsentForm() {
             sx={{ mt: 3 }}
           >{`If you choose "Proceed", an Australian Genomics Genetic Counsellor will contact you to talk about your options. It may take 7 days for the study genetic counsellor to contact you.`}</Typography>
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-            <Button sx={{ mr: 1 }} variant="outlined" onClick={() => saveForm(modalAction, true)}>
+            <Button
+              sx={{ mr: 1 }}
+              variant="outlined"
+              data-cy="proceed-button"
+              onClick={() => saveForm(modalAction, true)}
+            >
               Proceed
             </Button>
             <Button variant="contained" onClick={() => setModalOpen(false)}>

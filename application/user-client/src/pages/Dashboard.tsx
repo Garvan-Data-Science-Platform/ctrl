@@ -92,6 +92,7 @@ export default function Dashboard() {
               mt: 1,
               backgroundColor: (theme) => alpha(theme.palette.primary.light, 0.05),
             }}
+            data-cy={`step-card-${idx}`}
           >
             <Grid container spacing={5}>
               <Grid size={{ xs: 12, sm: 5 }}>
@@ -146,7 +147,13 @@ export default function Dashboard() {
                 </Box>
               </Grid>
               <Grid size={{ xs: 12, sm: 2 }}>
-                <Button component={Link} to={`/consent_form/${idx}`} fullWidth variant="contained">
+                <Button
+                  component={Link}
+                  to={`/consent_form/${idx}`}
+                  fullWidth
+                  variant="contained"
+                  data-cy={`step-button-${idx}`}
+                >
                   {val.status == 'completed'
                     ? 'Edit'
                     : val.status == 'review_required'

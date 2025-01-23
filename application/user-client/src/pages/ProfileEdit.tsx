@@ -15,7 +15,7 @@ import {
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { GetParticipantProfileResponse, UpdateProfileRequest } from '@common/types/api/users'
 import NavBar from '../components/NavBar'
 import { apiClient } from '../apiClient'
@@ -46,25 +46,25 @@ export default function ProfileEdit() {
     formState: { errors },
   } = useForm<FormValues>()
   const nav = useNavigate()
-  const queryClient = useQueryClient()
 
   const {
     isPending,
     error,
     data: pdata,
   } = useQuery({
-    queryKey: ['profile', 'get'],
+    queryKey: ['profile'],
     queryFn: () =>
       apiClient
         .get('/profiles/current')
         .then((res) => res.data) as Promise<GetParticipantProfileResponse>,
   })
-  if (!pdata) return 'Loading'
-  const data = pdata.data
 
   useEffect(() => {
     if (error) setError('root.serverError', error)
   }, [error])
+
+  if (!pdata) return 'Loading'
+  const data = pdata.data
 
   const onSubmit = (data: FormValues) => {
     //login('TOKEN')
@@ -91,12 +91,11 @@ export default function ProfileEdit() {
     apiClient
       .patch('/profiles/current', reqData)
       .then((res) => {
-        if (res.status == 200) {
-          queryClient.invalidateQueries({ queryKey: ['profile'] })
+        if (res.status == 204) {
           nav('/profile')
         } else {
           setError('root.serverError', {
-            message: `Error Updating Profile: ${JSON.stringify(res.data.message)}`,
+            message: `Error Updating Profile: ${JSON.stringify((res as any).response.data.message)}`,
           })
         }
       })
@@ -118,12 +117,17 @@ export default function ProfileEdit() {
                 <TextField
                   sx={{ m: 1, flexGrow: 1 }}
                   label="First Name"
+                  error={Boolean(errors.firstName)}
+                  helperText={errors.firstName?.message}
+                  data-cy="update-first"
                   disabled={isPending}
                   {...register('firstName', { required: true, value: data?.firstName })}
                 />
                 <TextField
                   sx={{ m: 1, flexGrow: 1 }}
                   label="Family Name"
+                  error={Boolean(errors.lastName)}
+                  helperText={errors.lastName?.message}
                   {...register('lastName', { required: true, value: data?.lastName })}
                 />
                 <TextField
@@ -131,9 +135,15 @@ export default function ProfileEdit() {
                   fullWidth
                   sx={{ m: 1 }}
                   label="Email"
+                  error={Boolean(errors.email)}
+                  helperText={errors.email?.message}
                   {...register('email', {
                     required: true,
                     value: data?.email,
+                    pattern: {
+                      value: /\S+@\S+\.\S+/,
+                      message: 'Entered a valid email',
+                    },
                   })}
                 />
 
@@ -142,6 +152,8 @@ export default function ProfileEdit() {
                   type="date"
                   sx={{ m: 1 }}
                   label="Date of Birth"
+                  error={Boolean(errors.dob)}
+                  helperText={errors.dob?.message}
                   slotProps={{ inputLabel: { shrink: true } }}
                   defaultValue={new Date(data.dob).toISOString().split('T')[0]}
                   {...register('dob', { required: true })}
@@ -150,11 +162,15 @@ export default function ProfileEdit() {
                 <TextField
                   sx={{ m: 1, flexGrow: 1 }}
                   label="Address Line"
+                  error={Boolean(errors.addressLine)}
+                  helperText={errors.addressLine?.message}
                   {...register('addressLine', { required: true, value: data.addressLine })}
                 />
                 <TextField
                   sx={{ m: 1 }}
                   label="Suburb"
+                  error={Boolean(errors.suburb)}
+                  helperText={errors.suburb?.message}
                   {...register('suburb', { required: true, value: data.suburb })}
                 />
                 <FormControl sx={{ m: 1, flexGrow: 1 }}>
@@ -162,6 +178,7 @@ export default function ProfileEdit() {
                   <Select
                     labelId="state-select-label"
                     label="State"
+                    error={Boolean(errors.state)}
                     defaultValue={data.state}
                     {...register('state', { required: true, value: data.state })}
                   >
@@ -178,18 +195,38 @@ export default function ProfileEdit() {
                 <TextField
                   sx={{ m: 1, flexGrow: 1 }}
                   label="Postcode"
-                  {...register('postcode', { required: true, value: data?.postcode })}
+                  error={Boolean(errors.postcode)}
+                  helperText={errors.postcode?.message}
+                  {...register('postcode', {
+                    required: true,
+                    value: data?.postcode,
+                    pattern: {
+                      value: /^\d{4}$/,
+                      message: 'Invalid postcode',
+                    },
+                  })}
                 />
                 <TextField
                   sx={{ m: 1, flexGrow: 1 }}
                   label="Mobile"
-                  {...register('mobile', { required: true, value: data?.mobile })}
+                  error={Boolean(errors.mobile)}
+                  helperText={errors.mobile?.message}
+                  data-cy="update-mobile"
+                  {...register('mobile', {
+                    required: true,
+                    value: data?.mobile,
+                    pattern: {
+                      value: /04\d{8}$/,
+                      message: 'Invalid mobile number',
+                    },
+                  })}
                 />
                 <FormControl sx={{ m: 1, flexGrow: 1, minWidth: 240 }}>
                   <InputLabel id="pref-select-label">Preferred Contact Method</InputLabel>
                   <Select
                     labelId="pref-select-label"
                     label="Preferred Contact Method"
+                    error={Boolean(errors.preferredContact)}
                     defaultValue={data.preferredContact}
                     {...register('preferredContact', {
                       required: true,
@@ -213,6 +250,9 @@ export default function ProfileEdit() {
                   sx={{ m: 1, flexGrow: 1 }}
                   key="nok_first"
                   label="First Name"
+                  error={Boolean(errors.nok_first)}
+                  helperText={errors.nok_first?.message}
+                  data-cy="update-nok-first"
                   {...register('nok_first', {
                     required: true,
                     value: data?.alternativeContact?.firstName,
@@ -221,6 +261,8 @@ export default function ProfileEdit() {
                 <TextField
                   sx={{ m: 1, flexGrow: 1 }}
                   label="Family Name"
+                  error={Boolean(errors.nok_surname)}
+                  helperText={errors.nok_surname?.message}
                   key="nok_surname"
                   {...register('nok_surname', {
                     required: true,
@@ -232,17 +274,12 @@ export default function ProfileEdit() {
                   fullWidth
                   sx={{ m: 1 }}
                   label="Email"
+                  error={Boolean(errors.nok_email)}
+                  helperText={errors.nok_email?.message}
                   key="nok_email"
                   {...register('nok_email', {
                     required: true,
                     value: data?.alternativeContact?.email,
-                  })}
-                />
-                <TextField
-                  sx={{ m: 1, flexGrow: 1 }}
-                  label="Mobile"
-                  {...register('nok_mobile', {
-                    value: data?.alternativeContact?.mobile,
                   })}
                 />
 
@@ -252,7 +289,7 @@ export default function ProfileEdit() {
                   </Alert>
                 ) : null}
               </Box>
-              <Button variant="contained" sx={{ mt: 3 }} type="submit">
+              <Button variant="contained" sx={{ mt: 3 }} type="submit" data-cy="update-button">
                 Update
               </Button>
             </form>

@@ -25,7 +25,7 @@ export class ParticipantsController extends Controller {
   @Get('/')
   public async getParticipants(): Promise<GetParticipantsResponse> {
     function determineStatus(answers: PrismaJson.SurveyAnswerData, date_published: Date) {
-      if (answers.every((val) => val.status == 'completed')) return 'complete'
+      if (answers.every((val) => ['completed', 'viewed'].includes(val.status))) return 'complete'
 
       const last_updated = determineLastUpdated(answers) || new Date('1900-01-01')
 

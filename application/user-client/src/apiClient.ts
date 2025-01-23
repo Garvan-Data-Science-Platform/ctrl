@@ -9,10 +9,8 @@ apiClient.interceptors.response.use(
   (err) => {
     if (err.status == 401) {
       location.replace('/login')
-    } else {
-      alert(err.message)
     }
-    return Promise.reject(err)
+    return err
   },
 )
 

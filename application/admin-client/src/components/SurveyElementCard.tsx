@@ -148,7 +148,10 @@ export function SurveyElementCard({
           }}
         />
         <Typography sx={{ mt: 1, fontSize: 15 }}>Choices</Typography>
-        <Box sx={{ mt: 1, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1 }}>
+        <Box
+          sx={{ mt: 1, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1 }}
+          data-cy="choices-box"
+        >
           {data.choices.map((val, idx) => (
             <Box key={`choice_${idx}`}>
               <TextField
@@ -172,9 +175,11 @@ export function SurveyElementCard({
               />
             </Box>
           ))}
-          <IconButton sx={{ width: 50, height: 50 }} onClick={handleAddChoice}>
-            <Add />
-          </IconButton>
+          {!disabled && (
+            <IconButton sx={{ width: 50, height: 50 }} onClick={handleAddChoice}>
+              <Add />
+            </IconButton>
+          )}
         </Box>
       </Box>
     )
@@ -220,10 +225,18 @@ export function SurveyElementCard({
         borderRadius: 3,
         opacity,
       }}
+      data-cy="survey-element"
     >
-      <Box sx={{ cursor: 'grab', display: 'flex', alignItems: 'center' }} ref={dragRef}>
-        <DragIndicator />
-      </Box>
+      {!disabled && (
+        <Box
+          sx={{ cursor: 'grab', display: 'flex', alignItems: 'center' }}
+          ref={dragRef}
+          data-cy="drag-handle"
+        >
+          <DragIndicator />
+        </Box>
+      )}
+
       {contentRenderer[element.type]()}
       <Box sx={{ flexGrow: 1 }} />
       <IconButton disabled={disabled} sx={{ width: 50, height: 50 }} onClick={handleDelete}>
@@ -252,6 +265,7 @@ export function SurveyDropSpace({ index }: SurveyDropSpaceProps) {
   return (
     <Box
       ref={drop}
+      data-cy="drop-zone"
       sx={{ width: '100%', height: 15, bgcolor: isOver ? '#fffccc' : 'transparent' }}
     />
   )

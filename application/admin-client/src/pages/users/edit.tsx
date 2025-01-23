@@ -1,15 +1,13 @@
 import { Box, TextField } from '@mui/material'
-import MenuItem from '@mui/material/MenuItem'
 import { Edit } from '@refinedev/mui'
 import { useForm } from '@refinedev/react-hook-form'
-import { Controller } from 'react-hook-form'
 
 export const UserEdit = () => {
   const {
     saveButtonProps,
     refineCore: { formLoading },
     register,
-    control,
+    //control,
     formState: { errors },
   } = useForm({})
 
@@ -55,25 +53,20 @@ export const UserEdit = () => {
           label={'Email'}
           name="email"
         />
-
+        {/*
         <Controller
           name="role"
           control={control}
           render={({ field }) => {
             return (
-              <TextField
-                select
-                {...field}
-                value={field?.value || 'admin'}
-                label={'Role'}
-                sx={{ mt: 1 }}
-              >
-                <MenuItem value="admin">Admin</MenuItem>
+              <TextField select {...field} value={field?.value} label={'Role'} sx={{ mt: 1 }}>
+                <MenuItem value="OrganisationAdmin">Admin</MenuItem>
                 <MenuItem value="participant">Participant</MenuItem>
               </TextField>
             )
           }}
         />
+          */}
       </Box>
     </Edit>
   )

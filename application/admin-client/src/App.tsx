@@ -7,6 +7,7 @@ import {
   notificationProvider,
   RefineSnackbarProvider,
   ThemedLayoutV2,
+  ThemedTitleV2,
 } from '@refinedev/mui'
 
 import { dataProvider } from './providers/dataProvider'
@@ -29,8 +30,9 @@ import { ForgotPassword } from './pages/forgotPassword'
 import { authProvider } from './providers/authProvider'
 import { ParticipantList, ParticipantShow } from './pages/participants'
 import { ResponsesView } from './pages/responses'
+import { ListAlt, Person, RecentActors } from '@mui/icons-material'
 
-export const API_URL = 'http://localhost:5000'
+export const API_URL = import.meta.env.VITE_BACKEND_URL
 
 function App() {
   return (
@@ -54,7 +56,9 @@ function App() {
                     edit: '/users/update/:id',
                     show: '/users/:id',
                     meta: {
+                      label: 'Admin Users',
                       canDelete: true,
+                      icon: <Person />,
                     },
                   },
                   {
@@ -64,6 +68,7 @@ function App() {
                     show: '/surveys/:id',
                     meta: {
                       canDelete: true,
+                      icon: <ListAlt />,
                     },
                   },
                   {
@@ -72,6 +77,7 @@ function App() {
                     show: '/participants/:id',
                     meta: {
                       canDelete: true,
+                      icon: <RecentActors />,
                     },
                   },
                   {
@@ -99,7 +105,12 @@ function App() {
                         key="authenticated-inner"
                         fallback={<CatchAllNavigate to="/login" />}
                       >
-                        <ThemedLayoutV2 Header={Header}>
+                        <ThemedLayoutV2
+                          Header={Header}
+                          Title={({ collapsed }) => (
+                            <ThemedTitleV2 collapsed={collapsed} text="CTRL Admin Portal" />
+                          )}
+                        >
                           <Outlet />
                         </ThemedLayoutV2>
                       </Authenticated>

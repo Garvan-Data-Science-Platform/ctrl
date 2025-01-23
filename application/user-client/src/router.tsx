@@ -12,10 +12,12 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetConfirmation from './pages/ResetConfirmation'
+import ErrorPage from './pages/Error'
 
 const router = createBrowserRouter([
   {
     element: <ProtectedRoutes />,
+    errorElement: <ErrorPage />,
     children: [
       {
         path: '/',

@@ -64,9 +64,9 @@ export const UserList = () => {
         renderCell: function render({ row }) {
           return (
             <>
-              <EditButton hideText recordItemId={row.id} />
-              <ShowButton hideText recordItemId={row.id} />
-              <DeleteButton hideText recordItemId={row.id} />
+              <EditButton data-cy="edit-button" hideText recordItemId={row.id} />
+              <ShowButton data-cy="view-button" hideText recordItemId={row.id} />
+              <DeleteButton data-cy="delete-button" hideText recordItemId={row.id} />
             </>
           )
         },
