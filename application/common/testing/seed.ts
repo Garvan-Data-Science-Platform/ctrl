@@ -95,7 +95,7 @@ export async function seedTests(prisma: PrismaClient) {
   })
   await prisma.participantProfile.create({
     data: {
-      id: 98,
+      id: PARTICIPANT_UNANSWERED_ID,
       firstName: 'Test',
       lastName: 'User',
       addressLine: '123 smith st',
@@ -112,7 +112,7 @@ export async function seedTests(prisma: PrismaClient) {
 
   await prisma.alternativeContact.create({
     data: {
-      participantProfileId: 98,
+      participantProfileId: PARTICIPANT_UNANSWERED_ID,
       email: 'alt@email.com',
       firstName: 'Alt',
       lastName: 'Cont',
@@ -121,7 +121,7 @@ export async function seedTests(prisma: PrismaClient) {
 
   await prisma.participantProfile.create({
     data: {
-      id: 99,
+      id: PARTICIPANT_COMPLETED_ID,
       firstName: 'Test',
       lastName: 'User',
       addressLine: '123 smith st',
@@ -173,7 +173,7 @@ export async function seedTests(prisma: PrismaClient) {
   await prisma.surveyParticipant.create({
     data: {
       versionId: 1,
-      profileId: 98,
+      profileId: PARTICIPANT_UNANSWERED_ID,
       answers: [
         { status: 'review_required', answers: [] },
         { status: 'review_required', answers: [true, 'Choice 1'] },
@@ -183,7 +183,7 @@ export async function seedTests(prisma: PrismaClient) {
   await prisma.surveyParticipant.create({
     data: {
       versionId: 1,
-      profileId: 99,
+      profileId: PARTICIPANT_COMPLETED_ID,
       answers: [
         { status: 'viewed', answers: [] },
         {

@@ -129,7 +129,7 @@ export const SurveyEditor = () => {
       <Box sx={{ border: '1px solid lightgrey', height: '100vh', ml: -3, mt: -3 }}>
         <ListSubheader>Survey Steps</ListSubheader>
         <Divider />
-        <List sx={{ width: 250 }}>
+        <List sx={{ width: 250 }} data-cy="step-list">
           {surveyData.map((val, index) => (
             <ListItem key={`step_${index}`} disablePadding>
               <ListItemButton onClick={() => setActiveStep(index)} selected={activeStep == index}>
@@ -158,10 +158,11 @@ export const SurveyEditor = () => {
       </Box>
       {surveyData.length > 0 ? (
         <DndProvider backend={HTML5Backend}>
-          <Box sx={{ flexGrow: 1, ml: 3 }}>
+          <Box sx={{ flexGrow: 1, ml: 3 }} data-cy="survey-editor">
             <Box sx={{ mb: 3, display: 'flex', flexDirection: 'row', gap: 1 }}>
               <Button
                 variant="outlined"
+                data-cy="publish-button"
                 disabled={savePending || disabled}
                 onClick={() => setPublishDialogOpen(true)}
               >
@@ -169,6 +170,7 @@ export const SurveyEditor = () => {
               </Button>
               <Button
                 variant="outlined"
+                data-cy="options-button"
                 onClick={handleOptionsClick}
                 disabled={savePending || disabled}
               >
@@ -220,13 +222,16 @@ export const SurveyEditor = () => {
                 publishing.
               </DialogContent>
               <DialogActions>
-                <Button onClick={handlePublish}>Publish</Button>
+                <Button data-cy="publish-confirm" onClick={handlePublish}>
+                  Publish
+                </Button>
                 <Button onClick={() => setPublishDialogOpen(false)}>Cancel</Button>
               </DialogActions>
             </Dialog>
             <TextField
               fullWidth
               label="Title"
+              data-cy="step-title"
               onChange={(e) => updateStepField(activeStep, 'title', e.target.value)}
               value={surveyData[activeStep].title}
               disabled={disabled}
@@ -236,6 +241,7 @@ export const SurveyEditor = () => {
               multiline
               sx={{ mt: 3 }}
               label="Description"
+              data-cy="step-description"
               onChange={(e) => updateStepField(activeStep, 'text', e.target.value)}
               value={surveyData[activeStep].text}
               disabled={disabled}

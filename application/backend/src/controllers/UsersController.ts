@@ -96,7 +96,7 @@ export class UsersController extends Controller {
   public async createUser(@Body() bodyRequest: CreateUserRequest): Promise<CreateUserResponse> {
     try {
       const insertedUser = await this.userRepo.create({
-        data: { ...bodyRequest, password: 'temp_password_hash' },
+        data: { ...bodyRequest, password: hashPassword(bodyRequest.password) },
       })
       const responseData = {
         id: insertedUser.id,

@@ -93,7 +93,7 @@ describe('Survey tests', () => {
     expect(data.data[1].last_updated).toBeUndefined()
 
     const res3 = await request(app)
-      .get('/surveys/responses/3') //Participant 3 corresponds to the latests survey
+      .get('/surveys/responses/4') //Participant 3 corresponds to the latests survey
       .set({ authorization: `Bearer ${adminToken}` })
     expect(res3.statusCode).toBe(200)
 
@@ -107,8 +107,8 @@ describe('Survey tests', () => {
 
     const data4 = res4.body as GetParticipantsResponse
     expect(data4.data[0].lastUpdated).toBeUndefined()
-    expect(data4.data[2].lastUpdated).toBeTruthy()
-    expect(data4.data[2].answers[0].status).toBe('partially_complete')
+    expect(data4.data[3].lastUpdated).toBeTruthy()
+    expect(data4.data[3].answers[0].status).toBe('partially_complete')
   })
 
   it('Admin publishes another survey version and user sees new questions, status is correct for admin', async () => {
@@ -172,7 +172,7 @@ describe('Survey tests', () => {
       .set({ authorization: `Bearer ${adminToken}` })
 
     const data4 = res4.body as GetParticipantsResponse
-    expect(data4.data[2].answers[1].status).toBe('incomplete')
+    expect(data4.data[3].answers[1].status).toBe('incomplete')
   })
 
   it('User partially completes new survey, admin sees correct status', async () => {
@@ -188,7 +188,7 @@ describe('Survey tests', () => {
       .set({ authorization: `Bearer ${adminToken}` })
 
     const data2 = res2.body as GetParticipantsResponse
-    expect(data2.data[2].answers[1].status).toBe('partially_complete')
+    expect(data2.data[3].answers[1].status).toBe('partially_complete')
   })
 
   it('User completes survey, admin and user see correct status and dates', async () => {
@@ -204,7 +204,7 @@ describe('Survey tests', () => {
       .set({ authorization: `Bearer ${adminToken}` })
 
     const data2 = res2.body as GetParticipantsResponse
-    expect(data2.data[2].answers[1].status).toBe('complete')
+    expect(data2.data[3].answers[1].status).toBe('complete')
 
     const res3 = await request(app)
       .get('/surveys/steps/0')

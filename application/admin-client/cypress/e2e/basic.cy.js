@@ -34,6 +34,6 @@ describe('basic', () => {
     cy.contains('OrganisationAdmin').should('exist')
     cy.login_expired()
     cy.visit('/surveys')
-    cy.contains('Log in').should('exist')
+    cy.contains('Sign in', { timeout: 20000 }).should('exist')
   })
 })

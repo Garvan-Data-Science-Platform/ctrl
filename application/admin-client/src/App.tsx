@@ -56,6 +56,7 @@ function App() {
                     edit: '/users/update/:id',
                     show: '/users/:id',
                     meta: {
+                      label: 'Admin Users',
                       canDelete: true,
                       icon: <Person />,
                     },

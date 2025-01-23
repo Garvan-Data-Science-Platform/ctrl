@@ -22,9 +22,9 @@ export const CategoryList = () => {
         sortable: false,
         renderCell: function render({ row }) {
           return row.status == 'DRAFT' ? (
-            <EditButton hideText recordItemId={row.id} />
+            <EditButton data-cy="edit-button" hideText recordItemId={row.id} />
           ) : (
-            <ShowButton hideText recordItemId={row.id} />
+            <ShowButton data-cy="view-button" hideText recordItemId={row.id} />
           )
         },
         align: 'center',
