@@ -26,6 +26,7 @@ export const UserCreate = () => {
           InputLabelProps={{ shrink: true }}
           type="text"
           label={'First Name'}
+          data-cy="create-first"
           name="firstName"
         />
         <TextField
@@ -68,19 +69,28 @@ export const UserCreate = () => {
           label={'Password'}
           name="password"
         />
-
-        <Controller
-          name="role"
-          control={control}
-          render={({ field }) => {
-            return (
-              <TextField select {...field} value={field?.value} label={'Role'} sx={{ mt: 1 }}>
-                <MenuItem value="admin">Admin</MenuItem>
-                <MenuItem value="participant">Participant</MenuItem>
-              </TextField>
-            )
-          }}
-        />
+        {
+          <Controller
+            name="role"
+            control={control}
+            defaultValue="OrganisationAdmin"
+            render={({ field }) => {
+              return (
+                <TextField
+                  disabled
+                  select
+                  {...field}
+                  value={field?.value}
+                  label={'Role'}
+                  sx={{ mt: 1 }}
+                >
+                  <MenuItem value="OrganisationAdmin">Admin</MenuItem>
+                  <MenuItem value="Participant">Participant</MenuItem>
+                </TextField>
+              )
+            }}
+          />
+        }
       </Box>
     </Create>
   )

@@ -17,7 +17,9 @@ export class HealthCheckController extends Controller {
    * @summary Health Check
    */
   @Get('/')
-  public async HealthCheck() {}
+  public async HealthCheck() {
+    return 'OK'
+  }
 
   /**
    * Get all Workspaces

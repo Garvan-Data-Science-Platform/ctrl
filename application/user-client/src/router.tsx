@@ -11,11 +11,13 @@ import ConsentForm from './pages/ConsentForm'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import ForgotPassword from './pages/ForgotPassword'
-import ResetConfirmation from './pages/ResetConfirmation'
+import ResetPassword from './pages/ResetPassword'
+import ErrorPage from './pages/Error'
 
 const router = createBrowserRouter([
   {
     element: <ProtectedRoutes />,
+    errorElement: <ErrorPage />,
     children: [
       {
         path: '/',
@@ -64,8 +66,8 @@ const router = createBrowserRouter([
     element: <ForgotPassword />,
   },
   {
-    path: '/reset-confirm',
-    element: <ResetConfirmation />,
+    path: '/reset-password',
+    element: <ResetPassword />,
   },
 ])
 export default router

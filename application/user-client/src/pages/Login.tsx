@@ -56,6 +56,7 @@ export default function Login() {
                 type="email"
                 fullWidth
                 label="Email"
+                data-cy="login-email"
                 {...register('email', {
                   required: true,
                 })}
@@ -64,6 +65,7 @@ export default function Login() {
                 type="password"
                 fullWidth
                 label="Password"
+                data-cy="login-password"
                 {...register('password', { required: true })}
               />
               {errors.root ? (
@@ -75,10 +77,10 @@ export default function Login() {
             </Button>
           </form>
           <Box sx={{ mt: 3 }}>
-            <Button component={Link} to="/register">
+            <Button data-cy="register" component={Link} to="/register">
               Register
             </Button>
-            <Button component={Link} to="/forgot">
+            <Button data-cy="forgot-password" component={Link} to="/forgot">
               Forgot Password
             </Button>
           </Box>

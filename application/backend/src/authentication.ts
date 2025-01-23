@@ -63,14 +63,10 @@ export function getUserIdFromToken(token: string): number {
   throw new Error('UserID not encoded in token.')
 }
 
-export async function hashPassword(password: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const salt = crypto.randomBytes(16)
-    crypto.scrypt(password, salt, 64, (err, derivedKey) => {
-      if (err) reject(err)
-      resolve(salt.toString('hex') + ':' + derivedKey.toString('hex'))
-    })
-  })
+export function hashPassword(password: string): string {
+  const salt = crypto.randomBytes(16)
+  const derived = crypto.scryptSync(password, salt, 64)
+  return salt.toString('hex') + ':' + derived.toString('hex')
 }
 
 export async function verifyPassword(hashedPassword: string, password: string): Promise<boolean> {
@@ -83,7 +79,7 @@ export async function verifyPassword(hashedPassword: string, password: string): 
   })
 }
 
-export async function generateToken(user: { userId: number; roles: string[] }): Promise<string> {
+export function generateToken(user: { userId: number; roles: string[] }): string {
   if (!process.env.JWT_SECRET) {
     logger.error({ message: 'JWT_SECRET environment variable not set' })
     throw new Error('JWT_SECRET environment variable not set')

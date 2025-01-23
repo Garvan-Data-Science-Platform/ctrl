@@ -8,7 +8,7 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({ sticky = tru
   return (
     <AppBar position={sticky ? 'sticky' : 'relative'}>
       <Toolbar>
-        <Stack direction="row" width="100%" justifyContent="flex-end" alignItems="center">
+        <Stack direction="row" width="100%" justifyContent="flex-start" alignItems="center">
           <HamburgerMenu />
         </Stack>
       </Toolbar>

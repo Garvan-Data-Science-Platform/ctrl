@@ -30,3 +30,4 @@ jobs:
           MAILER_USERNAME: ${{ secrets.TEST_MAILER_USERNAME }}
           MAILER_PASSWORD: ${{ secrets.TEST_MAILER_PASSWORD }}
         run: yarn test
+        #run: yarn workspace backend test && yarn workspace user-client test && yarn workspace common test && yarn workspace integrations test && yarn workspace admin-client test
