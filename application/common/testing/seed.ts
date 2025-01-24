@@ -256,6 +256,22 @@ export async function seedTests(prisma: PrismaClient) {
         status: InviteStatus.EXPIRED,
         expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day in the past
       },
+      // Pending invites for testing
+      {
+        email: 'john@example.com',
+        status: InviteStatus.PENDING,
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
+      },
+      {
+        email: 'jenny@gmail.com',
+        status: InviteStatus.PENDING,
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
+      },
+      {
+        email: 'abcsdfwefijsdf@gjiodsf.com',
+        status: InviteStatus.PENDING,
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
+      },
     ],
   })
 }

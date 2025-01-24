@@ -105,9 +105,9 @@ describe('Participant Invites', () => {
 
     // Check emails were successfully sent again
     const sentEmails = mockNodeMailer.mock.getSentMail()
-    expect(sentEmails.length).toBe(2)
-    expect(sentEmails[1].to).toBe(participantRegisterRequestBody.email)
-    expect(sentEmails[1].from).toBe(`CTRL <noreply@${process.env.HOSTNAME}>`)
+    expect(sentEmails.length).toBe(5)
+    expect(sentEmails[4].to).toBe(participantRegisterRequestBody.email)
+    expect(sentEmails[4].from).toBe(`CTRL <noreply@${process.env.HOSTNAME}>`)
   })
 
   it('should allow an OrganisationAdmin user to REVOKE invites to participants with status PENDING', async () => {

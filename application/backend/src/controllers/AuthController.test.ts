@@ -217,7 +217,7 @@ describe('AuthController', () => {
     const registerParticipantRequestBase: RegisterParticipantRequest = {
       firstName: 'John',
       lastName: 'Doe',
-      email: 'johndoe@example.com',
+      email: 'john@example.com',
       password: 'johnDoesP@ssword123',
       mobile: '+61477777777',
       addressLine: '123 Some Street',
