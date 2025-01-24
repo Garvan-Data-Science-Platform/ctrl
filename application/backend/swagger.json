@@ -1092,11 +1092,15 @@
         "type": "object",
         "additionalProperties": false
       },
+      "Email": {
+        "type": "string",
+        "pattern": "^(.+)@(.+)$"
+      },
       "InviteParticipantsRequest": {
         "properties": {
           "emails": {
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/Email"
             },
             "type": "array"
           }
@@ -1109,12 +1113,15 @@
       },
       "RevokeInviteRequest": {
         "properties": {
-          "email": {
-            "type": "string"
+          "emails": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           }
         },
         "required": [
-          "email"
+          "emails"
         ],
         "type": "object",
         "additionalProperties": false
@@ -2695,6 +2702,16 @@
               }
             }
           },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal Server Error",
             "content": {
@@ -2732,6 +2749,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
                 }
               }
             }

@@ -429,10 +429,15 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Email": {
+        "dataType": "refAlias",
+        "type": {"dataType":"string","validators":{"pattern":{"errorMsg":"Please provide valid email","value":"^(.+)@(.+)$"}}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "InviteParticipantsRequest": {
         "dataType": "refObject",
         "properties": {
-            "emails": {"dataType":"array","array":{"dataType":"string"},"required":true},
+            "emails": {"dataType":"array","array":{"dataType":"refAlias","ref":"Email"},"required":true},
         },
         "additionalProperties": false,
     },
@@ -440,7 +445,7 @@ const models: TsoaRoute.Models = {
     "RevokeInviteRequest": {
         "dataType": "refObject",
         "properties": {
-            "email": {"dataType":"string","required":true},
+            "emails": {"dataType":"array","array":{"dataType":"string"},"required":true},
         },
         "additionalProperties": false,
     },
