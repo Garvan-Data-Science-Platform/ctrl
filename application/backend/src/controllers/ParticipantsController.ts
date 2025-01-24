@@ -3,11 +3,20 @@ import {
   UnauthorizedErrorResponse,
   InternalErrorResponse,
   NotFoundErrorResponse,
+  ValidateErrorResponse,
 } from 'common/types/api/errors'
-import { GetInvitedResponse, GetParticipantsResponse } from 'common/types/api/participants'
-import { Route, Tags, Security, Controller, Get, Response } from 'tsoa'
+import type {
+  GetInvitesResponse,
+  GetParticipantsResponse,
+  InviteParticipantsRequest,
+  RevokeInviteRequest,
+} from 'common/types/api/participants'
+import { Route, Tags, Security, Controller, Get, Response, Body, Post } from 'tsoa'
 import { Participant } from 'common/types/api/participants/participant'
-import Invites from 'common/example_responses/getInvites.json'
+import mailerTransporter, { fromAddress } from '../utils/mailer'
+import nodemailer from 'nodemailer'
+import { InviteStatus } from '../../../common/types/api/participants/invite'
+import { NotFoundError } from '../middlewares/ErrorHandler'
 
 @Route('participants')
 @Tags('Participants')
@@ -105,18 +114,153 @@ export class ParticipantsController extends Controller {
 
 @Route('invites')
 @Tags('Invites')
-@Security('jwt')
+@Security('jwt', ['OrganisationAdmin'])
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 export class InvitesController extends Controller {
+  invitesRepo = prisma.invite
+
   /**
-   * List invites
+   * List all invites
    *
-   * @summary List participants
+   * @summary List all invites
    */
   @Get('/')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  public async getInvites(): Promise<GetInvitedResponse> {
-    return Invites
+  @Response<ValidateErrorResponse>('422', 'Validation Failed')
+  public async getInvites(): Promise<GetInvitesResponse> {
+    const invites = await this.invitesRepo.findMany()
+
+    // Map to response
+    const data = invites.map((invite) => ({
+      id: invite.id,
+      email: invite.email,
+      createdAt: invite.createdAt.toISOString(),
+      expiresAt: invite.expiresAt.toISOString(),
+      inviteStatus: invite.status as InviteStatus,
+    }))
+
+    return { data }
+  }
+
+  /**
+   * Create invites
+   *
+   * @summary Creates invites for a list of participant emails sends it to them
+   */
+  @Post('/')
+  @Response<ValidateErrorResponse>('422', 'Validation Failed')
+  public async createInvites(@Body() bodyRequest: InviteParticipantsRequest): Promise<void> {
+    const emails = bodyRequest.emails
+    const expiresAt = new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000) // MAKE EXPIRY CONFIGURABLE
+
+    // Fetch existing invites
+    const existingInvites = await this.invitesRepo.findMany({
+      where: { email: { in: emails } },
+    })
+
+    const newEmails = emails.filter(
+      (email) => !existingInvites.map((invite) => invite.email).includes(email),
+    )
+
+    // Resend invites for existing emails
+    if (existingInvites.length > 0) {
+      const emailsToResend: string[] = []
+      // If status is REVOKED, reset expiresAt and update status to PENDING
+      for (const invite of existingInvites) {
+        if (invite.status === 'REVOKED' || invite.status === 'EXPIRED') {
+          await this.invitesRepo.update({
+            where: { id: invite.id },
+            data: {
+              status: 'PENDING',
+              expiresAt: expiresAt,
+            },
+          })
+
+          // Add to list of emails to resend
+          emailsToResend.push(invite.email)
+        } else if (invite.status === 'PENDING') {
+          // Add to list of emails to resend
+          emailsToResend.push(invite.email)
+        } else if (invite.status === 'ACCEPTED') {
+          continue
+        }
+      }
+
+      await this.sendInvites(emailsToResend)
+    }
+
+    // Create new invites
+    if (newEmails.length > 0) {
+      await this.invitesRepo.createMany({
+        data: newEmails.map((email) => ({ email, expiresAt, status: 'PENDING' })),
+      })
+
+      // Send emails for new invites
+      await this.sendInvites(newEmails)
+    }
+  }
+
+  /**
+   * Resend pending invites
+   *
+   * @summary Resend invites that are currently pending
+   */
+  @Post('/resend')
+  public async resendPendingInvites(): Promise<void> {
+    // Get all pending invitations
+    const pendingEmails = await this.invitesRepo.findMany({
+      where: { status: 'PENDING' },
+      select: { email: true },
+    })
+
+    const pendingEmailList = pendingEmails.map(({ email }) => email)
+
+    // Send emails
+    await this.sendInvites(pendingEmailList)
+  }
+
+  /**
+   * Revoke invite
+   *
+   * @summary Revoke an invite by email
+   */
+  @Post('/revoke')
+  public async revokeInvite(@Body() bodyRequest: RevokeInviteRequest): Promise<void> {
+    const emails = bodyRequest.emails
+    const notFoundEmails: string[] = []
+
+    const invites = await Promise.all(
+      emails.map(async (email) => {
+        const invite = await this.invitesRepo.findFirst({ where: { email } })
+        if (!invite) notFoundEmails.push(email)
+        return invite
+      }),
+    )
+
+    if (invites.length == 0) throw new NotFoundError('No invites found')
+
+    await Promise.all(
+      invites.map(async (invite) => {
+        if (!invite) return
+        await this.invitesRepo.update({
+          where: { id: invite.id },
+          data: { status: InviteStatus.REVOKED },
+        })
+      }),
+    )
+  }
+
+  private async sendInvites(emails: string[]): Promise<void> {
+    for (const email of emails) {
+      // TODO: Make the email contents configurable
+      const mailOptions: nodemailer.SendMailOptions = {
+        from: fromAddress,
+        to: email,
+        subject: 'Invitation to ctrl',
+        text: 'You have been invited to participate in x study. Please register here: link',
+      }
+      await mailerTransporter.sendMail(mailOptions)
+    }
   }
 }
