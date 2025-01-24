@@ -4,20 +4,23 @@ import { Link } from 'react-router-dom'
 import { apiClient } from '../apiClient'
 import { useState } from 'react'
 
+interface FormValues {
+  email: string
+}
+
 export default function ForgotPassword() {
+  const logoPath = './australian-genomics-logo.png'
+
   const {
     register,
     handleSubmit,
     setError,
     formState: { errors },
-  } = useForm()
+  } = useForm<FormValues>()
 
   const [sent, setSent] = useState(false)
 
-  const onSubmit = (data: unknown) => {
-    //login('TOKEN')
-    //nav('/')
-    console.log('DATA', data)
+  const onSubmit = (data: FormValues) => {
     apiClient
       .post('/users/password/generate-reset-link', data)
       .then((res) => {
@@ -41,7 +44,7 @@ export default function ForgotPassword() {
           {sent ? (
             <Box>
               <Box sx={{ mt: 5, mb: 2 }}>
-                <img src="./australian-genomics-logo.png" height={40} />
+                <img src={logoPath} height={40} />
               </Box>
               <Typography>
                 If your email is in our system you will be sent a link to reset your password.
@@ -51,7 +54,7 @@ export default function ForgotPassword() {
             <form onSubmit={handleSubmit(onSubmit)}>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <Box sx={{ mt: 5, mb: 2 }}>
-                  <img src="./australian-genomics-logo.png" height={40} />
+                  <img src={logoPath} height={40} />
                 </Box>
                 <Typography>
                   Please enter the email address you registered with to receive a link to reset your
@@ -61,6 +64,7 @@ export default function ForgotPassword() {
                   type="email"
                   fullWidth
                   label="Email"
+                  data-cy="email"
                   {...register('email', {
                     required: true,
                   })}
@@ -69,7 +73,12 @@ export default function ForgotPassword() {
                   <Alert severity="error">{errors.root?.serverError?.message}</Alert>
                 ) : null}
               </Box>
-              <Button variant="contained" sx={{ mt: 3 }} type="submit">
+              <Button
+                data-cy="request-reset-button "
+                variant="contained"
+                sx={{ mt: 3 }}
+                type="submit"
+              >
                 Reset Password
               </Button>
             </form>
