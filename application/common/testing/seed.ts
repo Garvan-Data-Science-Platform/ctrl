@@ -1,4 +1,4 @@
-import { PrismaClient, Role } from '@prisma/client'
+import { InviteStatus, PrismaClient, Role } from '@prisma/client'
 import '../../backend/src/jsontypes'
 import { SurveyStep } from 'common/types/survey'
 import { hashPassword } from '../../backend/src/authentication'
@@ -230,5 +230,32 @@ export async function seedTests(prisma: PrismaClient) {
       expiresAt: new Date(Date.now() + 2 * 60 * 1000), // 2 minutes in the future
       used: false,
     },
+  })
+
+  // Setup 4 invites
+  // Setup 4 invites
+  await prisma.invite.createMany({
+    data: [
+      {
+        email: 'invite1@pending.com',
+        status: InviteStatus.PENDING,
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
+      },
+      {
+        email: 'invite2@accepted.com',
+        status: InviteStatus.ACCEPTED,
+        expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day in the past
+      },
+      {
+        email: 'invite3@revoked.com',
+        status: InviteStatus.REVOKED,
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
+      },
+      {
+        email: 'invite4@expired.com',
+        status: InviteStatus.EXPIRED,
+        expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day in the past
+      },
+    ],
   })
 }
