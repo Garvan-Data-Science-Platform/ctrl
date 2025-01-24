@@ -11,7 +11,7 @@ const mockNodeMailer = nodemailer as unknown as NodemailerMock
 const api = new Api()
 const app = api.app
 
-describe('Password Reset', () => {
+describe('User Password Reset', () => {
   let resetToken: string
   const userId = 105
   const userEmail = 'test-reset-password@example.com'
