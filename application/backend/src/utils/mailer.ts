@@ -3,6 +3,7 @@ import nodemailer from 'nodemailer'
 export const fromAddress = `CTRL <noreply@${process.env.HOSTNAME}>`
 
 const mailerTransporter: nodemailer.Transporter = nodemailer.createTransport({
+  pool: true,
   host: process.env.MAILER_HOST,
   port: Number(process.env.MAILER_PORT),
   auth: {
