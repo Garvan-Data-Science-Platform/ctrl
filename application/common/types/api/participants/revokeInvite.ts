@@ -1,3 +1,3 @@
 export interface RevokeInviteRequest {
-  email: string
+  emails: string[]
 }
