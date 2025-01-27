@@ -6,11 +6,13 @@ NODE_VERSION=$(shell cat .nvmrc|sed 's/^v//')
 # Keep 'help' as first target, 
 help:
 	@echo "--- List of available targets:"
-	@echo "- help - print this help message."
-	@echo "- e2e - spin up db/frontend/backend and run e2e tests"
-	@echo "- db - spin up db"
+	@echo "- help    - print this help message."
+	@echo "- e2e     - spin up db/frontend/backend and run e2e tests"
+	@echo "- db      - spin up db"
 	@echo "- db-down - bring down db"
-	@echo "- "
+	@echo "- clean   - bring down docker containers and remove db volume"
+	@echo "- seed    - apply migrations and seed db"
+	@echo "---"
 
 e2e:
 	docker compose up -d db-test
@@ -42,3 +44,10 @@ db:
 
 db-down:
 	docker compose down
+
+seed:
+	yarn prisma:migrate
+	yarn prisma:seed
+
+clean: db-down
+	docker volume rm ctrl-next_ctrl-db

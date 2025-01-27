@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import * as data from './seedUserData.json'
+import { hashPassword } from '../../src/authentication'
 
 const prisma = new PrismaClient()
 
@@ -92,8 +92,7 @@ const main = async () => {
       firstName: 'Bob',
       lastName: 'Brown',
       role: 'OrganisationAdmin',
-      password:
-        'ec116ddbcb6355d41d5aed7d95a4af34:bfa86b6ab6b14d519fa718ad4d96e37422a3fc9150d25db81b9dafe89b8782ca1987dbfcd93428e9e0acdd99e06aca9e581f538abaa45f2d3df2c369a1d83662',
+      password: 'SomePassword123',
       organisations: {
         connect: [
           {
@@ -144,17 +143,36 @@ const main = async () => {
   })
   console.log('Added the following users:', michael)
 
-  const judith = await prisma.user.upsert({
-    where: { email: 'judithwright@example.com' },
+  const exampleAdmin = await prisma.user.upsert({
+    where: { email: String(process.env.EXAMPLE_ADMIN_EMAIL) },
     update: {},
     create: {
-      email: 'judithwright@example.com',
+      email: String(process.env.EXAMPLE_ADMIN_EMAIL),
+      firstName: 'Example',
+      lastName: 'Admin',
+      role: 'OrganisationAdmin',
+      password: hashPassword(String(process.env.EXAMPLE_ADMIN_PASSWORD)),
+      organisations: {
+        connect: [
+          {
+            name: 'Garvan Institute of Medical Research',
+          },
+        ],
+      },
+    },
+  })
+  console.log('Added the following users:', exampleAdmin)
+
+  const exampleUser = await prisma.user.upsert({
+    where: { email: String(process.env.EXAMPLE_PARTICIPANT_EMAIL) },
+    update: {},
+    create: {
+      email: String(process.env.EXAMPLE_PARTICIPANT_EMAIL),
       firstName: 'Judith',
       middleName: 'Arundell',
       lastName: 'Wright',
       role: 'Participant',
-      password:
-        '5c33624957015a629e81531b5b59b958:a94c378a47dd5c2f4ded6d6c77c64dca633cc8335ed51c74957c50c2b7db0a42749b46bee5c7e25a6e7c1632d71a0b6882b85797f5b34ad248f68539cb8d204d',
+      password: hashPassword(String(process.env.EXAMPLE_PARTICIPANT_PASSWORD)),
       organisations: {},
       profiles: {
         create: [
@@ -165,7 +183,7 @@ const main = async () => {
             dob: new Date('1915-05-31'),
             mobile: '04123456',
             addressLine: '123 Main St',
-            suburb: 'Manly',
+            suburb: 'Armidale',
             state: 'NSW',
             postcode: '2000',
             participantType: 'STANDARD',
@@ -196,7 +214,7 @@ const main = async () => {
       },
     },
   })
-  console.log('Added the following users:', judith)
+  console.log('Added the following users:', exampleUser)
 }
 
 main()
