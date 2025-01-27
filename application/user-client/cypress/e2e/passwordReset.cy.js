@@ -54,11 +54,35 @@ describe('Password Reset', () => {
     cy.get('[data-cy="forgot-password"]').should('exist')
   })
 
-  // it('open password reset request confirmation page and return to login', () => {
-  //   cy.visit('/reset-request-confirm')
-  //   cy.get('[data-cy="return-to-login"]').click()
-  //   cy.get('[data-cy="register"]').should('exist')
-  //   cy.get('[data-cy="forgot-password"]').should('exist')
-  //   cy.contains('If your email').should('exist')
-  // })
+  it('open password reset page and return to login', () => {
+    cy.visit('/reset-password?token=valid-reset-token')
+    cy.get('[data-cy="return-to-login"]').click()
+    cy.get('[data-cy="login-email"]').should('exist')
+    cy.get('[data-cy="login-password"]').should('exist')
+    cy.get('[data-cy="register"]').should('exist')
+    cy.get('[data-cy="forgot-password"]').should('exist')
+  })
+
+  it('open password reset page and enter invalid password', () => {
+    cy.visit('/reset-password?token=valid-reset-token')
+    cy.get('[data-cy="new-password"]').type('pass{enter}')
+    cy.contains('Password must be at least').should('exist')
+  })
+
+  it('open password reset page and enter non-matching passwords', () => {
+    cy.visit('/reset-password?token=valid-reset-token')
+    cy.get('[data-cy="new-password"]').type('Password1')
+    cy.get('[data-cy="confirm-password"]').type('Password2{enter}')
+    cy.contains('Your passwords do not match').should('exist')
+  })
+
+  it('open password reset request confirmation page without token', () => {
+    cy.visit('/reset-password')
+    cy.contains('Invalid or missing token').should('exist')
+    cy.get('[data-cy="return-to-login"]').click()
+    cy.get('[data-cy="login-email"]').should('exist')
+    cy.get('[data-cy="login-password"]').should('exist')
+    cy.get('[data-cy="register"]').should('exist')
+    cy.get('[data-cy="forgot-password"]').should('exist')
+  })
 })

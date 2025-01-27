@@ -53,7 +53,7 @@ export default function ResetPassword() {
             </Alert>
           </Box>
           <Box sx={{ mt: 3 }}>
-            <Button component={Link} to="/login">
+            <Button data-cy="return-to-login" component={Link} to="/login">
               Back
             </Button>
           </Box>
@@ -125,6 +125,7 @@ export default function ResetPassword() {
                   label="New password"
                   error={Boolean(errors.newPassword)}
                   helperText={errors.newPassword?.message}
+                  data-cy="new-password"
                   {...register('newPassword', {
                     required: 'This field is required',
                     validate: (val) => {
@@ -141,6 +142,7 @@ export default function ResetPassword() {
                   label="Confirm password"
                   error={Boolean(errors.confirmPassword)}
                   helperText={errors.confirmPassword?.message}
+                  data-cy="confirm-password"
                   {...register('confirmPassword', {
                     required: 'This field is required',
                     validate: (val: string) => {
@@ -154,13 +156,13 @@ export default function ResetPassword() {
                   <Alert severity="error">{errors.root?.serverError?.message}</Alert>
                 ) : null}
               </Box>
-              <Button variant="contained" sx={{ mt: 3 }} type="submit">
+              <Button data-cy="reset-password" variant="contained" sx={{ mt: 3 }} type="submit">
                 Reset Password
               </Button>
             </form>
           )}
           <Box sx={{ mt: 3 }}>
-            <Button component={Link} to="/login">
+            <Button data-cy="return-to-login" component={Link} to="/login">
               Back
             </Button>
           </Box>
