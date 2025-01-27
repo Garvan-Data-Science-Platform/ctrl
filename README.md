@@ -32,15 +32,35 @@ Run the backend and frontend servers in development mode (with hot reload):
 
 `yarn dev`
 
-Open http://localhost:3000 with your browser to see the local frontend. You can also invoke the backend RESP API on port 5000, e.g. with:
+In another terminal, migrate and seed the database using:
 
-`curl http://localhost:5000/workspaces`
+`make seed`
+
+In your browser open:
+- http://localhost:5173 to see application frontend
+- http://localhost:5000/docs to see Swagger UI for the API
+- http://localhost:5174 to see admin portal
+- http://localhost:8080 for 'Adminer' browser database interface
+
+Seed data is intended for development only, NOT PRODUCTION.
+Seed data contains infomation to support tests, and also two users to made development easy:
+1. an example admin account
+2. an example user account
+
+The email and password information for these two accounts are specified in `application/backend/.env`.
+If you change this information, you will need to cancel `yarn dev`, run `make clean`, then restart the servers and re-seed the database.
 
 ### Other available yarn targets
 
 You can use yarn to perform these additional development tasks:
 
 ```bash
+# Perform a full project build.
+yarn build
+
+# Run the application (API and UI) from the build.
+yarn start
+
 # Run the Typescript compiler (i.e. perform a type-check on the code).
 yarn type-check
 
@@ -50,14 +70,11 @@ yarn format
 # Run eslint to lint the code.
 yarn lint
 
-# Run jest to test the code.
+# Run tests for each workspace the code.
 yarn test
 
-# Perform a full project build.
-yarn build
-
-# Run the application (API and UI) from the build.
-yarn start
+# Build docs for each workspace
+yarn build-docs
 ```
 
 ## Running locally via docker
@@ -76,31 +93,6 @@ docker build \
   -f Dockerfile .
 ```
 
-_**NOTE**: an [alternative Dockerfile](Dockerfile_with_nvm) is provided, that install Node.js through `nvm`._
-
-To run `ctrl-next` once the image has been built and its Postgres DB a [docker-compose.yml](docker-compose.yml) file is provided. The following commands are supported:
-
-```bash
-# Run ctrl-next and DB from docker images.
-make docker-run:
-
-# Stop ctrl-next and DB docker containers.
-make docker-stop:
-
-# Run the DB only (to access it from the ctrl-next code in development).
-make docker-run-db:
-```
-
-#### Advanced uses of the ctrl-next docker-image
-
-By default the `ctrl-next` docker image will simply run a build of `ctrl-next`. Any command line arguments passed to `docker run` will be interpreted as Bash commands and executed from the `ctrl-next` repository root inside the container.
-
-For instance, to run type-checks on the code in the container use:
-
-```bash
-docker run ctrl-next:latest yarn type-check
-```
-
 ## Prisma Database Management
 
 ```bash
@@ -108,13 +100,10 @@ docker run ctrl-next:latest yarn type-check
 cp application/backend/.env.example application/backend/.env
 
 # Run db
-make docker-run-db
+make db
 
-# Generate Prisma Client
-yarn prisma:generate
-
-# Run migrations
-yarn prisma:migrate
+# Run migrations and seed database (Note: do not seed database in production)
+make seed
 ```
 
 ### Mailer
