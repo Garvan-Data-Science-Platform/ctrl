@@ -4,52 +4,199 @@ import * as data from './seedUserData.json'
 const prisma = new PrismaClient()
 
 const main = async () => {
-  const { users, organisations } = data
-
-  // Create organisations
-  const createdOrganisations = await prisma.organisation.createMany({
-    data: organisations.map((org) => ({
-      name: org.name,
-    })),
-    skipDuplicates: true, // Skip duplicates if any
+  // Ensure a Study record exists with id = 1
+  const defaultStudy = await prisma.study.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
+      id: 1, // Explicitly set the ID to match the default value in the schema
+    },
   })
 
-  console.log(`Added ${createdOrganisations.count} organisations`)
+  console.log('Default Study created:', defaultStudy)
 
-  await prisma.study.create({})
+  const ExampleSurveyStepData = require('../../../common/src/surveys/exampleSurveyStepData.json')
 
-  // Create a map of organisation names to their ID
-  const savedOrganisations = await prisma.organisation.findMany({
-    where: { name: { in: organisations.map((o) => o.name) } },
-    select: { id: true, name: true },
+  const survey = await prisma.surveyVersion.create({
+    data: {
+      versionNumber: 1,
+      status: 'PUBLISHED',
+      data: ExampleSurveyStepData as SurveyStep[],
+    },
   })
 
-  const savedUsers = await Promise.all(
-    users.map(async (user) => {
-      return await prisma.user.upsert({
-        where: {
-          email: user.email,
-        },
-        update: {
-          ...user,
-          organisations: {
-            connect: user.organisations
-              .map((orgName) => savedOrganisations.find((org) => org.name === orgName)?.id)
-              .map((id) => ({ id: id! })),
+  const john = await prisma.user.upsert({
+    where: { email: 'johndoe@example.com' },
+    update: {},
+    create: {
+      email: 'johndoe@example.com',
+      firstName: 'John',
+      middleName: 'James',
+      lastName: 'Doe',
+      role: 'OrganisationAdmin',
+      password: 'SomePassword123',
+      organisations: {
+        create: [
+          {
+            name: 'Garvan Institute of Medical Research',
           },
-        },
-        create: {
-          ...user,
-          organisations: {
-            connect: user.organisations
-              .map((orgName) => savedOrganisations.find((org) => org.name === orgName)?.id)
-              .map((id) => ({ id: id! })),
+          {
+            name: 'University of New South Wales',
           },
-        },
-      })
-    }),
-  )
-  console.log('Added the following users:', savedUsers)
+        ],
+      },
+    },
+  })
+  console.log('Added the following users:', john)
+
+  const jane = await prisma.user.upsert({
+    where: { email: 'janesmith@example.com' },
+    update: {},
+    create: {
+      email: 'janesmith@example.com',
+      firstName: 'Jane',
+      lastName: 'Smith',
+      role: 'OperatorAdmin',
+      password: 'SomePassword123',
+      organisations: {
+        connect: [
+          {
+            name: 'University of New South Wales',
+          },
+        ],
+      },
+    },
+  })
+  console.log('Added the following users:', jane)
+
+  const alice = await prisma.user.upsert({
+    where: { email: 'alicejohnson@example.com' },
+    update: {},
+    create: {
+      email: 'alicejohnson@example.com',
+      firstName: 'Alice',
+      middleName: 'Mary',
+      lastName: 'Johnson',
+      role: 'Participant',
+      password: 'SomePassword123',
+      organisations: {},
+    },
+  })
+  console.log('Added the following users:', alice)
+
+  const bob = await prisma.user.upsert({
+    where: { email: 'bobbrown@example.com' },
+    update: {},
+    create: {
+      email: 'bobbrown@example.com',
+      firstName: 'Bob',
+      lastName: 'Brown',
+      role: 'OrganisationAdmin',
+      password:
+        'ec116ddbcb6355d41d5aed7d95a4af34:bfa86b6ab6b14d519fa718ad4d96e37422a3fc9150d25db81b9dafe89b8782ca1987dbfcd93428e9e0acdd99e06aca9e581f538abaa45f2d3df2c369a1d83662',
+      organisations: {
+        connect: [
+          {
+            name: 'Garvan Institute of Medical Research',
+          },
+        ],
+      },
+    },
+  })
+  console.log('Added the following users:', bob)
+
+  const emily = await prisma.user.upsert({
+    where: { email: 'emilydavis@example.com' },
+    update: {},
+    create: {
+      email: 'emilydavis@example.com',
+      firstName: 'Emily',
+      lastName: 'Davis',
+      role: 'OperatorAdmin',
+      password: 'SomePassword123',
+      organisations: {
+        connect: [
+          {
+            name: 'Garvan Institute of Medical Research',
+          },
+        ],
+        create: [
+          {
+            name: 'Apple Inc.',
+          },
+        ],
+      },
+    },
+  })
+  console.log('Added the following users:', emily)
+
+  const michael = await prisma.user.upsert({
+    where: { email: 'michaelwilson@example.com' },
+    update: {},
+    create: {
+      email: 'michaelwilson@example.com',
+      firstName: 'Michael',
+      lastName: 'Wilson',
+      role: 'Participant',
+      password: 'SomePassword123',
+      organisations: {},
+    },
+  })
+  console.log('Added the following users:', michael)
+
+  const judith = await prisma.user.upsert({
+    where: { email: 'judithwright@example.com' },
+    update: {},
+    create: {
+      email: 'judithwright@example.com',
+      firstName: 'Judith',
+      middleName: 'Arundell',
+      lastName: 'Wright',
+      role: 'Participant',
+      password:
+        '5c33624957015a629e81531b5b59b958:a94c378a47dd5c2f4ded6d6c77c64dca633cc8335ed51c74957c50c2b7db0a42749b46bee5c7e25a6e7c1632d71a0b6882b85797f5b34ad248f68539cb8d204d',
+      organisations: {},
+      profiles: {
+        create: [
+          {
+            firstName: 'Judith',
+            middleName: 'Arundell',
+            lastName: 'Wright',
+            dob: new Date('1915-05-31'),
+            mobile: '04123456',
+            addressLine: '123 Main St',
+            suburb: 'Manly',
+            state: 'NSW',
+            postcode: '2000',
+            participantType: 'STANDARD',
+            preferredContact: 'EMAIL',
+            nextOfKin: {
+              create: {
+                firstName: 'Jack',
+                lastName: 'McKinney',
+                email: 'jackmckinney@example.com',
+                mobile: '04123456',
+              },
+            },
+            surveys: {
+              create: {
+                versionId: 1,
+                answers: [
+                  { status: 'viewed', answers: [] },
+                  {
+                    status: 'completed',
+                    answers: [false, 'Choice 2'],
+                    last_updated: '2024-12-02T23:45:27.815Z',
+                  },
+                ],
+              },
+            },
+          },
+        ],
+      },
+    },
+  })
+  console.log('Added the following users:', judith)
 }
 
 main()
