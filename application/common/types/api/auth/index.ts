@@ -1,7 +1,11 @@
 import type { RegisterRequest, RegisterResponse } from './register'
 import type { LoginRequest, LoginResponse } from './login'
 import type { RegisterParticipantRequest, RegisterParticipantResponse } from './registerParticipant'
-import type { ResetPasswordRequest, ResetPasswordResponse } from './resetPassword'
+import type {
+  NewPasswordRequest,
+  ResetPasswordRequest,
+  ResetPasswordResponse,
+} from './resetPassword'
 import type { CreateParticipantRequest, CreateParticipantResponse } from './createParticipant'
 
 export {
@@ -11,6 +15,7 @@ export {
   LoginResponse,
   RegisterParticipantRequest,
   RegisterParticipantResponse,
+  NewPasswordRequest,
   ResetPasswordRequest,
   ResetPasswordResponse,
   CreateParticipantRequest,
