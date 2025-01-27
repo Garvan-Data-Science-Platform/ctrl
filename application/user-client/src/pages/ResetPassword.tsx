@@ -1,4 +1,13 @@
-import { Alert, Box, Button, Card, Container, TextField, Typography } from '@mui/material'
+import {
+  Alert,
+  Box,
+  Button,
+  Card,
+  CircularProgress,
+  Container,
+  TextField,
+  Typography,
+} from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { Link, useLocation } from 'react-router-dom'
 import { NewPasswordRequest } from '@common/types/api/auth'
@@ -29,7 +38,7 @@ export default function ResetPassword() {
     formState: { errors },
   } = useForm<FormValues>()
 
-  const [sent, setSent] = useState(false)
+  const [status, setStatus] = useState<'unsent' | 'pending' | 'sent'>('unsent')
 
   if (!token) {
     return (
@@ -59,18 +68,27 @@ export default function ResetPassword() {
       //confirmPassword: data.confirmPassword,
       token: token,
     }
+
+    // Set to pending before the request
+    setStatus('pending')
+
     apiClient
       .post('/users/password/reset', reqData)
       .then((res) => {
         if (res.status) {
-          setSent(true)
+          // Set to sent on successful response
+          setStatus('sent')
         } else {
+          // Back to unsent if there is an error
+          setStatus('unsent')
           setError('root.serverError', {
             message: `Error: ${JSON.stringify((res as any).message)}`,
           })
         }
       })
       .catch((e) => {
+        // Back to unsent if there is an error
+        setStatus('unsent')
         setError('root.serverError', { message: `Error Logging In: ${e}` })
       })
   }
@@ -79,12 +97,19 @@ export default function ResetPassword() {
     <>
       <Container>
         <Card sx={{ maxWidth: 400, mr: 'auto', ml: 'auto', mt: 10, p: 2 }}>
-          {sent ? (
+          {status === 'sent' ? (
             <Box>
               <Box sx={{ mt: 5, mb: 2 }}>
                 <img src={logoPath} height={40} />
               </Box>
               <Typography>Password reset was successful.</Typography>
+            </Box>
+          ) : status === 'pending' ? (
+            <Box
+              sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, py: 4 }}
+            >
+              <CircularProgress />
+              <Typography>Resetting password...</Typography>
             </Box>
           ) : (
             <form onSubmit={handleSubmit(onSubmit)}>

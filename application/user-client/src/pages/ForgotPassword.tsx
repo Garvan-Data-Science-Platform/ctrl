@@ -1,4 +1,13 @@
-import { Alert, Box, Button, Card, Container, TextField, Typography } from '@mui/material'
+import {
+  Alert,
+  Box,
+  Button,
+  Card,
+  CircularProgress,
+  Container,
+  TextField,
+  Typography,
+} from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { apiClient } from '../apiClient'
@@ -18,21 +27,29 @@ export default function ForgotPassword() {
     formState: { errors },
   } = useForm<FormValues>()
 
-  const [sent, setSent] = useState(false)
+  const [status, setStatus] = useState<'unsent' | 'pending' | 'sent'>('unsent')
 
   const onSubmit = (data: FormValues) => {
+    // Set to pending before the request
+    setStatus('pending')
+
     apiClient
       .post('/users/password/generate-reset-link', data)
       .then((res) => {
         if (res.status == 200) {
-          setSent(true)
+          // Set to sent on successful response
+          setStatus('sent')
         } else {
+          // Back to unsent if there is an error
+          setStatus('unsent')
           setError('root.serverError', {
             message: `Error: ${JSON.stringify((res as any).message)}`,
           })
         }
       })
       .catch((e) => {
+        // Back to unsent if there is an error
+        setStatus('unsent')
         setError('root.serverError', { message: `Error Logging In: ${e}` })
       })
   }
@@ -41,7 +58,7 @@ export default function ForgotPassword() {
     <>
       <Container>
         <Card sx={{ maxWidth: 400, mr: 'auto', ml: 'auto', mt: 10, p: 2 }}>
-          {sent ? (
+          {status === 'sent' ? (
             <Box>
               <Box sx={{ mt: 5, mb: 2 }}>
                 <img src={logoPath} height={40} />
@@ -49,6 +66,12 @@ export default function ForgotPassword() {
               <Typography>
                 If your email is in our system you will be sent a link to reset your password.
               </Typography>
+            </Box>
+          ) : status === 'pending' ? (
+            <Box
+              sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, py: 4 }}
+            >
+              <CircularProgress />
             </Box>
           ) : (
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -74,7 +97,7 @@ export default function ForgotPassword() {
                 ) : null}
               </Box>
               <Button
-                data-cy="request-reset-button "
+                data-cy="request-reset-button"
                 variant="contained"
                 sx={{ mt: 3 }}
                 type="submit"
@@ -85,7 +108,7 @@ export default function ForgotPassword() {
           )}
 
           <Box sx={{ mt: 3 }}>
-            <Button component={Link} to="/login">
+            <Button data-cy="return-to-login" component={Link} to="/login">
               Back
             </Button>
           </Box>
