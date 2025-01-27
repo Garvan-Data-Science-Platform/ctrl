@@ -5,11 +5,60 @@ beforeEach(() => {
 })
 
 describe('Password Reset', () => {
-  it('Can generate a reset link', () => {
-    cy.visit('/')
-    cy.get('[data-cy="forgot"]').click()
-    cy.get('input').type('tXXXXX@example.com')
-    cy.contains('Reset Password').click()
-    cy.contains('If your email').should('exist')
+  it('open login page and request password reset', () => {
+    cy.visit('/login')
+    cy.get('[data-cy="forgot-password"]').click()
+    cy.contains('Please enter the email address you registered with').should('exist')
   })
+
+  it('open password reset page and request password reset', () => {
+    cy.visit('/forgot')
+    cy.get('[data-cy="email"]').type(Cypress.env('PASSWORD_RESET_USER_EMAIL'))
+    cy.intercept(
+      'POST',
+      '/users/password/generate-reset-link',
+      '[{ email: @Cypress.env("PASSWORD_RESET_USER_EMAIL")}]',
+    ).as('requestReset')
+    cy.get('[data-cy="request-reset-button"]').click()
+    cy.wait('@requestReset')
+    cy.contains('If your email is in our system').should('exist')
+  })
+
+  it('request password reset with unknown email', () => {
+    cy.visit('/forgot')
+    cy.get('[data-cy="email"]').type('nouser@notevenanemailaddress')
+    cy.intercept(
+      'POST',
+      '/users/password/generate-reset-link',
+      '[{ email: @Cypress.env("PASSWORD_RESET_USER_EMAIL")}]',
+    ).as('requestReset')
+    cy.get('[data-cy="request-reset-button"]').click()
+    cy.wait('@requestReset')
+    cy.contains('If your email is in our system').should('exist')
+  })
+
+  it('request password reset and return to login page', () => {
+    cy.visit('/forgot')
+    cy.get('[data-cy="email"]').type(Cypress.env('PASSWORD_RESET_USER_EMAIL'))
+    cy.intercept(
+      'POST',
+      '/users/password/generate-reset-link',
+      '[{ email: @Cypress.env("PASSWORD_RESET_USER_EMAIL")}]',
+    ).as('requestReset')
+    cy.get('[data-cy="request-reset-button"]').click()
+    cy.wait('@requestReset')
+    cy.get('[data-cy="return-to-login"]').click()
+    cy.get('[data-cy="login-email"]').should('exist')
+    cy.get('[data-cy="login-password"]').should('exist')
+    cy.get('[data-cy="register"]').should('exist')
+    cy.get('[data-cy="forgot-password"]').should('exist')
+  })
+
+  // it('open password reset request confirmation page and return to login', () => {
+  //   cy.visit('/reset-request-confirm')
+  //   cy.get('[data-cy="return-to-login"]').click()
+  //   cy.get('[data-cy="register"]').should('exist')
+  //   cy.get('[data-cy="forgot-password"]').should('exist')
+  //   cy.contains('If your email').should('exist')
+  // })
 })

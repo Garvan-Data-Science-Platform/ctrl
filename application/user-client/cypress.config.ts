@@ -1,9 +1,11 @@
 import { publishNewVersion, resetDB } from 'common/testing/TestHelpers'
+import { PASSWORD_RESET_USER_EMAIL } from 'common/testing/seed'
 import { defineConfig } from 'cypress'
 
 export default defineConfig({
   env: {
     DATABASE_URL: 'postgres://postgres:password@db-test:5432/ctrl',
+    PASSWORD_RESET_USER_EMAIL: PASSWORD_RESET_USER_EMAIL,
   },
   e2e: {
     baseUrl: 'http://localhost:5002',
