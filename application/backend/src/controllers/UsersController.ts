@@ -228,7 +228,7 @@ export class UsersController extends Controller {
   @Post('/password/reset')
   @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
+  @Response<UnauthorizedErrorResponse>('403', 'Forbidden')
   public async resetPassword(@Body() bodyRequest: ResetPasswordRequest): Promise<void> {
     const { token, newPassword } = bodyRequest
     const passwordResetToken = await this.passwordResetTokenRepo.findUnique({

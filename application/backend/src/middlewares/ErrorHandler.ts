@@ -97,8 +97,7 @@ export function ErrorHandler(
     err instanceof TokenExpiredError ||
     err instanceof JsonWebTokenError ||
     err instanceof IncorrectPasswordError ||
-    err instanceof IncorrectPermissionsError ||
-    err instanceof PasswordResetTokenInvalidError
+    err instanceof IncorrectPermissionsError
   ) {
     const errorResponse: UnauthorizedErrorResponse = {
       message: err.message,
@@ -106,6 +105,16 @@ export function ErrorHandler(
     }
     logger.error({ ...errorResponse })
     return res.status(401).json(errorResponse)
+  }
+
+  // Password Reset Token Errors
+  if (err instanceof PasswordResetTokenInvalidError) {
+    const errorResponse: UnauthorizedErrorResponse = {
+      message: err.message,
+      details: err,
+    }
+    logger.error({ ...errorResponse })
+    return res.status(403).json(errorResponse)
   }
 
   // Handle Prisma Known Errors

@@ -38,7 +38,7 @@ export default function ResetPassword() {
     formState: { errors },
   } = useForm<FormValues>()
 
-  const [status, setStatus] = useState<'unsent' | 'pending' | 'sent'>('unsent')
+  const [status, setStatus] = useState<'unsent' | 'pending' | 'error' | 'sent'>('unsent')
 
   if (!token) {
     return (
@@ -49,7 +49,7 @@ export default function ResetPassword() {
               <img src={logoPath} height={40} />
             </Box>
             <Alert severity="error">
-              Invalid or missing token. Please check your reset password email link.
+              Missing token. Please check your reset password email link.
             </Alert>
           </Box>
           <Box sx={{ mt: 3 }}>
@@ -75,12 +75,12 @@ export default function ResetPassword() {
     apiClient
       .post('/users/password/reset', reqData)
       .then((res) => {
-        if (res.status) {
+        if (res.status == 200) {
           // Set to sent on successful response
           setStatus('sent')
         } else {
-          // Back to unsent if there is an error
-          setStatus('unsent')
+          // Set to error
+          setStatus('error')
           setError('root.serverError', {
             message: `Error: ${JSON.stringify((res as any).message)}`,
           })
@@ -88,86 +88,88 @@ export default function ResetPassword() {
       })
       .catch((e) => {
         // Back to unsent if there is an error
-        setStatus('unsent')
-        setError('root.serverError', { message: `Error Logging In: ${e}` })
+        setStatus('error')
+        setError('root.serverError', { message: `Error Resetting Password: ${e}` })
       })
   }
 
   return (
-    <>
-      <Container>
-        <Card sx={{ maxWidth: 400, mr: 'auto', ml: 'auto', mt: 10, p: 2 }}>
-          {status === 'sent' ? (
-            <Box>
+    <Container>
+      <Card sx={{ maxWidth: 400, mr: 'auto', ml: 'auto', mt: 10, p: 2 }}>
+        {status === 'sent' ? (
+          <Box>
+            <Box sx={{ mt: 5, mb: 2 }}>
+              <img src={logoPath} height={40} />
+            </Box>
+            <Typography>Password reset was successful.</Typography>
+          </Box>
+        ) : status === 'pending' ? (
+          <Box
+            sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, py: 4 }}
+          >
+            <CircularProgress />
+            <Typography>Resetting password...</Typography>
+          </Box>
+        ) : status === 'error' ? (
+          <Box sx={{ mt: 5, mb: 2 }}>
+            <img src={logoPath} height={40} />
+            <Alert severity="error">
+              Invalid token. Please check your reset password email link.
+            </Alert>
+          </Box>
+        ) : (
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <Box sx={{ mt: 5, mb: 2 }}>
                 <img src={logoPath} height={40} />
               </Box>
-              <Typography>Password reset was successful.</Typography>
+              <Typography>Please enter and confirm your new password</Typography>
+              <TextField
+                type="password"
+                fullWidth
+                label="New password"
+                error={Boolean(errors.newPassword)}
+                helperText={errors.newPassword?.message}
+                data-cy="new-password"
+                {...register('newPassword', {
+                  required: 'This field is required',
+                  validate: (val) => {
+                    const { isValid, fields } = checkPasswordStrength(val)
+                    if (!isValid) {
+                      return `Invalid password. ${Object.values(fields).map((f) => ' ' + f.message)}`
+                    }
+                  },
+                })}
+              />
+              <TextField
+                type="password"
+                fullWidth
+                label="Confirm password"
+                error={Boolean(errors.confirmPassword)}
+                helperText={errors.confirmPassword?.message}
+                data-cy="confirm-password"
+                {...register('confirmPassword', {
+                  required: 'This field is required',
+                  validate: (val: string) => {
+                    if (watch('newPassword') != val) {
+                      return 'Your passwords do not match'
+                    }
+                  },
+                })}
+              />
+              {errors.root && <Alert severity="error">{errors.root?.serverError?.message}</Alert>}
             </Box>
-          ) : status === 'pending' ? (
-            <Box
-              sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, py: 4 }}
-            >
-              <CircularProgress />
-              <Typography>Resetting password...</Typography>
-            </Box>
-          ) : (
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <Box sx={{ mt: 5, mb: 2 }}>
-                  <img src={logoPath} height={40} />
-                </Box>
-                <Typography>Please enter and confirm your new password</Typography>
-                {Object.keys(errors) && <Typography>{}</Typography>}
-                <TextField
-                  type="password"
-                  fullWidth
-                  label="New password"
-                  error={Boolean(errors.newPassword)}
-                  helperText={errors.newPassword?.message}
-                  data-cy="new-password"
-                  {...register('newPassword', {
-                    required: 'This field is required',
-                    validate: (val) => {
-                      const { isValid, fields } = checkPasswordStrength(val)
-                      if (!isValid) {
-                        return `Invalid password. ${Object.values(fields).map((f) => ' ' + f.message)}`
-                      }
-                    },
-                  })}
-                />
-                <TextField
-                  type="password"
-                  fullWidth
-                  label="Confirm password"
-                  error={Boolean(errors.confirmPassword)}
-                  helperText={errors.confirmPassword?.message}
-                  data-cy="confirm-password"
-                  {...register('confirmPassword', {
-                    required: 'This field is required',
-                    validate: (val: string) => {
-                      if (watch('newPassword') != val) {
-                        return 'Your passwords do not match'
-                      }
-                    },
-                  })}
-                />
-                {errors.root ? (
-                  <Alert severity="error">{errors.root?.serverError?.message}</Alert>
-                ) : null}
-              </Box>
-              <Button data-cy="reset-password" variant="contained" sx={{ mt: 3 }} type="submit">
-                Reset Password
-              </Button>
-            </form>
-          )}
-          <Box sx={{ mt: 3 }}>
-            <Button data-cy="return-to-login" component={Link} to="/login">
-              Back
+            <Button data-cy="reset-password" variant="contained" sx={{ mt: 3 }} type="submit">
+              Reset Password
             </Button>
-          </Box>
-        </Card>
-      </Container>
-    </>
+          </form>
+        )}
+        <Box sx={{ mt: 3 }}>
+          <Button data-cy="return-to-login" component={Link} to="/login">
+            Back
+          </Button>
+        </Box>
+      </Card>
+    </Container>
   )
 }
