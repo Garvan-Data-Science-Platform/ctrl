@@ -101,7 +101,7 @@ export default function NavBar() {
             </Tabs>
           </Box>
           <Box sx={{ flexGrow: 0 }}>
-            <Button variant="outlined" onClick={logout}>
+            <Button data-cy="log-out" variant="outlined" onClick={logout}>
               Log Out
             </Button>
           </Box>

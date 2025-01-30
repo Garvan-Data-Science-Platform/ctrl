@@ -130,6 +130,6 @@ describe('Password Reset', () => {
     cy.get('[data-cy="login-email"]').type(Cypress.env('PASSWORD_RESET_USER_EMAIL'))
     cy.get('[data-cy="login-password"]').type(newPassword)
     cy.get('[data-cy="login"]').click()
-    cy.contains('Welcome').should('exist')
+    cy.get('[data-cy="log-out"]').should('exist')
   })
 })

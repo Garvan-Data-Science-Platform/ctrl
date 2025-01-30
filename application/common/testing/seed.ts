@@ -220,43 +220,6 @@ export async function seedTests(prisma: PrismaClient) {
       lastName: 'User',
       password: await hashPassword('OldPassword123'),
       role: Role.Participant,
-      profiles: {
-        create: [
-          {
-            firstName: 'Test',
-            lastName: 'User',
-            dob: new Date('1915-05-31'),
-            mobile: '04123456',
-            addressLine: '123 Main St',
-            suburb: 'Armidale',
-            state: 'NSW',
-            postcode: '2000',
-            participantType: 'STANDARD',
-            preferredContact: 'EMAIL',
-            nextOfKin: {
-              create: {
-                firstName: 'Jack',
-                lastName: 'McKinney',
-                email: 'jackmckinney@example.com',
-                mobile: '04123456',
-              },
-            },
-            surveys: {
-              create: {
-                versionId: 1,
-                answers: [
-                  { status: 'viewed', answers: [] },
-                  {
-                    status: 'completed',
-                    answers: [false, 'Choice 2'],
-                    last_updated: '2024-12-02T23:45:27.815Z',
-                  },
-                ],
-              },
-            },
-          },
-        ],
-      },
     },
   })
 
