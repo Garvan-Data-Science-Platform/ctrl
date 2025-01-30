@@ -210,7 +210,7 @@ export class UsersController extends Controller {
       },
     })
 
-    const resetLink = `https://${process.env.HOSTNAME}/reset-password?token=${token}`
+    const resetLink = `${process.env.HOSTNAME}/reset-password?token=${token}`
 
     const { html, text } = generatePasswordResetEmail(resetLink, user.firstName)
 

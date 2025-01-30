@@ -10,7 +10,7 @@ import {
 } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { Link, useLocation } from 'react-router-dom'
-import { NewPasswordRequest } from '@common/types/api/auth'
+import { ResetPasswordRequest } from '@common/types/api/users'
 import { checkPasswordStrength } from '@common/src/PasswordStrength'
 import { apiClient } from '../apiClient'
 import { useState } from 'react'
@@ -63,14 +63,13 @@ export default function ResetPassword() {
   }
 
   const onSubmit = (data: FormValues) => {
-    const reqData: NewPasswordRequest = {
-      newPassword: data.newPassword,
-      //confirmPassword: data.confirmPassword,
-      token: token,
-    }
-
     // Set to pending before the request
     setStatus('pending')
+
+    const reqData: ResetPasswordRequest = {
+      newPassword: data.newPassword,
+      token: token,
+    }
 
     apiClient
       .post('/users/password/reset', reqData)

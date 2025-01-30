@@ -12,10 +12,7 @@ import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { apiClient } from '../apiClient'
 import { useState } from 'react'
-
-interface FormValues {
-  email: string
-}
+import { GeneratePasswordResetLinkRequest } from '@common/types/api/users'
 
 export default function ForgotPassword() {
   const logoPath = './australian-genomics-logo.png'
@@ -25,11 +22,11 @@ export default function ForgotPassword() {
     handleSubmit,
     setError,
     formState: { errors },
-  } = useForm<FormValues>()
+  } = useForm<GeneratePasswordResetLinkRequest>()
 
   const [status, setStatus] = useState<'unsent' | 'pending' | 'sent'>('unsent')
 
-  const onSubmit = (data: FormValues) => {
+  const onSubmit = (data: GeneratePasswordResetLinkRequest) => {
     // Set to pending before the request
     setStatus('pending')
 
