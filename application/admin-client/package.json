@@ -45,7 +45,7 @@
     "start": "refine start",
     "refine": "refine",
     "cy:open": "cypress open",
-    "cypress": "docker compose up --build -d db-test backend-test && dotenv -e ../backend/.env.test start-server-and-test 'refine dev --port 5003 --host 0.0.0.0' http://localhost:5003 cy:open",
+    "cypress": "docker compose up --build -d db-test backend-test && npx dotenv -e ../backend/.env.test start-server-and-test 'refine dev --port 5003 --host 0.0.0.0' http://localhost:5003 cy:open",
     "test": "docker compose up --build -d --wait db-test backend-test && npx dotenv -e ../backend/.env.test start-server-and-test 'refine dev --port 5003 --host 0.0.0.0' http://localhost:5003 cy:run",
     "cy:run": "cypress run"
   },
