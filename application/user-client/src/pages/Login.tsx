@@ -72,7 +72,7 @@ export default function Login() {
                 <Alert severity="error">{errors.root?.serverError?.message}</Alert>
               ) : null}
             </Box>
-            <Button variant="contained" sx={{ mt: 3 }} type="submit">
+            <Button data-cy="login" variant="contained" sx={{ mt: 3 }} type="submit">
               Log In
             </Button>
           </form>
