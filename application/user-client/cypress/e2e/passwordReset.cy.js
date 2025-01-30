@@ -78,11 +78,33 @@ describe('Password Reset', () => {
 
   it('open password reset request confirmation page without token', () => {
     cy.visit('/reset-password')
-    cy.contains('Invalid or missing token').should('exist')
+    cy.contains('Missing token').should('exist')
     cy.get('[data-cy="return-to-login"]').click()
     cy.get('[data-cy="login-email"]').should('exist')
     cy.get('[data-cy="login-password"]').should('exist')
     cy.get('[data-cy="register"]').should('exist')
     cy.get('[data-cy="forgot-password"]').should('exist')
+  })
+
+  it('request password reset with invalid token', () => {
+    cy.visit('/reset-password?token=invalid-reset-token')
+    cy.get('[data-cy="new-password"]').type('Password1{enter}')
+    cy.get('[data-cy="confirm-password"]').type('Password1{enter}')
+    cy.contains('Invalid token').should('exist')
+    cy.get('[data-cy="return-to-login"]').should('exist')
+  })
+
+  it('request password reset with already-used token', () => {
+    cy.visit('/reset-password?token=valid-reset-token')
+    cy.get('[data-cy="new-password"]').type('Password1{enter}')
+    cy.get('[data-cy="confirm-password"]').type('Password1{enter}')
+    cy.contains('Password reset was successful').should('exist')
+    cy.get('[data-cy="return-to-login"]').click()
+
+    cy.visit('/reset-password?token=valid-reset-token')
+    cy.get('[data-cy="new-password"]').type('Password1{enter}')
+    cy.get('[data-cy="confirm-password"]').type('Password1{enter}')
+    cy.contains('Invalid token').should('exist')
+    cy.get('[data-cy="return-to-login"]').should('exist')
   })
 })
