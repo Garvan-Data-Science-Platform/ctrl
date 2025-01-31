@@ -72,15 +72,15 @@ export default function Login() {
                 <Alert severity="error">{errors.root?.serverError?.message}</Alert>
               ) : null}
             </Box>
-            <Button variant="contained" sx={{ mt: 3 }} type="submit">
+            <Button data-cy="login" variant="contained" sx={{ mt: 3 }} type="submit">
               Log In
             </Button>
           </form>
           <Box sx={{ mt: 3 }}>
-            <Button component={Link} to="/register">
+            <Button data-cy="register" component={Link} to="/register">
               Register
             </Button>
-            <Button component={Link} to="/forgot" data-cy="forgot">
+            <Button data-cy="forgot-password" component={Link} to="/forgot">
               Forgot Password
             </Button>
           </Box>

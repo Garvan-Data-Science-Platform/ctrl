@@ -210,7 +210,7 @@ export class UsersController extends Controller {
       },
     })
 
-    const resetLink = `https://${process.env.HOSTNAME}/reset-password?token=${token}`
+    const resetLink = `${process.env.HOSTNAME}/reset-password?token=${token}`
 
     const { html, text } = generatePasswordResetEmail(resetLink, user.firstName)
 
@@ -228,7 +228,7 @@ export class UsersController extends Controller {
   @Post('/password/reset')
   @SuccessResponse('200', 'OK')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
+  @Response<UnauthorizedErrorResponse>('403', 'Forbidden')
   public async resetPassword(@Body() bodyRequest: ResetPasswordRequest): Promise<void> {
     const { token, newPassword } = bodyRequest
     const passwordResetToken = await this.passwordResetTokenRepo.findUnique({

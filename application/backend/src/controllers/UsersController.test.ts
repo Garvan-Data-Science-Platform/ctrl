@@ -338,18 +338,18 @@ describe('UsersController', () => {
       expect(usedToken?.used).toBe(true)
     })
 
-    it('should return 401 for an invalid token', async () => {
+    it('should return 403 for an invalid token', async () => {
       const invalidToken = 'invalid-reset-token'
 
       const response = await request(app)
         .post('/users/password/reset')
         .send({ token: invalidToken, newPassword: 'NewPassword123!' })
 
-      expect(response.status).toBe(401)
+      expect(response.status).toBe(403)
       expect(response.body.message).toBe('Reset token invalid')
     })
 
-    it('should return 401 for an already used token', async () => {
+    it('should return 403 for an already used token', async () => {
       // Mark token as used
       await prisma.passwordResetToken.update({
         where: { token: resetToken },
@@ -363,11 +363,11 @@ describe('UsersController', () => {
 
       const response = await request(app).post('/users/password/reset').send(requestBody)
 
-      expect(response.status).toBe(401)
+      expect(response.status).toBe(403)
       expect(response.body.message).toBe('Reset token has already been used')
     })
 
-    it('should return 401 for an expired reset token', async () => {
+    it('should return 403 for an expired reset token', async () => {
       // Expire the token
       await prisma.passwordResetToken.update({
         where: { token: resetToken },
@@ -381,7 +381,7 @@ describe('UsersController', () => {
 
       const response = await request(app).post('/users/password/reset').send(requestBody)
 
-      expect(response.status).toBe(401)
+      expect(response.status).toBe(403)
       expect(response.body.message).toBe('Reset token expired')
     })
 

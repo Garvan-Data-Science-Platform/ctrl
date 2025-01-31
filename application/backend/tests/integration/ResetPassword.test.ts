@@ -127,7 +127,7 @@ describe('Password Reset', () => {
       newPassword: 'Another@Password123',
     })
 
-    expect(response.status).toBe(401)
+    expect(response.status).toBe(403)
     expect(response.body.message).toBe('Reset token has already been used')
   })
 })

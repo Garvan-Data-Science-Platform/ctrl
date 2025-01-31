@@ -8,6 +8,7 @@ export const ORG_ADMIN_ID = 97
 export const PARTICIPANT_UNANSWERED_ID = 98
 export const PARTICIPANT_COMPLETED_ID = 99
 export const PASSWORD_RESET_USER_ID = 105
+export const PASSWORD_RESET_USER_EMAIL = 'test-reset-password@example.com'
 
 export async function seedTests(prisma: PrismaClient) {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -214,7 +215,7 @@ export async function seedTests(prisma: PrismaClient) {
   await prisma.user.create({
     data: {
       id: PASSWORD_RESET_USER_ID,
-      email: 'test-reset-password@example.com',
+      email: PASSWORD_RESET_USER_EMAIL,
       firstName: 'Test',
       lastName: 'User',
       password: await hashPassword('OldPassword123'),
