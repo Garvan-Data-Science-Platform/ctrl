@@ -23,5 +23,8 @@
     "prettier": "^3.2.4",
     "start-server-and-test": "^2.0.9",
     "typescript": "^5.3.3"
+  },
+  "resolutions": {
+    "cross-spawn": "^7.0.5"
   }
 }
