@@ -442,14 +442,6 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "RevokeInviteRequest": {
-        "dataType": "refObject",
-        "properties": {
-            "emails": {"dataType":"array","array":{"dataType":"string"},"required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "DefaultSelection_Prisma._36_OrganisationPayload_": {
         "dataType": "refAlias",
         "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"updatedAt":{"dataType":"datetime","required":true},"createdAt":{"dataType":"datetime","required":true},"id":{"dataType":"double","required":true},"name":{"dataType":"string","required":true}},"validators":{}},
@@ -1370,9 +1362,9 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsInvitesController_revokeInvite: Record<string, TsoaRoute.ParameterSchema> = {
-                bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"RevokeInviteRequest"},
+                inviteID: {"in":"path","name":"inviteID","required":true,"dataType":"double"},
         };
-        app.post('/invites/revoke',
+        app.post('/invites/revoke/:inviteID',
             authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(InvitesController)),
             ...(fetchMiddlewares<RequestHandler>(InvitesController.prototype.revokeInvite)),

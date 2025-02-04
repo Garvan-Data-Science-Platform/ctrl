@@ -9,9 +9,8 @@ import type {
   GetInvitesResponse,
   GetParticipantsResponse,
   InviteParticipantsRequest,
-  RevokeInviteRequest,
 } from 'common/types/api/participants'
-import { Route, Tags, Security, Controller, Get, Response, Body, Post } from 'tsoa'
+import { Route, Tags, Security, Controller, Get, Response, Body, Path, Post } from 'tsoa'
 import { Participant } from 'common/types/api/participants/participant'
 import mailerTransporter, { fromAddress } from '../utils/mailer'
 import nodemailer from 'nodemailer'
@@ -223,32 +222,21 @@ export class InvitesController extends Controller {
   /**
    * Revoke invite
    *
-   * @summary Revoke an invite by email
+   * @summary Revoke an invite by id
    */
-  @Post('/revoke')
-  public async revokeInvite(@Body() bodyRequest: RevokeInviteRequest): Promise<void> {
-    const emails = bodyRequest.emails
-    const notFoundEmails: string[] = []
+  @Post('/revoke/{inviteID}')
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
+  public async revokeInvite(@Path() inviteID: number): Promise<void> {
+    const invite = await this.invitesRepo.findFirst({ where: { id: inviteID } })
 
-    const invites = await Promise.all(
-      emails.map(async (email) => {
-        const invite = await this.invitesRepo.findFirst({ where: { email } })
-        if (!invite) notFoundEmails.push(email)
-        return invite
-      }),
-    )
+    if (!invite) {
+      throw new NotFoundError('Invite not found')
+    }
 
-    if (invites.length == 0) throw new NotFoundError('No invites found')
-
-    await Promise.all(
-      invites.map(async (invite) => {
-        if (!invite) return
-        await this.invitesRepo.update({
-          where: { id: invite.id },
-          data: { status: InviteStatus.REVOKED },
-        })
-      }),
-    )
+    await this.invitesRepo.update({
+      where: { id: invite.id },
+      data: { status: InviteStatus.REVOKED },
+    })
   }
 
   private async sendInvites(emails: string[]): Promise<void> {

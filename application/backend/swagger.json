@@ -1109,21 +1109,6 @@
         "type": "object",
         "additionalProperties": false
       },
-      "RevokeInviteRequest": {
-        "properties": {
-          "emails": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          }
-        },
-        "required": [
-          "emails"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
       "Organisation": {
         "description": "Model Organisation",
         "properties": {
@@ -2850,7 +2835,7 @@
         "parameters": []
       }
     },
-    "/invites/revoke": {
+    "/invites/revoke/{inviteID}": {
       "post": {
         "operationId": "RevokeInvite",
         "responses": {
@@ -2867,6 +2852,16 @@
               }
             }
           },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal Server Error",
             "content": {
@@ -2879,7 +2874,7 @@
           }
         },
         "description": "Revoke invite",
-        "summary": "Revoke an invite by email",
+        "summary": "Revoke an invite by id",
         "tags": [
           "Invites"
         ],
@@ -2890,17 +2885,17 @@
             ]
           }
         ],
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RevokeInviteRequest"
-              }
+        "parameters": [
+          {
+            "in": "path",
+            "name": "inviteID",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
             }
           }
-        }
+        ]
       }
     },
     "/organisations": {
