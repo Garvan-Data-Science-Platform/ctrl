@@ -146,7 +146,7 @@ const models: TsoaRoute.Models = {
     "GeneratePasswordResetLinkRequest": {
         "dataType": "refObject",
         "properties": {
-            "email": {"dataType":"string","required":true},
+            "email": {"dataType":"string","required":true,"validators":{"pattern":{"errorMsg":"please provide valid email","value":"^(.+)@(.+)$"}}},
         },
         "additionalProperties": false,
     },
@@ -154,8 +154,8 @@ const models: TsoaRoute.Models = {
     "ResetPasswordRequest": {
         "dataType": "refObject",
         "properties": {
+            "newPassword": {"dataType":"string","required":true,"validators":{"minLength":{"errorMsg":"Password must be at least 8 characters","value":8}}},
             "token": {"dataType":"string","required":true},
-            "newPassword": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },
