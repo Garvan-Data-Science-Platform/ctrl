@@ -1090,6 +1090,34 @@
         "type": "object",
         "additionalProperties": false
       },
+      "InviteParticipantsResponse": {
+        "properties": {
+          "resendEmailRequestCount": {
+            "type": "number",
+            "format": "double"
+          },
+          "newInvitesCount": {
+            "type": "number",
+            "format": "double"
+          },
+          "emailsToResendCount": {
+            "type": "number",
+            "format": "double"
+          },
+          "alreadyAcceptedCount": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": [
+          "resendEmailRequestCount",
+          "newInvitesCount",
+          "emailsToResendCount",
+          "alreadyAcceptedCount"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
       "Email": {
         "type": "string",
         "pattern": "^(.+)@(.+)$"
@@ -2733,8 +2761,15 @@
       "post": {
         "operationId": "CreateInvites",
         "responses": {
-          "204": {
-            "description": "No content"
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InviteParticipantsResponse"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized",

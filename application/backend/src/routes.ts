@@ -429,6 +429,17 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "InviteParticipantsResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "resendEmailRequestCount": {"dataType":"double","required":true},
+            "newInvitesCount": {"dataType":"double","required":true},
+            "emailsToResendCount": {"dataType":"double","required":true},
+            "alreadyAcceptedCount": {"dataType":"double","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Email": {
         "dataType": "refAlias",
         "type": {"dataType":"string","validators":{"pattern":{"errorMsg":"Please provide valid email","value":"^(.+)@(.+)$"}}},

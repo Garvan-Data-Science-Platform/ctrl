@@ -9,7 +9,9 @@ import type {
   GetInvitesResponse,
   GetParticipantsResponse,
   InviteParticipantsRequest,
+  InviteParticipantsResponse,
 } from 'common/types/api/participants'
+import logger from 'common/src/logger'
 import { Route, Tags, Security, Controller, Get, Response, Body, Path, Post } from 'tsoa'
 import { Participant } from 'common/types/api/participants/participant'
 import mailerTransporter, { fromAddress } from '../utils/mailer'
@@ -149,7 +151,9 @@ export class InvitesController extends Controller {
    */
   @Post('/')
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
-  public async createInvites(@Body() bodyRequest: InviteParticipantsRequest): Promise<void> {
+  public async createInvites(
+    @Body() bodyRequest: InviteParticipantsRequest,
+  ): Promise<InviteParticipantsResponse> {
     const emails = bodyRequest.emails
     const expiresAt = new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000) // MAKE EXPIRY CONFIGURABLE
 
@@ -161,6 +165,13 @@ export class InvitesController extends Controller {
     const newEmails = emails.filter(
       (email) => !existingInvites.map((invite) => invite.email).includes(email),
     )
+
+    const responseData = {
+      resendEmailRequestCount: emails.length,
+      newInvitesCount: newEmails.length,
+      emailsToResendCount: undefined!, // this gets assigned below
+      alreadyAcceptedCount: undefined!, // this gets assigned below
+    }
 
     // Resend invites for existing emails
     if (existingInvites.length > 0) {
@@ -186,6 +197,11 @@ export class InvitesController extends Controller {
         }
       }
 
+      Object.assign(responseData, {
+        emailsToResendCount: emailsToResend.length,
+        alreadyAcceptedCount: existingInvites.length - emailsToResend.length,
+      })
+
       await this.sendInvites(emailsToResend)
     }
 
@@ -198,6 +214,9 @@ export class InvitesController extends Controller {
       // Send emails for new invites
       await this.sendInvites(newEmails)
     }
+
+    logger.info({ ...responseData })
+    return responseData
   }
 
   /**
