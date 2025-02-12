@@ -1,0 +1,9 @@
+dependencies:
+- name: nginx-ingress
+  repository: oci://ghcr.io/nginx/charts
+  version: 2.0.0
+- name: postgresql
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 16.3.0
+digest: sha256:18b5250c5a230f58b922df09bd2ce64de76c65257ec3d547c5394f01266a6b37
+generated: "2025-02-12T14:57:50.851922+11:00"

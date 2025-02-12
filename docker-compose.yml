@@ -31,7 +31,7 @@ services:
     depends_on:
       - db-test
     build:
-      dockerfile: Dockerfile.backend
+      dockerfile: ./application/backend/Dockerfile
     env_file:
       - ./application/backend/.env.dockertest
     healthcheck:
