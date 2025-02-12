@@ -7,8 +7,6 @@ jobs:
     name: build checks
     runs-on: ubuntu-latest
     steps:
-      - name: Check locale
-        run: locale
       - name: Check out repository code
         uses: actions/checkout@v4
       - name: Enable Corepack
