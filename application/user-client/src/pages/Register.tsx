@@ -381,9 +381,7 @@ export default function Register() {
                         ml: 1,
                       }}
                     >
-                      <Typography>
-                        This child may not be able to provide consent themselves when they reach 18
-                      </Typography>
+                      <Typography>This person is permanently incapacitated.</Typography>
                       <Checkbox
                         defaultChecked={false}
                         {...register(`dependents.${idx}.permanent`)}
