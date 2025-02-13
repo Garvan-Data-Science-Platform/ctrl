@@ -4,6 +4,11 @@
 
 replicaCount: 1
 
+auth:
+  admin: #Default admin credentials
+    email:
+    password:
+
 userClient:
   image:
     repository: australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-user-client
@@ -62,6 +67,13 @@ ingress:
               name: admin
               port:
                 number: 80
+        - path: /api/
+          pathType: Prefix
+          backend:
+            service:
+              name: backend
+              port:
+                number: 80
 
 imagePullSecrets: []
 nameOverride: ''
@@ -97,8 +109,6 @@ securityContext:
 service:
   type: NodePort
   port: 80
-
-hostname: ctrlhost
 
 tls: []
 #  - secretName: chart-example-tls

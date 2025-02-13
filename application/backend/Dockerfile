@@ -26,4 +26,4 @@ RUN yarn workspace backend tsoa:spec
 
 
 #ENTRYPOINT ["tail", "-f", "/dev/null"]
-CMD yarn workspace backend prisma:migrate && yarn workspace backend start
+ENTRYPOINT [ "sh", "application/backend/scripts/entrypoint.sh" ]

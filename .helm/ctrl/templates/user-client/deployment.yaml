@@ -22,7 +22,7 @@ spec:
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        app: ADMINCLIENT
+        app: USERCLIENT
     spec:
       {{- with .Values.userClient.imagePullSecrets }}
       imagePullSecrets:

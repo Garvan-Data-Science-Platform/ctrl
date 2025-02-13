@@ -45,6 +45,10 @@ spec:
                 secretKeyRef:
                   name: ctrl-postgresql
                   key: postgres-password
+            - name: ADMIN_EMAIL
+              value: {{ .Values.auth.admin.email }}
+            - name: ADMIN_PASSWORD
+              value: {{ .Values.auth.admin.password }}
           ports:
             - name: http
               containerPort: 5000
