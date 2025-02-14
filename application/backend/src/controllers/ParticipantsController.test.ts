@@ -2,7 +2,11 @@ import { generateToken } from '../authentication'
 import { Api } from '../Api'
 import { resetDB } from 'common/testing/TestHelpers'
 import request from 'supertest'
-import { GetInvitesResponse, GetParticipantsResponse } from 'common/types/api/participants'
+import {
+  GetInvitesResponse,
+  GetParticipantsResponse,
+  InviteParticipantsResponse,
+} from 'common/types/api/participants'
 import { ORG_ADMIN_ID } from 'common/testing/seed'
 import { InviteStatus } from '@prisma/client'
 import prisma from '../PrismaClient'
@@ -12,6 +16,8 @@ const mockNodeMailer = nodemailer as unknown as NodemailerMock
 
 const api = new Api()
 const app = api.app
+
+const expectedNumberOfInvites = 7
 
 describe('ParticipantsController', () => {
   let registeredUserToken: string
@@ -82,7 +88,7 @@ describe('InvitesController', () => {
       expect(response.status).toBe(200)
 
       const body: GetInvitesResponse = response.body
-      expect(body.data).toHaveLength(7)
+      expect(body.data).toHaveLength(expectedNumberOfInvites)
       expect(body.data[0].inviteStatus).toBe(InviteStatus.PENDING)
       expect(body.data[1].inviteStatus).toBe(InviteStatus.ACCEPTED)
       expect(body.data[2].inviteStatus).toBe(InviteStatus.REVOKED)
@@ -94,7 +100,7 @@ describe('InvitesController', () => {
   })
 
   describe('POST /invites', () => {
-    it('should create new invites from a list of emails and send the invites to their emails', async () => {
+    it('should create new invites from a list of emails, return data about how many new invites were created, and send the invites to their emails', async () => {
       const emails = ['invite5@new.com', 'invite6@new.com']
 
       const response = await request(app)
@@ -102,7 +108,10 @@ describe('InvitesController', () => {
         .send({ emails })
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
-      expect(response.status).toBe(204)
+      const body: InviteParticipantsResponse = response.body
+      expect(response.status).toBe(200)
+
+      expect(body.newInvitesCount).toBe(2)
 
       // Check emails were successfully sent
       const sentEmails = mockNodeMailer.mock.getSentMail()
@@ -115,12 +124,14 @@ describe('InvitesController', () => {
       // Check invites were created
       for (const email of emails) {
         const createdInvite = await prisma.invite.findUnique({ where: { email } })
-        if (!createdInvite) throw new Error('Invite not found')
-        expect(createdInvite.status).toBe('PENDING')
+        expect(createdInvite).toBeDefined()
+
+        // See link about non-null assertion operator https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-0.html#non-null-assertion-operator
+        expect(createdInvite!.status).toBe('PENDING')
 
         // Check expiry
         const currentTime = new Date()
-        expect(new Date(createdInvite.expiresAt).getTime()).toBeGreaterThan(currentTime.getTime())
+        expect(new Date(createdInvite!.expiresAt).getTime()).toBeGreaterThan(currentTime.getTime())
       }
     }, 100000)
 
@@ -130,10 +141,10 @@ describe('InvitesController', () => {
         where: { email: 'invite3@revoked.com' },
       })
 
-      if (!invite) throw new Error('Invite not found')
+      expect(invite).toBeDefined()
 
-      expect(invite.status).toBe('REVOKED')
-      const oldExpiresAt = invite.expiresAt
+      expect(invite!.status).toBe('REVOKED')
+      const oldExpiresAt = invite!.expiresAt
 
       // Create invite for revoked
       const response = await request(app)
@@ -141,7 +152,9 @@ describe('InvitesController', () => {
         .send({ emails: ['invite3@revoked.com'] })
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
-      expect(response.status).toBe(204)
+      const body: InviteParticipantsResponse = response.body
+      expect(response.status).toBe(200)
+      expect(body.emailsToResendCount).toBe(1)
 
       // Check emails were successfully sent
       const sentEmails = mockNodeMailer.mock.getSentMail()
@@ -153,12 +166,12 @@ describe('InvitesController', () => {
       const updatedInvite = await prisma.invite.findUnique({
         where: { email: 'invite3@revoked.com' },
       })
-      if (!updatedInvite) throw new Error('Invite not found')
+      expect(updatedInvite).toBeDefined()
 
-      expect(updatedInvite.status).toBe('PENDING')
+      expect(updatedInvite!.status).toBe('PENDING')
 
       // Check expiry was reset
-      expect(new Date(updatedInvite.expiresAt).getTime()).toBeGreaterThan(oldExpiresAt.getTime())
+      expect(new Date(updatedInvite!.expiresAt).getTime()).toBeGreaterThan(oldExpiresAt.getTime())
     }, 100000)
 
     it('should resend emails for status PENDING invites and reset the expiry', async () => {
@@ -169,9 +182,9 @@ describe('InvitesController', () => {
         where: { email: emailPendingInvite },
       })
 
-      if (!invite) throw new Error('Invite not found')
+      expect(invite).toBeDefined()
 
-      expect(invite.status).toBe('PENDING')
+      expect(invite!.status).toBe('PENDING')
       // const oldExpiresAt = invite.expiresAt
 
       const response = await request(app)
@@ -179,7 +192,9 @@ describe('InvitesController', () => {
         .send({ emails: [emailPendingInvite] })
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
-      expect(response.status).toBe(204)
+      const body: InviteParticipantsResponse = response.body
+      expect(response.status).toBe(200)
+      expect(body.emailsToResendCount).toBe(1)
 
       // Check email(s) were successfully sent
       const sentEmails = mockNodeMailer.mock.getSentMail()
@@ -192,9 +207,9 @@ describe('InvitesController', () => {
         where: { email: emailPendingInvite },
       })
 
-      if (!updatedInvite) throw new Error('Invite not found')
+      expect(updatedInvite).toBeDefined()
 
-      expect(updatedInvite.status).toBe('PENDING')
+      expect(updatedInvite!.status).toBe('PENDING')
 
       // Check expiry(s) were reset (TODO: FIX)
       // const currentTime = new Date()
@@ -210,7 +225,9 @@ describe('InvitesController', () => {
         .send({ emails: [emailAcceptedInvite] })
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
-      expect(response.status).toBe(204)
+      const body: InviteParticipantsResponse = response.body
+      expect(response.status).toBe(200)
+      expect(body.alreadyAcceptedCount).toBe(1)
 
       // Check email(s) were not sent
       const sentEmails = mockNodeMailer.mock.getSentMail()
@@ -221,9 +238,9 @@ describe('InvitesController', () => {
         where: { email: emailAcceptedInvite },
       })
 
-      if (!updatedInvite) throw new Error('Invite not found')
+      expect(updatedInvite).toBeDefined()
 
-      expect(updatedInvite.status).toBe('ACCEPTED')
+      expect(updatedInvite!.status).toBe('ACCEPTED')
 
       // Check expiry(s) were not reset (TODO: FIX)
     })
@@ -251,9 +268,15 @@ describe('InvitesController', () => {
     it('should change invites status from PENDING to REVOKED given email(s)', async () => {
       const emailPendingInvite = 'invite1@pending.com'
 
+      const invite = await prisma.invite.findUnique({
+        where: { email: emailPendingInvite },
+      })
+
+      expect(invite).toBeDefined()
+      expect(invite!.status).toBe('PENDING')
+
       const response = await request(app)
-        .post('/invites/revoke')
-        .send({ emails: [emailPendingInvite] })
+        .post(`/invites/revoke/${invite!.id}`)
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       expect(response.status).toBe(204)
@@ -262,17 +285,17 @@ describe('InvitesController', () => {
       const updatedInvite = await prisma.invite.findUnique({
         where: { email: emailPendingInvite },
       })
-      if (!updatedInvite) throw new Error('Invite not found')
-      expect(updatedInvite.status).toBe('REVOKED')
+      expect(updatedInvite).toBeDefined()
+      expect(updatedInvite!.status).toBe('REVOKED')
     })
 
-    it('should return 200 even if the invite does not exist for security reasons', async () => {
+    it('should return error if revoking an invite that does not exist', async () => {
       const response = await request(app)
         .post('/invites/revoke')
-        .send({ emails: ['notexisting@email.com'] })
+        .send({ inviteId: expectedNumberOfInvites + 1 })
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
-      expect(response.status).toBe(204)
+      expect(response.status).toBe(404)
     })
   })
 })

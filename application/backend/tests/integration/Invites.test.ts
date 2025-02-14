@@ -6,11 +6,12 @@ import {
   ParticipantType,
   StateTerritory,
 } from 'common/types/api/users/ParticipantProfile'
-import { Role } from '@prisma/client'
+import { InviteStatus, Role } from '@prisma/client'
 import { NodemailerMock } from 'nodemailer-mock'
 import * as nodemailer from 'nodemailer'
 import { generateToken } from '../../src/authentication'
 import { RegisterParticipantRequest } from 'common/types/api/auth'
+import { GetInvitesResponse, InviteParticipantsResponse } from 'common/types/api/participants'
 import prisma from '../../src/PrismaClient'
 const mockNodeMailer = nodemailer as unknown as NodemailerMock
 
@@ -50,6 +51,10 @@ describe('Participant Invites', () => {
     await resetDB()
   })
 
+  beforeEach(async () => {
+    await resetDB()
+  })
+
   afterEach(async () => {
     mockNodeMailer.mock.reset()
   })
@@ -63,7 +68,6 @@ describe('Participant Invites', () => {
     const response = await request(app)
       .post('/auth/register/participant')
       .send(participantRegisterRequestBody)
-    console.log(response)
     expect(response.status).toBe(404)
     expect(response.body.message).toBe(
       `Invite for ${participantRegisterRequestBody.email} not found`,
@@ -78,7 +82,9 @@ describe('Participant Invites', () => {
         emails: [participantRegisterRequestBody.email],
       })
       .set({ Authorization: `Bearer ${orgAdminToken}` })
-    expect(response.status).toBe(204)
+    const body: InviteParticipantsResponse = response.body
+    expect(response.status).toBe(200)
+    expect(body.newInvitesCount).toBe(1)
 
     // Check emails were successfully sent
     const sentEmails = mockNodeMailer.mock.getSentMail()
@@ -91,51 +97,78 @@ describe('Participant Invites', () => {
       where: { email: participantRegisterRequestBody.email },
     })
 
-    if (!createdInvite) throw new Error('Invite not found')
-
-    expect(createdInvite.status).toBe('PENDING')
+    expect(createdInvite).toBeDefined()
+    // See link about non-null assertion operator https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-0.html#non-null-assertion-operator
+    expect(createdInvite!.status).toBe('PENDING')
   })
 
   it('should allow an OrganisationAdmin user to resend invites with status PENDING', async () => {
-    // Resend an invite
+    // Send a new invite
     const response = await request(app)
+      .post('/invites')
+      .send({
+        emails: [participantRegisterRequestBody.email],
+      })
+      .set({ Authorization: `Bearer ${orgAdminToken}` })
+    expect(response.status).toBe(200)
+
+    // Reset mailer to clear intial invite email
+    mockNodeMailer.mock.reset()
+
+    // get number of PENDING invites from seed to avoid hardcoding
+    const pendingResponse = await request(app)
+      .get('/invites')
+      .set({ Authorization: `Bearer ${orgAdminToken}` })
+    expect(pendingResponse.status).toBe(200)
+
+    const body: GetInvitesResponse = pendingResponse.body
+
+    const pendingCount = body.data.filter(
+      (invite) => invite.inviteStatus === InviteStatus.PENDING,
+    ).length
+
+    // Resend invites ()
+    const resendResponse = await request(app)
       .post(`/invites/resend`)
       .set({ Authorization: `Bearer ${orgAdminToken}` })
-    expect(response.status).toBe(204)
+    expect(resendResponse.status).toBe(204)
 
     // Check emails were successfully sent again
     const sentEmails = mockNodeMailer.mock.getSentMail()
-    expect(sentEmails.length).toBe(5)
-    expect(sentEmails[4].to).toBe(participantRegisterRequestBody.email)
-    expect(sentEmails[4].from).toBe(`CTRL <noreply@${process.env.HOSTNAME}>`)
+    expect(sentEmails.length).toBe(pendingCount)
+    // adjust count to be used as index
+    expect(sentEmails[pendingCount - 1].to).toBe(participantRegisterRequestBody.email)
+    // adjust count to be used as index
+    expect(sentEmails[pendingCount - 1].from).toBe(`CTRL <noreply@${process.env.HOSTNAME}>`)
   })
 
   it('should allow an OrganisationAdmin user to REVOKE invites to participants with status PENDING', async () => {
     // Send a new invite
-    const response1 = await request(app)
+    const response = await request(app)
       .post('/invites')
       .send({
         emails: [participantRegisterRequestBody.email],
       })
       .set({ Authorization: `Bearer ${orgAdminToken}` })
 
-    expect(response1.status).toBe(204)
+    const body: InviteParticipantsResponse = response.body
+    expect(response.status).toBe(200)
+    expect(body.newInvitesCount).toBe(1)
 
     // Check the invite exists
     const invite = await prisma.invite.findUnique({
       where: { email: participantRegisterRequestBody.email },
     })
 
-    if (!invite) throw new Error('Invite not found')
-    expect(invite.status).toBe('PENDING')
+    expect(invite).toBeDefined()
+    expect(invite!.status).toBe('PENDING')
 
     // Revoke an invite
-    const response2 = await request(app)
-      .post(`/invites/revoke`)
+    const revokedResponse = await request(app)
+      .post(`/invites/revoke/${invite!.id}`)
       .set({ Authorization: `Bearer ${orgAdminToken}` })
-      .send({ emails: [participantRegisterRequestBody.email] })
 
-    expect(response2.status).toBe(204)
+    expect(revokedResponse.status).toBe(204)
 
     // Check invite was revoked
     const revokedInvite = await prisma.invite.findUnique({
@@ -170,27 +203,30 @@ describe('Participant Invites', () => {
 
   it('should allow participants to register using a PENDING invite', async () => {
     // Send a new invite
-    const response1 = await request(app)
+    const response = await request(app)
       .post('/invites')
       .send({
         emails: [participantRegisterRequestBody.email],
       })
       .set({ Authorization: `Bearer ${orgAdminToken}` })
-    expect(response1.status).toBe(204)
+    const body: InviteParticipantsResponse = response.body
+    expect(response.status).toBe(200)
+
+    expect(body.resendEmailRequestCount).toBe(1)
 
     // Check the invite exists
     const invite = await prisma.invite.findUnique({
       where: { email: participantRegisterRequestBody.email },
     })
 
-    if (!invite) throw new Error('Invite not found')
-    expect(invite.status).toBe('PENDING')
+    expect(invite).toBeDefined()
+    expect(invite!.status).toBe('PENDING')
     // Register a participant with an invite
-    const response2 = await request(app)
+    const registerResponse = await request(app)
       .post('/auth/register/participant')
       .send(participantRegisterRequestBody)
 
-    expect(response2.status).toBe(201)
-    expect(response2.body.token).not.toBe(undefined)
+    expect(registerResponse.status).toBe(201)
+    expect(registerResponse.body.token).not.toBe(undefined)
   })
 })
