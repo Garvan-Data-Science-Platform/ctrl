@@ -190,6 +190,14 @@ export class InvitesController extends Controller {
           // Add to list of emails to resend
           emailsToResend.push(invite.email)
         } else if (invite.status === 'PENDING') {
+          // Update expiry datetime
+          await this.invitesRepo.update({
+            where: { id: invite.id },
+            data: {
+              expiresAt: expiresAt,
+            },
+          })
+
           // Add to list of emails to resend
           emailsToResend.push(invite.email)
         } else if (invite.status === 'ACCEPTED') {

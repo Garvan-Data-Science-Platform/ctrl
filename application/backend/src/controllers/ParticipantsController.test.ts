@@ -185,7 +185,7 @@ describe('InvitesController', () => {
       expect(invite).toBeDefined()
 
       expect(invite!.status).toBe('PENDING')
-      // const oldExpiresAt = invite.expiresAt
+      const oldExpiresAt = invite!.expiresAt
 
       const response = await request(app)
         .post('/invites')
@@ -211,10 +211,12 @@ describe('InvitesController', () => {
 
       expect(updatedInvite!.status).toBe('PENDING')
 
-      // Check expiry(s) were reset (TODO: FIX)
-      // const currentTime = new Date()
-      // expect(new Date(updatedInvite.expiresAt).getTime()).toBeGreaterThan(currentTime.getTime())
-      // expect(new Date(updatedInvite.expiresAt).getTime()).toBeGreaterThan(oldExpiresAt.getTime())
+      // Check expiry(s) are in the future, and were reset
+      const currentTime = new Date()
+      expect(new Date(updatedInvite!.expiresAt).getTime()).toBeGreaterThan(currentTime.getTime())
+      expect(new Date(updatedInvite!.expiresAt).getTime()).toBeGreaterThan(
+        new Date(oldExpiresAt).getTime(),
+      )
     })
 
     it('should do nothing for status ACCEPTED invites', async () => {
