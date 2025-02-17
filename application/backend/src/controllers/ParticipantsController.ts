@@ -16,6 +16,7 @@ import { Route, Tags, Security, Controller, Get, Response, Body, Path, Post } fr
 import { Participant } from 'common/types/api/participants/participant'
 import mailerTransporter, { fromAddress } from '../utils/mailer'
 import nodemailer from 'nodemailer'
+import { generateInviteEmail } from '../utils/generateInviteTemplate'
 import { InviteStatus } from '../../../common/types/api/participants/invite'
 import { NotFoundError } from '../middlewares/ErrorHandler'
 
@@ -267,13 +268,18 @@ export class InvitesController extends Controller {
   }
 
   private async sendInvites(emails: string[]): Promise<void> {
+    const registerLink = `${process.env.HOSTNAME}/register`
+
     for (const email of emails) {
       // TODO: Make the email contents configurable
+      const { html, text } = generateInviteEmail(registerLink)
+
       const mailOptions: nodemailer.SendMailOptions = {
         from: fromAddress,
         to: email,
-        subject: 'Invitation to ctrl',
-        text: 'You have been invited to participate in x study. Please register here: link',
+        subject: 'Invitation to CTRL - dynamic consent platform',
+        text,
+        html,
       }
       await mailerTransporter.sendMail(mailOptions)
     }
