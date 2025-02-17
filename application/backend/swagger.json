@@ -276,7 +276,8 @@
       "GeneratePasswordResetLinkRequest": {
         "properties": {
           "email": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^(.+)@(.+)$"
           }
         },
         "required": [
@@ -287,23 +288,20 @@
       },
       "ResetPasswordRequest": {
         "properties": {
-          "token": {
-            "type": "string"
-          },
           "newPassword": {
+            "type": "string",
+            "minLength": 8
+          },
+          "token": {
             "type": "string"
           }
         },
         "required": [
-          "token",
-          "newPassword"
+          "newPassword",
+          "token"
         ],
         "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "token": "some-valid-token",
-          "newPassword": "NewPassword123"
-        }
+        "additionalProperties": false
       },
       "SurveyVersionStatus": {
         "type": "string",
@@ -1946,6 +1944,16 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -3560,8 +3568,15 @@
       "get": {
         "operationId": "HealthCheck",
         "responses": {
-          "204": {
-            "description": "No content"
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           }
         },
         "description": "Health check to ensure server is up and running",
