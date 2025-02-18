@@ -26,5 +26,8 @@
   },
   "resolutions": {
     "cross-spawn": "^7.0.5"
+  },
+  "dependencies": {
+    "pdf-lib": "^1.17.1"
   }
 }
