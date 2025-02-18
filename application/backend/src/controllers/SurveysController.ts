@@ -208,6 +208,39 @@ export class SurveysController extends Controller {
    *
    * @summary Get all responses for a survey participant
    */
+  @Get('/responses/current')
+  @Response('404', 'Not Found')
+  @Security('jwt')
+  public async getCurrentResponses(@Request() request: any): Promise<GetResponsesByIdResponse> {
+    const profile = await this.profileRepo.findFirstOrThrow({
+      where: { userId: request.user.userId }, //TODO: STUDYID
+    })
+
+    const surveyParticipant = await this.spRepo.findFirstOrThrow({
+      where: { profileId: profile.id },
+    })
+
+    const survey = await this.surveyRepo.findUniqueOrThrow({
+      where: { id: surveyParticipant.versionId },
+    })
+
+    const currentAnswers = surveyParticipant.answers
+
+    const stepData = survey.data
+
+    for (const step in stepData) {
+      stepData[step] = populateSurveyStepAnswers(stepData[step], currentAnswers[step].answers)
+      stepData[step].last_updated = currentAnswers[step].last_updated
+    }
+
+    return { data: stepData }
+  }
+
+  /**
+   * Get responses
+   *
+   * @summary Get all responses for a survey participant
+   */
   @Get('/responses/:participantId')
   @Response('404', 'Not Found')
   public async getResponsesById(@Path() participantId: number): Promise<GetResponsesByIdResponse> {

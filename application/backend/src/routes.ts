@@ -1105,6 +1105,37 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsSurveysController_getCurrentResponses: Record<string, TsoaRoute.ParameterSchema> = {
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
+        };
+        app.get('/surveys/responses/current',
+            authenticateMiddleware([{"jwt":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(SurveysController)),
+            ...(fetchMiddlewares<RequestHandler>(SurveysController.prototype.getCurrentResponses)),
+
+            async function SurveysController_getCurrentResponses(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsSurveysController_getCurrentResponses, request, response });
+
+                const controller = new SurveysController();
+
+              await templateService.apiHandler({
+                methodName: 'getCurrentResponses',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsSurveysController_getResponsesById: Record<string, TsoaRoute.ParameterSchema> = {
                 participantId: {"in":"path","name":"participantId","required":true,"dataType":"double"},
         };
