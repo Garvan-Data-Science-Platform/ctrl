@@ -18,6 +18,7 @@ import Circle from '@mui/icons-material/Circle'
 import { Link } from 'react-router-dom'
 import { GetParticipantProfileResponse } from '@common/types/api/users'
 import { apiClient } from '../apiClient'
+import { handlePdfDownload } from '../pdfGenerator'
 
 export default function Dashboard() {
   const { isPending, error, data } = useQuery({
@@ -166,7 +167,7 @@ export default function Dashboard() {
         ))}
         <Box sx={{ display: 'flex' }}>
           <Box sx={{ flexGrow: 1 }} />
-          <Button variant="contained" sx={{ mt: 3 }}>
+          <Button variant="contained" sx={{ mt: 3 }} onClick={handlePdfDownload}>
             View Responses
           </Button>
         </Box>
