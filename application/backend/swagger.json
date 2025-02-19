@@ -853,6 +853,10 @@
               },
               "firstName": {
                 "type": "string"
+              },
+              "id": {
+                "type": "number",
+                "format": "double"
               }
             },
             "required": [
@@ -862,7 +866,8 @@
               "mobile",
               "dob",
               "lastName",
-              "firstName"
+              "firstName",
+              "id"
             ],
             "type": "object"
           }

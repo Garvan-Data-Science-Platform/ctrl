@@ -11,12 +11,13 @@ import {
 } from '@mui/material'
 import NavBar from '../components/NavBar'
 import type { GetUserSurveyStepsResponse } from '@common/types/api/surveys'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import CheckCircle from '@mui/icons-material/CheckCircle'
 import InfoOutlined from '@mui/icons-material/InfoOutlined'
 import Circle from '@mui/icons-material/Circle'
 import { Link } from 'react-router-dom'
 import { GetParticipantProfileResponse } from '@common/types/api/users'
+import { GetResponsesByIdResponse } from '@common/types/api/surveys'
 import { apiClient } from '../apiClient'
 import { createPdf } from '../pdfGenerator'
 
@@ -29,13 +30,30 @@ export default function Dashboard() {
         .then((res) => res.data) as Promise<GetUserSurveyStepsResponse>,
   })
 
-  const { data: pdata } = useQuery({
+  const { data: profileData } = useQuery({
     queryKey: ['profile', 'get'],
     queryFn: () =>
       apiClient
         .get('/profiles/current')
         .then((res) => res.data) as Promise<GetParticipantProfileResponse>,
   })
+
+  const queryClient = useQueryClient()
+
+  const handleClick = async (profileData: GetParticipantProfileResponse) => {
+    const responseData = await queryClient.fetchQuery({
+      queryKey: ['surveys', 'get', profileData.data.id],
+      queryFn: () =>
+        apiClient
+          .get(`/surveys/responses/${profileData.data.id}`)
+          .then((res) => res.data) as Promise<GetResponsesByIdResponse>,
+    })
+
+    await createPdf(
+      profileData as GetParticipantProfileResponse,
+      responseData as GetResponsesByIdResponse,
+    )
+  }
 
   const renderReviewStatus = (status: 'completed' | 'viewed' | 'review_required') => {
     if (['viewed', 'completed'].includes(status)) {
@@ -82,7 +100,7 @@ export default function Dashboard() {
       <NavBar />
       <Container maxWidth="md">
         <Typography variant="h3" textAlign="left" sx={{ mt: 3, mb: 3 }}>
-          Welcome {pdata?.data?.firstName}
+          Welcome {profileData?.data?.firstName}
         </Typography>
         {data?.data.map((val, idx) => (
           <Card
@@ -170,7 +188,7 @@ export default function Dashboard() {
           <Button
             variant="contained"
             sx={{ mt: 3 }}
-            onClick={() => pdata && createPdf(pdata as GetParticipantProfileResponse)}
+            onClick={() => profileData && handleClick(profileData as GetParticipantProfileResponse)}
           >
             View Responses
           </Button>
