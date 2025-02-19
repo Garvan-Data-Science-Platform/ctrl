@@ -41,7 +41,7 @@ ingress:
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
-    - host: ctrlhost
+    - host: ctrldemo.dsp.garvan.org.au
       paths:
         - path: /api/
           pathType: Prefix
@@ -58,7 +58,7 @@ ingress:
               port:
                 number: 80
 
-    - host: ctrladmin
+    - host: admin.ctrldemo.dsp.garvan.org.au
       paths:
         - path: /
           pathType: Prefix
