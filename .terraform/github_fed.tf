@@ -38,11 +38,11 @@ resource "google_iam_workload_identity_pool_provider" "pool_provider" {
     "attribute.aud"        = "assertion.aud"
     "attribute.actor"      = "assertion.actor"
     "attribute.repository" = "assertion.repository"
+    "attribute.org"        = "assertion.repository_owner"
   }
-  attribute_condition = "attribute.repository == assertion.repository && attribute.repository_owner == assertion.repository_owner"
+  attribute_condition = "attribute.org == \"Garvan-Data-Science-Platform\""
   oidc {
     issuer_uri        = "https://token.actions.githubusercontent.com"
-    allowed_audiences = []
   }
 }
 
