@@ -79,6 +79,10 @@ imagePullSecrets: []
 nameOverride: ''
 fullnameOverride: ''
 
+postgresql:
+  auth:
+    database: ctrl
+
 serviceAccount:
   # Specifies whether a service account should be created
   create: true

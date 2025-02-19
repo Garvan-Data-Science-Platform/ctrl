@@ -1,10 +1,13 @@
 name: Build and push
 
 on:
-  workflow_run: ["Build checks"]
-    branches: [main]
-    types:
-      - completed
+  #workflow_run: ["Build checks"]
+  #  branches: [main]
+  #  types:
+  #    - completed
+  push:
+    branches:
+      - '*'
 
 jobs:
   release:
