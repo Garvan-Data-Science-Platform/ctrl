@@ -27,7 +27,7 @@ jobs:
           service_account: 'ctrl-ci-sa@ctrl-358804.iam.gserviceaccount.com'
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@
+        uses: docker/setup-buildx-action@v2
 
       - name: Build and push
         uses: docker/build-push-action@v3
