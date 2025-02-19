@@ -29,12 +29,12 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-            context: .
-            file: application/backend/Dockerfile
-            platforms: linux/amd64,linux/arm64
-            push: true
-            tags: |
+          context: .
+          file: application/backend/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
             australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-backend:latest
             australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-backend:${{ github.sha }}
-            cache-from: type=gha
-            cache-to: type=gha,mode=max
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
