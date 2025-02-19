@@ -40,7 +40,7 @@ resource "google_iam_workload_identity_pool_provider" "pool_provider" {
     "attribute.repository" = "assertion.repository"
     "attribute.org"        = "assertion.repository_owner"
   }
-  attribute_condition = "attribute.org == \"Garvan-Data-Science-Platform\""
+  attribute_condition = "assertion.repository_owner == 'Garvan-Data-Science-Platform'"
   oidc {
     issuer_uri        = "https://token.actions.githubusercontent.com"
   }
