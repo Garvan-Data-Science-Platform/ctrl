@@ -26,10 +26,10 @@ jobs:
           workload_identity_provider: 'projects/ctrl-358804/locations/global/workloadIdentityPools/ctrl-next-id-pool/providers/github-provider'
           service_account: 'ctrl-ci-sa@ctrl-358804.iam.gserviceaccount.com'
 
-      - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v2'
-        with:
-          project_id: 'ctrl-358804'
+      #- name: 'Set up Cloud SDK'
+      #  uses: 'google-github-actions/setup-gcloud@v2'
+      #  with:
+      #    project_id: 'ctrl-358804'
 
       - name: 'Docker auth'
         run: gcloud auth configure-docker australia-southeast1-docker.pkg.dev
