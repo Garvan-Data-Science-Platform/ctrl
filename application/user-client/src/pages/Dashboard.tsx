@@ -11,13 +11,13 @@ import {
 } from '@mui/material'
 import NavBar from '../components/NavBar'
 import type { GetUserSurveyStepsResponse } from '@common/types/api/surveys'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import CheckCircle from '@mui/icons-material/CheckCircle'
 import InfoOutlined from '@mui/icons-material/InfoOutlined'
 import Circle from '@mui/icons-material/Circle'
 import { Link } from 'react-router-dom'
 import { GetParticipantProfileResponse } from '@common/types/api/users'
-// import { GetResponsesByIdResponse } from '@common/types/api/surveys'
+import { GetResponsesByIdResponse } from '@common/types/api/surveys'
 import { apiClient } from '../apiClient'
 import ResponsesPdf from '../components/PdfExport'
 import { BlobProvider } from '@react-pdf/renderer'
@@ -39,22 +39,22 @@ export default function Dashboard() {
         .then((res) => res.data) as Promise<GetParticipantProfileResponse>,
   })
 
-  // const queryClient = useQueryClient()
+  const queryClient = useQueryClient()
 
-  // const handleClick = async (profileData: GetParticipantProfileResponse) => {
-  //   const responseData = await queryClient.fetchQuery({
-  //     queryKey: ['surveys', 'get', profileData.data.id],
-  //     queryFn: () =>
-  //       apiClient
-  //         .get(`/surveys/responses/${profileData.data.id}`)
-  //         .then((res) => res.data) as Promise<GetResponsesByIdResponse>,
-  //   })
+  const handleClick = async (profileData: GetParticipantProfileResponse) => {
+    const responseData = await queryClient.fetchQuery({
+      queryKey: ['surveys', 'get', profileData.data.id],
+      queryFn: () =>
+        apiClient
+          .get(`/surveys/responses/${profileData.data.id}`)
+          .then((res) => res.data) as Promise<GetResponsesByIdResponse>,
+    })
 
-  //   exportPdf(
-  //     profileData as GetParticipantProfileResponse,
-  //     responseData as GetResponsesByIdResponse,
-  //   )
-  // }
+    await createPdf(
+      profileData as GetParticipantProfileResponse,
+      responseData as GetResponsesByIdResponse,
+    )
+  }
 
   const renderReviewStatus = (status: 'completed' | 'viewed' | 'review_required') => {
     if (['viewed', 'completed'].includes(status)) {
@@ -186,26 +186,13 @@ export default function Dashboard() {
         ))}
         <Box sx={{ display: 'flex' }}>
           <Box sx={{ flexGrow: 1 }} />
-          <BlobProvider document={<ResponsesPdf />}>
-            {({ blob, loading, error }) => (
-              <Button
-                variant="contained"
-                sx={{ mt: 3 }}
-                // onClick={() => profileData && handleClick(profileData as GetParticipantProfileResponse)}
-                onClick={() => {
-                  if (blob) {
-                    const link = document.createElement('a')
-                    link.href = URL.createObjectURL(blob)
-                    link.download = `CTRL-responses-${profileData!.data.firstName}_${profileData!.data.lastName}.pdf`
-                    link.click()
-                  }
-                }}
-                disabled={loading || !!error}
-              >
-                {loading ? 'Loading document...' : 'View Responses'}
-              </Button>
-            )}
-          </BlobProvider>
+          <Button
+            variant="contained"
+            sx={{ mt: 3 }}
+            onClick={() => profileData && handleClick(profileData as GetParticipantProfileResponse)}
+          >
+            View Responses
+          </Button>
         </Box>
       </Container>
     </>
