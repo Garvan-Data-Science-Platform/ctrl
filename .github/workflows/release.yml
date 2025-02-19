@@ -5,13 +5,13 @@ on:
     branches:
       - '*'
 
-permissions:
-  contents: read
-
 jobs:
   release:
     name: build and push
     runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
