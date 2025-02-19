@@ -1,13 +1,10 @@
 name: Build and push
 
 on:
-  #workflow_run: ["Build checks"]
-  #  branches: [main]
-  #  types:
-  #    - completed
-  push:
-    branches:
-      - '*'
+  workflow_run: ["Build checks"]
+    branches: [main]
+    types:
+      - completed
 
 jobs:
   release:
@@ -25,11 +22,6 @@ jobs:
         with:
           workload_identity_provider: 'projects/43338454952/locations/global/workloadIdentityPools/ctrl-next-id-pool/providers/github-provider'
           service_account: 'ctrl-ci-sa@ctrl-358804.iam.gserviceaccount.com'
-
-      #- name: 'Set up Cloud SDK'
-      #  uses: 'google-github-actions/setup-gcloud@v2'
-      #  with:
-      #    project_id: 'ctrl-358804'
 
       - name: 'Docker auth'
         run: gcloud auth configure-docker australia-southeast1-docker.pkg.dev

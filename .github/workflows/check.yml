@@ -3,9 +3,8 @@ name: Build checks
 on:
   push:
     branches:
-      - none
-      #- '**'
-      #- '!main'
+      - '**'
+      - '!main'
 
 jobs:
   build-checks:
