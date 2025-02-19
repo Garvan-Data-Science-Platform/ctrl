@@ -45,7 +45,7 @@ export function generateInviteEmail(registerLink: string): { html: string; text:
         <p>Hello,</p>
         <p>You have been invited to register with CTRL dynamic consent platform.</p>
         <p>Click the button below to register with CTRL:</p>
-        <a href="${registerLink}" class="button" target="_blank">Reset Password</a>
+        <a href="${registerLink}" class="button" target="_blank">Register</a>
         <p>If the button above does not work, copy and paste the following URL into your browser:</p>
         <p><a href="${registerLink}" target="_blank">${registerLink}</a></p>
         <p class="footer">If you have any issues, please contact our support team.</p>
