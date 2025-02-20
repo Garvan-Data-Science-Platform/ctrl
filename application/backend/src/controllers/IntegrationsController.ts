@@ -28,6 +28,7 @@ import { SurveyStep } from 'common/types/survey'
 import exampleREDCapMapping from '../../../integrations/src/exampleREDCapMapping.json'
 import { parseCSV, validateFile } from '../utils/parseCsv'
 import { FileUploadError } from '../middlewares/ErrorHandler'
+import logger from 'common/src/logger'
 import { AuthController } from './AuthController'
 const upload = multer({ storage: multer.memoryStorage() })
 
@@ -58,7 +59,7 @@ export class IntegrationsController extends Controller {
   }
 
   @Post('/redcap/participant/upload/api')
-  @SuccessResponse('201', 'Created Participants from CSV')
+  @SuccessResponse('201', 'Created Participants from REDCap API')
   public async uploadRedcapParticipantAPI(
     @Body() bodyRequest: UploadRedcapParticipantAPIRequest,
   ): Promise<UploadRedcapParticipantResponse> {
@@ -109,7 +110,7 @@ export class IntegrationsController extends Controller {
   }
 
   @Post('/redcap/instrument/upload/api')
-  @SuccessResponse('201', 'Created Survey using Redcap API')
+  @SuccessResponse('201', 'Created Survey from Redcap API')
   public async uploadRedcapInstrumentAPI(
     @Body() bodyRequest: UploadRedcapInstrumentAPIRequest,
   ): Promise<UploadRedcapInstrumentResponse> {
@@ -161,10 +162,17 @@ export class IntegrationsController extends Controller {
         select: { id: true, profiles: true },
       })
 
+      // If user doesn't exist, create a participant using the authController, otherwise create a profile and attact it to the user.
       if (!user) {
-        const participantResponse = await authController.createParticipant(participantData)
-        ids.push(participantResponse.id)
-        profilesCreatedCount++
+        try {
+          const participantResponse = await authController.createParticipant(participantData)
+          ids.push(participantResponse.id)
+          profilesCreatedCount++
+        } catch (err) {
+          logger.error(err)
+          profilesAlreadyExistedCount++
+          continue
+        }
       } else {
         if (user.profiles.length === 0) {
           const participantProfile = await prisma.participantProfile.create({
