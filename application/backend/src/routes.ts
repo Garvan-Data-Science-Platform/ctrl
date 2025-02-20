@@ -592,6 +592,8 @@ const models: TsoaRoute.Models = {
     "UploadRedcapParticipantResponse": {
         "dataType": "refObject",
         "properties": {
+            "profilesCreatedCount": {"dataType":"double","required":true},
+            "profilesAlreadyExistedCount": {"dataType":"double","required":true},
             "ids": {"dataType":"array","array":{"dataType":"double"},"required":true},
         },
         "additionalProperties": false,

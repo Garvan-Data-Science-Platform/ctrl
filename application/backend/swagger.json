@@ -1260,6 +1260,14 @@
       },
       "UploadRedcapParticipantResponse": {
         "properties": {
+          "profilesCreatedCount": {
+            "type": "number",
+            "format": "double"
+          },
+          "profilesAlreadyExistedCount": {
+            "type": "number",
+            "format": "double"
+          },
           "ids": {
             "items": {
               "type": "number",
@@ -3481,7 +3489,7 @@
         "operationId": "UploadRedcapParticipantAPI",
         "responses": {
           "201": {
-            "description": "Created Participants from CSV",
+            "description": "Created Participants from REDCap API",
             "content": {
               "application/json": {
                 "schema": {
@@ -3677,7 +3685,7 @@
         "operationId": "UploadRedcapInstrumentAPI",
         "responses": {
           "201": {
-            "description": "Created Survey using Redcap API",
+            "description": "Created Survey from Redcap API",
             "content": {
               "application/json": {
                 "schema": {
