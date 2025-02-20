@@ -187,6 +187,27 @@ export class AuthController extends Controller {
       }
     }
 
+    // Check if participant exists already
+    const existingParticipant = await this.profileRepo.findFirst({
+      where: {
+        firstName: firstName,
+        lastName: lastName,
+        dob: new Date(dob),
+      },
+    })
+
+    if (existingParticipant) {
+      throw new ValidateError(
+        {
+          'firstName, lastName and dob': {
+            message: 'These fields together must be unique',
+            value: `${firstName}, ${lastName} and ${dob}`,
+          },
+        },
+        'Participant already exists',
+      )
+    }
+
     // Create Profile
     const profile = await this.profileRepo.create({
       data: {
