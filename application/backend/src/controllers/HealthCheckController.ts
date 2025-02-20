@@ -8,7 +8,7 @@ const workspaces: Workspace[] = [
   { name: 'frontend', version: '1.0.0' },
 ]
 
-@Route('healthcheck')
+@Route('/')
 @Tags('Healthcheck')
 export class HealthCheckController extends Controller {
   /**

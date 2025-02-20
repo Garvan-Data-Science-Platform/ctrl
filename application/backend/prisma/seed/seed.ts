@@ -17,10 +17,18 @@ const main = async () => {
 
   const ExampleSurveyStepData = require('../../../common/src/surveys/exampleSurveyStepData.json')
 
-  const survey = await prisma.surveyVersion.create({
+  await prisma.surveyVersion.create({
     data: {
       versionNumber: 1,
       status: 'PUBLISHED',
+      data: ExampleSurveyStepData as SurveyStep[],
+    },
+  })
+
+  await prisma.surveyVersion.create({
+    data: {
+      versionNumber: 2,
+      status: 'DRAFT',
       data: ExampleSurveyStepData as SurveyStep[],
     },
   })

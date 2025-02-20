@@ -1839,7 +1839,7 @@ export function RegisterRoutes(app: Router) {
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsHealthCheckController_HealthCheck: Record<string, TsoaRoute.ParameterSchema> = {
         };
-        app.get('/healthcheck',
+        app.get('/',
             ...(fetchMiddlewares<RequestHandler>(HealthCheckController)),
             ...(fetchMiddlewares<RequestHandler>(HealthCheckController.prototype.HealthCheck)),
 
@@ -1868,7 +1868,7 @@ export function RegisterRoutes(app: Router) {
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsHealthCheckController_getAllWorkspaces: Record<string, TsoaRoute.ParameterSchema> = {
         };
-        app.get('/healthcheck/workspaces',
+        app.get('/workspaces',
             ...(fetchMiddlewares<RequestHandler>(HealthCheckController)),
             ...(fetchMiddlewares<RequestHandler>(HealthCheckController.prototype.getAllWorkspaces)),
 
