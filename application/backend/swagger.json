@@ -7,25 +7,6 @@
     "requestBodies": {},
     "responses": {},
     "schemas": {
-      "UnauthorizedErrorResponse": {
-        "properties": {
-          "message": {
-            "type": "string"
-          },
-          "details": {}
-        },
-        "required": [
-          "message"
-        ],
-        "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "message": "Unauthorized",
-          "details": {
-            "message": "Token not in headers"
-          }
-        }
-      },
       "InternalErrorResponse": {
         "properties": {
           "message": {
@@ -46,6 +27,25 @@
           "message": "Internal Server Error",
           "details": {
             "message": "Some error happened D:"
+          }
+        }
+      },
+      "UnauthorizedErrorResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "details": {}
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "message": "Unauthorized",
+          "details": {
+            "message": "Token not in headers"
           }
         }
       },
@@ -1041,12 +1041,27 @@
         "type": "object",
         "additionalProperties": false
       },
-      "GetInvitedResponse": {
+      "InviteStatus": {
+        "enum": [
+          "PENDING",
+          "ACCEPTED",
+          "EXPIRED",
+          "REVOKED"
+        ],
+        "type": "string"
+      },
+      "GetInvitesResponse": {
         "properties": {
           "data": {
             "items": {
               "properties": {
-                "date": {
+                "inviteStatus": {
+                  "$ref": "#/components/schemas/InviteStatus"
+                },
+                "expiresAt": {
+                  "type": "string"
+                },
+                "createdAt": {
                   "type": "string"
                 },
                 "email": {
@@ -1058,7 +1073,9 @@
                 }
               },
               "required": [
-                "date",
+                "inviteStatus",
+                "expiresAt",
+                "createdAt",
                 "email",
                 "id"
               ],
@@ -1069,6 +1086,53 @@
         },
         "required": [
           "data"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "InviteParticipantsResponse": {
+        "properties": {
+          "resendEmailRequestCount": {
+            "type": "number",
+            "format": "double"
+          },
+          "newInvitesCount": {
+            "type": "number",
+            "format": "double"
+          },
+          "emailsToResendCount": {
+            "type": "number",
+            "format": "double"
+          },
+          "alreadyAcceptedCount": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": [
+          "resendEmailRequestCount",
+          "newInvitesCount",
+          "emailsToResendCount",
+          "alreadyAcceptedCount"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "Email": {
+        "type": "string",
+        "pattern": "^(.+)@(.+)$"
+      },
+      "InviteParticipantsRequest": {
+        "properties": {
+          "emails": {
+            "items": {
+              "$ref": "#/components/schemas/Email"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "emails"
         ],
         "type": "object",
         "additionalProperties": false
@@ -1877,16 +1941,6 @@
           "200": {
             "description": "OK"
           },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -1934,8 +1988,8 @@
           "200": {
             "description": "OK"
           },
-          "401": {
-            "description": "Unauthorized",
+          "403": {
+            "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
@@ -2654,10 +2708,184 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetInvitedResponse"
+                  "$ref": "#/components/schemas/GetInvitesResponse"
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "List all invites",
+        "summary": "List all invites",
+        "tags": [
+          "Invites"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": []
+      },
+      "post": {
+        "operationId": "CreateInvites",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InviteParticipantsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Create invites",
+        "summary": "Creates invites for a list of participant emails sends it to them",
+        "tags": [
+          "Invites"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteParticipantsRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invites/resend": {
+      "post": {
+        "operationId": "ResendPendingInvites",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Resend pending invites",
+        "summary": "Resend invites that are currently pending",
+        "tags": [
+          "Invites"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": []
+      }
+    },
+    "/invites/revoke/{inviteID}": {
+      "post": {
+        "operationId": "RevokeInvite",
+        "responses": {
+          "204": {
+            "description": "No content"
           },
           "401": {
             "description": "Unauthorized",
@@ -2690,17 +2918,29 @@
             }
           }
         },
-        "description": "List invites",
-        "summary": "List participants",
+        "description": "Revoke invite",
+        "summary": "Revoke an invite by id",
         "tags": [
           "Invites"
         ],
         "security": [
           {
-            "jwt": []
+            "jwt": [
+              "OrganisationAdmin"
+            ]
           }
         ],
-        "parameters": []
+        "parameters": [
+          {
+            "in": "path",
+            "name": "inviteID",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
       }
     },
     "/organisations": {

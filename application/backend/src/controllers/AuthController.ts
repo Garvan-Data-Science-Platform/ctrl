@@ -32,6 +32,7 @@ export class AuthController extends Controller {
   profileRepo = prisma.participantProfile
   surveyRepo = prisma.surveyVersion
   spRepo = prisma.surveyParticipant
+  inviteRepo = prisma.invite
 
   /**
    * register
@@ -80,6 +81,12 @@ export class AuthController extends Controller {
     // Extract info for user creation
     const { firstName, middleName, lastName, email, password, ...participantInfo } = bodyRequest
 
+    // Check that the Participant has an invitation
+    const invite = await this.inviteRepo.findFirst({ where: { email } })
+    if (!invite || invite.status !== 'PENDING') {
+      throw new NotFoundError(`Invite for ${email} not found`)
+    }
+
     // Check and hash Password
     const { isValid, fields } = await checkPasswordStrength(password)
     if (!isValid) {
@@ -96,11 +103,13 @@ export class AuthController extends Controller {
       role: Role.Participant,
       password: hashedPassword,
     }
+
     const insertedUser = await this.userRepo.create({ data })
 
     // Extract info for participant creation
     const participantData: CreateParticipantRequest = { firstName, lastName, ...participantInfo }
     await this.createParticipant(participantData, insertedUser)
+    logger.info(`Participant ${insertedUser.id} created`)
 
     // Generate token
     const token = await generateToken({ userId: insertedUser.id, roles: [insertedUser.role] })
@@ -108,6 +117,18 @@ export class AuthController extends Controller {
     const responseData = {
       id: insertedUser.id,
       token,
+    }
+
+    // Once a participant has been registered, we need
+    // to update their invitation status to ACCEPTED
+    const res = await this.inviteRepo.update({
+      where: { email },
+      data: { status: 'ACCEPTED' },
+    })
+
+    if (!res) {
+      logger.error('No invitation found for email: ', email)
+      throw new NotFoundError(`Invite for ${email} not found`)
     }
 
     return responseData
@@ -160,6 +181,7 @@ export class AuthController extends Controller {
           dob: new Date(dependents[0].dob),
         },
       })
+      console.log('EXISTING DEP', existingDep)
       if (existingDep) {
         familyId = existingDep.familyId
       }

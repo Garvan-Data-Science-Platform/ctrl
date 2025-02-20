@@ -1,7 +1,4 @@
-export function generatePasswordResetEmail(
-  resetLink: string,
-  firstName: string,
-): { html: string; text: string } {
+export function generateInviteEmail(registerLink: string): { html: string; text: string } {
   const html = `
 <!DOCTYPE html>
 <html>
@@ -44,19 +41,19 @@ export function generatePasswordResetEmail(
 </head>
 <body>
     <div class="container">
-        <h2>Password Reset Request</h2>
-        <p>Hello ${firstName},</p>
-        <p>We received a request to reset your password. If you did not make this request, you can safely ignore this email.</p>
-        <p>Click the button below to reset your password:</p>
-        <a href="${resetLink}" class="button" target="_blank">Reset Password</a>
+        <h2>Invitation</h2>
+        <p>Hello,</p>
+        <p>You have been invited to register with CTRL dynamic consent platform.</p>
+        <p>Click the button below to register with CTRL:</p>
+        <a href="${registerLink}" class="button" target="_blank">Register</a>
         <p>If the button above does not work, copy and paste the following URL into your browser:</p>
-        <p><a href="${resetLink}" target="_blank">${resetLink}</a></p>
+        <p><a href="${registerLink}" target="_blank">${registerLink}</a></p>
         <p class="footer">If you have any issues, please contact our support team.</p>
     </div>
 </body>
 </html>
     `
 
-  const text = `Hello ${firstName},\n\nWe received a request to reset your password. If you did not make this request, you can safely ignore this email.\n\nUse the following URL to reset your password:\n${resetLink}\n\nIf you have any issues, please contact our support team.`
+  const text = `Hello,\n\nYou have been invited to register with CTRL dynamic consent platform.\n\nUse the following URL to register with CTRL:\n${registerLink}\n\nIf you have any issues, please contact our support team.`
   return { html, text }
 }
