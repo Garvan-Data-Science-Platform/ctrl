@@ -1275,7 +1275,7 @@
             "type": "array"
           }
         },
-        "required": ["ids"],
+        "required": ["profilesCreatedCount", "profilesAlreadyExistedCount", "ids"],
         "type": "object",
         "additionalProperties": false
       },
@@ -1299,41 +1299,6 @@
           }
         },
         "required": ["id"],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "UploadRedcapParticipantAPIRequest": {
-        "description": "This is the name of the redcap instrument you are importing from.\nNOTE: These 'forms' are not the form label values that are seen on the webpages,\nbut instead they are the unique form names seen in Column B of the data dictionary.",
-        "properties": {
-          "form": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "required": ["form"],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "UploadRedcapInstrumentResponse": {
-        "properties": {
-          "id": {
-            "type": "number",
-            "format": "double"
-          }
-        },
-        "required": ["id"],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "UploadRedcapInstrumentAPIRequest": {
-        "description": "This is the name of the redcap instrument you are importing from.\nNOTE: These 'forms' are not the form label values that are seen on the webpages,\nbut instead they are the unique form names seen in Column B of the data dictionary.",
-        "properties": {
-          "form": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "required": ["form"],
         "type": "object",
         "additionalProperties": false
       },
@@ -3563,11 +3528,6 @@
           }
         },
         "tags": ["Integrations"],
-        "security": [
-          {
-            "jwt": ["OrganisationAdmin"]
-          }
-        ],
         "parameters": []
       }
     },
