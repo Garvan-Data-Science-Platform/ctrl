@@ -15,13 +15,13 @@ const main = async () => {
 
   console.log('Default Study created:', defaultStudy)
 
-  const ExampleSurveyStepData = require('../../../common/src/surveys/exampleSurveyStepData.json')
+  const SeedSurveyStepData = require('./seedSurveyStepData.json')
 
   await prisma.surveyVersion.create({
     data: {
       versionNumber: 1,
       status: 'PUBLISHED',
-      data: ExampleSurveyStepData as SurveyStep[],
+      data: SeedSurveyStepData as SurveyStep[],
     },
   })
 
@@ -29,7 +29,7 @@ const main = async () => {
     data: {
       versionNumber: 2,
       status: 'DRAFT',
-      data: ExampleSurveyStepData as SurveyStep[],
+      data: SeedSurveyStepData as SurveyStep[],
     },
   })
 
@@ -208,12 +208,11 @@ const main = async () => {
               create: {
                 versionId: 1,
                 answers: [
-                  { status: 'viewed', answers: [] },
-                  {
-                    status: 'completed',
-                    answers: [false, 'Choice 2'],
-                    last_updated: '2024-12-02T23:45:27.815Z',
-                  },
+                  { status: 'review_required', answers: [] },
+                  { status: 'review_required', answers: [] },
+                  { status: 'review_required', answers: [] },
+                  { status: 'review_required', answers: [] },
+                  { status: 'review_required', answers: [] },
                 ],
               },
             },
