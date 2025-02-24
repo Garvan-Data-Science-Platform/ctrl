@@ -18,6 +18,7 @@ COPY application/integrations/package.json application/integrations/
 RUN corepack enable && yarn 
 
 COPY application/backend application/backend
+COPY application/backend/.env.dockerprod application/backend/.env
 COPY application/common application/common
 COPY application/integrations application/integrations
 

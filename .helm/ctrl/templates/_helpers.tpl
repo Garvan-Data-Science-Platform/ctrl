@@ -60,3 +60,15 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Create or generate jwt secret
+*/}}
+{{- define "secret.jwt" -}}
+{{- $secret := lookup "v1" "Secret" .Release.Namespace "jwt" -}}
+{{- if $secret.data -}}
+jwt: {{ $secret.data.jwt }}
+{{- else -}}
+jwt: {{ randAlphaNum 10 | b64enc }}
+{{- end -}}
+{{- end -}}
