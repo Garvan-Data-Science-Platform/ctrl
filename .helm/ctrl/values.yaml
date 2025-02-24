@@ -33,6 +33,12 @@ backend:
 nginx-ingress:
   enabled: true
 
+mailer:
+  host:
+  port:
+  username:
+  password:
+
 ingress:
   enabled: true
   className: 'nginx'

@@ -40,15 +40,33 @@ spec:
           env:
             - name: POSTGRES_HOST
               value: ctrl-postgresql
+            - name: HOSTNAME
+            {{ with index .Values.ingress.hosts 0 }}
+              value: {{ .host | quote }}
+            {{ end }}
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: ctrl-postgresql
                   key: postgres-password
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jwt
+                  key: jwt
             - name: ADMIN_EMAIL
               value: {{ .Values.auth.admin.email }}
             - name: ADMIN_PASSWORD
               value: {{ .Values.auth.admin.password }}
+            - name: MAILER_HOST
+              value: {{ .Values.mailer.host }}
+            - name: MAILER_PORT
+              value: {{ .Values.mailer.port }}
+            - name: MAILER_USERNAME
+              value: {{ .Values.mailer.username }}
+            - name: MAILER_PASSWORD
+              value: {{ .Values.mailer.password }}
+            
           ports:
             - name: http
               containerPort: 5000
