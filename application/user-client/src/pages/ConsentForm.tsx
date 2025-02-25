@@ -1,4 +1,5 @@
 import {
+  Alert,
   alpha,
   Box,
   Button,
@@ -36,6 +37,7 @@ export default function ConsentForm() {
   const [formState, setFormState] = useState<SurveyElement[]>([])
   const [modalOpen, setModalOpen] = useState(false)
   const [modalAction, setModalAction] = useState<'save' | 'next'>('save')
+  const [showError, setShowError] = useState(false)
 
   const { isPending, data } = useQuery({
     queryKey: ['form_step', currentStep],
@@ -72,8 +74,7 @@ export default function ConsentForm() {
         nav('/')
       }
     } catch {
-      console.log('ERROR SAVING ANSWERS')
-      alert('Error saving answers') //TODO: Show proper alert
+      setShowError(true)
     }
   }
   const handleNext = async () => {
@@ -244,6 +245,7 @@ export default function ConsentForm() {
             <Typography variant="h4">{data?.title}</Typography>
             <Typography sx={{ mt: 3, mb: 3 }}>{data?.text}</Typography>
             {renderElements(formState)}
+            {showError && <Alert severity="error">Error saving page</Alert>}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
               {currentStep == 0 ? (
                 <Box width={70} />
