@@ -48,7 +48,7 @@ describe('Answer functions', () => {
       const answer1: UserSurveyStepState = { status: 'review_required', answers: [] }
       const answer2: UserSurveyStepState = {
         status: 'review_required',
-        answers: [true, 'Choice 1'],
+        answers: [null, null],
       }
       expect(defaultanswers[0]).toStrictEqual(answer1)
       expect(defaultanswers[1]).toStrictEqual(answer2)
