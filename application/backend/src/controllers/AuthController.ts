@@ -197,15 +197,12 @@ export class AuthController extends Controller {
     })
 
     if (existingParticipant) {
-      throw new ValidateError(
-        {
-          'firstName, lastName and dob': {
-            message: 'These fields together must be unique',
-            value: `${firstName}, ${lastName} and ${dob}`,
-          },
+      logger.error('Participant already exists', {
+        'firstName, lastName and dob': {
+          message: 'These fields together must be unique',
+          value: `${firstName}, ${lastName} and ${dob}`,
         },
-        'Participant already exists',
-      )
+      })
     }
 
     // Create Profile

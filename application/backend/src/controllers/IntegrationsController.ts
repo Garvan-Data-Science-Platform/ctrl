@@ -82,10 +82,10 @@ export class IntegrationsController extends Controller {
     })
       .then((response) => response.json())
       .then((data) => {
+        if (data.error) {
+          throw new BadGatewayError('Error communicating with REDCap API')
+        }
         return data
-      })
-      .catch(() => {
-        throw new BadGatewayError('Error communicating with REDCap API')
       })
 
     return await this.processParticipantData(participantData)
@@ -132,10 +132,10 @@ export class IntegrationsController extends Controller {
     })
       .then((response) => response.json())
       .then((data) => {
+        if (data.error) {
+          throw new BadGatewayError('Error communicating with REDCap API')
+        }
         return data
-      })
-      .catch(() => {
-        throw new BadGatewayError('Error communicating with REDCap API')
       })
 
     return await this.processInstrumentData(surveyData, true)
