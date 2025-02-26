@@ -29,9 +29,9 @@ import prisma from '../PrismaClient'
 import '../jsontypes'
 import { GetSurveyVersionByIdResponse } from 'common/types/api/surveys/getSurveyVersionById'
 import { validateAnswers } from 'common/src/surveys/validateSurveyAnswers'
-import { createDefaultAnswers } from 'common/src/surveys/createDefaultAnswers'
 import { populateSurveyStepAnswers } from 'common/src/surveys/populateSurveyStepAnswers'
 import { ValidateErrorResponse } from 'common/types/api/errors'
+import { answersFromPreviousSurvey, createDefaultAnswers } from '../utils/answers'
 
 @Route('surveys')
 @Tags('Surveys')
@@ -338,12 +338,39 @@ export class SurveysController extends Controller {
 
     const profiles = await this.profileRepo.findMany({})
 
-    const participants = profiles.map((val) => ({
-      versionId: survey.id,
-      profileId: val.id,
-      answers: createDefaultAnswers(survey.data),
-    }))
+    //Carry across answers from previous if they exist
 
-    await this.spRepo.createMany({ data: participants })
+    const participants = profiles.map(async (val) => {
+      const previousSurveyParticipant = await this.spRepo.findFirst({
+        where: { profileId: val.id },
+        orderBy: { versionId: 'desc' },
+        select: { answers: true, version: { select: { createdAt: true, id: true } } },
+      })
+
+      let answers
+      if (previousSurveyParticipant) {
+        const previousSurveyVersion = await this.surveyRepo.findFirstOrThrow({
+          where: { id: previousSurveyParticipant.version.id },
+        })
+        const currentSurveyVersion = await this.surveyRepo.findFirstOrThrow({
+          where: { id: surveyId },
+        })
+        answers = answersFromPreviousSurvey(
+          previousSurveyVersion,
+          currentSurveyVersion,
+          previousSurveyParticipant.answers,
+        )
+      } else {
+        answers = createDefaultAnswers(survey.data)
+      }
+
+      return {
+        versionId: survey.id,
+        profileId: val.id,
+        answers,
+      }
+    })
+
+    await this.spRepo.createMany({ data: await Promise.all(participants) })
   }
 }

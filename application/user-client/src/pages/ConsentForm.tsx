@@ -44,6 +44,19 @@ export default function ConsentForm() {
     queryFn: async () => {
       try {
         const surveyStep = await apiClient.get(`/surveys/step/1/${currentStep}`)
+
+        //Set default values if not answered
+        for (const i in surveyStep.data.data.elements) {
+          const e = surveyStep.data.data.elements[i] as SurveyElement
+          if (e.type == 'question-checkbox' && e.data.value == null) {
+            surveyStep.data.data.elements[i].data.value = true
+          }
+          if (e.type == 'question-choices' && e.data.value == null) {
+            surveyStep.data.data.elements[i].data.value =
+              surveyStep.data.data.elements[i].data.choices[0]
+          }
+        }
+
         return surveyStep.data.data as GetUserSurveyStepResponse['data']
         // eslint-disable-next-line
       } catch (error: any) {
@@ -140,7 +153,7 @@ export default function ConsentForm() {
         )}
         {type == 'question-checkbox' && (
           <Checkbox
-            checked={!!formState[idx].data.value}
+            checked={formState[idx].data.value}
             data-cy={`checkbox-${idx}`}
             onClick={() =>
               setFormState((state) => {

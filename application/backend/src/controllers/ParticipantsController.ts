@@ -19,6 +19,7 @@ import nodemailer from 'nodemailer'
 import { generateInviteEmail } from '../utils/generateInviteTemplate'
 import { InviteStatus } from '../../../common/types/api/participants/invite'
 import { NotFoundError } from '../middlewares/ErrorHandler'
+import { determineLastUpdated, determineStatus } from '../utils/answers'
 
 @Route('participants')
 @Tags('Participants')
@@ -35,29 +36,6 @@ export class ParticipantsController extends Controller {
    */
   @Get('/')
   public async getParticipants(): Promise<GetParticipantsResponse> {
-    function determineStatus(answers: PrismaJson.SurveyAnswerData, date_published: Date) {
-      if (answers.every((val) => ['completed', 'viewed'].includes(val.status))) return 'complete'
-
-      const last_updated = determineLastUpdated(answers) || new Date('1900-01-01')
-
-      if (last_updated > date_published) return 'partially_complete'
-
-      return 'incomplete'
-    }
-
-    function determineLastUpdated(answers: PrismaJson.SurveyAnswerData) {
-      let latest_date = new Date('1900-01-01')
-
-      for (const answerStep of answers) {
-        const ans_date = new Date(answerStep.last_updated || '1900-01-01')
-        if (ans_date > latest_date) {
-          latest_date = ans_date
-        }
-      }
-      if (latest_date.toISOString() == new Date('1900-01-01').toISOString()) return null
-      return latest_date
-    }
-
     const unique_participants = await this.participantRepo.findMany({
       distinct: ['profileId'],
       select: {
