@@ -32,6 +32,8 @@ import logger from 'common/src/logger'
 import { AuthController } from './AuthController'
 const upload = multer({ storage: multer.memoryStorage() })
 
+const REDCAP_API_URL: string = process.env.REDCAP_API_URL!
+
 @Route('integrations')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
@@ -71,7 +73,7 @@ export class IntegrationsController extends Controller {
     params.append('type', 'flat')
     params.append('form[0]', form)
 
-    const participantData = await fetch('https://redcap.gimr.garvan.org.au/api/', {
+    const participantData = await fetch(REDCAP_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -121,7 +123,7 @@ export class IntegrationsController extends Controller {
     params.append('format', 'json')
     params.append('forms[0]', form)
 
-    const surveyData = await fetch('https://redcap.gimr.garvan.org.au/api/', {
+    const surveyData = await fetch(REDCAP_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
