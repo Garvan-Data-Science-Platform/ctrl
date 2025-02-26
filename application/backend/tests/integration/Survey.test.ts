@@ -171,7 +171,7 @@ describe('Survey tests', () => {
     expect(data3.data[1].last_updated).toBeUndefined()
     //Previous answers should be carried across
     expect(data3.data[1].elements[0].data.value).toBe(false)
-    //New questions should ahve null answer
+    //New questions should have null answer
     expect(data3.data[1].elements[1].data.value).toBe(null)
 
     const res4 = await request(app)
