@@ -20,8 +20,8 @@ import type {
   ValidateErrorResponse,
 } from 'common/types/api/errors'
 import { IncorrectPasswordError, NotFoundError } from '../middlewares/ErrorHandler'
-import { createDefaultAnswers } from 'common/src/surveys/createDefaultAnswers'
 import { ParticipantType } from 'common/types/api/users/ParticipantProfile'
+import { createDefaultAnswers } from '../utils/answers'
 
 @Route('auth')
 @Tags('Auth')

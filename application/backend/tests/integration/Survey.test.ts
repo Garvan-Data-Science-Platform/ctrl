@@ -111,7 +111,7 @@ describe('Survey tests', () => {
     expect(data4.data[3].answers[0].status).toBe('partially_complete')
   })
 
-  it('Admin publishes another survey version and user sees new questions, status is correct for admin', async () => {
+  it('Admin publishes another survey version and user sees new questions, status is correct for admin, answers are carried over', async () => {
     const reqBody: UpdateSurveyRequest = {
       data: [
         {
@@ -132,7 +132,10 @@ describe('Survey tests', () => {
         {
           text: '',
           title: '',
-          elements: [{ type: 'question-checkbox', data: { text: 'Question 3b', value: true } }],
+          elements: [
+            { type: 'question-checkbox', data: { text: 'Question 1', value: true } },
+            { type: 'question-checkbox', data: { text: 'Question 2', value: true } },
+          ],
         },
       ],
     }
@@ -166,6 +169,10 @@ describe('Survey tests', () => {
     const data3 = res3.body as GetResponsesByIdResponse
     expect(data3.data[0].last_updated).toBeUndefined()
     expect(data3.data[1].last_updated).toBeUndefined()
+    //Previous answers should be carried across
+    expect(data3.data[1].elements[0].data.value).toBe(false)
+    //New questions should ahve null answer
+    expect(data3.data[1].elements[1].data.value).toBe(null)
 
     const res4 = await request(app)
       .get('/participants')
@@ -192,7 +199,7 @@ describe('Survey tests', () => {
   })
 
   it('User completes survey, admin and user see correct status and dates', async () => {
-    const reqBody: UpdateSurveyAnswersRequest = { step: 1, data: [false] }
+    const reqBody: UpdateSurveyAnswersRequest = { step: 1, data: [false, true] }
 
     await request(app)
       .post('/surveys/answers/')
