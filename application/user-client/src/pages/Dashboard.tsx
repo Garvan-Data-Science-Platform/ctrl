@@ -19,18 +19,8 @@ import { Link } from 'react-router-dom'
 import { GetParticipantProfileResponse } from '@common/types/api/users'
 // import { GetResponsesByIdResponse } from '@common/types/api/surveys'
 import { apiClient } from '../apiClient'
-// import { exportPdf } from '../components/PdfExport'
-import { BlobProvider, Document, Page, Text } from '@react-pdf/renderer'
-
-// Define your PDF document
-const MyDocument = () => (
-  <Document>
-    <Page>
-      <Text>Here are the responses...</Text>
-      {/* Your response data rendering */}
-    </Page>
-  </Document>
-)
+import ResponsesPdf from '../components/PdfExport'
+import { BlobProvider } from '@react-pdf/renderer'
 
 export default function Dashboard() {
   const { isPending, error, data } = useQuery({
@@ -196,7 +186,7 @@ export default function Dashboard() {
         ))}
         <Box sx={{ display: 'flex' }}>
           <Box sx={{ flexGrow: 1 }} />
-          <BlobProvider document={<MyDocument />}>
+          <BlobProvider document={<ResponsesPdf />}>
             {({ blob, loading, error }) => (
               <Button
                 variant="contained"
@@ -206,7 +196,7 @@ export default function Dashboard() {
                   if (blob) {
                     const link = document.createElement('a')
                     link.href = URL.createObjectURL(blob)
-                    link.download = 'responses.pdf'
+                    link.download = `CTRL-responses-${profileData!.data.firstName}_${profileData!.data.lastName}.pdf`
                     link.click()
                   }
                 }}
