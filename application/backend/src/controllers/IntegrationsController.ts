@@ -5,15 +5,14 @@ import {
   Security,
   Controller,
   Response,
-  Request,
   Middlewares,
   SuccessResponse,
   Body,
+  UploadedFile,
 } from 'tsoa'
 import { Integrations } from '../../../integrations/src/Integrations'
 import prisma from '../PrismaClient'
 import { Readable } from 'stream'
-import * as express from 'express'
 import multer from 'multer'
 import { RegisterParticipantRequest } from 'common/types/api/auth'
 import type {
@@ -28,7 +27,6 @@ import { SurveyStep } from 'common/types/survey'
 import exampleREDCapMapping from '../../../integrations/src/exampleREDCapMapping.json'
 import { parseCSV, validateFile } from '../utils/parseCsv'
 import { FileUploadError } from '../middlewares/ErrorHandler'
-import logger from 'common/src/logger'
 import { AuthController } from './AuthController'
 const upload = multer({ storage: multer.memoryStorage() })
 
@@ -47,12 +45,11 @@ export class IntegrationsController extends Controller {
   integrationService = new Integrations(exampleREDCapMapping)
 
   @Post('/redcap/participant/upload/csv')
-  @Middlewares(upload.single('file'))
   @SuccessResponse('201', 'Created Participants from CSV')
   public async uploadRedcapParticipantCSV(
-    @Request() request: express.Request,
+    @UploadedFile() file: Express.Multer.File,
   ): Promise<UploadRedcapParticipantResponse> {
-    const file = await validateFile(request, []) // no required headers here so we pass none to the headers checker
+    await validateFile(file, []) // no required headers here so we pass none to the headers checker
     // Create a readable stream from the buffer
     const readableStream = Readable.from(file.buffer.toString())
     const csvData: Record<string, string>[] = await parseCSV(readableStream)
@@ -95,9 +92,9 @@ export class IntegrationsController extends Controller {
   @Middlewares(upload.single('file'))
   @SuccessResponse('201', 'Upserted Survey from Instrument CSV')
   public async uploadRedcapInstrumentCSV(
-    @Request() request: express.Request,
+    @UploadedFile() file: Express.Multer.File,
   ): Promise<UploadRedcapInstrumentResponse> {
-    const file = await validateFile(request, [
+    await validateFile(file, [
       '"Field Type"',
       '"Field Label"',
       '"Section Header"',
@@ -171,7 +168,6 @@ export class IntegrationsController extends Controller {
           ids.push(participantResponse.id)
           profilesCreatedCount++
         } catch (err) {
-          logger.error(err)
           profilesAlreadyExistedCount++
           continue
         }

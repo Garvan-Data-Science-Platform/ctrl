@@ -203,6 +203,7 @@ export class AuthController extends Controller {
           value: `${firstName}, ${lastName} and ${dob}`,
         },
       })
+      throw new Error('Participant already exists')
     }
 
     // Create Profile
