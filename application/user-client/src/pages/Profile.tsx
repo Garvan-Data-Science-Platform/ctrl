@@ -180,7 +180,7 @@ export default function Profile() {
               </table>
             </Card>
           </Grid>
-          {data.familyMembers.length > 0 ? (
+          {data.familyMembers.length > 0 && (
             <Grid size={{ xs: 12, sm: 6 }}>
               <Card sx={{ boxShadow: '0', p: 2 }} raised={false}>
                 <table width={'100%'} style={{ textAlign: 'left', tableLayout: 'fixed' }}>
@@ -213,7 +213,7 @@ export default function Profile() {
                 </table>
               </Card>
             </Grid>
-          ) : null}
+          )}
         </Grid>
       </Container>
 

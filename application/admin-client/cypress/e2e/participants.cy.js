@@ -14,8 +14,28 @@ describe('Participants', () => {
     cy.contains('Dependent').should('exist')
     cy.contains('V1').should('exist')
   })
-  it('View and edit participant details', () => {
-    //Not yet implemented
+  it('View participant details', () => {
+    cy.login(UserType.ADMIN)
+    cy.visit('/participants/98')
+    cy.contains('Test User').should('exist')
+    cy.contains('123 smith st').should('exist')
+    cy.contains('V1').should('exist')
+    cy.contains('Family').should('not.exist')
+    cy.visit('/participants/99')
+    cy.contains('Family').should('exist')
+    cy.contains('Dependent').should('exist')
+  })
+
+  it('Edit participant details', () => {
+    cy.login(UserType.ADMIN)
+    cy.visit('/participants/98')
+    cy.contains('Test User').should('exist')
+    cy.contains('123 smith st').should('exist')
+    cy.contains('V1').should('exist')
+    cy.contains('Family').should('not.exist')
+    cy.visit('/participants/99')
+    cy.contains('Family').should('exist')
+    cy.contains('Dependent').should('exist')
   })
 
   it('View answers', () => {

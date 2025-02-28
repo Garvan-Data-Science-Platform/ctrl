@@ -1,8 +1,10 @@
+import { GetParticipantProfileResponse } from '../users'
+
 export interface Participant {
-  id: number
   email?: string
   firstName: string
   lastName: string
+  profile: GetParticipantProfileResponse['data']
   answers: ParticipantAnswerStatus[]
   lastUpdated?: string
 }

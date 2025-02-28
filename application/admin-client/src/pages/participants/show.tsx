@@ -1,13 +1,35 @@
-import { Stack, Typography } from '@mui/material'
+import { ParticipantAnswerStatus } from '@common/types/api/participants/participant'
+import { GetParticipantByIdResponse } from '@common/types/api/participants'
+import { Box, Button, Stack, Tooltip, Typography } from '@mui/material'
 import { useShow } from '@refinedev/core'
 import { DateField, Show, TextFieldComponent as TextField } from '@refinedev/mui'
+import { Link } from 'react-router-dom'
+import { statusMap } from './list'
+import { ParticipantType } from '@common/types/api/users/ParticipantProfile'
 
 export const ParticipantShow = () => {
   const { queryResult } = useShow({})
 
   const { data, isLoading } = queryResult
 
-  const record = data?.data
+  const record = data?.data as GetParticipantByIdResponse['data']
+
+  const renderAnswers = (answers: ParticipantAnswerStatus[]) => {
+    return answers.map((val) => (
+      <Link key={val.participantId} to={`/responses/${val.participantId}`}>
+        <Tooltip title={statusMap[val.status].tooltip}>
+          <Button sx={{ color: statusMap[val.status].color }}>V{val.surveyVersion}</Button>
+        </Tooltip>
+      </Link>
+    ))
+  }
+
+  const familyMap = (p: ParticipantType) => {
+    if (p == 'STANDARD') return 'Family Member'
+    if (p == 'DEPENDENT_AGE') return 'Dependent child'
+    if (p == 'DEPENDENT_OTHER') return 'Dependent (permanent)'
+    if (p == 'GUARDIAN') return 'Co-parent / guardian'
+  }
 
   return (
     <Show
@@ -16,33 +38,82 @@ export const ParticipantShow = () => {
     >
       <Stack gap={1}>
         <Typography variant="body1" fontWeight="bold">
-          {'ID'}
-        </Typography>
-        <TextField value={record?.id} />
-
-        <Typography variant="body1" fontWeight="bold">
           {'First Name'}
         </Typography>
         <TextField value={record?.firstName} />
-
         <Typography variant="body1" fontWeight="bold">
           {'Last Name'}
         </Typography>
         <TextField value={record?.lastName} />
-
         <Typography variant="body1" fontWeight="bold">
-          {'email'}
+          {'Email'}
         </Typography>
         <TextField value={record?.email} />
         <Typography variant="body1" fontWeight="bold">
-          {'Role'}
+          {'Date of birth'}
         </Typography>
-        <TextField value={record?.role} />
+        <TextField value={new Date(record?.profile.dob).toLocaleDateString()} />{' '}
         <Typography variant="body1" fontWeight="bold">
-          {'CreatedAt'}
+          {'Address'}
         </Typography>
-        <DateField value={record?.createdAt} />
+        <TextField
+          value={`${record?.profile.addressLine}, ${record?.profile?.suburb}, ${record?.profile.state}, ${record?.profile.postcode}`}
+        />
+        <Typography variant="body1" fontWeight="bold">
+          {'Mobile'}
+        </Typography>
+        <TextField value={record?.profile.mobile} />
+        <Typography variant="body1" fontWeight="bold">
+          {'Preferred Contact Method'}
+        </Typography>
+        <TextField value={record?.profile.preferredContact} />
+        <Typography variant="body1" fontWeight="bold">
+          {'Alternative Contact'}
+        </Typography>
+        <TextField
+          value={`${record?.profile.nextOfKin?.firstName} ${record?.profile.nextOfKin?.lastName}`}
+        />
+        <TextField value={record?.profile.nextOfKin?.email} />
+        <TextField value={record?.profile.nextOfKin?.mobile} />
       </Stack>
+
+      {record?.profile.familyMembers.length > 0 && (
+        <table style={{ textAlign: 'left', tableLayout: 'fixed' }}>
+          <tbody>
+            <>
+              <tr>
+                <td>
+                  <Typography fontWeight="bold" sx={{ mt: 1, mb: 1 }}>
+                    Family Members
+                  </Typography>
+                </td>
+              </tr>
+              {record.profile.familyMembers.map((val, idx) => {
+                return (
+                  <tr key={`fam_${idx}`}>
+                    <td>
+                      <Typography>
+                        {val.firstName} {val.lastName}
+                      </Typography>
+                    </td>
+
+                    <td>
+                      <Typography>{familyMap(val.participantType)}</Typography>
+                    </td>
+                  </tr>
+                )
+              })}
+            </>
+          </tbody>
+        </table>
+      )}
+
+      <Typography variant="body1" fontWeight="bold" sx={{ mt: 1 }}>
+        {'Answer History (By Survey Version)'}
+      </Typography>
+      <Box sx={{ display: 'flex', flexDirection: 'row', mt: 1 }}>
+        {record?.answers && renderAnswers(record?.answers)}
+      </Box>
     </Show>
   )
 }

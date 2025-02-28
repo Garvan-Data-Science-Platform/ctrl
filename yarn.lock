@@ -3328,12 +3328,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@refinedev/cli@npm:^2.16.21":
-  version: 2.16.38
-  resolution: "@refinedev/cli@npm:2.16.38"
+"@refinedev/cli@npm:^2.16.42":
+  version: 2.16.42
+  resolution: "@refinedev/cli@npm:2.16.42"
   dependencies:
     "@npmcli/package-json": "npm:^5.2.0"
-    "@refinedev/devtools-server": "npm:1.1.36"
+    "@refinedev/devtools-server": "npm:1.1.40"
     boxen: "npm:^5.1.2"
     camelcase: "npm:^6.2.0"
     cardinal: "npm:^2.1.1"
@@ -3347,7 +3347,6 @@ __metadata:
     dotenv: "npm:^16.0.3"
     envinfo: "npm:^7.8.1"
     execa: "npm:^5.1.1"
-    express: "npm:^4.18.2"
     figlet: "npm:^1.5.2"
     fs-extra: "npm:^10.1.0"
     globby: "npm:^11.1.0"
@@ -3371,11 +3370,11 @@ __metadata:
     tslib: "npm:^2.6.2"
   bin:
     refine: dist/cli.cjs
-  checksum: d5447b5a86ff66061a309f93c18ff4b9470013bf9716f5a74aa1e7ba53bba1ab8944f58920c17b0dedd81c4170053764c0908fdb061fe3fb7a8bfe4018916704
+  checksum: 581758a3fb55798364c9fed46106659f94f720e2a5f63bfb0e05d6b55795abd61a8d1fc3bcf17e21fa06368016375490acbcfd1a7b3fcd83f9e9c53b6c2b1d2c
   languageName: node
   linkType: hard
 
-"@refinedev/core@npm:^4.47.1, @refinedev/core@npm:^4.51.0":
+"@refinedev/core@npm:^4.51.0":
   version: 4.54.1
   resolution: "@refinedev/core@npm:4.54.1"
   dependencies:
@@ -3398,6 +3397,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@refinedev/core@npm:^4.57.5":
+  version: 4.57.5
+  resolution: "@refinedev/core@npm:4.57.5"
+  dependencies:
+    "@refinedev/devtools-internal": "npm:1.1.16"
+    "@tanstack/react-query": "npm:^4.10.1"
+    lodash: "npm:^4.17.21"
+    lodash-es: "npm:^4.17.21"
+    papaparse: "npm:^5.3.0"
+    pluralize: "npm:^8.0.0"
+    qs: "npm:^6.10.1"
+    tslib: "npm:^2.6.2"
+    warn-once: "npm:^0.1.0"
+  peerDependencies:
+    "@tanstack/react-query": ^4.10.1
+    "@types/react": ^17.0.0 || ^18.0.0
+    "@types/react-dom": ^17.0.0 || ^18.0.0
+    react: ^17.0.0 || ^18.0.0
+    react-dom: ^17.0.0 || ^18.0.0
+  checksum: 610a9ff5b2ce8f10e855138f6bbcf6323c4349ae09a15c4377e1807d251c22baee1f6467897c31665c25c745bec14a456b6ec47e4fa61f154b8893f085b26ffd
+  languageName: node
+  linkType: hard
+
 "@refinedev/devtools-internal@npm:1.1.14":
   version: 1.1.14
   resolution: "@refinedev/devtools-internal@npm:1.1.14"
@@ -3414,11 +3436,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@refinedev/devtools-server@npm:1.1.36":
-  version: 1.1.36
-  resolution: "@refinedev/devtools-server@npm:1.1.36"
+"@refinedev/devtools-internal@npm:1.1.16":
+  version: 1.1.16
+  resolution: "@refinedev/devtools-internal@npm:1.1.16"
   dependencies:
-    "@refinedev/devtools-shared": "npm:1.1.12"
+    "@refinedev/devtools-shared": "npm:1.1.14"
+    "@tanstack/react-query": "npm:^4.10.1"
+    error-stack-parser: "npm:^2.1.4"
+  peerDependencies:
+    "@types/react": ^17.0.0 || ^18.0.0
+    "@types/react-dom": ^17.0.0 || ^18.0.0
+    react: ^17.0.0 || ^18.0.0
+    react-dom: ^17.0.0 || ^18.0.0
+  checksum: 0b2e565f4c8fb5f789a58ded722b8ea6b4198fa0f44ffa5f60ac1db17ecb574c3ea8fcc0e4cc4d5e02f622bd3a7d437a7c678695c43ddcf51ce28388af3dbd08
+  languageName: node
+  linkType: hard
+
+"@refinedev/devtools-server@npm:1.1.40":
+  version: 1.1.40
+  resolution: "@refinedev/devtools-server@npm:1.1.40"
+  dependencies:
+    "@refinedev/devtools-shared": "npm:1.1.14"
     body-parser: "npm:^1.20.2"
     boxen: "npm:^5.1.2"
     chalk: "npm:^4.1.2"
@@ -3426,7 +3464,7 @@ __metadata:
     dotenv: "npm:^16.0.3"
     error-stack-parser: "npm:^2.1.4"
     execa: "npm:^5.1.1"
-    express: "npm:^4.18.2"
+    express: "npm:^4.21.0"
     fs-extra: "npm:^10.1.0"
     globby: "npm:^11.1.0"
     gray-matter: "npm:^4.0.3"
@@ -3448,7 +3486,7 @@ __metadata:
     react-dom: ^17.0.0 || ^18.0.0
   bin:
     refine-devtools: dist/cli.cjs
-  checksum: a6b081442bab7faeb5624e6cb3dde40eaa01ccab16b6e5c2f2fb75e431ef26a41320e0c0b1892dc1a19542eedeefdce07152405879a7d61ca2768e497cc14e08
+  checksum: 376f22dd253ced10605300aa5a35b448f84e75fb40bf61b64b36f8a11075462d8c2bfc1443a97fde71a1d741eda7a90fa613ddf3c68557a70a8c343fa27a3e2e
   languageName: node
   linkType: hard
 
@@ -3467,43 +3505,58 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@refinedev/devtools@npm:^1.1.32":
-  version: 1.2.8
-  resolution: "@refinedev/devtools@npm:1.2.8"
+"@refinedev/devtools-shared@npm:1.1.14":
+  version: 1.1.14
+  resolution: "@refinedev/devtools-shared@npm:1.1.14"
   dependencies:
-    "@aliemir/dom-to-fiber-utils": "npm:^0.4.0"
-    "@refinedev/devtools-shared": "npm:1.1.12"
+    "@tanstack/react-query": "npm:^4.10.1"
     error-stack-parser: "npm:^2.1.4"
-    lodash: "npm:^4.17.21"
-    lodash-es: "npm:^4.17.21"
   peerDependencies:
-    "@refinedev/cli": 2.16.38
-    "@refinedev/core": ^4.46.1
-    "@refinedev/devtools-server": 1.1.36
     "@types/react": ^17.0.0 || ^18.0.0
     "@types/react-dom": ^17.0.0 || ^18.0.0
     react: ^17.0.0 || ^18.0.0
     react-dom: ^17.0.0 || ^18.0.0
-  checksum: 9c7c35655bd57511102cf86daf7b2e57d716294c0ba7e15552f00dfc580d08d743875269edd0ec76072a4e8d9b90e006a3970adab71fa520e1618db8e476dc4a
+  checksum: ad3d71544c6f9379e409e67d67166320bfb1c25df32a98552b450ce8266c9699b396e97ebb16a34d6a1aa1b4d6e62c31d71d7f74815266aea32c5a4e4baa3cfc
   languageName: node
   linkType: hard
 
-"@refinedev/kbar@npm:^1.3.6":
-  version: 1.3.12
-  resolution: "@refinedev/kbar@npm:1.3.12"
+"@refinedev/devtools@npm:^1.2.12":
+  version: 1.2.12
+  resolution: "@refinedev/devtools@npm:1.2.12"
+  dependencies:
+    "@aliemir/dom-to-fiber-utils": "npm:^0.4.0"
+    "@refinedev/devtools-shared": "npm:1.1.14"
+    error-stack-parser: "npm:^2.1.4"
+    lodash: "npm:^4.17.21"
+    lodash-es: "npm:^4.17.21"
+  peerDependencies:
+    "@refinedev/cli": 2.16.42
+    "@refinedev/core": ^4.46.1
+    "@refinedev/devtools-server": 1.1.40
+    "@types/react": ^17.0.0 || ^18.0.0
+    "@types/react-dom": ^17.0.0 || ^18.0.0
+    react: ^17.0.0 || ^18.0.0
+    react-dom: ^17.0.0 || ^18.0.0
+  checksum: 716eabc8384a6069cc41861347b5f25399e521301ed23f9d3b58dc0328103c06f141227db2e95dcf8a36f58897a7b974bf16f87aacbd09283eaef6a9d3cbfa16
+  languageName: node
+  linkType: hard
+
+"@refinedev/kbar@npm:^1.3.14":
+  version: 1.3.14
+  resolution: "@refinedev/kbar@npm:1.3.14"
   dependencies:
     kbar: "npm:^0.1.0-beta.40"
   peerDependencies:
     "@refinedev/core": ^4.46.1
     react: ^17.0.0 || ^18.0.0
     react-dom: ^17.0.0 || ^18.0.0
-  checksum: 13e8553f2b6e0e54cf58d05c7d21d3cc7c7101828e2eed434bc91b381f665d2e2e2b8b2474135629428465b9d0e5622a447d52513a2fe59c8cbb336b7bbd0352
+  checksum: b4c5d59d12e8636a44bd06c48c0d2e9f3abd3722da9a383cfd7eda388892b561f7bb132cb2fd54d34c62dd4adf6cd3a79545c20bb76ff1159bb97d8dc82d5af5
   languageName: node
   linkType: hard
 
-"@refinedev/mui@npm:^5.14.4":
-  version: 5.21.0
-  resolution: "@refinedev/mui@npm:5.21.0"
+"@refinedev/mui@npm:^5.22.0":
+  version: 5.22.0
+  resolution: "@refinedev/mui@npm:5.22.0"
   dependencies:
     "@emotion/react": "npm:^11.8.2"
     "@emotion/styled": "npm:^11.8.1"
@@ -3512,7 +3565,7 @@ __metadata:
     "@mui/material": "npm:^5.14.2"
     "@mui/system": "npm:^5.15.15"
     "@mui/x-data-grid": "npm:^6.6.0"
-    "@refinedev/react-hook-form": "npm:^4.9.0"
+    "@refinedev/react-hook-form": "npm:^4.9.1"
     "@refinedev/ui-types": "npm:^1.22.9"
     dayjs: "npm:^1.10.7"
     lodash: "npm:^4.17.21"
@@ -3535,13 +3588,13 @@ __metadata:
     react: ^17.0.0 || ^18.0.0
     react-dom: ^17.0.0 || ^18.0.0
     react-hook-form: ^7.43.5
-  checksum: f61140942d8107c6b5c90d96b2688ace7ed1792ceb6d38d483cc0cad3274c28bb63e6bba6a3fb59b6ff0fe3fec488efa2da3edd6051ba702028b7d4773d54fd1
+  checksum: c67fda87d0245aada92f82bf07eca5e3a1e1475926c61411bf289a81246e115554ca44abf7caf150919d100394f01f2c35e029d3c2a0e6f2d67ef4a9023777f5
   languageName: node
   linkType: hard
 
-"@refinedev/react-hook-form@npm:^4.8.14, @refinedev/react-hook-form@npm:^4.9.0":
-  version: 4.9.0
-  resolution: "@refinedev/react-hook-form@npm:4.9.0"
+"@refinedev/react-hook-form@npm:^4.9.1, @refinedev/react-hook-form@npm:^4.9.3":
+  version: 4.9.3
+  resolution: "@refinedev/react-hook-form@npm:4.9.3"
   dependencies:
     lodash: "npm:^4.17.21"
     lodash-es: "npm:^4.17.21"
@@ -3553,13 +3606,13 @@ __metadata:
     react: ^17.0.0 || ^18.0.0
     react-dom: ^17.0.0 || ^18.0.0
     react-hook-form: ^7.43.5
-  checksum: 75b713d9e1ed03bac4ea2499c8f882555955bc97873204819a2428a86d1a77803aa1eb550e5d32756bfab17275a84ad2a4fd3ba0913cb06d44ae016e5f6eb147
+  checksum: c8e0d11fadba8b9b26c625c092e7861acddb3793c99a48577da35ba12e001427cff2223158b768fa021c1c00d2b7ae5838e739edaa7d710c03046814ae7f458a
   languageName: node
   linkType: hard
 
-"@refinedev/react-router-v6@npm:^4.5.5":
-  version: 4.6.0
-  resolution: "@refinedev/react-router-v6@npm:4.6.0"
+"@refinedev/react-router-v6@npm:^4.6.2":
+  version: 4.6.2
+  resolution: "@refinedev/react-router-v6@npm:4.6.2"
   dependencies:
     qs: "npm:^6.10.1"
     react-router-dom: "npm:^6.8.1"
@@ -3570,19 +3623,19 @@ __metadata:
     react: ^17.0.0 || ^18.0.0
     react-dom: ^17.0.0 || ^18.0.0
     react-router-dom: ^6.8.1
-  checksum: c1fc8f5c54786de8c98b22dcecf181352bfa714e405042a6c8ab5b7085a668f41afb6947e7e810ac94d2b5081720475c564e435129e3fe24d3d6e64e6b8c6266
+  checksum: a22b9a92bd9e8df1918f64e38b4e89e6997286c231d2d40108bdf515189ae48d52df592619fdd2fa6b527cb48a71980d3307590818c9cbf08b016b933d08e899
   languageName: node
   linkType: hard
 
-"@refinedev/simple-rest@npm:^5.0.1":
-  version: 5.0.8
-  resolution: "@refinedev/simple-rest@npm:5.0.8"
+"@refinedev/simple-rest@npm:^5.0.10":
+  version: 5.0.10
+  resolution: "@refinedev/simple-rest@npm:5.0.10"
   dependencies:
     axios: "npm:^1.6.2"
     query-string: "npm:^7.1.1"
   peerDependencies:
     "@refinedev/core": ^4.46.1
-  checksum: 80fd77ac4b65c80b2a4be6e6d085a32506e97b26b740185f2f2dcfe307ff865dfec35636af001d81d979ba0191256b87b96a62245cdd32bfc9c778d91934a730
+  checksum: 4323cb1356c6f71a2640cb307dbaaeb8bb9e042f5081ab440b0207046181a4d0db088336f4e4d9efae9202456103ba299bf57e44f27b3dbf68b4c9d51c4ea68a
   languageName: node
   linkType: hard
 
@@ -5142,14 +5195,14 @@ __metadata:
     "@mui/lab": "npm:^5.0.0-alpha.85"
     "@mui/material": "npm:^6.1.5"
     "@mui/x-data-grid": "npm:^6.6.0"
-    "@refinedev/cli": "npm:^2.16.21"
-    "@refinedev/core": "npm:^4.47.1"
-    "@refinedev/devtools": "npm:^1.1.32"
-    "@refinedev/kbar": "npm:^1.3.6"
-    "@refinedev/mui": "npm:^5.14.4"
-    "@refinedev/react-hook-form": "npm:^4.8.14"
-    "@refinedev/react-router-v6": "npm:^4.5.5"
-    "@refinedev/simple-rest": "npm:^5.0.1"
+    "@refinedev/cli": "npm:^2.16.42"
+    "@refinedev/core": "npm:^4.57.5"
+    "@refinedev/devtools": "npm:^1.2.12"
+    "@refinedev/kbar": "npm:^1.3.14"
+    "@refinedev/mui": "npm:^5.22.0"
+    "@refinedev/react-hook-form": "npm:^4.9.3"
+    "@refinedev/react-router-v6": "npm:^4.6.2"
+    "@refinedev/simple-rest": "npm:^5.0.10"
     "@types/node": "npm:^18.16.2"
     "@types/react": "npm:^18.0.0"
     "@types/react-dom": "npm:^18.0.0"
@@ -7884,46 +7937,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"express@npm:^4.18.2":
-  version: 4.21.1
-  resolution: "express@npm:4.21.1"
-  dependencies:
-    accepts: "npm:~1.3.8"
-    array-flatten: "npm:1.1.1"
-    body-parser: "npm:1.20.3"
-    content-disposition: "npm:0.5.4"
-    content-type: "npm:~1.0.4"
-    cookie: "npm:0.7.1"
-    cookie-signature: "npm:1.0.6"
-    debug: "npm:2.6.9"
-    depd: "npm:2.0.0"
-    encodeurl: "npm:~2.0.0"
-    escape-html: "npm:~1.0.3"
-    etag: "npm:~1.8.1"
-    finalhandler: "npm:1.3.1"
-    fresh: "npm:0.5.2"
-    http-errors: "npm:2.0.0"
-    merge-descriptors: "npm:1.0.3"
-    methods: "npm:~1.1.2"
-    on-finished: "npm:2.4.1"
-    parseurl: "npm:~1.3.3"
-    path-to-regexp: "npm:0.1.10"
-    proxy-addr: "npm:~2.0.7"
-    qs: "npm:6.13.0"
-    range-parser: "npm:~1.2.1"
-    safe-buffer: "npm:5.2.1"
-    send: "npm:0.19.0"
-    serve-static: "npm:1.16.2"
-    setprototypeof: "npm:1.2.0"
-    statuses: "npm:2.0.1"
-    type-is: "npm:~1.6.18"
-    utils-merge: "npm:1.0.1"
-    vary: "npm:~1.1.2"
-  checksum: 0c287867e5f6129d3def1edd9b63103a53c40d4dc8628839d4b6827e35eb8f0de5a4656f9d85f4457eba584f9871ebb2ad26c750b36bd75d9bbb8bcebdc4892c
-  languageName: node
-  linkType: hard
-
-"express@npm:^4.21.2":
+"express@npm:^4.21.0, express@npm:^4.21.2":
   version: 4.21.2
   resolution: "express@npm:4.21.2"
   dependencies:
@@ -11597,13 +11611,6 @@ __metadata:
     lru-cache: "npm:^10.2.0"
     minipass: "npm:^5.0.0 || ^6.0.2 || ^7.0.0"
   checksum: 32a13711a2a505616ae1cc1b5076801e453e7aae6ac40ab55b388bb91b9d0547a52f5aaceff710ea400205f18691120d4431e520afbe4266b836fadede15872d
-  languageName: node
-  linkType: hard
-
-"path-to-regexp@npm:0.1.10":
-  version: 0.1.10
-  resolution: "path-to-regexp@npm:0.1.10"
-  checksum: 34196775b9113ca6df88e94c8d83ba82c0e1a2063dd33bfe2803a980da8d49b91db8104f49d5191b44ea780d46b8670ce2b7f4a5e349b0c48c6779b653f1afe4
   languageName: node
   linkType: hard
 

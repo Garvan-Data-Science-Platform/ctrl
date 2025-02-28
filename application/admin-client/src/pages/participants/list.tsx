@@ -1,9 +1,24 @@
 import { ParticipantAnswerStatus } from '@common/types/api/participants/participant'
 import { Box, Button, Tooltip } from '@mui/material'
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
-import { DateField, List, ShowButton, useDataGrid } from '@refinedev/mui'
+import { DateField, EditButton, List, ShowButton, useDataGrid } from '@refinedev/mui'
 import React from 'react'
 import { Link } from 'react-router-dom'
+
+export const statusMap = {
+  incomplete: {
+    color: 'grey',
+    tooltip: 'Incomplete',
+  },
+  partially_complete: {
+    color: 'orange',
+    tooltip: 'Partially Complete',
+  },
+  complete: {
+    color: 'primary',
+    tooltip: 'Complete',
+  },
+}
 
 export const ParticipantList = () => {
   const { dataGridProps } = useDataGrid({
@@ -14,49 +29,14 @@ export const ParticipantList = () => {
     resource: 'invites',
   })
 
-  const renderAnswers = (answers: ParticipantAnswerStatus[]) => {
-    const filled = answers.filter((val) => val.status == 'complete')
-
-    if (filled && filled[filled.length - 1] == answers[answers.length - 1]) {
-      const val = filled[filled.length - 1]
-      return (
-        <Tooltip title="Complete">
-          <Link key={val.participantId} to={`/responses/${val.participantId}`}>
-            <Button>V{val.surveyVersion}</Button>
-          </Link>
+  const renderAnswer = (answer: ParticipantAnswerStatus) => {
+    return (
+      <Link key={answer.participantId} to={`/responses/${answer.participantId}`}>
+        <Tooltip title={statusMap[answer.status].tooltip}>
+          <Button sx={{ color: statusMap[answer.status].color }}>V{answer.surveyVersion}</Button>
         </Tooltip>
-      )
-    }
-
-    const lastComplete = filled.length > 0 ? answers.indexOf(filled[filled.length - 1]) : 0
-
-    return answers.slice(lastComplete).map((val) => {
-      if (val.status == 'incomplete') {
-        return (
-          <Tooltip key={val.participantId} title="Incomplete">
-            <Box>
-              <Button disabled>V{val.surveyVersion}</Button>
-            </Box>
-          </Tooltip>
-        )
-      } else if (val.status == 'partially_complete') {
-        return (
-          <Link key={val.participantId} to={`/responses/${val.participantId}`}>
-            <Tooltip title="Partially Complete">
-              <Button sx={{ color: 'orange' }}>V{val.surveyVersion}</Button>
-            </Tooltip>
-          </Link>
-        )
-      } else {
-        return (
-          <Link key={val.participantId} to={`/responses/${val.participantId}`}>
-            <Tooltip title="Complete">
-              <Button>V{val.surveyVersion}</Button>
-            </Tooltip>
-          </Link>
-        )
-      }
-    })
+      </Link>
+    )
   }
 
   const columns = React.useMemo<GridColDef[]>(
@@ -81,14 +61,14 @@ export const ParticipantList = () => {
       },
       {
         field: 'answers',
-        headerName: 'Latest answers',
+        headerName: 'Latest Answers',
         minWidth: 250,
-        renderCell: ({ value }) => renderAnswers(value),
+        renderCell: ({ value }) => renderAnswer(value.at(-1)),
       },
       {
         field: 'lastUpdated',
         flex: 1,
-        headerName: 'Last Updated',
+        headerName: 'Latest Survey Response',
         minWidth: 100,
         renderCell: function render({ value }) {
           return <DateField value={value} />
@@ -102,6 +82,7 @@ export const ParticipantList = () => {
           return (
             <>
               <ShowButton hideText recordItemId={row.id} />
+              <EditButton hideText recordItemId={row.id} />
             </>
           )
         },

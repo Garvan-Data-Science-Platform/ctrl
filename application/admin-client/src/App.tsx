@@ -31,6 +31,7 @@ import { authProvider } from './providers/authProvider'
 import { ParticipantList, ParticipantShow } from './pages/participants'
 import { ResponsesView } from './pages/responses'
 import { ListAlt, Person, RecentActors } from '@mui/icons-material'
+import { ParticipantEdit } from './pages/participants/edit'
 
 export const API_URL = import.meta.env.VITE_BACKEND_URL
 
@@ -74,6 +75,7 @@ function App() {
                   {
                     name: 'participants',
                     list: '/participants',
+                    edit: '/participants/edit/:id',
                     show: '/participants/:id',
                     meta: {
                       canDelete: true,
@@ -130,6 +132,7 @@ function App() {
                     </Route>
                     <Route path="/participants">
                       <Route index element={<ParticipantList />} />
+                      <Route path="edit/:id" element={<ParticipantEdit />} />
                       <Route path=":id" element={<ParticipantShow />} />
                     </Route>
                     <Route path="/responses/:id" index element={<ResponsesView />} />
