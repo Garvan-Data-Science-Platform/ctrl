@@ -46,8 +46,6 @@ echo "  gzip_types text/css application/javascript application/json application/
 echo "  gzip_vary on;" >> /etc/nginx/conf.d/default.conf
 echo "" >> /etc/nginx/conf.d/default.conf
 echo "  location / {" >> /etc/nginx/conf.d/default.conf
-echo "    root   /usr/share/nginx/html;" >> /etc/nginx/conf.d/default.conf
-echo "    index  index.html index.htm;" >> /etc/nginx/conf.d/default.conf
 echo "    try_files \$uri /index.html;" >> /etc/nginx/conf.d/default.conf
 echo "  }" >> /etc/nginx/conf.d/default.conf
 echo "" >> /etc/nginx/conf.d/default.conf
