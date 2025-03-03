@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import type { GetParticipantProfileResponse } from '@common/types/api/users'
 import { Link } from 'react-router-dom'
 import { apiClient } from '../apiClient'
-import { ParticipantType } from '@common/types/api/users/ParticipantProfile'
+import { familyMap } from '@common/src/familyMap'
 
 export default function Profile() {
   const {
@@ -25,13 +25,6 @@ export default function Profile() {
   const data = pdata.data
 
   if (error) return <Typography>Error loading user profile: {error.message}</Typography>
-
-  const familyMap = (p: ParticipantType) => {
-    if (data.participantType == 'STANDARD') return 'Family Member'
-    if (p == 'DEPENDENT_AGE') return 'Dependent child'
-    if (p == 'DEPENDENT_OTHER') return 'Dependent (permanent)'
-    if (p == 'GUARDIAN') return 'Co-parent / guardian'
-  }
 
   return (
     <>
@@ -203,7 +196,7 @@ export default function Profile() {
                             </td>
 
                             <td>
-                              <Typography>{familyMap(val.participantType)}</Typography>
+                              <Typography>{familyMap[val.participantType]}</Typography>
                             </td>
                           </tr>
                         )

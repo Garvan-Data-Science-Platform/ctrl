@@ -179,20 +179,6 @@ export const ParticipantEdit = () => {
           type="text"
           label={'Mobile'}
         />
-        {/*
-        <Controller
-          name="role"
-          control={control}
-          render={({ field }) => {
-            return (
-              <TextField select {...field} value={field?.value} label={'Role'} sx={{ mt: 1 }}>
-                <MenuItem value="OrganisationAdmin">Admin</MenuItem>
-                <MenuItem value="participant">Participant</MenuItem>
-              </TextField>
-            )
-          }}
-        />
-          */}
       </Box>
     </Edit>
   )

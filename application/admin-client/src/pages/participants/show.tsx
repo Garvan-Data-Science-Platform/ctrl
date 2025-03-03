@@ -5,7 +5,7 @@ import { useShow } from '@refinedev/core'
 import { Show, TextFieldComponent as TextField } from '@refinedev/mui'
 import { Link } from 'react-router-dom'
 import { statusMap } from './list'
-import { ParticipantType } from '@common/types/api/users/ParticipantProfile'
+import { familyMap } from '@common/src/familyMap'
 
 export const ParticipantShow = () => {
   const { queryResult } = useShow({})
@@ -22,13 +22,6 @@ export const ParticipantShow = () => {
         </Tooltip>
       </Link>
     ))
-  }
-
-  const familyMap = (p: ParticipantType) => {
-    if (p == 'STANDARD') return 'Family Member'
-    if (p == 'DEPENDENT_AGE') return 'Dependent child'
-    if (p == 'DEPENDENT_OTHER') return 'Dependent (permanent)'
-    if (p == 'GUARDIAN') return 'Co-parent / guardian'
   }
 
   return (
@@ -98,7 +91,7 @@ export const ParticipantShow = () => {
                     </td>
 
                     <td>
-                      <Typography>{familyMap(val.participantType)}</Typography>
+                      <Typography>{familyMap[val.participantType]}</Typography>
                     </td>
                   </tr>
                 )
