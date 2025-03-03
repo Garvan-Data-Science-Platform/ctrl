@@ -152,7 +152,7 @@ export default function Profile() {
                         </Typography>
                       </td>
                       <td>
-                        <Typography>{data.alternativeContact?.firstName}</Typography>
+                        <Typography>{data.nextOfKin?.firstName}</Typography>
                       </td>
                     </tr>
                     <tr>
@@ -162,7 +162,7 @@ export default function Profile() {
                         </Typography>
                       </td>
                       <td>
-                        <Typography>{data.alternativeContact?.lastName}</Typography>
+                        <Typography>{data.nextOfKin?.lastName}</Typography>
                       </td>
                     </tr>
                     <tr>
@@ -172,7 +172,7 @@ export default function Profile() {
                         </Typography>
                       </td>
                       <td>
-                        <Typography>{data.alternativeContact?.email}</Typography>
+                        <Typography>{data.nextOfKin?.email}</Typography>
                       </td>
                     </tr>
                   </>

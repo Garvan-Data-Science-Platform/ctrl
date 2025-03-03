@@ -1,5 +1,5 @@
 import { ParticipantAnswerStatus } from '@common/types/api/participants/participant'
-import { Box, Button, Tooltip } from '@mui/material'
+import { Button, Tooltip } from '@mui/material'
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import { DateField, EditButton, List, ShowButton, useDataGrid } from '@refinedev/mui'
 import React from 'react'

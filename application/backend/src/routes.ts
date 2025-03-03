@@ -398,10 +398,10 @@ const models: TsoaRoute.Models = {
     "Participant": {
         "dataType": "refObject",
         "properties": {
+            "id": {"dataType":"double","required":true},
             "email": {"dataType":"string"},
             "firstName": {"dataType":"string","required":true},
             "lastName": {"dataType":"string","required":true},
-            "profile": {"dataType":"nestedObjectLiteral","nestedProperties":{"familyMembers":{"dataType":"array","array":{"dataType":"refObject","ref":"FamilyMember"},"required":true},"nextOfKin":{"ref":"AlternativeContact"},"participantType":{"ref":"ParticipantType","required":true},"preferredContact":{"ref":"ContactMethod","required":true},"postcode":{"dataType":"string"},"state":{"ref":"StateTerritory"},"suburb":{"dataType":"string"},"addressLine":{"dataType":"string"},"mobile":{"dataType":"string","required":true},"email":{"dataType":"string"},"dob":{"dataType":"string","required":true},"lastName":{"dataType":"string","required":true},"middleName":{"dataType":"string"},"firstName":{"dataType":"string","required":true}},"required":true},
             "answers": {"dataType":"array","array":{"dataType":"refObject","ref":"ParticipantAnswerStatus"},"required":true},
             "lastUpdated": {"dataType":"string"},
         },
@@ -416,10 +416,15 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ParticipantWithProfile": {
+        "dataType": "refAlias",
+        "type": {"dataType":"intersection","subSchemas":[{"ref":"Participant"},{"dataType":"nestedObjectLiteral","nestedProperties":{"profile":{"dataType":"nestedObjectLiteral","nestedProperties":{"familyMembers":{"dataType":"array","array":{"dataType":"refObject","ref":"FamilyMember"},"required":true},"nextOfKin":{"ref":"AlternativeContact"},"participantType":{"ref":"ParticipantType","required":true},"preferredContact":{"ref":"ContactMethod","required":true},"postcode":{"dataType":"string"},"state":{"ref":"StateTerritory"},"suburb":{"dataType":"string"},"addressLine":{"dataType":"string"},"mobile":{"dataType":"string","required":true},"email":{"dataType":"string"},"dob":{"dataType":"string","required":true},"lastName":{"dataType":"string","required":true},"middleName":{"dataType":"string"},"firstName":{"dataType":"string","required":true}},"required":true}}}],"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "GetParticipantByIdResponse": {
         "dataType": "refObject",
         "properties": {
-            "data": {"ref":"Participant","required":true},
+            "data": {"ref":"ParticipantWithProfile","required":true},
         },
         "additionalProperties": false,
     },

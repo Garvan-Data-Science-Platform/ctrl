@@ -2,7 +2,7 @@ import { ParticipantAnswerStatus } from '@common/types/api/participants/particip
 import { GetParticipantByIdResponse } from '@common/types/api/participants'
 import { Box, Button, Stack, Tooltip, Typography } from '@mui/material'
 import { useShow } from '@refinedev/core'
-import { DateField, Show, TextFieldComponent as TextField } from '@refinedev/mui'
+import { Show, TextFieldComponent as TextField } from '@refinedev/mui'
 import { Link } from 'react-router-dom'
 import { statusMap } from './list'
 import { ParticipantType } from '@common/types/api/users/ParticipantProfile'

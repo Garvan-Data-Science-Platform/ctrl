@@ -28,14 +28,14 @@ describe('Participants', () => {
 
   it('Edit participant details', () => {
     cy.login(UserType.ADMIN)
-    cy.visit('/participants/98')
-    cy.contains('Test User').should('exist')
-    cy.contains('123 smith st').should('exist')
-    cy.contains('V1').should('exist')
-    cy.contains('Family').should('not.exist')
-    cy.visit('/participants/99')
-    cy.contains('Family').should('exist')
-    cy.contains('Dependent').should('exist')
+    cy.visit('/participants/edit/98')
+    cy.contains('Edit Participant').should('exist')
+    cy.get('input[name="addressLine"]').clear().type('1 Smith St')
+    cy.get('input[name="nextOfKin.firstName"]').clear().type('Betty')
+    cy.contains('Save').click()
+    cy.url().should('contain', 'participants/98')
+    cy.contains('Betty').should('exist')
+    cy.contains('1 Smith St').should('exist')
   })
 
   it('View answers', () => {

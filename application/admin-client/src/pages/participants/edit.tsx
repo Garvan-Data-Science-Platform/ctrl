@@ -1,9 +1,9 @@
-import { DatePicker } from '@mui/lab'
 import { Box, TextField, Typography } from '@mui/material'
 import { useNavigation, useParsed } from '@refinedev/core'
-import { DateField, Edit } from '@refinedev/mui'
+import { Edit } from '@refinedev/mui'
 import { useForm } from '@refinedev/react-hook-form'
 import { Controller } from 'react-hook-form'
+import { UpdateProfileRequest } from '@common/types/api/users/updateProfile'
 
 export const ParticipantEdit = () => {
   const { id } = useParsed()
@@ -16,7 +16,7 @@ export const ParticipantEdit = () => {
     register,
     control,
     formState: { errors },
-  } = useForm({
+  } = useForm<any, any, UpdateProfileRequest>({
     refineCoreProps: {
       resource: 'profiles',
       id,
@@ -40,7 +40,6 @@ export const ParticipantEdit = () => {
           InputLabelProps={{ shrink: true }}
           type="text"
           label={'First Name'}
-          name="firstName"
         />
         <TextField
           {...register('lastName', {
@@ -53,7 +52,6 @@ export const ParticipantEdit = () => {
           InputLabelProps={{ shrink: true }}
           type="text"
           label={'Last Name'}
-          name="lastName"
         />
         <Controller
           name="dob"
@@ -68,9 +66,8 @@ export const ParticipantEdit = () => {
               InputLabelProps={{ shrink: true }}
               type="date"
               label="Date of Birth"
-              value={new Date(field.value || null).toISOString().split('T')[0]}
+              value={new Date(field.value || 0).toISOString().split('T')[0]}
               inputRef={field.ref}
-              name="dob"
               onChange={(val) => field.onChange(new Date(val.target.value).toISOString())}
             />
           )}
@@ -86,7 +83,6 @@ export const ParticipantEdit = () => {
           InputLabelProps={{ shrink: true }}
           type="text"
           label={'Address Line'}
-          name="address_line"
         />
         <TextField
           {...register('suburb', {
@@ -99,7 +95,6 @@ export const ParticipantEdit = () => {
           InputLabelProps={{ shrink: true }}
           type="text"
           label={'Suburb'}
-          name="suburb"
         />
         <TextField
           {...register('state', {
@@ -112,7 +107,6 @@ export const ParticipantEdit = () => {
           InputLabelProps={{ shrink: true }}
           type="text"
           label={'State'}
-          name="state"
         />
         <TextField
           {...register('postcode', {
@@ -125,7 +119,6 @@ export const ParticipantEdit = () => {
           InputLabelProps={{ shrink: true }}
           type="text"
           label={'Postcode'}
-          name="postcode"
         />
         <TextField
           {...register('preferredContact', {
@@ -138,7 +131,6 @@ export const ParticipantEdit = () => {
           InputLabelProps={{ shrink: true }}
           type="text"
           label={'Preferred Contact Method'}
-          name="preferredContact"
         />
         <Typography fontWeight={'bold'}>Alternative Contact</Typography>
         <TextField
@@ -152,7 +144,6 @@ export const ParticipantEdit = () => {
           InputLabelProps={{ shrink: true }}
           type="text"
           label={'First Name'}
-          name="nokFirstName"
         />
         <TextField
           {...register('nextOfKin.lastName', {
@@ -165,7 +156,6 @@ export const ParticipantEdit = () => {
           InputLabelProps={{ shrink: true }}
           type="text"
           label={'Last Name'}
-          name="nokLastName"
         />
         <TextField
           {...register('nextOfKin.email', {
@@ -178,7 +168,6 @@ export const ParticipantEdit = () => {
           InputLabelProps={{ shrink: true }}
           type="text"
           label={'Email'}
-          name="nokEmail"
         />
         <TextField
           {...register('nextOfKin.mobile', {})}
@@ -189,7 +178,6 @@ export const ParticipantEdit = () => {
           InputLabelProps={{ shrink: true }}
           type="text"
           label={'Mobile'}
-          name="nokMobile"
         />
         {/*
         <Controller

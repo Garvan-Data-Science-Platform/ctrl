@@ -103,6 +103,7 @@ export class ParticipantsController extends Controller {
 
     return {
       data: {
+        id: profileId,
         profile: profileData,
         firstName: profile.firstName,
         lastName: profile.lastName,
