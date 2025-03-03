@@ -5,7 +5,6 @@ import {
   Security,
   Controller,
   Response,
-  Middlewares,
   SuccessResponse,
   Body,
   UploadedFile,
@@ -13,7 +12,6 @@ import {
 import { Integrations } from '../../../integrations/src/Integrations'
 import prisma from '../PrismaClient'
 import { Readable } from 'stream'
-import multer from 'multer'
 import { RegisterParticipantRequest } from 'common/types/api/auth'
 import type {
   UploadRedcapInstrumentResponse,
@@ -28,7 +26,6 @@ import exampleREDCapMapping from '../../../integrations/src/exampleREDCapMapping
 import { parseCSV, validateFile } from '../utils/parseCsv'
 import { FileUploadError } from '../middlewares/ErrorHandler'
 import { AuthController } from './AuthController'
-const upload = multer({ storage: multer.memoryStorage() })
 
 const REDCAP_API_URL: string = process.env.REDCAP_API_URL!
 
@@ -84,12 +81,14 @@ export class IntegrationsController extends Controller {
         }
         return data
       })
+      .catch((error) => {
+        throw new BadGatewayError('Error communicating with REDCap API', error)
+      })
 
     return await this.processParticipantData(participantData)
   }
 
   @Post('/redcap/instrument/upload/csv')
-  @Middlewares(upload.single('file'))
   @SuccessResponse('201', 'Upserted Survey from Instrument CSV')
   public async uploadRedcapInstrumentCSV(
     @UploadedFile() file: Express.Multer.File,
@@ -127,14 +126,19 @@ export class IntegrationsController extends Controller {
       },
       body: params.toString(),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        console.log(response)
+        return response.json()
+      })
       .then((data) => {
         if (data.error) {
           throw new BadGatewayError('Error communicating with REDCap API')
         }
         return data
       })
-
+      .catch((error) => {
+        throw new BadGatewayError('Error communicating with REDCap API', error)
+      })
     return await this.processInstrumentData(surveyData, true)
   }
 
