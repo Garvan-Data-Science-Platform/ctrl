@@ -26,6 +26,7 @@ import exampleREDCapMapping from '../../../integrations/src/exampleREDCapMapping
 import { parseCSV, validateFile } from '../utils/parseCsv'
 import { FileUploadError } from '../middlewares/ErrorHandler'
 import { AuthController } from './AuthController'
+import logger from 'common/src/logger'
 
 const REDCAP_API_URL: string = process.env.REDCAP_API_URL!
 
@@ -46,6 +47,7 @@ export class IntegrationsController extends Controller {
   public async uploadRedcapParticipantCSV(
     @UploadedFile() file: Express.Multer.File,
   ): Promise<UploadRedcapParticipantResponse> {
+    logger.info({ message: 'This is the file that has been uploaded', file })
     await validateFile(file, []) // no required headers here so we pass none to the headers checker
     // Create a readable stream from the buffer
     const readableStream = Readable.from(file.buffer.toString())
@@ -64,7 +66,17 @@ export class IntegrationsController extends Controller {
     params.append('token', process.env.REDCAP_API_KEY as string)
     params.append('content', 'record')
     params.append('format', 'json')
+
+    /**
+     * flat - output as one record per row [default]
+     */
     params.append('type', 'flat')
+
+    /**
+     * an array of form names you wish to pull records for.
+     * If the form name has a space in it, replace the space
+     * with an underscore (by default, all records are pulled)
+     */
     params.append('form[0]', form)
 
     const participantData = await fetch(REDCAP_API_URL, {
@@ -117,6 +129,13 @@ export class IntegrationsController extends Controller {
     params.append('token', process.env.REDCAP_API_KEY as string)
     params.append('content', 'metadata')
     params.append('format', 'json')
+
+    /**
+     * an array of form names specifying specific data collection instruments
+     * for which you wish to pull metadata (by default, all metadata is pulled).
+     * NOTE: These 'forms' are not the form label values that are seen on the webpages,
+     * but instead they are the unique form names seen in Column B of the data dictionary."
+     */
     params.append('forms[0]', form)
 
     const surveyData = await fetch(REDCAP_API_URL, {
@@ -127,7 +146,6 @@ export class IntegrationsController extends Controller {
       body: params.toString(),
     })
       .then((response) => {
-        console.log(response)
         return response.json()
       })
       .then((data) => {
