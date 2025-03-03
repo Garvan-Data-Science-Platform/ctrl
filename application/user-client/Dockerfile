@@ -30,7 +30,7 @@ FROM nginx
 
 COPY --from=build /usr/src/app/application/user-client/dist /usr/share/nginx/html
 
-RUN touch /etc/nginx/conf.d/default.conf
+RUN rm /etc/nginx/conf.d/default.conf && touch /etc/nginx/conf.d/default.conf
 
 RUN <<EOF
 echo "server {" >> /etc/nginx/conf.d/default.conf
