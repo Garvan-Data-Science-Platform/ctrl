@@ -1,5 +1,11 @@
 import { SurveyVersion } from '@prisma/client'
 import { populateSurveyStepAnswers } from 'common/src/surveys/populateSurveyStepAnswers'
+import {
+  SurveyElement,
+  SurveyStep,
+  SurveyStepAnswerArray,
+  UserSurveyStepState,
+} from 'common/types/survey'
 
 export function determineLastUpdated(answers: PrismaJson.SurveyAnswerData) {
   let latest_date = new Date('1900-01-01')
@@ -23,13 +29,6 @@ export function determineStatus(answers: PrismaJson.SurveyAnswerData, date_publi
 
   return 'incomplete'
 }
-
-import {
-  SurveyElement,
-  SurveyStep,
-  SurveyStepAnswerArray,
-  UserSurveyStepState,
-} from 'common/types/survey'
 
 export function createDefaultAnswers(surveySteps: SurveyStep[]): UserSurveyStepState[] {
   const result: UserSurveyStepState[] = []
