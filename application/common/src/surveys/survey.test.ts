@@ -1,5 +1,4 @@
-import { SurveyStep, UserSurveyStepState } from 'types/survey'
-import { createDefaultAnswers } from './createDefaultAnswers'
+import { SurveyStep } from 'types/survey'
 import { extractSurveyStepAnswers } from './extractSurveyStepAnswers'
 import { populateSurveyStepAnswers } from './populateSurveyStepAnswers'
 import { validateAnswers } from './validateSurveyAnswers'
@@ -7,19 +6,6 @@ import ExampleSurveyVersion from './exampleSurveyStepData.json'
 
 describe('Survey utility tests', () => {
   const sampleSurveySteps = ExampleSurveyVersion as SurveyStep[]
-
-  describe('createEmptyAnswers', () => {
-    it('Creates empty answers to match shape of questions', () => {
-      const defaultanswers = createDefaultAnswers(sampleSurveySteps)
-      const answer1: UserSurveyStepState = { status: 'review_required', answers: [] }
-      const answer2: UserSurveyStepState = {
-        status: 'review_required',
-        answers: [true, 'Choice 1'],
-      }
-      expect(defaultanswers[0]).toStrictEqual(answer1)
-      expect(defaultanswers[1]).toStrictEqual(answer2)
-    })
-  })
 
   describe('extractSurveyStepAnswers', () => {
     it('Extracts answers correctly', () => {

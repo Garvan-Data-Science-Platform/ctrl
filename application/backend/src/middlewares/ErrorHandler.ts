@@ -66,14 +66,24 @@ export class FileUploadError extends Error {
   }
 }
 
+export class BadGatewayError extends Error {
+  details: unknown
+  constructor(message: string, details?: unknown) {
+    super(message)
+    this.name = 'BadGatewayError'
+    this.details = details
+  }
+}
+
 export function ErrorHandler(
   err: unknown,
   req: Request,
   res: Response,
   next: NextFunction,
 ): Response | void {
+  console.log(err)
   // Bad Request Errors
-  if (err instanceof FileUploadError) {
+  if (err instanceof FileUploadError || err instanceof TypeError) {
     const errorResponse: BadRequestErrorResponse = {
       message: err.message,
       details: err,
@@ -144,6 +154,15 @@ export function ErrorHandler(
     }
     logger.error({ ...errorResponse })
     return res.status(404).json(errorResponse)
+  }
+
+  if (err instanceof BadGatewayError) {
+    const errorResponse: BadRequestErrorResponse = {
+      message: err.message,
+      details: err.details,
+    }
+    logger.error({ ...errorResponse })
+    return res.status(502).json(errorResponse)
   }
 
   // Default error handling for any other type of error

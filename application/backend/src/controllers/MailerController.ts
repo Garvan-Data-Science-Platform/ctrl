@@ -54,8 +54,8 @@ export class MailerController extends Controller {
     })
 
     // Send the email to admin(s)
-    const mailListAdmins: string[] | string = process.env.CTRL_ADMIN_EMAIL
-      ? [process.env.CTRL_ADMIN_EMAIL]
+    const mailListAdmins: string[] | string = process.env.ADMIN_EMAIL
+      ? [process.env.ADMIN_EMAIL]
       : organisationAdminEmails.map((admin) => admin.email)
 
     const subjectToAdmin: string = `New Contact Us Request RE: ${bodyRequest.subject}`

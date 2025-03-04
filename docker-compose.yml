@@ -31,11 +31,11 @@ services:
     depends_on:
       - db-test
     build:
-      dockerfile: Dockerfile.backend
+      dockerfile: ./application/backend/Dockerfile
     env_file:
       - ./application/backend/.env.dockertest
     healthcheck:
-      test: wget --no-verbose --tries=1 --spider http://localhost:5001/healthcheck/
+      test: wget --no-verbose --tries=1 --spider http://localhost:5001/
       interval: 5s
       timeout: 2s
       retries: 10

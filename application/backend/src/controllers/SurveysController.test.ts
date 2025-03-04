@@ -171,7 +171,7 @@ describe('SurveysController', () => {
       const participant = await prisma.surveyParticipant.findFirstOrThrow({
         where: { profileId: 99 },
       })
-      expect(participant.answers[1].answers[0]).toBe(true)
+      expect(participant.answers[1].answers[0]).toBe(null)
     })
   })
 

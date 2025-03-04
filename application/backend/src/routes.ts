@@ -26,6 +26,8 @@ import { HealthCheckController } from './controllers/HealthCheckController';
 import { expressAuthentication } from './authentication';
 // @ts-ignore - no great way to install types from subpackage
 import type { Request as ExRequest, Response as ExResponse, RequestHandler, Router } from 'express';
+const multer = require('multer');
+
 
 const expressAuthenticationRecasted = expressAuthentication as (req: ExRequest, securityName: string, scopes?: string[], res?: ExResponse) => Promise<any>;
 
@@ -33,19 +35,19 @@ const expressAuthenticationRecasted = expressAuthentication as (req: ExRequest, 
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
 const models: TsoaRoute.Models = {
-    "UnauthorizedErrorResponse": {
+    "InternalErrorResponse": {
         "dataType": "refObject",
         "properties": {
-            "message": {"dataType":"string","required":true},
+            "message": {"dataType":"enum","enums":["Internal Server Error"],"required":true},
             "details": {"dataType":"any"},
         },
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "InternalErrorResponse": {
+    "UnauthorizedErrorResponse": {
         "dataType": "refObject",
         "properties": {
-            "message": {"dataType":"enum","enums":["Internal Server Error"],"required":true},
+            "message": {"dataType":"string","required":true},
             "details": {"dataType":"any"},
         },
         "additionalProperties": false,
@@ -146,7 +148,7 @@ const models: TsoaRoute.Models = {
     "GeneratePasswordResetLinkRequest": {
         "dataType": "refObject",
         "properties": {
-            "email": {"dataType":"string","required":true},
+            "email": {"dataType":"string","required":true,"validators":{"pattern":{"errorMsg":"please provide valid email","value":"^(.+)@(.+)$"}}},
         },
         "additionalProperties": false,
     },
@@ -154,8 +156,8 @@ const models: TsoaRoute.Models = {
     "ResetPasswordRequest": {
         "dataType": "refObject",
         "properties": {
+            "newPassword": {"dataType":"string","required":true,"validators":{"minLength":{"errorMsg":"Password must be at least 8 characters","value":8}}},
             "token": {"dataType":"string","required":true},
-            "newPassword": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },
@@ -416,10 +418,39 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "GetInvitedResponse": {
+    "InviteStatus": {
+        "dataType": "refEnum",
+        "enums": ["PENDING","ACCEPTED","EXPIRED","REVOKED"],
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GetInvitesResponse": {
         "dataType": "refObject",
         "properties": {
-            "data": {"dataType":"array","array":{"dataType":"nestedObjectLiteral","nestedProperties":{"date":{"dataType":"string","required":true},"email":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}}},"required":true},
+            "data": {"dataType":"array","array":{"dataType":"nestedObjectLiteral","nestedProperties":{"inviteStatus":{"ref":"InviteStatus","required":true},"expiresAt":{"dataType":"string","required":true},"createdAt":{"dataType":"string","required":true},"email":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}}},"required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "InviteParticipantsResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "resendEmailRequestCount": {"dataType":"double","required":true},
+            "newInvitesCount": {"dataType":"double","required":true},
+            "emailsToResendCount": {"dataType":"double","required":true},
+            "alreadyAcceptedCount": {"dataType":"double","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Email": {
+        "dataType": "refAlias",
+        "type": {"dataType":"string","validators":{"pattern":{"errorMsg":"Please provide valid email","value":"^(.+)@(.+)$"}}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "InviteParticipantsRequest": {
+        "dataType": "refObject",
+        "properties": {
+            "emails": {"dataType":"array","array":{"dataType":"refAlias","ref":"Email"},"required":true},
         },
         "additionalProperties": false,
     },
@@ -563,7 +594,17 @@ const models: TsoaRoute.Models = {
     "UploadRedcapParticipantResponse": {
         "dataType": "refObject",
         "properties": {
+            "profilesCreatedCount": {"dataType":"double","required":true},
+            "profilesAlreadyExistedCount": {"dataType":"double","required":true},
             "ids": {"dataType":"array","array":{"dataType":"double"},"required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "UploadRedcapParticipantAPIRequest": {
+        "dataType": "refObject",
+        "properties": {
+            "form": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
         },
         "additionalProperties": false,
     },
@@ -572,6 +613,14 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "id": {"dataType":"double","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "UploadRedcapInstrumentAPIRequest": {
+        "dataType": "refObject",
+        "properties": {
+            "form": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
         },
         "additionalProperties": false,
     },
@@ -589,13 +638,14 @@ const templateService = new ExpressTemplateService(models, {"noImplicitAdditiona
 
 
 
-export function RegisterRoutes(app: Router) {
+export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof multer>}) {
 
     // ###########################################################################################################
     //  NOTE: If you do not see routes for all of your controllers in this file, then you might not have informed tsoa of where to look
     //      Please look into the "controllerPathGlobs" config option described in the readme: https://github.com/lukeautry/tsoa
     // ###########################################################################################################
 
+    const upload = opts?.multer ||  multer({"limits":{"fileSize":8388608}});
 
     
         const argsUsersController_getAllUsers: Record<string, TsoaRoute.ParameterSchema> = {
@@ -1255,7 +1305,7 @@ export function RegisterRoutes(app: Router) {
         const argsInvitesController_getInvites: Record<string, TsoaRoute.ParameterSchema> = {
         };
         app.get('/invites',
-            authenticateMiddleware([{"jwt":[]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(InvitesController)),
             ...(fetchMiddlewares<RequestHandler>(InvitesController.prototype.getInvites)),
 
@@ -1271,6 +1321,98 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'getInvites',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsInvitesController_createInvites: Record<string, TsoaRoute.ParameterSchema> = {
+                bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"InviteParticipantsRequest"},
+        };
+        app.post('/invites',
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(InvitesController)),
+            ...(fetchMiddlewares<RequestHandler>(InvitesController.prototype.createInvites)),
+
+            async function InvitesController_createInvites(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsInvitesController_createInvites, request, response });
+
+                const controller = new InvitesController();
+
+              await templateService.apiHandler({
+                methodName: 'createInvites',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsInvitesController_resendPendingInvites: Record<string, TsoaRoute.ParameterSchema> = {
+        };
+        app.post('/invites/resend',
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(InvitesController)),
+            ...(fetchMiddlewares<RequestHandler>(InvitesController.prototype.resendPendingInvites)),
+
+            async function InvitesController_resendPendingInvites(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsInvitesController_resendPendingInvites, request, response });
+
+                const controller = new InvitesController();
+
+              await templateService.apiHandler({
+                methodName: 'resendPendingInvites',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsInvitesController_revokeInvite: Record<string, TsoaRoute.ParameterSchema> = {
+                inviteID: {"in":"path","name":"inviteID","required":true,"dataType":"double"},
+        };
+        app.post('/invites/revoke/:inviteID',
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(InvitesController)),
+            ...(fetchMiddlewares<RequestHandler>(InvitesController.prototype.revokeInvite)),
+
+            async function InvitesController_revokeInvite(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsInvitesController_revokeInvite, request, response });
+
+                const controller = new InvitesController();
+
+              await templateService.apiHandler({
+                methodName: 'revokeInvite',
                 controller,
                 response,
                 next,
@@ -1654,26 +1796,32 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsIntegrationsController_uploadRedcapParticipant: Record<string, TsoaRoute.ParameterSchema> = {
-                request: {"in":"request","name":"request","required":true,"dataType":"object"},
+        const argsIntegrationsController_uploadRedcapParticipantCSV: Record<string, TsoaRoute.ParameterSchema> = {
+                file: {"in":"formData","name":"file","required":true,"dataType":"file"},
         };
-        app.post('/integrations/redcap/participant/upload',
+        app.post('/integrations/redcap/participant/upload/csv',
             authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            upload.fields([
+                {
+                    name: "file",
+                    maxCount: 1
+                }
+            ]),
             ...(fetchMiddlewares<RequestHandler>(IntegrationsController)),
-            ...(fetchMiddlewares<RequestHandler>(IntegrationsController.prototype.uploadRedcapParticipant)),
+            ...(fetchMiddlewares<RequestHandler>(IntegrationsController.prototype.uploadRedcapParticipantCSV)),
 
-            async function IntegrationsController_uploadRedcapParticipant(request: ExRequest, response: ExResponse, next: any) {
+            async function IntegrationsController_uploadRedcapParticipantCSV(request: ExRequest, response: ExResponse, next: any) {
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsIntegrationsController_uploadRedcapParticipant, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args: argsIntegrationsController_uploadRedcapParticipantCSV, request, response });
 
                 const controller = new IntegrationsController();
 
               await templateService.apiHandler({
-                methodName: 'uploadRedcapParticipant',
+                methodName: 'uploadRedcapParticipantCSV',
                 controller,
                 response,
                 next,
@@ -1685,31 +1833,99 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsIntegrationsController_uploadRedcapInstrument: Record<string, TsoaRoute.ParameterSchema> = {
-                request: {"in":"request","name":"request","required":true,"dataType":"object"},
+        const argsIntegrationsController_uploadRedcapParticipantAPI: Record<string, TsoaRoute.ParameterSchema> = {
+                bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"UploadRedcapParticipantAPIRequest"},
         };
-        app.post('/integrations/redcap/instrument/upload',
+        app.post('/integrations/redcap/participant/upload/api',
             authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(IntegrationsController)),
-            ...(fetchMiddlewares<RequestHandler>(IntegrationsController.prototype.uploadRedcapInstrument)),
+            ...(fetchMiddlewares<RequestHandler>(IntegrationsController.prototype.uploadRedcapParticipantAPI)),
 
-            async function IntegrationsController_uploadRedcapInstrument(request: ExRequest, response: ExResponse, next: any) {
+            async function IntegrationsController_uploadRedcapParticipantAPI(request: ExRequest, response: ExResponse, next: any) {
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsIntegrationsController_uploadRedcapInstrument, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args: argsIntegrationsController_uploadRedcapParticipantAPI, request, response });
 
                 const controller = new IntegrationsController();
 
               await templateService.apiHandler({
-                methodName: 'uploadRedcapInstrument',
+                methodName: 'uploadRedcapParticipantAPI',
                 controller,
                 response,
                 next,
                 validatedArgs,
-                successStatus: 200,
+                successStatus: 201,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsIntegrationsController_uploadRedcapInstrumentCSV: Record<string, TsoaRoute.ParameterSchema> = {
+                file: {"in":"formData","name":"file","required":true,"dataType":"file"},
+        };
+        app.post('/integrations/redcap/instrument/upload/csv',
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            upload.fields([
+                {
+                    name: "file",
+                    maxCount: 1
+                }
+            ]),
+            ...(fetchMiddlewares<RequestHandler>(IntegrationsController)),
+            ...(fetchMiddlewares<RequestHandler>(IntegrationsController.prototype.uploadRedcapInstrumentCSV)),
+
+            async function IntegrationsController_uploadRedcapInstrumentCSV(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsIntegrationsController_uploadRedcapInstrumentCSV, request, response });
+
+                const controller = new IntegrationsController();
+
+              await templateService.apiHandler({
+                methodName: 'uploadRedcapInstrumentCSV',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 201,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsIntegrationsController_uploadRedcapInstrumentAPI: Record<string, TsoaRoute.ParameterSchema> = {
+                bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"UploadRedcapInstrumentAPIRequest"},
+        };
+        app.post('/integrations/redcap/instrument/upload/api',
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(IntegrationsController)),
+            ...(fetchMiddlewares<RequestHandler>(IntegrationsController.prototype.uploadRedcapInstrumentAPI)),
+
+            async function IntegrationsController_uploadRedcapInstrumentAPI(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsIntegrationsController_uploadRedcapInstrumentAPI, request, response });
+
+                const controller = new IntegrationsController();
+
+              await templateService.apiHandler({
+                methodName: 'uploadRedcapInstrumentAPI',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 201,
               });
             } catch (err) {
                 return next(err);
@@ -1718,7 +1934,7 @@ export function RegisterRoutes(app: Router) {
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsHealthCheckController_HealthCheck: Record<string, TsoaRoute.ParameterSchema> = {
         };
-        app.get('/healthcheck',
+        app.get('/',
             ...(fetchMiddlewares<RequestHandler>(HealthCheckController)),
             ...(fetchMiddlewares<RequestHandler>(HealthCheckController.prototype.HealthCheck)),
 
@@ -1747,7 +1963,7 @@ export function RegisterRoutes(app: Router) {
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsHealthCheckController_getAllWorkspaces: Record<string, TsoaRoute.ParameterSchema> = {
         };
-        app.get('/healthcheck/workspaces',
+        app.get('/workspaces',
             ...(fetchMiddlewares<RequestHandler>(HealthCheckController)),
             ...(fetchMiddlewares<RequestHandler>(HealthCheckController.prototype.getAllWorkspaces)),
 

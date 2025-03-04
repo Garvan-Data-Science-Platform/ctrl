@@ -9,6 +9,6 @@ docker compose down backend-test
 npx dotenv -e .env.test -- yarn prisma migrate deploy
 
 # run tests
-TZ=UTC npx dotenv -e .env.test -- jest --detectOpenHandles --runInBand --coverage $1
+TZ=UTC npx dotenv -e .env.test -- jest --detectOpenHandles --runInBand --coverage "$@"
 
 docker compose down db-test

@@ -1,7 +1,8 @@
 #! /bin/bash
+set -e
 
-yarn prisma migrate deploy
+yarn workspace backend prisma migrate deploy
 
-yarn ts-node scripts/runCreateAdmin.ts
+yarn workspace backend ts-node scripts/runCreateAdmin.ts
 
-yarn start
+yarn workspace backend start

@@ -8,10 +8,11 @@
 
 .DS_Store
 .vscode
-application/*/.env
+application/**/.env
 
 # Dependency directories
 node_modules/
 application/*/dist/
 
 application/*/coverage/
+*.tgz

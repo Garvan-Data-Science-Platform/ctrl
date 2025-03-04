@@ -1,37 +1,60 @@
-# This Dockerfile uses `serve` npm package to serve the static files with node process.
-# You can find the Dockerfile for nginx in the following link:
-# https://github.com/refinedev/dockerfiles/blob/main/vite/Dockerfile.nginx
-FROM refinedev/node:18 AS base
+#Must be built from top directory
 
-FROM base as deps
+ARG NODE_VERSION=20.10.0
 
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .npmrc* ./
+FROM node:${NODE_VERSION}-alpine AS build
 
-RUN \
-  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-  elif [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then yarn global add pnpm && pnpm i --frozen-lockfile; \
-  else echo "Lockfile not found." && exit 1; \
-  fi
+ARG NODE_ENV=production
+ENV NODE_ENV $NODE_ENV
 
-FROM base as builder
+WORKDIR /usr/src/app
 
-ENV NODE_ENV production
+ENV VITE_BACKEND_URL "/api"
 
-COPY --from=deps /app/refine/node_modules ./node_modules
+COPY package.json .yarnrc.yml yarn.lock ./
+COPY application/admin-client/package.json application/admin-client/
+COPY application/user-client/package.json application/user-client/
+COPY application/backend/package.json application/backend/
+COPY application/common/package.json application/common/
 
-COPY . .
+RUN corepack enable && yarn 
 
-RUN npm run build
+COPY application/admin-client application/admin-client
+COPY application/backend application/backend
+COPY application/common application/common
 
-FROM base as runner
+RUN yarn workspace backend prisma:generate
 
-ENV NODE_ENV production
+RUN yarn workspace admin-client build
 
-RUN npm install -g serve
+FROM nginx
 
-COPY --from=builder /app/refine/dist ./
+COPY --from=build /usr/src/app/application/admin-client/dist /usr/share/nginx/html
 
-USER refine
+RUN rm /etc/nginx/conf.d/default.conf && touch /etc/nginx/conf.d/default.conf
 
-CMD ["serve"]
+RUN <<EOF
+echo "server {" >> /etc/nginx/conf.d/default.conf
+echo "  listen 80;" >> /etc/nginx/conf.d/default.conf
+echo "" >> /etc/nginx/conf.d/default.conf
+echo "  gzip on;" >> /etc/nginx/conf.d/default.conf
+echo "  gzip_proxied any;" >> /etc/nginx/conf.d/default.conf
+echo "  gzip_comp_level 6;" >> /etc/nginx/conf.d/default.conf
+echo "  gzip_buffers 16 8k;" >> /etc/nginx/conf.d/default.conf
+echo "  gzip_http_version 1.1;" >> /etc/nginx/conf.d/default.conf
+echo "  gzip_types text/css application/javascript application/json application/font-woff application/font-tff image/gif image/png image/svg+xml application/octet-stream;" >> /etc/nginx/conf.d/default.conf
+echo "  gzip_vary on;" >> /etc/nginx/conf.d/default.conf
+echo "" >> /etc/nginx/conf.d/default.conf
+echo "  location / {" >> /etc/nginx/conf.d/default.conf
+echo "    root   /usr/share/nginx/html;" >> /etc/nginx/conf.d/default.conf
+echo "    index  index.html index.htm;" >> /etc/nginx/conf.d/default.conf
+echo "    try_files \$uri /index.html =404;" >> /etc/nginx/conf.d/default.conf
+echo "  }" >> /etc/nginx/conf.d/default.conf
+echo "" >> /etc/nginx/conf.d/default.conf
+echo "  error_page   500 502 503 504  /50x.html;" >> /etc/nginx/conf.d/default.conf
+echo "" >> /etc/nginx/conf.d/default.conf
+echo "  location = /50x.html {" >> /etc/nginx/conf.d/default.conf
+echo "    root   /usr/share/nginx/html;" >> /etc/nginx/conf.d/default.conf
+echo "  }" >> /etc/nginx/conf.d/default.conf
+echo "}" >> /etc/nginx/conf.d/default.conf
+EOF

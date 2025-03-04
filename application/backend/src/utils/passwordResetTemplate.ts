@@ -48,9 +48,9 @@ export function generatePasswordResetEmail(
         <p>Hello ${firstName},</p>
         <p>We received a request to reset your password. If you did not make this request, you can safely ignore this email.</p>
         <p>Click the button below to reset your password:</p>
-        <a href="${resetLink}" class="button">Reset Password</a>
+        <a href="${resetLink}" class="button" target="_blank">Reset Password</a>
         <p>If the button above does not work, copy and paste the following URL into your browser:</p>
-        <p><a href="${resetLink}">${resetLink}</a></p>
+        <p><a href="${resetLink}" target="_blank">${resetLink}</a></p>
         <p class="footer">If you have any issues, please contact our support team.</p>
     </div>
 </body>

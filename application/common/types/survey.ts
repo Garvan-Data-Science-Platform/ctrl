@@ -59,7 +59,7 @@ export interface SurveyVersion {
 
 export type SurveyStepStatus = 'completed' | 'review_required' | 'viewed'
 
-export type SurveyStepAnswerArray = (string | boolean | undefined)[]
+export type SurveyStepAnswerArray = (string | boolean | null)[]
 
 export interface UserSurveyStepState {
   status: SurveyStepStatus

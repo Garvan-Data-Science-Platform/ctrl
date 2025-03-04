@@ -18,6 +18,7 @@ COPY application/integrations/package.json application/integrations/
 RUN corepack enable && yarn 
 
 COPY application/backend application/backend
+COPY application/backend/.env.dockerprod application/backend/.env
 COPY application/common application/common
 COPY application/integrations application/integrations
 
@@ -26,4 +27,4 @@ RUN yarn workspace backend tsoa:spec
 
 
 #ENTRYPOINT ["tail", "-f", "/dev/null"]
-CMD yarn workspace backend prisma:migrate && yarn workspace backend start
+ENTRYPOINT [ "sh", "application/backend/scripts/entrypoint.sh" ]

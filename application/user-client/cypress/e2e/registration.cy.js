@@ -8,7 +8,7 @@ describe('registration', () => {
   function fillValid() {
     cy.get('[data-cy="reg-first"]').type('FIRST')
     cy.get('[data-cy="reg-last"]').type('LAST')
-    cy.get('[data-cy="reg-email"]').type('valid@email.com')
+    cy.get('[data-cy="reg-email"]').type('invite1@pending.com')
     cy.get('[data-cy="reg-password"]').type('Aadsfoswefw1515fd@!')
     cy.get('[data-cy="reg-confirm-password"]').type('Aadsfoswefw1515fd@!')
     cy.get('[data-cy="reg-dob"]').type('1990-01-01')
@@ -52,13 +52,15 @@ describe('registration', () => {
     cy.contains('at least 8 characters').should('exist')
     cy.contains('passwords do not match').should('exist')
   })
-  it('Attempt to register existing email and get correct error message', () => {
+
+  it('Attempt to register existing email (i.e. no invite) and get correct error message', () => {
     cy.visit('/register')
     fillValid()
+    const testEmail = 'test1@example.com'
     cy.get('[data-cy="reg-email"]').clear()
-    cy.get('[data-cy="reg-email"]').type('test1@example.com')
+    cy.get('[data-cy="reg-email"]').type(testEmail)
     cy.get('[data-cy="reg-button"]').click()
-    cy.contains('email already in use').should('exist')
+    cy.contains(`Invite for ${testEmail} not found`).should('exist')
   })
 
   it('Add dependents, check errors and valid submission', () => {

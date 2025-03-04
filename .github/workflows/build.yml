@@ -1,33 +1,69 @@
-name: Build checks
+name: Build and push
 
-on: [push]
+on:
+  workflow_run:
+    workflows: ['Build checks']
+    branches: [main]
+    types: [completed]
 
 jobs:
-  build-checks:
-    name: build checks
+  release:
+    name: build and push
     runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
-      - name: Enable Corepack
-        run: corepack enable
-      - name: Configure Environment
-        run: cp ./application/backend/.env.test ./application/backend/.env
-      - name: Setup Nodejs and npm
-        uses: actions/setup-node@v4
+
+      - name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v2'
         with:
-          node-version: '20.10.0'
-          cache: 'yarn'
-      - run: yarn install && yarn build
-      - name: Check Types
-        run: yarn type-check
-      - name: Format Code
-        run: yarn format
-      - name: Lint Code
-        run: yarn lint
-      - name: Run Unit Testing
-        env:
-          MAILER_USERNAME: ${{ secrets.TEST_MAILER_USERNAME }}
-          MAILER_PASSWORD: ${{ secrets.TEST_MAILER_PASSWORD }}
-        run: yarn test
-        #run: yarn workspace backend test && yarn workspace user-client test && yarn workspace common test && yarn workspace integrations test && yarn workspace admin-client test
+          workload_identity_provider: 'projects/43338454952/locations/global/workloadIdentityPools/ctrl-next-id-pool/providers/github-provider'
+          service_account: 'ctrl-ci-sa@ctrl-358804.iam.gserviceaccount.com'
+
+      - name: 'Docker auth'
+        run: gcloud auth configure-docker australia-southeast1-docker.pkg.dev
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build and push backend
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: application/backend/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-backend:latest
+            australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-backend:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push user client
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: application/user-client/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-user-client:latest
+            australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-user-client:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push admin client
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: application/admin-client/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-admin-client:latest
+            australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-admin-client:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
