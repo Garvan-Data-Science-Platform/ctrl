@@ -75,7 +75,8 @@ export class IntegrationsController extends Controller {
     /**
      * an array of form names you wish to pull records for.
      * If the form name has a space in it, replace the space
-     * with an underscore (by default, all records are pulled)
+     * with an underscore
+     * (by default, all recirds from all data collection instruments is pulled)
      */
     params.append('form[0]', form)
 
@@ -133,8 +134,9 @@ export class IntegrationsController extends Controller {
     /**
      * an array of form names specifying specific data collection instruments
      * for which you wish to pull metadata (by default, all metadata is pulled).
+     *
      * NOTE: These 'forms' are not the form label values that are seen on the webpages,
-     * but instead they are the unique form names seen in Column B of the data dictionary."
+     * but instead they are the unique form names seen in Column B of the data dictionary.
      */
     params.append('forms[0]', form)
 
