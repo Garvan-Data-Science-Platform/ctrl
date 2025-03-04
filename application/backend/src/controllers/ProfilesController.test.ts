@@ -44,6 +44,7 @@ describe('ProfilesController', () => {
 
       const expectedProfileData = expect.objectContaining({
         addressLine: '123 smith st',
+        alternativeContact: null,
         dob: '1980-01-23T00:00:00.000Z',
         mobile: '0412345678',
         participantType: 'GUARDIAN',
@@ -56,6 +57,7 @@ describe('ProfilesController', () => {
         lastName: 'User',
         familyMembers: [
           { firstName: 'Test', lastName: 'Dependent', participantType: 'DEPENDENT_AGE' },
+          { firstName: 'Second', lastName: 'Guardian', participantType: 'GUARDIAN' },
         ],
       })
 

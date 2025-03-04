@@ -36,7 +36,7 @@ describe('Participants', () => {
     cy.task('partialComplete')
     cy.visit('/participants')
     cy.get('[data-rowindex="2"]').contains('V1').trigger('mouseover', { force: true })
-    cy.contains('Partially Complete').should('be.visible')
+    cy.contains('Incomplete').should('be.visible')
   })
 
   it('Can view responses', () => {

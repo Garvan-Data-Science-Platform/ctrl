@@ -176,8 +176,8 @@ export async function seedTests(prisma: PrismaClient) {
   await prisma.participantProfile.create({
     data: {
       id: SECOND_GUARDIAN_ID,
-      firstName: 'Test',
-      lastName: 'Dependent',
+      firstName: 'Second',
+      lastName: 'Guardian',
       addressLine: '123 smith st',
       dob: new Date('1990-01-23'),
       mobile: '0412345678',
