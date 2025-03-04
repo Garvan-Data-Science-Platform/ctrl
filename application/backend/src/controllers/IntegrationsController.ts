@@ -27,7 +27,6 @@ import { parseCSV, validateFile } from '../utils/parseCsv'
 import { FileUploadError } from '../middlewares/ErrorHandler'
 import logger from 'common/src/logger'
 import { AuthController } from './AuthController'
-import logger from 'common/src/logger'
 
 const REDCAP_API_URL: string = process.env.REDCAP_API_URL!
 

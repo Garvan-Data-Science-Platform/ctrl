@@ -1,8 +1,6 @@
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
-import { Button } from '@mui/material'
 import { EditButton, List, ShowButton, useDataGrid } from '@refinedev/mui'
 import React from 'react'
-import { Link } from 'react-router-dom'
 
 export const SurveyList = () => {
   const { dataGridProps } = useDataGrid({
@@ -38,13 +36,7 @@ export const SurveyList = () => {
   )
 
   return (
-    <List
-      headerButtons={
-        <Link to="/surveys/import">
-          <Button variant="contained">Import REDCap Instrument</Button>
-        </Link>
-      }
-    >
+    <List>
       <DataGrid {...dataGridProps} columns={columns} autoHeight />
     </List>
   )
