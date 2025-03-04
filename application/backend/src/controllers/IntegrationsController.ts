@@ -76,7 +76,7 @@ export class IntegrationsController extends Controller {
      * an array of form names you wish to pull records for.
      * If the form name has a space in it, replace the space
      * with an underscore
-     * (by default, all recirds from all data collection instruments is pulled)
+     * (by default, all records from all data collection instruments is pulled)
      */
     params.append('form[0]', form)
 
