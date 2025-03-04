@@ -211,7 +211,7 @@ export class AuthController extends Controller {
     // Create profiles for dependents if no existing family ID
     if (!familyId) {
       for (const dep of dependents) {
-        await this.profileRepo.create({
+        const depProfile = await this.profileRepo.create({
           data: {
             ...noNextOfKinProfileData,
             firstName: dep.firstName,
@@ -223,6 +223,15 @@ export class AuthController extends Controller {
               : ParticipantType.DEPENDENT_AGE,
           },
         })
+        if (currentSurvey) {
+          await this.spRepo.create({
+            data: {
+              profileId: depProfile.id,
+              versionId: currentSurvey.id,
+              answers: createDefaultAnswers(currentSurvey.data),
+            },
+          })
+        }
       }
     }
 
