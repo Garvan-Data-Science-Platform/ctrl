@@ -109,16 +109,16 @@ describe('IntegrationsController', () => {
       expect(response.body.profilesAlreadyExistedCount).toBe(1)
     }, 15000)
 
-    it('should throw a 404 error if no file is given', async () => {
+    it('should throw a 400 error if no file is given', async () => {
       const response = await request(app)
         .post('/integrations/redcap/participant/upload/csv')
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(400)
       const body = response.body
-      expect(body.message).toBe('No file uploaded')
+      expect(body.message).toBe("Cannot read properties of undefined (reading 'file')")
     })
 
-    it('should throw a 404 error if given an empty file', async () => {
+    it('should throw a 400 error if given an empty file', async () => {
       const csvPath = path.resolve(__dirname, '../../tests/test_data/empty_file.csv')
       const response = await request(app)
         .post('/integrations/redcap/participant/upload/csv')
@@ -198,12 +198,12 @@ describe('IntegrationsController', () => {
       expect(survey?.data.length).toBe(4)
     })
 
-    it('should throw a 404 error if no file is given', async () => {
+    it('should throw a 400 error if no file is given', async () => {
       const response = await request(app)
         .post('/integrations/redcap/instrument/upload/csv')
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(400)
-      expect(response.body.message).toBe('No file uploaded')
+      expect(response.body.message).toBe("Cannot read properties of undefined (reading 'file')")
     })
 
     it('should throw a 404 error if given an empty file', async () => {

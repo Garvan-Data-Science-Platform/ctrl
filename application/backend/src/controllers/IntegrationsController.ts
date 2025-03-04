@@ -5,16 +5,13 @@ import {
   Security,
   Controller,
   Response,
-  Request,
-  Middlewares,
   SuccessResponse,
   Body,
+  UploadedFile,
 } from 'tsoa'
 import { Integrations } from '../../../integrations/src/Integrations'
 import prisma from '../PrismaClient'
 import { Readable } from 'stream'
-import * as express from 'express'
-import multer from 'multer'
 import { RegisterParticipantRequest } from 'common/types/api/auth'
 import type {
   UploadRedcapInstrumentResponse,
@@ -30,7 +27,9 @@ import { parseCSV, validateFile } from '../utils/parseCsv'
 import { FileUploadError } from '../middlewares/ErrorHandler'
 import logger from 'common/src/logger'
 import { AuthController } from './AuthController'
-const upload = multer({ storage: multer.memoryStorage() })
+import logger from 'common/src/logger'
+
+const REDCAP_API_URL: string = process.env.REDCAP_API_URL!
 
 @Route('integrations')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
@@ -45,12 +44,12 @@ export class IntegrationsController extends Controller {
   integrationService = new Integrations(exampleREDCapMapping)
 
   @Post('/redcap/participant/upload/csv')
-  @Middlewares(upload.single('file'))
   @SuccessResponse('201', 'Created Participants from CSV')
   public async uploadRedcapParticipantCSV(
-    @Request() request: express.Request,
+    @UploadedFile() file: Express.Multer.File,
   ): Promise<UploadRedcapParticipantResponse> {
-    const file = await validateFile(request, []) // no required headers here so we pass none to the headers checker
+    logger.info({ message: 'This is the file that has been uploaded', file })
+    await validateFile(file, []) // no required headers here so we pass none to the headers checker
     // Create a readable stream from the buffer
     const readableStream = Readable.from(file.buffer.toString())
     const csvData: Record<string, string>[] = await parseCSV(readableStream)
@@ -68,10 +67,20 @@ export class IntegrationsController extends Controller {
     params.append('token', process.env.REDCAP_API_KEY as string)
     params.append('content', 'record')
     params.append('format', 'json')
+    /**
+     * flat - output as one record per row [default]
+     */
     params.append('type', 'flat')
+
+    /**
+     * an array of form names you wish to pull records for.
+     * If the form name has a space in it, replace the space
+     * with an underscore
+     * (by default, all records from all data collection instruments is pulled)
+     */
     params.append('form[0]', form)
 
-    const participantData = await fetch('https://redcap.gimr.garvan.org.au/api/', {
+    const participantData = await fetch(REDCAP_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -80,22 +89,24 @@ export class IntegrationsController extends Controller {
     })
       .then((response) => response.json())
       .then((data) => {
+        if (data.error) {
+          throw new BadGatewayError('Error communicating with REDCap API')
+        }
         return data
       })
-      .catch(() => {
-        throw new BadGatewayError('Error communicating with REDCap API')
+      .catch((error) => {
+        throw new BadGatewayError('Error communicating with REDCap API', error)
       })
 
     return await this.processParticipantData(participantData)
   }
 
   @Post('/redcap/instrument/upload/csv')
-  @Middlewares(upload.single('file'))
   @SuccessResponse('201', 'Upserted Survey from Instrument CSV')
   public async uploadRedcapInstrumentCSV(
-    @Request() request: express.Request,
+    @UploadedFile() file: Express.Multer.File,
   ): Promise<UploadRedcapInstrumentResponse> {
-    const file = await validateFile(request, [
+    await validateFile(file, [
       '"Field Type"',
       '"Field Label"',
       '"Section Header"',
@@ -119,23 +130,35 @@ export class IntegrationsController extends Controller {
     params.append('token', process.env.REDCAP_API_KEY as string)
     params.append('content', 'metadata')
     params.append('format', 'json')
+
+    /**
+     * an array of form names specifying specific data collection instruments
+     * for which you wish to pull metadata (by default, all metadata is pulled).
+     *
+     * NOTE: These 'forms' are not the form label values that are seen on the webpages,
+     * but instead they are the unique form names seen in Column B of the data dictionary.
+     */
     params.append('forms[0]', form)
 
-    const surveyData = await fetch('https://redcap.gimr.garvan.org.au/api/', {
+    const surveyData = await fetch(REDCAP_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: params.toString(),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        return response.json()
+      })
       .then((data) => {
+        if (data.error) {
+          throw new BadGatewayError('Error communicating with REDCap API')
+        }
         return data
       })
-      .catch(() => {
-        throw new BadGatewayError('Error communicating with REDCap API')
+      .catch((error) => {
+        throw new BadGatewayError('Error communicating with REDCap API', error)
       })
-
     return await this.processInstrumentData(surveyData, true)
   }
 

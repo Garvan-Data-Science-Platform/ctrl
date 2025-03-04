@@ -1,6 +1,5 @@
 import { Readable } from 'stream'
 import { parse } from 'fast-csv'
-import * as express from 'express'
 import { FileUploadError } from '../middlewares/ErrorHandler'
 
 export async function parseCSV(stream: Readable): Promise<Record<string, string>[]> {
@@ -18,11 +17,9 @@ export async function parseCSV(stream: Readable): Promise<Record<string, string>
 }
 
 export async function validateFile(
-  request: express.Request,
+  file: Express.Multer.File,
   requiredHeaders: string[],
-): Promise<Express.Multer.File> {
-  const file = request.file
-
+): Promise<void> {
   if (!file) {
     throw new FileUploadError('No file uploaded')
   } else if (!file.buffer || file.buffer.length === 0) {
@@ -58,6 +55,4 @@ export async function validateFile(
       )
     }
   }
-
-  return file
 }

@@ -30,7 +30,8 @@ function replaceRefsWithSchemas(schemas: Record<string, Schema>) {
     // Check if the schema is a $ref to "DefaultSelection_Prisma"
     if (
       schemaDefinition.$ref &&
-      schemaDefinition.$ref.startsWith('#/components/schemas/DefaultSelection_Prisma')
+      (schemaDefinition.$ref.startsWith('#/components/schemas/DefaultSelection_Prisma') ||
+        schemaDefinition.$ref.startsWith('#/components/schemas/_36_Enums'))
     ) {
       console.log(`Found ${schemaDefinition.$ref} to be replaced with ${schemaName}`)
 

@@ -25,7 +25,7 @@ import { SurveyElementCard, SurveyDropSpace } from '../../components/SurveyEleme
 import { useSurveyStore } from '../../surveyStore'
 import { axiosInstance } from '../../providers/dataProvider'
 import { API_URL } from '../../App'
-import { useResource, useShow, useUpdate, useNavigation } from '@refinedev/core'
+import { useResource, useShow, useUpdate, useNavigation, useNotification } from '@refinedev/core'
 
 export const SurveyEditor = () => {
   const {
@@ -63,6 +63,8 @@ export const SurveyEditor = () => {
   const { id } = useResource()
 
   const { queryResult } = useShow({ resource: 'surveys' })
+
+  const { open } = useNotification()
 
   const { mutate } = useUpdate({
     resource: 'surveys',
@@ -119,8 +121,8 @@ export const SurveyEditor = () => {
       .then(() => {
         list('surveys')
       })
-      .catch(() => {
-        alert('ERROR PUBLISHING')
+      .catch((error) => {
+        open?.({ type: 'error', message: `Could not publish survey: ${error}` })
       })
   }
 

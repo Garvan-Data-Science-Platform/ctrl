@@ -20,8 +20,8 @@ import type {
   ValidateErrorResponse,
 } from 'common/types/api/errors'
 import { IncorrectPasswordError, NotFoundError } from '../middlewares/ErrorHandler'
-import { createDefaultAnswers } from 'common/src/surveys/createDefaultAnswers'
 import { ParticipantType } from 'common/types/api/users/ParticipantProfile'
+import { createDefaultAnswers } from '../utils/answers'
 
 @Route('auth')
 @Tags('Auth')
@@ -181,7 +181,6 @@ export class AuthController extends Controller {
           dob: new Date(dependents[0].dob),
         },
       })
-      console.log('EXISTING DEP', existingDep)
       if (existingDep) {
         familyId = existingDep.familyId
       }
@@ -197,15 +196,13 @@ export class AuthController extends Controller {
     })
 
     if (existingParticipant) {
-      throw new ValidateError(
-        {
-          'firstName, lastName and dob': {
-            message: 'These fields together must be unique',
-            value: `${firstName}, ${lastName} and ${dob}`,
-          },
+      logger.error('Participant already exists', {
+        'firstName, lastName and dob': {
+          message: 'These fields together must be unique',
+          value: `${firstName}, ${lastName} and ${dob}`,
         },
-        'Participant already exists',
-      )
+      })
+      throw new Error('Participant already exists')
     }
 
     // Create Profile

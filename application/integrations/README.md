@@ -1,3 +1,9 @@
-# integrations
+# Integrations
 
-Plan to remove '--passWithNoTests' from the 'test' script in the future.
+## REDCap
+
+This workspace integrates [REDCap](https://project-redcap.org/) with ctrl through API calls and/or downloading files from REDCap & Uploading to ctrl.
+
+## ELSA
+
+TBD

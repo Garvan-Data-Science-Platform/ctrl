@@ -78,14 +78,6 @@
           }
         }
       },
-      "_36_Enums.Role": {
-        "type": "string",
-        "enum": [
-          "OperatorAdmin",
-          "Participant",
-          "OrganisationAdmin"
-        ]
-      },
       "User": {
         "description": "Model User",
         "properties": {
@@ -193,7 +185,12 @@
         "additionalProperties": false
       },
       "Role": {
-        "$ref": "#/components/schemas/_36_Enums.Role"
+        "type": "string",
+        "enum": [
+          "OperatorAdmin",
+          "Participant",
+          "OrganisationAdmin"
+        ]
       },
       "CreateUserRequest": {
         "properties": {
@@ -3781,7 +3778,26 @@
             ]
           }
         ],
-        "parameters": []
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        }
       }
     },
     "/integrations/redcap/participant/upload/api": {
@@ -3887,7 +3903,26 @@
             ]
           }
         ],
-        "parameters": []
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        }
       }
     },
     "/integrations/redcap/instrument/upload/api": {

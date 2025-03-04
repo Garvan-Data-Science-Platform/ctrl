@@ -3,7 +3,7 @@ import recordDataTwo from './RedCapFetchData/recordDataTwo.json'
 import instrumentDataTwo from './RedCapFetchData/instrumentDataTwo.json'
 
 export const redcapFetch = jest.fn((url, options) => {
-  if (url === 'https://redcap.gimr.garvan.org.au/api/' && options.method === 'POST') {
+  if (url === process.env.REDCAP_API_URL && options.method === 'POST') {
     const params = new URLSearchParams(options.body)
 
     if (params.get('content') === 'record' && params.get('format') === 'json') {

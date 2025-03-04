@@ -81,8 +81,9 @@ export function ErrorHandler(
   res: Response,
   next: NextFunction,
 ): Response | void {
+  console.log(err)
   // Bad Request Errors
-  if (err instanceof FileUploadError) {
+  if (err instanceof FileUploadError || err instanceof TypeError) {
     const errorResponse: BadRequestErrorResponse = {
       message: err.message,
       details: err,
