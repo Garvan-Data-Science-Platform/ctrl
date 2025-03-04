@@ -12,7 +12,7 @@ import { Edit } from '@refinedev/mui'
 import { useForm } from '@refinedev/react-hook-form'
 import { Controller } from 'react-hook-form'
 import { UpdateProfileRequest } from '@common/types/api/users/updateProfile'
-import { ContactMethod } from '@common/types/api/users/ParticipantProfile'
+import { ContactMethod, StateTerritory } from '@common/types/api/users/ParticipantProfile'
 
 export const ParticipantEdit = () => {
   const { id } = useParsed()
@@ -62,10 +62,32 @@ export const ParticipantEdit = () => {
           type="text"
           label={'Last Name'}
         />
+        <TextField
+          {...register('email', {
+            required: 'This field is required',
+            pattern: {
+              value: /\S+@\S+\.\S+/,
+              message: 'Invalid email',
+            },
+          })}
+          error={!!errors.email}
+          helperText={errors.email?.message}
+          margin="normal"
+          fullWidth
+          InputLabelProps={{ shrink: true }}
+          type="text"
+          label={'Email'}
+        />
         <Controller
           name="dob"
           control={control}
-          rules={{ required: true }}
+          rules={{
+            required: true,
+            validate: {
+              maxDate: (date) => new Date(date || '') <= new Date() || 'Invalid date',
+              minDate: (date) => new Date(date || '') > new Date('1900-01-01') || 'Invalid date',
+            },
+          }}
           render={({ field }) => (
             <TextField
               error={!!errors.dob}
@@ -105,17 +127,30 @@ export const ParticipantEdit = () => {
           type="text"
           label={'Suburb'}
         />
-        <TextField
-          {...register('state', {
-            required: 'This field is required',
-          })}
-          error={!!errors.state}
-          helperText={errors.state?.message}
-          margin="normal"
-          fullWidth
-          InputLabelProps={{ shrink: true }}
-          type="text"
-          label={'State'}
+        <Controller
+          name="state"
+          control={control}
+          rules={{ required: true }}
+          render={({ field }) => (
+            <FormControl>
+              <InputLabel id="pref-select-label">State</InputLabel>
+              <Select
+                labelId="state-select-label"
+                label="State"
+                error={Boolean(errors.state)}
+                value={field.value || StateTerritory.NSW}
+                onChange={field.onChange}
+              >
+                {Object.keys(StateTerritory).map((val, idx) => {
+                  return (
+                    <MenuItem value={val} key={`state_${idx}`}>
+                      {val}
+                    </MenuItem>
+                  )
+                })}
+              </Select>
+            </FormControl>
+          )}
         />
         <TextField
           {...register('postcode', {

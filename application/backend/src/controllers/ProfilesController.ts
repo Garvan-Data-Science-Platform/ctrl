@@ -156,7 +156,7 @@ export class ProfilesController extends Controller {
     const profile = await this.participantProfileRepo.findUniqueOrThrow({
       where: { id: profileId },
     })
-    const { nextOfKin, ...updateData } = { ...bodyRequest }
+    const { nextOfKin, email, ...updateData } = { ...bodyRequest }
     if (bodyRequest.dob) updateData.dob = new Date(bodyRequest.dob) as any
 
     const hasNok = Boolean(nextOfKin)
@@ -168,7 +168,7 @@ export class ProfilesController extends Controller {
 
     await this.userRepo.update({
       where: { id: request.user?.userId },
-      data: { firstName: bodyRequest.firstName, lastName: bodyRequest.lastName },
+      data: { email: email, firstName: bodyRequest.firstName, lastName: bodyRequest.lastName },
     })
   }
 }
