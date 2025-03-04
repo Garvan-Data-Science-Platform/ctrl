@@ -10,7 +10,7 @@ export class Integrations {
   }
 
   // returns a list of participant request to create users
-  mapCSVToParticipantRequests(csv: Record<string, string>[]): RegisterParticipantRequest[] {
+  mapRecordToParticipantRequests(csv: Record<string, string>[]): RegisterParticipantRequest[] {
     const res: RegisterParticipantRequest[] = []
     for (const userData of csv) {
       res.push(mapToParticipantRequest(userData, this.mapping))
@@ -20,9 +20,9 @@ export class Integrations {
   }
 
   // returns a list of survey elements to be created into a survey later
-  mapInstrumentCSVToSurvey(csv: Record<string, string>[]): SurveyStep[] {
+  mapInstrumentCSVToSurvey(csv: Record<string, string>[], rawFields: boolean): SurveyStep[] {
     const steps: SurveyStep[] = csv.reduce<SurveyStep[]>((acc, surveyQuestion) => {
-      const [element, sectionHeader] = mapToSurveyElement(surveyQuestion)
+      const [element, sectionHeader] = mapToSurveyElement(surveyQuestion, rawFields)
 
       if (sectionHeader) {
         acc.push({

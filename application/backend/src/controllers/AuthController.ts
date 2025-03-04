@@ -181,10 +181,28 @@ export class AuthController extends Controller {
           dob: new Date(dependents[0].dob),
         },
       })
-      console.log('EXISTING DEP', existingDep)
       if (existingDep) {
         familyId = existingDep.familyId
       }
+    }
+
+    // Check if participant exists already
+    const existingParticipant = await this.profileRepo.findFirst({
+      where: {
+        firstName: firstName,
+        lastName: lastName,
+        dob: new Date(dob),
+      },
+    })
+
+    if (existingParticipant) {
+      logger.error('Participant already exists', {
+        'firstName, lastName and dob': {
+          message: 'These fields together must be unique',
+          value: `${firstName}, ${lastName} and ${dob}`,
+        },
+      })
+      throw new Error('Participant already exists')
     }
 
     // Create Profile

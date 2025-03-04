@@ -4,28 +4,31 @@ import {
   Tags,
   Security,
   Controller,
-  SuccessResponse,
   Response,
-  Request,
-  Middlewares,
+  SuccessResponse,
+  Body,
+  UploadedFile,
 } from 'tsoa'
 import { Integrations } from '../../../integrations/src/Integrations'
 import prisma from '../PrismaClient'
 import { Readable } from 'stream'
-import * as express from 'express'
-import multer from 'multer'
 import { RegisterParticipantRequest } from 'common/types/api/auth'
-import {
+import type {
   UploadRedcapInstrumentResponse,
+  UploadRedcapInstrumentAPIRequest,
   UploadRedcapParticipantResponse,
+  UploadRedcapParticipantAPIRequest,
 } from 'common/types/api/integrations/redcap'
+import { BadGatewayError } from '../middlewares/ErrorHandler'
 import { UnauthorizedErrorResponse, InternalErrorResponse } from 'common/types/api/errors'
 import { SurveyStep } from 'common/types/survey'
 import exampleREDCapMapping from '../../../integrations/src/exampleREDCapMapping.json'
 import { parseCSV, validateFile } from '../utils/parseCsv'
 import { FileUploadError } from '../middlewares/ErrorHandler'
 import { AuthController } from './AuthController'
-const upload = multer({ storage: multer.memoryStorage() })
+import logger from 'common/src/logger'
+
+const REDCAP_API_URL: string = process.env.REDCAP_API_URL!
 
 @Route('integrations')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
@@ -39,50 +42,71 @@ export class IntegrationsController extends Controller {
   spRepo = prisma.surveyParticipant
   integrationService = new Integrations(exampleREDCapMapping)
 
-  @Post('/redcap/participant/upload')
-  @Middlewares(upload.single('file'))
+  @Post('/redcap/participant/upload/csv')
   @SuccessResponse('201', 'Created Participants from CSV')
-  public async uploadRedcapParticipant(
-    @Request() request: express.Request,
+  public async uploadRedcapParticipantCSV(
+    @UploadedFile() file: Express.Multer.File,
   ): Promise<UploadRedcapParticipantResponse> {
-    const file = await validateFile(request, []) // no required headers here so we pass none to the headers checker
+    logger.info({ message: 'This is the file that has been uploaded', file })
+    await validateFile(file, []) // no required headers here so we pass none to the headers checker
     // Create a readable stream from the buffer
     const readableStream = Readable.from(file.buffer.toString())
     const csvData: Record<string, string>[] = await parseCSV(readableStream)
 
-    // fetches data from mapping
-    let data: RegisterParticipantRequest[] = []
-    try {
-      data = this.integrationService.mapCSVToParticipantRequests(csvData)
-    } catch (error) {
-      throw new FileUploadError(
-        error instanceof Error ? error.message : 'Unknown Error: Failed to Map Data',
-      )
-    }
-
-    const participants = []
-    const ids = []
-    const authController: AuthController = new AuthController()
-    for (const participant of data) {
-      // Since we are not creating a user anymore we don't need all the data from RegisterParticipantRequest, fields may be needed later in dev tho
-      // specifically these fields might be required to create a new account for the person and send them an email for it
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { email, password, middleName, ...participantData } = participant
-      const addedParticipant = participants.push(
-        await authController.createParticipant(participantData),
-      )
-      ids.push(addedParticipant)
-    }
-    return { ids: ids }
+    return await this.processParticipantData(csvData)
   }
 
-  @Post('/redcap/instrument/upload')
-  @Middlewares(upload.single('file'))
-  @SuccessResponse('200', 'Upserted Survey from Instrument CSV')
-  public async uploadRedcapInstrument(
-    @Request() request: express.Request,
+  @Post('/redcap/participant/upload/api')
+  @SuccessResponse('201', 'Created Participants from REDCap API')
+  public async uploadRedcapParticipantAPI(
+    @Body() bodyRequest: UploadRedcapParticipantAPIRequest,
+  ): Promise<UploadRedcapParticipantResponse> {
+    const { form } = bodyRequest
+    const params = new URLSearchParams()
+    params.append('token', process.env.REDCAP_API_KEY as string)
+    params.append('content', 'record')
+    params.append('format', 'json')
+
+    /**
+     * flat - output as one record per row [default]
+     */
+    params.append('type', 'flat')
+
+    /**
+     * an array of form names you wish to pull records for.
+     * If the form name has a space in it, replace the space
+     * with an underscore
+     * (by default, all records from all data collection instruments is pulled)
+     */
+    params.append('form[0]', form)
+
+    const participantData = await fetch(REDCAP_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params.toString(),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          throw new BadGatewayError('Error communicating with REDCap API')
+        }
+        return data
+      })
+      .catch((error) => {
+        throw new BadGatewayError('Error communicating with REDCap API', error)
+      })
+
+    return await this.processParticipantData(participantData)
+  }
+
+  @Post('/redcap/instrument/upload/csv')
+  @SuccessResponse('201', 'Upserted Survey from Instrument CSV')
+  public async uploadRedcapInstrumentCSV(
+    @UploadedFile() file: Express.Multer.File,
   ): Promise<UploadRedcapInstrumentResponse> {
-    const file = await validateFile(request, [
+    await validateFile(file, [
       '"Field Type"',
       '"Field Label"',
       '"Section Header"',
@@ -93,10 +117,114 @@ export class IntegrationsController extends Controller {
     const readableStream = Readable.from(file.buffer.toString())
     const csvData: Record<string, string>[] = await parseCSV(readableStream)
 
-    // fetches elements from mapping
+    return await this.processInstrumentData(csvData, false)
+  }
+
+  @Post('/redcap/instrument/upload/api')
+  @SuccessResponse('201', 'Created Survey from Redcap API')
+  public async uploadRedcapInstrumentAPI(
+    @Body() bodyRequest: UploadRedcapInstrumentAPIRequest,
+  ): Promise<UploadRedcapInstrumentResponse> {
+    const { form } = bodyRequest
+    const params = new URLSearchParams()
+    params.append('token', process.env.REDCAP_API_KEY as string)
+    params.append('content', 'metadata')
+    params.append('format', 'json')
+
+    /**
+     * an array of form names specifying specific data collection instruments
+     * for which you wish to pull metadata (by default, all metadata is pulled).
+     *
+     * NOTE: These 'forms' are not the form label values that are seen on the webpages,
+     * but instead they are the unique form names seen in Column B of the data dictionary.
+     */
+    params.append('forms[0]', form)
+
+    const surveyData = await fetch(REDCAP_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params.toString(),
+    })
+      .then((response) => {
+        return response.json()
+      })
+      .then((data) => {
+        if (data.error) {
+          throw new BadGatewayError('Error communicating with REDCap API')
+        }
+        return data
+      })
+      .catch((error) => {
+        throw new BadGatewayError('Error communicating with REDCap API', error)
+      })
+    return await this.processInstrumentData(surveyData, true)
+  }
+
+  private async processParticipantData(rawData: Record<string, string>[]) {
+    let data: RegisterParticipantRequest[] = []
+    try {
+      data = this.integrationService.mapRecordToParticipantRequests(rawData)
+    } catch (error) {
+      throw new FileUploadError(
+        error instanceof Error ? error.message : 'Unknown Error: Failed to Map Data',
+      )
+    }
+
+    const authController = new AuthController()
+    const ids: number[] = []
+    let profilesCreatedCount = 0
+    let profilesAlreadyExistedCount = 0
+
+    for (const participant of data) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { email, password, middleName, ...participantData } = participant
+      const user = await this.userRepo.findFirst({
+        where: { email: email },
+        select: { id: true, profiles: true },
+      })
+
+      // If user doesn't exist, create a participant using the authController, otherwise create a profile and attact it to the user.
+      if (!user) {
+        try {
+          const participantResponse = await authController.createParticipant(participantData)
+          ids.push(participantResponse.id)
+          profilesCreatedCount++
+        } catch (err) {
+          profilesAlreadyExistedCount++
+          continue
+        }
+      } else {
+        if (user.profiles.length === 0) {
+          const participantProfile = await prisma.participantProfile.create({
+            data: {
+              ...participantData,
+              user: {
+                connect: { id: user.id },
+              },
+              nextOfKin: participantData.nextOfKin
+                ? {
+                    create: participantData.nextOfKin,
+                  }
+                : undefined,
+            },
+          })
+          ids.push(participantProfile.id)
+          profilesCreatedCount++
+        } else {
+          profilesAlreadyExistedCount++
+        }
+      }
+    }
+
+    return { profilesCreatedCount, profilesAlreadyExistedCount, ids }
+  }
+
+  private async processInstrumentData(data: Record<string, string>[], isRawData: boolean) {
     let steps: SurveyStep[] = []
     try {
-      steps = this.integrationService.mapInstrumentCSVToSurvey(csvData)
+      steps = this.integrationService.mapInstrumentCSVToSurvey(data, isRawData)
     } catch (error) {
       throw new FileUploadError(
         error instanceof Error ? error.message : 'Unknown Error: Failed to Map Data',
