@@ -24,7 +24,12 @@ export function determineStatus(answers: PrismaJson.SurveyAnswerData, date_publi
   return 'incomplete'
 }
 
-import { SurveyElement, SurveyStep, UserSurveyStepState } from 'common/types/survey'
+import {
+  SurveyElement,
+  SurveyStep,
+  SurveyStepAnswerArray,
+  UserSurveyStepState,
+} from 'common/types/survey'
 
 export function createDefaultAnswers(surveySteps: SurveyStep[]): UserSurveyStepState[] {
   const result: UserSurveyStepState[] = []
@@ -81,4 +86,24 @@ export function answersFromPreviousSurvey(
     result.push({ status: 'review_required', answers: stepAnswers })
   }
   return result
+}
+
+export function combineGuardianAnswers(
+  answers1: SurveyStepAnswerArray,
+  answers2: SurveyStepAnswerArray,
+): SurveyStepAnswerArray {
+  if (answers1.length != answers2.length) {
+    throw Error('Guardian Answer Mismatch')
+  }
+  return answers1.map((val, idx) => {
+    if (val == answers2[idx]) {
+      return val
+    } else if (val === null) {
+      return answers2[idx]
+    } else if (answers2[idx] === null) {
+      return val
+    } else {
+      return null
+    }
+  })
 }

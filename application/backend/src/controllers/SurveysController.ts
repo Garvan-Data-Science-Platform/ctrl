@@ -31,7 +31,11 @@ import { GetSurveyVersionByIdResponse } from 'common/types/api/surveys/getSurvey
 import { validateAnswers } from 'common/src/surveys/validateSurveyAnswers'
 import { populateSurveyStepAnswers } from 'common/src/surveys/populateSurveyStepAnswers'
 import { ValidateErrorResponse } from 'common/types/api/errors'
-import { answersFromPreviousSurvey, createDefaultAnswers } from '../utils/answers'
+import {
+  answersFromPreviousSurvey,
+  combineGuardianAnswers,
+  createDefaultAnswers,
+} from '../utils/answers'
 
 @Route('surveys')
 @Tags('Surveys')
@@ -289,6 +293,41 @@ export class SurveysController extends Controller {
       where: { id: participant.id }, //
       data: { answers },
     })
+
+    //Also update any dependents
+    if (profile.participantType == 'GUARDIAN') {
+      const dependents = await this.profileRepo.findMany({
+        where: {
+          familyId: profile.familyId,
+          OR: [{ participantType: 'DEPENDENT_AGE' }, { participantType: 'DEPENDENT_OTHER' }],
+        },
+      })
+
+      const coGuardian = await this.profileRepo.findFirst({
+        where: { NOT: { id: profile.id }, familyId: profile.familyId, participantType: 'GUARDIAN' },
+      })
+
+      if (coGuardian) {
+        const coGuardianSP = await this.spRepo.findFirstOrThrow({
+          where: { profileId: coGuardian.id, versionId: participant.versionId },
+        })
+        const coGuardianAnswers = coGuardianSP.answers
+        answers[step].answers = combineGuardianAnswers(
+          answers[step].answers,
+          coGuardianAnswers[step].answers,
+        )
+      }
+
+      for (const dep of dependents) {
+        const sp = await this.spRepo.findFirstOrThrow({
+          where: { profileId: dep.id, versionId: participant.versionId },
+        })
+        await this.spRepo.update({
+          where: { id: sp.id }, //
+          data: { answers },
+        })
+      }
+    }
   }
 
   /**
