@@ -151,7 +151,6 @@ export class ProfilesController extends Controller {
   public async updateProfileById(
     @Path() profileId: number,
     @Body() bodyRequest: UpdateProfileRequest,
-    @Request() request: express.Request,
   ) {
     const profile = await this.participantProfileRepo.findUniqueOrThrow({
       where: { id: profileId },
