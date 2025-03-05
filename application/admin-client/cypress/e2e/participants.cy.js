@@ -40,6 +40,7 @@ describe('Participants', () => {
     cy.contains('Save').click()
     cy.contains('Invalid email').should('exist')
     cy.get('input[name="nextOfKin.email"]').clear().type('valid@email.com')
+    cy.get('input[name="email"]').clear().type('valid2@email.com')
     cy.contains('Save').click()
     cy.url().should('contain', 'participants/98')
     cy.contains('Betty').should('exist')
