@@ -78,14 +78,6 @@
           }
         }
       },
-      "_36_Enums.Role": {
-        "type": "string",
-        "enum": [
-          "OperatorAdmin",
-          "Participant",
-          "OrganisationAdmin"
-        ]
-      },
       "User": {
         "description": "Model User",
         "properties": {
@@ -193,7 +185,12 @@
         "additionalProperties": false
       },
       "Role": {
-        "$ref": "#/components/schemas/_36_Enums.Role"
+        "type": "string",
+        "enum": [
+          "OperatorAdmin",
+          "Participant",
+          "OrganisationAdmin"
+        ]
       },
       "CreateUserRequest": {
         "properties": {
@@ -773,8 +770,7 @@
             "type": "string"
           },
           "mobile": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "email": {
             "type": "string"
@@ -818,7 +814,7 @@
                 },
                 "type": "array"
               },
-              "nextOfKin": {
+              "alternativeContact": {
                 "$ref": "#/components/schemas/AlternativeContact"
               },
               "participantType": {
@@ -1034,92 +1030,6 @@
               "$ref": "#/components/schemas/Participant"
             },
             "type": "array"
-          }
-        },
-        "required": [
-          "data"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "ParticipantWithProfile": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Participant"
-          },
-          {
-            "properties": {
-              "profile": {
-                "properties": {
-                  "familyMembers": {
-                    "items": {
-                      "$ref": "#/components/schemas/FamilyMember"
-                    },
-                    "type": "array"
-                  },
-                  "nextOfKin": {
-                    "$ref": "#/components/schemas/AlternativeContact"
-                  },
-                  "participantType": {
-                    "$ref": "#/components/schemas/ParticipantType"
-                  },
-                  "preferredContact": {
-                    "$ref": "#/components/schemas/ContactMethod"
-                  },
-                  "postcode": {
-                    "type": "string"
-                  },
-                  "state": {
-                    "$ref": "#/components/schemas/StateTerritory"
-                  },
-                  "suburb": {
-                    "type": "string"
-                  },
-                  "addressLine": {
-                    "type": "string"
-                  },
-                  "mobile": {
-                    "type": "string"
-                  },
-                  "email": {
-                    "type": "string"
-                  },
-                  "dob": {
-                    "type": "string"
-                  },
-                  "lastName": {
-                    "type": "string"
-                  },
-                  "middleName": {
-                    "type": "string"
-                  },
-                  "firstName": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "familyMembers",
-                  "participantType",
-                  "preferredContact",
-                  "mobile",
-                  "dob",
-                  "lastName",
-                  "firstName"
-                ],
-                "type": "object"
-              }
-            },
-            "required": [
-              "profile"
-            ],
-            "type": "object"
-          }
-        ]
-      },
-      "GetParticipantByIdResponse": {
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/ParticipantWithProfile"
           }
         },
         "required": [
@@ -1559,6 +1469,14 @@
       },
       "UploadRedcapParticipantResponse": {
         "properties": {
+          "profilesCreatedCount": {
+            "type": "number",
+            "format": "double"
+          },
+          "profilesAlreadyExistedCount": {
+            "type": "number",
+            "format": "double"
+          },
           "ids": {
             "items": {
               "type": "number",
@@ -1568,7 +1486,23 @@
           }
         },
         "required": [
+          "profilesCreatedCount",
+          "profilesAlreadyExistedCount",
           "ids"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UploadRedcapParticipantAPIRequest": {
+        "description": "This is the name of the redcap instrument you are importing from.\nNOTE: These 'forms' are not the form label values that are seen on the webpages,\nbut instead they are the unique form names seen in Column B of the data dictionary.",
+        "properties": {
+          "form": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "form"
         ],
         "type": "object",
         "additionalProperties": false
@@ -1582,6 +1516,20 @@
         },
         "required": [
           "id"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UploadRedcapInstrumentAPIRequest": {
+        "description": "This is the name of the redcap instrument you are importing from.\nNOTE: These 'forms' are not the form label values that are seen on the webpages,\nbut instead they are the unique form names seen in Column B of the data dictionary.",
+        "properties": {
+          "form": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "form"
         ],
         "type": "object",
         "additionalProperties": false
@@ -2660,9 +2608,9 @@
         }
       }
     },
-    "/profiles/user/{userId}": {
+    "/profiles/{userId}": {
       "get": {
-        "operationId": "GetParticipantProfileByUserID",
+        "operationId": "GetParticipantProfileByID",
         "responses": {
           "200": {
             "description": "Ok",
@@ -2728,141 +2676,6 @@
         ]
       }
     },
-    "/profiles/{profileId}": {
-      "get": {
-        "operationId": "GetParticipantProfileByID",
-        "responses": {
-          "200": {
-            "description": "Ok",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetParticipantProfileResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NotFoundErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Profiles"
-        ],
-        "security": [
-          {
-            "jwt": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "profileId",
-            "required": true,
-            "schema": {
-              "format": "double",
-              "type": "number"
-            }
-          }
-        ]
-      },
-      "patch": {
-        "operationId": "UpdateProfileById",
-        "responses": {
-          "204": {
-            "description": "No content"
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Failed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Profiles"
-        ],
-        "security": [
-          {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "profileId",
-            "required": true,
-            "schema": {
-              "format": "double",
-              "type": "number"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateProfileRequest"
-              }
-            }
-          }
-        }
-      }
-    },
     "/participants": {
       "get": {
         "operationId": "GetParticipants",
@@ -2909,74 +2722,6 @@
           }
         ],
         "parameters": []
-      }
-    },
-    "/participants/{profileId}": {
-      "get": {
-        "operationId": "GetParticipantById",
-        "responses": {
-          "200": {
-            "description": "Ok",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetParticipantByIdResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NotFoundErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "description": "Get participant by ID",
-        "summary": "Get a  Participant by ID",
-        "tags": [
-          "Participants"
-        ],
-        "security": [
-          {
-            "jwt": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "profileId",
-            "required": true,
-            "schema": {
-              "format": "double",
-              "type": "number"
-            }
-          }
-        ]
       }
     },
     "/invites": {
@@ -3988,9 +3733,9 @@
         }
       }
     },
-    "/integrations/redcap/participant/upload": {
+    "/integrations/redcap/participant/upload/csv": {
       "post": {
-        "operationId": "UploadRedcapParticipant",
+        "operationId": "UploadRedcapParticipantCSV",
         "responses": {
           "201": {
             "description": "Created Participants from CSV",
@@ -4033,14 +3778,91 @@
             ]
           }
         ],
-        "parameters": []
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        }
       }
     },
-    "/integrations/redcap/instrument/upload": {
+    "/integrations/redcap/participant/upload/api": {
       "post": {
-        "operationId": "UploadRedcapInstrument",
+        "operationId": "UploadRedcapParticipantAPI",
         "responses": {
-          "200": {
+          "201": {
+            "description": "Created Participants from REDCap API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadRedcapParticipantResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Integrations"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadRedcapParticipantAPIRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integrations/redcap/instrument/upload/csv": {
+      "post": {
+        "operationId": "UploadRedcapInstrumentCSV",
+        "responses": {
+          "201": {
             "description": "Upserted Survey from Instrument CSV",
             "content": {
               "application/json": {
@@ -4081,7 +3903,84 @@
             ]
           }
         ],
-        "parameters": []
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integrations/redcap/instrument/upload/api": {
+      "post": {
+        "operationId": "UploadRedcapInstrumentAPI",
+        "responses": {
+          "201": {
+            "description": "Created Survey from Redcap API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadRedcapInstrumentResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Integrations"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadRedcapInstrumentAPIRequest"
+              }
+            }
+          }
+        }
       }
     },
     "/": {
