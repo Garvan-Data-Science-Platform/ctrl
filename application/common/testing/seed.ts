@@ -5,8 +5,11 @@ import { hashPassword } from '../../backend/src/authentication'
 
 export const OPERATOR_ADMIN_ID = 96
 export const ORG_ADMIN_ID = 97
+export const ORG_ADMIN_2_ID = 101
 export const PARTICIPANT_UNANSWERED_ID = 98
 export const PARTICIPANT_COMPLETED_ID = 99
+export const DEPENDENT_ID = 100
+export const SECOND_GUARDIAN_ID = 102
 export const PASSWORD_RESET_USER_ID = 105
 export const PASSWORD_RESET_USER_EMAIL = 'test-reset-password@example.com'
 
@@ -50,10 +53,10 @@ export async function seedTests(prisma: PrismaClient) {
     },
   })
 
-  //OrganisationAdminUser
+  //OrganisationAdminUser2
   await prisma.user.create({
     data: {
-      id: 101,
+      id: ORG_ADMIN_2_ID,
       email: 'testOrgAdmin2@example.com',
       firstName: 'Organisation2',
       lastName: 'Admin2',
@@ -81,6 +84,18 @@ export async function seedTests(prisma: PrismaClient) {
           name: 'Another Organisation',
         },
       },
+    },
+  })
+
+  //Second guardian user
+  await prisma.user.create({
+    data: {
+      id: SECOND_GUARDIAN_ID,
+      email: 'g2@example.com',
+      firstName: 'Second',
+      lastName: 'Guardian',
+      password: hashPassword('password'),
+      role: Role.Participant,
     },
   })
   //User with completed survey
@@ -141,7 +156,7 @@ export async function seedTests(prisma: PrismaClient) {
   //Dependent Profile (no user)
   await prisma.participantProfile.create({
     data: {
-      id: 100,
+      id: DEPENDENT_ID,
       firstName: 'Test',
       lastName: 'Dependent',
       addressLine: '123 smith st',
@@ -154,6 +169,25 @@ export async function seedTests(prisma: PrismaClient) {
       familyId: 100,
       userId: null,
       participantType: 'DEPENDENT_AGE',
+    },
+  })
+
+  //Second guardian
+  await prisma.participantProfile.create({
+    data: {
+      id: SECOND_GUARDIAN_ID,
+      firstName: 'Second',
+      lastName: 'Guardian',
+      addressLine: '123 smith st',
+      dob: new Date('1990-01-23'),
+      mobile: '0412345678',
+      postcode: '1234',
+      preferredContact: 'EMAIL',
+      state: 'VIC',
+      suburb: 'Melbourne',
+      familyId: 100,
+      userId: SECOND_GUARDIAN_ID,
+      participantType: 'GUARDIAN',
     },
   })
 
@@ -177,7 +211,7 @@ export async function seedTests(prisma: PrismaClient) {
       profileId: PARTICIPANT_UNANSWERED_ID,
       answers: [
         { status: 'review_required', answers: [] },
-        { status: 'review_required', answers: [true, 'Choice 1'] },
+        { status: 'review_required', answers: [null, null] },
       ],
     },
   })
@@ -199,12 +233,27 @@ export async function seedTests(prisma: PrismaClient) {
   await prisma.surveyParticipant.create({
     data: {
       versionId: 1,
-      profileId: 100,
+      profileId: DEPENDENT_ID,
       answers: [
         { status: 'viewed', answers: [] },
         {
-          status: 'completed',
-          answers: [false, 'Choice 2'],
+          status: 'review_required',
+          answers: [null, null],
+          last_updated: '2024-12-02T23:45:27.815Z',
+        },
+      ],
+    },
+  })
+
+  await prisma.surveyParticipant.create({
+    data: {
+      versionId: 1,
+      profileId: SECOND_GUARDIAN_ID,
+      answers: [
+        { status: 'viewed', answers: [] },
+        {
+          status: 'review_required',
+          answers: [null, null],
           last_updated: '2024-12-02T23:45:27.815Z',
         },
       ],

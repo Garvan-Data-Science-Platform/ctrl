@@ -93,7 +93,7 @@ describe('Survey tests', () => {
     expect(data.data[1].last_updated).toBeUndefined()
 
     const res3 = await request(app)
-      .get('/surveys/responses/4') //Participant 3 corresponds to the latests survey
+      .get('/surveys/responses/5') //Participant 3 corresponds to the latests survey
       .set({ authorization: `Bearer ${adminToken}` })
     expect(res3.statusCode).toBe(200)
 
@@ -107,8 +107,8 @@ describe('Survey tests', () => {
 
     const data4 = res4.body as GetParticipantsResponse
     expect(data4.data[0].lastUpdated).toBeUndefined()
-    expect(data4.data[3].lastUpdated).toBeTruthy()
-    expect(data4.data[3].answers[0].status).toBe('partially_complete')
+    expect(data4.data[4].lastUpdated).toBeTruthy()
+    expect(data4.data[4].answers[0].status).toBe('partially_complete')
   })
 
   it('Admin publishes another survey version and user sees new questions, status is correct for admin, answers are carried over', async () => {
@@ -162,7 +162,7 @@ describe('Survey tests', () => {
     expect(data.data[1].last_updated).toBeUndefined()
 
     const res3 = await request(app)
-      .get('/surveys/responses/6')
+      .get('/surveys/responses/7')
       .set({ authorization: `Bearer ${adminToken}` })
     expect(res3.statusCode).toBe(200)
 
@@ -195,7 +195,7 @@ describe('Survey tests', () => {
       .set({ authorization: `Bearer ${adminToken}` })
 
     const data2 = res2.body as GetParticipantsResponse
-    expect(data2.data[3].answers[1].status).toBe('partially_complete')
+    expect(data2.data[4].answers[1].status).toBe('partially_complete')
   })
 
   it('User completes survey, admin and user see correct status and dates', async () => {
@@ -211,7 +211,7 @@ describe('Survey tests', () => {
       .set({ authorization: `Bearer ${adminToken}` })
 
     const data2 = res2.body as GetParticipantsResponse
-    expect(data2.data[3].answers[1].status).toBe('complete')
+    expect(data2.data[4].answers[1].status).toBe('complete')
 
     const res3 = await request(app)
       .get('/surveys/steps/0')

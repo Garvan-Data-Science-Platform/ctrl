@@ -47,7 +47,7 @@ describe('ParticipantsController', () => {
       const body: GetParticipantsResponse = response.body
       expect(response.status).toBe(200)
 
-      expect(body.data).toHaveLength(3)
+      expect(body.data).toHaveLength(4)
       expect(body.data[0]).not.toHaveProperty('lastUpdated')
       expect(body.data[1].lastUpdated).toBe(
         new Date('2024-12-02T02:38:01.195Z').toLocaleDateString(),

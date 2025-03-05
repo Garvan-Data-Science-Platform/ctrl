@@ -13,9 +13,11 @@ import {
 } from 'common/types/api/surveys'
 import { GetSurveyVersionByIdResponse } from 'common/types/api/surveys/getSurveyVersionById'
 import {
+  DEPENDENT_ID,
   ORG_ADMIN_ID,
   PARTICIPANT_COMPLETED_ID,
   PARTICIPANT_UNANSWERED_ID,
+  SECOND_GUARDIAN_ID,
 } from 'common/testing/seed'
 
 const api = new Api()
@@ -78,13 +80,13 @@ describe('SurveysController', () => {
       expect(body.data.elements[0].data.value).toBe(false)
       expect(body.data.elements[3].type).toBe('video')
     })
-    it('should return default answers when the user has not answered yet', async () => {
+    it('should return null when the user has not answered yet', async () => {
       const response = await request(app)
         .get('/surveys/step/1/1')
         .set({ Authorization: `Bearer ${tokenNoAnswers}` })
       expect(response.status).toBe(200)
       const body: GetUserSurveyStepResponse = response.body
-      expect(body.data.elements[0].data.value).toBe(true)
+      expect(body.data.elements[0].data.value).toBe(null)
     })
 
     it('should fail if step does not exist', async () => {
@@ -126,7 +128,9 @@ describe('SurveysController', () => {
         .set({ Authorization: `Bearer ${token}` })
         .send(reqBody)
       expect(response.status).toBe(204)
-      const participant = await prisma.surveyParticipant.findFirst({ where: { id: 1 } })
+      const participant = await prisma.surveyParticipant.findFirst({
+        where: { profileId: PARTICIPANT_COMPLETED_ID },
+      })
       expect(participant?.answers[1].answers).toEqual([true, 'Choice 1'])
     })
 
@@ -158,6 +162,27 @@ describe('SurveysController', () => {
         .set({ Authorization: `Bearer ${token}` })
         .send(reqBody)
       expect(response.status).toBe(422)
+    })
+
+    it('participant should inherit answers from both guardians correctly', async () => {
+      const secondGuardianToken = generateToken({
+        userId: SECOND_GUARDIAN_ID,
+        roles: ['Participant'],
+      })
+
+      const reqBody: UpdateSurveyAnswersRequest = {
+        step: 1,
+        data: [false, 'Choice 1'], //Other parent answer is [false, 'Choice 2']
+      }
+      const response = await request(app)
+        .post('/surveys/answers')
+        .set({ Authorization: `Bearer ${secondGuardianToken}` })
+        .send(reqBody)
+      expect(response.status).toBe(204)
+      const dependentAnswers = await prisma.surveyParticipant.findFirstOrThrow({
+        where: { profileId: DEPENDENT_ID },
+      })
+      expect(dependentAnswers.answers[1].answers).toEqual([false, null])
     })
   })
 
