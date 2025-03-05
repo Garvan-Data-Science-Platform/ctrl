@@ -52,7 +52,7 @@ describe('Survey tests', () => {
         { firstName: 'Child2', lastName: 'K', dob: '2020-01-02', permanent: false },
       ],
     }
-    const reqBody2 = { ...reqBody, email: 'parent2@gmail.com' }
+    const reqBody2 = { ...reqBody, email: 'parent2@gmail.com', firstName: 'X' }
 
     let regRes = await request(app).post('/auth/register/participant').send(reqBody)
     expect(regRes.statusCode).toBe(201)
