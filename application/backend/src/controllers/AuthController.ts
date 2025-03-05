@@ -181,7 +181,6 @@ export class AuthController extends Controller {
           dob: new Date(dependents[0].dob),
         },
       })
-      console.log('EXISTING DEP', existingDep)
       if (existingDep) {
         familyId = existingDep.familyId
       }

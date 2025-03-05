@@ -2,43 +2,37 @@ import request from 'supertest'
 import { generateToken } from '../../src/authentication'
 import { Api } from '../../src/Api'
 import { resetDB } from 'common/testing/TestHelpers'
-import {
-  GetResponsesByIdResponse,
-  GetUserSurveyStepResponse,
-  GetUserSurveyStepsResponse,
-  UpdateSurveyAnswersRequest,
-  UpdateSurveyRequest,
-} from 'common/types/api/surveys'
+import { UpdateSurveyAnswersRequest } from 'common/types/api/surveys'
 import { RegisterParticipantRequest } from 'common/types/api/auth'
 import {
   ContactMethod,
   ParticipantType,
   StateTerritory,
 } from 'common/types/api/users/ParticipantProfile'
-import { GetParticipantsResponse } from 'common/types/api/participants'
-import { ORG_ADMIN_ID } from 'common/testing/seed'
+
 import prisma from '../../src/PrismaClient'
-import { SurveysController } from '../../src/controllers/SurveysController'
-import { UsersController } from '../../src/controllers/UsersController'
 
 const api = new Api()
 const app = api.app
-let participantToken: string, adminToken: string
 
 describe('Survey tests', () => {
   beforeAll(async () => {
     api.run()
     await resetDB()
-
-    participantToken = await generateToken({ userId: 1, roles: ['Participant'] })
-    adminToken = await generateToken({ userId: ORG_ADMIN_ID, roles: ['OrganisationAdmin'] })
   })
 
   afterAll(async () => {
     api.stop()
   })
 
-  it('User registers and sees current survey version', async () => {
+  it('Two parents register, with two dependents', async () => {
+    await prisma.invite.create({
+      data: { email: 'parent1@gmail.com', expiresAt: new Date('2100-01-01'), status: 'PENDING' },
+    })
+    await prisma.invite.create({
+      data: { email: 'parent2@gmail.com', expiresAt: new Date('2100-01-01'), status: 'PENDING' },
+    })
+
     const reqBody: RegisterParticipantRequest = {
       addressLine: 'abc',
       dob: '1990-01-01',
@@ -70,10 +64,64 @@ describe('Survey tests', () => {
   })
 
   it('One parent submits answers and both dependents inherit all answers', async () => {
-    const reqBody: UpdateSurveyAnswersRequest = { step: 0, data: [] }
-    const p = prisma.user.findFirstOrThrow({ where: { email: 'parent1@gmail.com' } })
-    const p2 = prisma.user.findFirstOrThrow({ where: { email: 'parent2@gmail.com' } })
-    const answers = ''
-    new SurveysController().updateSurveyAnswers(null, { step: 0 })
+    const p = await prisma.user.findFirstOrThrow({ where: { email: 'parent1@gmail.com' } })
+    const p2 = await prisma.user.findFirstOrThrow({ where: { email: 'parent2@gmail.com' } })
+    const p1Token = await generateToken({ userId: p.id, roles: ['Participant'] })
+    const p2Token = await generateToken({ userId: p.id, roles: ['Participant'] })
+
+    const reqBody: UpdateSurveyAnswersRequest = { step: 1, data: [true, 'Choice 1'] }
+
+    const res = await request(app)
+      .post('/surveys/answers/')
+      .set({ authorization: `Bearer ${p1Token}` })
+      .send(reqBody)
+
+    expect(res.statusCode).toBe(204)
+
+    expect(
+      (
+        await prisma.surveyParticipant.findFirstOrThrow({
+          where: { profile: { firstName: 'Child1' } },
+        })
+      ).answers[1].answers,
+    ).toEqual([true, 'Choice 1'])
+
+    expect(
+      (
+        await prisma.surveyParticipant.findFirstOrThrow({
+          where: { profile: { firstName: 'Child2' } },
+        })
+      ).answers[1].answers,
+    ).toEqual([true, 'Choice 1'])
+  })
+
+  it('Second parent answers with a conflict, and children inherit correct answers', async () => {
+    const p2 = await prisma.user.findFirstOrThrow({ where: { email: 'parent2@gmail.com' } })
+    const p2Token = await generateToken({ userId: p2.id, roles: ['Participant'] })
+
+    const reqBody: UpdateSurveyAnswersRequest = { step: 1, data: [false, 'Choice 1'] }
+
+    const res = await request(app)
+      .post('/surveys/answers/')
+      .set({ authorization: `Bearer ${p2Token}` })
+      .send(reqBody)
+
+    expect(res.statusCode).toBe(204)
+
+    expect(
+      (
+        await prisma.surveyParticipant.findFirstOrThrow({
+          where: { profile: { firstName: 'Child1' } },
+        })
+      ).answers[1].answers,
+    ).toEqual([null, 'Choice 1'])
+
+    expect(
+      (
+        await prisma.surveyParticipant.findFirstOrThrow({
+          where: { profile: { firstName: 'Child2' } },
+        })
+      ).answers[1].answers,
+    ).toEqual([null, 'Choice 1'])
   })
 })
