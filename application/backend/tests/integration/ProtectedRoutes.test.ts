@@ -149,7 +149,7 @@ describe('Protected Routes', () => {
     },
     {
       method: HttpMethod.GET,
-      url: '/profiles/1',
+      url: '/profiles/user/1',
       rolesWhitelisted: [],
     },
   ]

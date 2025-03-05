@@ -71,7 +71,7 @@ describe('ProfilesController', () => {
 
       expect(response.status).toBe(404)
       const body = response.body
-      expect(body.message).toBe(`Participant Profile with userId: ${userId} not found`)
+      expect(body.message).toBe(`Record not found`)
     })
   })
 
@@ -108,7 +108,7 @@ describe('ProfilesController', () => {
 
       expect(response.status).toBe(404)
       const body = response.body
-      expect(body.message).toBe(`Participant Profile with userId: ${ORG_ADMIN_ID} not found`)
+      expect(body.message).toBe(`Record not found`)
     })
   })
 

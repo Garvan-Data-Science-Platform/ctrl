@@ -26,7 +26,7 @@ export interface AlternativeContact {
   firstName: string
   middleName?: string
   lastName: string
-  mobile?: string
+  mobile?: string | null
   email: string
 }
 

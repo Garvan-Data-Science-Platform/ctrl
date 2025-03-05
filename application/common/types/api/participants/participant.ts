@@ -1,3 +1,5 @@
+import { GetParticipantProfileResponse } from '../users'
+
 export interface Participant {
   id: number
   email?: string
@@ -5,6 +7,10 @@ export interface Participant {
   lastName: string
   answers: ParticipantAnswerStatus[]
   lastUpdated?: string
+}
+
+export type ParticipantWithProfile = Participant & {
+  profile: GetParticipantProfileResponse['data']
 }
 
 export interface ParticipantAnswerStatus {

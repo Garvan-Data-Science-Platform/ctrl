@@ -7,6 +7,7 @@ import {
 } from 'common/types/api/errors'
 import type {
   GetInvitesResponse,
+  GetParticipantByIdResponse,
   GetParticipantsResponse,
   InviteParticipantsRequest,
   InviteParticipantsResponse,
@@ -20,6 +21,7 @@ import { generateInviteEmail } from '../utils/generateInviteTemplate'
 import { InviteStatus } from '../../../common/types/api/participants/invite'
 import { NotFoundError } from '../middlewares/ErrorHandler'
 import { determineLastUpdated, determineStatus } from '../utils/answers'
+import { ProfilesController } from './ProfilesController'
 
 @Route('participants')
 @Tags('Participants')
@@ -28,6 +30,7 @@ import { determineLastUpdated, determineStatus } from '../utils/answers'
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 export class ParticipantsController extends Controller {
   participantRepo = prisma.surveyParticipant
+  profileRepo = prisma.participantProfile
 
   /**
    * List participants
@@ -79,17 +82,40 @@ export class ParticipantsController extends Controller {
    * Get participant by ID
    *
    * @summary Get a  Participant by ID
- 
-  @Get('/{participantId}')
-  @SuccessResponse('200', 'OK')
+   */
+
+  @Get('/{profileId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  public async getParticipantById(
-    @Path() participantId: number,
-  ): Promise<GetParticipantByIdResponse> {
-    console.log(participantId)
-    return Participant as GetParticipantByIdResponse
+  public async getParticipantById(@Path() profileId: number): Promise<GetParticipantByIdResponse> {
+    const profile = await this.profileRepo.findFirstOrThrow({
+      where: { id: profileId },
+      select: { userId: true, firstName: true, lastName: true, user: { select: { email: true } } },
+    })
+
+    const profileDataResponse = await new ProfilesController().getParticipantProfileByID(profileId)
+    const profileData = profileDataResponse.data
+
+    const p_answers = await this.participantRepo.findMany({
+      where: { profileId: profileId },
+      select: { answers: true, version: { select: { id: true, updatedAt: true } }, id: true },
+      orderBy: { versionId: 'asc' },
+    })
+
+    return {
+      data: {
+        id: profileId,
+        profile: profileData,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        email: profile.user?.email,
+        answers: p_answers.map((val) => ({
+          surveyVersion: val.version.id,
+          participantId: val.id,
+          status: determineStatus(val.answers, new Date(val.version.updatedAt)),
+        })),
+      },
+    }
   }
-      */
 }
 
 @Route('invites')

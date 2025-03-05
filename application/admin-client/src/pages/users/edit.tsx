@@ -1,15 +1,17 @@
 import { Box, TextField } from '@mui/material'
 import { Edit } from '@refinedev/mui'
 import { useForm } from '@refinedev/react-hook-form'
+import { UpdateUserRequest } from '@common/types/api/users'
 
 export const UserEdit = () => {
+  type FieldValues = UpdateUserRequest
   const {
     saveButtonProps,
     refineCore: { formLoading },
     register,
     //control,
     formState: { errors },
-  } = useForm({})
+  } = useForm<any, any, FieldValues>({})
 
   return (
     <Edit isLoading={formLoading} saveButtonProps={saveButtonProps}>

@@ -46,7 +46,8 @@ export class ProfilesController extends Controller {
     }
 
     const userId: number = request.user.userId
-    return this.getParticipantProfile(userId)
+    const p = await this.participantProfileRepo.findFirstOrThrow({ where: { userId } })
+    return this.getParticipantProfile(p.id)
   }
 
   /**
@@ -54,18 +55,28 @@ export class ProfilesController extends Controller {
    *
    * @summary Get a Participants Profile by ID
    */
-  @Get('/{userId}')
+  @Get('/user/{userId}')
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
+  @Security('jwt')
+  public async getParticipantProfileByUserID(
+    @Path() userId: number,
+  ): Promise<GetParticipantProfileResponse> {
+    const p = await this.participantProfileRepo.findFirstOrThrow({ where: { userId } })
+    return this.getParticipantProfile(p.id)
+  }
+
+  @Get('/{profileId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   @Security('jwt')
   public async getParticipantProfileByID(
-    @Path() userId: number,
+    @Path() profileId: number,
   ): Promise<GetParticipantProfileResponse> {
-    return this.getParticipantProfile(userId)
+    return this.getParticipantProfile(profileId)
   }
 
-  private async getParticipantProfile(userId: number): Promise<GetParticipantProfileResponse> {
-    const data = await this.participantProfileRepo.findFirst({
-      where: { userId },
+  private async getParticipantProfile(profileId: number): Promise<GetParticipantProfileResponse> {
+    const data = await this.participantProfileRepo.findUniqueOrThrow({
+      where: { id: profileId },
       include: {
         user: {
           select: { firstName: true, lastName: true, email: true, middleName: true },
@@ -73,12 +84,6 @@ export class ProfilesController extends Controller {
         nextOfKin: { select: { firstName: true, lastName: true, email: true, mobile: true } },
       },
     })
-
-    if (!data) {
-      const errorMessage: string = `Participant Profile with userId: ${userId} not found`
-      logger.error({ errorMessage })
-      throw new NotFoundError(errorMessage)
-    }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { user, ...profile } = data
@@ -89,7 +94,7 @@ export class ProfilesController extends Controller {
     const preferredContact = profile.preferredContact as ContactMethod
 
     const familyMembers = (await this.participantProfileRepo.findMany({
-      where: { familyId: data.familyId, OR: [{ userId: null }, { NOT: { userId: userId } }] },
+      where: { familyId: data.familyId, OR: [{ userId: null }, { NOT: { id: profileId } }] },
       select: { firstName: true, lastName: true, participantType: true },
     })) as FamilyMember[]
 
@@ -107,7 +112,7 @@ export class ProfilesController extends Controller {
         mobile,
         participantType,
         familyMembers,
-        alternativeContact: profile.nextOfKin as AlternativeContact,
+        nextOfKin: profile.nextOfKin as AlternativeContact,
       },
     }
     logger.info({ ...responseData })
@@ -138,5 +143,33 @@ export class ProfilesController extends Controller {
       where: { id: request.user?.userId },
       data: { firstName: bodyRequest.firstName, lastName: bodyRequest.lastName },
     })
+  }
+
+  @Patch('/{profileId}')
+  @Response<ValidateErrorResponse>('422', 'Validation Failed')
+  @Security('jwt', ['OrganisationAdmin'])
+  public async updateProfileById(
+    @Path() profileId: number,
+    @Body() bodyRequest: UpdateProfileRequest,
+  ) {
+    const profile = await this.participantProfileRepo.findUniqueOrThrow({
+      where: { id: profileId },
+    })
+    const { nextOfKin, email, ...updateData } = { ...bodyRequest }
+    if (bodyRequest.dob) updateData.dob = new Date(bodyRequest.dob) as any
+
+    const hasNok = Boolean(nextOfKin)
+
+    await this.participantProfileRepo.update({
+      where: { id: profile.id },
+      data: { ...updateData, nextOfKin: hasNok ? { update: nextOfKin } : undefined },
+    })
+
+    if (profile.userId) {
+      await this.userRepo.update({
+        where: { id: profile.userId },
+        data: { email: email, firstName: bodyRequest.firstName, lastName: bodyRequest.lastName },
+      })
+    }
   }
 }
