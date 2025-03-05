@@ -34,6 +34,21 @@ export const statusMap = {
   },
 }
 
+export const statusMap = {
+  incomplete: {
+    color: 'grey',
+    tooltip: 'Incomplete',
+  },
+  partially_complete: {
+    color: 'orange',
+    tooltip: 'Partially Complete',
+  },
+  complete: {
+    color: 'primary',
+    tooltip: 'Complete',
+  },
+}
+
 export const ParticipantList = () => {
   const { dataGridProps } = useDataGrid({
     syncWithLocation: true,
