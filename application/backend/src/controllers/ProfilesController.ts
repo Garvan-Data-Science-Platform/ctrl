@@ -166,9 +166,11 @@ export class ProfilesController extends Controller {
       data: { ...updateData, nextOfKin: hasNok ? { update: nextOfKin } : undefined },
     })
 
-    await this.userRepo.update({
-      where: { id: request.user?.userId },
-      data: { email: email, firstName: bodyRequest.firstName, lastName: bodyRequest.lastName },
-    })
+    if (profile.userId) {
+      await this.userRepo.update({
+        where: { id: profile.userId },
+        data: { email: email, firstName: bodyRequest.firstName, lastName: bodyRequest.lastName },
+      })
+    }
   }
 }
