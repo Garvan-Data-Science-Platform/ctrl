@@ -65,9 +65,7 @@ describe('Survey tests', () => {
 
   it('One parent submits answers and both dependents inherit all answers', async () => {
     const p = await prisma.user.findFirstOrThrow({ where: { email: 'parent1@gmail.com' } })
-    const p2 = await prisma.user.findFirstOrThrow({ where: { email: 'parent2@gmail.com' } })
     const p1Token = await generateToken({ userId: p.id, roles: ['Participant'] })
-    const p2Token = await generateToken({ userId: p.id, roles: ['Participant'] })
 
     const reqBody: UpdateSurveyAnswersRequest = { step: 1, data: [true, 'Choice 1'] }
 
