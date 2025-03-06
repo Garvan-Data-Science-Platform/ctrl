@@ -180,3 +180,4 @@ As software is developed, previous decisions around schema design are often reco
 
 4. Apply the new migration to our database by running: `yarn prisma:migrate`.
 5. Now our database is up to date with our prisma schema, we can ensure data safety.
+hi
