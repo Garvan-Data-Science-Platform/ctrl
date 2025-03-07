@@ -1,5 +1,5 @@
 import { Box, Button, Typography, TextField, Divider, Modal, IconButton } from '@mui/material'
-import { Create } from '@refinedev/mui'
+import { Show } from '@refinedev/mui'
 import { useForm } from '@refinedev/react-hook-form'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -78,7 +78,14 @@ export const SurveyImport = () => {
   const handleClose = () => setOpen(false)
 
   return (
-    <Create isLoading={formLoading} title="REDCap Instrument Import" footerButtons={null}>
+    <Show
+      isLoading={formLoading}
+      title="REDCap Instrument Import"
+      canDelete={false}
+      canEdit={false}
+      /* eslint-disable @typescript-eslint/no-unused-vars */
+      headerButtons={({ defaultButtons }) => null}
+    >
       <Box
         component="form"
         sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
@@ -193,6 +200,6 @@ export const SurveyImport = () => {
           </Box>
         </Box>
       </Box>
-    </Create>
+    </Show>
   )
 }
