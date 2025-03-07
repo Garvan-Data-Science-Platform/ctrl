@@ -46,9 +46,11 @@ export const SurveyImport = () => {
           'Content-Type': 'multipart/form-data',
         },
       })
-      .then((data) => {
-        console.log(data)
-        navigate('../')
+      .then((response) => {
+        console.log(response)
+        const data = response.data
+        navigate(`/surveys/edit/${data.id}`)
+        navigate(0) // Refresh the page
       })
       .catch(() => {
         alert('ERROR UPLOADING FILE')
@@ -62,9 +64,10 @@ export const SurveyImport = () => {
     }
     axiosInstance
       .post(`${API_URL}/integrations/redcap/instrument/upload/api`, { form })
-      .then((data) => {
-        console.log(data)
-        navigate('../')
+      .then((response) => {
+        const data = response.data
+        navigate(`/surveys/edit/${data.id}`)
+        navigate(0) // Refresh the page
       })
       .catch(() => {
         alert('ERROR IMPORTING FROM API')
