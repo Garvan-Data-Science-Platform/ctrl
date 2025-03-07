@@ -2,7 +2,8 @@ import type { DataProvider } from '@refinedev/core'
 import axios from 'axios'
 import { TOKEN_KEY } from './authProvider'
 
-export const axiosInstance = axios.create()
+const API_URL = import.meta.env.VITE_BACKEND_URL
+export const axiosInstance = axios.create({ baseURL: API_URL })
 
 axiosInstance.interceptors.request.use(
   async (config) => {
@@ -17,23 +18,23 @@ axiosInstance.interceptors.request.use(
   },
 )
 
-export const dataProvider = (url: string): DataProvider => ({
+export const dataProvider = (): DataProvider => ({
   getOne: async ({ resource, id }) => {
-    const response = await axiosInstance.get(`${url}/${resource}/${id}`)
+    const response = await axiosInstance.get(`${resource}/${id}`)
     const data = response.data.data
     return {
       data,
     }
   },
   update: async ({ resource, id, variables }) => {
-    const response = await axiosInstance.patch(`${url}/${resource}/${id}`, variables)
+    const response = await axiosInstance.patch(`${resource}/${id}`, variables)
     const data = response.data
     return {
       data,
     }
   },
   getList: async ({ resource }) => {
-    const response = await axiosInstance.get(`${url}/${resource}`)
+    const response = await axiosInstance.get(`${resource}`)
     const data = response.data.data
     return {
       data,
@@ -41,20 +42,20 @@ export const dataProvider = (url: string): DataProvider => ({
     }
   },
   create: async ({ resource, variables }) => {
-    const response = await axiosInstance.post(`${url}/${resource}`, variables)
+    const response = await axiosInstance.post(`${resource}`, variables)
     const data = response.data
     return {
       data,
     }
   },
   deleteOne: async ({ resource, id }) => {
-    const response = await axiosInstance.delete(`${url}/${resource}/${id}`)
+    const response = await axiosInstance.delete(`${resource}/${id}`)
     const data = response.data
     return {
       data,
     }
   },
-  getApiUrl: () => url,
+  getApiUrl: () => API_URL,
   // Optional methods:
   // getMany: () => { /* ... */ },
   // createMany: () => { /* ... */ },

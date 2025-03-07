@@ -33,8 +33,6 @@ import { ResponsesView } from './pages/responses'
 import { ListAlt, Person, RecentActors } from '@mui/icons-material'
 import { ParticipantEdit } from './pages/participants/edit'
 
-export const API_URL = import.meta.env.VITE_BACKEND_URL
-
 function App() {
   return (
     <BrowserRouter>
@@ -45,7 +43,7 @@ function App() {
           <RefineSnackbarProvider>
             <DevtoolsProvider>
               <Refine
-                dataProvider={dataProvider(API_URL)}
+                dataProvider={dataProvider()}
                 notificationProvider={notificationProvider}
                 routerProvider={routerBindings}
                 authProvider={authProvider}

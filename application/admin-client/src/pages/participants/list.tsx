@@ -1,9 +1,23 @@
 import { ParticipantAnswerStatus } from '@common/types/api/participants/participant'
-import { Button, Tooltip } from '@mui/material'
+import {
+  Box,
+  Button,
+  CircularProgress,
+  IconButton,
+  Menu,
+  MenuItem,
+  Modal,
+  Tooltip,
+} from '@mui/material'
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import { DateField, EditButton, List, ShowButton, useDataGrid } from '@refinedev/mui'
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { InviteModal } from '../../components/InviteModal'
+import { axiosInstance } from '../../providers/dataProvider'
+import { useInvalidate, useNotification } from '@refinedev/core'
+import { InviteStatus } from '@common/types/api/participants/invite'
+import { MoreVert } from '@mui/icons-material'
 
 export const statusMap = {
   incomplete: {
@@ -28,6 +42,49 @@ export const ParticipantList = () => {
     syncWithLocation: true,
     resource: 'invites',
   })
+
+  const invalidate = useInvalidate()
+
+  const [modalOpen, setModalOpen] = useState(false)
+
+  const [loading, setLoading] = useState(false)
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const [inviteRowId, setInviteRowId] = useState(0)
+
+  const { open } = useNotification()
+
+  const sendInvites = (emails: string[]) => {
+    setLoading(true)
+    axiosInstance
+      .post('invites', { emails })
+      .then(() => {
+        setModalOpen(false)
+        open?.({ type: 'success', message: `Invites sent` })
+        setLoading(false)
+        invalidate({ resource: 'invites', invalidates: ['list'] })
+      })
+      .catch((error) => {
+        setModalOpen(false)
+        open?.({ type: 'error', message: `Could not publish survey: ${error}` })
+        setLoading(false)
+      })
+  }
+
+  const closeInviteActionMenu = () => {
+    setAnchorEl(null)
+  }
+
+  const revokeInvite = (id: number) => {
+    console.log(id)
+    open?.({ type: 'success', message: 'Invite Revoked' })
+    closeInviteActionMenu()
+  }
+  const resendInvite = (id: number) => {
+    console.log(id)
+    open?.({ type: 'success', message: 'Invite Resent' })
+    closeInviteActionMenu()
+  }
 
   const renderAnswer = (answer: ParticipantAnswerStatus) => {
     return (
@@ -94,16 +151,52 @@ export const ParticipantList = () => {
     [],
   )
 
+  const inviteStatusMap: { [key in InviteStatus]: string } = {
+    ACCEPTED: 'Accepted',
+    EXPIRED: 'Expired',
+    PENDING: 'Pending',
+    REVOKED: 'Revoked',
+  }
+
   const inviteCols = React.useMemo<GridColDef[]>(
     () => [
       {
         field: 'email',
         headerName: 'Email',
-        minWidth: 300,
+        flex: 2,
       },
       {
-        field: 'date',
+        field: 'createdAt',
         headerName: 'Date Sent',
+        flex: 1,
+        renderCell: ({ value }) => new Date(value).toLocaleDateString(),
+      },
+      {
+        field: 'inviteStatus',
+        headerName: 'Status',
+        flex: 1,
+        renderCell: ({ value }) => inviteStatusMap[value as InviteStatus],
+      },
+      {
+        field: 'actions',
+        headerName: 'Actions',
+        sortable: false,
+        renderCell: function render({ row }) {
+          return (
+            <>
+              <IconButton
+                onClick={(event) => {
+                  setAnchorEl(event.currentTarget)
+                  setInviteRowId(row.id)
+                }}
+              >
+                <MoreVert />
+              </IconButton>
+            </>
+          )
+        },
+        align: 'center',
+        headerAlign: 'center',
       },
     ],
     [],
@@ -111,9 +204,57 @@ export const ParticipantList = () => {
 
   return (
     <>
-      <List headerButtons={<Button variant="contained">Invite Participants</Button>}>
+      <Modal open={loading}>
+        <CircularProgress
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+          }}
+        />
+      </Modal>
+      <Modal open={modalOpen}>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            bgcolor: 'background.paper',
+            boxShadow: 24,
+            p: 2,
+            borderRadius: 2,
+          }}
+        >
+          <InviteModal
+            onCancel={() => {
+              setModalOpen(false)
+            }}
+            onSend={sendInvites}
+          />
+        </Box>
+      </Modal>
+
+      <Menu open={Boolean(anchorEl)} anchorEl={anchorEl} onClose={() => closeInviteActionMenu()}>
+        <MenuItem onClick={() => revokeInvite(inviteRowId)}>Revoke</MenuItem>
+        <MenuItem onClick={() => resendInvite(inviteRowId)}>Resend</MenuItem>
+      </Menu>
+      <List
+        headerButtons={
+          <Button
+            variant="contained"
+            onClick={() => {
+              setModalOpen(true)
+            }}
+          >
+            Invite Participants
+          </Button>
+        }
+      >
         <DataGrid {...dataGridProps} columns={columns} autoHeight />
       </List>
+      <Box sx={{ mt: 1 }} />
       <List headerProps={{ title: 'Pending Invites' }}>
         <DataGrid {...inviteGridProps} columns={inviteCols} autoHeight />
       </List>
