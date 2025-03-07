@@ -181,7 +181,9 @@ export const SurveyEditor = () => {
               </Button>
               <Box sx={{ flexGrow: 1 }} />
               <Link to="/surveys/import">
-                <Button variant="outlined">Import REDCap Instrument</Button>
+                <Button variant="outlined" disabled={savePending || disabled}>
+                  Import REDCap Instrument
+                </Button>
               </Link>
               <Menu
                 id="basic-menu"

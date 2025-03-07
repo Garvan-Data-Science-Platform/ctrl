@@ -15,6 +15,7 @@ describe('Surveys', () => {
     cy.get('[data-cy="edit-button"]').should('exist')
     cy.get('[data-cy="view-button"]').should('exist')
   })
+
   it('View a survey', () => {
     cy.login(UserType.ADMIN)
     cy.visit('/surveys')
