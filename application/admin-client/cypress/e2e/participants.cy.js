@@ -14,8 +14,36 @@ describe('Participants', () => {
     cy.contains('Dependent').should('exist')
     cy.contains('V1').should('exist')
   })
-  it('View and edit participant details', () => {
-    //Not yet implemented
+  it('View participant details', () => {
+    cy.login(UserType.ADMIN)
+    cy.visit('/participants/98')
+    cy.contains('Test User').should('exist')
+    cy.contains('123 smith st').should('exist')
+    cy.contains('V1').should('exist')
+    cy.contains('Family').should('not.exist')
+    cy.visit('/participants/99')
+    cy.contains('Family').should('exist')
+    cy.contains('Dependent').should('exist')
+  })
+
+  it('Edit participant details', () => {
+    cy.login(UserType.ADMIN)
+    cy.visit('/participants/edit/98')
+    cy.contains('Edit Participant').should('exist')
+    cy.get('input[name="addressLine"]').clear().type('1 Smith St')
+    cy.get('input[name="nextOfKin.firstName"]').clear().type('Betty')
+    cy.get('input[name="postcode"]').clear().type('222a')
+    cy.contains('Save').click()
+    cy.contains('Invalid postcode').should('exist')
+    cy.get('input[name="postcode"]').clear().type('2222')
+    cy.get('input[name="nextOfKin.email"]').clear().type('invalid')
+    cy.contains('Save').click()
+    cy.contains('Invalid email').should('exist')
+    cy.get('input[name="nextOfKin.email"]').clear().type('valid@email.com')
+    cy.contains('Save').click()
+    cy.url().should('contain', 'participants/98')
+    cy.contains('Betty').should('exist')
+    cy.contains('1 Smith St').should('exist')
   })
 
   it('View answers', () => {
@@ -36,7 +64,7 @@ describe('Participants', () => {
     cy.task('partialComplete')
     cy.visit('/participants')
     cy.get('[data-rowindex="2"]').contains('V1').trigger('mouseover', { force: true })
-    cy.contains('Partially Complete').should('be.visible')
+    cy.contains('Incomplete').should('be.visible')
   })
 
   it('Can view responses', () => {

@@ -117,6 +117,7 @@ export default function ProfileEdit() {
                 <TextField
                   sx={{ m: 1, flexGrow: 1 }}
                   label="First Name"
+                  defaultValue="."
                   error={Boolean(errors.firstName)}
                   helperText={errors.firstName?.message}
                   data-cy="update-first"
@@ -126,6 +127,7 @@ export default function ProfileEdit() {
                 <TextField
                   sx={{ m: 1, flexGrow: 1 }}
                   label="Family Name"
+                  defaultValue="."
                   error={Boolean(errors.lastName)}
                   helperText={errors.lastName?.message}
                   {...register('lastName', { required: true, value: data?.lastName })}
@@ -135,6 +137,7 @@ export default function ProfileEdit() {
                   fullWidth
                   sx={{ m: 1 }}
                   label="Email"
+                  defaultValue="."
                   error={Boolean(errors.email)}
                   helperText={errors.email?.message}
                   {...register('email', {
@@ -162,6 +165,7 @@ export default function ProfileEdit() {
                 <TextField
                   sx={{ m: 1, flexGrow: 1 }}
                   label="Address Line"
+                  defaultValue="."
                   error={Boolean(errors.addressLine)}
                   helperText={errors.addressLine?.message}
                   {...register('addressLine', { required: true, value: data.addressLine })}
@@ -169,6 +173,7 @@ export default function ProfileEdit() {
                 <TextField
                   sx={{ m: 1 }}
                   label="Suburb"
+                  defaultValue="."
                   error={Boolean(errors.suburb)}
                   helperText={errors.suburb?.message}
                   {...register('suburb', { required: true, value: data.suburb })}
@@ -195,6 +200,7 @@ export default function ProfileEdit() {
                 <TextField
                   sx={{ m: 1, flexGrow: 1 }}
                   label="Postcode"
+                  defaultValue="."
                   error={Boolean(errors.postcode)}
                   helperText={errors.postcode?.message}
                   {...register('postcode', {
@@ -209,6 +215,7 @@ export default function ProfileEdit() {
                 <TextField
                   sx={{ m: 1, flexGrow: 1 }}
                   label="Mobile"
+                  defaultValue="."
                   error={Boolean(errors.mobile)}
                   helperText={errors.mobile?.message}
                   data-cy="update-mobile"
@@ -250,23 +257,25 @@ export default function ProfileEdit() {
                   sx={{ m: 1, flexGrow: 1 }}
                   key="nok_first"
                   label="First Name"
+                  defaultValue="."
                   error={Boolean(errors.nok_first)}
                   helperText={errors.nok_first?.message}
                   data-cy="update-nok-first"
                   {...register('nok_first', {
                     required: true,
-                    value: data?.alternativeContact?.firstName,
+                    value: data?.nextOfKin?.firstName,
                   })}
                 />
                 <TextField
                   sx={{ m: 1, flexGrow: 1 }}
                   label="Family Name"
+                  defaultValue="."
                   error={Boolean(errors.nok_surname)}
                   helperText={errors.nok_surname?.message}
                   key="nok_surname"
                   {...register('nok_surname', {
                     required: true,
-                    value: data?.alternativeContact?.lastName,
+                    value: data?.nextOfKin?.lastName,
                   })}
                 />
                 <TextField
@@ -274,12 +283,13 @@ export default function ProfileEdit() {
                   fullWidth
                   sx={{ m: 1 }}
                   label="Email"
+                  defaultValue="."
                   error={Boolean(errors.nok_email)}
                   helperText={errors.nok_email?.message}
                   key="nok_email"
                   {...register('nok_email', {
                     required: true,
-                    value: data?.alternativeContact?.email,
+                    value: data?.nextOfKin?.email,
                   })}
                 />
 

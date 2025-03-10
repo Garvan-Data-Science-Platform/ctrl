@@ -44,6 +44,7 @@ describe('ProfilesController', () => {
 
       const expectedProfileData = expect.objectContaining({
         addressLine: '123 smith st',
+        nextOfKin: null,
         dob: '1980-01-23T00:00:00.000Z',
         mobile: '0412345678',
         participantType: 'GUARDIAN',
@@ -56,6 +57,7 @@ describe('ProfilesController', () => {
         lastName: 'User',
         familyMembers: [
           { firstName: 'Test', lastName: 'Dependent', participantType: 'DEPENDENT_AGE' },
+          { firstName: 'Second', lastName: 'Guardian', participantType: 'GUARDIAN' },
         ],
       })
 
@@ -71,7 +73,7 @@ describe('ProfilesController', () => {
 
       expect(response.status).toBe(404)
       const body = response.body
-      expect(body.message).toBe(`Participant Profile with userId: ${userId} not found`)
+      expect(body.message).toBe(`Record not found`)
     })
   })
 
@@ -108,7 +110,7 @@ describe('ProfilesController', () => {
 
       expect(response.status).toBe(404)
       const body = response.body
-      expect(body.message).toBe(`Participant Profile with userId: ${ORG_ADMIN_ID} not found`)
+      expect(body.message).toBe(`Record not found`)
     })
   })
 

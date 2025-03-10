@@ -1,5 +1,5 @@
-import { Participant } from './participant'
+import { ParticipantWithProfile } from './participant'
 
 export interface GetParticipantByIdResponse {
-  data: Participant
+  data: ParticipantWithProfile
 }

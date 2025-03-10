@@ -25,7 +25,7 @@ export interface GetParticipantProfileResponse {
     postcode?: string
     preferredContact: ContactMethod
     participantType: ParticipantType
-    alternativeContact?: AlternativeContact
+    nextOfKin?: AlternativeContact
     familyMembers: FamilyMember[]
   }
 }

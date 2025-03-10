@@ -189,7 +189,7 @@ const main = async () => {
             middleName: 'Arundell',
             lastName: 'Wright',
             dob: new Date('1915-05-31'),
-            mobile: '04123456',
+            mobile: '0412345678',
             addressLine: '123 Main St',
             suburb: 'Armidale',
             state: 'NSW',
@@ -201,7 +201,7 @@ const main = async () => {
                 firstName: 'Jack',
                 lastName: 'McKinney',
                 email: 'jackmckinney@example.com',
-                mobile: '04123456',
+                mobile: '0412345679',
               },
             },
             surveys: {

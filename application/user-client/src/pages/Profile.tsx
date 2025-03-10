@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import type { GetParticipantProfileResponse } from '@common/types/api/users'
 import { Link } from 'react-router-dom'
 import { apiClient } from '../apiClient'
-import { ParticipantType } from '@common/types/api/users/ParticipantProfile'
+import { familyMap } from '@common/src/familyMap'
 
 export default function Profile() {
   const {
@@ -25,13 +25,6 @@ export default function Profile() {
   const data = pdata.data
 
   if (error) return <Typography>Error loading user profile: {error.message}</Typography>
-
-  const familyMap = (p: ParticipantType) => {
-    if (data.participantType == 'STANDARD') return 'Family Member'
-    if (p == 'DEPENDENT_AGE') return 'Dependent child'
-    if (p == 'DEPENDENT_OTHER') return 'Dependent (permanent)'
-    if (p == 'GUARDIAN') return 'Co-parent / guardian'
-  }
 
   return (
     <>
@@ -152,7 +145,7 @@ export default function Profile() {
                         </Typography>
                       </td>
                       <td>
-                        <Typography>{data.alternativeContact?.firstName}</Typography>
+                        <Typography>{data.nextOfKin?.firstName}</Typography>
                       </td>
                     </tr>
                     <tr>
@@ -162,7 +155,7 @@ export default function Profile() {
                         </Typography>
                       </td>
                       <td>
-                        <Typography>{data.alternativeContact?.lastName}</Typography>
+                        <Typography>{data.nextOfKin?.lastName}</Typography>
                       </td>
                     </tr>
                     <tr>
@@ -172,7 +165,7 @@ export default function Profile() {
                         </Typography>
                       </td>
                       <td>
-                        <Typography>{data.alternativeContact?.email}</Typography>
+                        <Typography>{data.nextOfKin?.email}</Typography>
                       </td>
                     </tr>
                   </>
@@ -180,7 +173,7 @@ export default function Profile() {
               </table>
             </Card>
           </Grid>
-          {data.familyMembers.length > 0 ? (
+          {data.familyMembers.length > 0 && (
             <Grid size={{ xs: 12, sm: 6 }}>
               <Card sx={{ boxShadow: '0', p: 2 }} raised={false}>
                 <table width={'100%'} style={{ textAlign: 'left', tableLayout: 'fixed' }}>
@@ -203,7 +196,7 @@ export default function Profile() {
                             </td>
 
                             <td>
-                              <Typography>{familyMap(val.participantType)}</Typography>
+                              <Typography>{familyMap[val.participantType]}</Typography>
                             </td>
                           </tr>
                         )
@@ -213,7 +206,7 @@ export default function Profile() {
                 </table>
               </Card>
             </Grid>
-          ) : null}
+          )}
         </Grid>
       </Container>
 

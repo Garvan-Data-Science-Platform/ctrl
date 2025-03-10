@@ -1,5 +1,5 @@
 import { SurveyVersion } from '@prisma/client'
-import { answersFromPreviousSurvey, createDefaultAnswers } from './answers'
+import { answersFromPreviousSurvey, combineGuardianAnswers, createDefaultAnswers } from './answers'
 import { SurveyStep, UserSurveyStepState } from 'common/types/survey'
 import ExampleSurveyVersion from 'common/src/surveys/exampleSurveyStepData.json'
 
@@ -89,6 +89,26 @@ describe('Answer functions', () => {
       const newAnswers = answersFromPreviousSurvey(prevVersion, currentVersion, prevAnswers)
       expect(newAnswers[0].answers).toEqual(['choiceA', 'choice1'])
       expect(newAnswers[1].answers).toEqual([null, true])
+    })
+  })
+  describe('combineGuardianAnswers()', () => {
+    it('Combines answers correctly', () => {
+      expect(combineGuardianAnswers([null, true, 'blue'], [null, false, 'blue'])).toEqual([
+        null,
+        null,
+        'blue',
+      ])
+      expect(combineGuardianAnswers([true, true, true], [true, false, null])).toEqual([
+        true,
+        null,
+        true,
+      ])
+      expect(combineGuardianAnswers([false], [false])).toEqual([false])
+      expect(combineGuardianAnswers(['red'], ['blue'])).toEqual([null])
+      expect(combineGuardianAnswers([], [])).toEqual([])
+    })
+    it('Throws error on mismatch', () => {
+      expect(() => combineGuardianAnswers([true], [true, null])).toThrow()
     })
   })
 })
