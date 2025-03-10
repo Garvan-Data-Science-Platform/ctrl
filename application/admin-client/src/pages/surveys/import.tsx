@@ -96,6 +96,9 @@ export const SurveyImport = () => {
           alt="REDCap Logo"
           style={{ height: '100px', marginBottom: '16px' }}
         />
+        <Typography variant="body2" color="error" gutterBottom>
+          Note: This will overwrite the current draft survey.
+        </Typography>
         <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
             <Typography variant="h6" gutterBottom>
@@ -137,9 +140,6 @@ export const SurveyImport = () => {
             >
               Save as Draft
             </Button>
-            <Typography variant="body2" color="error" gutterBottom>
-              Note: This will overwrite the current draft survey.
-            </Typography>
             <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
               Need help?{' '}
               <span
