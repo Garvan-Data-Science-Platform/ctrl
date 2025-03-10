@@ -9,9 +9,6 @@ jobs:
   build-checks:
     name: build checks
     runs-on: ubuntu-22.04
-    strategy:
-      matrix:
-        workspace: ['backend', 'admin-client', 'user-client', 'common', 'integrations']
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
@@ -35,4 +32,5 @@ jobs:
         env:
           MAILER_USERNAME: ${{ secrets.TEST_MAILER_USERNAME }}
           MAILER_PASSWORD: ${{ secrets.TEST_MAILER_PASSWORD }}
-        run: yarn workspace ${{ matrix.workspace }} test
+        run: yarn test
+        #run: yarn workspace backend test && yarn workspace user-client test && yarn workspace common test && yarn workspace integrations test && yarn workspace admin-client test
