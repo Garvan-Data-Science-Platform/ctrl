@@ -1,24 +1,22 @@
 import { Box, Button, Typography, TextField, Divider, Modal, IconButton } from '@mui/material'
-import { Show } from '@refinedev/mui'
 import { useForm } from '@refinedev/react-hook-form'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { axiosInstance } from '../../providers/dataProvider'
 import { API_URL } from '../../App'
-import { Close } from '@mui/icons-material'
+import { Close, ArrowBack } from '@mui/icons-material'
 import ReactMarkdown from 'react-markdown'
 import { instrumentUploadCSVDocumentation } from './getInstrumentFromRedcap'
+import { useNotification, useBack } from '@refinedev/core'
 
 export const SurveyImport = () => {
-  const {
-    refineCore: { formLoading },
-    handleSubmit,
-  } = useForm({})
+  const { handleSubmit } = useForm({})
   const [file, setFile] = useState<File | null>(null)
-  const [inputKey, setInputKey] = useState<number>(0)
-  const [form, setForm] = useState<string>('')
-  const [open, setOpen] = useState(false)
+  const [formName, setFormName] = useState<string>('')
+  const [openPage, setOpenPage] = useState(false)
   const navigate = useNavigate()
+  const { open } = useNotification()
+  const back = useBack()
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -26,14 +24,9 @@ export const SurveyImport = () => {
     }
   }
 
-  const handleRemoveFile = () => {
-    setFile(null)
-    setInputKey((prevKey) => prevKey + 1) // Change the key to reset the input
-  }
-
   const onSubmitFile = () => {
     if (!file) {
-      alert('Please upload a file before submitting.')
+      open?.({ type: 'error', message: 'Please upload a file before proceeding' })
       return
     }
 
@@ -53,17 +46,18 @@ export const SurveyImport = () => {
         navigate(0) // Refresh the page
       })
       .catch(() => {
-        alert('ERROR UPLOADING FILE')
+        open?.({ type: 'error', message: 'Error uploading file' })
+        return
       })
   }
 
   const onSubmitApi = () => {
-    if (!form) {
+    if (!formName) {
       alert('Please enter a form to pull from REDCap')
       return
     }
     axiosInstance
-      .post(`${API_URL}/integrations/redcap/instrument/upload/api`, { form })
+      .post(`${API_URL}/integrations/redcap/instrument/upload/api`, { form: formName })
       .then((response) => {
         const data = response.data
         navigate(`/surveys/edit/${data.id}`)
@@ -74,18 +68,19 @@ export const SurveyImport = () => {
       })
   }
 
-  const handleOpen = () => setOpen(true)
-  const handleClose = () => setOpen(false)
+  const handleOpen = () => setOpenPage(true)
+  const handleClose = () => setOpenPage(false)
 
   return (
-    <Show
-      isLoading={formLoading}
-      title="REDCap Instrument Import"
-      canDelete={false}
-      canEdit={false}
-      /* eslint-disable @typescript-eslint/no-unused-vars */
-      headerButtons={({ defaultButtons }) => null}
-    >
+    <Box>
+      <IconButton
+        sx={{
+          position: 'relative',
+        }}
+        onClick={() => back()}
+      >
+        <ArrowBack />
+      </IconButton>
       <Box
         component="form"
         sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
@@ -99,47 +94,32 @@ export const SurveyImport = () => {
         <Typography variant="body2" color="error" gutterBottom>
           Note: This will overwrite the current draft survey.
         </Typography>
-        <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
+        <Box sx={{ mt: 1, display: 'flex', width: '100%', justifyContent: 'space-between' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
             <Typography variant="h6" gutterBottom>
               Upload Instrument File
             </Typography>
-            <Button variant="contained" component="label">
+            <Button variant="outlined" component="label">
               UPLOAD FILE
-              <input
-                key={inputKey} // Add key to force reset
-                type="file"
-                hidden
-                accept=".csv"
-                onChange={handleFileChange}
-              />
+              <input type="file" hidden accept=".csv" onChange={handleFileChange} />
             </Button>
             {file && (
-              <Box sx={{ mt: 2, textAlign: 'center' }}>
-                <Typography variant="body1" gutterBottom>
-                  File uploaded: {file.name}
-                </Typography>
-                <Button variant="outlined" color="error" onClick={handleRemoveFile} sx={{ mr: 1 }}>
-                  Remove
-                </Button>
+              <>
+                <Box sx={{ mt: 2, textAlign: 'center' }}>
+                  <Typography variant="body1" gutterBottom>
+                    File uploaded: {file.name}
+                  </Typography>
+                </Box>
                 <Button
-                  variant="outlined"
+                  variant="contained"
                   color="primary"
-                  href={URL.createObjectURL(file)}
-                  download={file.name}
+                  onClick={handleSubmit(onSubmitFile)}
+                  sx={{ mt: 2 }}
                 >
-                  Download
+                  Confirm
                 </Button>
-              </Box>
+              </>
             )}
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleSubmit(onSubmitFile)}
-              sx={{ mt: 2 }}
-            >
-              Save as Draft
-            </Button>
             <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
               Need help?{' '}
               <span
@@ -151,7 +131,7 @@ export const SurveyImport = () => {
             </Typography>
 
             <Modal
-              open={open}
+              open={openPage}
               onClose={handleClose}
               aria-labelledby="modal-title"
               aria-describedby="modal-description"
@@ -190,16 +170,21 @@ export const SurveyImport = () => {
             <TextField
               label="Form Name"
               variant="outlined"
-              value={form}
-              onChange={(e) => setForm(e.target.value)}
+              value={formName}
+              onChange={(e) => setFormName(e.target.value)}
               sx={{ mb: 2 }}
             />
-            <Button variant="contained" color="primary" onClick={handleSubmit(onSubmitApi)}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleSubmit(onSubmitApi)}
+              disabled={!formName}
+            >
               Import from API
             </Button>
           </Box>
         </Box>
       </Box>
-    </Show>
+    </Box>
   )
 }
