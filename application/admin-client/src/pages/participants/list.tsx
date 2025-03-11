@@ -76,13 +76,26 @@ export const ParticipantList = () => {
   }
 
   const revokeInvite = (id: number) => {
-    console.log(id)
-    open?.({ type: 'success', message: 'Invite Revoked' })
+    axiosInstance
+      .post(`invites/revoke/${id}`)
+      .then(() => {
+        open?.({ type: 'success', message: 'Invite Revoked' })
+        invalidate({ resource: 'invites', invalidates: ['list'] })
+      })
+      .catch((error) => {
+        open?.({ type: 'error', message: `Could not revoke invite: ${error}` })
+      })
     closeInviteActionMenu()
   }
   const resendInvite = (id: number) => {
-    console.log(id)
-    open?.({ type: 'success', message: 'Invite Resent' })
+    axiosInstance
+      .post(`invites/resend/${id}`)
+      .then(() => {
+        open?.({ type: 'success', message: 'Invite Resent' })
+      })
+      .catch((error) => {
+        open?.({ type: 'error', message: `Could not resend invite: ${error}` })
+      })
     closeInviteActionMenu()
   }
 
@@ -189,6 +202,7 @@ export const ParticipantList = () => {
                   setAnchorEl(event.currentTarget)
                   setInviteRowId(row.id)
                 }}
+                data-cy="invite-actions"
               >
                 <MoreVert />
               </IconButton>
@@ -237,8 +251,12 @@ export const ParticipantList = () => {
       </Modal>
 
       <Menu open={Boolean(anchorEl)} anchorEl={anchorEl} onClose={() => closeInviteActionMenu()}>
-        <MenuItem onClick={() => revokeInvite(inviteRowId)}>Revoke</MenuItem>
-        <MenuItem onClick={() => resendInvite(inviteRowId)}>Resend</MenuItem>
+        <MenuItem data-cy="revoke-button" onClick={() => revokeInvite(inviteRowId)}>
+          Revoke
+        </MenuItem>
+        <MenuItem data-cy="resend-button" onClick={() => resendInvite(inviteRowId)}>
+          Resend
+        </MenuItem>
       </Menu>
       <List
         headerButtons={
@@ -247,6 +265,7 @@ export const ParticipantList = () => {
             onClick={() => {
               setModalOpen(true)
             }}
+            data-cy="invite-button"
           >
             Invite Participants
           </Button>
@@ -255,8 +274,8 @@ export const ParticipantList = () => {
         <DataGrid {...dataGridProps} columns={columns} autoHeight />
       </List>
       <Box sx={{ mt: 1 }} />
-      <List headerProps={{ title: 'Pending Invites' }}>
-        <DataGrid {...inviteGridProps} columns={inviteCols} autoHeight />
+      <List headerProps={{ title: 'Invites' }}>
+        <DataGrid {...inviteGridProps} columns={inviteCols} autoHeight data-cy="pending-list" />
       </List>
     </>
   )

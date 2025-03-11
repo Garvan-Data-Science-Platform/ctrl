@@ -233,7 +233,24 @@ export class InvitesController extends Controller {
   }
 
   /**
-   * Resend pending invites
+   * Resend pending invite by ID
+   *
+   * @summary Resend invites that are currently pending
+   */
+  @Post('/resend/{inviteId}')
+  public async resendPendingInviteById(@Path() inviteId: number): Promise<void> {
+    // Get all pending invitations
+
+    const pendingInvite = await this.invitesRepo.findUniqueOrThrow({
+      where: { id: inviteId, status: 'PENDING' },
+      select: { email: true },
+    })
+
+    // Send emails
+    await this.sendInvites([pendingInvite.email])
+  }
+  /**
+   * Resend all pending invites
    *
    * @summary Resend invites that are currently pending
    */

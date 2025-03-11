@@ -46,7 +46,7 @@ export function InviteModal({ onSend, onCancel }: InviteModalProps) {
   }
 
   return (
-    <Box sx={{ width: 400 }} onPasteCapture={handlePaste}>
+    <Box sx={{ width: 400 }} onPasteCapture={handlePaste} data-cy="invite-modal">
       <Typography variant="h4">Invite Participants</Typography>
 
       <TextField
@@ -58,7 +58,7 @@ export function InviteModal({ onSend, onCancel }: InviteModalProps) {
           input: {
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton onClick={handleAdd}>
+                <IconButton data-cy="add-button" onClick={handleAdd}>
                   <Add />
                 </IconButton>
               </InputAdornment>
@@ -72,11 +72,13 @@ export function InviteModal({ onSend, onCancel }: InviteModalProps) {
         }}
         value={fieldValue}
         onChange={(e) => setFieldValue(e.target.value)}
+        data-cy="email-field"
       ></TextField>
       <Typography sx={{ mt: 1 }}>Recipients:</Typography>
       <List
         dense
         sx={{ height: 180, overflow: 'auto', bgcolor: 'rgba(0,0,0,0.05)', borderRadius: 2 }}
+        data-cy="recipients-list"
       >
         {emails.map((email, idx) => {
           return (
@@ -86,6 +88,7 @@ export function InviteModal({ onSend, onCancel }: InviteModalProps) {
                   onClick={() => {
                     setEmails(emails.filter((e) => e != email))
                   }}
+                  data-cy="remove-button"
                 >
                   <Delete />
                 </IconButton>
@@ -101,6 +104,7 @@ export function InviteModal({ onSend, onCancel }: InviteModalProps) {
       <Box sx={{ mt: 2, justifyContent: 'space-between', display: 'flex', flexDirection: 'row' }}>
         <Button
           variant="contained"
+          disabled={!(emails.length > 0 || fieldValue)}
           onClick={() => {
             if (fieldValue) {
               onSend([...emails, fieldValue])
@@ -108,10 +112,11 @@ export function InviteModal({ onSend, onCancel }: InviteModalProps) {
               onSend(emails)
             }
           }}
+          data-cy="send-button"
         >
           Send Invites
         </Button>
-        <Button variant="contained" color="error" onClick={onCancel}>
+        <Button variant="contained" color="error" onClick={onCancel} data-cy="invite-modal-cancel">
           Cancel
         </Button>
       </Box>
