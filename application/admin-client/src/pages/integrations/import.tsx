@@ -1,4 +1,17 @@
-import { Box, Button, Typography, TextField, Divider, Modal, IconButton } from '@mui/material'
+import {
+  Box,
+  Button,
+  Typography,
+  TextField,
+  Divider,
+  Modal,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+} from '@mui/material'
 import { useForm } from '@refinedev/react-hook-form'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -13,7 +26,8 @@ export const SurveyImport = () => {
   const { handleSubmit } = useForm({})
   const [file, setFile] = useState<File | null>(null)
   const [formName, setFormName] = useState<string>('')
-  const [openPage, setOpenPage] = useState(false)
+  const [openPage, setHelpPageOpen] = useState(false)
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
   const navigate = useNavigate()
   const { open } = useNotification()
   const back = useBack()
@@ -25,6 +39,7 @@ export const SurveyImport = () => {
   }
 
   const onSubmitFile = () => {
+    handleConfirmDialogClose()
     if (!file) {
       open?.({ type: 'error', message: 'Please upload a file before proceeding' })
       return
@@ -68,8 +83,17 @@ export const SurveyImport = () => {
       })
   }
 
-  const handleOpen = () => setOpenPage(true)
-  const handleClose = () => setOpenPage(false)
+  const handleConfirmDialogOpen = () => {
+    setConfirmDialogOpen(true)
+  }
+
+  const handleConfirmDialogClose = () => {
+    console.log('close dialog')
+    setConfirmDialogOpen(false)
+  }
+
+  const handleHelpPageOpen = () => setHelpPageOpen(true)
+  const handleHelpPageClose = () => setHelpPageOpen(false)
 
   return (
     <Box>
@@ -113,18 +137,39 @@ export const SurveyImport = () => {
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={handleSubmit(onSubmitFile)}
+                  onClick={handleConfirmDialogOpen}
                   sx={{ mt: 2 }}
                 >
                   Confirm
                 </Button>
+                <Dialog
+                  open={confirmDialogOpen}
+                  onClose={handleHelpPageClose}
+                  aria-labelledby="alert-dialog-title"
+                  aria-describedby="alert-dialog-description"
+                >
+                  <DialogTitle id="alert-dialog-title">{'Confirm Survey Import'}</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                      Warning: This action will overwrite the current draft survey. The imported
+                      file "{file?.name}" will replace any existing content. Do you want to
+                      continue?
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={handleConfirmDialogClose}>Cancel</Button>
+                    <Button onClick={onSubmitFile} color="error" autoFocus>
+                      Yes, Overwrite
+                    </Button>
+                  </DialogActions>
+                </Dialog>
               </>
             )}
             <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
               Need help?{' '}
               <span
                 style={{ color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}
-                onClick={handleOpen}
+                onClick={handleHelpPageOpen}
               >
                 How to export instruments from REDCap
               </span>
@@ -132,7 +177,7 @@ export const SurveyImport = () => {
 
             <Modal
               open={openPage}
-              onClose={handleClose}
+              onClose={handleHelpPageClose}
               aria-labelledby="modal-title"
               aria-describedby="modal-description"
             >
@@ -152,7 +197,7 @@ export const SurveyImport = () => {
                 }}
               >
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <IconButton onClick={handleClose}>
+                  <IconButton onClick={handleHelpPageClose}>
                     <Close />
                   </IconButton>
                 </Box>
