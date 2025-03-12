@@ -96,6 +96,20 @@ function App() {
                   warnWhenUnsavedChanges: true,
                   useNewQueryKeys: true,
                   projectId: 'UqrerM-EBDoyv-UEni4Y',
+                  reactQuery: {
+                    clientConfig: {
+                      defaultOptions: {
+                        queries: {
+                          retry: (failureCount: number, error: any) => {
+                            if (error.status == 401) {
+                              return false
+                            }
+                            return failureCount < 3
+                          },
+                        },
+                      },
+                    },
+                  },
                 }}
               >
                 <Routes>

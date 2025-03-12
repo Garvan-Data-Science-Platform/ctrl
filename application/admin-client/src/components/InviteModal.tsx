@@ -9,7 +9,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface InviteModalProps {
   onSend: (emails: string[]) => void
@@ -19,9 +19,12 @@ interface InviteModalProps {
 export function InviteModal({ onSend, onCancel }: InviteModalProps) {
   const [emails, setEmails] = useState<string[]>([])
   const [fieldValue, setFieldValue] = useState<string>('')
+  const [invalid, setInvalid] = useState(false)
 
   const handleAdd = () => {
-    if (fieldValue.includes('@') && !emails.includes(fieldValue)) {
+    if (!validateEmail(fieldValue)) {
+      setInvalid(true)
+    } else if (!emails.includes(fieldValue)) {
       setEmails((current) => {
         const c = structuredClone(current)
         c.push(fieldValue)
@@ -30,6 +33,16 @@ export function InviteModal({ onSend, onCancel }: InviteModalProps) {
       setFieldValue('')
     }
   }
+  const validateEmail = (email: string) => {
+    const r = new RegExp(/\S+@\S+\.\S+/)
+    return r.test(email)
+  }
+
+  useEffect(() => {
+    if (invalid) {
+      setInvalid(!validateEmail(fieldValue))
+    }
+  }, [fieldValue])
 
   const handlePaste = (event: React.ClipboardEvent) => {
     event.preventDefault()
@@ -37,7 +50,7 @@ export function InviteModal({ onSend, onCancel }: InviteModalProps) {
     setEmails((current) => {
       const c = structuredClone(current)
       for (const p of pasted) {
-        if (!c.includes(p)) {
+        if (!c.includes(p) && validateEmail(p)) {
           c.push(p)
         }
       }
@@ -52,7 +65,8 @@ export function InviteModal({ onSend, onCancel }: InviteModalProps) {
       <TextField
         fullWidth
         placeholder="tom@example.com"
-        helperText="Enter manually or paste from excel"
+        helperText={invalid ? 'Invalid email' : 'Enter manually or paste from spreadsheet'}
+        error={invalid}
         sx={{ mt: 2, mb: 2 }}
         slotProps={{
           input: {
@@ -73,8 +87,11 @@ export function InviteModal({ onSend, onCancel }: InviteModalProps) {
         value={fieldValue}
         onChange={(e) => setFieldValue(e.target.value)}
         data-cy="email-field"
-      ></TextField>
-      <Typography sx={{ mt: 1 }}>Recipients:</Typography>
+      />
+
+      <Typography sx={{ mt: 1 }}>
+        Recipients{emails.length > 0 && ` (${emails.length})`}:
+      </Typography>
       <List
         dense
         sx={{ height: 180, overflow: 'auto', bgcolor: 'rgba(0,0,0,0.05)', borderRadius: 2 }}
@@ -107,7 +124,11 @@ export function InviteModal({ onSend, onCancel }: InviteModalProps) {
           disabled={!(emails.length > 0 || fieldValue)}
           onClick={() => {
             if (fieldValue) {
-              onSend([...emails, fieldValue])
+              if (!validateEmail(fieldValue)) {
+                setInvalid(true)
+              } else {
+                onSend([...emails, fieldValue])
+              }
             } else {
               onSend(emails)
             }

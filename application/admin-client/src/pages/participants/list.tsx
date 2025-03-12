@@ -66,7 +66,7 @@ export const ParticipantList = () => {
       })
       .catch((error) => {
         setModalOpen(false)
-        open?.({ type: 'error', message: `Could not publish survey: ${error}` })
+        open?.({ type: 'error', message: `Could not send invites: ${error}` })
         setLoading(false)
       })
   }
