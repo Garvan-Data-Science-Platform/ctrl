@@ -1319,7 +1319,6 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         const argsProfilesController_updateProfileById: Record<string, TsoaRoute.ParameterSchema> = {
                 profileId: {"in":"path","name":"profileId","required":true,"dataType":"double"},
                 bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"UpdateProfileRequest"},
-                request: {"in":"request","name":"request","required":true,"dataType":"object"},
         };
         app.patch('/profiles/:profileId',
             authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
@@ -1460,6 +1459,37 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
 
               await templateService.apiHandler({
                 methodName: 'createInvites',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsInvitesController_resendInviteById: Record<string, TsoaRoute.ParameterSchema> = {
+                inviteId: {"in":"path","name":"inviteId","required":true,"dataType":"double"},
+        };
+        app.post('/invites/resend/:inviteId',
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(InvitesController)),
+            ...(fetchMiddlewares<RequestHandler>(InvitesController.prototype.resendInviteById)),
+
+            async function InvitesController_resendInviteById(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsInvitesController_resendInviteById, request, response });
+
+                const controller = new InvitesController();
+
+              await templateService.apiHandler({
+                methodName: 'resendInviteById',
                 controller,
                 response,
                 next,

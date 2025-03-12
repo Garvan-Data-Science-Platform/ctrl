@@ -33,8 +33,6 @@ import { ResponsesView } from './pages/responses'
 import { ListAlt, Person, RecentActors } from '@mui/icons-material'
 import { ParticipantEdit } from './pages/participants/edit'
 
-export const API_URL = import.meta.env.VITE_BACKEND_URL
-
 function App() {
   return (
     <BrowserRouter>
@@ -45,7 +43,7 @@ function App() {
           <RefineSnackbarProvider>
             <DevtoolsProvider>
               <Refine
-                dataProvider={dataProvider(API_URL)}
+                dataProvider={dataProvider()}
                 notificationProvider={notificationProvider}
                 routerProvider={routerBindings}
                 authProvider={authProvider}
@@ -98,6 +96,20 @@ function App() {
                   warnWhenUnsavedChanges: true,
                   useNewQueryKeys: true,
                   projectId: 'UqrerM-EBDoyv-UEni4Y',
+                  reactQuery: {
+                    clientConfig: {
+                      defaultOptions: {
+                        queries: {
+                          retry: (failureCount: number, error: any) => {
+                            if (error.status == 401) {
+                              return false
+                            }
+                            return failureCount < 3
+                          },
+                        },
+                      },
+                    },
+                  },
                 }}
               >
                 <Routes>

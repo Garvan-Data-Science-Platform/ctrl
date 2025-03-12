@@ -17,7 +17,7 @@ const mockNodeMailer = nodemailer as unknown as NodemailerMock
 const api = new Api()
 const app = api.app
 
-const expectedNumberOfInvites = 7
+const expectedNumberOfInvites = 6
 
 describe('ParticipantsController', () => {
   let registeredUserToken: string
@@ -92,12 +92,11 @@ describe('InvitesController', () => {
       const body: GetInvitesResponse = response.body
       expect(body.data).toHaveLength(expectedNumberOfInvites)
       expect(body.data[0].inviteStatus).toBe(InviteStatus.PENDING)
-      expect(body.data[1].inviteStatus).toBe(InviteStatus.ACCEPTED)
-      expect(body.data[2].inviteStatus).toBe(InviteStatus.REVOKED)
-      expect(body.data[3].inviteStatus).toBe(InviteStatus.EXPIRED)
+      expect(body.data[1].inviteStatus).toBe(InviteStatus.REVOKED)
+      expect(body.data[2].inviteStatus).toBe(InviteStatus.EXPIRED)
+      expect(body.data[3].inviteStatus).toBe(InviteStatus.PENDING)
       expect(body.data[4].inviteStatus).toBe(InviteStatus.PENDING)
       expect(body.data[5].inviteStatus).toBe(InviteStatus.PENDING)
-      expect(body.data[6].inviteStatus).toBe(InviteStatus.PENDING)
     })
   })
 
