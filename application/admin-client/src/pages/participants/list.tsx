@@ -19,20 +19,6 @@ import { useInvalidate, useNotification } from '@refinedev/core'
 import { InviteStatus } from '@common/types/api/participants/invite'
 import { MoreVert } from '@mui/icons-material'
 
-export const statusMap = {
-  incomplete: {
-    color: 'grey',
-    tooltip: 'Incomplete',
-  },
-  partially_complete: {
-    color: 'orange',
-    tooltip: 'Partially Complete',
-  },
-  complete: {
-    color: 'primary',
-    tooltip: 'Complete',
-  },
-}
 
 export const statusMap = {
   incomplete: {
