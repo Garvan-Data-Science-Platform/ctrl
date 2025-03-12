@@ -1,15 +1,23 @@
+import { GetUserByIdResponse } from '@common/types/api/users'
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import { useMany } from '@refinedev/core'
 import { DateField, DeleteButton, EditButton, List, ShowButton, useDataGrid } from '@refinedev/mui'
 import React from 'react'
 
+export const roleMap: { [r in GetUserByIdResponse['data']['role']]: string } = {
+  OrganisationAdmin: 'Organisation Admin',
+  OperatorAdmin: 'Operator Admin',
+  Participant: 'Participant',
+}
+
 export const UserList = () => {
   const { dataGridProps } = useDataGrid({
+    resource: 'users/admin',
     syncWithLocation: true,
   })
 
   const { data: userData } = useMany({
-    resource: 'users',
+    resource: 'users/admin',
     ids: dataGridProps?.rows?.map((item: any) => item?.user?.id).filter(Boolean) ?? [],
     queryOptions: {
       enabled: !!dataGridProps?.rows,
@@ -47,6 +55,7 @@ export const UserList = () => {
         flex: 1,
         headerName: 'Role',
         minWidth: 100,
+        renderCell: ({ value }) => roleMap[value as GetUserByIdResponse['data']['role']],
       },
       {
         field: 'createdAt',

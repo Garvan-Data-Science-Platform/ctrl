@@ -1773,6 +1773,56 @@
         }
       }
     },
+    "/users/admin": {
+      "get": {
+        "operationId": "GetAllAdminUsers",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllUsersResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Get all Admin Users",
+        "summary": "Get all Admin Users",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": []
+      }
+    },
     "/users/{userId}": {
       "get": {
         "operationId": "GetUserById",

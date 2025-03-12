@@ -61,6 +61,9 @@ function App() {
                     },
                   },
                   {
+                    name: 'users/admin',
+                  },
+                  {
                     name: 'surveys',
                     list: '/surveys',
                     edit: '/surveys/edit/:id',
