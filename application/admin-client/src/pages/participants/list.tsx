@@ -92,6 +92,7 @@ export const ParticipantList = () => {
       .post(`invites/resend/${id}`)
       .then(() => {
         open?.({ type: 'success', message: 'Invite Resent' })
+        invalidate({ resource: 'invites', invalidates: ['list'] })
       })
       .catch((error) => {
         open?.({ type: 'error', message: `Could not resend invite: ${error}` })

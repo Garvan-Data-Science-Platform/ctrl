@@ -1470,26 +1470,26 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsInvitesController_resendPendingInviteById: Record<string, TsoaRoute.ParameterSchema> = {
+        const argsInvitesController_resendInviteById: Record<string, TsoaRoute.ParameterSchema> = {
                 inviteId: {"in":"path","name":"inviteId","required":true,"dataType":"double"},
         };
         app.post('/invites/resend/:inviteId',
             authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(InvitesController)),
-            ...(fetchMiddlewares<RequestHandler>(InvitesController.prototype.resendPendingInviteById)),
+            ...(fetchMiddlewares<RequestHandler>(InvitesController.prototype.resendInviteById)),
 
-            async function InvitesController_resendPendingInviteById(request: ExRequest, response: ExResponse, next: any) {
+            async function InvitesController_resendInviteById(request: ExRequest, response: ExResponse, next: any) {
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsInvitesController_resendPendingInviteById, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args: argsInvitesController_resendInviteById, request, response });
 
                 const controller = new InvitesController();
 
               await templateService.apiHandler({
-                methodName: 'resendPendingInviteById',
+                methodName: 'resendInviteById',
                 controller,
                 response,
                 next,
