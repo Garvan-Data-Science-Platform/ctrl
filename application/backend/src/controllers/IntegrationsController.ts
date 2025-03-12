@@ -124,9 +124,9 @@ export class IntegrationsController extends Controller {
   public async uploadRedcapInstrumentAPI(
     @Body() bodyRequest: UploadRedcapInstrumentAPIRequest,
   ): Promise<UploadRedcapInstrumentResponse> {
-    const { form } = bodyRequest
+    const { form, token } = bodyRequest
     const params = new URLSearchParams()
-    params.append('token', process.env.REDCAP_API_KEY as string)
+    params.append('token', token || (process.env.REDCAP_API_KEY as string))
     params.append('content', 'metadata')
     params.append('format', 'json')
 
