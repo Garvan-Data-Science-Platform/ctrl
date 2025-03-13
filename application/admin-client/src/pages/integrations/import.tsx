@@ -12,22 +12,54 @@ import {
   DialogContentText,
   DialogActions,
 } from '@mui/material'
-import { useForm } from '@refinedev/react-hook-form'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { axiosInstance } from '../../providers/dataProvider'
 import { API_URL } from '../../App'
 import { Close, ArrowBack } from '@mui/icons-material'
+import { useNavigate } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import { instrumentUploadCSVDocumentation } from './getInstrumentFromRedcap'
 import { useNotification, useBack } from '@refinedev/core'
 
+const ConfirmImportDialog = ({
+  open,
+  onClose,
+  onConfirm,
+  dataLocation,
+}: {
+  open: boolean
+  onClose: () => void
+  onConfirm: () => void
+  dataLocation: string
+}) => {
+  return (
+    <Dialog open={open} onClose={onClose} data-cy="confirmDialog">
+      <DialogTitle>{'Confirm Survey Import'}</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          Warning: This action will overwrite the current draft survey. The imported data from "
+          {dataLocation}" will replace any existing content. Do you want to continue?
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onConfirm} color="error" autoFocus>
+          Yes, Overwrite
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
+}
+
 export const SurveyImport = () => {
-  const { handleSubmit } = useForm({})
+  // States
   const [file, setFile] = useState<File | null>(null)
   const [formName, setFormName] = useState<string>('')
-  const [openPage, setHelpPageOpen] = useState(false)
-  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
+  const [redcapAPIKey, setRedcapAPIKey] = useState<string>('')
+  const [openHelpPage, setHelpPageOpen] = useState(false)
+  const [confirmFileDialogOpen, setConfirmFileDialogOpen] = useState(false)
+  const [confirmApiDialogOpen, setConfirmApiDialogOpen] = useState(false)
+
   const navigate = useNavigate()
   const { open } = useNotification()
   const back = useBack()
@@ -38,8 +70,9 @@ export const SurveyImport = () => {
     }
   }
 
+  // File Submission
   const onSubmitFile = () => {
-    handleConfirmDialogClose()
+    handleFileDialogClose()
     if (!file) {
       open?.({ type: 'error', message: 'Please upload a file before proceeding' })
       return
@@ -54,11 +87,16 @@ export const SurveyImport = () => {
           'Content-Type': 'multipart/form-data',
         },
       })
-      .then((response) => {
+      .then(async (response) => {
         console.log(response)
-        const data = response.data
-        navigate(`/surveys/edit/${data.id}`)
-        navigate(0) // Refresh the page
+        const surveyId = response.data.id
+
+        open?.({
+          type: 'success',
+          message: `Successfully uploaded "${file.name}" as a draft survey ${surveyId}`,
+        })
+
+        navigate(`/surveys/edit/${surveyId}`)
       })
       .catch(() => {
         open?.({ type: 'error', message: 'Error uploading file' })
@@ -66,30 +104,57 @@ export const SurveyImport = () => {
       })
   }
 
+  // API Submission
   const onSubmitApi = () => {
+    handleApiDialogClose()
+
     if (!formName) {
-      alert('Please enter a form to pull from REDCap')
+      open?.({ type: 'error', message: 'Please enter a form to pull from REDCap' })
+      return
+    } else if (!redcapAPIKey) {
+      open?.({ type: 'error', message: 'Please enter a REDCap API key' })
       return
     }
+
     axiosInstance
-      .post(`${API_URL}/integrations/redcap/instrument/upload/api`, { form: formName })
+      .post(`${API_URL}/integrations/redcap/instrument/upload/api`, {
+        formName,
+        redcapAPIKey,
+      })
       .then((response) => {
-        const data = response.data
-        navigate(`/surveys/edit/${data.id}`)
-        navigate(0) // Refresh the page
+        console.log(response)
+        const surveyId = response.data.id
+
+        open?.({
+          type: 'success',
+          message: `Successfully pulled "${formName}" from REDCap as a draft survey ${surveyId}`,
+        })
+
+        navigate(`/surveys/edit/${surveyId}`)
       })
-      .catch(() => {
-        alert('ERROR IMPORTING FROM API')
+      .catch((response) => {
+        open?.({
+          type: 'error',
+          message: `Internal Server Error: ${response.response.data.message}`,
+        })
       })
   }
 
-  const handleConfirmDialogOpen = () => {
-    setConfirmDialogOpen(true)
+  // Handlers
+  const handleFileDialogOpen = () => {
+    setConfirmFileDialogOpen(true)
   }
 
-  const handleConfirmDialogClose = () => {
-    console.log('close dialog')
-    setConfirmDialogOpen(false)
+  const handleFileDialogClose = () => {
+    setConfirmFileDialogOpen(false)
+  }
+
+  const handleApiDialogOpen = () => {
+    setConfirmApiDialogOpen(true)
+  }
+
+  const handleApiDialogClose = () => {
+    setConfirmApiDialogOpen(false)
   }
 
   const handleHelpPageOpen = () => setHelpPageOpen(true)
@@ -125,10 +190,16 @@ export const SurveyImport = () => {
             </Typography>
             <Button variant="outlined" component="label">
               UPLOAD FILE
-              <input type="file" hidden accept=".csv" onChange={handleFileChange} />
+              <input
+                type="file"
+                hidden
+                accept=".csv"
+                onChange={handleFileChange}
+                data-cy="instrumentAttach"
+              />
             </Button>
             {file && (
-              <>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <Box sx={{ mt: 2, textAlign: 'center' }}>
                   <Typography variant="body1" gutterBottom>
                     File uploaded: {file.name}
@@ -137,33 +208,18 @@ export const SurveyImport = () => {
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={handleConfirmDialogOpen}
+                  onClick={handleFileDialogOpen}
                   sx={{ mt: 2 }}
                 >
                   Confirm
                 </Button>
-                <Dialog
-                  open={confirmDialogOpen}
-                  onClose={handleHelpPageClose}
-                  aria-labelledby="alert-dialog-title"
-                  aria-describedby="alert-dialog-description"
-                >
-                  <DialogTitle id="alert-dialog-title">{'Confirm Survey Import'}</DialogTitle>
-                  <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                      Warning: This action will overwrite the current draft survey. The imported
-                      file "{file?.name}" will replace any existing content. Do you want to
-                      continue?
-                    </DialogContentText>
-                  </DialogContent>
-                  <DialogActions>
-                    <Button onClick={handleConfirmDialogClose}>Cancel</Button>
-                    <Button onClick={onSubmitFile} color="error" autoFocus>
-                      Yes, Overwrite
-                    </Button>
-                  </DialogActions>
-                </Dialog>
-              </>
+                <ConfirmImportDialog
+                  open={confirmFileDialogOpen}
+                  onClose={handleFileDialogClose}
+                  onConfirm={onSubmitFile}
+                  dataLocation={file.name}
+                />
+              </Box>
             )}
             <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
               Need help?{' '}
@@ -175,12 +231,7 @@ export const SurveyImport = () => {
               </span>
             </Typography>
 
-            <Modal
-              open={openPage}
-              onClose={handleHelpPageClose}
-              aria-labelledby="modal-title"
-              aria-describedby="modal-description"
-            >
+            <Modal open={openHelpPage} onClose={handleHelpPageClose} data-cy="helpPage">
               <Box
                 sx={{
                   position: 'absolute',
@@ -197,11 +248,11 @@ export const SurveyImport = () => {
                 }}
               >
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <IconButton onClick={handleHelpPageClose}>
+                  <IconButton onClick={handleHelpPageClose} data-cy="closeHelpPage">
                     <Close />
                   </IconButton>
                 </Box>
-                <Box id="modal-description" sx={{ mt: 2, maxWidth: '100%' }}>
+                <Box sx={{ mt: 2, maxWidth: '100%' }}>
                   <ReactMarkdown>{instrumentUploadCSVDocumentation}</ReactMarkdown>
                 </Box>
               </Box>
@@ -213,20 +264,37 @@ export const SurveyImport = () => {
               Import from REDCap API
             </Typography>
             <TextField
+              label="REDCap API Key"
+              variant="outlined"
+              value={redcapAPIKey}
+              onChange={(e) => setRedcapAPIKey(e.target.value)}
+              sx={{ mb: 2 }}
+              type="password"
+              data-cy="redcapAPIKey"
+            />
+            <TextField
               label="Form Name"
               variant="outlined"
               value={formName}
               onChange={(e) => setFormName(e.target.value)}
               sx={{ mb: 2 }}
+              data-cy="formName"
             />
             <Button
               variant="contained"
               color="primary"
-              onClick={handleSubmit(onSubmitApi)}
-              disabled={!formName}
+              onClick={handleApiDialogOpen}
+              disabled={!formName || !redcapAPIKey}
+              data-cy="apiSubmit"
             >
               Import from API
             </Button>
+            <ConfirmImportDialog
+              open={confirmApiDialogOpen}
+              onClose={handleApiDialogClose}
+              onConfirm={onSubmitApi}
+              dataLocation={formName}
+            />
           </Box>
         </Box>
       </Box>
