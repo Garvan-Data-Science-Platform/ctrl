@@ -19,7 +19,7 @@ import { Close, ArrowBack } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import { instrumentUploadCSVDocumentation } from './getInstrumentFromRedcap'
-import { useNotification, useBack } from '@refinedev/core'
+import { useNotification, useBack, useInvalidate } from '@refinedev/core'
 
 const ConfirmImportDialog = ({
   open,
