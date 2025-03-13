@@ -7,6 +7,7 @@ import type {
   RegisterParticipantResponse,
   CreateParticipantResponse,
   CreateParticipantRequest,
+  RegisterSetupRequest,
 } from 'common/types/api/auth'
 import { Route, Tags, Controller, Body, Post, SuccessResponse, Response, ValidateError } from 'tsoa'
 import prisma from '../PrismaClient'
@@ -65,6 +66,49 @@ export class AuthController extends Controller {
     }
 
     logger.info({ ...responseData })
+    return responseData
+  }
+
+  /**
+   * register admin
+   *
+   * @summary Register initial admin user
+   */
+  @Post('/register/setup')
+  @SuccessResponse('201', 'User Created')
+  public async registerInitialUser(
+    @Body() bodyRequest: RegisterSetupRequest,
+  ): Promise<RegisterResponse> {
+    const { password, email } = bodyRequest
+
+    const { isValid, fields } = await checkPasswordStrength(password)
+
+    if (!isValid) {
+      throw new ValidateError(fields, 'Password does not meet strength requirements')
+    }
+
+    const existingUsers = await this.userRepo.count()
+    if (existingUsers > 0) {
+      throw new Error('CTRL is already set up')
+    }
+
+    const hashedPassword = await hashPassword(password)
+    const insertedUser: User = await this.userRepo.create({
+      data: {
+        email,
+        firstName: '',
+        lastName: '',
+        role: 'OperatorAdmin',
+        password: hashedPassword,
+      },
+    })
+
+    const token = await generateToken({ userId: insertedUser.id, roles: [insertedUser.role] })
+
+    const responseData = {
+      token,
+    }
+
     return responseData
   }
 
