@@ -1,8 +1,6 @@
-// import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
-// import { GetParticipantProfileResponse } from '@common/types/api/users'
-// import { GetResponsesByIdResponse } from '@common/types/api/surveys'
-
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
+import { GetParticipantProfileResponse } from '@common/types/api/users'
+import { GetResponsesByIdResponse } from '@common/types/api/surveys'
 
 // Define styles
 const styles = StyleSheet.create({
@@ -19,6 +17,16 @@ const styles = StyleSheet.create({
     margin: 10,
     padding: 10,
     flexGrow: 1,
+  },
+  profileSection: {
+    marginBottom: 20,
+    padding: 10,
+    borderBottom: '1pt solid #ccc',
+  },
+  subtitle: {
+    fontSize: 18,
+    marginBottom: 10,
+    fontWeight: 'bold',
   },
   table: {
     display: 'flex',
@@ -42,80 +50,51 @@ const styles = StyleSheet.create({
   },
 })
 
+interface ResponsesPdfProps {
+  profile: GetParticipantProfileResponse
+  responses: GetResponsesByIdResponse
+}
+
 // Create a PDF document component
-const ResponsesPdf = () => (
+const ResponsesPdf = ({ profile, responses }: ResponsesPdfProps) => (
   <Document>
     <Page size="A4" style={styles.page}>
-      <View style={styles.section}>
-        <Text>Hello, World!</Text>
+      <Text style={styles.title}>
+        Responses for {profile.data.firstName} {profile.data.lastName}
+      </Text>
+      /* Profile Section */
+      <View style={styles.profileSection}>
+        <Text style={styles.subtitle}>Participant Information</Text>
+        <Text>Date of birth: {profile.data.dob}</Text>
+        <Text>Email: {profile.data.email}</Text>
+        <Text>Mobile: {profile.data.mobile}</Text>
+        <Text>Address:</Text>
+        <Text> {profile.data.addressLine}</Text>
+        <Text> {profile.data.suburb}</Text>
+        <Text>
+          {' '}
+          {profile.data.state} {profile.data.postcode}
+        </Text>
       </View>
+      /* Responses Section */
       <View style={styles.section}>
-        <Text>Generating PDF files in React is simple!</Text>
+        <Text style={styles.subtitle}>Consent responses</Text>
+        <View style={styles.table}>
+          <View style={[styles.tableRow, styles.tableHeader]}>
+            <Text style={styles.tableCell}>Question text</Text>
+            <Text style={styles.tableCell}>Response</Text>
+          </View>
+          {responses.data[1].elements.map((item) => (
+            // <View style={styles.tableRow} key={item.id}>
+            <View style={styles.tableRow}>
+              <Text style={styles.tableCell}>{item.data.text}</Text>
+              <Text style={styles.tableCell}>{item.data.value ? 'Yes' : 'No'}</Text>
+            </View>
+          ))}
+        </View>
       </View>
     </Page>
   </Document>
 )
-
-// export default function ResponsesPdf() {
-//   profile: GetParticipantProfileResponse,
-// responses: GetResponsesByIdResponse,
-// <PDFViewer width="100%" height="600">
-//   <MyDocument />
-// </PDFViewer>
-//   return (
-//     <PDFDownloadLink document={<MyDocument />} fileName="Ctrl-responses.pdf">
-//       {({ loading }) => (loading ? 'Loading document...' : 'Download Responses')}
-//     </PDFDownloadLink>
-//   )
-// }
-// export async function exportPdf(
-// ) {
-// try {
-//   const pdfDoc = await PDFDocument.create()
-//   const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman)
-
-//   const page = pdfDoc.addPage()
-//   const { height } = page.getSize()
-//   const fontSize = 15
-//   page.drawText(`Responses for ${profile.data.firstName} ${profile.data.lastName}`, {
-//     x: 50,
-//     y: height - 4 * fontSize,
-//     size: fontSize,
-//     font: timesRomanFont,
-//     color: rgb(0, 0.53, 0.71),
-//   })
-
-//   page.drawText(
-//     `${responses.data[1].elements[0].data.text}: ${responses.data[1].elements[0].data.value}`,
-//     {
-//       x: 50,
-//       y: height - 5 * fontSize,
-//       size: fontSize,
-//       font: timesRomanFont,
-//       color: rgb(0, 0.53, 0.71),
-//     },
-//   )
-//   const pdfBytes = await pdfDoc.save()
-
-//   // Create a Blob from the PDF bytes
-//   const blob = new Blob([pdfBytes], { type: 'application/pdf' })
-
-//   // Create a link element
-//   const url = window.URL.createObjectURL(blob)
-//   const link = document.createElement('a')
-//   link.href = url
-//   link.download = 'Ctrl-responses.pdf'
-
-//   // Trigger the download
-//   document.body.appendChild(link)
-//   link.click()
-
-//   // Clean up
-//   document.body.removeChild(link)
-//   window.URL.revokeObjectURL(url)
-// } catch (error) {
-//   console.error('Error generating PDF:', error)
-// }
-// }
 
 export default ResponsesPdf

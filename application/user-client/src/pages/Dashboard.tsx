@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   alpha,
   Box,
@@ -20,7 +21,7 @@ import { GetParticipantProfileResponse } from '@common/types/api/users'
 import { GetResponsesByIdResponse } from '@common/types/api/surveys'
 import { apiClient } from '../apiClient'
 import ResponsesPdf from '../components/PdfExport'
-import { BlobProvider } from '@react-pdf/renderer'
+import { pdf } from '@react-pdf/renderer'
 
 export default function Dashboard() {
   const { isPending, error, data } = useQuery({
@@ -39,21 +40,41 @@ export default function Dashboard() {
         .then((res) => res.data) as Promise<GetParticipantProfileResponse>,
   })
 
+  const [isLoading, setIsLoading] = useState(false)
+  // const [pdfError, setPdfError] = useState<string | null>(null) // TODO ensure pdf error case is handled
+  // const [showPdf, setShowPdf] = useState(false)
+
   const queryClient = useQueryClient()
 
   const handleClick = async (profileData: GetParticipantProfileResponse) => {
-    const responseData = await queryClient.fetchQuery({
-      queryKey: ['surveys', 'get', profileData.data.id],
-      queryFn: () =>
-        apiClient
-          .get(`/surveys/responses/${profileData.data.id}`)
-          .then((res) => res.data) as Promise<GetResponsesByIdResponse>,
-    })
+    setIsLoading(true)
+    // setPdfError(null)
 
-    await createPdf(
-      profileData as GetParticipantProfileResponse,
-      responseData as GetResponsesByIdResponse,
-    )
+    try {
+      const responseData = await queryClient.fetchQuery({
+        queryKey: ['surveys', 'get', profileData.data.id],
+        queryFn: () =>
+          apiClient
+            .get(`/surveys/responses/${profileData.data.id}`)
+            .then((res) => res.data) as Promise<GetResponsesByIdResponse>,
+      })
+
+      // Generate PDF with the data
+      const pdfDoc = <ResponsesPdf profile={profileData} responses={responseData} />
+
+      // Create a blob from the PDF document
+      const blob = await pdf(pdfDoc).toBlob()
+
+      // Trigger download
+      const link = document.createElement('a')
+      link.href = URL.createObjectURL(blob)
+      link.download = `CTRL-responses-${profileData!.data.firstName}_${profileData!.data.lastName}.pdf`
+      link.click()
+    } catch (err) {
+      setPdfError(err instanceof Error ? err.message : 'Failed to generate PDF')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const renderReviewStatus = (status: 'completed' | 'viewed' | 'review_required') => {
@@ -190,8 +211,9 @@ export default function Dashboard() {
             variant="contained"
             sx={{ mt: 3 }}
             onClick={() => profileData && handleClick(profileData as GetParticipantProfileResponse)}
+            disabled={isLoading || !!error}
           >
-            View Responses
+            {isLoading ? 'Loading document...' : 'View Responses'}
           </Button>
         </Box>
       </Container>
