@@ -63,6 +63,7 @@ export const SurveyImport = () => {
   const navigate = useNavigate()
   const { open } = useNotification()
   const back = useBack()
+  const invalidate = useInvalidate()
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -89,14 +90,9 @@ export const SurveyImport = () => {
       })
       .then(async (response) => {
         console.log(response)
-        const surveyId = response.data.id
-
-        open?.({
-          type: 'success',
-          message: `Successfully uploaded "${file.name}" as a draft survey ${surveyId}`,
-        })
-
-        navigate(`/surveys/edit/${surveyId}`)
+        const data = response.data
+        invalidate({ resource: 'surveys', invalidates: ['resourceAll'] })
+        navigate(`/surveys/edit/${data.id}`)
       })
       .catch(() => {
         open?.({ type: 'error', message: 'Error uploading file' })
@@ -122,15 +118,9 @@ export const SurveyImport = () => {
         redcapAPIKey,
       })
       .then((response) => {
-        console.log(response)
-        const surveyId = response.data.id
-
-        open?.({
-          type: 'success',
-          message: `Successfully pulled "${formName}" from REDCap as a draft survey ${surveyId}`,
-        })
-
-        navigate(`/surveys/edit/${surveyId}`)
+        const data = response.data
+        invalidate({ resource: 'surveys', invalidates: ['resourceAll'] })
+        navigate(`/surveys/edit/${data.id}`)
       })
       .catch((response) => {
         open?.({
