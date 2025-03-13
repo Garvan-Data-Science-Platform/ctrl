@@ -69,30 +69,38 @@ const ResponsesPdf = ({ profile, responses }: ResponsesPdfProps) => (
         <Text>Email: {profile.data.email}</Text>
         <Text>Mobile: {profile.data.mobile}</Text>
         <Text>Address:</Text>
-        <Text> {profile.data.addressLine}</Text>
-        <Text> {profile.data.suburb}</Text>
         <Text>
-          {' '}
+          {'    '}
+          {profile.data.addressLine}
+        </Text>
+        <Text>
+          {'    '}
+          {profile.data.suburb}
+        </Text>
+        <Text>
+          {'    '}
           {profile.data.state} {profile.data.postcode}
         </Text>
       </View>
       /* Responses Section */
-      <View style={styles.section}>
-        <Text style={styles.subtitle}>Consent responses</Text>
-        <View style={styles.table}>
-          <View style={[styles.tableRow, styles.tableHeader]}>
-            <Text style={styles.tableCell}>Question text</Text>
-            <Text style={styles.tableCell}>Response</Text>
-          </View>
-          {responses.data[1].elements.map((item) => (
-            // <View style={styles.tableRow} key={item.id}>
-            <View style={styles.tableRow}>
-              <Text style={styles.tableCell}>{item.data.text}</Text>
-              <Text style={styles.tableCell}>{item.data.value ? 'Yes' : 'No'}</Text>
+      {responses.data.map((page) => (
+        <View style={styles.section}>
+          <Text style={styles.subtitle}>{page.title}</Text>
+          <View style={styles.table}>
+            <View style={[styles.tableRow, styles.tableHeader]}>
+              <Text style={styles.tableCell}>Question text</Text>
+              <Text style={styles.tableCell}>Response</Text>
             </View>
-          ))}
+            {page.elements.map((item) => (
+              // <View style={styles.tableRow} key={item.id}>
+              <View style={styles.tableRow}>
+                <Text style={styles.tableCell}>{item.data.text}</Text>
+                <Text style={styles.tableCell}>{item.data.value ? 'Yes' : 'No'}</Text>
+              </View>
+            ))}
+          </View>
         </View>
-      </View>
+      ))}
     </Page>
   </Document>
 )
