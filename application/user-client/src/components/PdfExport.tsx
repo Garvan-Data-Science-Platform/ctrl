@@ -65,7 +65,14 @@ const ResponsesPdf = ({ profile, responses }: ResponsesPdfProps) => (
       /* Profile Section */
       <View style={styles.profileSection}>
         <Text style={styles.subtitle}>Participant Information</Text>
-        <Text>Date of birth: {profile.data.dob}</Text>
+        <Text>
+          Date of birth:{' '}
+          {new Date(profile.data.dob).toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+          })}
+        </Text>
         <Text>Email: {profile.data.email}</Text>
         <Text>Mobile: {profile.data.mobile}</Text>
         <Text>Address:</Text>
@@ -99,6 +106,15 @@ const ResponsesPdf = ({ profile, responses }: ResponsesPdfProps) => (
               </View>
             ))}
           </View>
+          <Text style={styles.subtitle}>
+            {page.last_updated
+              ? `Reviewed on ${new Date(page.last_updated).toLocaleDateString('en-GB', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                })}`
+              : 'Not reviewed'}
+          </Text>
         </View>
       ))}
     </Page>
