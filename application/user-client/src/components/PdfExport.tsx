@@ -2,6 +2,11 @@ import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
 import { GetParticipantProfileResponse } from '@common/types/api/users'
 import { GetResponsesByIdResponse } from '@common/types/api/surveys'
 
+// TODO handle different question types (e.g. video link)
+// TODO pagination
+// TODO handle different response types (e.g. checkbox vs multichoice)
+// TODO handle null responses
+
 // Define styles
 const styles = StyleSheet.create({
   page: {
@@ -19,16 +24,18 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   profileSection: {
+    fontSize: 12,
     marginBottom: 20,
     padding: 10,
     borderBottom: '1pt solid #ccc',
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: 16,
     marginBottom: 10,
     fontWeight: 'bold',
   },
   table: {
+    fontSize: 12,
     display: 'flex',
     width: 'auto',
     borderStyle: 'solid',
