@@ -25,7 +25,6 @@ import { SurveyElementCard, SurveyDropSpace } from '../../components/SurveyEleme
 import { useSurveyStore } from '../../surveyStore'
 import { axiosInstance } from '../../providers/dataProvider'
 import { API_URL } from '../../App'
-import { Link } from 'react-router-dom'
 import { useResource, useShow, useUpdate, useNavigation, useNotification } from '@refinedev/core'
 
 export const SurveyEditor = () => {
@@ -180,11 +179,6 @@ export const SurveyEditor = () => {
                 <Settings />
               </Button>
               <Box sx={{ flexGrow: 1 }} />
-              <Link to="/surveys/import">
-                <Button variant="outlined" disabled={savePending || disabled}>
-                  Import REDCap Instrument
-                </Button>
-              </Link>
               <Menu
                 id="basic-menu"
                 anchorEl={anchorEl}
