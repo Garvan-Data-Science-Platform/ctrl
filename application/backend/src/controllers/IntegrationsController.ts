@@ -61,9 +61,9 @@ export class IntegrationsController extends Controller {
   public async uploadRedcapParticipantAPI(
     @Body() bodyRequest: UploadRedcapParticipantAPIRequest,
   ): Promise<UploadRedcapParticipantResponse> {
-    const { form } = bodyRequest
+    const { formName, redcapAPIKey } = bodyRequest
     const params = new URLSearchParams()
-    params.append('token', process.env.REDCAP_API_KEY as string)
+    params.append('token', redcapAPIKey || (process.env.REDCAP_API_KEY as string))
     params.append('content', 'record')
     params.append('format', 'json')
     /**
@@ -77,7 +77,7 @@ export class IntegrationsController extends Controller {
      * with an underscore
      * (by default, all records from all data collection instruments is pulled)
      */
-    params.append('form[0]', form)
+    params.append('form[0]', formName)
 
     const participantData = await fetch(REDCAP_API_URL, {
       method: 'POST',
@@ -124,9 +124,9 @@ export class IntegrationsController extends Controller {
   public async uploadRedcapInstrumentAPI(
     @Body() bodyRequest: UploadRedcapInstrumentAPIRequest,
   ): Promise<UploadRedcapInstrumentResponse> {
-    const { form, token } = bodyRequest
+    const { formName, redcapAPIKey } = bodyRequest
     const params = new URLSearchParams()
-    params.append('token', token || (process.env.REDCAP_API_KEY as string))
+    params.append('token', redcapAPIKey || (process.env.REDCAP_API_KEY as string))
     params.append('content', 'metadata')
     params.append('format', 'json')
 
@@ -137,7 +137,7 @@ export class IntegrationsController extends Controller {
      * NOTE: These 'forms' are not the form label values that are seen on the webpages,
      * but instead they are the unique form names seen in Column B of the data dictionary.
      */
-    params.append('forms[0]', form)
+    params.append('forms[0]', formName)
 
     const surveyData = await fetch(REDCAP_API_URL, {
       method: 'POST',

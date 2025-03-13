@@ -617,7 +617,8 @@ const models: TsoaRoute.Models = {
     "UploadRedcapParticipantAPIRequest": {
         "dataType": "refObject",
         "properties": {
-            "form": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
+            "formName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
+            "redcapAPIKey": {"dataType":"string","validators":{"minLength":{"value":1}}},
         },
         "additionalProperties": false,
     },
@@ -633,7 +634,8 @@ const models: TsoaRoute.Models = {
     "UploadRedcapInstrumentAPIRequest": {
         "dataType": "refObject",
         "properties": {
-            "form": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
+            "formName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
+            "redcapAPIKey": {"dataType":"string","validators":{"minLength":{"value":1}}},
         },
         "additionalProperties": false,
     },
@@ -1319,7 +1321,6 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         const argsProfilesController_updateProfileById: Record<string, TsoaRoute.ParameterSchema> = {
                 profileId: {"in":"path","name":"profileId","required":true,"dataType":"double"},
                 bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"UpdateProfileRequest"},
-                request: {"in":"request","name":"request","required":true,"dataType":"object"},
         };
         app.patch('/profiles/:profileId',
             authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),

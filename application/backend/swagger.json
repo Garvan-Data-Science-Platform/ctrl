@@ -770,7 +770,8 @@
             "type": "string"
           },
           "mobile": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "email": {
             "type": "string"
@@ -814,7 +815,7 @@
                 },
                 "type": "array"
               },
-              "alternativeContact": {
+              "nextOfKin": {
                 "$ref": "#/components/schemas/AlternativeContact"
               },
               "participantType": {
@@ -1030,6 +1031,92 @@
               "$ref": "#/components/schemas/Participant"
             },
             "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "ParticipantWithProfile": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Participant"
+          },
+          {
+            "properties": {
+              "profile": {
+                "properties": {
+                  "familyMembers": {
+                    "items": {
+                      "$ref": "#/components/schemas/FamilyMember"
+                    },
+                    "type": "array"
+                  },
+                  "nextOfKin": {
+                    "$ref": "#/components/schemas/AlternativeContact"
+                  },
+                  "participantType": {
+                    "$ref": "#/components/schemas/ParticipantType"
+                  },
+                  "preferredContact": {
+                    "$ref": "#/components/schemas/ContactMethod"
+                  },
+                  "postcode": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "$ref": "#/components/schemas/StateTerritory"
+                  },
+                  "suburb": {
+                    "type": "string"
+                  },
+                  "addressLine": {
+                    "type": "string"
+                  },
+                  "mobile": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "dob": {
+                    "type": "string"
+                  },
+                  "lastName": {
+                    "type": "string"
+                  },
+                  "middleName": {
+                    "type": "string"
+                  },
+                  "firstName": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "familyMembers",
+                  "participantType",
+                  "preferredContact",
+                  "mobile",
+                  "dob",
+                  "lastName",
+                  "firstName"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "profile"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "GetParticipantByIdResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ParticipantWithProfile"
           }
         },
         "required": [
@@ -1496,13 +1583,17 @@
       "UploadRedcapParticipantAPIRequest": {
         "description": "This is the name of the redcap instrument you are importing from.\nNOTE: These 'forms' are not the form label values that are seen on the webpages,\nbut instead they are the unique form names seen in Column B of the data dictionary.",
         "properties": {
-          "form": {
+          "formName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "redcapAPIKey": {
             "type": "string",
             "minLength": 1
           }
         },
         "required": [
-          "form"
+          "formName"
         ],
         "type": "object",
         "additionalProperties": false
@@ -1523,13 +1614,17 @@
       "UploadRedcapInstrumentAPIRequest": {
         "description": "This is the name of the redcap instrument you are importing from.\nNOTE: These 'forms' are not the form label values that are seen on the webpages,\nbut instead they are the unique form names seen in Column B of the data dictionary.",
         "properties": {
-          "form": {
+          "formName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "redcapAPIKey": {
             "type": "string",
             "minLength": 1
           }
         },
         "required": [
-          "form"
+          "formName"
         ],
         "type": "object",
         "additionalProperties": false
@@ -2608,9 +2703,9 @@
         }
       }
     },
-    "/profiles/{userId}": {
+    "/profiles/user/{userId}": {
       "get": {
-        "operationId": "GetParticipantProfileByID",
+        "operationId": "GetParticipantProfileByUserID",
         "responses": {
           "200": {
             "description": "Ok",
@@ -2676,6 +2771,141 @@
         ]
       }
     },
+    "/profiles/{profileId}": {
+      "get": {
+        "operationId": "GetParticipantProfileByID",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetParticipantProfileResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Profiles"
+        ],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "profileId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "UpdateProfileById",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Profiles"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "profileId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProfileRequest"
+              }
+            }
+          }
+        }
+      }
+    },
     "/participants": {
       "get": {
         "operationId": "GetParticipants",
@@ -2722,6 +2952,74 @@
           }
         ],
         "parameters": []
+      }
+    },
+    "/participants/{profileId}": {
+      "get": {
+        "operationId": "GetParticipantById",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetParticipantByIdResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Get participant by ID",
+        "summary": "Get a  Participant by ID",
+        "tags": [
+          "Participants"
+        ],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "profileId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
       }
     },
     "/invites": {

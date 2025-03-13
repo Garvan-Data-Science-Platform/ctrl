@@ -7,11 +7,11 @@ export interface UploadRedcapInstrumentAPIRequest {
   /**
    * @minLength 1
    */
-  form: string // specify the form you want to accesss
+  formName: string // specify the form you want to accesss
   /**
    * @minLength 1
    */
-  token?: string // specify the token to access the redcap api
+  redcapAPIKey?: string // specify the redcapAPIKey to access the redcap api
 }
 
 export interface UploadRedcapInstrumentResponse {
