@@ -37,10 +37,14 @@ export const statusMap = {
 export const ParticipantList = () => {
   const { dataGridProps } = useDataGrid({
     syncWithLocation: true,
+    filters: { mode: 'off' },
+    sorters: { mode: 'off' },
   })
   const { dataGridProps: inviteGridProps } = useDataGrid({
     syncWithLocation: true,
     resource: 'invites',
+    filters: { mode: 'off' },
+    sorters: { mode: 'off' },
   })
 
   const invalidate = useInvalidate()
@@ -135,20 +139,28 @@ export const ParticipantList = () => {
         headerName: 'Latest Answers',
         minWidth: 250,
         renderCell: ({ value }) => renderAnswer(value.at(-1)),
+        sortable: false,
+        disableColumnMenu: true,
       },
       {
         field: 'lastUpdated',
         flex: 1,
         headerName: 'Latest Survey Response',
         minWidth: 100,
+        type: 'date',
+        valueGetter: (cell) => {
+          if (!cell.value) return null
+          return new Date(cell.value)
+        },
         renderCell: function render({ value }) {
-          return <DateField value={value} />
+          return <DateField value={value} format="DD/MM/YYYY" />
         },
       },
       {
         field: 'actions',
         headerName: 'Actions',
         sortable: false,
+        disableColumnMenu: true,
         renderCell: function render({ row }) {
           return (
             <>
@@ -183,18 +195,28 @@ export const ParticipantList = () => {
         field: 'createdAt',
         headerName: 'Date Sent',
         flex: 1,
-        renderCell: ({ value }) => new Date(value).toLocaleDateString(),
+        type: 'date',
+        valueGetter: (cell) => {
+          if (!cell.value) return null
+          return new Date(cell.value)
+        },
+        renderCell: function render({ value }) {
+          return <DateField value={value} format="DD/MM/YYYY" />
+        },
       },
       {
         field: 'inviteStatus',
         headerName: 'Status',
         flex: 1,
         renderCell: ({ value }) => inviteStatusMap[value as InviteStatus],
+        type: 'singleSelect',
+        valueOptions: Object.keys(InviteStatus),
       },
       {
         field: 'actions',
         headerName: 'Actions',
         sortable: false,
+        disableColumnMenu: true,
         renderCell: function render({ row }) {
           return (
             <>

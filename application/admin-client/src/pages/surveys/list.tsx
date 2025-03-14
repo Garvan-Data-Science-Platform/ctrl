@@ -1,10 +1,11 @@
-import { DataGrid, type GridColDef } from '@mui/x-data-grid'
+import { DataGrid, getGridStringOperators, type GridColDef } from '@mui/x-data-grid'
 import { EditButton, List, ShowButton, useDataGrid } from '@refinedev/mui'
 import React from 'react'
 
 export const CategoryList = () => {
   const { dataGridProps } = useDataGrid({
-    sorters: { initial: [{ field: 'versionNumber', order: 'desc' }] },
+    sorters: { mode: 'off', initial: [{ field: 'versionNumber', order: 'desc' }] },
+    filters: { mode: 'off' },
   })
 
   const columns = React.useMemo<GridColDef[]>(
@@ -20,6 +21,7 @@ export const CategoryList = () => {
         field: 'actions',
         headerName: 'Actions',
         sortable: false,
+        disableColumnMenu: true,
         renderCell: function render({ row }) {
           return row.status == 'DRAFT' ? (
             <EditButton data-cy="edit-button" hideText recordItemId={row.id} />

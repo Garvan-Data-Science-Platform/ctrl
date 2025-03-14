@@ -14,6 +14,8 @@ export const UserList = () => {
   const { dataGridProps } = useDataGrid({
     resource: 'users/admin',
     syncWithLocation: true,
+    filters: { mode: 'off' },
+    sorters: { mode: 'off' },
   })
 
   const { data: userData } = useMany({
@@ -56,20 +58,27 @@ export const UserList = () => {
         headerName: 'Role',
         minWidth: 100,
         renderCell: ({ value }) => roleMap[value as GetUserByIdResponse['data']['role']],
+        type: 'singleSelect',
+        valueOptions: Object.keys(roleMap),
       },
       {
         field: 'createdAt',
         flex: 1,
         headerName: 'Created at',
         minWidth: 100,
+        type: 'date',
+        valueGetter: (cell) => {
+          return new Date(cell.value)
+        },
         renderCell: function render({ value }) {
-          return <DateField value={value} />
+          return <DateField value={value} format="DD/MM/YYYY" />
         },
       },
       {
         field: 'actions',
         headerName: 'Actions',
         sortable: false,
+        disableColumnMenu: true,
         renderCell: function render({ row }) {
           return (
             <>
