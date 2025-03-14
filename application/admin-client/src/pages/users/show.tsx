@@ -1,6 +1,8 @@
 import { Stack, Typography } from '@mui/material'
 import { useShow } from '@refinedev/core'
 import { DateField, Show, TextFieldComponent as TextField } from '@refinedev/mui'
+import { roleMap } from './list'
+import { GetUserByIdResponse } from '@common/types/api/users'
 
 export const UserShow = () => {
   const { queryResult } = useShow({})
@@ -31,15 +33,15 @@ export const UserShow = () => {
         <TextField value={record?.lastName} />
 
         <Typography variant="body1" fontWeight="bold">
-          {'email'}
+          {'Email'}
         </Typography>
         <TextField value={record?.email} />
         <Typography variant="body1" fontWeight="bold">
           {'Role'}
         </Typography>
-        <TextField value={record?.role} />
+        <TextField value={record && roleMap[record.role as GetUserByIdResponse['data']['role']]} />
         <Typography variant="body1" fontWeight="bold">
-          {'CreatedAt'}
+          {'Created At'}
         </Typography>
         <DateField value={record?.createdAt} />
       </Stack>

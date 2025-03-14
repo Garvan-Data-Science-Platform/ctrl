@@ -63,6 +63,23 @@ export class UsersController extends Controller {
   }
 
   /**
+   * Get all Admin Users
+   *
+   * @summary Get all Admin Users
+   */
+  @Get('/admin')
+  @Security('jwt', ['OrganisationAdmin'])
+  @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
+  public async getAllAdminUsers(): Promise<GetAllUsersResponse> {
+    const users: User[] = await this.userRepo.findMany({
+      where: { role: { in: ['OperatorAdmin', 'OrganisationAdmin'] } },
+    })
+    const responseData = { data: users }
+    logger.info({ ...responseData })
+    return responseData
+  }
+
+  /**
    * Gets a Specific User using their ID
    *
    * @summary Get Specific User

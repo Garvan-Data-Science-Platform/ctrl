@@ -54,6 +54,7 @@ describe('UsersController', () => {
 
       const body: GetAllUsersResponse = response.body
       expect(body).toHaveProperty('data')
+      expect(body.data).toHaveLength(7)
     })
 
     it('should return a 500 error if a database error occurs', async () => {
@@ -68,6 +69,21 @@ describe('UsersController', () => {
 
       const body: GetAllUsersResponse = response.body
       expect(body.data).toBe(undefined)
+    })
+  })
+
+  describe('GET /users/admin', () => {
+    it('should return a list of admin users', async () => {
+      const response = await request(app)
+        .get('/users/admin')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(response.status).toBe(200)
+
+      const body: GetAllUsersResponse = response.body
+      expect(body.data).toHaveLength(3)
+      body.data.map((user) => {
+        expect(user.role).not.toEqual('Participant')
+      })
     })
   })
 
