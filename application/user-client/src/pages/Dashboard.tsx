@@ -65,10 +65,14 @@ export default function Dashboard() {
       // Create a blob from the PDF document
       const blob = await pdf(pdfDoc).toBlob()
 
+      // Format datetime for appending to filename. Ugly code but avoids adding another dependency
+      const now = new Date()
+      const formattedDatetime = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}`
+
       // Trigger download
       const link = document.createElement('a')
       link.href = URL.createObjectURL(blob)
-      link.download = `CTRL-responses-${profileData!.data.firstName}_${profileData!.data.lastName}.pdf`
+      link.download = `CTRL-responses-${profileData!.data.firstName}_${profileData!.data.lastName}_${formattedDatetime}.pdf`
       link.click()
     } catch (err) {
       setPdfError(err instanceof Error ? err.message : 'Failed to generate PDF')

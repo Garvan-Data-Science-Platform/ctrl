@@ -3,8 +3,6 @@ import { GetParticipantProfileResponse } from '@common/types/api/users'
 import { GetResponsesByIdResponse } from '@common/types/api/surveys'
 import { SurveyElement } from '@common/types/survey'
 
-// TODO pagination
-
 // Define styles
 const styles = StyleSheet.create({
   page: {
@@ -13,7 +11,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    marginBottom: 20,
+    marginBottom: 10,
     fontWeight: 'bold',
   },
   section: {
@@ -63,13 +61,20 @@ const styles = StyleSheet.create({
     borderColor: '#bfbfbf',
     width: '20%',
   },
+  tableSubheadingCell: {
+    fontWeight: 'bold',
+    padding: 5,
+    borderWidth: 1,
+    borderColor: '#bfbfbf',
+    width: '100%',
+  },
 })
 
 // Take a response question type and format a table row accordingly
 const FormatResponseElement = (element: SurveyElement) => {
   if (element.type === 'question-checkbox') {
     return (
-      <View style={styles.tableRow}>
+      <View style={styles.tableRow} wrap={false}>
         <Text style={styles.tableQuestionCell}>{element.data.text}</Text>
         <Text style={styles.tableResponseCell}>
           {element.data.value == null ? 'Not answered' : element.data.value ? 'Yes' : 'No'}
@@ -78,7 +83,7 @@ const FormatResponseElement = (element: SurveyElement) => {
     )
   } else if (element.type === 'question-choices') {
     return (
-      <View style={styles.tableRow}>
+      <View style={styles.tableRow} wrap={false}>
         <Text style={styles.tableQuestionCell}>{element.data.text}</Text>
         <Text style={styles.tableResponseCell}>
           {element.data.value == null ? 'Not answered' : element.data.value}
@@ -87,13 +92,13 @@ const FormatResponseElement = (element: SurveyElement) => {
     )
   } else if (element.type === 'subheading') {
     return (
-      <View style={styles.tableRow}>
-        <Text>{element.data.text}</Text>
+      <View style={styles.tableRow} wrap={false}>
+        <Text style={styles.tableSubheadingCell}>{element.data.text}</Text>
       </View>
     )
   } else if (element.type === 'video') {
     return (
-      <View style={styles.tableRow}>
+      <View style={styles.tableRow} wrap={false}>
         <Text>Video content</Text>
       </View>
     )
@@ -114,6 +119,18 @@ const ResponsesPdf = ({ profile, responses }: ResponsesPdfProps) => (
       <Text style={styles.title}>
         Responses for {profile.data.firstName} {profile.data.lastName}
       </Text>
+      <View style={styles.profileSection}>
+        <Text style={styles.footer}>
+          Printed on:{' '}
+          {new Date().toLocaleDateString('en-GB', {
+            hour: 'numeric',
+            minute: '2-digit',
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+          })}
+        </Text>
+      </View>
       /* Profile Section */
       <View style={styles.profileSection}>
         <Text style={styles.subtitle}>Participant Information</Text>
