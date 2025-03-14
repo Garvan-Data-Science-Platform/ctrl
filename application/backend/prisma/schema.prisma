@@ -116,7 +116,7 @@ model SurveyVersion {
   status             SurveyVersionStatus @default(DRAFT)
   surveyParticipants SurveyParticipant[]
   study              Study               @relation(fields: [studyId], references: [id], onDelete: Cascade)
-  studyId            Int                 
+  studyId            Int                 @default(1)
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
 }
