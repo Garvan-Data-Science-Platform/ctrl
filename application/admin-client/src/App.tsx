@@ -94,7 +94,7 @@ function App() {
                 ]}
                 options={{
                   syncWithLocation: true,
-                  warnWhenUnsavedChanges: true,
+                  warnWhenUnsavedChanges: false,
                   useNewQueryKeys: true,
                   projectId: 'UqrerM-EBDoyv-UEni4Y',
                   reactQuery: {

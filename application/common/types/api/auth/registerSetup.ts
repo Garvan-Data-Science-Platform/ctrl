@@ -1,4 +1,3 @@
-import { Role } from '@prisma/client'
 /**
  * @example {
  *  "email": "john.doe@email.com",

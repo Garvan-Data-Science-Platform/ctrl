@@ -1,6 +1,8 @@
+import { RegisterParticipantResponse } from '@common/types/api/auth'
 import { Alert, Box, Button, Card, Container, TextField, Typography } from '@mui/material'
-import { AuthPage } from '@refinedev/mui'
+import { useLogin } from '@refinedev/core'
 import { useForm } from 'react-hook-form'
+import { checkPasswordStrength } from '@common/src/PasswordStrength'
 
 export const SetupPage = () => {
   const {
@@ -10,8 +12,37 @@ export const SetupPage = () => {
     formState: { errors },
   } = useForm()
 
+  type LoginVariables = {
+    username: string
+    password: string
+  }
+
+  const { mutate: login } = useLogin<LoginVariables>()
+
   const onSubmit = (data: any) => {
-    console.log('SUBMITTED', data)
+    fetch(import.meta.env.VITE_BACKEND_URL + '/auth/register/setup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+      .then((res) => {
+        if (res.ok) {
+          res.json().then((rdata: RegisterParticipantResponse) => {
+            console.log('OK')
+            if (!rdata.token) throw new Error('No token provided')
+            login(data)
+          })
+        } else {
+          res.json().then((data) => {
+            setError('root.serverError', {
+              message: `Error Registering: ${data.message} ${data.details}`,
+            })
+          })
+        }
+      })
+      .catch((e) => {
+        setError('root.serverError', { message: `Error Registering In: ${e}` })
+      })
   }
   return (
     <Container>
@@ -37,23 +68,37 @@ export const SetupPage = () => {
               type="email"
               fullWidth
               label="Email"
-              data-cy="login-email"
+              data-cy="setup-email"
               {...register('email', {
                 required: true,
+                pattern: {
+                  value: /\S+@\S+\.\S+/,
+                  message: 'Entered a valid email',
+                },
               })}
             />
             <TextField
               type="password"
               fullWidth
               label="Password"
-              data-cy="login-password"
-              {...register('password', { required: true })}
+              data-cy="setup-password"
+              error={Boolean(errors.password)}
+              helperText={errors.password?.message as any}
+              {...register('password', {
+                required: true,
+                validate: (val) => {
+                  const { isValid, fields } = checkPasswordStrength(val)
+                  if (!isValid) {
+                    return `Invalid password. ${Object.values(fields).map((f) => ' ' + f.message)}`
+                  }
+                },
+              })}
             />
             {errors.root ? (
               <Alert severity="error">{errors.root?.serverError?.message}</Alert>
             ) : null}
           </Box>
-          <Button fullWidth data-cy="login" variant="contained" sx={{ mt: 3 }} type="submit">
+          <Button fullWidth data-cy="setup-submit" variant="contained" sx={{ mt: 3 }} type="submit">
             Register Admin
           </Button>
         </form>

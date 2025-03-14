@@ -58,8 +58,9 @@ export class SurveysController extends Controller {
       orderBy: [{ id: 'desc' }],
     })
     if (surveys.length == 0) {
+      const study = await prisma.study.create({})
       const initial_survey = await this.surveyRepo.create({
-        data: { versionNumber: 1, data: [], status: 'DRAFT' },
+        data: { versionNumber: 1, data: [], status: 'DRAFT', studyId: study.id },
       })
       surveys.push(initial_survey)
     }
