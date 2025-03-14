@@ -1,16 +1,14 @@
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
 import { GetParticipantProfileResponse } from '@common/types/api/users'
 import { GetResponsesByIdResponse } from '@common/types/api/surveys'
+import { SurveyElement } from '@common/types/survey'
 
-// TODO handle different question types (e.g. video link)
 // TODO pagination
-// TODO handle different response types (e.g. checkbox vs multichoice)
-// TODO handle null responses
 
 // Define styles
 const styles = StyleSheet.create({
   page: {
-    padding: 30,
+    padding: 20,
     backgroundColor: '#ffffff',
   },
   title: {
@@ -20,18 +18,22 @@ const styles = StyleSheet.create({
   },
   section: {
     margin: 10,
-    padding: 10,
+    padding: 5,
     flexGrow: 1,
   },
   profileSection: {
     fontSize: 12,
-    marginBottom: 20,
-    padding: 10,
+    marginBottom: 10,
+    padding: 5,
     borderBottom: '1pt solid #ccc',
   },
   subtitle: {
     fontSize: 16,
     marginBottom: 10,
+    fontWeight: 'bold',
+  },
+  footer: {
+    fontSize: 12,
     fontWeight: 'bold',
   },
   table: {
@@ -49,13 +51,56 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
     fontWeight: 'bold',
   },
-  tableCell: {
+  tableQuestionCell: {
     padding: 5,
     borderWidth: 1,
     borderColor: '#bfbfbf',
-    flex: 1,
+    width: '80%',
+  },
+  tableResponseCell: {
+    padding: 5,
+    borderWidth: 1,
+    borderColor: '#bfbfbf',
+    width: '20%',
   },
 })
+
+// Take a response question type and format a table row accordingly
+const FormatResponseElement = (element: SurveyElement) => {
+  if (element.type === 'question-checkbox') {
+    return (
+      <View style={styles.tableRow}>
+        <Text style={styles.tableQuestionCell}>{element.data.text}</Text>
+        <Text style={styles.tableResponseCell}>
+          {element.data.value == null ? 'Not answered' : element.data.value ? 'Yes' : 'No'}
+        </Text>
+      </View>
+    )
+  } else if (element.type === 'question-choices') {
+    return (
+      <View style={styles.tableRow}>
+        <Text style={styles.tableQuestionCell}>{element.data.text}</Text>
+        <Text style={styles.tableResponseCell}>
+          {element.data.value == null ? 'Not answered' : element.data.value}
+        </Text>
+      </View>
+    )
+  } else if (element.type === 'subheading') {
+    return (
+      <View style={styles.tableRow}>
+        <Text>{element.data.text}</Text>
+      </View>
+    )
+  } else if (element.type === 'video') {
+    return (
+      <View style={styles.tableRow}>
+        <Text>Video content</Text>
+      </View>
+    )
+  } else {
+    return null
+  }
+}
 
 interface ResponsesPdfProps {
   profile: GetParticipantProfileResponse
@@ -102,18 +147,12 @@ const ResponsesPdf = ({ profile, responses }: ResponsesPdfProps) => (
           <Text style={styles.subtitle}>{page.title}</Text>
           <View style={styles.table}>
             <View style={[styles.tableRow, styles.tableHeader]}>
-              <Text style={styles.tableCell}>Question text</Text>
-              <Text style={styles.tableCell}>Response</Text>
+              <Text style={styles.tableQuestionCell}>Question text</Text>
+              <Text style={styles.tableResponseCell}>Response</Text>
             </View>
-            {page.elements.map((item) => (
-              // <View style={styles.tableRow} key={item.id}>
-              <View style={styles.tableRow}>
-                <Text style={styles.tableCell}>{item.data.text}</Text>
-                <Text style={styles.tableCell}>{item.data.value ? 'Yes' : 'No'}</Text>
-              </View>
-            ))}
+            {page.elements.map((item) => FormatResponseElement(item))}
           </View>
-          <Text style={styles.subtitle}>
+          <Text style={styles.footer}>
             {page.last_updated
               ? `Reviewed on ${new Date(page.last_updated).toLocaleDateString('en-GB', {
                   day: 'numeric',
