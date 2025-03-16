@@ -28,7 +28,6 @@ export const SetupPage = () => {
       .then((res) => {
         if (res.ok) {
           res.json().then((rdata: RegisterParticipantResponse) => {
-            console.log('OK')
             if (!rdata.token) throw new Error('No token provided')
             login(data)
           })
@@ -65,15 +64,16 @@ export const SetupPage = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: 320 }}>
             <TextField
-              type="email"
               fullWidth
               label="Email"
               data-cy="setup-email"
+              error={Boolean(errors.email)}
+              helperText={errors.email?.message as any}
               {...register('email', {
                 required: true,
                 pattern: {
                   value: /\S+@\S+\.\S+/,
-                  message: 'Entered a valid email',
+                  message: 'Enter a valid email',
                 },
               })}
             />
