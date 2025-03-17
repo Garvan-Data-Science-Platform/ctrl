@@ -34,7 +34,7 @@ export function InviteModal({ onSend, onCancel }: InviteModalProps) {
     }
   }
   const validateEmail = (email: string) => {
-    const r = new RegExp(/\S+@\S+\.\S+/)
+    const r = new RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
     return r.test(email)
   }
 

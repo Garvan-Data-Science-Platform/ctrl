@@ -72,7 +72,7 @@ export const SetupPage = () => {
               {...register('email', {
                 required: true,
                 pattern: {
-                  value: /\S+@\S+\.\S+/,
+                  value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
                   message: 'Enter a valid email',
                 },
               })}

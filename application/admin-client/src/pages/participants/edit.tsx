@@ -66,7 +66,7 @@ export const ParticipantEdit = () => {
           {...register('email', {
             required: 'This field is required',
             pattern: {
-              value: /\S+@\S+\.\S+/,
+              value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
               message: 'Invalid email',
             },
           })}
@@ -240,7 +240,7 @@ export const ParticipantEdit = () => {
           {...register('nextOfKin.email', {
             required: 'This field is required',
             pattern: {
-              value: /\S+@\S+\.\S+/,
+              value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
               message: 'Invalid email',
             },
           })}
