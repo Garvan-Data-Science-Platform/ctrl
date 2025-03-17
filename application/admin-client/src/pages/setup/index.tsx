@@ -72,7 +72,7 @@ export const SetupPage = () => {
               {...register('email', {
                 required: true,
                 pattern: {
-                  value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
+                  value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, //eslint-disable-line
                   message: 'Enter a valid email',
                 },
               })}
