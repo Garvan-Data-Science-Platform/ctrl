@@ -144,7 +144,7 @@ export default function ProfileEdit() {
                     required: true,
                     value: data?.email,
                     pattern: {
-                      value: /\S+@\S+\.\S+/,
+                      value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, //eslint-disable-line
                       message: 'Entered a valid email',
                     },
                   })}

@@ -32,6 +32,7 @@ import { ParticipantList, ParticipantShow } from './pages/participants'
 import { ResponsesView } from './pages/responses'
 import { ListAlt, Person, RecentActors } from '@mui/icons-material'
 import { ParticipantEdit } from './pages/participants/edit'
+import { SetupPage } from './pages/setup'
 
 function App() {
   return (
@@ -96,7 +97,7 @@ function App() {
                 ]}
                 options={{
                   syncWithLocation: true,
-                  warnWhenUnsavedChanges: true,
+                  warnWhenUnsavedChanges: false,
                   useNewQueryKeys: true,
                   projectId: 'UqrerM-EBDoyv-UEni4Y',
                   reactQuery: {
@@ -134,6 +135,7 @@ function App() {
                     }
                   >
                     <Route index element={<NavigateToResource resource="users" />} />
+
                     <Route path="/users">
                       <Route index element={<UserList />} />
                       <Route path="create" element={<UserCreate />} />
@@ -161,6 +163,7 @@ function App() {
                     }
                   >
                     <Route path="/login" element={<Login />} />
+                    <Route path="/setup" element={<SetupPage />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/forgot-password" element={<ForgotPassword />} />
                   </Route>

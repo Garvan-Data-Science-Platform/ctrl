@@ -169,7 +169,7 @@ export function ErrorHandler(
   if (err instanceof Error) {
     const error: InternalErrorResponse = {
       message: 'Internal Server Error',
-      details: err,
+      details: err.message,
     }
 
     logger.error({ ...error })

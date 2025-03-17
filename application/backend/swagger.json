@@ -1401,6 +1401,24 @@
           "role": "OrganisationAdmin"
         }
       },
+      "RegisterSetupRequest": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "pattern": "^(.+)@(.+)$"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
       "RegisterParticipantResponse": {
         "properties": {
           "id": {
@@ -4002,6 +4020,112 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/setup": {
+      "get": {
+        "operationId": "CheckSetup",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "isSetup": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "isSetup"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Check setup",
+        "summary": "Check if CTRL is setup",
+        "tags": [
+          "Auth"
+        ],
+        "security": [],
+        "parameters": []
+      }
+    },
+    "/auth/register/setup": {
+      "post": {
+        "operationId": "RegisterInitialUser",
+        "responses": {
+          "201": {
+            "description": "User Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "register admin",
+        "summary": "Register initial admin user",
+        "tags": [
+          "Auth"
+        ],
+        "security": [],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterSetupRequest"
               }
             }
           }

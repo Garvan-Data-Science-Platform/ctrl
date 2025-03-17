@@ -10,7 +10,7 @@ import type {
 } from 'common/types/api/auth'
 import prisma from '../PrismaClient'
 import { Role } from '@prisma/client'
-import { resetDB } from 'common/testing/TestHelpers'
+import { resetDB, wipeDB } from 'common/testing/TestHelpers'
 import {
   ContactMethod,
   ParticipantType,
@@ -210,6 +210,25 @@ describe('AuthController', () => {
         Uppercase: { message: 'Password must contain at least one uppercase letter' },
         Number: { message: 'Password must contain at least one number' },
       })
+    })
+  })
+
+  describe('POST /auth/register/setup', () => {
+    it('Should allow setup registration when db has been wiped', async () => {
+      await wipeDB()
+      const res = await request(app)
+        .post('/auth/register/setup')
+        .send({ email: 'testadmin@test.com', password: 'abDFS141@!' })
+      expect(res.status).toEqual(201)
+      const user = await prisma.user.findFirst({ where: { email: 'testadmin@test.com' } })
+      expect(user).not.toBeNull()
+    })
+    it('Should not allow setup registration when a user exists', async () => {
+      await resetDB()
+      const res = await request(app)
+        .post('/auth/register/setup')
+        .send({ email: 'testadmin@test.com', password: 'abDFS141@!' })
+      expect(res.ok).toBe(false)
     })
   })
 
