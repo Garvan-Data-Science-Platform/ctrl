@@ -14,7 +14,6 @@ import {
 } from '@mui/material'
 import { useState } from 'react'
 import { axiosInstance } from '../../providers/dataProvider'
-import { API_URL } from '../../App'
 import { Close, ArrowBack } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
@@ -83,7 +82,7 @@ export const SurveyImport = () => {
     formData.append('file', file)
 
     axiosInstance
-      .post(`${API_URL}/integrations/redcap/instrument/upload/csv`, formData, {
+      .post('/integrations/redcap/instrument/upload/csv', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -112,7 +111,7 @@ export const SurveyImport = () => {
     }
 
     axiosInstance
-      .post(`${API_URL}/integrations/redcap/instrument/upload/api`, {
+      .post('/integrations/redcap/instrument/upload/api', {
         formName,
         redcapAPIToken,
       })
