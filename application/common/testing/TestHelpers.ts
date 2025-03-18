@@ -58,4 +58,19 @@ export async function wipeDB() {
     prisma.$disconnect()
     throw error
   }
+
+export async function readDir(directory: string) {
+  const fs = await import('fs')
+  return fs.readdirSync(directory)
+}
+
+export async function getLatestFile(files: string[]) {
+  const fs = await import('fs')
+  const path = await import('path')
+  return files
+    .map((file) => ({
+      file,
+      time: fs.statSync(path.join('cypress/downloads/', file)).mtime.getTime(),
+    }))
+    .sort((a, b) => b.time - a.time)[0]?.file
 }
