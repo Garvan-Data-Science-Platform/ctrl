@@ -11,7 +11,7 @@ export interface UploadRedcapInstrumentAPIRequest {
   /**
    * @minLength 1
    */
-  redcapAPIKey?: string // specify the redcapAPIKey to access the redcap api
+  redcapAPIToken?: string // specify the redcapAPIToken to access the redcap api
 }
 
 export interface UploadRedcapInstrumentResponse {

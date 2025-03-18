@@ -61,9 +61,9 @@ export class IntegrationsController extends Controller {
   public async uploadRedcapParticipantAPI(
     @Body() bodyRequest: UploadRedcapParticipantAPIRequest,
   ): Promise<UploadRedcapParticipantResponse> {
-    const { formName, redcapAPIKey } = bodyRequest
+    const { formName, redcapAPIToken } = bodyRequest
     const params = new URLSearchParams()
-    params.append('token', redcapAPIKey || (process.env.REDCAP_API_KEY as string))
+    params.append('token', redcapAPIToken || (process.env.REDCAP_API_TOKEN as string))
     params.append('content', 'record')
     params.append('format', 'json')
     /**
@@ -124,9 +124,9 @@ export class IntegrationsController extends Controller {
   public async uploadRedcapInstrumentAPI(
     @Body() bodyRequest: UploadRedcapInstrumentAPIRequest,
   ): Promise<UploadRedcapInstrumentResponse> {
-    const { formName, redcapAPIKey } = bodyRequest
+    const { formName, redcapAPIToken } = bodyRequest
     const params = new URLSearchParams()
-    params.append('token', redcapAPIKey || (process.env.REDCAP_API_KEY as string))
+    params.append('token', redcapAPIToken || (process.env.REDCAP_API_TOKEN as string))
     params.append('content', 'metadata')
     params.append('format', 'json')
 

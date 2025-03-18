@@ -55,7 +55,7 @@ export const SurveyImport = () => {
   // States
   const [file, setFile] = useState<File | null>(null)
   const [formName, setFormName] = useState<string>('')
-  const [redcapAPIKey, setRedcapAPIKey] = useState<string>('')
+  const [redcapAPIToken, setRedcapAPIToken] = useState<string>('')
   const [openHelpPage, setHelpPageOpen] = useState(false)
   const [confirmFileDialogOpen, setConfirmFileDialogOpen] = useState(false)
   const [confirmApiDialogOpen, setConfirmApiDialogOpen] = useState(false)
@@ -106,15 +106,15 @@ export const SurveyImport = () => {
     if (!formName) {
       open?.({ type: 'error', message: 'Please enter a form to pull from REDCap' })
       return
-    } else if (!redcapAPIKey) {
-      open?.({ type: 'error', message: 'Please enter a REDCap API key' })
+    } else if (!redcapAPIToken) {
+      open?.({ type: 'error', message: 'Please enter a REDCap API Token' })
       return
     }
 
     axiosInstance
       .post(`${API_URL}/integrations/redcap/instrument/upload/api`, {
         formName,
-        redcapAPIKey,
+        redcapAPIToken,
       })
       .then((response) => {
         const data = response.data
@@ -253,13 +253,13 @@ export const SurveyImport = () => {
               Import from REDCap API
             </Typography>
             <TextField
-              label="REDCap API Key"
+              label="REDCap API Token"
               variant="outlined"
-              value={redcapAPIKey}
-              onChange={(e) => setRedcapAPIKey(e.target.value)}
+              value={redcapAPIToken}
+              onChange={(e) => setRedcapAPIToken(e.target.value)}
               sx={{ mb: 2 }}
               type="password"
-              data-cy="redcapAPIKey"
+              data-cy="redcapAPIToken"
             />
             <TextField
               label="Form Name"
@@ -273,7 +273,7 @@ export const SurveyImport = () => {
               variant="contained"
               color="primary"
               onClick={handleApiDialogOpen}
-              disabled={!formName || !redcapAPIKey}
+              disabled={!formName || !redcapAPIToken}
               data-cy="apiSubmit"
             >
               Import from API
