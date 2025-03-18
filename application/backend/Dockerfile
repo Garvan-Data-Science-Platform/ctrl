@@ -24,7 +24,7 @@ COPY application/integrations application/integrations
 
 RUN yarn workspace backend build 
 RUN yarn workspace backend tsoa:spec
-RUN yarn workspace backend prisma:generate
+RUN yarn workspace backend prisma:migrate && yarn workspace backend prisma:generate
 
 
 #ENTRYPOINT ["tail", "-f", "/dev/null"]
