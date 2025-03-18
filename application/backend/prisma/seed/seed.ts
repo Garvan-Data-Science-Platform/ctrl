@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import { hashPassword } from '../../src/authentication'
 import { SurveyStep } from '../../../common/types/survey'
+import { createDefaultAnswers } from '../../src/utils/answers'
 
 const prisma = new PrismaClient()
 
@@ -208,13 +209,7 @@ const main = async () => {
             surveys: {
               create: {
                 versionId: 1,
-                answers: [
-                  { status: 'review_required', answers: [] },
-                  { status: 'review_required', answers: [] },
-                  { status: 'review_required', answers: [] },
-                  { status: 'review_required', answers: [] },
-                  { status: 'review_required', answers: [] },
-                ],
+                answers: createDefaultAnswers(SeedSurveyStepData),
               },
             },
           },
