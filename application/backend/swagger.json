@@ -1587,7 +1587,7 @@
             "type": "string",
             "minLength": 1
           },
-          "redcapAPIKey": {
+          "redcapAPIToken": {
             "type": "string",
             "minLength": 1
           }
@@ -1618,7 +1618,7 @@
             "type": "string",
             "minLength": 1
           },
-          "redcapAPIKey": {
+          "redcapAPIToken": {
             "type": "string",
             "minLength": 1
           }
