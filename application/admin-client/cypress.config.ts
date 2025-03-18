@@ -1,4 +1,4 @@
-import { partiallyCompleteSurvey, resetDB } from 'common/testing/TestHelpers'
+import { partiallyCompleteSurvey, resetDB, wipeDB } from 'common/testing/TestHelpers'
 import { defineConfig } from 'cypress'
 
 export default defineConfig({
@@ -15,6 +15,9 @@ export default defineConfig({
         },
         partialComplete() {
           return partiallyCompleteSurvey()
+        },
+        wipe() {
+          return wipeDB()
         },
       })
     },

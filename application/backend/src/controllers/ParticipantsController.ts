@@ -127,15 +127,15 @@ export class InvitesController extends Controller {
   invitesRepo = prisma.invite
 
   /**
-   * List all invites
+   * List all non-accepted invites
    *
-   * @summary List all invites
+   * @summary List all non-accepted invites
    */
   @Get('/')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
   public async getInvites(): Promise<GetInvitesResponse> {
-    const invites = await this.invitesRepo.findMany()
+    const invites = await this.invitesRepo.findMany({ where: { status: { not: 'ACCEPTED' } } })
 
     // Map to response
     const data = invites.map((invite) => ({
@@ -233,7 +233,29 @@ export class InvitesController extends Controller {
   }
 
   /**
-   * Resend pending invites
+   * Resend invite by ID
+   *
+   * @summary Resend invite
+   */
+  @Post('/resend/{inviteId}')
+  public async resendInviteById(@Path() inviteId: number): Promise<void> {
+    // Get all pending invitations
+
+    const pendingInvite = await this.invitesRepo.findUniqueOrThrow({
+      where: { id: inviteId, status: { not: 'ACCEPTED' } },
+      select: { email: true },
+    })
+
+    // Send emails
+    await this.sendInvites([pendingInvite.email])
+
+    await this.invitesRepo.update({
+      where: { id: inviteId },
+      data: { status: InviteStatus.PENDING },
+    })
+  }
+  /**
+   * Resend all pending invites
    *
    * @summary Resend invites that are currently pending
    */

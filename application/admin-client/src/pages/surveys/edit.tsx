@@ -24,7 +24,6 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import { SurveyElementCard, SurveyDropSpace } from '../../components/SurveyElementCard'
 import { useSurveyStore } from '../../surveyStore'
 import { axiosInstance } from '../../providers/dataProvider'
-import { API_URL } from '../../App'
 import { useResource, useShow, useUpdate, useNavigation, useNotification } from '@refinedev/core'
 
 export const SurveyEditor = () => {
@@ -122,7 +121,7 @@ export const SurveyEditor = () => {
 
   const handlePublish = () => {
     axiosInstance
-      .post(`${API_URL}/surveys/publish/${id}`)
+      .post(`surveys/publish/${id}`)
       .then(() => {
         list('surveys')
       })

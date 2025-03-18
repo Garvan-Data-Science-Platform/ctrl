@@ -1,15 +1,25 @@
+import { GetUserByIdResponse } from '@common/types/api/users'
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import { useMany } from '@refinedev/core'
 import { DateField, DeleteButton, EditButton, List, ShowButton, useDataGrid } from '@refinedev/mui'
 import React from 'react'
 
+export const roleMap: { [r in GetUserByIdResponse['data']['role']]: string } = {
+  OrganisationAdmin: 'Organisation Admin',
+  OperatorAdmin: 'Operator Admin',
+  Participant: 'Participant',
+}
+
 export const UserList = () => {
   const { dataGridProps } = useDataGrid({
+    resource: 'users/admin',
     syncWithLocation: true,
+    filters: { mode: 'off' },
+    sorters: { mode: 'off' },
   })
 
   const { data: userData } = useMany({
-    resource: 'users',
+    resource: 'users/admin',
     ids: dataGridProps?.rows?.map((item: any) => item?.user?.id).filter(Boolean) ?? [],
     queryOptions: {
       enabled: !!dataGridProps?.rows,
@@ -47,20 +57,28 @@ export const UserList = () => {
         flex: 1,
         headerName: 'Role',
         minWidth: 100,
+        renderCell: ({ value }) => roleMap[value as GetUserByIdResponse['data']['role']],
+        type: 'singleSelect',
+        valueOptions: Object.keys(roleMap),
       },
       {
         field: 'createdAt',
         flex: 1,
         headerName: 'Created at',
         minWidth: 100,
+        type: 'date',
+        valueGetter: (cell) => {
+          return new Date(cell.value)
+        },
         renderCell: function render({ value }) {
-          return <DateField value={value} />
+          return <DateField value={value} format="DD/MM/YYYY" />
         },
       },
       {
         field: 'actions',
         headerName: 'Actions',
         sortable: false,
+        disableColumnMenu: true,
         renderCell: function render({ row }) {
           return (
             <>

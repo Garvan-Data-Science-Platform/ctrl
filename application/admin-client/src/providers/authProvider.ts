@@ -74,7 +74,7 @@ export const authProvider: AuthProvider = {
     if (error?.status === 401) {
       return {
         logout: true,
-        error: { name: 'Auth error', message: error.message },
+        error: { name: 'Message', message: 'You have been logged out' },
       }
     }
 

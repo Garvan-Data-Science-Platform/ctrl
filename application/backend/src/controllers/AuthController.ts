@@ -7,8 +7,19 @@ import type {
   RegisterParticipantResponse,
   CreateParticipantResponse,
   CreateParticipantRequest,
+  RegisterSetupRequest,
 } from 'common/types/api/auth'
-import { Route, Tags, Controller, Body, Post, SuccessResponse, Response, ValidateError } from 'tsoa'
+import {
+  Route,
+  Tags,
+  Controller,
+  Body,
+  Post,
+  SuccessResponse,
+  Response,
+  ValidateError,
+  Get,
+} from 'tsoa'
 import prisma from '../PrismaClient'
 import logger from 'common/src/logger'
 import { checkPasswordStrength } from 'common/src/PasswordStrength'
@@ -65,6 +76,66 @@ export class AuthController extends Controller {
     }
 
     logger.info({ ...responseData })
+    return responseData
+  }
+
+  /**
+   * Check setup
+   *
+   * @summary Check if CTRL is setup
+   */
+  @Get('/setup')
+  public async checkSetup(): Promise<{ isSetup: boolean }> {
+    const existingUsers = await this.userRepo.count()
+    const isSetup = existingUsers != 0
+    return { isSetup }
+  }
+
+  /**
+   * register admin
+   *
+   * @summary Register initial admin user
+   */
+  @Post('/register/setup')
+  @SuccessResponse('201', 'User Created')
+  public async registerInitialUser(
+    @Body() bodyRequest: RegisterSetupRequest,
+  ): Promise<RegisterResponse> {
+    const { password, email } = bodyRequest
+
+    const { isValid, fields } = await checkPasswordStrength(password)
+
+    if (!isValid) {
+      throw new ValidateError(fields, 'Password does not meet strength requirements')
+    }
+
+    const existingUsers = await this.userRepo.count()
+    if (existingUsers > 0) {
+      throw new Error('CTRL is already set up')
+    }
+
+    const hashedPassword = await hashPassword(password)
+    const insertedUser: User = await this.userRepo.create({
+      data: {
+        email,
+        firstName: '',
+        lastName: '',
+        role: 'OrganisationAdmin',
+        password: hashedPassword,
+      },
+    })
+
+    const study = await prisma.study.create({})
+    await this.surveyRepo.create({
+      data: { data: [], versionNumber: 1, status: 'DRAFT', studyId: study.id },
+    })
+
+    const token = await generateToken({ userId: insertedUser.id, roles: [insertedUser.role] })
+
+    const responseData = {
+      token,
+    }
+
     return responseData
   }
 

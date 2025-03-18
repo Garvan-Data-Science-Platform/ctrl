@@ -147,7 +147,7 @@ export default function Register() {
                 {...register('email', {
                   required: 'This field is required',
                   pattern: {
-                    value: /\S+@\S+\.\S+/,
+                    value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, //eslint-disable-line
                     message: 'Entered a valid email',
                   },
                 })}

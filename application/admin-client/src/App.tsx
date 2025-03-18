@@ -33,8 +33,7 @@ import { SurveyImport, IntegrationsHome } from './pages/integrations'
 import { ResponsesView } from './pages/responses'
 import { ListAlt, Person, RecentActors, DatasetLinked } from '@mui/icons-material'
 import { ParticipantEdit } from './pages/participants/edit'
-
-export const API_URL = import.meta.env.VITE_BACKEND_URL
+import { SetupPage } from './pages/setup'
 
 function App() {
   return (
@@ -46,7 +45,7 @@ function App() {
           <RefineSnackbarProvider>
             <DevtoolsProvider>
               <Refine
-                dataProvider={dataProvider(API_URL)}
+                dataProvider={dataProvider()}
                 notificationProvider={notificationProvider}
                 routerProvider={routerBindings}
                 authProvider={authProvider}
@@ -62,6 +61,9 @@ function App() {
                       canDelete: true,
                       icon: <Person />,
                     },
+                  },
+                  {
+                    name: 'users/admin',
                   },
                   {
                     name: 'surveys',
@@ -105,9 +107,23 @@ function App() {
                 ]}
                 options={{
                   syncWithLocation: true,
-                  warnWhenUnsavedChanges: true,
+                  warnWhenUnsavedChanges: false,
                   useNewQueryKeys: true,
                   projectId: 'UqrerM-EBDoyv-UEni4Y',
+                  reactQuery: {
+                    clientConfig: {
+                      defaultOptions: {
+                        queries: {
+                          retry: (failureCount: number, error: any) => {
+                            if (error.status == 401) {
+                              return false
+                            }
+                            return failureCount < 3
+                          },
+                        },
+                      },
+                    },
+                  },
                 }}
               >
                 <Routes>
@@ -129,6 +145,7 @@ function App() {
                     }
                   >
                     <Route index element={<NavigateToResource resource="users" />} />
+
                     <Route path="/users">
                       <Route index element={<UserList />} />
                       <Route path="create" element={<UserCreate />} />
@@ -160,6 +177,7 @@ function App() {
                     }
                   >
                     <Route path="/login" element={<Login />} />
+                    <Route path="/setup" element={<SetupPage />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/forgot-password" element={<ForgotPassword />} />
                   </Route>
