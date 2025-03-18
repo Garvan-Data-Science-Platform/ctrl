@@ -4,6 +4,9 @@
 
 replicaCount: 1
 
+demoMode:
+  enabled: false
+
 auth:
   admin: #Default admin credentials
     email:
@@ -47,7 +50,7 @@ ingress:
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
-    - host: ctrldemo.dsp.garvan.org.au
+    - host: ctrlhost
       paths:
         - path: /api/
           pathType: Prefix
@@ -64,7 +67,7 @@ ingress:
               port:
                 number: 80
 
-    - host: admin.ctrldemo.dsp.garvan.org.au
+    - host: ctrladmin
       paths:
         - path: /
           pathType: Prefix

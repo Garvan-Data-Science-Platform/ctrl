@@ -1,0 +1,35 @@
+{{- if .Values.demoMode.enabled }}
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: demo-reset
+spec:
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: cron-backend
+            image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default .Chart.AppVersion }}"
+            imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+            env:
+              - name: POSTGRES_HOST
+                value: ctrl-postgresql
+              - name: HOSTNAME
+              {{ with index .Values.ingress.hosts 0 }}
+                value: {{ .host | quote }}
+              {{ end }}
+              - name: POSTGRES_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: ctrl-postgresql
+                    key: postgres-password
+            command:
+            - /bin/sh
+            - -c
+            - date; yarn prisma:wipe && yarn prisma:seed
+          restartPolicy: OnFailure
+
+{{- end }}

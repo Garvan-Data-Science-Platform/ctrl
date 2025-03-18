@@ -11,6 +11,7 @@
     "build-docs": "yarn run tsoa:routes && yarn run tsoa:spec && tsx scripts/replace-refs.ts",
     "prisma:generate": "yarn prisma generate",
     "prisma:seed": "yarn prisma db seed",
+    "prisma:wipe": "yarn ts-node scripts/runWipeDB.ts",
     "prisma:migrate": "yarn prisma migrate dev"
   },
   "prisma": {
