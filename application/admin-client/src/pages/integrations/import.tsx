@@ -89,7 +89,6 @@ export const SurveyImport = () => {
         },
       })
       .then(async (response) => {
-        console.log(response)
         const data = response.data
         invalidate({ resource: 'surveys', invalidates: ['resourceAll'] })
         navigate(`/surveys/edit/${data.id}`)
