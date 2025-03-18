@@ -50,7 +50,8 @@ ingress:
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
-    - host: ctrlhost
+    userClient:
+      hostname: ctrlhost
       paths:
         - path: /api/
           pathType: Prefix
@@ -67,7 +68,8 @@ ingress:
               port:
                 number: 80
 
-    - host: ctrladmin
+    adminClient:
+      hostname: ctrladmin
       paths:
         - path: /
           pathType: Prefix
