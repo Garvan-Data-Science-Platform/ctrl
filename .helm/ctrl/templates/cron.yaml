@@ -25,6 +25,10 @@ spec:
                 value: admin@example.com
               - name: EXAMPLE_ADMIN_PASSWORD
                 value: Testpassword1
+              - name: EXAMPLE_PARTICIPANT_EMAIL
+                value: user@example.com
+              - name: EXAMPLE_PARTICIPANT_PASSWORD
+                value: Testpassword2
               - name: POSTGRES_PASSWORD
                 valueFrom:
                   secretKeyRef:
