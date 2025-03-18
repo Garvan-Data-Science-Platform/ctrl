@@ -1,5 +1,6 @@
 #! /bin/bash
 set -e
+yarn workspace backend prisma:generate
 
 yarn workspace backend prisma migrate deploy
 
