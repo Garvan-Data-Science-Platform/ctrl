@@ -55,7 +55,7 @@ export default function Dashboard() {
         queryKey: ['surveys', 'get', profileData.data.id],
         queryFn: () =>
           apiClient
-            .get(`/surveys/responses/${profileData.data.id}`)
+            .get(`/surveys/responses/current`)
             .then((res) => res.data) as Promise<GetResponsesByIdResponse>,
       })
 
@@ -75,7 +75,7 @@ export default function Dashboard() {
       link.download = `CTRL-responses-${profileData!.data.firstName}_${profileData!.data.lastName}_${formattedDatetime}.pdf`
       link.click()
     } catch (err) {
-      setPdfError(err instanceof Error ? err.message : 'Failed to generate PDF')
+      // setPdfError(err instanceof Error ? err.message : 'Failed to generate PDF')
     } finally {
       setIsLoading(false)
     }
@@ -214,6 +214,7 @@ export default function Dashboard() {
           <Button
             variant="contained"
             sx={{ mt: 3 }}
+            data-cy={`view-pdf`}
             onClick={() => profileData && handleClick(profileData as GetParticipantProfileResponse)}
             disabled={isLoading || !!error}
           >
