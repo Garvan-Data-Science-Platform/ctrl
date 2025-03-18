@@ -265,7 +265,7 @@ describe('IntegrationsController', () => {
     it('should create a survey when given a form using the redcap api', async () => {
       const response = await request(app)
         .post('/integrations/redcap/instrument/upload/api')
-        .send({ form: 'ctrl_test_2', redcapAPIToken: REDCAP_API_TOKEN })
+        .send({ formName: 'ctrl_test_2', redcapAPIToken: REDCAP_API_TOKEN })
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(201)
       const survey = await prisma.surveyVersion.findFirst({ where: { id: 2 } })
