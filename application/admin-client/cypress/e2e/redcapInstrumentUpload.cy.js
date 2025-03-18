@@ -5,8 +5,8 @@ const { UserType } = require('../support/commands')
 beforeEach(() => {
   cy.task('reset')
   cy.login(UserType.ADMIN)
-  cy.visit('/surveys/edit/2')
-  cy.contains('Import REDCap Instrument').should('exist').click()
+  cy.visit('/integrations')
+  cy.contains('Import Instrument').should('exist').click()
 })
 
 describe('REDCap Instrument Upload', () => {
@@ -24,73 +24,157 @@ describe('REDCap Instrument Upload', () => {
 
     it('should have upload button and API form', () => {
       cy.contains('UPLOAD FILE').should('be.visible')
-      cy.get('input[type="text"]').should('be.visible')
+      cy.get('[data-cy="formName"]').should('be.visible')
       cy.contains('button', 'Import from API').should('be.visible')
     })
 
     it('should handle file upload', () => {
-      const fileName = 'test_instrument.csv'
-      cy.contains('Download').should('not.exist')
-      cy.contains('Remove').should('not.exist')
-      cy.get('input[type="file"]').attachFile(fileName)
-      cy.contains(fileName).should('be.visible')
-      cy.contains('Remove').should('be.visible')
-      cy.contains('Download').should('be.visible')
-    })
+      const fileName0 = 'test_instrument0.csv'
+      cy.get('Confirm').should('not.exist')
+      cy.get('[data-cy="instrumentAttach"]').attachFile(fileName0)
+      cy.get('Confirm').should('not.exist')
+      cy.contains(fileName0).should('be.visible')
 
-    it('should remove uploaded file', () => {
-      const fileName = 'test_instrument.csv'
-      cy.get('input[type="file"]').attachFile(fileName)
-      cy.contains('Remove').click()
-      cy.contains(fileName).should('not.exist')
-    })
-
-    it('should show error when submitting without file', () => {
-      cy.contains('button', 'Save as Draft').click()
-      cy.on('window:alert', (text) => {
-        expect(text).to.equal('Please upload a file before submitting.')
-      })
+      //
+      const fileName1 = 'test_instrument1.csv'
+      cy.get('[data-cy="instrumentAttach"]').attachFile(fileName1)
+      cy.get('Confirm').should('not.exist')
+      cy.contains(fileName1).should('be.visible')
     })
 
     it('should handle successful file upload submission', () => {
-      const fileName = 'test_instrument.csv'
-      cy.get('input[type="file"]').attachFile(fileName)
+      // Check current draft metadata
+      let initialDraft
+      let updatedDraft
+      cy.request({
+        method: 'GET',
+        url: 'http://localhost:5001/surveys',
+        headers: {
+          Authorization: `Bearer ${window.localStorage.getItem('refine-auth')}`,
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(200)
+        initialDraft = response.body.data[0]
+        cy.wrap(initialDraft).as('initialDraft')
+      })
 
+      const fileName = 'test_instrument0.csv'
+      cy.get('[data-cy="instrumentAttach"]').attachFile(fileName)
+
+      // Click the initial confirm button
+      cy.contains('button', 'Confirm').click()
+
+      // Verify dialog content
+      cy.get('[data-cy="confirmDialog"]').should('be.visible')
+      cy.contains('Warning: This action will overwrite the current draft survey').should(
+        'be.visible',
+      )
+      cy.contains(`The imported data from "${fileName}" will replace any existing content`).should(
+        'be.visible',
+      )
+
+      // Click the confirmation button in dialog
+      cy.contains('button', 'Yes, Overwrite').click()
+
+      // Intercept the upload request
       cy.intercept('POST', '**/integrations/redcap/instrument/upload/csv', {
         statusCode: 200,
-        body: { id: '123' },
       }).as('uploadFile')
 
-      cy.contains('button', 'Save as Draft').click()
-      cy.wait('@uploadFile')
-      cy.url().should('include', '/surveys/edit/123')
-    })
+      cy.url().should('include', '/surveys/edit/')
 
-    it('should handle empty form submission', () => {
-      cy.contains('button', 'Import from API').click()
-      cy.on('window:alert', (text) => {
-        expect(text).to.equal('Please enter a form to pull from REDCap')
+      // Check updated draft metadata
+      cy.request({
+        method: 'GET',
+        url: 'http://localhost:5001/surveys',
+        headers: {
+          Authorization: `Bearer ${window.localStorage.getItem('refine-auth')}`,
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(200)
+        updatedDraft = response.body.data[0]
+        cy.wrap(updatedDraft).as('updatedDraft')
+      })
+
+      // Check that the survey has been updated
+      cy.get('@initialDraft').then((initialDraft) => {
+        cy.get('@updatedDraft').then((updatedDraft) => {
+          expect(initialDraft.id).to.eq(updatedDraft.id)
+          expect(new Date(initialDraft.updatedAt)).to.be.lessThan(new Date(updatedDraft.updatedAt))
+        })
       })
     })
 
     it('should handle successful API import', () => {
-      cy.get('input[type="text"]').type('test_form')
+      // Check current draft metadata
+      let initialDraft
+      let updatedDraft
+      cy.request({
+        method: 'GET',
+        url: 'http://localhost:5001/surveys',
+        headers: {
+          Authorization: `Bearer ${window.localStorage.getItem('refine-auth')}`,
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(200)
+        initialDraft = response.body.data[0]
+        cy.wrap(initialDraft).as('initialDraft')
+      })
+
+      const formName = 'test_form'
+      cy.get('[data-cy="redcapAPIKey"]').should('be.visible').type(Cypress.env('REDCAP_API_KEY'))
+      cy.get('[data-cy="apiSubmit"]').should('be.visible').should('be.disabled')
+      cy.get('[data-cy="formName"]').should('be.visible').type(formName)
+      cy.get('[data-cy="apiSubmit"]').should('be.visible').should('be.enabled')
+
+      cy.contains('button', 'Import from API').click()
+
+      // Verify dialog content
+      cy.get('[data-cy="confirmDialog"]').should('be.visible')
+      cy.contains('Warning: This action will overwrite the current draft survey').should(
+        'be.visible',
+      )
+      cy.contains(`The imported data from "${formName}" will replace any existing content`).should(
+        'be.visible',
+      )
+
+      // Click the confirmation button in dialog
+      cy.contains('button', 'Yes, Overwrite').click()
 
       cy.intercept('POST', '**/integrations/redcap/instrument/upload/api', {
         statusCode: 200,
-        body: { id: '456' },
-      }).as('apiImport')
+      })
 
-      cy.contains('button', 'Import from API').click()
-      cy.wait('@apiImport')
-      cy.url().should('include', '/surveys/edit/456')
+      cy.url().should('include', '/surveys/edit/')
+
+      // Check updated draft metadata
+      cy.request({
+        method: 'GET',
+        url: 'http://localhost:5001/surveys',
+        headers: {
+          Authorization: `Bearer ${window.localStorage.getItem('refine-auth')}`,
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(200)
+        updatedDraft = response.body.data[0]
+        cy.wrap(updatedDraft).as('updatedDraft')
+      })
+
+      // Check that the survey has been updated
+      // Check that the survey has been updated
+      cy.get('@initialDraft').then((initialDraft) => {
+        cy.get('@updatedDraft').then((updatedDraft) => {
+          expect(initialDraft.id).to.eq(updatedDraft.id)
+          expect(new Date(initialDraft.updatedAt)).to.be.lessThan(new Date(updatedDraft.updatedAt))
+        })
+      })
     })
 
     it('should open and close help modal', () => {
       cy.contains('How to export instruments from REDCap').click()
-      cy.get('[aria-labelledby="modal-title"]').should('be.visible')
-      cy.get('[data-testid="CloseIcon"]').click()
-      cy.get('[aria-labelledby="modal-title"]').should('not.exist')
+      cy.get('[data-cy="helpPage"]').should('be.visible')
+      cy.get('[data-cy="closeHelpPage"]').click()
+      cy.get('[data-cy="helpPage"]').should('not.exist')
     })
   })
 })
