@@ -14,6 +14,7 @@ COPY package.json .yarnrc.yml yarn.lock ./
 COPY application/backend/package.json application/backend/
 COPY application/common/package.json application/common/
 COPY application/integrations/package.json application/integrations/
+COPY --chown=node:node application/backend/prisma ./application/backend/prisma
 
 RUN corepack enable && yarn 
 
