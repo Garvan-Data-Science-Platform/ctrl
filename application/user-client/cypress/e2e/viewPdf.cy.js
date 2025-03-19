@@ -7,12 +7,6 @@ beforeEach(() => {
 const { UserType } = require('../support/commands')
 const downloadsPath = 'cypress/downloads/'
 
-// login as person who has answered some things in the past
-// update a response
-// see response has changed
-// hard to test date :(
-// pdf error page?
-
 describe('viewPdf', () => {
   it('If unanswered, PDF shows "not answered"', () => {
     cy.login(UserType.PARTICIPANT_UNANSWERED)
@@ -142,5 +136,21 @@ describe('viewPdf', () => {
     cy.get('input[type="radio"]').eq(0).should('not.be.checked')
     cy.contains('Save').click()
     cy.get('[data-cy="proceed-button"]').click()
+  })
+
+  it('should display error when PDF generation fails', () => {
+    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.visit('/')
+
+    // Mock the API response to return an error
+    cy.intercept('GET', '/surveys/responses/current', {
+      statusCode: 500,
+      body: { error: 'Server error' },
+    }).as('getResponses')
+    cy.get('[data-cy="view-pdf"]').click()
+    cy.wait('@getResponses')
+
+    // Assert that the error message is displayed
+    cy.contains('Error Creating PDF').should('be.visible')
   })
 })

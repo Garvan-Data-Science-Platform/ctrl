@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import {
+  Alert,
   alpha,
   Box,
   Button,
@@ -41,14 +42,12 @@ export default function Dashboard() {
   })
 
   const [isLoading, setIsLoading] = useState(false)
-  // const [pdfError, setPdfError] = useState<string | null>(null) // TODO ensure pdf error case is handled
-  // const [showPdf, setShowPdf] = useState(false)
+  const [showPdfError, setShowPdfError] = useState(false)
 
   const queryClient = useQueryClient()
 
   const handleClick = async (profileData: GetParticipantProfileResponse) => {
     setIsLoading(true)
-    // setPdfError(null)
 
     try {
       const responseData = await queryClient.fetchQuery({
@@ -74,8 +73,8 @@ export default function Dashboard() {
       link.href = URL.createObjectURL(blob)
       link.download = `CTRL-responses-${profileData!.data.firstName}_${profileData!.data.lastName}_${formattedDatetime}.pdf`
       link.click()
-    } catch (err) {
-      // setPdfError(err instanceof Error ? err.message : 'Failed to generate PDF')
+    } catch {
+      setShowPdfError(true)
     } finally {
       setIsLoading(false)
     }
@@ -211,15 +210,21 @@ export default function Dashboard() {
         ))}
         <Box sx={{ display: 'flex' }}>
           <Box sx={{ flexGrow: 1 }} />
-          <Button
-            variant="contained"
-            sx={{ mt: 3 }}
-            data-cy={`view-pdf`}
-            onClick={() => profileData && handleClick(profileData as GetParticipantProfileResponse)}
-            disabled={isLoading || !!error}
-          >
-            {isLoading ? 'Loading document...' : 'View Responses'}
-          </Button>
+          {showPdfError ? (
+            <Alert severity="error">Error Creating PDF</Alert>
+          ) : (
+            <Button
+              variant="contained"
+              sx={{ mt: 3 }}
+              data-cy={`view-pdf`}
+              onClick={() =>
+                profileData && handleClick(profileData as GetParticipantProfileResponse)
+              }
+              disabled={isLoading || !!error}
+            >
+              {isLoading ? 'Loading document...' : 'View Responses'}
+            </Button>
+          )}
         </Box>
       </Container>
     </>
