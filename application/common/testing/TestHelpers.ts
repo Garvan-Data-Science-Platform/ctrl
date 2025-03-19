@@ -58,6 +58,7 @@ export async function wipeDB() {
     prisma.$disconnect()
     throw error
   }
+}
 
 export async function readDir(directory: string) {
   const fs = await import('fs')
