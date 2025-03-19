@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { hashPassword } from '../../src/authentication'
+import { SurveyStep } from '../../../common/types/survey'
 
 const prisma = new PrismaClient()
 

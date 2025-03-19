@@ -6,6 +6,7 @@ docker compose up -d db-test --wait
 docker compose down backend-test
 
 # migrate db
+yarn prisma:generate
 npx dotenv -e .env.test -- yarn prisma migrate deploy
 
 # run tests
