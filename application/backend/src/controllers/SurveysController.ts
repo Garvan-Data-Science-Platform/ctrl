@@ -45,6 +45,7 @@ export class SurveysController extends Controller {
   surveyRepo = prisma.surveyVersion
   spRepo = prisma.surveyParticipant
   profileRepo = prisma.participantProfile
+  auditLogRepo = prisma.auditLog
 
   /**
    * Get all Surveys
