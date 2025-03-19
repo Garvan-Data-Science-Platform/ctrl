@@ -42,7 +42,7 @@ spec:
               value: ctrl-postgresql
             - name: HOSTNAME
             {{ with .Values.ingress.hosts.userClient }}
-              value: {{ .host | quote }}
+              value: {{ .hostname | quote }}
             {{ end }}
             - name: POSTGRES_PASSWORD
               valueFrom:
