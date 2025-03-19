@@ -67,10 +67,50 @@ export async function readDir(directory: string) {
 export async function getLatestFile(files: string[]) {
   const fs = await import('fs')
   const path = await import('path')
-  return files
+
+  if (files.length === 0) {
+    return null
+  }
+
+  const latestFile = files
     .map((file) => ({
       file,
       time: fs.statSync(path.join('cypress/downloads/', file)).mtime.getTime(),
     }))
     .sort((a, b) => b.time - a.time)[0]?.file
+
+  return latestFile || null
+}
+
+export async function readPdf(filePath: string): Promise<string> {
+  const fs = await import('fs')
+  const path = await import('path')
+  const pdfParseModule = await import('pdf-parse-new')
+
+  const pdfParse = pdfParseModule.default || pdfParseModule
+
+  return new Promise((resolve) => {
+    const resolvedPath = path.resolve(filePath)
+    const dataBuffer = fs.readFileSync(resolvedPath)
+    pdfParse(dataBuffer).then(function ({ text }) {
+      resolve(text)
+    })
+  })
+}
+
+export async function deleteFile(filePath: string) {
+  const fs = await import('fs')
+  const path = await import('path')
+  try {
+    const resolvedPath = path.resolve(filePath)
+    if (fs.existsSync(resolvedPath)) {
+      fs.unlinkSync(resolvedPath)
+      return `Deleted: ${filePath}`
+    }
+    return `File not found: ${filePath}`
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+
+    return `Error deleting file: ${errorMessage}`
+  }
 }

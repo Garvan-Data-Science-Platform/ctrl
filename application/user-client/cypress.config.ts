@@ -1,4 +1,11 @@
-import { publishNewVersion, resetDB, readDir, getLatestFile } from 'common/testing/TestHelpers'
+import {
+  publishNewVersion,
+  resetDB,
+  readDir,
+  getLatestFile,
+  readPdf,
+  deleteFile,
+} from 'common/testing/TestHelpers'
 import { PASSWORD_RESET_USER_EMAIL } from 'common/testing/seed'
 import { defineConfig } from 'cypress'
 
@@ -23,6 +30,12 @@ export default defineConfig({
         },
         getLatestFile(files: string[]) {
           return getLatestFile(files)
+        },
+        readPdf(filePath: string) {
+          return readPdf(filePath)
+        },
+        deleteFile(filePath: string) {
+          return deleteFile(filePath)
         },
       })
     },
