@@ -21,7 +21,7 @@ yarn workspace backend prisma:generate
 printenv
 
 # run tests
-npx dotenv -e ../../backend/.env.test start-server-and-test 'refine dev --port 5003 --host 0.0.0.0' http://localhost:5003 cy:$CYPRESS_MODE
+npx dotenv -e ../backend/.env.test start-server-and-test 'refine dev --port 5003 --host 0.0.0.0' http://localhost:5003 cy:$CYPRESS_MODE
 
 # Tear down
 docker compose down db-test backend-test

@@ -19,7 +19,7 @@ docker compose up --build -d --wait backend-test
 yarn workspace backend prisma:generate
 
 # run tests
-npx dotenv -e ../../backend/.env.test start-server-and-test 'vite --port 5002 --host 0.0.0.0' http://localhost:5002 cy:$CYPRESS_MODE
+npx dotenv -e ../backend/.env.test start-server-and-test 'vite --port 5002 --host 0.0.0.0' http://localhost:5002 cy:$CYPRESS_MODE
 
 # Tear down
 docker compose down db-test backend-test
