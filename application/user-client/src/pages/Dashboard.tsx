@@ -222,7 +222,7 @@ export default function Dashboard() {
               }
               disabled={isLoading || !!error}
             >
-              {isLoading ? 'Loading document...' : 'View Responses'}
+              View Responses
             </Button>
           )}
         </Box>
