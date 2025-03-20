@@ -46,7 +46,7 @@ export default function Dashboard() {
 
   const queryClient = useQueryClient()
 
-  const handleClick = async (profileData: GetParticipantProfileResponse) => {
+  const generatePdf = async (profileData: GetParticipantProfileResponse) => {
     setIsLoading(true)
 
     try {
@@ -218,7 +218,7 @@ export default function Dashboard() {
               sx={{ mt: 3 }}
               data-cy={`view-pdf`}
               onClick={() =>
-                profileData && handleClick(profileData as GetParticipantProfileResponse)
+                profileData && generatePdf(profileData as GetParticipantProfileResponse)
               }
               disabled={isLoading || !!error}
             >
