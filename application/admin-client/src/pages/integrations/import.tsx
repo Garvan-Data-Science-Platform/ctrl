@@ -20,44 +20,14 @@ import ReactMarkdown from 'react-markdown'
 import { instrumentUploadCSVDocumentation } from './getInstrumentFromRedcap'
 import { useNotification, useBack, useInvalidate } from '@refinedev/core'
 
-const ConfirmImportDialog = ({
-  open,
-  onClose,
-  onConfirm,
-  dataLocation,
-}: {
-  open: boolean
-  onClose: () => void
-  onConfirm: () => void
-  dataLocation: string
-}) => {
-  return (
-    <Dialog open={open} onClose={onClose} data-cy="confirmDialog">
-      <DialogTitle>{'Confirm Survey Import'}</DialogTitle>
-      <DialogContent>
-        <DialogContentText>
-          Warning: This action will overwrite the current draft survey. The imported data from "
-          {dataLocation}" will replace any existing content. Do you want to continue?
-        </DialogContentText>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={onConfirm} color="error" autoFocus>
-          Yes, Overwrite
-        </Button>
-      </DialogActions>
-    </Dialog>
-  )
-}
-
 export const SurveyImport = () => {
   // States
   const [file, setFile] = useState<File | null>(null)
   const [formName, setFormName] = useState<string>('')
   const [redcapAPIToken, setRedcapAPIToken] = useState<string>('')
   const [openHelpPage, setHelpPageOpen] = useState(false)
-  const [confirmFileDialogOpen, setConfirmFileDialogOpen] = useState(false)
-  const [confirmApiDialogOpen, setConfirmApiDialogOpen] = useState(false)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [dialogType, setDialogType] = useState<'FILE' | 'API'>('FILE')
 
   const navigate = useNavigate()
   const { open } = useNotification()
@@ -72,7 +42,7 @@ export const SurveyImport = () => {
 
   // File Submission
   const onSubmitFile = () => {
-    handleFileDialogClose()
+    closeDialog()
     if (!file) {
       open?.({ type: 'error', message: 'Please upload a file before proceeding' })
       return
@@ -100,7 +70,7 @@ export const SurveyImport = () => {
 
   // API Submission
   const onSubmitApi = () => {
-    handleApiDialogClose()
+    closeDialog()
 
     if (!formName) {
       open?.({ type: 'error', message: 'Please enter a form to pull from REDCap' })
@@ -128,28 +98,33 @@ export const SurveyImport = () => {
       })
   }
 
-  // Handlers
-  const handleFileDialogOpen = () => {
-    setConfirmFileDialogOpen(true)
-  }
-
-  const handleFileDialogClose = () => {
-    setConfirmFileDialogOpen(false)
-  }
-
-  const handleApiDialogOpen = () => {
-    setConfirmApiDialogOpen(true)
-  }
-
-  const handleApiDialogClose = () => {
-    setConfirmApiDialogOpen(false)
-  }
-
   const handleHelpPageOpen = () => setHelpPageOpen(true)
   const handleHelpPageClose = () => setHelpPageOpen(false)
+  const openDialog = () => setDialogOpen(true)
+  const closeDialog = () => setDialogOpen(false)
 
   return (
     <Box>
+      <Dialog open={dialogOpen} onClose={closeDialog} data-cy="confirmDialog">
+        <DialogTitle>{'Confirm Survey Import'}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Warning: This action will overwrite the current draft survey. The imported data from "
+            {dialogType == 'API' ? formName : file?.name}" will replace any existing content. Do you
+            want to continue?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeDialog}>Cancel</Button>
+          <Button
+            onClick={dialogType == 'API' ? onSubmitApi : onSubmitFile}
+            color="error"
+            autoFocus
+          >
+            Yes, Overwrite
+          </Button>
+        </DialogActions>
+      </Dialog>
       <IconButton
         sx={{
           position: 'relative',
@@ -196,17 +171,14 @@ export const SurveyImport = () => {
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={handleFileDialogOpen}
+                  onClick={() => {
+                    setDialogType('FILE')
+                    openDialog()
+                  }}
                   sx={{ mt: 2 }}
                 >
                   Confirm
                 </Button>
-                <ConfirmImportDialog
-                  open={confirmFileDialogOpen}
-                  onClose={handleFileDialogClose}
-                  onConfirm={onSubmitFile}
-                  dataLocation={file.name}
-                />
               </Box>
             )}
             <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
@@ -271,18 +243,15 @@ export const SurveyImport = () => {
             <Button
               variant="contained"
               color="primary"
-              onClick={handleApiDialogOpen}
+              onClick={() => {
+                setDialogType('API')
+                openDialog()
+              }}
               disabled={!formName || !redcapAPIToken}
               data-cy="apiSubmit"
             >
               Import from API
             </Button>
-            <ConfirmImportDialog
-              open={confirmApiDialogOpen}
-              onClose={handleApiDialogClose}
-              onConfirm={onSubmitApi}
-              dataLocation={formName}
-            />
           </Box>
         </Box>
       </Box>
