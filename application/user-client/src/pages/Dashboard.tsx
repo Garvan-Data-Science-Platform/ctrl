@@ -46,8 +46,9 @@ export default function Dashboard() {
 
   const queryClient = useQueryClient()
 
-  const generatePdf = async (profileData: GetParticipantProfileResponse) => {
+  const generatePdf = async () => {
     setIsLoading(true)
+    if (!profileData) throw new Error()
 
     try {
       const responseData = await queryClient.fetchQuery({
