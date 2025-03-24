@@ -48,9 +48,8 @@ export default function Dashboard() {
 
   const generatePdf = async () => {
     setIsLoading(true)
-    if (!profileData) throw new Error()
-
     try {
+        if (!profileData) throw new Error()
       const responseData = await queryClient.fetchQuery({
         queryKey: ['surveys', 'get', profileData.data.id],
         queryFn: () =>
