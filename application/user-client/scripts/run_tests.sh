@@ -10,8 +10,7 @@ fi
 echo "Running tests in cypress $CYPRESS_MODE mode"
 
 # Spin-up backend and db
-docker compose up --build -d --wait db-test
-docker compose up --build -d --wait backend-test
+docker compose up --build -d --wait db-test backend-test
 
 # Generate prisma types
 yarn workspace backend prisma:generate
