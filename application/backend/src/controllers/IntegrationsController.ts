@@ -28,8 +28,6 @@ import { FileUploadError } from '../middlewares/ErrorHandler'
 import logger from 'common/src/logger'
 import { AuthController } from './AuthController'
 
-const REDCAP_API_URL: string = process.env.REDCAP_API_URL!
-
 @Route('integrations')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
@@ -41,6 +39,7 @@ export class IntegrationsController extends Controller {
   surveyRepo = prisma.surveyVersion
   spRepo = prisma.surveyParticipant
   integrationService = new Integrations(exampleREDCapMapping)
+  REDCAP_API_URL: string = this.validateRedcapConfig()
 
   @Post('/redcap/participant/upload/csv')
   @SuccessResponse('201', 'Created Participants from CSV')
@@ -79,7 +78,7 @@ export class IntegrationsController extends Controller {
      */
     params.append('form[0]', formName)
 
-    const participantData = await fetch(REDCAP_API_URL, {
+    const participantData = await fetch(this.REDCAP_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -139,7 +138,7 @@ export class IntegrationsController extends Controller {
      */
     params.append('forms[0]', formName)
 
-    const surveyData = await fetch(REDCAP_API_URL, {
+    const surveyData = await fetch(this.REDCAP_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -250,5 +249,12 @@ export class IntegrationsController extends Controller {
     })
 
     return { id: survey.id }
+  }
+
+  private validateRedcapConfig() {
+    if (!process.env.REDCAP_API_URL) {
+      throw new BadGatewayError('Redcap API not configured: missing REDCAP_API_URL')
+    }
+    return process.env.REDCAP_API_URL
   }
 }
