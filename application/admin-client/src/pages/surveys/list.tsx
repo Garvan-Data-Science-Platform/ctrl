@@ -2,7 +2,7 @@ import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import { EditButton, List, ShowButton, useDataGrid } from '@refinedev/mui'
 import React from 'react'
 
-export const CategoryList = () => {
+export const SurveyList = () => {
   const { dataGridProps } = useDataGrid({
     sorters: { mode: 'off', initial: [{ field: 'versionNumber', order: 'desc' }] },
     filters: { mode: 'off' },

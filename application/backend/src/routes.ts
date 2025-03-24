@@ -626,7 +626,8 @@ const models: TsoaRoute.Models = {
     "UploadRedcapParticipantAPIRequest": {
         "dataType": "refObject",
         "properties": {
-            "form": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
+            "formName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
+            "redcapAPIToken": {"dataType":"string","validators":{"minLength":{"value":1}}},
         },
         "additionalProperties": false,
     },
@@ -642,7 +643,8 @@ const models: TsoaRoute.Models = {
     "UploadRedcapInstrumentAPIRequest": {
         "dataType": "refObject",
         "properties": {
-            "form": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
+            "formName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
+            "redcapAPIToken": {"dataType":"string","validators":{"minLength":{"value":1}}},
         },
         "additionalProperties": false,
     },
