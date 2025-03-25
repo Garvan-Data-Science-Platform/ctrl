@@ -39,7 +39,7 @@ export class IntegrationsController extends Controller {
   surveyRepo = prisma.surveyVersion
   spRepo = prisma.surveyParticipant
   integrationService = new Integrations(exampleREDCapMapping)
-  REDCAP_API_URL: string = this.validateRedcapConfig()
+  REDCAP_API_URL: string = ''
 
   @Post('/redcap/participant/upload/csv')
   @SuccessResponse('201', 'Created Participants from CSV')
@@ -60,6 +60,8 @@ export class IntegrationsController extends Controller {
   public async uploadRedcapParticipantAPI(
     @Body() bodyRequest: UploadRedcapParticipantAPIRequest,
   ): Promise<UploadRedcapParticipantResponse> {
+    this.REDCAP_API_URL = this.validateRedcapConfig()
+
     const { formName, redcapAPIToken } = bodyRequest
     const params = new URLSearchParams()
     params.append('token', redcapAPIToken || (process.env.REDCAP_API_TOKEN as string))
@@ -123,6 +125,7 @@ export class IntegrationsController extends Controller {
   public async uploadRedcapInstrumentAPI(
     @Body() bodyRequest: UploadRedcapInstrumentAPIRequest,
   ): Promise<UploadRedcapInstrumentResponse> {
+    this.REDCAP_API_URL = this.validateRedcapConfig()
     const { formName, redcapAPIToken } = bodyRequest
     const params = new URLSearchParams()
     params.append('token', redcapAPIToken || (process.env.REDCAP_API_TOKEN as string))
