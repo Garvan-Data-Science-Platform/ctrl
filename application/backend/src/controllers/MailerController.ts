@@ -1,4 +1,4 @@
-import { Response, Controller, Security, Tags, Route, Post, Body, Request } from 'tsoa'
+import { Response, Controller, Security, Tags, Route, Post, Body, Request, Middlewares } from 'tsoa'
 import {
   InternalErrorResponse,
   UnauthorizedErrorResponse,
@@ -12,12 +12,14 @@ import { NotFoundError } from '../middlewares/ErrorHandler'
 import mailerTransporter, { fromAddress } from '../utils/mailer'
 import nodemailer from 'nodemailer'
 import logger from 'common/src/logger'
+import { auditLog } from '../middlewares/AuditLog'
 
 @Route('mailer')
 @Tags('Mailer')
 @Security('jwt')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
+@Middlewares(auditLog)
 export class MailerController extends Controller {
   userRepo = prisma.user
 

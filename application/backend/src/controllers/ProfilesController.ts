@@ -8,7 +8,19 @@ import {
 } from 'common/types/api/errors'
 import type { GetParticipantProfileResponse, UpdateProfileRequest } from 'common/types/api/users'
 import { NotFoundError } from '../middlewares/ErrorHandler'
-import { Route, Tags, Security, Controller, Get, Path, Response, Request, Patch, Body } from 'tsoa'
+import {
+  Route,
+  Tags,
+  Security,
+  Controller,
+  Get,
+  Path,
+  Response,
+  Request,
+  Patch,
+  Body,
+  Middlewares,
+} from 'tsoa'
 import * as express from 'express'
 import {
   AlternativeContact,
@@ -17,11 +29,13 @@ import {
   StateTerritory,
 } from 'common/types/api/users/ParticipantProfile'
 import { FamilyMember } from 'common/types/api/users/getParticipantProfile'
+import { auditLog } from '../middlewares/AuditLog'
 
 @Route('profiles')
 @Tags('Profiles')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
+@Middlewares(auditLog)
 export class ProfilesController extends Controller {
   participantProfileRepo = prisma.participantProfile
   userRepo = prisma.user

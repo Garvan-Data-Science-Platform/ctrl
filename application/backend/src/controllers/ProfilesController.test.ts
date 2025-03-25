@@ -159,6 +159,11 @@ describe('ProfilesController', () => {
       expect(profile.lastName).toBe('Brown')
       expect(profile.dob).toEqual(new Date('2010-12-12'))
       expect(profile.state).toBe('QLD')
+
+      const aLog = await prisma.auditLog.findFirstOrThrow({ where: { userId: user.id } })
+      expect(aLog.resource).toBe('profiles')
+      expect(aLog.operation).toBe('UPDATE')
+      expect((aLog.meta as any).resourceId).toBe('current')
     })
 
     it('should reject invalid data', async () => {

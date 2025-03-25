@@ -19,6 +19,7 @@ import {
   Response,
   ValidateError,
   Get,
+  Middlewares,
 } from 'tsoa'
 import prisma from '../PrismaClient'
 import logger from 'common/src/logger'
@@ -33,11 +34,13 @@ import type {
 import { IncorrectPasswordError, NotFoundError } from '../middlewares/ErrorHandler'
 import { ParticipantType } from 'common/types/api/users/ParticipantProfile'
 import { createDefaultAnswers } from '../utils/answers'
+import { auditLog } from '../middlewares/AuditLog'
 
 @Route('auth')
 @Tags('Auth')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 @Response<ValidateErrorResponse>('422', 'Validation Failed')
+@Middlewares(auditLog)
 export class AuthController extends Controller {
   userRepo = prisma.user
   profileRepo = prisma.participantProfile

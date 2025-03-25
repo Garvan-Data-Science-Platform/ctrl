@@ -8,6 +8,7 @@ import {
   SuccessResponse,
   Body,
   UploadedFile,
+  Middlewares,
 } from 'tsoa'
 import { Integrations } from '../../../integrations/src/Integrations'
 import prisma from '../PrismaClient'
@@ -27,12 +28,14 @@ import { parseCSV, validateFile } from '../utils/parseCsv'
 import { FileUploadError } from '../middlewares/ErrorHandler'
 import logger from 'common/src/logger'
 import { AuthController } from './AuthController'
+import { auditLog } from '../middlewares/AuditLog'
 
 @Route('integrations')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 @Tags('Integrations')
 @Security('jwt', ['OrganisationAdmin'])
+@Middlewares(auditLog)
 export class IntegrationsController extends Controller {
   userRepo = prisma.user
   profileRepo = prisma.participantProfile
