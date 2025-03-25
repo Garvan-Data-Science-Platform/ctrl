@@ -7,7 +7,7 @@ import {
 } from 'common/types/api/errors'
 import type {
   GetInvitesResponse,
-  GetParticipantByIdResponse,
+  GetParticipantResponse,
   GetParticipantsResponse,
   InviteParticipantsRequest,
   InviteParticipantsResponse,
@@ -23,6 +23,7 @@ import {
   Body,
   Path,
   Post,
+  Request,
   Middlewares,
 } from 'tsoa'
 import { Participant } from 'common/types/api/participants/participant'
@@ -34,6 +35,7 @@ import { NotFoundError } from '../middlewares/ErrorHandler'
 import { determineLastUpdated, determineStatus } from '../utils/answers'
 import { ProfilesController } from './ProfilesController'
 import { auditLog } from '../middlewares/AuditLog'
+import * as express from 'express'
 
 @Route('participants')
 @Tags('Participants')
@@ -51,6 +53,7 @@ export class ParticipantsController extends Controller {
    * @summary List participants
    */
   @Get('/')
+  @Security('jwt', ['OrganisationAdmin'])
   public async getParticipants(): Promise<GetParticipantsResponse> {
     const unique_participants = await this.participantRepo.findMany({
       distinct: ['profileId'],
@@ -91,15 +94,16 @@ export class ParticipantsController extends Controller {
 
     return { data: participants }
   }
+
   /**
    * Get participant by ID
    *
    * @summary Get a  Participant by ID
    */
-
   @Get('/{profileId}')
+  @Security('jwt', ['OrganisationAdmin'])
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  public async getParticipantById(@Path() profileId: number): Promise<GetParticipantByIdResponse> {
+  public async getParticipantById(@Path() profileId: number): Promise<GetParticipantResponse> {
     const profile = await this.profileRepo.findFirstOrThrow({
       where: { id: profileId },
       select: { userId: true, firstName: true, lastName: true, user: { select: { email: true } } },
@@ -117,6 +121,59 @@ export class ParticipantsController extends Controller {
     return {
       data: {
         id: profileId,
+        profile: profileData,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        email: profile.user?.email,
+        answers: p_answers.map((val) => ({
+          surveyVersion: val.version.id,
+          participantId: val.id,
+          status: determineStatus(val.answers, new Date(val.version.updatedAt)),
+        })),
+      },
+    }
+  }
+
+  /**
+   * Get participant by token
+   *
+   * @summary Get a participant by token
+   */
+  @Get('/current')
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
+  @Response<ValidateErrorResponse>('422', 'Validation Failed')
+  public async getCurrentParticipant(
+    @Request() request: express.Request,
+  ): Promise<GetParticipantResponse> {
+    if (!request.user) {
+      throw new NotFoundError('User not found')
+    }
+
+    const userId: number = request.user.userId
+
+    const profile = await this.profileRepo.findFirstOrThrow({
+      where: { userId }, // Find the profile with current userId
+      select: {
+        id: true,
+        userId: true,
+        firstName: true,
+        lastName: true,
+        user: { select: { email: true } },
+      },
+    })
+
+    const profileDataResponse = await new ProfilesController().getParticipantProfileByID(profile.id)
+    const profileData = profileDataResponse.data
+
+    const p_answers = await this.participantRepo.findMany({
+      where: { profileId: profile.id },
+      select: { answers: true, version: { select: { id: true, updatedAt: true } }, id: true },
+      orderBy: { versionId: 'asc' },
+    })
+
+    return {
+      data: {
+        id: profile.id,
         profile: profileData,
         firstName: profile.firstName,
         lastName: profile.lastName,

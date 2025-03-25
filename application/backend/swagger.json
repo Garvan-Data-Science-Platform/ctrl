@@ -1123,7 +1123,7 @@
           }
         ]
       },
-      "GetParticipantByIdResponse": {
+      "GetParticipantResponse": {
         "properties": {
           "data": {
             "$ref": "#/components/schemas/ParticipantWithProfile"
@@ -2717,7 +2717,7 @@
     },
     "/profiles/current": {
       "get": {
-        "operationId": "GetParticipantProfileByToken",
+        "operationId": "GetCurrentParticipantProfile",
         "responses": {
           "200": {
             "description": "Ok",
@@ -2750,8 +2750,8 @@
             }
           }
         },
-        "description": "Get a Participants Profile by token",
-        "summary": "Get a Participants Profile by token",
+        "description": "Get the current Participants Profile",
+        "summary": "Get the current Participants Profile",
         "tags": [
           "Profiles"
         ],
@@ -2872,7 +2872,9 @@
         ],
         "security": [
           {
-            "jwt": []
+            "jwt": [
+              "OrganisationAdmin"
+            ]
           }
         ],
         "parameters": [
@@ -2938,7 +2940,9 @@
         ],
         "security": [
           {
-            "jwt": []
+            "jwt": [
+              "OrganisationAdmin"
+            ]
           }
         ],
         "parameters": [
@@ -3065,7 +3069,9 @@
         ],
         "security": [
           {
-            "jwt": []
+            "jwt": [
+              "OrganisationAdmin"
+            ]
           }
         ],
         "parameters": []
@@ -3080,7 +3086,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetParticipantByIdResponse"
+                  "$ref": "#/components/schemas/GetParticipantResponse"
                 }
               }
             }
@@ -3123,7 +3129,9 @@
         ],
         "security": [
           {
-            "jwt": []
+            "jwt": [
+              "OrganisationAdmin"
+            ]
           }
         ],
         "parameters": [
@@ -3137,6 +3145,74 @@
             }
           }
         ]
+      }
+    },
+    "/participants/current": {
+      "get": {
+        "operationId": "GetCurrentParticipant",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetParticipantResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Get participant by token",
+        "summary": "Get a participant by token",
+        "tags": [
+          "Participants"
+        ],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": []
       }
     },
     "/invites": {
