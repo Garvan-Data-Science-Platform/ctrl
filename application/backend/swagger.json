@@ -1601,13 +1601,17 @@
       "UploadRedcapParticipantAPIRequest": {
         "description": "This is the name of the redcap instrument you are importing from.\nNOTE: These 'forms' are not the form label values that are seen on the webpages,\nbut instead they are the unique form names seen in Column B of the data dictionary.",
         "properties": {
-          "form": {
+          "formName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "redcapAPIToken": {
             "type": "string",
             "minLength": 1
           }
         },
         "required": [
-          "form"
+          "formName"
         ],
         "type": "object",
         "additionalProperties": false
@@ -1628,13 +1632,17 @@
       "UploadRedcapInstrumentAPIRequest": {
         "description": "This is the name of the redcap instrument you are importing from.\nNOTE: These 'forms' are not the form label values that are seen on the webpages,\nbut instead they are the unique form names seen in Column B of the data dictionary.",
         "properties": {
-          "form": {
+          "formName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "redcapAPIToken": {
             "type": "string",
             "minLength": 1
           }
         },
         "required": [
-          "form"
+          "formName"
         ],
         "type": "object",
         "additionalProperties": false

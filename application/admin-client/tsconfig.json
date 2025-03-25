@@ -17,7 +17,8 @@
     "jsx": "react-jsx",
     "paths": {
       "@common/*": ["../common/*"]
-    }
+    },
+    "types": ["cypress-file-upload"]
   },
   "include": ["src"],
   "references": [

@@ -14,6 +14,8 @@
 // -- This is a parent command --
 // Cypress.Commands.add('login', (email, password) => { ... })
 //
+import 'cypress-file-upload'
+
 export enum UserType {
   PARTICIPANT_COMPLETED = 'test3@example.com',
   PARTICIPANT_UNANSWERED = 'test2@example.com',

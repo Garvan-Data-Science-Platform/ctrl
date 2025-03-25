@@ -21,7 +21,7 @@ import routerBindings, {
   DocumentTitleHandler,
 } from '@refinedev/react-router-v6'
 import { UserList, UserCreate, UserEdit, UserShow } from './pages/users'
-import { CategoryList, SurveyEditor } from './pages/surveys'
+import { SurveyList, SurveyEditor } from './pages/surveys'
 import { ColorModeContextProvider } from './contexts/color-mode'
 import { Header } from './components/header'
 import { Login } from './pages/login'
@@ -29,8 +29,9 @@ import { Register } from './pages/register'
 import { ForgotPassword } from './pages/forgotPassword'
 import { authProvider } from './providers/authProvider'
 import { ParticipantList, ParticipantShow } from './pages/participants'
+import { SurveyImport, IntegrationsHome } from './pages/integrations'
 import { ResponsesView } from './pages/responses'
-import { ListAlt, Person, RecentActors } from '@mui/icons-material'
+import { ListAlt, Person, RecentActors, DatasetLinked } from '@mui/icons-material'
 import { ParticipantEdit } from './pages/participants/edit'
 import { SetupPage } from './pages/setup'
 
@@ -82,6 +83,15 @@ function App() {
                     meta: {
                       canDelete: true,
                       icon: <RecentActors />,
+                    },
+                  },
+                  {
+                    name: 'integrations',
+                    list: '/integrations',
+                    meta: {
+                      label: 'Integrations',
+                      icon: <DatasetLinked />,
+                      canDelete: true,
                     },
                   },
                   {
@@ -143,7 +153,7 @@ function App() {
                       <Route path=":id" element={<UserShow />} />
                     </Route>
                     <Route path="/surveys">
-                      <Route index element={<CategoryList />} />
+                      <Route index element={<SurveyList />} />
                       <Route path="edit/:id" element={<SurveyEditor />} />
                       <Route path=":id" element={<SurveyEditor />} />
                     </Route>
@@ -151,6 +161,10 @@ function App() {
                       <Route index element={<ParticipantList />} />
                       <Route path="edit/:id" element={<ParticipantEdit />} />
                       <Route path=":id" element={<ParticipantShow />} />
+                    </Route>
+                    <Route path="/integrations">
+                      <Route index element={<IntegrationsHome />} />
+                      <Route path="redcap/survey/import" element={<SurveyImport />} />
                     </Route>
                     <Route path="/responses/:id" index element={<ResponsesView />} />
                     <Route path="*" element={<ErrorComponent />} />
