@@ -157,13 +157,6 @@ model PasswordResetToken {
   used      Boolean  @default(false)
 }
 
-enum AuditLogResource {
-  USER
-  PROFILE
-  SURVEY_VERSION
-  SURVEY_PARTICIPANT
-}
-
 enum AuditLogOperation {
   CREATE
   UPDATE
@@ -172,8 +165,9 @@ enum AuditLogOperation {
 
 model AuditLog {
   id        Int               @id @default(autoincrement())
-  resource  AuditLogResource
+  resource  String
   operation AuditLogOperation
+  success   Boolean           @default(true)
   timestamp DateTime          @default(now())
   userId    Int?
   user      User?             @relation(fields: [userId], references: [id], onDelete: Restrict)

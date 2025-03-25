@@ -13,6 +13,7 @@ import {
   Security,
   Patch,
   ValidateError,
+  Middlewares,
 } from 'tsoa'
 import logger from 'common/src/logger'
 import type {
@@ -36,11 +37,13 @@ import {
   combineGuardianAnswers,
   createDefaultAnswers,
 } from '../utils/answers'
+import { auditLog } from '../middlewares/AuditLog'
 
 @Route('surveys')
 @Tags('Surveys')
 @Response('500', 'Internal Server Error')
 @Response('401', 'Unauthorized')
+@Middlewares(auditLog)
 export class SurveysController extends Controller {
   surveyRepo = prisma.surveyVersion
   spRepo = prisma.surveyParticipant
