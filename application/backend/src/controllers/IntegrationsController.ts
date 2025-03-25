@@ -61,7 +61,6 @@ export class IntegrationsController extends Controller {
     @Body() bodyRequest: UploadRedcapParticipantAPIRequest,
   ): Promise<UploadRedcapParticipantResponse> {
     this.REDCAP_API_URL = this.validateRedcapConfig()
-
     const { formName, redcapAPIToken } = bodyRequest
     const params = new URLSearchParams()
     params.append('token', redcapAPIToken || (process.env.REDCAP_API_TOKEN as string))
