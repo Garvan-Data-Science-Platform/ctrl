@@ -88,7 +88,7 @@ export class UsersController extends Controller {
    * @summary Get Specific User
    */
   @Get('/{userId}')
-  @Security('jwt')
+  @Security('jwt', ['OrganisationAdmin'])
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
   public async getUserById(@Path() userId: number): Promise<GetUserByIdResponse> {

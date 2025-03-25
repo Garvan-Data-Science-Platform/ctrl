@@ -249,6 +249,7 @@ export class SurveysController extends Controller {
   @Get('/responses/:participantId')
   @Security('jwt')
   @Response('404', 'Not Found')
+  @Security('jwt', ['OrganisationAdmin'])
   public async getResponsesById(@Path() participantId: number): Promise<GetResponsesByIdResponse> {
     const surveyParticipant = await this.spRepo.findUniqueOrThrow({
       where: { id: participantId },

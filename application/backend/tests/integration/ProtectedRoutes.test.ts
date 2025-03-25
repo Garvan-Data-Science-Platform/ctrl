@@ -74,7 +74,7 @@ describe('Protected Routes', () => {
     {
       method: HttpMethod.GET,
       url: '/users/1',
-      rolesWhitelisted: [],
+      rolesWhitelisted: [Role.OrganisationAdmin],
     },
     {
       method: HttpMethod.POST,
@@ -150,7 +150,7 @@ describe('Protected Routes', () => {
     {
       method: HttpMethod.GET,
       url: '/profiles/user/1',
-      rolesWhitelisted: [],
+      rolesWhitelisted: [Role.OrganisationAdmin],
     },
   ]
 
