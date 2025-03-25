@@ -1,7 +1,4 @@
 -- CreateEnum
-CREATE TYPE "AuditLogResource" AS ENUM ('USER', 'PROFILE', 'SURVEY_VERSION', 'SURVEY_PARTICIPANT');
-
--- CreateEnum
 CREATE TYPE "AuditLogOperation" AS ENUM ('CREATE', 'UPDATE', 'DELETE');
 
 -- AlterTable
@@ -10,8 +7,9 @@ ALTER TABLE "User" ADD COLUMN     "deleted" BOOLEAN NOT NULL DEFAULT false;
 -- CreateTable
 CREATE TABLE "AuditLog" (
     "id" SERIAL NOT NULL,
-    "resource" "AuditLogResource" NOT NULL,
+    "resource" TEXT NOT NULL,
     "operation" "AuditLogOperation" NOT NULL,
+    "success" BOOLEAN NOT NULL DEFAULT true,
     "timestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "userId" INTEGER,
     "meta" JSONB NOT NULL,
