@@ -29,6 +29,8 @@ spec:
                 value: user@example.com
               - name: EXAMPLE_PARTICIPANT_PASSWORD
                 value: Testpassword2
+              - name: REDCAP_API_URL
+                value: https://redcap.gimr.garvan.org.au/api/
               - name: POSTGRES_PASSWORD
                 valueFrom:
                   secretKeyRef:
