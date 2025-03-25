@@ -45,7 +45,7 @@ import { auditLog } from '../middlewares/AuditLog'
 @Route('users')
 @Tags('Users')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
-//@Middlewares(auditLog)
+@Middlewares(auditLog)
 export class UsersController extends Controller {
   userRepo = prisma.user
   passwordResetTokenRepo = prisma.passwordResetToken
