@@ -30,8 +30,6 @@ import logger from 'common/src/logger'
 import { AuthController } from './AuthController'
 import { auditLog } from '../middlewares/AuditLog'
 
-const REDCAP_API_URL: string = process.env.REDCAP_API_URL!
-
 @Route('integrations')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')

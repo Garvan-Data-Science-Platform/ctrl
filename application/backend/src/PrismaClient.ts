@@ -38,7 +38,9 @@ prisma.$use(async (params, next) => {
       }
     }
     if (params.action == 'update') {
-      params.args.where['deleted'] = false
+      if (params.args.where.deleted == undefined) {
+        params.args.where['deleted'] = false
+      }
     }
     if (params.action == 'updateMany') {
       if (params.args.where != undefined) {
