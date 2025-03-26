@@ -49,7 +49,7 @@ export default function Dashboard() {
   const generatePdf = async () => {
     setIsLoading(true)
     try {
-        if (!profileData) throw new Error()
+      if (!profileData) throw new Error()
       const responseData = await queryClient.fetchQuery({
         queryKey: ['surveys', 'get', profileData.data.id],
         queryFn: () =>
@@ -217,9 +217,7 @@ export default function Dashboard() {
               variant="contained"
               sx={{ mt: 3 }}
               data-cy={`view-pdf`}
-              onClick={() =>
-                profileData && generatePdf(profileData as GetParticipantProfileResponse)
-              }
+              onClick={() => profileData && generatePdf()}
               disabled={isLoading || !!error}
             >
               View Responses
