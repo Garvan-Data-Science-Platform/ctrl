@@ -82,6 +82,7 @@ export default function ConsentForm() {
         data: extractSurveyStepAnswers(formState),
       })
       if (action == 'next') {
+        setModalOpen(false)
         nav('/consent_form/' + String(currentStep + 1))
       } else {
         nav('/')
@@ -133,7 +134,7 @@ export default function ConsentForm() {
     return (
       <Card
         key={idx}
-        sx={{
+        sx={(theme) => ({
           display: 'flex',
           alignItems: 'center',
           p: 3,
@@ -141,7 +142,11 @@ export default function ConsentForm() {
           mt: 1,
           bgcolor: (theme) => alpha(theme.palette.primary.light, 0.1),
           boxShadow: '0',
-        }}
+          [theme.breakpoints.down('sm')]: {
+            p: 1,
+            gap: 1,
+          },
+        })}
       >
         <Typography sx={{ flexGrow: 1, textAlign: 'left' }}>{data.text}</Typography>
         {data.tooltip ? (
@@ -166,7 +171,7 @@ export default function ConsentForm() {
         )}
         {type == 'question-choices' && (
           <Box>
-            <RadioGroup value={data.value} row>
+            <RadioGroup value={data.value}>
               {data.choices?.map((val: string, i: number) => {
                 return (
                   <FormControlLabel
@@ -174,6 +179,7 @@ export default function ConsentForm() {
                     value={val}
                     control={<Radio />}
                     label={val}
+                    sx={(theme) => ({ [theme.breakpoints.up('sm')]: { minWidth: 110 } })}
                     onChange={() => {
                       setFormState((state) => {
                         const s = [...state]
@@ -213,7 +219,7 @@ export default function ConsentForm() {
           <Typography sx={{ mt: 3 }}>You have not selected a required statement.</Typography>
           <Typography
             sx={{ mt: 3 }}
-          >{`If you choose "Proceed", an Australian Genomics Genetic Counsellor will contact you to talk about your options. It may take 7 days for the study genetic counsellor to contact you.`}</Typography>
+          >{`If you choose "Proceed", a Genetic Counsellor will contact you to talk about your options. It may take 7 days for the study genetic counsellor to contact you.`}</Typography>
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
             <Button
               sx={{ mr: 1 }}
@@ -250,13 +256,22 @@ export default function ConsentForm() {
             </Step>
           ))}
       </Stepper>
-      <Card sx={{ p: 3, boxShadow: 0, border: '1px solid lightgrey' }}>
+      <Card
+        sx={(theme) => ({
+          p: 3,
+          boxShadow: 0,
+          border: '1px solid lightgrey',
+          [theme.breakpoints.down('sm')]: { p: 1 },
+        })}
+      >
         {isPending ? (
           <CircularProgress />
         ) : (
           <>
             <Typography variant="h4">{data?.title}</Typography>
-            <Typography sx={{ mt: 3, mb: 3 }}>{data?.text}</Typography>
+            <Typography sx={{ mt: 3, mb: 3, whiteSpace: 'preserve', textAlign: 'justify' }}>
+              {data?.text}
+            </Typography>
             {renderElements(formState)}
             {showError && <Alert severity="error">Error saving page</Alert>}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
