@@ -66,6 +66,8 @@ spec:
               value: {{ .Values.mailer.username }}
             - name: MAILER_PASSWORD
               value: {{ .Values.mailer.password }}
+            - name: REDCAP_API_URL
+              value: {{ .Values.redcap.apiUrl }}
             
           ports:
             - name: http

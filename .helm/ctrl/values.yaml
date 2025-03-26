@@ -42,6 +42,9 @@ mailer:
   username:
   password:
 
+redcap:
+  apiUrl:
+
 ingress:
   enabled: true
   className: 'nginx'
