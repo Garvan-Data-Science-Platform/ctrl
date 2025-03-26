@@ -11,6 +11,7 @@ import {
   Patch,
   Delete,
   Security,
+  Middlewares,
 } from 'tsoa'
 import logger from 'common/src/logger'
 import prisma from '../PrismaClient'
@@ -30,12 +31,14 @@ import {
   ValidateErrorResponse,
 } from 'common/types/api/errors'
 import { NotFoundError } from '../middlewares/ErrorHandler'
+import { auditLog } from '../middlewares/AuditLog'
 
 @Route('organisations')
 @Tags('Organisations')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 @Security('jwt', ['OrganisationAdmin'])
+@Middlewares(auditLog)
 export class OrganisationsController extends Controller {
   organisationRepo = prisma.organisation
   userRepo = prisma.user

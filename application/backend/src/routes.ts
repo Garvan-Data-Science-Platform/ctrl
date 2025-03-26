@@ -24,7 +24,7 @@ import { IntegrationsController } from './controllers/IntegrationsController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { HealthCheckController } from './controllers/HealthCheckController';
 import { expressAuthentication } from './authentication';
-// eslint-disable-line - no great way to install types from subpackage
+// @ts-ignore - no great way to install types from subpackage
 import type { Request as ExRequest, Response as ExResponse, RequestHandler, Router } from 'express';
 const multer = require('multer');
 
@@ -69,7 +69,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "DefaultSelection_Prisma._36_UserPayload_": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"updatedAt":{"dataType":"datetime","required":true},"createdAt":{"dataType":"datetime","required":true},"role":{"ref":"_36_Enums.Role","required":true},"password":{"dataType":"string","required":true},"email":{"dataType":"string","required":true},"lastName":{"dataType":"string","required":true},"middleName":{"dataType":"string","required":true},"firstName":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"deleted":{"dataType":"boolean","required":true},"updatedAt":{"dataType":"datetime","required":true},"createdAt":{"dataType":"datetime","required":true},"role":{"ref":"_36_Enums.Role","required":true},"password":{"dataType":"string","required":true},"email":{"dataType":"string","required":true},"lastName":{"dataType":"string","required":true},"middleName":{"dataType":"string","required":true},"firstName":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "User": {
@@ -626,7 +626,8 @@ const models: TsoaRoute.Models = {
     "UploadRedcapParticipantAPIRequest": {
         "dataType": "refObject",
         "properties": {
-            "form": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
+            "formName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
+            "redcapAPIToken": {"dataType":"string","validators":{"minLength":{"value":1}}},
         },
         "additionalProperties": false,
     },
@@ -642,7 +643,8 @@ const models: TsoaRoute.Models = {
     "UploadRedcapInstrumentAPIRequest": {
         "dataType": "refObject",
         "properties": {
-            "form": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
+            "formName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
+            "redcapAPIToken": {"dataType":"string","validators":{"minLength":{"value":1}}},
         },
         "additionalProperties": false,
     },

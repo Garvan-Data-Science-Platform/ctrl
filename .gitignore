@@ -9,6 +9,7 @@
 .DS_Store
 .vscode
 application/**/.env
+application/**/cypress.env.json
 
 # Dependency directories
 node_modules/

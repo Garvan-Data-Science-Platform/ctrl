@@ -6,8 +6,8 @@ on:
       - '**'
 
 jobs:
-  build-checks:
-    name: build checks
+  build:
+    name: build and check
     runs-on: ubuntu-22.04
     steps:
       - name: Check out repository code
@@ -28,9 +28,31 @@ jobs:
         run: yarn format
       - name: Lint Code
         run: yarn lint
-      - name: Run Unit Testing
+
+  test:
+    needs: build
+    name: test (${{ matrix.workspace }})
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        workspace: [backend, admin-client, common, user-client, integrations]
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - name: Enable Corepack
+        run: corepack enable
+      - name: Configure Environment
+        run: cp ./application/backend/.env.test ./application/backend/.env
+      - name: Setup Nodejs and npm
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.10.0'
+          cache: 'yarn'
+      - run: yarn install
+      - name: Run Tests
         env:
           MAILER_USERNAME: ${{ secrets.TEST_MAILER_USERNAME }}
           MAILER_PASSWORD: ${{ secrets.TEST_MAILER_PASSWORD }}
-        run: yarn test
-        #run: yarn workspace backend test && yarn workspace user-client test && yarn workspace common test && yarn workspace integrations test && yarn workspace admin-client test
+          CYPRESS_REDCAP_API_TOKEN: ${{ secrets.REDCAP_API_TOKEN }}
+        run: yarn workspace ${{ matrix.workspace }} test

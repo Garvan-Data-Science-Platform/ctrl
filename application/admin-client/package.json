@@ -23,6 +23,7 @@
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.0.0",
     "react-hook-form": "^7.30.0",
+    "react-markdown": "^10.0.1",
     "react-router-dom": "^6.8.1",
     "zustand": "^5.0.0"
   },
@@ -33,6 +34,7 @@
     "@typescript-eslint/parser": "^5.57.1",
     "@vitejs/plugin-react": "^4.0.0",
     "cypress": "^13.17.0",
+    "cypress-file-upload": "^5.0.8",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.3.4",
     "start-server-and-test": "^2.0.10",
@@ -45,8 +47,8 @@
     "start": "refine start",
     "refine": "refine",
     "cy:open": "cypress open",
-    "cypress": "docker compose up --build -d db-test backend-test && npx dotenv -e ../backend/.env.test start-server-and-test 'refine dev --port 5003 --host 0.0.0.0' http://localhost:5003 cy:open",
-    "test": "docker compose up --build -d --wait db-test backend-test && npx dotenv -e ../backend/.env.test start-server-and-test 'refine dev --port 5003 --host 0.0.0.0' http://localhost:5003 cy:run",
+    "cypress": "CYPRESS_MODE=open bash scripts/run_tests.sh",
+    "test": "CYPRESS_MODE=run bash scripts/run_tests.sh",
     "cy:run": "cypress run"
   },
   "browserslist": {

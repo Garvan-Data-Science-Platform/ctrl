@@ -23,7 +23,9 @@ model User {
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
   profiles            ParticipantProfile[]
+  auditLogs           AuditLog[]
   passwordResetTokens PasswordResetToken[]
+  deleted             Boolean              @default(false)
 }
 
 enum ParticipantType {
@@ -153,4 +155,21 @@ model PasswordResetToken {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresAt DateTime
   used      Boolean  @default(false)
+}
+
+enum AuditLogOperation {
+  CREATE
+  UPDATE
+  DELETE
+}
+
+model AuditLog {
+  id        Int               @id @default(autoincrement())
+  resource  String
+  operation AuditLogOperation
+  success   Boolean           @default(true)
+  timestamp DateTime          @default(now())
+  userId    Int?
+  user      User?             @relation(fields: [userId], references: [id], onDelete: Restrict)
+  meta      Json
 }

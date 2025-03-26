@@ -132,6 +132,12 @@ describe('SurveysController', () => {
         where: { profileId: PARTICIPANT_COMPLETED_ID },
       })
       expect(participant?.answers[1].answers).toEqual([true, 'Choice 1'])
+      const aLog = await prisma.auditLog.findFirstOrThrow({
+        where: { userId: PARTICIPANT_COMPLETED_ID },
+      })
+      expect(aLog.resource).toBe('surveys/answers')
+      expect(aLog.operation).toBe('UPDATE')
+      expect((aLog.meta as any).bodyData).toStrictEqual(reqBody)
     })
 
     it('should change status from requires_review after submission', async () => {
@@ -197,6 +203,11 @@ describe('SurveysController', () => {
         where: { profileId: 99 },
       })
       expect(participant.answers[1].answers[0]).toBe(null)
+      const aLog = await prisma.auditLog.findFirstOrThrow({
+        where: { userId: 99 },
+      })
+      expect(aLog.resource).toBe('surveys/participant')
+      expect(aLog.operation).toBe('UPDATE')
     })
   })
 
@@ -221,6 +232,14 @@ describe('SurveysController', () => {
       expect(response.status).toBe(204)
       const survey = await prisma.surveyVersion.findFirst({ where: { id: 2 } })
       expect(survey?.data[0].elements[1].data.text).toBe('Question 1')
+
+      const aLog = await prisma.auditLog.findFirstOrThrow({
+        where: { userId: PARTICIPANT_COMPLETED_ID },
+      })
+      expect(aLog.resource).toBe('surveys')
+      expect(aLog.operation).toBe('UPDATE')
+      expect((aLog.meta as any).bodyData).toStrictEqual(reqBody)
+      expect((aLog.meta as any).resourceId).toBe('2')
     })
 
     it('should fail to update a published survey', async () => {

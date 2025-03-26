@@ -8,6 +8,7 @@ import {
   SuccessResponse,
   Body,
   UploadedFile,
+  Middlewares,
 } from 'tsoa'
 import { Integrations } from '../../../integrations/src/Integrations'
 import prisma from '../PrismaClient'
@@ -25,22 +26,23 @@ import { SurveyStep } from 'common/types/survey'
 import exampleREDCapMapping from '../../../integrations/src/exampleREDCapMapping.json'
 import { parseCSV, validateFile } from '../utils/parseCsv'
 import { FileUploadError } from '../middlewares/ErrorHandler'
-import { AuthController } from './AuthController'
 import logger from 'common/src/logger'
-
-const REDCAP_API_URL: string = process.env.REDCAP_API_URL!
+import { AuthController } from './AuthController'
+import { auditLog } from '../middlewares/AuditLog'
 
 @Route('integrations')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 @Tags('Integrations')
 @Security('jwt', ['OrganisationAdmin'])
+@Middlewares(auditLog)
 export class IntegrationsController extends Controller {
   userRepo = prisma.user
   profileRepo = prisma.participantProfile
   surveyRepo = prisma.surveyVersion
   spRepo = prisma.surveyParticipant
   integrationService = new Integrations(exampleREDCapMapping)
+  REDCAP_API_URL: string = ''
 
   @Post('/redcap/participant/upload/csv')
   @SuccessResponse('201', 'Created Participants from CSV')
@@ -61,12 +63,12 @@ export class IntegrationsController extends Controller {
   public async uploadRedcapParticipantAPI(
     @Body() bodyRequest: UploadRedcapParticipantAPIRequest,
   ): Promise<UploadRedcapParticipantResponse> {
-    const { form } = bodyRequest
+    this.REDCAP_API_URL = this.validateRedcapConfig()
+    const { formName, redcapAPIToken } = bodyRequest
     const params = new URLSearchParams()
-    params.append('token', process.env.REDCAP_API_KEY as string)
+    params.append('token', redcapAPIToken || (process.env.REDCAP_API_TOKEN as string))
     params.append('content', 'record')
     params.append('format', 'json')
-
     /**
      * flat - output as one record per row [default]
      */
@@ -78,9 +80,9 @@ export class IntegrationsController extends Controller {
      * with an underscore
      * (by default, all records from all data collection instruments is pulled)
      */
-    params.append('form[0]', form)
+    params.append('form[0]', formName)
 
-    const participantData = await fetch(REDCAP_API_URL, {
+    const participantData = await fetch(this.REDCAP_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -125,9 +127,10 @@ export class IntegrationsController extends Controller {
   public async uploadRedcapInstrumentAPI(
     @Body() bodyRequest: UploadRedcapInstrumentAPIRequest,
   ): Promise<UploadRedcapInstrumentResponse> {
-    const { form } = bodyRequest
+    this.REDCAP_API_URL = this.validateRedcapConfig()
+    const { formName, redcapAPIToken } = bodyRequest
     const params = new URLSearchParams()
-    params.append('token', process.env.REDCAP_API_KEY as string)
+    params.append('token', redcapAPIToken || (process.env.REDCAP_API_TOKEN as string))
     params.append('content', 'metadata')
     params.append('format', 'json')
 
@@ -138,9 +141,9 @@ export class IntegrationsController extends Controller {
      * NOTE: These 'forms' are not the form label values that are seen on the webpages,
      * but instead they are the unique form names seen in Column B of the data dictionary.
      */
-    params.append('forms[0]', form)
+    params.append('forms[0]', formName)
 
-    const surveyData = await fetch(REDCAP_API_URL, {
+    const surveyData = await fetch(this.REDCAP_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -192,6 +195,7 @@ export class IntegrationsController extends Controller {
           ids.push(participantResponse.id)
           profilesCreatedCount++
         } catch (err) {
+          logger.error(err)
           profilesAlreadyExistedCount++
           continue
         }
@@ -250,5 +254,12 @@ export class IntegrationsController extends Controller {
     })
 
     return { id: survey.id }
+  }
+
+  private validateRedcapConfig() {
+    if (!process.env.REDCAP_API_URL) {
+      throw new BadGatewayError('Redcap API not configured: missing REDCAP_API_URL')
+    }
+    return process.env.REDCAP_API_URL
   }
 }

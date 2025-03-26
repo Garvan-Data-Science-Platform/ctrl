@@ -148,10 +148,11 @@ export default function Dashboard() {
                     height: '100%',
                   }}
                 >
-                  <Box sx={{ display: 'flex', gap: 3 }}>
+                  <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
                     <Box
                       sx={{
                         width: 24,
+                        minWidth: 24,
                         height: 24,
                         borderRadius: '50%',
                         border: '2px solid',

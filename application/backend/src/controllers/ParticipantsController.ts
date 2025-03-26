@@ -13,7 +13,18 @@ import type {
   InviteParticipantsResponse,
 } from 'common/types/api/participants'
 import logger from 'common/src/logger'
-import { Route, Tags, Security, Controller, Get, Response, Body, Path, Post } from 'tsoa'
+import {
+  Route,
+  Tags,
+  Security,
+  Controller,
+  Get,
+  Response,
+  Body,
+  Path,
+  Post,
+  Middlewares,
+} from 'tsoa'
 import { Participant } from 'common/types/api/participants/participant'
 import mailerTransporter, { fromAddress } from '../utils/mailer'
 import nodemailer from 'nodemailer'
@@ -22,12 +33,14 @@ import { InviteStatus } from '../../../common/types/api/participants/invite'
 import { NotFoundError } from '../middlewares/ErrorHandler'
 import { determineLastUpdated, determineStatus } from '../utils/answers'
 import { ProfilesController } from './ProfilesController'
+import { auditLog } from '../middlewares/AuditLog'
 
 @Route('participants')
 @Tags('Participants')
 @Security('jwt')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
+@Middlewares(auditLog)
 export class ParticipantsController extends Controller {
   participantRepo = prisma.surveyParticipant
   profileRepo = prisma.participantProfile

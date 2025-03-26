@@ -12,6 +12,7 @@ import {
   Controller,
   Security,
   ValidateError,
+  Middlewares,
 } from 'tsoa'
 import logger from 'common/src/logger'
 import type {
@@ -39,10 +40,12 @@ import { generatePasswordResetEmail } from '../utils/passwordResetTemplate'
 import crypto from 'crypto'
 import nodemailer from 'nodemailer'
 import mailerTransporter, { fromAddress } from '../utils/mailer'
+import { auditLog } from '../middlewares/AuditLog'
 
 @Route('users')
 @Tags('Users')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
+@Middlewares(auditLog)
 export class UsersController extends Controller {
   userRepo = prisma.user
   passwordResetTokenRepo = prisma.passwordResetToken

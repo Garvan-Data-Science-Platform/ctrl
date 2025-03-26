@@ -29,7 +29,9 @@ services:
 
   backend-test:
     depends_on:
-      - db-test
+      db-test:
+        condition: service_healthy
+        restart: true
     build:
       dockerfile: ./application/backend/Dockerfile
     env_file:

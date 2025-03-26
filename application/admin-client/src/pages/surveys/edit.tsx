@@ -82,9 +82,14 @@ export const SurveyEditor = () => {
   useEffect(() => {
     if (queryData && !isLoading) {
       setJustLoaded(true)
-      setData(queryData.data.data)
     }
   }, [isLoading])
+
+  useEffect(() => {
+    if (queryData) {
+      setData(queryData.data.data)
+    }
+  }, [queryData])
 
   useEffect(() => {
     if (justLoaded) {
@@ -97,7 +102,7 @@ export const SurveyEditor = () => {
       setSavePending(true)
       clearTimeout(timeoutObject)
       const t = setTimeout(() => {
-        mutate({ id, values: { data: surveyData } })
+        mutate({ id, values: { data: surveyData }, invalidates: [] })
         setSavePending(false)
       }, 2000)
       setTimeoutObject(t as any)
@@ -177,6 +182,7 @@ export const SurveyEditor = () => {
               >
                 <Settings />
               </Button>
+              <Box sx={{ flexGrow: 1 }} />
               <Menu
                 id="basic-menu"
                 anchorEl={anchorEl}
