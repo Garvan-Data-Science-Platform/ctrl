@@ -30,10 +30,12 @@ export class NotFoundError extends Error {
   }
 }
 
-export class IncorrectPasswordError extends Error {
-  constructor() {
-    super('Incorrect Password')
-    this.name = 'IncorrectPasswordError'
+export class InvalidCredentialsError extends Error {
+  details: unknown
+  constructor(details?: unknown) {
+    super('Invalid credentials')
+    this.name = 'InvalidCredentialsError'
+    this.details = details
   }
 }
 
@@ -106,7 +108,7 @@ export function ErrorHandler(
     err instanceof NoTokenError ||
     err instanceof TokenExpiredError ||
     err instanceof JsonWebTokenError ||
-    err instanceof IncorrectPasswordError ||
+    err instanceof InvalidCredentialsError ||
     err instanceof IncorrectPermissionsError
   ) {
     const errorResponse: UnauthorizedErrorResponse = {

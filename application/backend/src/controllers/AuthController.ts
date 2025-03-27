@@ -31,7 +31,7 @@ import type {
   UnauthorizedErrorResponse,
   ValidateErrorResponse,
 } from 'common/types/api/errors'
-import { IncorrectPasswordError, NotFoundError } from '../middlewares/ErrorHandler'
+import { InvalidCredentialsError, NotFoundError } from '../middlewares/ErrorHandler'
 import { ParticipantType } from 'common/types/api/users/ParticipantProfile'
 import { createDefaultAnswers } from '../utils/answers'
 import { auditLog } from '../middlewares/AuditLog'
@@ -218,12 +218,9 @@ export class AuthController extends Controller {
   public async login(@Body() bodyRequest: LoginRequest): Promise<LoginResponse> {
     // Check if user exists and password matches
     const user = await this.userRepo.findUnique({ where: { email: bodyRequest.email } })
-    if (!user) {
-      throw new NotFoundError(`User ${bodyRequest.email} does not exist`)
-    }
 
-    if (!(await verifyPassword(user.password, bodyRequest.password))) {
-      throw new IncorrectPasswordError()
+    if (!user || !(await verifyPassword(user.password, bodyRequest.password))) {
+      throw new InvalidCredentialsError('Invalid credentials provided')
     }
 
     const token = await generateToken({ userId: user.id, roles: [user.role] })
