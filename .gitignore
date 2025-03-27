@@ -17,3 +17,5 @@ application/*/dist/
 
 application/*/coverage/
 *.tgz
+
+application/user-client/cypress/downloads

@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import {
+  Alert,
   alpha,
   Box,
   Button,
@@ -11,13 +13,16 @@ import {
 } from '@mui/material'
 import NavBar from '../components/NavBar'
 import type { GetUserSurveyStepsResponse } from '@common/types/api/surveys'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import CheckCircle from '@mui/icons-material/CheckCircle'
 import InfoOutlined from '@mui/icons-material/InfoOutlined'
 import Circle from '@mui/icons-material/Circle'
 import { Link } from 'react-router-dom'
 import { GetParticipantProfileResponse } from '@common/types/api/users'
+import { GetResponsesByIdResponse } from '@common/types/api/surveys'
 import { apiClient } from '../apiClient'
+import ResponsesPdf from '../components/PdfExport'
+import { pdf } from '@react-pdf/renderer'
 
 export default function Dashboard() {
   const { isPending, error, data } = useQuery({
@@ -28,13 +33,52 @@ export default function Dashboard() {
         .then((res) => res.data) as Promise<GetUserSurveyStepsResponse>,
   })
 
-  const { data: pdata } = useQuery({
+  const { data: profileData } = useQuery({
     queryKey: ['profile', 'get'],
     queryFn: () =>
       apiClient
         .get('/profiles/current')
         .then((res) => res.data) as Promise<GetParticipantProfileResponse>,
   })
+
+  const [isLoading, setIsLoading] = useState(false)
+  const [showPdfError, setShowPdfError] = useState(false)
+
+  const queryClient = useQueryClient()
+
+  const generatePdf = async () => {
+    setIsLoading(true)
+    try {
+      if (!profileData) throw new Error()
+      const responseData = await queryClient.fetchQuery({
+        queryKey: ['surveys', 'get', profileData.data.id],
+        queryFn: () =>
+          apiClient
+            .get(`/surveys/responses/current`)
+            .then((res) => res.data) as Promise<GetResponsesByIdResponse>,
+      })
+
+      // Generate PDF with the data
+      const pdfDoc = <ResponsesPdf profile={profileData} responses={responseData} />
+
+      // Create a blob from the PDF document
+      const blob = await pdf(pdfDoc).toBlob()
+
+      // Format datetime for appending to filename. Ugly code but avoids adding another dependency
+      const now = new Date()
+      const formattedDatetime = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}`
+
+      // Trigger download
+      const link = document.createElement('a')
+      link.href = URL.createObjectURL(blob)
+      link.download = `CTRL-responses-${profileData!.data.firstName}_${profileData!.data.lastName}_${formattedDatetime}.pdf`
+      link.click()
+    } catch {
+      setShowPdfError(true)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const renderReviewStatus = (status: 'completed' | 'viewed' | 'review_required') => {
     if (['viewed', 'completed'].includes(status)) {
@@ -81,7 +125,7 @@ export default function Dashboard() {
       <NavBar />
       <Container maxWidth="md">
         <Typography variant="h3" textAlign="left" sx={{ mt: 3, mb: 3 }}>
-          Welcome {pdata?.data?.firstName}
+          Welcome {profileData?.data?.firstName}
         </Typography>
         {data?.data.map((val, idx) => (
           <Card
@@ -167,9 +211,19 @@ export default function Dashboard() {
         ))}
         <Box sx={{ display: 'flex' }}>
           <Box sx={{ flexGrow: 1 }} />
-          <Button variant="contained" sx={{ mt: 3 }}>
-            View Responses
-          </Button>
+          {showPdfError ? (
+            <Alert severity="error">Error Creating PDF</Alert>
+          ) : (
+            <Button
+              variant="contained"
+              sx={{ mt: 3 }}
+              data-cy={`view-pdf`}
+              onClick={() => profileData && generatePdf()}
+              disabled={isLoading || !!error}
+            >
+              View Responses
+            </Button>
+          )}
         </Box>
       </Container>
     </>
