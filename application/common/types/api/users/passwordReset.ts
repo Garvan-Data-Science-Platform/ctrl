@@ -1,6 +1,6 @@
 /**
  * @example {
- *  "email": "john.doe@email.com",
+ *  "email": "john.doe@email.com"
  * }
  */
 export interface GeneratePasswordResetLinkRequest {
@@ -13,7 +13,7 @@ export interface GeneratePasswordResetLinkRequest {
 /**
  * @example {
  *  "newPassword": "newPassword123",
- *  "token": "1063e00e4a273e698577",
+ *  "token": "1063e00e4a273e698577"
  * }
  */
 export interface ResetPasswordRequest {
