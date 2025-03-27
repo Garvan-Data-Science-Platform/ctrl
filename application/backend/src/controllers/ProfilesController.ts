@@ -102,7 +102,7 @@ export class ProfilesController extends Controller {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { user, ...profile } = data
-    const { mobile, addressLine, postcode, suburb, firstName, lastName, familyId } = profile
+    const { mobile, addressLine, postcode, suburb, firstName, lastName, id, familyId } = profile
     const dob = profile.dob.toISOString()
     const state = profile.state as StateTerritory
     const participantType = profile.participantType as ParticipantType
@@ -115,6 +115,7 @@ export class ProfilesController extends Controller {
 
     const responseData: GetParticipantProfileResponse = {
       data: {
+        id,
         firstName,
         lastName,
         addressLine,
