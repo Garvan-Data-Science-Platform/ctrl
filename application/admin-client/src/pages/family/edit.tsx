@@ -1,0 +1,258 @@
+import {
+  Box,
+  Button,
+  Checkbox,
+  Container,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Radio,
+  RadioGroup,
+  Select,
+  TextField,
+  Typography,
+} from '@mui/material'
+import { useInvalidate, useNavigation, useOne, useParsed, useShow } from '@refinedev/core'
+import { Breadcrumb, Edit, Show } from '@refinedev/mui'
+import { useForm } from '@refinedev/react-hook-form'
+import { Controller } from 'react-hook-form'
+import { UpdateProfileRequest } from '@common/types/api/users/updateProfile'
+import { ContactMethod, OnBehalf, StateTerritory } from '@common/types/api/users/ParticipantProfile'
+import { useState } from 'react'
+import { ParticipantSearch } from '../../components/ParticipantSearch'
+import { ArrowBack, Delete } from '@mui/icons-material'
+import { Link } from 'react-router-dom'
+import { FamilyMember } from '@common/types/api/users/getParticipantProfile'
+import { axiosInstance } from '../../providers/dataProvider'
+
+export const FamilyEdit = () => {
+  const { id } = useParsed()
+
+  const { show } = useNavigation()
+  const invalidate = useInvalidate()
+
+  const { data } = useOne<FamilyMember[]>({ resource: 'families', id })
+
+  const [action, setAction] = useState<'ADD' | 'REMOVE' | null>(null)
+  const [newMemberStatus, setNewMemberStatus] = useState<'NEW' | 'EXISTING' | null>(null)
+  const [newMemberType, setNewMemberType] = useState<'DEPENDENT' | 'GUARDIAN' | 'OTHER' | null>(
+    null,
+  )
+
+  //Dependents add form
+  const {
+    register,
+    control,
+    handleSubmit,
+    setError,
+    watch,
+    formState: { errors },
+  } = useForm<OnBehalf>()
+
+  const handleRemove = async (profileId: number) => {
+    await axiosInstance.post(`/families/remove/${profileId}`)
+    invalidate({ resource: 'families', invalidates: ['all'] })
+  }
+
+  return (
+    <Show
+      resource="family"
+      title={<Typography variant="h5">Edit Family</Typography>}
+      goBack={
+        <IconButton component={Link} to="/participants">
+          <ArrowBack />
+        </IconButton>
+      }
+    >
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Typography>Current Family Members:</Typography>
+        <Box>
+          {data?.data.map((val) => (
+            <Box
+              key={val.id}
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                minHeight: 40,
+                width: 250,
+                mt: 1,
+                mb: 1,
+                borderRadius: 2,
+                border: '1px solid',
+                borderColor: action == 'REMOVE' ? 'red' : 'lightgrey',
+              }}
+            >
+              {action == 'REMOVE' && (
+                <IconButton onClick={() => handleRemove(val.id)}>
+                  <Delete />
+                </IconButton>
+              )}
+              <Typography>{`${val.firstName} ${val.lastName}`}</Typography>
+            </Box>
+          ))}
+        </Box>
+
+        <Box>
+          <Button
+            variant={action == 'ADD' ? 'contained' : 'outlined'}
+            onClick={() => setAction('ADD')}
+          >
+            Add member to this family
+          </Button>
+          <Button
+            sx={{ ml: 1 }}
+            variant={action == 'REMOVE' ? 'contained' : 'outlined'}
+            onClick={() => setAction('REMOVE')}
+          >
+            Remove member from this family
+          </Button>
+        </Box>
+
+        {action == 'ADD' && (
+          <>
+            <FormControl>
+              <FormLabel>Is this person registered as a participant in CTRL?</FormLabel>
+              <RadioGroup
+                row
+                onChange={(e) => {
+                  setNewMemberStatus(e.target.value as any)
+                }}
+                value={newMemberStatus}
+              >
+                <FormControlLabel
+                  value={'EXISTING'}
+                  control={<Radio />}
+                  label="Yes"
+                  sx={(theme) => ({ [theme.breakpoints.up('sm')]: { minWidth: 110 } })}
+                />
+                <FormControlLabel
+                  value={'NEW'}
+                  control={<Radio />}
+                  label="No"
+                  sx={(theme) => ({ [theme.breakpoints.up('sm')]: { minWidth: 110 } })}
+                />
+              </RadioGroup>
+            </FormControl>
+
+            {newMemberStatus == 'NEW' && (
+              <>
+                <FormControl>
+                  <FormLabel>The new member is a:</FormLabel>
+                  <RadioGroup
+                    row
+                    value={newMemberType}
+                    onChange={(e) => setNewMemberType(e.target.value as any)}
+                  >
+                    <FormControlLabel
+                      value={'DEPENDENT'}
+                      control={<Radio />}
+                      label="Dependent"
+                      sx={(theme) => ({ [theme.breakpoints.up('sm')]: { minWidth: 110 } })}
+                    />
+                    <FormControlLabel
+                      value={'GUARDIAN'}
+                      control={<Radio />}
+                      label="Parent/Guardian"
+                      sx={(theme) => ({ [theme.breakpoints.up('sm')]: { minWidth: 110 } })}
+                    />
+                    <FormControlLabel
+                      value={'OTHER'}
+                      control={<Radio />}
+                      label="Other"
+                      sx={(theme) => ({ [theme.breakpoints.up('sm')]: { minWidth: 110 } })}
+                    />
+                  </RadioGroup>
+                </FormControl>
+                {newMemberType == 'DEPENDENT' && (
+                  <Box sx={{ maxWidth: 500 }} component="form">
+                    <TextField
+                      sx={{ m: 1, flexGrow: 1 }}
+                      label="First Name"
+                      data-cy="dep-first"
+                      required
+                      {...register(`firstName`, {
+                        required: 'This field is required',
+                      })}
+                    />
+                    <TextField
+                      sx={{ m: 1, flexGrow: 1 }}
+                      label="Family Name"
+                      required
+                      data-cy="dep-surname"
+                      {...register(`lastName`, {
+                        required: 'This field is required',
+                      })}
+                    />
+                    <TextField
+                      type="date"
+                      sx={{ m: 1 }}
+                      label="Date of Birth"
+                      required
+                      data-cy="dep-dob"
+                      {...register(`dob`, { required: 'This field is required' })}
+                      slotProps={{ inputLabel: { shrink: true } }}
+                    />
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        mt: 1,
+                        ml: 1,
+                      }}
+                    >
+                      <Typography>
+                        This child may not be able to provide consent themselves when they reach 18
+                      </Typography>
+                      <Checkbox defaultChecked={false} {...register(`permanent`)} />
+                    </Box>
+                    <Button
+                      data-cy="request-reset-button"
+                      variant="contained"
+                      sx={{ mt: 3 }}
+                      type="submit"
+                    >
+                      Add Dependent
+                    </Button>
+                  </Box>
+                )}
+
+                {(newMemberType == 'GUARDIAN' || newMemberType == 'OTHER') && (
+                  <>
+                    <Typography>
+                      You need to invite this person to create an account in CTRL
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      component={Link}
+                      to="/participants"
+                      sx={{ width: 200 }}
+                    >
+                      Invite Participant
+                    </Button>
+                  </>
+                )}
+              </>
+            )}
+            {newMemberStatus == 'EXISTING' && (
+              <>
+                <Typography>Search and select the family member you want to add:</Typography>
+                <ParticipantSearch
+                  buttonText="Add to family"
+                  onConfirm={(id: number) => console.log('ADDED', id)}
+                  exclude={data?.data.map((val) => val.id) || []}
+                />
+              </>
+            )}
+          </>
+        )}
+      </Box>
+    </Show>
+  )
+}

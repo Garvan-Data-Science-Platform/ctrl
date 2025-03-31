@@ -23,6 +23,8 @@ import { AuthController } from './controllers/AuthController';
 import { IntegrationsController } from './controllers/IntegrationsController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { HealthCheckController } from './controllers/HealthCheckController';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { FamiliesController } from './controllers/FamiliesController';
 import { expressAuthentication } from './authentication';
 // @ts-ignore - no great way to install types from subpackage
 import type { Request as ExRequest, Response as ExResponse, RequestHandler, Router } from 'express';
@@ -353,6 +355,7 @@ const models: TsoaRoute.Models = {
         "properties": {
             "firstName": {"dataType":"string","required":true},
             "lastName": {"dataType":"string","required":true},
+            "id": {"dataType":"double","required":true},
             "participantType": {"ref":"ParticipantType","required":true},
         },
         "additionalProperties": false,
@@ -361,7 +364,7 @@ const models: TsoaRoute.Models = {
     "GetParticipantProfileResponse": {
         "dataType": "refObject",
         "properties": {
-            "data": {"dataType":"nestedObjectLiteral","nestedProperties":{"familyMembers":{"dataType":"array","array":{"dataType":"refObject","ref":"FamilyMember"},"required":true},"nextOfKin":{"ref":"AlternativeContact"},"participantType":{"ref":"ParticipantType","required":true},"preferredContact":{"ref":"ContactMethod","required":true},"postcode":{"dataType":"string"},"state":{"ref":"StateTerritory"},"suburb":{"dataType":"string"},"addressLine":{"dataType":"string"},"mobile":{"dataType":"string","required":true},"email":{"dataType":"string"},"dob":{"dataType":"string","required":true},"lastName":{"dataType":"string","required":true},"middleName":{"dataType":"string"},"firstName":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}},"required":true},
+            "data": {"dataType":"nestedObjectLiteral","nestedProperties":{"familyId":{"dataType":"double","required":true},"familyMembers":{"dataType":"array","array":{"dataType":"refObject","ref":"FamilyMember"},"required":true},"nextOfKin":{"ref":"AlternativeContact"},"participantType":{"ref":"ParticipantType","required":true},"preferredContact":{"ref":"ContactMethod","required":true},"postcode":{"dataType":"string"},"state":{"ref":"StateTerritory"},"suburb":{"dataType":"string"},"addressLine":{"dataType":"string"},"mobile":{"dataType":"string","required":true},"email":{"dataType":"string"},"dob":{"dataType":"string","required":true},"lastName":{"dataType":"string","required":true},"middleName":{"dataType":"string"},"firstName":{"dataType":"string","required":true}},"required":true},
         },
         "additionalProperties": false,
     },
@@ -432,7 +435,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "ParticipantWithProfile": {
         "dataType": "refAlias",
-        "type": {"dataType":"intersection","subSchemas":[{"ref":"Participant"},{"dataType":"nestedObjectLiteral","nestedProperties":{"profile":{"dataType":"nestedObjectLiteral","nestedProperties":{"familyMembers":{"dataType":"array","array":{"dataType":"refObject","ref":"FamilyMember"},"required":true},"nextOfKin":{"ref":"AlternativeContact"},"participantType":{"ref":"ParticipantType","required":true},"preferredContact":{"ref":"ContactMethod","required":true},"postcode":{"dataType":"string"},"state":{"ref":"StateTerritory"},"suburb":{"dataType":"string"},"addressLine":{"dataType":"string"},"mobile":{"dataType":"string","required":true},"email":{"dataType":"string"},"dob":{"dataType":"string","required":true},"lastName":{"dataType":"string","required":true},"middleName":{"dataType":"string"},"firstName":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}},"required":true}}}],"validators":{}},
+        "type": {"dataType":"intersection","subSchemas":[{"ref":"Participant"},{"dataType":"nestedObjectLiteral","nestedProperties":{"profile":{"dataType":"nestedObjectLiteral","nestedProperties":{"familyId":{"dataType":"double","required":true},"familyMembers":{"dataType":"array","array":{"dataType":"refObject","ref":"FamilyMember"},"required":true},"nextOfKin":{"ref":"AlternativeContact"},"participantType":{"ref":"ParticipantType","required":true},"preferredContact":{"ref":"ContactMethod","required":true},"postcode":{"dataType":"string"},"state":{"ref":"StateTerritory"},"suburb":{"dataType":"string"},"addressLine":{"dataType":"string"},"mobile":{"dataType":"string","required":true},"email":{"dataType":"string"},"dob":{"dataType":"string","required":true},"lastName":{"dataType":"string","required":true},"middleName":{"dataType":"string"},"firstName":{"dataType":"string","required":true}},"required":true}}}],"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "GetParticipantResponse": {
@@ -657,6 +660,19 @@ const models: TsoaRoute.Models = {
         "properties": {
             "formName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
             "redcapAPIToken": {"dataType":"string","validators":{"minLength":{"value":1}}},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Workspace": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"version":{"dataType":"string","required":true},"name":{"dataType":"string","required":true}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GetFamilyResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "data": {"dataType":"array","array":{"dataType":"refObject","ref":"FamilyMember"},"required":true},
         },
         "additionalProperties": false,
     },
@@ -2227,6 +2243,122 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
 
               await templateService.apiHandler({
                 methodName: 'HealthCheck',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsHealthCheckController_getAllWorkspaces, request, response });
+
+                const controller = new HealthCheckController();
+
+              await templateService.apiHandler({
+                methodName: 'getAllWorkspaces',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsFamiliesController_getFamilyById: Record<string, TsoaRoute.ParameterSchema> = {
+                familyId: {"in":"path","name":"familyId","required":true,"dataType":"double"},
+        };
+        app.get('/families/:familyId',
+            authenticateMiddleware([{"jwt":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(FamiliesController)),
+            ...(fetchMiddlewares<RequestHandler>(FamiliesController.prototype.getFamilyById)),
+
+            async function FamiliesController_getFamilyById(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsFamiliesController_getFamilyById, request, response });
+
+                const controller = new FamiliesController();
+
+              await templateService.apiHandler({
+                methodName: 'getFamilyById',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsFamiliesController_removeMember: Record<string, TsoaRoute.ParameterSchema> = {
+                profileId: {"in":"path","name":"profileId","required":true,"dataType":"double"},
+        };
+        app.post('/families/remove/:profileId',
+            authenticateMiddleware([{"jwt":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(FamiliesController)),
+            ...(fetchMiddlewares<RequestHandler>(FamiliesController.prototype.removeMember)),
+
+            async function FamiliesController_removeMember(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsFamiliesController_removeMember, request, response });
+
+                const controller = new FamiliesController();
+
+              await templateService.apiHandler({
+                methodName: 'removeMember',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsFamiliesController_addMember: Record<string, TsoaRoute.ParameterSchema> = {
+                familyId: {"in":"path","name":"familyId","required":true,"dataType":"double"},
+                profileId: {"in":"path","name":"profileId","required":true,"dataType":"double"},
+        };
+        app.post('/families/:familyId/add/:profileId',
+            authenticateMiddleware([{"jwt":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(FamiliesController)),
+            ...(fetchMiddlewares<RequestHandler>(FamiliesController.prototype.addMember)),
+
+            async function FamiliesController_addMember(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsFamiliesController_addMember, request, response });
+
+                const controller = new FamiliesController();
+
+              await templateService.apiHandler({
+                methodName: 'addMember',
                 controller,
                 response,
                 next,
