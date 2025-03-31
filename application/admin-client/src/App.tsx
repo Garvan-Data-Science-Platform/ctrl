@@ -34,6 +34,7 @@ import { ResponsesView } from './pages/responses'
 import { ListAlt, Person, RecentActors, DatasetLinked } from '@mui/icons-material'
 import { ParticipantEdit } from './pages/participants/edit'
 import { SetupPage } from './pages/setup'
+import { FamilyEdit } from './pages/family/edit'
 
 function App() {
   return (
@@ -104,6 +105,9 @@ function App() {
                   {
                     name: 'invites',
                   },
+                  {
+                    name: 'families',
+                  },
                 ]}
                 options={{
                   syncWithLocation: true,
@@ -160,6 +164,7 @@ function App() {
                     <Route path="/participants">
                       <Route index element={<ParticipantList />} />
                       <Route path="edit/:id" element={<ParticipantEdit />} />
+                      <Route path="family/edit/:id" element={<FamilyEdit />} />
                       <Route path=":id" element={<ParticipantShow />} />
                     </Route>
                     <Route path="/integrations">

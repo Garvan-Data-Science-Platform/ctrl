@@ -8,6 +8,7 @@ import {
 export interface FamilyMember {
   firstName: string
   lastName: string
+  id: number
   participantType: ParticipantType
 }
 
@@ -27,5 +28,6 @@ export interface GetParticipantProfileResponse {
     participantType: ParticipantType
     nextOfKin?: AlternativeContact
     familyMembers: FamilyMember[]
+    familyId: number
   }
 }

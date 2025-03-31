@@ -1,11 +1,12 @@
 import { ParticipantAnswerStatus } from '@common/types/api/participants/participant'
 import { GetParticipantByIdResponse } from '@common/types/api/participants'
-import { Box, Button, Stack, Tooltip, Typography } from '@mui/material'
+import { Box, Button, IconButton, Stack, Tooltip, Typography } from '@mui/material'
 import { useShow } from '@refinedev/core'
 import { Show, TextFieldComponent as TextField } from '@refinedev/mui'
 import { Link } from 'react-router-dom'
 import { statusMap } from './list'
 import { familyMap } from '@common/src/familyMap'
+import { Edit, MoreVert } from '@mui/icons-material'
 
 export const ParticipantShow = () => {
   const { queryResult } = useShow({})
@@ -70,36 +71,44 @@ export const ParticipantShow = () => {
         <TextField value={record?.profile.nextOfKin?.mobile} />
       </Stack>
 
-      {record?.profile.familyMembers.length > 0 && (
-        <table style={{ textAlign: 'left', tableLayout: 'fixed' }}>
-          <tbody>
-            <>
-              <tr>
-                <td>
+      <table style={{ textAlign: 'left', tableLayout: 'fixed' }}>
+        <tbody>
+          <>
+            <tr>
+              <td>
+                <Box sx={{ display: 'flex', flexDirection: 'row' }}>
                   <Typography fontWeight="bold" sx={{ mt: 1, mb: 1 }}>
                     Family Members
                   </Typography>
-                </td>
-              </tr>
-              {record.profile.familyMembers.map((val, idx) => {
-                return (
-                  <tr key={`fam_${idx}`}>
-                    <td>
+                  <IconButton
+                    component={Link}
+                    to={`/participants/family/edit/${record?.profile.familyId}`}
+                  >
+                    <Edit />
+                  </IconButton>
+                </Box>
+              </td>
+            </tr>
+            {record?.profile.familyMembers.map((val, idx) => {
+              return (
+                <tr key={`fam_${idx}`}>
+                  <td>
+                    <Link to={`/participants/${val.id}`}>
                       <Typography>
                         {val.firstName} {val.lastName}
                       </Typography>
-                    </td>
+                    </Link>
+                  </td>
 
-                    <td>
-                      <Typography>{familyMap[val.participantType]}</Typography>
-                    </td>
-                  </tr>
-                )
-              })}
-            </>
-          </tbody>
-        </table>
-      )}
+                  <td>
+                    <Typography>{familyMap[val.participantType]}</Typography>
+                  </td>
+                </tr>
+              )
+            })}
+          </>
+        </tbody>
+      </table>
 
       <Typography variant="body1" fontWeight="bold" sx={{ mt: 1 }}>
         {'Answer History (By Survey Version)'}
