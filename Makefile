@@ -6,9 +6,9 @@ LOCAL_DEPLOYMENT:=ctrl-local
 LOCAL_CONFIG:=demoMode.enabled=true,$\
 	userClient.image.repository=docker.io/library/user-client,$\
 	userClient.image.pullPolicy=Never,$\
-	adminClient.image.repository=docker.io/library/user-client,$\
+	adminClient.image.repository=docker.io/library/admin-client,$\
 	adminClient.image.pullPolicy=Never,$\
-	backend.image.repository=docker.io/library/user-client,$\
+	backend.image.repository=docker.io/library/backend,$\
 	backend.image.pullPolicy=Never
 
 .PHONY: help
