@@ -16,16 +16,18 @@ LOCAL_CONFIG:=demoMode.enabled=true,$\
 # Keep 'help' as first target,
 help:
 	@echo "--- List of available targets:"
-	@echo "- help      - print this help message."
-	@echo "- e2e       - spin up db/frontend/backend and run e2e tests"
-	@echo "- db        - spin up db"
-	@echo "- db-down   - bring down db"
-	@echo "- clean     - bring down docker containers and remove db volume"
-	@echo "- seed      - apply migrations and seed db"
-	@echo "- docker    - build local docker images"
-	@echo "- install   - local helm deployment"
-	@echo "- upgrade   - local helm upgrade"
-	@echo "- uninstall - local helm remove deployment"
+	@echo "- help           - print this help message."
+	@echo "- e2e            - spin up db/frontend/backend and run e2e tests"
+	@echo "- db             - spin up db"
+	@echo "- db-down        - bring down db"
+	@echo "- clean          - bring down docker containers and remove db volume"
+	@echo "- seed           - apply migrations and seed db"
+	@echo "- kube-start     - start minikube cluster"
+	@echo "- kube-delete    - delete minikube cluster"
+	@echo "- docker         - build local docker images"
+	@echo "- install        - local helm deployment"
+	@echo "- upgrade        - local helm upgrade"
+	@echo "- uninstall      - local helm remove deployment"
 	@echo "---"
 
 e2e:
@@ -69,6 +71,13 @@ clean: db-down
 # Local deployment via minikube and helm
 
 # Build images
+
+kube-start:
+	minikube start
+
+kube-delete:
+	minikube delete
+
 docker:
 	eval $$(minikube -p minikube docker-env) && \
 	docker build -t user-client -f application/user-client/Dockerfile . && \
