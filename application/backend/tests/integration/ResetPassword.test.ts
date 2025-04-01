@@ -108,7 +108,7 @@ describe('User Password Reset', () => {
 
     // Check the response
     expect(originalPasswordResponse.status).toBe(401)
-    expect(originalPasswordResponse.body.message).toBe('Incorrect Password')
+    expect(originalPasswordResponse.body.message).toBe('Invalid credentials')
 
     // Attempt login with the new password
     const newPasswordResponse = await request(app).post(loginUrl).send({

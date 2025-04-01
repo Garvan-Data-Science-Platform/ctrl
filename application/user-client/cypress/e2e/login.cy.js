@@ -18,6 +18,6 @@ describe('Login', () => {
     cy.get('[data-cy="login-email"]').type('test2@example.com')
     cy.get('[data-cy="login-password"]').type('passwordwrong')
     cy.contains('Log In').click()
-    cy.contains('Incorrect Password').should('exist')
+    cy.contains('Invalid credentials').should('exist')
   })
 })

@@ -81,6 +81,9 @@
       "User": {
         "description": "Model User",
         "properties": {
+          "deleted": {
+            "type": "boolean"
+          },
           "updatedAt": {
             "type": "string",
             "format": "date-time"
@@ -113,6 +116,7 @@
           }
         },
         "required": [
+          "deleted",
           "updatedAt",
           "createdAt",
           "role",
