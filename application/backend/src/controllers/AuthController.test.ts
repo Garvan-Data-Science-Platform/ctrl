@@ -416,7 +416,7 @@ describe('AuthController', () => {
       expect(loginResponse.status).toEqual(401)
 
       const body = loginResponse.body
-      expect(body.message).toBe('Incorrect Password')
+      expect(body.message).toBe('Invalid credentials')
       expect(body.token).toBe(undefined)
     })
 
