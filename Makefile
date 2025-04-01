@@ -85,11 +85,11 @@ docker:
 	docker build -t backend -f application/backend/Dockerfile .
 
 install:
-	helm install $(LOCAL_DEPLOYMENT) .helm/ctrl -f .helm/ctrl/values.yaml \
+	helm install $(LOCAL_DEPLOYMENT) .helm/ctrl \
 		--set $(LOCAL_CONFIG)
 
 upgrade:
-	helm upgrade $(LOCAL_DEPLOYMENT) .helm/ctrl -f .helm/ctrl/values.yaml \
+	helm upgrade $(LOCAL_DEPLOYMENT) .helm/ctrl \
 		--set $(LOCAL_CONFIG)
 
 uninstall:
