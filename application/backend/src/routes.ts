@@ -1494,37 +1494,6 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsParticipantsController_getCurrentParticipant: Record<string, TsoaRoute.ParameterSchema> = {
-                request: {"in":"request","name":"request","required":true,"dataType":"object"},
-        };
-        app.get('/participants/current',
-            authenticateMiddleware([{"jwt":[]}]),
-            ...(fetchMiddlewares<RequestHandler>(ParticipantsController)),
-            ...(fetchMiddlewares<RequestHandler>(ParticipantsController.prototype.getCurrentParticipant)),
-
-            async function ParticipantsController_getCurrentParticipant(request: ExRequest, response: ExResponse, next: any) {
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsParticipantsController_getCurrentParticipant, request, response });
-
-                const controller = new ParticipantsController();
-
-              await templateService.apiHandler({
-                methodName: 'getCurrentParticipant',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: undefined,
-              });
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsInvitesController_getInvites: Record<string, TsoaRoute.ParameterSchema> = {
         };
         app.get('/invites',
