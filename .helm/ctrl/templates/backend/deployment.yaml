@@ -39,7 +39,7 @@ spec:
           imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
           env:
             - name: POSTGRES_HOST
-              value: ctrl-postgresql
+              value: {{ .Release.Name }}-postgresql
             - name: HOSTNAME
             {{ with .Values.ingress.hosts.userClient }}
               value: {{ .hostname | quote }}
@@ -47,7 +47,7 @@ spec:
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: ctrl-postgresql
+                  name: {{ .Release.Name }}-postgresql
                   key: postgres-password
             - name: JWT_SECRET
               valueFrom:
