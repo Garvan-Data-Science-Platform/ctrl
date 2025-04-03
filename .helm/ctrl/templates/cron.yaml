@@ -5,6 +5,7 @@ kind: CronJob
 metadata:
   name: demo-reset
 spec:
+  timeZone: "Australia/Sydney"
   schedule: "0 0 * * *"
   jobTemplate:
     spec:
