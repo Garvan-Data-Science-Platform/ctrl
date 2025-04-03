@@ -6,6 +6,8 @@ import {
   SurveyStepAnswerArray,
   UserSurveyStepState,
 } from 'common/types/survey'
+import { ProfilesController } from 'controllers/ProfilesController'
+import prisma from '../PrismaClient'
 
 export function determineLastUpdated(answers: PrismaJson.SurveyAnswerData) {
   let latest_date = new Date('1900-01-01')
@@ -87,22 +89,77 @@ export function answersFromPreviousSurvey(
   return result
 }
 
-export function combineGuardianAnswers(
-  answers1: SurveyStepAnswerArray,
-  answers2: SurveyStepAnswerArray,
-): SurveyStepAnswerArray {
-  if (answers1.length != answers2.length) {
-    throw Error('Guardian Answer Mismatch')
+export function combineGuardianAnswers(answers_ls: SurveyStepAnswerArray[]): SurveyStepAnswerArray {
+  for (const i in answers_ls) {
+    if (answers_ls[i].length !== answers_ls[0].length) {
+      throw Error('Guardian Answer Mismatch')
+    }
   }
-  return answers1.map((val, idx) => {
-    if (val == answers2[idx]) {
-      return val
-    } else if (val === null) {
-      return answers2[idx]
-    } else if (answers2[idx] === null) {
-      return val
+  //Iterate over each question
+  return answers_ls[0].map((_, idx) => {
+    //Create a set from each guardian's answer to that question
+    const answer_set = new Set(answers_ls.map((a) => a[idx]))
+    //If they all agree, use that answer
+    if (answer_set.size == 1) {
+      return answer_set.values().next().value as any
+      //If they all agree, with some unanswered (null): use the non-null answer
+    } else if (answer_set.size == 2 && answer_set.has(null)) {
+      answer_set.delete(null)
+      return answer_set.values().next().value as any
+      //They disagree
     } else {
       return null
     }
   })
+}
+
+//Recalculates answers for all dependents in the family
+export async function recalculateAnswers(familyId: number) {
+  const dependents = await prisma.participantProfile.findMany({
+    where: { familyId: familyId, participantType: { in: ['DEPENDENT_AGE', 'DEPENDENT_OTHER'] } },
+  })
+  if (!dependents) return
+
+  const guardians = await prisma.participantProfile.findMany({
+    where: { familyId: familyId, participantType: 'GUARDIAN' },
+  })
+
+  if (guardians.length == 0) return
+
+  let answers: PrismaJson.SurveyAnswerData
+
+  const latestSurveyParticipant = await prisma.surveyParticipant.findFirstOrThrow({
+    where: { profileId: guardians[0].id },
+    orderBy: { versionId: 'desc' },
+  })
+
+  if (guardians.length == 1) {
+    answers = latestSurveyParticipant.answers
+  } else {
+    const promises = guardians.map(async (coGuardian) => {
+      const coGuardianSP = await prisma.surveyParticipant.findFirstOrThrow({
+        where: { profileId: coGuardian.id, versionId: latestSurveyParticipant.versionId },
+      })
+      return coGuardianSP.answers
+    })
+    const answers_ls = await Promise.all(promises)
+
+    answers = structuredClone(answers_ls[0])
+    for (const step in answers) {
+      answers[step].answers = combineGuardianAnswers(answers_ls.map((val) => val[step].answers))
+    }
+  }
+
+  for (const dep of dependents) {
+    const sp = await prisma.surveyParticipant.findFirstOrThrow({
+      where: { profileId: dep.id, versionId: latestSurveyParticipant.versionId },
+    })
+    await prisma.surveyParticipant.update({
+      where: { id: sp.id }, //
+      data: {
+        answers,
+        derived: guardians.map((val) => `${val.firstName} ${val.lastName}`).join(', '),
+      },
+    })
+  }
 }

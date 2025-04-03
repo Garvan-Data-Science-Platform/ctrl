@@ -1,3 +1,4 @@
 import type { GetFamilyResponse } from './getFamily'
+import type { AddDependentRequest } from './addDependent'
 
-export { GetFamilyResponse }
+export { GetFamilyResponse, AddDependentRequest }

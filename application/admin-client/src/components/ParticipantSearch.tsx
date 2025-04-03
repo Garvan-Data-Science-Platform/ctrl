@@ -31,7 +31,7 @@ export function ParticipantSearch({ buttonText, onConfirm, exclude }) {
       )
     })
     setParticipants(filtered || [])
-  }, [data, first, last])
+  }, [data, first, last, exclude])
 
   return (
     <Box>
