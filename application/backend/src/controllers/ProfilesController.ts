@@ -30,6 +30,7 @@ import {
 } from 'common/types/api/users/ParticipantProfile'
 import { FamilyMember } from 'common/types/api/users/getParticipantProfile'
 import { auditLog } from '../middlewares/AuditLog'
+import { recalculateAnswers } from '../utils/answers'
 
 @Route('profiles')
 @Tags('Profiles')
@@ -185,6 +186,10 @@ export class ProfilesController extends Controller {
         where: { id: profile.userId },
         data: { email: email, firstName: bodyRequest.firstName, lastName: bodyRequest.lastName },
       })
+    }
+
+    if (bodyRequest.participantType) {
+      recalculateAnswers(profile.familyId)
     }
   }
 }

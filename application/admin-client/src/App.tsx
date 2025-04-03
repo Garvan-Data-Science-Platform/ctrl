@@ -190,7 +190,11 @@ function App() {
 
                 <RefineKbar />
                 <UnsavedChangesNotifier />
-                <DocumentTitleHandler />
+                <DocumentTitleHandler
+                  handler={({ resource }) =>
+                    resource ? `${resource.meta?.label} | CTRL Admin Portal` : 'CTRL Admin Portal'
+                  }
+                />
               </Refine>
               <DevtoolsPanel />
             </DevtoolsProvider>

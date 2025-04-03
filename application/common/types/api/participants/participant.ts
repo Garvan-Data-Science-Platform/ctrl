@@ -5,6 +5,7 @@ export interface Participant {
   email?: string
   firstName: string
   lastName: string
+  familyId: number
   answers: ParticipantAnswerStatus[]
   lastUpdated?: string
 }

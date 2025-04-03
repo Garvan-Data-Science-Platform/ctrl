@@ -15,12 +15,24 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import { useInvalidate, useNavigation, useOne, useParsed, useShow } from '@refinedev/core'
+import {
+  useInvalidate,
+  useNavigation,
+  useNotification,
+  useOne,
+  useParsed,
+  useShow,
+} from '@refinedev/core'
 import { Breadcrumb, Edit, Show } from '@refinedev/mui'
 import { useForm } from '@refinedev/react-hook-form'
 import { Controller } from 'react-hook-form'
 import { UpdateProfileRequest } from '@common/types/api/users/updateProfile'
-import { ContactMethod, OnBehalf, StateTerritory } from '@common/types/api/users/ParticipantProfile'
+import {
+  ContactMethod,
+  OnBehalf,
+  ParticipantType,
+  StateTerritory,
+} from '@common/types/api/users/ParticipantProfile'
 import { useState } from 'react'
 import { ParticipantSearch } from '../../components/ParticipantSearch'
 import { ArrowBack, Delete } from '@mui/icons-material'
@@ -37,6 +49,7 @@ export const FamilyEdit = () => {
   const { data } = useOne<FamilyMember[]>({ resource: 'families', id })
 
   const [action, setAction] = useState<'ADD' | 'REMOVE' | null>(null)
+  const [loading, setLoading] = useState(false)
   const [newMemberStatus, setNewMemberStatus] = useState<'NEW' | 'EXISTING' | null>(null)
   const [newMemberType, setNewMemberType] = useState<'DEPENDENT' | 'GUARDIAN' | 'OTHER' | null>(
     null,
@@ -49,12 +62,66 @@ export const FamilyEdit = () => {
     handleSubmit,
     setError,
     watch,
+    reset,
     formState: { errors },
   } = useForm<OnBehalf>()
 
+  const resetForm = () => {
+    reset()
+    setAction(null)
+    setNewMemberStatus(null)
+    setNewMemberType(null)
+  }
+
+  const { open } = useNotification()
+
   const handleRemove = async (profileId: number) => {
-    await axiosInstance.post(`/families/remove/${profileId}`)
-    invalidate({ resource: 'families', invalidates: ['all'] })
+    try {
+      await axiosInstance.post(`/families/remove/${profileId}`)
+      open?.({ type: 'success', message: 'Removed member from family' })
+      invalidate({ resource: 'families', invalidates: ['all'] })
+      resetForm()
+    } catch (e: any) {
+      open?.({ type: 'error', message: `Failed to remove dependent: ${e.response.data.details}` })
+    }
+  }
+
+  const handleAdd = async (profileId: number) => {
+    try {
+      await axiosInstance.post(`/families/${id}/add/${profileId}`)
+      open?.({ type: 'success', message: 'Added member to family' })
+      invalidate({ resource: 'families', invalidates: ['all'] })
+      invalidate({ resource: 'participants', invalidates: ['all'] })
+      resetForm()
+    } catch (e: any) {
+      open?.({
+        type: 'error',
+        message: `Failed to add member to family: ${e.response.data.details}`,
+      })
+    }
+  }
+
+  const onSubmitNewDependent = async (data: any) => {
+    try {
+      await axiosInstance.post(`/families/${id}/add-dependent`, data)
+      open?.({ type: 'success', message: 'Added dependent to family' })
+      invalidate({ resource: 'families', invalidates: ['all'] })
+      resetForm()
+    } catch (e: any) {
+      open?.({ type: 'error', message: `Failed to add new dependent: ${e.response.data.details}` })
+    }
+  }
+
+  const handleChangeType = async (profileId: number, type: ParticipantType) => {
+    try {
+      setLoading(true)
+      await axiosInstance.patch(`/profiles/${profileId}`, { participantType: type })
+    } catch (e: any) {
+      open?.({ type: 'error', message: `Failed to change member type: ${e.response.data.details}` })
+    } finally {
+      invalidate({ resource: 'families', invalidates: ['all'] })
+      setLoading(false)
+    }
   }
 
   return (
@@ -76,23 +143,38 @@ export const FamilyEdit = () => {
               sx={{
                 display: 'flex',
                 flexDirection: 'row',
-                justifyContent: 'center',
+                justifyContent: 'space-between',
                 alignItems: 'center',
                 minHeight: 40,
-                width: 250,
+                width: 400,
                 mt: 1,
                 mb: 1,
+                p: 1,
                 borderRadius: 2,
                 border: '1px solid',
                 borderColor: action == 'REMOVE' ? 'red' : 'lightgrey',
               }}
             >
-              {action == 'REMOVE' && (
-                <IconButton onClick={() => handleRemove(val.id)}>
-                  <Delete />
-                </IconButton>
-              )}
-              <Typography>{`${val.firstName} ${val.lastName}`}</Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', ml: 1 }}>
+                {action == 'REMOVE' && (
+                  <IconButton onClick={() => handleRemove(val.id)}>
+                    <Delete />
+                  </IconButton>
+                )}
+                <Typography>{`${val.firstName} ${val.lastName}`}</Typography>
+              </Box>
+              <Select
+                size="small"
+                sx={{ width: 200 }}
+                value={val.participantType}
+                disabled={loading}
+                onChange={(e) => handleChangeType(val.id, e.target.value as ParticipantType)}
+              >
+                <MenuItem value={ParticipantType.DEPENDENT_AGE}>Dependent (age based)</MenuItem>
+                <MenuItem value={ParticipantType.DEPENDENT_OTHER}>Dependent (other)</MenuItem>
+                <MenuItem value={ParticipantType.GUARDIAN}>Guardian</MenuItem>
+                <MenuItem value={ParticipantType.STANDARD}>Non-Guardian</MenuItem>
+              </Select>
             </Box>
           ))}
         </Box>
@@ -169,7 +251,11 @@ export const FamilyEdit = () => {
                   </RadioGroup>
                 </FormControl>
                 {newMemberType == 'DEPENDENT' && (
-                  <Box sx={{ maxWidth: 500 }} component="form">
+                  <Box
+                    sx={{ maxWidth: 500 }}
+                    component="form"
+                    onSubmit={handleSubmit(onSubmitNewDependent)}
+                  >
                     <TextField
                       sx={{ m: 1, flexGrow: 1 }}
                       label="First Name"
@@ -245,7 +331,7 @@ export const FamilyEdit = () => {
                 <Typography>Search and select the family member you want to add:</Typography>
                 <ParticipantSearch
                   buttonText="Add to family"
-                  onConfirm={(id: number) => console.log('ADDED', id)}
+                  onConfirm={handleAdd}
                   exclude={data?.data.map((val) => val.id) || []}
                 />
               </>

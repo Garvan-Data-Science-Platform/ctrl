@@ -665,6 +665,11 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "AddDependentRequest": {
+        "dataType": "refAlias",
+        "type": {"ref":"OnBehalf","validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 };
 const templateService = new ExpressTemplateService(models, {"noImplicitAdditionalProperties":"throw-on-extras","bodyCoercion":true});
 
@@ -2301,27 +2306,59 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsFamiliesController_addMember: Record<string, TsoaRoute.ParameterSchema> = {
+        const argsFamiliesController_addExistingMember: Record<string, TsoaRoute.ParameterSchema> = {
                 familyId: {"in":"path","name":"familyId","required":true,"dataType":"double"},
                 profileId: {"in":"path","name":"profileId","required":true,"dataType":"double"},
         };
         app.post('/families/:familyId/add/:profileId',
             authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(FamiliesController)),
-            ...(fetchMiddlewares<RequestHandler>(FamiliesController.prototype.addMember)),
+            ...(fetchMiddlewares<RequestHandler>(FamiliesController.prototype.addExistingMember)),
 
-            async function FamiliesController_addMember(request: ExRequest, response: ExResponse, next: any) {
+            async function FamiliesController_addExistingMember(request: ExRequest, response: ExResponse, next: any) {
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsFamiliesController_addMember, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args: argsFamiliesController_addExistingMember, request, response });
 
                 const controller = new FamiliesController();
 
               await templateService.apiHandler({
-                methodName: 'addMember',
+                methodName: 'addExistingMember',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsFamiliesController_addNewDependent: Record<string, TsoaRoute.ParameterSchema> = {
+                familyId: {"in":"path","name":"familyId","required":true,"dataType":"double"},
+                bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"AddDependentRequest"},
+        };
+        app.post('/families/:familyId/add-dependent',
+            authenticateMiddleware([{"jwt":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(FamiliesController)),
+            ...(fetchMiddlewares<RequestHandler>(FamiliesController.prototype.addNewDependent)),
+
+            async function FamiliesController_addNewDependent(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsFamiliesController_addNewDependent, request, response });
+
+                const controller = new FamiliesController();
+
+              await templateService.apiHandler({
+                methodName: 'addNewDependent',
                 controller,
                 response,
                 next,
