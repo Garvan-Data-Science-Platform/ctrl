@@ -12,6 +12,6 @@ module.exports = {
   },
   reporters:
     process.env.GITHUB_ACTIONS === 'true'
-      ? ['github-actions', { silent: false }, 'summary']
+      ? [['github-actions', { silent: false }], 'summary']
       : [['default', { summaryThreshold: 10 }]],
 }
