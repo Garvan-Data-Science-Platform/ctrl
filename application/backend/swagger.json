@@ -1697,21 +1697,6 @@
         ],
         "type": "object",
         "additionalProperties": false
-      },
-      "Workspace": {
-        "properties": {
-          "version": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "version",
-          "name"
-        ],
-        "type": "object"
       }
     },
     "securitySchemes": {
@@ -2579,9 +2564,6 @@
           "Surveys"
         ],
         "security": [
-          {
-            "jwt": []
-          },
           {
             "jwt": [
               "OrganisationAdmin"
@@ -4630,41 +4612,6 @@
         },
         "description": "Health check to ensure server is up and running",
         "summary": "Health Check",
-        "tags": [
-          "Healthcheck"
-        ],
-        "security": [],
-        "parameters": []
-      }
-    },
-    "/workspaces": {
-      "get": {
-        "operationId": "GetAllWorkspaces",
-        "responses": {
-          "200": {
-            "description": "Ok",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "data": {
-                      "items": {
-                        "$ref": "#/components/schemas/Workspace"
-                      },
-                      "type": "array"
-                    }
-                  },
-                  "required": [
-                    "data"
-                  ],
-                  "type": "object"
-                }
-              }
-            }
-          }
-        },
-        "description": "Get all Workspaces",
-        "summary": "Get all Workspaces",
         "tags": [
           "Healthcheck"
         ],

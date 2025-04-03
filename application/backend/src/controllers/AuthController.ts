@@ -20,6 +20,7 @@ import {
   ValidateError,
   Get,
   Middlewares,
+  NoSecurity,
 } from 'tsoa'
 import prisma from '../PrismaClient'
 import logger from 'common/src/logger'
@@ -54,6 +55,7 @@ export class AuthController extends Controller {
    * @summary Register a new user
    */
   @Post('/register')
+  @NoSecurity()
   @SuccessResponse('201', 'User Created')
   public async registerUser(@Body() bodyRequest: RegisterRequest): Promise<RegisterResponse> {
     const { password, ...userDetails } = bodyRequest
@@ -88,6 +90,7 @@ export class AuthController extends Controller {
    * @summary Check if CTRL is setup
    */
   @Get('/setup')
+  @NoSecurity()
   public async checkSetup(): Promise<{ isSetup: boolean }> {
     const existingUsers = await this.userRepo.count()
     const isSetup = existingUsers != 0
@@ -100,6 +103,7 @@ export class AuthController extends Controller {
    * @summary Register initial admin user
    */
   @Post('/register/setup')
+  @NoSecurity()
   @SuccessResponse('201', 'User Created')
   public async registerInitialUser(
     @Body() bodyRequest: RegisterSetupRequest,
@@ -148,6 +152,7 @@ export class AuthController extends Controller {
    * @summary Register a participant
    */
   @Post('/register/participant')
+  @NoSecurity()
   @SuccessResponse('201', 'Participant Created')
   public async registerParticipant(
     @Body() bodyRequest: RegisterParticipantRequest,
@@ -214,6 +219,7 @@ export class AuthController extends Controller {
    * @summary Login a User
    */
   @Post('/login')
+  @NoSecurity()
   @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
   public async login(@Body() bodyRequest: LoginRequest): Promise<LoginResponse> {
     // Check if user exists and password matches

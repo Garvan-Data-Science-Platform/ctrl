@@ -16,7 +16,8 @@
           "OrganisationAdmin": "Access to organisation admin level resources"
         }
       }
-    }
+    },
+    "rootSecurity": [{ "jwt": [] }]
   },
   "routes": {
     "authenticationModule": "src/authentication.ts",

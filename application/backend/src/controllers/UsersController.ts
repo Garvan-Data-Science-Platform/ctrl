@@ -13,6 +13,7 @@ import {
   Security,
   ValidateError,
   Middlewares,
+  NoSecurity,
 } from 'tsoa'
 import logger from 'common/src/logger'
 import type {
@@ -210,6 +211,7 @@ export class UsersController extends Controller {
    */
   @Post('/password/generate-reset-link')
   @SuccessResponse('200', 'OK')
+  @NoSecurity()
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async generatePasswordResetLink(
     @Body() bodyRequest: GeneratePasswordResetLinkRequest,
@@ -252,6 +254,7 @@ export class UsersController extends Controller {
 
   @Post('/password/reset')
   @SuccessResponse('200', 'OK')
+  @NoSecurity()
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   @Response<UnauthorizedErrorResponse>('403', 'Forbidden')
   public async resetPassword(@Body() bodyRequest: ResetPasswordRequest): Promise<void> {

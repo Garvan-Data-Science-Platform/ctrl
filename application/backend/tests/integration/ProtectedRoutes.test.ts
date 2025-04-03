@@ -96,6 +96,11 @@ describe('Protected Routes', () => {
       url: '/users/1',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
+    {
+      method: HttpMethod.GET,
+      url: '/users/admin',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
   ]
 
   const organisationRoutes: Route[] = [
@@ -152,6 +157,21 @@ describe('Protected Routes', () => {
       url: '/profiles/user/1',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
+    {
+      method: HttpMethod.GET,
+      url: '/profiles/1',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.PATCH,
+      url: '/profiles/current',
+      rolesWhitelisted: [],
+    },
+    {
+      method: HttpMethod.PATCH,
+      url: '/profiles/1',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
   ]
 
   const surveyRoutes: Route[] = [
@@ -192,6 +212,73 @@ describe('Protected Routes', () => {
     },
   ]
 
+  const mailerRoutes: Route[] = [
+    {
+      method: HttpMethod.POST,
+      url: '/mailer/contact-us',
+      rolesWhitelisted: [],
+    },
+  ]
+
+  const integrationRoutes: Route[] = [
+    {
+      method: HttpMethod.POST,
+      url: '/integrations/redcap/participant/upload/csv',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/integrations/redcap/participant/upload/api',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/integrations/redcap/instrument/upload/csv',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/integrations/redcap/instrument/upload/api',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+  ]
+
+  const participantRoutes: Route[] = [
+    {
+      method: HttpMethod.GET,
+      url: '/participants',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.GET,
+      url: '/participants/1',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+  ]
+
+  const inviteRoutes: Route[] = [
+    {
+      method: HttpMethod.GET,
+      url: '/invites',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/invites',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/invites/resend',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/invites/revoke/1',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+  ]
+
   describe('User Routes', () => {
     userRoutes.forEach((route: Route) => {
       it(`${route.method.toUpperCase()} ${route.url} should be a protected route`, async () => {
@@ -218,6 +305,38 @@ describe('Protected Routes', () => {
 
   describe('Profile Routes', () => {
     profileRoutes.forEach((route: Route) => {
+      it(`${route.method.toUpperCase()} ${route.url} should be a protected route`, async () => {
+        await checkProtectedRoutes(route)
+      })
+    })
+  })
+
+  describe('Mailer Routes', () => {
+    mailerRoutes.forEach((route: Route) => {
+      it(`${route.method.toUpperCase()} ${route.url} should be a protected route`, async () => {
+        await checkProtectedRoutes(route)
+      })
+    })
+  })
+
+  describe('Integration Routes', () => {
+    integrationRoutes.forEach((route: Route) => {
+      it(`${route.method.toUpperCase()} ${route.url} should be a protected route`, async () => {
+        await checkProtectedRoutes(route)
+      })
+    })
+  })
+
+  describe('Participant Routes', () => {
+    participantRoutes.forEach((route: Route) => {
+      it(`${route.method.toUpperCase()} ${route.url} should be a protected route`, async () => {
+        await checkProtectedRoutes(route)
+      })
+    })
+  })
+
+  describe('Invite Routes', () => {
+    inviteRoutes.forEach((route: Route) => {
       it(`${route.method.toUpperCase()} ${route.url} should be a protected route`, async () => {
         await checkProtectedRoutes(route)
       })

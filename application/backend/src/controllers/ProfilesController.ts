@@ -46,7 +46,6 @@ export class ProfilesController extends Controller {
    * @summary Get the current Participants Profile
    */
   @Get('/current')
-  @Security('jwt')
   public async getCurrentParticipantProfile(
     @Request() request: express.Request,
   ): Promise<GetParticipantProfileResponse> {
@@ -136,7 +135,6 @@ export class ProfilesController extends Controller {
 
   @Patch('/current')
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
-  @Security('jwt')
   public async updateCurrentProfile(
     @Body() bodyRequest: UpdateProfileRequest,
     @Request() request: express.Request,
