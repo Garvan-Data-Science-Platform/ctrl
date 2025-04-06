@@ -122,4 +122,10 @@ describe('Survey tests', () => {
       ).answers[1].answers,
     ).toEqual([null, 'Choice 1'])
   })
+
+  it('Another dependent is registered and inherits the latest answers', () => {})
+
+  it('A dependent is moved into this family and inherits the latests answers', () => {})
+
+  it('A parent is removed from the family, and the dependents answers are changed to only inherit from remaining parent', () => {})
 })
