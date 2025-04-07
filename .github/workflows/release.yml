@@ -10,14 +10,8 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4
 
-      - name: read-yaml-file
-        uses: pietrobolcato/action-read-yaml@1.0.0
-        id: read_ver
-        with:
-          config: .helm/ctrl/Chart.yaml
-
       - name: Check helm version
-        run: test ${{ github.ref_name }} = ${{ steps.read_ver.outputs['version'] }}
+        run: test ${{ github.ref_name }} = $(cat .helm/ctrl/Chart.yaml | grep ^version' | tr -d "version: ")
 
   build_push:
     name: build and push ${{ matrix.name }}
@@ -54,7 +48,7 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-${{ matrix.name }}:${{ steps.read_ver.outputs['version'] }}
+            australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-${{ matrix.name }}:${{ github.ref_name }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -82,4 +76,4 @@ jobs:
         run: helm dependency build && helm package .helm/ctrl
 
       - name: Push helm
-        run: helm push ctrl-${{ steps.read_ver.outputs['version'] }}.tgz oci://australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public
+        run: helm push ctrl-${{ github.ref_name }}.tgz oci://australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public
