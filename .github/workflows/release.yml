@@ -73,7 +73,7 @@ jobs:
           service_account: 'ctrl-ci-sa@ctrl-358804.iam.gserviceaccount.com'
 
       - name: Package helm
-        run: helm dependency build && helm package .helm/ctrl
+        run: helm dependency build .helm/ctrl && helm package .helm/ctrl
 
       - name: Push helm
         run: helm push ctrl-${{ github.ref_name }}.tgz oci://australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public
