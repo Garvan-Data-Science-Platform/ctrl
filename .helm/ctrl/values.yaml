@@ -17,21 +17,21 @@ userClient:
     repository: australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-user-client
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: 'latest'
+    tag: #
 
 adminClient:
   image:
     repository: australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-admin-client
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: 'latest'
+    tag: #
 
 backend:
   image:
     repository: australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-backend
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: 'latest'
+    tag: #
 
 nginx-ingress:
   enabled: true
