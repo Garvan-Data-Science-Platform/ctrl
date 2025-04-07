@@ -13,15 +13,29 @@ import {
   DialogActions,
 } from '@mui/material'
 import { useState } from 'react'
-import { axiosInstance } from '../../providers/dataProvider'
 import { Close, ArrowBack } from '@mui/icons-material'
-import { useNavigate } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
-import { instrumentUploadCSVDocumentation } from './getInstrumentFromRedcap'
 import { useNotification, useBack, useInvalidate } from '@refinedev/core'
+import { useNavigate } from 'react-router-dom'
+import { axiosInstance } from '../providers/dataProvider'
 
-export const SurveyImport = () => {
-  // States
+interface RedcapImportProps {
+  type: 'survey' | 'participant'
+  helpDocumentation: string
+  apiEndpoint: string
+  fileEndpoint: string
+  successRedirect?: string
+  warningMessage: string
+}
+
+export const RedcapImport = ({
+  type,
+  helpDocumentation,
+  apiEndpoint,
+  fileEndpoint,
+  successRedirect,
+  warningMessage,
+}: RedcapImportProps) => {
   const [file, setFile] = useState<File | null>(null)
   const [formName, setFormName] = useState<string>('')
   const [redcapAPIToken, setRedcapAPIToken] = useState<string>('')
@@ -40,7 +54,6 @@ export const SurveyImport = () => {
     }
   }
 
-  // File Submission
   const onSubmitFile = () => {
     closeDialog()
     if (!file) {
@@ -52,15 +65,19 @@ export const SurveyImport = () => {
     formData.append('file', file)
 
     axiosInstance
-      .post('/integrations/redcap/instrument/upload/csv', formData, {
+      .post(fileEndpoint, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       })
       .then(async (response) => {
         const data = response.data
-        invalidate({ resource: 'surveys', invalidates: ['resourceAll'] })
-        navigate(`/surveys/edit/${data.id}`)
+        invalidate({ resource: `${type}s`, invalidates: ['resourceAll'] })
+        if (successRedirect) {
+          navigate(successRedirect.replace(':surveyId', data.id))
+        } else {
+          navigate(`/${type}s`)
+        }
       })
       .catch(() => {
         open?.({ type: 'error', message: 'Error uploading file' })
@@ -68,7 +85,6 @@ export const SurveyImport = () => {
       })
   }
 
-  // API Submission
   const onSubmitApi = () => {
     closeDialog()
 
@@ -81,14 +97,18 @@ export const SurveyImport = () => {
     }
 
     axiosInstance
-      .post('/integrations/redcap/instrument/upload/api', {
+      .post(apiEndpoint, {
         formName,
         redcapAPIToken,
       })
       .then((response) => {
         const data = response.data
-        invalidate({ resource: 'surveys', invalidates: ['resourceAll'] })
-        navigate(`/surveys/edit/${data.id}`)
+        invalidate({ resource: `${type}s`, invalidates: ['resourceAll'] })
+        if (successRedirect) {
+          navigate(successRedirect.replace(':id', data.id))
+        } else {
+          navigate(`/${type}s`)
+        }
       })
       .catch((response) => {
         open?.({
@@ -106,12 +126,12 @@ export const SurveyImport = () => {
   return (
     <Box>
       <Dialog open={dialogOpen} onClose={closeDialog} data-cy="confirmDialog">
-        <DialogTitle>{'Confirm Survey Import'}</DialogTitle>
+        <DialogTitle sx={{ textTransform: 'capitalize' }}>{`Confirm ${type} Import`}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Warning: This action will overwrite the current draft survey. The imported data from "
-            {dialogType == 'API' ? formName : file?.name}" will replace any existing content. Do you
-            want to continue?
+            Warning: {warningMessage} The imported data from "
+            {dialogType == 'API' ? formName : file?.name}" will replace any existing/duplicate
+            content. Do you want to continue?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -135,7 +155,7 @@ export const SurveyImport = () => {
       </IconButton>
       <Box
         component="form"
-        sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+        sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}
         autoComplete="off"
       >
         <img
@@ -144,12 +164,12 @@ export const SurveyImport = () => {
           style={{ height: '100px', marginBottom: '16px' }}
         />
         <Typography variant="body2" color="error" gutterBottom>
-          Note: This will overwrite the current draft survey.
+          {warningMessage}
         </Typography>
         <Box sx={{ mt: 1, display: 'flex', width: '100%', justifyContent: 'space-between' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
-            <Typography variant="h6" gutterBottom>
-              Upload Instrument File
+            <Typography variant="h6" gutterBottom sx={{ textTransform: 'capitalize' }}>
+              Upload {type} File
             </Typography>
             <Button variant="outlined" component="label">
               UPLOAD FILE
@@ -158,7 +178,7 @@ export const SurveyImport = () => {
                 hidden
                 accept=".csv"
                 onChange={handleFileChange}
-                data-cy="instrumentAttach"
+                data-cy={`${type}Attach`}
               />
             </Button>
             {file && (
@@ -187,7 +207,7 @@ export const SurveyImport = () => {
                 style={{ color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}
                 onClick={handleHelpPageOpen}
               >
-                How to export instruments from REDCap
+                How to export {type}s from REDCap
               </span>
             </Typography>
 
@@ -213,7 +233,7 @@ export const SurveyImport = () => {
                   </IconButton>
                 </Box>
                 <Box sx={{ mt: 2, maxWidth: '100%' }}>
-                  <ReactMarkdown>{instrumentUploadCSVDocumentation}</ReactMarkdown>
+                  <ReactMarkdown>{helpDocumentation}</ReactMarkdown>
                 </Box>
               </Box>
             </Modal>

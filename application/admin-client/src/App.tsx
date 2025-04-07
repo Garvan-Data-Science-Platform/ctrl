@@ -29,7 +29,7 @@ import { Register } from './pages/register'
 import { ForgotPassword } from './pages/forgotPassword'
 import { authProvider } from './providers/authProvider'
 import { ParticipantList, ParticipantShow } from './pages/participants'
-import { SurveyImport, IntegrationsHome } from './pages/integrations'
+import { SurveyImport, IntegrationsHome, ParticipantImport } from './pages/integrations'
 import { ResponsesView } from './pages/responses'
 import { ListAlt, Person, RecentActors, DatasetLinked } from '@mui/icons-material'
 import { ParticipantEdit } from './pages/participants/edit'
@@ -170,6 +170,7 @@ function App() {
                     <Route path="/integrations">
                       <Route index element={<IntegrationsHome />} />
                       <Route path="redcap/survey/import" element={<SurveyImport />} />
+                      <Route path="redcap/participant/import" element={<ParticipantImport />} />
                     </Route>
                     <Route path="/responses/:id" index element={<ResponsesView />} />
                     <Route path="*" element={<ErrorComponent />} />

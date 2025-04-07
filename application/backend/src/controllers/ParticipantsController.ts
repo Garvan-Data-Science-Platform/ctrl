@@ -186,7 +186,7 @@ export class InvitesController extends Controller {
   public async createInvites(
     @Body() bodyRequest: InviteParticipantsRequest,
   ): Promise<InviteParticipantsResponse> {
-    const emails = bodyRequest.emails
+    const emails = [...new Set(bodyRequest.emails)]
     const expiresAt = new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000) // MAKE EXPIRY CONFIGURABLE
 
     // Fetch existing invites

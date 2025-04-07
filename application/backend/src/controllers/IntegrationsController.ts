@@ -23,12 +23,14 @@ import type {
 import { BadGatewayError } from '../middlewares/ErrorHandler'
 import { UnauthorizedErrorResponse, InternalErrorResponse } from 'common/types/api/errors'
 import { SurveyStep } from 'common/types/survey'
-import exampleREDCapMapping from '../../../integrations/src/exampleREDCapMapping.json'
+import REDCapMapping from '../../../integrations/src/REDCapMapping.json'
 import { parseCSV, validateFile } from '../utils/parseCsv'
 import { FileUploadError } from '../middlewares/ErrorHandler'
 import logger from 'common/src/logger'
 import { AuthController } from './AuthController'
+import { InvitesController } from './ParticipantsController'
 import { auditLog } from '../middlewares/AuditLog'
+import { InviteParticipantsRequest } from 'common/types/api/participants'
 
 @Route('integrations')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
@@ -41,7 +43,7 @@ export class IntegrationsController extends Controller {
   profileRepo = prisma.participantProfile
   surveyRepo = prisma.surveyVersion
   spRepo = prisma.surveyParticipant
-  integrationService = new Integrations(exampleREDCapMapping)
+  integrationService = new Integrations(REDCapMapping)
   REDCAP_API_URL: string = ''
 
   @Post('/redcap/participant/upload/csv')
@@ -169,10 +171,22 @@ export class IntegrationsController extends Controller {
     let data: RegisterParticipantRequest[] = []
     try {
       data = this.integrationService.mapRecordToParticipantRequests(rawData)
+      console.log('mapped data', data)
     } catch (error) {
       throw new FileUploadError(
         error instanceof Error ? error.message : 'Unknown Error: Failed to Map Data',
       )
+    }
+
+    try {
+      // Send invitiations for all participants
+      const invitesController = new InvitesController()
+      const inviteRequest: InviteParticipantsRequest = {
+        emails: data.map((p) => p.email),
+      }
+      await invitesController.createInvites(inviteRequest)
+    } catch (error) {
+      logger.error(error)
     }
 
     const authController = new AuthController()
@@ -188,7 +202,7 @@ export class IntegrationsController extends Controller {
         select: { id: true, profiles: true },
       })
 
-      // If user doesn't exist, create a participant using the authController, otherwise create a profile and attact it to the user.
+      // If user doesn't exist, create a participant using the authController and send an invitation, otherwise create a profile and attach it to the user.
       if (!user) {
         try {
           const participantResponse = await authController.createParticipant(participantData)
