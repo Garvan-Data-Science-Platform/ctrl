@@ -3,6 +3,12 @@
  */
 type Email = string
 
+/**
+ *
+ * @example {
+ *  "emails": ["john.doe@email.com", "jane@email.com"]
+ * }
+ */
 export interface InviteParticipantsRequest {
   emails: Email[]
 }

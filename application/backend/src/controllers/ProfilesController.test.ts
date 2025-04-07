@@ -11,10 +11,10 @@ const api = new Api()
 const app = api.app
 
 describe('ProfilesController', () => {
-  let registeredUserToken: string, registeredParticipantToken: string
+  let orgAdminToken: string, registeredParticipantToken: string
 
   beforeAll(async () => {
-    registeredUserToken = await generateToken({
+    orgAdminToken = await generateToken({
       userId: ORG_ADMIN_ID,
       roles: ['OrganisationAdmin'],
     })
@@ -38,7 +38,7 @@ describe('ProfilesController', () => {
       // Get user profile
       const response = await request(app)
         .get(`/profiles/${PARTICIPANT_COMPLETED_ID}`)
-        .set({ Authorization: `Bearer ${registeredParticipantToken}` })
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
 
       expect(response.status).toBe(200)
 
@@ -70,7 +70,7 @@ describe('ProfilesController', () => {
       const userId: number = 999
       const response = await request(app)
         .get(`/profiles/${userId}`)
-        .set({ Authorization: `Bearer ${registeredParticipantToken}` })
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
 
       expect(response.status).toBe(404)
       const body = response.body
@@ -107,7 +107,7 @@ describe('ProfilesController', () => {
     it('should return a 404 error if the authenticated user does not have a profile', async () => {
       const response = await request(app)
         .get('/profiles/current')
-        .set({ Authorization: `Bearer ${registeredUserToken}` })
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
 
       expect(response.status).toBe(404)
       const body = response.body
@@ -123,7 +123,7 @@ describe('ProfilesController', () => {
 
       const participantProfileByIDResponse = await request(app)
         .get(`/profiles/${PARTICIPANT_COMPLETED_ID}`)
-        .set({ Authorization: `Bearer ${registeredParticipantToken}` })
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
 
       expect(currentParticipantProfileResponse.status).toBe(200)
       expect(participantProfileByIDResponse.status).toBe(200)

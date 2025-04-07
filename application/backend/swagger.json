@@ -258,7 +258,10 @@
         },
         "required": ["email"],
         "type": "object",
-        "additionalProperties": false
+        "additionalProperties": false,
+        "example": {
+          "email": "john.doe@email.com"
+        }
       },
       "ResetPasswordRequest": {
         "properties": {
@@ -272,7 +275,11 @@
         },
         "required": ["newPassword", "token"],
         "type": "object",
-        "additionalProperties": false
+        "additionalProperties": false,
+        "example": {
+          "newPassword": "newPassword123",
+          "token": "1063e00e4a273e698577"
+        }
       },
       "SurveyVersionStatus": {
         "type": "string",
@@ -777,7 +784,7 @@
         "type": "object",
         "additionalProperties": false
       },
-      "Partial_RegisterParticipantRequest_": {
+      "UpdateProfileRequest": {
         "properties": {
           "firstName": {
             "type": "string",
@@ -838,10 +845,30 @@
           }
         },
         "type": "object",
-        "description": "Make all properties in T optional"
-      },
-      "UpdateProfileRequest": {
-        "$ref": "#/components/schemas/Partial_RegisterParticipantRequest_"
+        "additionalProperties": false,
+        "example": {
+          "firstName": "John",
+          "middleName": "James",
+          "lastName": "Doe",
+          "email": "john.doe@email.com",
+          "password": "Password123",
+          "dob": "2000-05-21",
+          "mobile": "0412341234",
+          "addressLine": "123 Sydney Street",
+          "suburb": "Sydney",
+          "postcode": "2000",
+          "state": "NSW",
+          "participantType": "STANDARD",
+          "preferredContact": "MOBILE",
+          "nextOfKin": {
+            "firstName": "Jeremy",
+            "middleName": "Jimmy",
+            "lastName": "Doe",
+            "mobile": "0412341432",
+            "email": "jeremydoe@email.com"
+          },
+          "dependents": []
+        }
       },
       "ParticipantAnswerStatus": {
         "properties": {
@@ -985,7 +1012,7 @@
           }
         ]
       },
-      "GetParticipantByIdResponse": {
+      "GetParticipantResponse": {
         "properties": {
           "data": {
             "$ref": "#/components/schemas/ParticipantWithProfile"
@@ -1074,7 +1101,10 @@
         },
         "required": ["emails"],
         "type": "object",
-        "additionalProperties": false
+        "additionalProperties": false,
+        "example": {
+          "emails": ["john.doe@email.com", "jane@email.com"]
+        }
       },
       "DefaultSelection_Prisma._36_OrganisationPayload_": {
         "properties": {
@@ -1246,7 +1276,11 @@
         },
         "required": ["email", "password"],
         "type": "object",
-        "additionalProperties": false
+        "additionalProperties": false,
+        "example": {
+          "email": "john.doe@email.com",
+          "password": "Password123"
+        }
       },
       "RegisterParticipantResponse": {
         "properties": {
@@ -1711,7 +1745,7 @@
         "tags": ["Users"],
         "security": [
           {
-            "jwt": []
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -2436,7 +2470,7 @@
     },
     "/profiles/current": {
       "get": {
-        "operationId": "GetParticipantProfileByToken",
+        "operationId": "GetCurrentParticipantProfile",
         "responses": {
           "200": {
             "description": "Ok",
@@ -2585,7 +2619,7 @@
         "tags": ["Profiles"],
         "security": [
           {
-            "jwt": []
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -2649,7 +2683,7 @@
         "tags": ["Profiles"],
         "security": [
           {
-            "jwt": []
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -2770,7 +2804,7 @@
         "tags": ["Participants"],
         "security": [
           {
-            "jwt": []
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": []
@@ -2785,7 +2819,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetParticipantByIdResponse"
+                  "$ref": "#/components/schemas/GetParticipantResponse"
                 }
               }
             }
@@ -2826,7 +2860,7 @@
         "tags": ["Participants"],
         "security": [
           {
-            "jwt": []
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
