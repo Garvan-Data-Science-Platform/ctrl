@@ -35,7 +35,7 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default .Chart.Version }}"
           imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
           env:
             - name: POSTGRES_HOST
