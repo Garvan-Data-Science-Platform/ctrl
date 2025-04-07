@@ -14,7 +14,7 @@ jobs:
         uses: pietrobolcato/action-read-yaml@1.0.0
         id: read_ver
         with:
-          config: ./.helm/Chart.yaml
+          config: .helm/ctrl/Chart.yaml
 
       - name: Check helm version
         run: test ${{ github.ref_name }} = ${{ steps.read_ver.outputs['version'] }}
