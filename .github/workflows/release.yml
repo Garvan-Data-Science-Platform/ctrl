@@ -72,6 +72,9 @@ jobs:
           workload_identity_provider: 'projects/43338454952/locations/global/workloadIdentityPools/ctrl-next-id-pool/providers/github-provider'
           service_account: 'ctrl-ci-sa@ctrl-358804.iam.gserviceaccount.com'
 
+      - name: 'Docker auth'
+        run: gcloud auth configure-docker australia-southeast1-docker.pkg.dev
+
       - name: Package helm
         run: helm dependency build .helm/ctrl && helm package .helm/ctrl
 
