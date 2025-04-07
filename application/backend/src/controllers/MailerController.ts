@@ -1,4 +1,4 @@
-import { Response, Controller, Security, Tags, Route, Post, Body, Request, Middlewares } from 'tsoa'
+import { Response, Controller, Tags, Route, Post, Body, Request, Middlewares } from 'tsoa'
 import {
   InternalErrorResponse,
   UnauthorizedErrorResponse,
@@ -16,7 +16,6 @@ import { auditLog } from '../middlewares/AuditLog'
 
 @Route('mailer')
 @Tags('Mailer')
-@Security('jwt')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 @Middlewares(auditLog)
