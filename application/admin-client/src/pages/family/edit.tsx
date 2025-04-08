@@ -39,12 +39,7 @@ export const FamilyEdit = () => {
   )
 
   //Dependents add form
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<OnBehalf>()
+  const { register, handleSubmit, reset } = useForm<OnBehalf>()
 
   const resetForm = () => {
     reset()
