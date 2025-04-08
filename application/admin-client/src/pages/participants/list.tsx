@@ -171,6 +171,7 @@ export const ParticipantList = () => {
                   color="primary"
                   component={Link}
                   to={`/participants/family/edit/${row.familyId}`}
+                  data-cy="family-button"
                 >
                   <People />
                 </IconButton>

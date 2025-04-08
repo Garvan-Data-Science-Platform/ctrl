@@ -2,12 +2,10 @@ import {
   Box,
   Button,
   Checkbox,
-  Container,
   FormControl,
   FormControlLabel,
   FormLabel,
   IconButton,
-  InputLabel,
   MenuItem,
   Radio,
   RadioGroup,
@@ -15,24 +13,10 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import {
-  useInvalidate,
-  useNavigation,
-  useNotification,
-  useOne,
-  useParsed,
-  useShow,
-} from '@refinedev/core'
-import { Breadcrumb, Edit, Show } from '@refinedev/mui'
+import { useInvalidate, useNotification, useOne, useParsed } from '@refinedev/core'
+import { Show } from '@refinedev/mui'
 import { useForm } from '@refinedev/react-hook-form'
-import { Controller } from 'react-hook-form'
-import { UpdateProfileRequest } from '@common/types/api/users/updateProfile'
-import {
-  ContactMethod,
-  OnBehalf,
-  ParticipantType,
-  StateTerritory,
-} from '@common/types/api/users/ParticipantProfile'
+import { OnBehalf, ParticipantType } from '@common/types/api/users/ParticipantProfile'
 import { useState } from 'react'
 import { ParticipantSearch } from '../../components/ParticipantSearch'
 import { ArrowBack, Delete } from '@mui/icons-material'
@@ -43,7 +27,6 @@ import { axiosInstance } from '../../providers/dataProvider'
 export const FamilyEdit = () => {
   const { id } = useParsed()
 
-  const { show } = useNavigation()
   const invalidate = useInvalidate()
 
   const { data } = useOne<FamilyMember[]>({ resource: 'families', id })
@@ -56,15 +39,7 @@ export const FamilyEdit = () => {
   )
 
   //Dependents add form
-  const {
-    register,
-    control,
-    handleSubmit,
-    setError,
-    watch,
-    reset,
-    formState: { errors },
-  } = useForm<OnBehalf>()
+  const { register, handleSubmit, reset } = useForm<OnBehalf>()
 
   const resetForm = () => {
     reset()
@@ -136,7 +111,7 @@ export const FamilyEdit = () => {
     >
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Typography>Current Family Members:</Typography>
-        <Box>
+        <Box data-cy="current-family-members">
           {data?.data.map((val) => (
             <Box
               key={val.id}
@@ -157,7 +132,7 @@ export const FamilyEdit = () => {
             >
               <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', ml: 1 }}>
                 {action == 'REMOVE' && (
-                  <IconButton onClick={() => handleRemove(val.id)}>
+                  <IconButton onClick={() => handleRemove(val.id)} data-cy="remove-icon-button">
                     <Delete />
                   </IconButton>
                 )}
@@ -169,6 +144,7 @@ export const FamilyEdit = () => {
                 value={val.participantType}
                 disabled={loading}
                 onChange={(e) => handleChangeType(val.id, e.target.value as ParticipantType)}
+                data-cy="type-select"
               >
                 <MenuItem value={ParticipantType.DEPENDENT_AGE}>Dependent (age based)</MenuItem>
                 <MenuItem value={ParticipantType.DEPENDENT_OTHER}>Dependent (other)</MenuItem>
@@ -183,6 +159,7 @@ export const FamilyEdit = () => {
           <Button
             variant={action == 'ADD' ? 'contained' : 'outlined'}
             onClick={() => setAction('ADD')}
+            data-cy="add-member-button"
           >
             Add member to this family
           </Button>
@@ -190,6 +167,7 @@ export const FamilyEdit = () => {
             sx={{ ml: 1 }}
             variant={action == 'REMOVE' ? 'contained' : 'outlined'}
             onClick={() => setAction('REMOVE')}
+            data-cy="remove-member-button"
           >
             Remove member from this family
           </Button>
@@ -211,12 +189,14 @@ export const FamilyEdit = () => {
                   control={<Radio />}
                   label="Yes"
                   sx={(theme) => ({ [theme.breakpoints.up('sm')]: { minWidth: 110 } })}
+                  data-cy="registered-yes"
                 />
                 <FormControlLabel
                   value={'NEW'}
                   control={<Radio />}
                   label="No"
                   sx={(theme) => ({ [theme.breakpoints.up('sm')]: { minWidth: 110 } })}
+                  data-cy="registered-no"
                 />
               </RadioGroup>
             </FormControl>
@@ -235,6 +215,7 @@ export const FamilyEdit = () => {
                       control={<Radio />}
                       label="Dependent"
                       sx={(theme) => ({ [theme.breakpoints.up('sm')]: { minWidth: 110 } })}
+                      data-cy="new-dependent"
                     />
                     <FormControlLabel
                       value={'GUARDIAN'}
@@ -299,7 +280,7 @@ export const FamilyEdit = () => {
                       <Checkbox defaultChecked={false} {...register(`permanent`)} />
                     </Box>
                     <Button
-                      data-cy="request-reset-button"
+                      data-cy="add-dep-button"
                       variant="contained"
                       sx={{ mt: 3 }}
                       type="submit"

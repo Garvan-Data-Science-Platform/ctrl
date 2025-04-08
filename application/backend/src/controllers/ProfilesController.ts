@@ -189,7 +189,7 @@ export class ProfilesController extends Controller {
     }
 
     if (bodyRequest.participantType) {
-      recalculateAnswers(profile.familyId)
+      await recalculateAnswers(profile.familyId)
     }
   }
 }

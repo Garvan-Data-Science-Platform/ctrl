@@ -6,7 +6,7 @@ import { Show, TextFieldComponent as TextField } from '@refinedev/mui'
 import { Link } from 'react-router-dom'
 import { statusMap } from './list'
 import { familyMap } from '@common/src/familyMap'
-import { Edit, MoreVert } from '@mui/icons-material'
+import { Edit } from '@mui/icons-material'
 
 export const ParticipantShow = () => {
   const { queryResult } = useShow({})
