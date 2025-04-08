@@ -301,7 +301,7 @@ const models: TsoaRoute.Models = {
     "GetResponsesByIdResponse": {
         "dataType": "refObject",
         "properties": {
-            "data": {"dataType":"array","array":{"dataType":"refObject","ref":"SurveyStep"},"required":true},
+            "data": {"dataType":"nestedObjectLiteral","nestedProperties":{"derived_from":{"dataType":"string"},"steps":{"dataType":"array","array":{"dataType":"refObject","ref":"SurveyStep"},"required":true}},"required":true},
         },
         "additionalProperties": false,
     },
@@ -407,6 +407,7 @@ const models: TsoaRoute.Models = {
             "email": {"dataType":"string"},
             "firstName": {"dataType":"string","required":true},
             "lastName": {"dataType":"string","required":true},
+            "familyId": {"dataType":"double","required":true},
             "answers": {"dataType":"array","array":{"dataType":"refObject","ref":"ParticipantAnswerStatus"},"required":true},
             "lastUpdated": {"dataType":"string"},
         },
@@ -2248,7 +2249,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 familyId: {"in":"path","name":"familyId","required":true,"dataType":"double"},
         };
         app.get('/families/:familyId',
-            authenticateMiddleware([{"jwt":[]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(FamiliesController)),
             ...(fetchMiddlewares<RequestHandler>(FamiliesController.prototype.getFamilyById)),
 
@@ -2279,7 +2280,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 profileId: {"in":"path","name":"profileId","required":true,"dataType":"double"},
         };
         app.post('/families/remove/:profileId',
-            authenticateMiddleware([{"jwt":[]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(FamiliesController)),
             ...(fetchMiddlewares<RequestHandler>(FamiliesController.prototype.removeMember)),
 
@@ -2311,7 +2312,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 profileId: {"in":"path","name":"profileId","required":true,"dataType":"double"},
         };
         app.post('/families/:familyId/add/:profileId',
-            authenticateMiddleware([{"jwt":[]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(FamiliesController)),
             ...(fetchMiddlewares<RequestHandler>(FamiliesController.prototype.addExistingMember)),
 
@@ -2343,7 +2344,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"AddDependentRequest"},
         };
         app.post('/families/:familyId/add-dependent',
-            authenticateMiddleware([{"jwt":[]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(FamiliesController)),
             ...(fetchMiddlewares<RequestHandler>(FamiliesController.prototype.addNewDependent)),
 
