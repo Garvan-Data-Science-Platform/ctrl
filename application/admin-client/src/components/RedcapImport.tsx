@@ -130,8 +130,8 @@ export const RedcapImport = ({
         <DialogContent>
           <DialogContentText>
             Warning: {warningMessage} The imported data from "
-            {dialogType == 'API' ? formName : file?.name}" will replace any existing/duplicate
-            content. Do you want to continue?
+            {dialogType == 'API' ? formName : file?.name}" will replace any existing content. Do you
+            want to continue?
           </DialogContentText>
         </DialogContent>
         <DialogActions>

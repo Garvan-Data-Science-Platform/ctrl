@@ -9,7 +9,7 @@ export const SurveyImport = () => {
       apiEndpoint="/integrations/redcap/instrument/upload/api"
       fileEndpoint="/integrations/redcap/instrument/upload/csv"
       successRedirect="/surveys/edit/:surveyId"
-      warningMessage="This will overwrite the current draft survey."
+      warningMessage="This action will overwrite the current draft survey."
     />
   )
 }

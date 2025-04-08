@@ -8,7 +8,8 @@ export const ParticipantImport = () => {
       helpDocumentation={participantUploadCSVDocumentation}
       apiEndpoint="/integrations/redcap/participant/upload/api"
       fileEndpoint="/integrations/redcap/participant/upload/csv"
-      warningMessage="This will overwrite any duplicate Participants."
+      successRedirect="/participants/"
+      warningMessage="This will overwrite any duplicate participants."
     />
   )
 }
