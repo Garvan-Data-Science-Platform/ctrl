@@ -1,5 +1,5 @@
 import { ParticipantAnswerStatus } from '@common/types/api/participants/participant'
-import { GetParticipantByIdResponse } from '@common/types/api/participants'
+import { GetParticipantResponse } from '@common/types/api/participants'
 import { Box, Button, IconButton, Stack, Tooltip, Typography } from '@mui/material'
 import { useShow } from '@refinedev/core'
 import { Show, TextFieldComponent as TextField } from '@refinedev/mui'
