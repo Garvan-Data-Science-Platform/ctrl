@@ -6,7 +6,6 @@ import {
   SurveyStepAnswerArray,
   UserSurveyStepState,
 } from 'common/types/survey'
-import { ProfilesController } from 'controllers/ProfilesController'
 import prisma from '../PrismaClient'
 
 export function determineLastUpdated(answers: PrismaJson.SurveyAnswerData) {

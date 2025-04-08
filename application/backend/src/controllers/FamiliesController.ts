@@ -27,6 +27,7 @@ import { createDefaultAnswers, recalculateAnswers } from '../utils/answers'
 @Tags('Families')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
+@Security('jwt', ['OrganisationAdmin'])
 @Middlewares(auditLog)
 export class FamiliesController extends Controller {
   participantProfileRepo = prisma.participantProfile
@@ -34,7 +35,6 @@ export class FamiliesController extends Controller {
 
   @Get('/{familyId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  @Security('jwt')
   public async getFamilyById(@Path() familyId: number): Promise<GetFamilyResponse> {
     const members = (await prisma.participantProfile.findMany({
       where: { familyId },
@@ -51,7 +51,6 @@ export class FamiliesController extends Controller {
    */
   @Post('/remove/{profileId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  @Security('jwt')
   public async removeMember(@Path() profileId: number) {
     const profile = await prisma.participantProfile.findUniqueOrThrow({ where: { id: profileId } })
 
@@ -85,7 +84,6 @@ export class FamiliesController extends Controller {
    */
   @Post('/{familyId}/add/{profileId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  @Security('jwt')
   public async addExistingMember(@Path() familyId: number, @Path() profileId: number) {
     const profile = await prisma.participantProfile.findUniqueOrThrow({ where: { id: profileId } })
     const oldId = profile.familyId
@@ -110,7 +108,6 @@ export class FamiliesController extends Controller {
   @Post('/{familyId}/add-dependent')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
-  @Security('jwt')
   public async addNewDependent(@Path() familyId: number, @Body() bodyRequest: AddDependentRequest) {
     //Check dependent doesn't already exist
     const depCheck = await prisma.participantProfile.findFirst({
@@ -159,7 +156,7 @@ export class FamiliesController extends Controller {
       },
     })
 
-    recalculateAnswers(familyId)
+    await recalculateAnswers(familyId)
 
     return
   }

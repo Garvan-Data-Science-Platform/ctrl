@@ -1,26 +1,21 @@
-import {
-  Box,
-  Button,
-  Container,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  TextField,
-} from '@mui/material'
+import { Box, Button, List, ListItem, ListItemButton, ListItemText, TextField } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { axiosInstance } from '../providers/dataProvider'
 import { HttpError, useList } from '@refinedev/core'
 import { Participant } from '@common/types/api/participants/participant'
 
-export function ParticipantSearch({ buttonText, onConfirm, exclude }) {
+interface ParticipantSearchProps {
+  buttonText: string
+  onConfirm: (id: number) => void
+  exclude: number[]
+}
+
+export function ParticipantSearch({ buttonText, onConfirm, exclude }: ParticipantSearchProps) {
   const [first, setFirst] = useState('')
   const [last, setLast] = useState('')
-  const [results, setResults] = useState([])
   const [selectedId, setSelectedId] = useState<number>()
   const [participants, setParticipants] = useState<Participant[]>([])
 
-  const { data, isLoading, isError } = useList<Participant, HttpError>({ resource: 'participants' })
+  const { data } = useList<Participant, HttpError>({ resource: 'participants' })
 
   useEffect(() => {
     const filtered = data?.data.filter((val) => {
@@ -42,6 +37,7 @@ export function ParticipantSearch({ buttonText, onConfirm, exclude }) {
           onChange={(e) => {
             setFirst(e.target.value)
           }}
+          data-cy="search-first"
         />
         <TextField
           label="Last Name"
@@ -60,6 +56,7 @@ export function ParticipantSearch({ buttonText, onConfirm, exclude }) {
           borderRadius: 1,
           mt: 1,
         }}
+        data-cy="participant-list"
       >
         <List>
           {participants.map((participant) => {
@@ -81,8 +78,9 @@ export function ParticipantSearch({ buttonText, onConfirm, exclude }) {
       <Button
         disabled={!selectedId}
         variant="outlined"
-        onClick={() => onConfirm(selectedId)}
+        onClick={() => onConfirm(selectedId || 0)}
         sx={{ mt: 1 }}
+        data-cy="search-confirm-button"
       >
         {buttonText}
       </Button>
