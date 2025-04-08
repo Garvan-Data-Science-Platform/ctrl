@@ -211,7 +211,7 @@ export class SurveysController extends Controller {
    */
   @Get('/responses/current')
   @Response('404', 'Not Found')
-  public async getUserResponses(@Request() request: any): Promise<any> {
+  public async getUserResponses(@Request() request: any): Promise<GetResponsesByIdResponse> {
     const participantProfile = await this.profileRepo.findFirstOrThrow({
       where: { userId: request.user.userId },
     })
@@ -233,7 +233,7 @@ export class SurveysController extends Controller {
       stepData[step].last_updated = currentAnswers[step].last_updated
     }
 
-    return { data: stepData }
+    return { data: { steps: stepData, derived_from: surveyParticipant.derived || undefined } }
   }
 
   /**

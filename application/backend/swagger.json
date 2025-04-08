@@ -2565,7 +2565,9 @@
 						"description": "Ok",
 						"content": {
 							"application/json": {
-								"schema": {}
+								"schema": {
+									"$ref": "#/components/schemas/GetResponsesByIdResponse"
+								}
 							}
 						}
 					},
