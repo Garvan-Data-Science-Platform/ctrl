@@ -6,11 +6,11 @@ beforeEach(() => {
   cy.task('reset')
   cy.login(UserType.ADMIN)
   cy.visit('/integrations')
-  cy.contains('Import Instruments').should('exist').click()
+  cy.contains('Import Participants').should('exist').click()
 })
 
-describe('REDCap Instrument Upload', () => {
-  describe('Survey Import Page', () => {
+describe('REDCap Participant Upload', () => {
+  describe('Participant Import Page', () => {
     it('should display REDCap logo', () => {
       cy.get('img[alt="REDCap Logo"]')
         .should('be.visible')
@@ -18,7 +18,7 @@ describe('REDCap Instrument Upload', () => {
     })
 
     it('should display both import sections', () => {
-      cy.contains('Upload survey File').should('exist')
+      cy.contains('Upload participant File').should('exist')
       cy.contains('Import from REDCap API').should('exist')
     })
 
@@ -29,46 +29,44 @@ describe('REDCap Instrument Upload', () => {
     })
 
     it('should handle file upload', () => {
-      const fileName0 = 'test_instrument0.csv'
+      const fileName0 = 'test_participant0.csv'
       cy.get('Confirm').should('not.exist')
-      cy.get('[data-cy="surveyAttach"]').attachFile(fileName0)
+      cy.get('[data-cy="participantAttach"]').attachFile(fileName0)
       cy.get('Confirm').should('not.exist')
       cy.contains(fileName0).should('be.visible')
 
       //
       const fileName1 = 'test_instrument1.csv'
-      cy.get('[data-cy="surveyAttach"]').attachFile(fileName1)
+      cy.get('[data-cy="participantAttach"]').attachFile(fileName1)
       cy.get('Confirm').should('not.exist')
       cy.contains(fileName1).should('be.visible')
     })
 
     it('should handle successful file upload submission', () => {
       // Check current draft metadata
-      let initialDraft
-      let updatedDraft
+      let initialInvites
+      let updatedInvites
       cy.request({
         method: 'GET',
-        url: 'http://localhost:5001/surveys',
+        url: 'http://localhost:5001/invites',
         headers: {
           Authorization: `Bearer ${window.localStorage.getItem('refine-auth')}`,
         },
       }).then((response) => {
         expect(response.status).to.eq(200)
-        initialDraft = response.body.data[0]
-        cy.wrap(initialDraft).as('initialDraft')
+        initialInvites = response.body.data
+        cy.wrap(initialInvites).as('initialInvites')
       })
 
-      const fileName = 'test_instrument0.csv'
-      cy.get('[data-cy="surveyAttach"]').attachFile(fileName)
+      const fileName = 'test_participant0.csv'
+      cy.get('[data-cy="participantAttach"]').attachFile(fileName)
 
       // Click the initial confirm button
       cy.contains('button', 'Confirm').click()
 
       // Verify dialog content
       cy.get('[data-cy="confirmDialog"]').should('be.visible')
-      cy.contains('Warning: This action will overwrite the current draft survey').should(
-        'be.visible',
-      )
+      cy.contains('Warning: This will overwrite any duplicate participants.').should('be.visible')
       cy.contains(`The imported data from "${fileName}" will replace any existing content`).should(
         'be.visible',
       )
@@ -77,52 +75,57 @@ describe('REDCap Instrument Upload', () => {
       cy.contains('button', 'Yes, Overwrite').click()
 
       // Intercept the upload request
-      cy.intercept('POST', '**/integrations/redcap/instrument/upload/csv', {
-        statusCode: 200,
+      cy.intercept('POST', '**/integrations/redcap/participant/upload/csv', {
+        statusCode: 201,
       }).as('uploadFile')
 
-      cy.url().should('include', '/surveys/edit/')
+      cy.url({ timeout: 10000 }).should('include', '/participants/')
 
       // Check updated draft metadata
       cy.request({
         method: 'GET',
-        url: 'http://localhost:5001/surveys',
+        url: 'http://localhost:5001/invites',
         headers: {
           Authorization: `Bearer ${window.localStorage.getItem('refine-auth')}`,
         },
       }).then((response) => {
         expect(response.status).to.eq(200)
-        updatedDraft = response.body.data[0]
-        cy.wrap(updatedDraft).as('updatedDraft')
+        updatedInvites = response.body.data
+        cy.wrap(updatedInvites).as('updatedInvites')
       })
 
-      // Check that the survey has been updated
-      cy.get('@initialDraft').then((initialDraft) => {
-        cy.get('@updatedDraft').then((updatedDraft) => {
-          expect(initialDraft.id).to.eq(updatedDraft.id)
-          expect(new Date(initialDraft.updatedAt)).to.be.lessThan(new Date(updatedDraft.updatedAt))
+      // Check that the participant has been updated
+      cy.get('@initialInvites').then((initialInvites) => {
+        cy.get('@updatedInvites').then((updatedInvites) => {
+          console.log('initialInvites', initialInvites)
+          console.log('updatedInvites', updatedInvites)
+          const num_new_invites = updatedInvites.length - initialInvites.length
+          expect(initialInvites.length).to.be.lessThan(updatedInvites.length)
+          expect(num_new_invites).to.eq(3)
         })
       })
     })
 
     it('should handle successful API import', () => {
       // Check current draft metadata
-      let initialDraft
-      let updatedDraft
+      let initialInvites
+      let updatedInvites
       cy.request({
         method: 'GET',
-        url: 'http://localhost:5001/surveys',
+        url: 'http://localhost:5001/participants',
         headers: {
           Authorization: `Bearer ${window.localStorage.getItem('refine-auth')}`,
         },
       }).then((response) => {
         expect(response.status).to.eq(200)
-        initialDraft = response.body.data[0]
-        cy.wrap(initialDraft).as('initialDraft')
+        initialInvites = response.body.data
+        cy.wrap(initialInvites).as('initialInvites')
       })
 
       const formName = 'test_form'
-      cy.get('[data-cy="redcapAPIToken"]').should('be.visible').type('DUMMY_TOKEN')
+      cy.get('[data-cy="redcapAPIToken"]')
+        .should('be.visible')
+        .type(Cypress.env('REDCAP_API_TOKEN'))
       cy.get('[data-cy="apiSubmit"]').should('be.visible').should('be.disabled')
       cy.get('[data-cy="formName"]').should('be.visible').type(formName)
       cy.get('[data-cy="apiSubmit"]').should('be.visible').should('be.enabled')
@@ -131,45 +134,45 @@ describe('REDCap Instrument Upload', () => {
 
       // Verify dialog content
       cy.get('[data-cy="confirmDialog"]').should('be.visible')
-      cy.contains('Warning: This action will overwrite the current draft survey').should(
-        'be.visible',
-      )
+      cy.contains('Warning: This will overwrite any duplicate participants').should('be.visible')
       cy.contains(`The imported data from "${formName}" will replace any existing content`).should(
         'be.visible',
       )
+
+      // Click the confirmation button in dialog
+      cy.contains('button', 'Yes, Overwrite').click()
 
       cy.intercept('POST', '**/integrations/redcap/instrument/upload/api', {
         statusCode: 200,
       })
 
-      // Click the confirmation button in dialog
-      cy.contains('button', 'Yes, Overwrite').click()
-
-      cy.url().should('include', '/surveys/edit/')
+      cy.url({ timeout: 10000 }).should('include', '/participants/')
 
       // Check updated draft metadata
       cy.request({
         method: 'GET',
-        url: 'http://localhost:5001/surveys',
+        url: 'http://localhost:5001/participants',
         headers: {
           Authorization: `Bearer ${window.localStorage.getItem('refine-auth')}`,
         },
       }).then((response) => {
         expect(response.status).to.eq(200)
-        updatedDraft = response.body.data[0]
-        cy.wrap(updatedDraft).as('updatedDraft')
+        updatedInvites = response.body.data
+        cy.wrap(updatedInvites).as('updatedInvites')
       })
 
-      // Check that the survey has been updated
-      cy.get('@initialDraft').then((initialDraft) => {
-        cy.get('@updatedDraft').then((updatedDraft) => {
-          expect(initialDraft.id).to.eq(updatedDraft.id)
+      // Check that the participant has been updated
+      cy.get('@initialInvites').then((initialInvites) => {
+        cy.get('@updatedInvites').then((updatedInvites) => {
+          const num_new_invites = updatedInvites.length - initialInvites.length
+          expect(initialInvites.length).to.be.lessThan(updatedInvites.length)
+          expect(num_new_invites).to.eq(3)
         })
       })
     })
 
     it('should open and close help modal', () => {
-      cy.contains('How to export surveys from REDCap').click()
+      cy.contains('How to export participants from REDCap').click()
       cy.get('[data-cy="helpPage"]').should('be.visible')
       cy.get('[data-cy="closeHelpPage"]').click()
       cy.get('[data-cy="helpPage"]').should('not.exist')
