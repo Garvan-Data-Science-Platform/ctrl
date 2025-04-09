@@ -34,6 +34,7 @@ import { ResponsesView } from './pages/responses'
 import { ListAlt, Person, RecentActors, DatasetLinked } from '@mui/icons-material'
 import { ParticipantEdit } from './pages/participants/edit'
 import { SetupPage } from './pages/setup'
+import { AllResponsesView } from './pages/responses/all'
 import { FamilyEdit } from './pages/family/edit'
 
 function App() {
@@ -98,6 +99,13 @@ function App() {
                   {
                     name: 'surveys/responses',
                     show: '/responses/:id',
+                    meta: {
+                      canDelete: true,
+                    },
+                  },
+                  {
+                    name: 'surveys/responses/all',
+                    show: '/responses/all/:id',
                     meta: {
                       canDelete: true,
                     },
@@ -171,6 +179,7 @@ function App() {
                       <Route index element={<IntegrationsHome />} />
                       <Route path="redcap/survey/import" element={<SurveyImport />} />
                     </Route>
+                    <Route path="/responses/all/:id" index element={<AllResponsesView />} />
                     <Route path="/responses/:id" index element={<ResponsesView />} />
                     <Route path="*" element={<ErrorComponent />} />
                   </Route>

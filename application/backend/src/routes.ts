@@ -298,6 +298,38 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "SurveyStepAnswerArray": {
+        "dataType": "refAlias",
+        "type": {"dataType":"array","array":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"boolean"},{"dataType":"enum","enums":[null]}]},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "UserSurveyStepState": {
+        "dataType": "refObject",
+        "properties": {
+            "status": {"ref":"SurveyStepStatus","required":true},
+            "answers": {"ref":"SurveyStepAnswerArray","required":true},
+            "last_updated": {"dataType":"string"},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ParticipantData": {
+        "dataType": "refObject",
+        "properties": {
+            "profile": {"dataType":"nestedObjectLiteral","nestedProperties":{"dob":{"dataType":"datetime","required":true},"lastName":{"dataType":"string","required":true},"firstName":{"dataType":"string","required":true}},"required":true},
+            "answers": {"dataType":"array","array":{"dataType":"refObject","ref":"UserSurveyStepState"},"required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GetAllResponsesResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "data": {"dataType":"nestedObjectLiteral","nestedProperties":{"participants":{"dataType":"array","array":{"dataType":"refObject","ref":"ParticipantData"},"required":true},"surveyData":{"dataType":"array","array":{"dataType":"refObject","ref":"SurveyStep"},"required":true}},"required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "GetResponsesByIdResponse": {
         "dataType": "refObject",
         "properties": {
@@ -1151,6 +1183,37 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
 
               await templateService.apiHandler({
                 methodName: 'getUserResponses',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsSurveysController_getAllResponses: Record<string, TsoaRoute.ParameterSchema> = {
+                versionId: {"in":"path","name":"versionId","required":true,"dataType":"double"},
+        };
+        app.get('/surveys/responses/all/:versionId',
+            authenticateMiddleware([{"jwt":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(SurveysController)),
+            ...(fetchMiddlewares<RequestHandler>(SurveysController.prototype.getAllResponses)),
+
+            async function SurveysController_getAllResponses(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsSurveysController_getAllResponses, request, response });
+
+                const controller = new SurveysController();
+
+              await templateService.apiHandler({
+                methodName: 'getAllResponses',
                 controller,
                 response,
                 next,
