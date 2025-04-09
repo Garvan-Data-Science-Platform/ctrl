@@ -28,7 +28,7 @@ export const IntegrationsHome = () => {
             }}
           >
             <PlaylistAddIcon />
-            Import Instruments
+            Import Survey
           </Button>
           <Button
             variant="contained"

@@ -6,10 +6,10 @@ beforeEach(() => {
   cy.task('reset')
   cy.login(UserType.ADMIN)
   cy.visit('/integrations')
-  cy.contains('Import Instruments').should('exist').click()
+  cy.contains('Import Survey').should('exist').click()
 })
 
-describe('REDCap Instrument Upload', () => {
+describe('REDCap Survey Upload', () => {
   describe('Survey Import Page', () => {
     it('should display REDCap logo', () => {
       cy.get('img[alt="REDCap Logo"]')
