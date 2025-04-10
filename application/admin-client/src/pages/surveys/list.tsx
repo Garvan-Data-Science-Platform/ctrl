@@ -1,6 +1,9 @@
+import { ChecklistRtl } from '@mui/icons-material'
+import { Button, IconButton } from '@mui/material'
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import { EditButton, List, ShowButton, useDataGrid } from '@refinedev/mui'
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 export const SurveyList = () => {
   const { dataGridProps } = useDataGrid({
@@ -26,7 +29,22 @@ export const SurveyList = () => {
           return row.status == 'DRAFT' ? (
             <EditButton data-cy="edit-button" hideText recordItemId={row.id} />
           ) : (
-            <ShowButton data-cy="view-button" hideText recordItemId={row.id} />
+            <>
+              <ShowButton
+                title="View survey questions"
+                data-cy="view-button"
+                hideText
+                recordItemId={row.id}
+              />
+              <IconButton
+                component={Link}
+                to={`/responses/all/${row.versionNumber}`}
+                title="View responses"
+                color="primary"
+              >
+                <ChecklistRtl />
+              </IconButton>
+            </>
           )
         },
         align: 'center',
@@ -38,7 +56,29 @@ export const SurveyList = () => {
   )
 
   return (
-    <List>
+    <List
+      headerButtons={
+        <>
+          <Button
+            variant="contained"
+            component={Link}
+            to={`/responses/all/${dataGridProps.rows.at(0)?.versionNumber - 1}`}
+            data-cy="invite-button"
+          >
+            View All Responses
+          </Button>
+
+          <Button
+            variant="contained"
+            component={Link}
+            to={`/surveys/edit/${dataGridProps.rows.at(0)?.versionNumber}`}
+            data-cy="invite-button"
+          >
+            Edit current draft
+          </Button>
+        </>
+      }
+    >
       <DataGrid {...dataGridProps} columns={columns} autoHeight />
     </List>
   )
