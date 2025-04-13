@@ -28,9 +28,7 @@ import { parseCSV, validateFile } from '../utils/parseCsv'
 import { FileUploadError } from '../middlewares/ErrorHandler'
 import logger from 'common/src/logger'
 import { AuthController } from './AuthController'
-import { InvitesController } from './ParticipantsController'
 import { auditLog } from '../middlewares/AuditLog'
-import { InviteParticipantsRequest } from 'common/types/api/participants'
 
 @Route('integrations')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
@@ -176,17 +174,6 @@ export class IntegrationsController extends Controller {
       throw new FileUploadError(
         error instanceof Error ? error.message : 'Unknown Error: Failed to Map Data',
       )
-    }
-
-    try {
-      // Send invitiations for all participants
-      const invitesController = new InvitesController()
-      const inviteRequest: InviteParticipantsRequest = {
-        emails: data.map((p) => p.email),
-      }
-      await invitesController.createInvites(inviteRequest)
-    } catch (error) {
-      logger.error(error)
     }
 
     const authController = new AuthController()
