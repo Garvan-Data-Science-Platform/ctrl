@@ -11,8 +11,8 @@ import {
 } from '@mui/material'
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import { DateField, EditButton, List, ShowButton, useDataGrid } from '@refinedev/mui'
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { InviteModal } from '../../components/InviteModal'
 import { axiosInstance } from '../../providers/dataProvider'
 import { useInvalidate, useNotification } from '@refinedev/core'
@@ -47,7 +47,10 @@ export const ParticipantList = () => {
     sorters: { mode: 'off' },
   })
 
+  const location = useLocation()
   const invalidate = useInvalidate()
+
+  const [initialEmails, setInitialEmails] = useState<string[]>([])
 
   const [modalOpen, setModalOpen] = useState(false)
 
@@ -57,6 +60,15 @@ export const ParticipantList = () => {
   const [inviteRowId, setInviteRowId] = useState(0)
 
   const { open } = useNotification()
+
+  useEffect(() => {
+    if (location.state?.openInviteModal) {
+      setModalOpen(true)
+      setInitialEmails(location.state.initialEmails || [])
+      // Clear the navigation state
+      window.history.replaceState({}, document.title)
+    }
+  }, [location])
 
   const sendInvites = (emails: string[]) => {
     setLoading(true)
@@ -279,6 +291,7 @@ export const ParticipantList = () => {
               setModalOpen(false)
             }}
             onSend={sendInvites}
+            initialEmails={initialEmails}
           />
         </Box>
       </Modal>
