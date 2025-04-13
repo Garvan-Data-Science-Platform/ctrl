@@ -73,10 +73,15 @@ export const RedcapImport = ({
       .then(async (response) => {
         const data = response.data
         invalidate({ resource: `${type}s`, invalidates: ['resourceAll'] })
-        if (successRedirect) {
+        if (type == 'survey' && successRedirect) {
           navigate(successRedirect.replace(':surveyId', data.id))
-        } else {
-          navigate(`/${type}s`)
+        } else if (type == 'participant' && successRedirect) {
+          navigate(successRedirect, {
+            state: {
+              openInviteModal: true,
+              initialEmails: ['peterererer@a.com', 'a'],
+            },
+          })
         }
       })
       .catch(() => {
