@@ -22,15 +22,15 @@ jobs:
           node-version: '20.10.0'
           cache: 'yarn'
       - run: yarn install --immutable && yarn prisma:generate
-      - run: yarn workspace backend build
-      - run: yarn workspace user-client build
-      - run: cd ./application/admin-client && yarn run refine build
       - name: Check Types
         run: yarn type-check
       - name: Format Code
         run: yarn format
       - name: Lint Code
         run: yarn lint
+      - run: yarn workspace backend build
+      - run: yarn workspace user-client build
+      - run: yarn workspace admin-client run refine build
 
   test:
     needs: build
