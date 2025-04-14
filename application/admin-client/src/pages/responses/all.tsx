@@ -47,6 +47,13 @@ export const AllResponsesView = () => {
         minWidth: 100,
         valueGetter: ({ row }) => `${row.profile.familyId}`,
       },
+      {
+        field: 'versionId',
+        headerName: 'Survey Version',
+        minWidth: 100,
+        valueGetter: ({ row }) => `${row.versionId}`,
+      },
+
       ...(questions || []).map((val, idx) => {
         return {
           field: `answers[${idx}]`,

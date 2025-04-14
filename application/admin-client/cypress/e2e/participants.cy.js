@@ -17,7 +17,7 @@ describe('Participants', () => {
   it('View participant details', () => {
     cy.login(UserType.ADMIN)
     cy.visit('/participants/98')
-    cy.contains('Test User').should('exist')
+    cy.contains('Unanswered User').should('exist')
     cy.contains('123 smith st').should('exist')
     cy.contains('V1').should('exist')
     cy.visit('/participants/99')

@@ -53,7 +53,7 @@ describe('SurveysController', () => {
 
       const body: GetSurveyVersionsResponse = response.body
       expect(body.data[0].status).toBe('DRAFT')
-      expect(body.data[1].versionNumber).toBe(1)
+      expect(body.data[1].id).toBe(1)
     })
   })
 
@@ -302,7 +302,7 @@ describe('SurveysController', () => {
       expect(data.data.surveyData[0].text).toBe('This is an introduction video')
       expect(data.data.surveyData).toHaveLength(2)
       expect(data.data.participants).toHaveLength(4)
-      expect(data.data.participants[1].profile.firstName).toBe('Test')
+      expect(data.data.participants[1].profile.firstName).toBe('Completed')
       expect(data.data.participants[1].answers[0].answers).toEqual([])
       expect(data.data.participants[1].answers[1].answers).toEqual([false, 'Choice 2'])
     })

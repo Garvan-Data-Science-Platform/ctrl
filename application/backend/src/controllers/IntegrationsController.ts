@@ -243,12 +243,10 @@ export class IntegrationsController extends Controller {
     const survey = await this.surveyRepo.upsert({
       where: { id: existingSurvey ? existingSurvey.id : -1 }, // Use a non-existent id for creation
       update: {
-        versionNumber: { increment: 1 },
         data: steps,
       },
       create: {
         status: 'DRAFT',
-        versionNumber: 1,
         data: steps,
       },
     })

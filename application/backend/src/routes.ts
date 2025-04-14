@@ -173,7 +173,6 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "id": {"dataType":"double"},
-            "versionNumber": {"dataType":"double"},
             "published_date": {"dataType":"string"},
             "status": {"ref":"SurveyVersionStatus","required":true},
         },
@@ -316,8 +315,9 @@ const models: TsoaRoute.Models = {
     "ParticipantData": {
         "dataType": "refObject",
         "properties": {
-            "profile": {"dataType":"nestedObjectLiteral","nestedProperties":{"dob":{"dataType":"datetime","required":true},"lastName":{"dataType":"string","required":true},"firstName":{"dataType":"string","required":true}},"required":true},
+            "profile": {"dataType":"nestedObjectLiteral","nestedProperties":{"familyId":{"dataType":"double","required":true},"dob":{"dataType":"datetime","required":true},"lastName":{"dataType":"string","required":true},"firstName":{"dataType":"string","required":true}},"required":true},
             "answers": {"dataType":"array","array":{"dataType":"refObject","ref":"UserSurveyStepState"},"required":true},
+            "versionId": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
     },

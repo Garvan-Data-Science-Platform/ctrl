@@ -21,7 +21,6 @@ const main = async () => {
 
   await prisma.surveyVersion.create({
     data: {
-      versionNumber: 1,
       status: 'PUBLISHED',
       data: SeedSurveyStepData as SurveyStep[],
     },
@@ -29,7 +28,6 @@ const main = async () => {
 
   await prisma.surveyVersion.create({
     data: {
-      versionNumber: 2,
       status: 'DRAFT',
       data: SeedSurveyStepData as SurveyStep[],
     },

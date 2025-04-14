@@ -18,7 +18,7 @@ export const SurveyList = () => {
         flex: 1,
         headerName: 'Version',
         minWidth: 200,
-        valueGetter: (val) => (val.row.status == 'DRAFT' ? 'Current Draft' : val.row.versionNumber),
+        valueGetter: (val) => (val.row.status == 'DRAFT' ? 'Current Draft' : val.row.id),
       },
       {
         field: 'actions',
@@ -38,9 +38,10 @@ export const SurveyList = () => {
               />
               <IconButton
                 component={Link}
-                to={`/responses/all/${row.versionNumber}`}
+                to={`/responses/all/${row.id}`}
                 title="View responses"
                 color="primary"
+                data-cy="response-icon-button"
               >
                 <ChecklistRtl />
               </IconButton>
@@ -62,8 +63,8 @@ export const SurveyList = () => {
           <Button
             variant="contained"
             component={Link}
-            to={`/responses/all/${dataGridProps.rows.at(0)?.versionNumber - 1}`}
-            data-cy="invite-button"
+            to={`/responses/all/${dataGridProps.rows.at(0)?.id - 1}`}
+            data-cy="view-all-responses-button"
           >
             View All Responses
           </Button>
@@ -71,7 +72,7 @@ export const SurveyList = () => {
           <Button
             variant="contained"
             component={Link}
-            to={`/surveys/edit/${dataGridProps.rows.at(0)?.versionNumber}`}
+            to={`/surveys/edit/${dataGridProps.rows.at(0)?.id}`}
             data-cy="invite-button"
           >
             Edit current draft
