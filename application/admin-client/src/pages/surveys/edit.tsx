@@ -126,7 +126,10 @@ export const SurveyEditor = () => {
         list('surveys')
       })
       .catch((error) => {
-        open?.({ type: 'error', message: `Could not publish survey: ${error}` })
+        open?.({
+          type: 'error',
+          message: `Could not publish survey: ${error.response.data.details.Question.message || error}`,
+        })
       })
   }
 
