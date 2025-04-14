@@ -18,7 +18,14 @@ interface InviteModalProps {
 }
 
 export function InviteModal({ onSend, onCancel, initialEmails = [] }: InviteModalProps) {
-  const [emails, setEmails] = useState<string[]>(initialEmails)
+  const validateEmail = (email: string) => {
+    const r = new RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) //eslint-disable-line
+    return r.test(email)
+  }
+
+  const [emails, setEmails] = useState<string[]>(() =>
+    initialEmails.filter((email) => validateEmail(email)),
+  )
   const [fieldValue, setFieldValue] = useState<string>('')
   const [invalid, setInvalid] = useState(false)
 
@@ -33,13 +40,6 @@ export function InviteModal({ onSend, onCancel, initialEmails = [] }: InviteModa
       })
       setFieldValue('')
     }
-  }
-
-  // TODO: Figure out how to validate the email on import from redcap
-
-  const validateEmail = (email: string) => {
-    const r = new RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) //eslint-disable-line
-    return r.test(email)
   }
 
   useEffect(() => {
