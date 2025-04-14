@@ -321,12 +321,14 @@ describe('AuthController', () => {
       })
       const dep1 = await prisma.participantProfile.findFirstOrThrow({
         where: { firstName: 'A', lastName: 'B' },
+        select: { familyId: true, nextOfKin: { select: { email: true } } },
       })
       const dep2 = await prisma.participantProfile.findFirstOrThrow({
         where: { firstName: 'B', lastName: 'B' },
       })
       expect(registered.familyId).toEqual(dep1.familyId)
       expect(registered.familyId).toEqual(dep2.familyId)
+      expect(dep1.nextOfKin?.email).toEqual('john@smith.com')
     })
 
     it('Two parents with the same child receive same family ID, dependent is not re-registered', async () => {
