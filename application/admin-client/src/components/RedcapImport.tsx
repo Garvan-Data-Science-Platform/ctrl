@@ -54,6 +54,23 @@ export const RedcapImport = ({
     }
   }
 
+  const getInitialEmails = async (file: File): Promise<string[]> => {
+    const content = await file.text()
+    const rows = content.split('\n').slice(1) // Skip header row
+    const uniqueEmails = new Set<string>()
+
+    rows.forEach((row: string) => {
+      const columns = row.split(',')
+      const participantEmail = columns[5] // ctrl_email index
+
+      if (participantEmail && participantEmail !== 'ctrl_email') {
+        uniqueEmails.add(participantEmail)
+      }
+    })
+
+    return Array.from(uniqueEmails)
+  }
+
   const onSubmitFile = () => {
     closeDialog()
     if (!file) {
@@ -79,12 +96,13 @@ export const RedcapImport = ({
           navigate(successRedirect, {
             state: {
               openInviteModal: true,
-              initialEmails: ['peterererer@a.com', 'a'],
+              initialEmails: await getInitialEmails(file),
             },
           })
         }
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error(err)
         open?.({ type: 'error', message: 'Error uploading file' })
         return
       })
