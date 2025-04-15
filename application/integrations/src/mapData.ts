@@ -30,7 +30,7 @@ export function mapToParticipantRequest(
     postcode: getField('postcode'),
     state: Object.values(StateTerritory)[Number(getField('state'))],
     password: 'temporaryPassword123', // temporary
-    dob: getField('dob'),
+    dob: transformDate(getField('dob')),
     participantType: ParticipantType.STANDARD, // temporary
     nextOfKin: {
       firstName: getField('nokFirstName', true),
@@ -133,4 +133,18 @@ export function mapToSurveyElement(
   }
 
   return [element, sectionHeader]
+}
+
+export function transformDate(dateStr: string): string {
+  try {
+    const [day, month, year] = dateStr.split('/')
+    const newDateStr = `${month}/${day}/${year}`
+    console.log(newDateStr)
+    if (isNaN(Date.parse(newDateStr))) {
+      throw new Error(`Invalid date format: ${dateStr}`)
+    }
+    return newDateStr
+  } catch (error) {
+    throw new Error(`Failed to transform date "${dateStr}"`)
+  }
 }

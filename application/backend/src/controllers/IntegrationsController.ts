@@ -169,7 +169,6 @@ export class IntegrationsController extends Controller {
     let data: RegisterParticipantRequest[] = []
     try {
       data = this.integrationService.mapRecordToParticipantRequests(rawData)
-      console.log('mapped data', data)
     } catch (error) {
       throw new FileUploadError(
         error instanceof Error ? error.message : 'Unknown Error: Failed to Map Data',
