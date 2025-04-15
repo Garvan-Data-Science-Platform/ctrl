@@ -6,8 +6,8 @@ on:
       - '**'
 
 jobs:
-  build:
-    name: build and check
+  helm-install:
+    name: test helm install
     runs-on: ubuntu-22.04
     steps:
       - name: Check out repository code
@@ -23,6 +23,30 @@ jobs:
 
       - name: install from helm
         run: helm dependency build .helm/ctrl && helm install ctrl .helm/ctrl
+
+      - name: test installation
+        run: helm test ctrl
+
+  helm-upgrade:
+    name: test helm upgrade from previous version
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: start minikube
+        id: minikube
+        uses: medyagh/setup-minikube@latest
+
+      - name: install helm
+        id: helm
+        uses: azure/setup-helm@v4.3.0
+
+      - name: install previous version with helm
+        run: helm install ctrl oci://australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl:0.1.16
+
+      - name: upgrade
+        run: helm dependency build .helm/ctrl && helm upgrade ctrl .helm/ctrl
 
       - name: test installation
         run: helm test ctrl
