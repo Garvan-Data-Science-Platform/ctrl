@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     name: build and check
-    runs-on: ubuntu-22.04
+    runs-on: self-hosted
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
@@ -32,7 +32,7 @@ jobs:
   test:
     needs: build
     name: test (${{ matrix.workspace }})
-    runs-on: ubuntu-22.04
+    runs-on: self-hosted
     strategy:
       fail-fast: false
       matrix:

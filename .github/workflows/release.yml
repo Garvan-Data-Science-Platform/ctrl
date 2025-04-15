@@ -5,7 +5,7 @@ on:
 
 jobs:
   check_name:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
@@ -15,7 +15,7 @@ jobs:
 
   build_push:
     name: build and push ${{ matrix.name }}
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: check_name
     permissions:
       contents: 'read'
@@ -54,7 +54,7 @@ jobs:
 
   package_push_chart:
     name: package and push helm
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: build_push
     permissions:
       contents: 'read'

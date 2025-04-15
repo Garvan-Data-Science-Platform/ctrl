@@ -10,6 +10,7 @@ on:
 jobs:
   security-checks:
     name: Security Audit
+    runs-on: self-hosted
     uses: Garvan-Data-Science-Platform/reusable-ci-actions/.github/workflows/security-audit.yml@main
     with:
       policy-path: .snyk
