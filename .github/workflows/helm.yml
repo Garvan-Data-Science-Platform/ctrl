@@ -1,0 +1,28 @@
+name: Test helm install
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  build:
+    name: build and check
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: start minikube
+        id: minikube
+        uses: medyagh/setup-minikube@latest
+
+      - name: install helm
+        id: helm
+        uses: azure/setup-helm@v4.3.0
+
+      - name: install from helm
+        run: helm install ctrl .helm/ctrl
+
+      - name: test installation
+        run: helm test ctrl
