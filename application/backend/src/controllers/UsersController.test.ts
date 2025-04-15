@@ -21,18 +21,12 @@ const api = new Api()
 const app = api.app
 
 describe('UsersController', () => {
-  let token: string
   let opAdminToken: string
   let orgAdminToken: string
 
   beforeAll(async () => {
     opAdminToken = await generateToken({ userId: OPERATOR_ADMIN_ID, roles: ['OperatorAdmin'] })
     orgAdminToken = await generateToken({ userId: ORG_ADMIN_ID, roles: ['OrganisationAdmin'] })
-
-    token = await generateToken({
-      userId: PARTICIPANT_UNANSWERED_ID,
-      roles: ['Participant'],
-    })
 
     api.run()
   })
@@ -92,7 +86,7 @@ describe('UsersController', () => {
       const userId = PARTICIPANT_UNANSWERED_ID
       const response = await request(app)
         .get(`/users/${userId}`)
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
 
       expect(response.status).toBe(200)
 
@@ -105,7 +99,7 @@ describe('UsersController', () => {
       const response = await request(app)
         .get(`/users/${userId}`)
         .set({
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${orgAdminToken}`,
         })
 
       expect(response.status).toBe(404)

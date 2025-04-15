@@ -35,7 +35,7 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.adminClient.image.repository }}:{{ .Values.adminClient.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.adminClient.image.repository }}:{{ .Values.adminClient.image.tag | default .Chart.Version }}"
           imagePullPolicy: {{ .Values.adminClient.image.pullPolicy }}
           env:
             - name: VITE_BACKEND_URL

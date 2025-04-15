@@ -285,7 +285,10 @@
           "email"
         ],
         "type": "object",
-        "additionalProperties": false
+        "additionalProperties": false,
+        "example": {
+          "email": "john.doe@email.com"
+        }
       },
       "ResetPasswordRequest": {
         "properties": {
@@ -302,7 +305,11 @@
           "token"
         ],
         "type": "object",
-        "additionalProperties": false
+        "additionalProperties": false,
+        "example": {
+          "newPassword": "newPassword123",
+          "token": "1063e00e4a273e698577"
+        }
       },
       "SurveyVersionStatus": {
         "type": "string",
@@ -906,7 +913,7 @@
         "type": "object",
         "additionalProperties": false
       },
-      "Partial_RegisterParticipantRequest_": {
+      "UpdateProfileRequest": {
         "properties": {
           "firstName": {
             "type": "string",
@@ -967,10 +974,30 @@
           }
         },
         "type": "object",
-        "description": "Make all properties in T optional"
-      },
-      "UpdateProfileRequest": {
-        "$ref": "#/components/schemas/Partial_RegisterParticipantRequest_"
+        "additionalProperties": false,
+        "example": {
+          "firstName": "John",
+          "middleName": "James",
+          "lastName": "Doe",
+          "email": "john.doe@email.com",
+          "password": "Password123",
+          "dob": "2000-05-21",
+          "mobile": "0412341234",
+          "addressLine": "123 Sydney Street",
+          "suburb": "Sydney",
+          "postcode": "2000",
+          "state": "NSW",
+          "participantType": "STANDARD",
+          "preferredContact": "MOBILE",
+          "nextOfKin": {
+            "firstName": "Jeremy",
+            "middleName": "Jimmy",
+            "lastName": "Doe",
+            "mobile": "0412341432",
+            "email": "jeremydoe@email.com"
+          },
+          "dependents": []
+        }
       },
       "ParticipantAnswerStatus": {
         "properties": {
@@ -1127,7 +1154,7 @@
           }
         ]
       },
-      "GetParticipantByIdResponse": {
+      "GetParticipantResponse": {
         "properties": {
           "data": {
             "$ref": "#/components/schemas/ParticipantWithProfile"
@@ -1233,7 +1260,13 @@
           "emails"
         ],
         "type": "object",
-        "additionalProperties": false
+        "additionalProperties": false,
+        "example": {
+          "emails": [
+            "john.doe@email.com",
+            "jane@email.com"
+          ]
+        }
       },
       "Organisation": {
         "description": "Model Organisation",
@@ -1431,7 +1464,11 @@
           "password"
         ],
         "type": "object",
-        "additionalProperties": false
+        "additionalProperties": false,
+        "example": {
+          "email": "john.doe@email.com",
+          "password": "Password123"
+        }
       },
       "RegisterParticipantResponse": {
         "properties": {
@@ -1660,21 +1697,6 @@
         ],
         "type": "object",
         "additionalProperties": false
-      },
-      "Workspace": {
-        "properties": {
-          "version": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "version",
-          "name"
-        ],
-        "type": "object"
       }
     },
     "securitySchemes": {
@@ -1915,7 +1937,9 @@
         ],
         "security": [
           {
-            "jwt": []
+            "jwt": [
+              "OrganisationAdmin"
+            ]
           }
         ],
         "parameters": [
@@ -2541,7 +2565,9 @@
         ],
         "security": [
           {
-            "jwt": []
+            "jwt": [
+              "OrganisationAdmin"
+            ]
           }
         ],
         "parameters": [
@@ -2721,7 +2747,7 @@
     },
     "/profiles/current": {
       "get": {
-        "operationId": "GetParticipantProfileByToken",
+        "operationId": "GetCurrentParticipantProfile",
         "responses": {
           "200": {
             "description": "Ok",
@@ -2754,8 +2780,8 @@
             }
           }
         },
-        "description": "Get a Participants Profile by token",
-        "summary": "Get a Participants Profile by token",
+        "description": "Get the current Participants Profile",
+        "summary": "Get the current Participants Profile",
         "tags": [
           "Profiles"
         ],
@@ -2876,7 +2902,9 @@
         ],
         "security": [
           {
-            "jwt": []
+            "jwt": [
+              "OrganisationAdmin"
+            ]
           }
         ],
         "parameters": [
@@ -2942,7 +2970,9 @@
         ],
         "security": [
           {
-            "jwt": []
+            "jwt": [
+              "OrganisationAdmin"
+            ]
           }
         ],
         "parameters": [
@@ -3069,7 +3099,9 @@
         ],
         "security": [
           {
-            "jwt": []
+            "jwt": [
+              "OrganisationAdmin"
+            ]
           }
         ],
         "parameters": []
@@ -3084,7 +3116,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetParticipantByIdResponse"
+                  "$ref": "#/components/schemas/GetParticipantResponse"
                 }
               }
             }
@@ -3127,7 +3159,9 @@
         ],
         "security": [
           {
-            "jwt": []
+            "jwt": [
+              "OrganisationAdmin"
+            ]
           }
         ],
         "parameters": [
@@ -4578,41 +4612,6 @@
         },
         "description": "Health check to ensure server is up and running",
         "summary": "Health Check",
-        "tags": [
-          "Healthcheck"
-        ],
-        "security": [],
-        "parameters": []
-      }
-    },
-    "/workspaces": {
-      "get": {
-        "operationId": "GetAllWorkspaces",
-        "responses": {
-          "200": {
-            "description": "Ok",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "data": {
-                      "items": {
-                        "$ref": "#/components/schemas/Workspace"
-                      },
-                      "type": "array"
-                    }
-                  },
-                  "required": [
-                    "data"
-                  ],
-                  "type": "object"
-                }
-              }
-            }
-          }
-        },
-        "description": "Get all Workspaces",
-        "summary": "Get all Workspaces",
         "tags": [
           "Healthcheck"
         ],

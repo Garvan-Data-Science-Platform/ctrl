@@ -41,13 +41,12 @@ export class ProfilesController extends Controller {
   userRepo = prisma.user
 
   /**
-   * Get a Participants Profile by token
+   * Get the current Participants Profile
    *
-   * @summary Get a Participants Profile by token
+   * @summary Get the current Participants Profile
    */
   @Get('/current')
-  @Security('jwt')
-  public async getParticipantProfileByToken(
+  public async getCurrentParticipantProfile(
     @Request() request: express.Request,
   ): Promise<GetParticipantProfileResponse> {
     /**
@@ -71,7 +70,7 @@ export class ProfilesController extends Controller {
    */
   @Get('/user/{userId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  @Security('jwt')
+  @Security('jwt', ['OrganisationAdmin'])
   public async getParticipantProfileByUserID(
     @Path() userId: number,
   ): Promise<GetParticipantProfileResponse> {
@@ -81,7 +80,7 @@ export class ProfilesController extends Controller {
 
   @Get('/{profileId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  @Security('jwt')
+  @Security('jwt', ['OrganisationAdmin'])
   public async getParticipantProfileByID(
     @Path() profileId: number,
   ): Promise<GetParticipantProfileResponse> {
@@ -136,7 +135,6 @@ export class ProfilesController extends Controller {
 
   @Patch('/current')
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
-  @Security('jwt')
   public async updateCurrentProfile(
     @Body() bodyRequest: UpdateProfileRequest,
     @Request() request: express.Request,

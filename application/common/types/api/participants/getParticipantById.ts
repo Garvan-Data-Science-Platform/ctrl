@@ -1,5 +1,5 @@
 import { ParticipantWithProfile } from './participant'
 
-export interface GetParticipantByIdResponse {
+export interface GetParticipantResponse {
   data: ParticipantWithProfile
 }

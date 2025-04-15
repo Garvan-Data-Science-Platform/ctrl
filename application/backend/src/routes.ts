@@ -377,14 +377,26 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Partial_RegisterParticipantRequest_": {
-        "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"firstName":{"dataType":"string","validators":{"minLength":{"value":1}}},"middleName":{"dataType":"string","validators":{"minLength":{"value":1}}},"lastName":{"dataType":"string","validators":{"minLength":{"value":1}}},"email":{"dataType":"string","validators":{"pattern":{"errorMsg":"please provide valid email","value":"^(.+)@(.+)$"}}},"mobile":{"dataType":"string","validators":{"pattern":{"errorMsg":"please provide valid phone number","value":"^(\\+\\d{1,2}\\s?)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$"}}},"preferredContact":{"ref":"ContactMethod"},"addressLine":{"dataType":"string","validators":{"minLength":{"value":1}}},"suburb":{"dataType":"string","validators":{"minLength":{"value":1}}},"postcode":{"dataType":"string","validators":{"minLength":{"value":1}}},"state":{"ref":"StateTerritory"},"password":{"dataType":"string","validators":{"minLength":{"errorMsg":"Password must be at least 8 characters","value":8}}},"dob":{"dataType":"string","validators":{"isDate":{"errorMsg":"Date of birth must be of date format"}}},"participantType":{"ref":"ParticipantType"},"nextOfKin":{"ref":"AlternativeContact"},"dependents":{"dataType":"array","array":{"dataType":"refObject","ref":"OnBehalf"}}},"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "UpdateProfileRequest": {
-        "dataType": "refAlias",
-        "type": {"ref":"Partial_RegisterParticipantRequest_","validators":{}},
+        "dataType": "refObject",
+        "properties": {
+            "firstName": {"dataType":"string","validators":{"minLength":{"value":1}}},
+            "middleName": {"dataType":"string","validators":{"minLength":{"value":1}}},
+            "lastName": {"dataType":"string","validators":{"minLength":{"value":1}}},
+            "email": {"dataType":"string","validators":{"pattern":{"errorMsg":"please provide valid email","value":"^(.+)@(.+)$"}}},
+            "mobile": {"dataType":"string","validators":{"pattern":{"errorMsg":"please provide valid phone number","value":"^(\\+\\d{1,2}\\s?)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$"}}},
+            "preferredContact": {"ref":"ContactMethod"},
+            "addressLine": {"dataType":"string","validators":{"minLength":{"value":1}}},
+            "suburb": {"dataType":"string","validators":{"minLength":{"value":1}}},
+            "postcode": {"dataType":"string","validators":{"minLength":{"value":1}}},
+            "state": {"ref":"StateTerritory"},
+            "password": {"dataType":"string","validators":{"minLength":{"errorMsg":"Password must be at least 8 characters","value":8}}},
+            "dob": {"dataType":"string","validators":{"isDate":{"errorMsg":"Date of birth must be of date format"}}},
+            "participantType": {"ref":"ParticipantType"},
+            "nextOfKin": {"ref":"AlternativeContact"},
+            "dependents": {"dataType":"array","array":{"dataType":"refObject","ref":"OnBehalf"}},
+        },
+        "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "ParticipantAnswerStatus": {
@@ -423,7 +435,7 @@ const models: TsoaRoute.Models = {
         "type": {"dataType":"intersection","subSchemas":[{"ref":"Participant"},{"dataType":"nestedObjectLiteral","nestedProperties":{"profile":{"dataType":"nestedObjectLiteral","nestedProperties":{"familyMembers":{"dataType":"array","array":{"dataType":"refObject","ref":"FamilyMember"},"required":true},"nextOfKin":{"ref":"AlternativeContact"},"participantType":{"ref":"ParticipantType","required":true},"preferredContact":{"ref":"ContactMethod","required":true},"postcode":{"dataType":"string"},"state":{"ref":"StateTerritory"},"suburb":{"dataType":"string"},"addressLine":{"dataType":"string"},"mobile":{"dataType":"string","required":true},"email":{"dataType":"string"},"dob":{"dataType":"string","required":true},"lastName":{"dataType":"string","required":true},"middleName":{"dataType":"string"},"firstName":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}},"required":true}}}],"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "GetParticipantByIdResponse": {
+    "GetParticipantResponse": {
         "dataType": "refObject",
         "properties": {
             "data": {"ref":"ParticipantWithProfile","required":true},
@@ -649,11 +661,6 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Workspace": {
-        "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"version":{"dataType":"string","required":true},"name":{"dataType":"string","required":true}},"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 };
 const templateService = new ExpressTemplateService(models, {"noImplicitAdditionalProperties":"throw-on-extras","bodyCoercion":true});
 
@@ -736,7 +743,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 userId: {"in":"path","name":"userId","required":true,"dataType":"double"},
         };
         app.get('/users/:userId',
-            authenticateMiddleware([{"jwt":[]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(UsersController)),
             ...(fetchMiddlewares<RequestHandler>(UsersController.prototype.getUserById)),
 
@@ -1142,7 +1149,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 participantId: {"in":"path","name":"participantId","required":true,"dataType":"double"},
         };
         app.get('/surveys/responses/:participantId',
-            authenticateMiddleware([{"jwt":[]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(SurveysController)),
             ...(fetchMiddlewares<RequestHandler>(SurveysController.prototype.getResponsesById)),
 
@@ -1264,26 +1271,26 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsProfilesController_getParticipantProfileByToken: Record<string, TsoaRoute.ParameterSchema> = {
+        const argsProfilesController_getCurrentParticipantProfile: Record<string, TsoaRoute.ParameterSchema> = {
                 request: {"in":"request","name":"request","required":true,"dataType":"object"},
         };
         app.get('/profiles/current',
             authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(ProfilesController)),
-            ...(fetchMiddlewares<RequestHandler>(ProfilesController.prototype.getParticipantProfileByToken)),
+            ...(fetchMiddlewares<RequestHandler>(ProfilesController.prototype.getCurrentParticipantProfile)),
 
-            async function ProfilesController_getParticipantProfileByToken(request: ExRequest, response: ExResponse, next: any) {
+            async function ProfilesController_getCurrentParticipantProfile(request: ExRequest, response: ExResponse, next: any) {
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsProfilesController_getParticipantProfileByToken, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args: argsProfilesController_getCurrentParticipantProfile, request, response });
 
                 const controller = new ProfilesController();
 
               await templateService.apiHandler({
-                methodName: 'getParticipantProfileByToken',
+                methodName: 'getCurrentParticipantProfile',
                 controller,
                 response,
                 next,
@@ -1299,7 +1306,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 userId: {"in":"path","name":"userId","required":true,"dataType":"double"},
         };
         app.get('/profiles/user/:userId',
-            authenticateMiddleware([{"jwt":[]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(ProfilesController)),
             ...(fetchMiddlewares<RequestHandler>(ProfilesController.prototype.getParticipantProfileByUserID)),
 
@@ -1330,7 +1337,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 profileId: {"in":"path","name":"profileId","required":true,"dataType":"double"},
         };
         app.get('/profiles/:profileId',
-            authenticateMiddleware([{"jwt":[]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(ProfilesController)),
             ...(fetchMiddlewares<RequestHandler>(ProfilesController.prototype.getParticipantProfileByID)),
 
@@ -1424,7 +1431,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         const argsParticipantsController_getParticipants: Record<string, TsoaRoute.ParameterSchema> = {
         };
         app.get('/participants',
-            authenticateMiddleware([{"jwt":[]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(ParticipantsController)),
             ...(fetchMiddlewares<RequestHandler>(ParticipantsController.prototype.getParticipants)),
 
@@ -1455,7 +1462,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 profileId: {"in":"path","name":"profileId","required":true,"dataType":"double"},
         };
         app.get('/participants/:profileId',
-            authenticateMiddleware([{"jwt":[]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(ParticipantsController)),
             ...(fetchMiddlewares<RequestHandler>(ParticipantsController.prototype.getParticipantById)),
 
@@ -2220,35 +2227,6 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
 
               await templateService.apiHandler({
                 methodName: 'HealthCheck',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: undefined,
-              });
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsHealthCheckController_getAllWorkspaces: Record<string, TsoaRoute.ParameterSchema> = {
-        };
-        app.get('/workspaces',
-            ...(fetchMiddlewares<RequestHandler>(HealthCheckController)),
-            ...(fetchMiddlewares<RequestHandler>(HealthCheckController.prototype.getAllWorkspaces)),
-
-            async function HealthCheckController_getAllWorkspaces(request: ExRequest, response: ExResponse, next: any) {
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsHealthCheckController_getAllWorkspaces, request, response });
-
-                const controller = new HealthCheckController();
-
-              await templateService.apiHandler({
-                methodName: 'getAllWorkspaces',
                 controller,
                 response,
                 next,

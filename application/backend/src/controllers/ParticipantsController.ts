@@ -7,7 +7,7 @@ import {
 } from 'common/types/api/errors'
 import type {
   GetInvitesResponse,
-  GetParticipantByIdResponse,
+  GetParticipantResponse,
   GetParticipantsResponse,
   InviteParticipantsRequest,
   InviteParticipantsResponse,
@@ -37,7 +37,7 @@ import { auditLog } from '../middlewares/AuditLog'
 
 @Route('participants')
 @Tags('Participants')
-@Security('jwt')
+@Security('jwt', ['OrganisationAdmin'])
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 @Middlewares(auditLog)
@@ -91,15 +91,15 @@ export class ParticipantsController extends Controller {
 
     return { data: participants }
   }
+
   /**
    * Get participant by ID
    *
    * @summary Get a  Participant by ID
    */
-
   @Get('/{profileId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  public async getParticipantById(@Path() profileId: number): Promise<GetParticipantByIdResponse> {
+  public async getParticipantById(@Path() profileId: number): Promise<GetParticipantResponse> {
     const profile = await this.profileRepo.findFirstOrThrow({
       where: { id: profileId },
       select: { userId: true, firstName: true, lastName: true, user: { select: { email: true } } },

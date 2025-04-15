@@ -80,7 +80,6 @@ export class SurveysController extends Controller {
    */
   @Get('/{surveyID}')
   @Response('404', 'Not Found')
-  @Security('jwt')
   public async getSurveyVersionById(
     @Path() surveyID: number,
   ): Promise<GetSurveyVersionByIdResponse> {
@@ -136,7 +135,6 @@ export class SurveysController extends Controller {
    */
   @Get('/steps/:study')
   @Response('404', 'Not Found')
-  @Security('jwt')
   public async getUserSurveySteps(
     @Request() request: any,
     //eslint-disable-next-line
@@ -174,7 +172,6 @@ export class SurveysController extends Controller {
    */
   @Get('/step/:study/:step')
   @Response('404', 'Not Found')
-  @Security('jwt')
   public async getUserSurveyStep(
     @Request() request: any,
     @Path() study: number,
@@ -214,8 +211,6 @@ export class SurveysController extends Controller {
    */
   @Get('/responses/current')
   @Response('404', 'Not Found')
-  @Security('jwt')
-  // public async getUserResponses(@Request() request: any): Promise<GetResponsesByIdResponse> {
   public async getUserResponses(@Request() request: any): Promise<any> {
     const participantProfile = await this.profileRepo.findFirstOrThrow({
       where: { userId: request.user.userId },
@@ -247,8 +242,8 @@ export class SurveysController extends Controller {
    * @summary Get all responses for a survey participant
    */
   @Get('/responses/:participantId')
-  @Security('jwt')
   @Response('404', 'Not Found')
+  @Security('jwt', ['OrganisationAdmin'])
   public async getResponsesById(@Path() participantId: number): Promise<GetResponsesByIdResponse> {
     const surveyParticipant = await this.spRepo.findUniqueOrThrow({
       where: { id: participantId },
@@ -278,7 +273,6 @@ export class SurveysController extends Controller {
   @Post('/answers')
   @Response('404', 'Not Found')
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
-  @Security('jwt')
   public async updateSurveyAnswers(
     @Request() request: any,
     @Body() body: UpdateSurveyAnswersRequest,
