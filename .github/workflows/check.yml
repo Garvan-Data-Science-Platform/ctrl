@@ -12,6 +12,10 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
+      - name: Install and Use nvm
+        run: |
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.2/install.sh | bash
+          nvm use
       - name: Enable Corepack
         run: corepack enable
       - name: Configure Environment
