@@ -15,6 +15,7 @@ jobs:
       - name: Install and Use nvm
         run: |
           curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.2/install.sh | bash
+          . ~/.nvm/nvm.sh
           nvm use
       - name: Enable Corepack
         run: corepack enable
