@@ -22,7 +22,7 @@ jobs:
         uses: azure/setup-helm@v4.3.0
 
       - name: install from helm
-        run: helm install ctrl .helm/ctrl
+        run: helm dependency build .helm/ctrl && helm install ctrl .helm/ctrl
 
       - name: test installation
         run: helm test ctrl
