@@ -9,7 +9,7 @@ metadata:
 spec:
   containers:
     - name: wget
-      image: busybox
+      image: alpine/curl
       command: ['sh','-c']
-      args: ['wget --no-cache --spider ctrl && wget --no-cache --spider admin && for i in 1 2 3 4 5; do wget backend && break || sleep 5; done']
+      args: ['curl ctrl && curl admin && curl --retry 5 --retry-connrefused backend']
   restartPolicy: Never
