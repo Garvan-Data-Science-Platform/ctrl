@@ -22,7 +22,7 @@ jobs:
         uses: azure/setup-helm@v4.3.0
 
       - name: install from helm
-        run: helm dependency build .helm/ctrl && helm install ctrl .helm/ctrl
+        run: helm dependency build .helm/ctrl && helm install --wait ctrl .helm/ctrl
 
       - name: test installation
         run: helm test ctrl --logs
@@ -47,10 +47,10 @@ jobs:
         uses: azure/setup-helm@v4.3.0
 
       - name: install previous version with helm
-        run: helm install ctrl oci://australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl:0.1.16
+        run: helm install --wait ctrl oci://australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl:0.1.16
 
       - name: upgrade
-        run: helm dependency build .helm/ctrl && helm upgrade ctrl .helm/ctrl
+        run: helm dependency build .helm/ctrl && helm upgrade --wait ctrl .helm/ctrl
 
       - name: test installation
         run: helm test ctrl --logs

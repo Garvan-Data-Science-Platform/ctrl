@@ -11,5 +11,5 @@ spec:
     - name: wget
       image: alpine/curl
       command: ['sh','-c']
-      args: ['curl ctrl && curl admin && curl --retry 5 --retry-connrefused backend']
+      args: ['curl --retry 5 ctrl && curl --retry 5 admin && curl --retry 5 backend']
   restartPolicy: Never
