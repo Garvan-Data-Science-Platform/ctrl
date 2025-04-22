@@ -10,6 +10,6 @@ spec:
   containers:
     - name: wget
       image: busybox
-      command: ['wget']
-      args: ['{{ include "ctrl.fullname" . }}:{{ .Values.service.port }}']
+      command: ['sh','-c']
+      args: ['wget --no-cache --spider ctrl && wget --no-cache --spider admin && wget --no-cache --spider backend']
   restartPolicy: Never
