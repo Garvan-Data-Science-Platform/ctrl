@@ -11,5 +11,5 @@ spec:
     - name: wget
       image: busybox
       command: ['sh','-c']
-      args: ['wget --no-cache --spider ctrl && wget --no-cache --spider admin && wget --no-cache --spider --timeout=1 --tries 20 backend']
+      args: ['wget --no-cache --spider ctrl && wget --no-cache --spider admin && wget --no-cache --spider --timeout=1 --tries=20 backend']
   restartPolicy: Never
