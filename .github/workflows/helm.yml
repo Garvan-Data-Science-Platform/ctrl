@@ -27,6 +27,10 @@ jobs:
       - name: test installation
         run: helm test ctrl --logs
 
+      - name: print logs
+        if: always()
+        run: kubectl logs -l app=USERCLIENT && kubectl logs -l app=BACKEND && kubectl logs -l app=ADMINCLIENT
+
   helm-upgrade:
     name: test helm upgrade from previous version
     runs-on: ubuntu-22.04
@@ -50,7 +54,7 @@ jobs:
 
       - name: test installation
         run: helm test ctrl --logs
-        continue-on-error: true
 
       - name: print logs
-        run: kubectl logs -l app=USERCLIENT
+        if: always()
+        run: kubectl logs -l app=USERCLIENT && kubectl logs -l app=BACKEND && kubectl logs -l app=ADMINCLIENT
