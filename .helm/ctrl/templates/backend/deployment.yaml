@@ -73,6 +73,8 @@ spec:
             - name: http
               containerPort: 5000
               protocol: TCP
+          startupProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
