@@ -271,7 +271,7 @@ describe('SurveysController', () => {
 
     it('should fail to publish an invalid survey', async () => {
       await prisma.surveyVersion.update({
-        where: { id: 1 },
+        where: { id: 2 },
         data: {
           data: [
             {
@@ -283,7 +283,7 @@ describe('SurveysController', () => {
         },
       })
       const response = await request(app)
-        .post('/surveys/publish/1')
+        .post('/surveys/publish/2')
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(422)
     })
