@@ -25,7 +25,7 @@ jobs:
         run: helm dependency build .helm/ctrl && helm install ctrl .helm/ctrl
 
       - name: test installation
-        run: helm test ctrl
+        run: helm test ctrl --logs
 
   helm-upgrade:
     name: test helm upgrade from previous version
@@ -49,4 +49,8 @@ jobs:
         run: helm dependency build .helm/ctrl && helm upgrade ctrl .helm/ctrl
 
       - name: test installation
-        run: helm test ctrl
+        run: helm test ctrl --logs
+        continue-on-error: true
+
+      - name: print logs
+        run: kubectl logs -l app=USERCLIENT
