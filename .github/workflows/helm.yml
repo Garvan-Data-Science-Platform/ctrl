@@ -47,7 +47,7 @@ jobs:
         uses: azure/setup-helm@v4.3.0
 
       - name: install previous version with helm
-        run: helm install --wait --set nginx-ingress.enabled=false ctrl .helm/ctrl #oci://australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl:0.1.16
+        run: helm dependency build .helm/ctrl && helm install --wait --set nginx-ingress.enabled=false ctrl .helm/ctrl #oci://australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl:0.1.16
 
       - name: seed
         run: kubectl exec deployment/backend -- yarn prisma:seed
