@@ -28,8 +28,8 @@ import {
 import { Participant } from 'common/types/api/participants/participant'
 import mailerTransporter, { fromAddress } from '../utils/mailer'
 import nodemailer from 'nodemailer'
-import { generateInviteEmail } from '../utils/generateInviteTemplate'
-import { InviteStatus } from '../../../common/types/api/participants/invite'
+import { generateInviteEmail } from 'common/src/generateInviteTemplate'
+import { InviteStatus } from 'common/types/api/participants/invite'
 import { NotFoundError } from '../middlewares/ErrorHandler'
 import { determineLastUpdated, determineStatus } from '../utils/answers'
 import { ProfilesController } from './ProfilesController'
@@ -186,6 +186,13 @@ export class InvitesController extends Controller {
   public async createInvites(
     @Body() bodyRequest: InviteParticipantsRequest,
   ): Promise<InviteParticipantsResponse> {
+    const { subjectText, explantoryText } = bodyRequest
+
+    await prisma.study.update({
+      where: { id: 1 },
+      data: { inviteEmailSubject: subjectText, inviteEmailText: explantoryText },
+    })
+
     const emails = [...new Set(bodyRequest.emails)]
     const expiresAt = new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000) // MAKE EXPIRY CONFIGURABLE
 
@@ -322,15 +329,18 @@ export class InvitesController extends Controller {
 
   private async sendInvites(emails: string[]): Promise<void> {
     const registerLink = `${process.env.HOSTNAME}/register`
+    const study = await prisma.study.findFirstOrThrow({})
+    const subjectText = study?.inviteEmailSubject
+    const explanatoryText = study?.inviteEmailText
 
     for (const email of emails) {
       // TODO: Make the email contents configurable
-      const { html, text } = generateInviteEmail(registerLink)
+      const { html, text } = generateInviteEmail(registerLink, subjectText, explanatoryText)
 
       const mailOptions: nodemailer.SendMailOptions = {
         from: fromAddress,
         to: email,
-        subject: 'Invitation to CTRL - dynamic consent platform',
+        subject: subjectText,
         text,
         html,
       }

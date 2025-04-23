@@ -10,6 +10,7 @@ import {
   Typography,
 } from '@mui/material'
 import { useEffect, useState } from 'react'
+import { generateInviteEmail } from '@common/src/generateInviteTemplate'
 
 interface InviteModalProps {
   onSend: (emails: string[]) => void
@@ -26,6 +27,10 @@ export function InviteModal({ onSend, onCancel, initialEmails = [] }: InviteModa
   const [emails, setEmails] = useState<string[]>(initialEmails.filter(validateEmail))
   const [fieldValue, setFieldValue] = useState<string>('')
   const [invalid, setInvalid] = useState(false)
+  const [emailText, setEmailText] = useState(
+    'You have been invited to register with CTRL dynamic consent platform.',
+  )
+  const [emailTitle, setEmailTitle] = useState('Invitation to CTRL')
 
   const handleAdd = () => {
     if (!validateEmail(fieldValue)) {
@@ -60,88 +65,127 @@ export function InviteModal({ onSend, onCancel, initialEmails = [] }: InviteModa
     })
   }
 
+  const { html: emailPreview } = generateInviteEmail(
+    'http://exampleregisterurl',
+    emailTitle,
+    emailText,
+  )
+
   return (
-    <Box sx={{ width: 400 }} onPasteCapture={handlePaste} data-cy="invite-modal">
-      <Typography variant="h4">Invite Participants</Typography>
+    <Box sx={{ width: 800, display: 'flex', flexDirection: 'row' }} data-cy="invite-modal">
+      <Box sx={{ flex: 1 }}>
+        <Typography variant="h4">Invite Participants</Typography>
 
-      <TextField
-        fullWidth
-        placeholder="tom@example.com"
-        helperText={invalid ? 'Invalid email' : 'Enter manually or paste from spreadsheet'}
-        error={invalid}
-        sx={{ mt: 2, mb: 2 }}
-        slotProps={{
-          input: {
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton data-cy="add-button" onClick={handleAdd}>
-                  <Add />
-                </IconButton>
-              </InputAdornment>
-            ),
-          },
-        }}
-        onKeyUp={(event) => {
-          if (event.key == 'Enter') {
-            handleAdd()
-          }
-        }}
-        value={fieldValue}
-        onChange={(e) => setFieldValue(e.target.value)}
-        data-cy="email-field"
-      />
-
-      <Typography sx={{ mt: 1 }}>
-        Recipients{emails.length > 0 && ` (${emails.length})`}:
-      </Typography>
-      <List
-        dense
-        sx={{ height: 180, overflow: 'auto', bgcolor: 'rgba(0,0,0,0.05)', borderRadius: 2 }}
-        data-cy="recipients-list"
-      >
-        {emails.map((email, idx) => {
-          return (
-            <ListItem
-              secondaryAction={
-                <IconButton
-                  onClick={() => {
-                    setEmails(emails.filter((e) => e != email))
-                  }}
-                  data-cy="remove-button"
-                >
-                  <Delete />
-                </IconButton>
-              }
-              key={`email_${idx}`}
-              sx={{ display: 'flex', flexDirection: 'row' }}
-            >
-              <Typography>{email}</Typography>
-            </ListItem>
-          )
-        })}
-      </List>
-      <Box sx={{ mt: 2, justifyContent: 'space-between', display: 'flex', flexDirection: 'row' }}>
-        <Button
-          variant="contained"
-          disabled={!(emails.length > 0 || fieldValue)}
-          onClick={() => {
-            if (fieldValue) {
-              if (!validateEmail(fieldValue)) {
-                setInvalid(true)
-              } else {
-                onSend([...emails, fieldValue])
-              }
-            } else {
-              onSend(emails)
+        <TextField
+          fullWidth
+          placeholder="tom@example.com"
+          helperText={invalid ? 'Invalid email' : 'Enter manually or paste from spreadsheet'}
+          error={invalid}
+          sx={{ mt: 2, mb: 2 }}
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton data-cy="add-button" onClick={handleAdd}>
+                    <Add />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
+          }}
+          onKeyUp={(event) => {
+            if (event.key == 'Enter') {
+              handleAdd()
             }
           }}
-          data-cy="send-button"
+          value={fieldValue}
+          onChange={(e) => setFieldValue(e.target.value)}
+          data-cy="email-field"
+          onPasteCapture={handlePaste}
+        />
+        <Typography sx={{ mt: 1 }}>
+          Recipients{emails.length > 0 && ` (${emails.length})`}:
+        </Typography>
+        <List
+          dense
+          sx={{ height: 180, overflow: 'auto', bgcolor: 'rgba(0,0,0,0.05)', borderRadius: 2 }}
+          data-cy="recipients-list"
         >
-          Send Invites
-        </Button>
-        <Button variant="contained" color="error" onClick={onCancel} data-cy="invite-modal-cancel">
-          Cancel
-        </Button>
+          {emails.map((email, idx) => {
+            return (
+              <ListItem
+                secondaryAction={
+                  <IconButton
+                    onClick={() => {
+                      setEmails(emails.filter((e) => e != email))
+                    }}
+                    data-cy="remove-button"
+                  >
+                    <Delete />
+                  </IconButton>
+                }
+                key={`email_${idx}`}
+                sx={{ display: 'flex', flexDirection: 'row' }}
+              >
+                <Typography>{email}</Typography>
+              </ListItem>
+            )
+          })}
+        </List>
+        <TextField
+          label="Email Subject"
+          fullWidth
+          multiline
+          sx={{ mt: 3 }}
+          value={emailTitle}
+          onChange={(e) => setEmailTitle(e.target.value)}
+        />
+        <TextField
+          label="Email text"
+          fullWidth
+          multiline
+          minRows={4}
+          maxRows={4}
+          sx={{ mt: 1, mb: 2 }}
+          value={emailText}
+          onChange={(e) => setEmailText(e.target.value)}
+        />
+        <Box sx={{ mt: 2, justifyContent: 'space-between', display: 'flex', flexDirection: 'row' }}>
+          <Button
+            variant="contained"
+            disabled={!(emails.length > 0 || fieldValue)}
+            onClick={() => {
+              if (fieldValue) {
+                if (!validateEmail(fieldValue)) {
+                  setInvalid(true)
+                } else {
+                  onSend([...emails, fieldValue])
+                }
+              } else {
+                onSend(emails)
+              }
+            }}
+            data-cy="send-button"
+          >
+            Send Invites
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={onCancel}
+            data-cy="invite-modal-cancel"
+          >
+            Cancel
+          </Button>
+        </Box>
+      </Box>
+      <Box sx={{ flex: 1, ml: 2, mt: 5 }}>
+        <Typography variant="h5" textAlign="center">
+          Email Preview
+        </Typography>
+        <Box sx={{ maxHeight: 600, overflow: 'auto' }}>
+          <div dangerouslySetInnerHTML={{ __html: emailPreview }}></div>
+        </Box>
       </Box>
     </Box>
   )

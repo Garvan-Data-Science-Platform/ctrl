@@ -11,6 +11,8 @@ type Email = string
  */
 export interface InviteParticipantsRequest {
   emails: Email[]
+  subjectText: string
+  explantoryText: string
 }
 
 export interface InviteParticipantsResponse {
