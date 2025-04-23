@@ -17,7 +17,7 @@ import { InviteModal } from '../../components/InviteModal'
 import { axiosInstance } from '../../providers/dataProvider'
 import { useInvalidate, useNotification } from '@refinedev/core'
 import { InviteStatus } from '@common/types/api/participants/invite'
-import { MoreVert } from '@mui/icons-material'
+import { MoreVert, People } from '@mui/icons-material'
 
 export const statusMap = {
   incomplete: {
@@ -166,6 +166,16 @@ export const ParticipantList = () => {
             <>
               <ShowButton hideText recordItemId={row.id} />
               <EditButton hideText recordItemId={row.id} />
+              <Tooltip title="View family">
+                <IconButton
+                  color="primary"
+                  component={Link}
+                  to={`/participants/family/edit/${row.familyId}`}
+                  data-cy="family-button"
+                >
+                  <People />
+                </IconButton>
+              </Tooltip>
             </>
           )
         },

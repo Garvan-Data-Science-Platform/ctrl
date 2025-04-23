@@ -159,7 +159,7 @@ const ResponsesPdf = ({ profile, responses }: ResponsesPdfProps) => (
         </Text>
       </View>
       /* Responses Section */
-      {responses.data.map((page) => (
+      {responses.data.steps.map((page) => (
         <View style={styles.section}>
           <Text style={styles.subtitle}>{page.title}</Text>
           <View style={styles.table}>

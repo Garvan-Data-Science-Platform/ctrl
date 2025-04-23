@@ -93,22 +93,31 @@ describe('Answer functions', () => {
   })
   describe('combineGuardianAnswers()', () => {
     it('Combines answers correctly', () => {
-      expect(combineGuardianAnswers([null, true, 'blue'], [null, false, 'blue'])).toEqual([
-        null,
-        null,
-        'blue',
-      ])
-      expect(combineGuardianAnswers([true, true, true], [true, false, null])).toEqual([
-        true,
-        null,
-        true,
-      ])
-      expect(combineGuardianAnswers([false], [false])).toEqual([false])
-      expect(combineGuardianAnswers(['red'], ['blue'])).toEqual([null])
-      expect(combineGuardianAnswers([], [])).toEqual([])
+      expect(
+        combineGuardianAnswers([
+          [null, true, 'blue'],
+          [null, false, 'blue'],
+        ]),
+      ).toEqual([null, null, 'blue'])
+      expect(
+        combineGuardianAnswers([
+          [true, true, true],
+          [true, false, null],
+        ]),
+      ).toEqual([true, null, true])
+      expect(combineGuardianAnswers([[false], [false]])).toEqual([false])
+      expect(combineGuardianAnswers([['red'], ['blue']])).toEqual([null])
+      expect(combineGuardianAnswers([[], []])).toEqual([])
+      expect(
+        combineGuardianAnswers([
+          [null, true, 'blue', 'blue'],
+          [null, false, 'blue', null],
+          [null, false, 'blue', null],
+        ]),
+      ).toEqual([null, null, 'blue', 'blue'])
     })
     it('Throws error on mismatch', () => {
-      expect(() => combineGuardianAnswers([true], [true, null])).toThrow()
+      expect(() => combineGuardianAnswers([[true], [true, null]])).toThrow()
     })
   })
 })

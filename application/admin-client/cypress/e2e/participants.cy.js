@@ -20,7 +20,6 @@ describe('Participants', () => {
     cy.contains('Test User').should('exist')
     cy.contains('123 smith st').should('exist')
     cy.contains('V1').should('exist')
-    cy.contains('Family').should('not.exist')
     cy.visit('/participants/99')
     cy.contains('Family').should('exist')
     cy.contains('Dependent').should('exist')
