@@ -1,0 +1,63 @@
+name: Test helm install
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  helm-install:
+    name: test helm install
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: start minikube
+        id: minikube
+        uses: medyagh/setup-minikube@latest
+
+      - name: install helm
+        id: helm
+        uses: azure/setup-helm@v4.3.0
+
+      - name: install from helm
+        run: helm dependency build .helm/ctrl && helm install --wait --set nginx-ingress.enabled=false ctrl .helm/ctrl
+
+      - name: test installation
+        run: helm test ctrl --logs
+
+      - name: print logs
+        if: always()
+        run: kubectl logs -l app=USERCLIENT && kubectl logs -l app=BACKEND && kubectl logs -l app=ADMINCLIENT
+
+  helm-upgrade:
+    name: test helm upgrade from previous version
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: start minikube
+        id: minikube
+        uses: medyagh/setup-minikube@latest
+
+      - name: install helm
+        id: helm
+        uses: azure/setup-helm@v4.3.0
+
+      - name: install previous version with helm
+        run: helm dependency build .helm/ctrl && helm install --wait --set nginx-ingress.enabled=false ctrl .helm/ctrl #oci://australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl:0.1.16
+
+      - name: seed
+        run: kubectl exec deployment/backend -- yarn prisma:seed
+
+      - name: upgrade
+        run: helm dependency build .helm/ctrl && helm upgrade --wait --set nginx-ingress.enabled=false ctrl .helm/ctrl
+
+      - name: test installation
+        run: helm test ctrl --logs
+
+      - name: print logs
+        if: always()
+        run: kubectl logs -l app=USERCLIENT && kubectl logs -l app=BACKEND && kubectl logs -l app=ADMINCLIENT
