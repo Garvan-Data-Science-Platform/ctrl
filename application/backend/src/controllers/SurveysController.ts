@@ -410,6 +410,29 @@ export class SurveysController extends Controller {
       throw Error('Can only publish a draft survey')
     }
 
+    //Validate questions
+    for (const step of survey.data) {
+      for (const element of step.elements) {
+        if (element.type == 'question-choices') {
+          if (element.data.choices.length == 0) {
+            throw new ValidateError(
+              { Question: { message: 'A multi-choice question is missing choices' } },
+              'Question is missing choices',
+            )
+          }
+        }
+        if (
+          (element.type == 'question-checkbox' || element.type == 'question-choices') &&
+          element.data.text == ''
+        ) {
+          throw new ValidateError(
+            { question: { message: 'A question is missing text' } },
+            'Missing question text',
+          )
+        }
+      }
+    }
+
     await this.surveyRepo.create({
       data: { status: 'DRAFT', data: survey.data, versionNumber: survey.versionNumber + 1 },
     })
