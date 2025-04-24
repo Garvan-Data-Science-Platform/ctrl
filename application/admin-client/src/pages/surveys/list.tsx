@@ -18,7 +18,7 @@ export const SurveyList = () => {
         flex: 1,
         headerName: 'Version',
         minWidth: 200,
-        valueGetter: (val) => (val.row.status == 'DRAFT' ? 'Current Draft' : val.row.id),
+        renderCell: ({ row }) => (row.status == 'DRAFT' ? 'Current Draft' : row.id),
       },
       {
         field: 'actions',

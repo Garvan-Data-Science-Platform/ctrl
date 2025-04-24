@@ -148,9 +148,9 @@ export const ParticipantList = () => {
         headerName: 'Latest Survey Response',
         minWidth: 100,
         type: 'date',
-        valueGetter: (cell) => {
-          if (!cell.value) return null
-          return new Date(cell.value)
+        valueGetter: (value) => {
+          if (!value) return null
+          return new Date(value)
         },
         renderCell: function render({ value }) {
           return <DateField value={value} format="DD/MM/YYYY" />
@@ -206,9 +206,9 @@ export const ParticipantList = () => {
         headerName: 'Date Sent',
         flex: 1,
         type: 'date',
-        valueGetter: (cell) => {
-          if (!cell.value) return null
-          return new Date(cell.value)
+        valueGetter: (value) => {
+          if (!value) return null
+          return new Date(value)
         },
         renderCell: function render({ value }) {
           return <DateField value={value} format="DD/MM/YYYY" />

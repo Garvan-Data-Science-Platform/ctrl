@@ -1,8 +1,34 @@
 import { useParsed, useShow } from '@refinedev/core'
 import { GetAllResponsesResponse } from '@common/types/api/surveys'
-import { DataGrid, GridColDef, GridToolbar } from '@mui/x-data-grid'
+import {
+  ColumnsPanelTrigger,
+  DataGrid,
+  ExportCsv,
+  FilterPanelTrigger,
+  GridColDef,
+  GridFilterListIcon,
+  GridSearchIcon,
+  QuickFilter,
+  QuickFilterClear,
+  QuickFilterControl,
+  QuickFilterTrigger,
+  ToolbarButton,
+  Toolbar,
+  GridViewColumnIcon,
+} from '@mui/x-data-grid'
 import { useMemo } from 'react'
-import { List } from '@refinedev/mui'
+import { ExportButton, List } from '@refinedev/mui'
+import { styled } from '@mui/material/styles'
+import {
+  Badge,
+  Button,
+  Divider,
+  InputAdornment,
+  TextField,
+  Tooltip,
+  Typography,
+} from '@mui/material'
+import { Cancel, FileDownload } from '@mui/icons-material'
 
 export const AllResponsesView = () => {
   const { queryResult } = useShow<GetAllResponsesResponse['data']>({
@@ -38,33 +64,147 @@ export const AllResponsesView = () => {
         field: 'profile',
         headerName: 'Participant',
         minWidth: 200,
-        valueGetter: ({ row }) =>
-          `${row.profile.firstName} ${row.profile.lastName} (${new Date(row.profile.dob).toLocaleDateString()})`,
+        valueGetter: (val) =>
+          `${val.firstName} ${val.lastName} (${new Date(val.dob).toLocaleDateString()})`,
       },
       {
         field: 'family',
         headerName: 'Family Id',
         minWidth: 100,
-        valueGetter: ({ row }) => `${row.profile.familyId}`,
+        valueGetter: (val, row) => `${row.profile.familyId}`,
       },
       {
         field: 'versionId',
         headerName: 'Survey Version',
         minWidth: 100,
-        valueGetter: ({ row }) => `${row.versionId}`,
       },
-
       ...(questions || []).map((val, idx) => {
         return {
           field: `answers[${idx}]`,
           headerName: val,
           minWidth: 200,
-          valueGetter: ({ row }) => formatAnswer(row.answers.flatMap((v: any) => v.answers)[idx]),
+          valueGetter: (val, row) => formatAnswer(row.answers.flatMap((v: any) => v.answers)[idx]),
+          //formatAnswer(val.flatMap((v: any) => v.answers)[idx]),
         } as GridColDef
       }),
     ],
     [questions],
   )
+
+  function TextInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
+    return <input {...props} />
+  }
+
+  type OwnerState = {
+    expanded: boolean
+  }
+
+  const StyledQuickFilter = styled(QuickFilter)({
+    display: 'grid',
+    alignItems: 'center',
+  })
+
+  const StyledToolbarButton = styled(ToolbarButton)<{ ownerState: OwnerState }>(
+    ({ theme, ownerState }) => ({
+      gridArea: '1 / 1',
+      width: 'min-content',
+      height: 'min-content',
+      zIndex: 1,
+      opacity: ownerState.expanded ? 0 : 1,
+      pointerEvents: ownerState.expanded ? 'none' : 'auto',
+      transition: theme.transitions.create(['opacity']),
+    }),
+  )
+
+  const StyledTextField = styled(TextField)<{
+    ownerState: OwnerState
+  }>(({ theme, ownerState }) => ({
+    gridArea: '1 / 1',
+    overflowX: 'clip',
+    width: ownerState.expanded ? 260 : 'var(--trigger-width)',
+    opacity: ownerState.expanded ? 1 : 0,
+    transition: theme.transitions.create(['width', 'opacity']),
+  }))
+
+  function CustomToolbar() {
+    return (
+      <Toolbar>
+        <Tooltip title="Columns">
+          <ColumnsPanelTrigger render={<ToolbarButton />}>
+            <GridViewColumnIcon fontSize="small" />
+          </ColumnsPanelTrigger>
+        </Tooltip>
+        <Tooltip title="Filters">
+          <FilterPanelTrigger
+            render={(props, state) => (
+              <ToolbarButton {...props} color="default">
+                <Badge badgeContent={state.filterCount} color="primary" variant="dot">
+                  <GridFilterListIcon fontSize="small" />
+                </Badge>
+              </ToolbarButton>
+            )}
+          />
+        </Tooltip>
+        <Divider orientation="vertical" variant="middle" flexItem sx={{ mx: 0.5 }} />
+        <Tooltip title="Export current view as csv">
+          <ExportCsv render={<ToolbarButton />}>
+            <FileDownload fontSize="small" />
+          </ExportCsv>
+        </Tooltip>
+        <StyledQuickFilter>
+          <QuickFilterTrigger
+            render={(triggerProps, state) => (
+              <Tooltip title="Search" enterDelay={0}>
+                <StyledToolbarButton
+                  {...triggerProps}
+                  ownerState={{ expanded: state.expanded }}
+                  color="default"
+                  aria-disabled={state.expanded}
+                >
+                  <GridSearchIcon fontSize="small" />
+                </StyledToolbarButton>
+              </Tooltip>
+            )}
+          />
+          <QuickFilterControl
+            render={({ ref, ...controlProps }, state) => (
+              <StyledTextField
+                {...controlProps}
+                ownerState={{ expanded: state.expanded }}
+                inputRef={ref}
+                aria-label="Search"
+                placeholder="Search..."
+                size="small"
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <GridSearchIcon fontSize="small" />
+                      </InputAdornment>
+                    ),
+                    endAdornment: state.value ? (
+                      <InputAdornment position="end">
+                        <QuickFilterClear
+                          edge="end"
+                          size="small"
+                          aria-label="Clear search"
+                          material={{ sx: { marginRight: -0.75 } }}
+                        >
+                          <Cancel fontSize="small" />
+                        </QuickFilterClear>
+                      </InputAdornment>
+                    ) : null,
+                    ...controlProps.slotProps?.input,
+                  },
+                  ...controlProps.slotProps,
+                }}
+              />
+            )}
+          />
+        </StyledQuickFilter>
+      </Toolbar>
+    )
+  }
 
   return (
     <List title={`Responses: Survey Version ${id}`} breadcrumb={false}>
@@ -75,7 +215,8 @@ export const AllResponsesView = () => {
           initialState={{ sorting: { sortModel: [{ field: 'family', sort: 'asc' }] } }}
           rows={rows}
           columns={inviteCols}
-          slots={{ toolbar: GridToolbar }}
+          showToolbar
+          slots={{ toolbar: CustomToolbar }}
           autoHeight
         />
       )}

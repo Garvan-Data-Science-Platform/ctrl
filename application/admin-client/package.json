@@ -8,7 +8,7 @@
     "@mui/icons-material": "^5.8.3",
     "@mui/lab": "^5.0.0-alpha.85",
     "@mui/material": "^6.1.5",
-    "@mui/x-data-grid": "^6.6.0",
+    "@mui/x-data-grid": "^8.0.0",
     "@refinedev/cli": "^2.16.46",
     "@refinedev/core": "^4.57.9",
     "@refinedev/devtools": "^1.2.16",
