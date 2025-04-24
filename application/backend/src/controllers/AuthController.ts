@@ -309,6 +309,7 @@ export class AuthController extends Controller {
         const depProfile = await this.profileRepo.create({
           data: {
             ...noNextOfKinProfileData,
+            ...nextOfKinCreateData,
             firstName: dep.firstName,
             lastName: dep.lastName,
             dob: new Date(dep.dob),
