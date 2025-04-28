@@ -15,8 +15,12 @@ import {
   ToolbarButton,
   Toolbar,
   GridViewColumnIcon,
+  useGridApiContext,
+  useGridSelector,
+  gridFilterActiveItemsSelector,
+  gridColumnVisibilityModelSelector,
 } from '@mui/x-data-grid'
-import { useMemo } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { List } from '@refinedev/mui'
 import { styled } from '@mui/material/styles'
 import { Badge, Divider, InputAdornment, TextField, Tooltip } from '@mui/material'
@@ -116,14 +120,18 @@ export const AllResponsesView = () => {
   }))
 
   function CustomToolbar() {
+    const apiRef = useGridApiContext()
+    const activeFilters = useGridSelector(apiRef, gridFilterActiveItemsSelector)
+    const cols = useGridSelector(apiRef, gridColumnVisibilityModelSelector)
+    const isFilter = activeFilters.length > 0 || Object.values(cols).some((val) => !val)
     return (
       <Toolbar>
-        <Tooltip title="Columns">
+        <Tooltip title="Select Columns">
           <ColumnsPanelTrigger render={<ToolbarButton />}>
             <GridViewColumnIcon fontSize="small" />
           </ColumnsPanelTrigger>
         </Tooltip>
-        <Tooltip title="Filters">
+        <Tooltip title="Filter Rows">
           <FilterPanelTrigger
             render={(props, state) => (
               <ToolbarButton {...props} color="default">
@@ -136,7 +144,12 @@ export const AllResponsesView = () => {
         </Tooltip>
         <Divider orientation="vertical" variant="middle" flexItem sx={{ mx: 0.5 }} />
         <Tooltip title="Export current view as csv">
-          <ExportCsv render={<ToolbarButton />}>
+          <ExportCsv
+            render={<ToolbarButton />}
+            options={{
+              fileName: `ctrl-responses-survey-v${id}-${new Date().toLocaleDateString()}${isFilter ? '-filtered' : ''}`,
+            }}
+          >
             <FileDownload fontSize="small" />
           </ExportCsv>
         </Tooltip>

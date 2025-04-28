@@ -153,6 +153,7 @@ export const ParticipantList = () => {
           return new Date(value)
         },
         renderCell: function render({ value }) {
+          //TODO: Localisation
           return <DateField sx={{ p: 2 }} value={value} format="DD/MM/YYYY" />
         },
       },
