@@ -137,13 +137,46 @@ export function mapToSurveyElement(
 
 export function transformDate(dateStr: string): string {
   try {
-    const [day, month, year] = dateStr.split('/')
-    const newDateStr = `${month}/${day}/${year}`
-    console.log(newDateStr)
-    if (isNaN(Date.parse(newDateStr))) {
-      throw new Error(`Invalid date format: ${dateStr}`)
+    const parts = dateStr.split(/[-/]/)
+
+    if (parts.length !== 3) {
+      throw new Error(
+        `Invalid date format: ${dateStr}. Expected DD-MM-YYYY, DD/MM/YYYY, or YYYY-MM-DD`,
+      )
     }
-    return newDateStr
+
+    const isYearFirst = parts[0].length === 4
+    const [first, second, third] = parts
+
+    // Determine date parts based on format
+    const dateComponents = isYearFirst
+      ? { year: first, month: second, day: third }
+      : { day: first, month: second, year: third }
+
+    // Validate the parts
+    const month = parseInt(dateComponents.month, 10)
+    const day = parseInt(dateComponents.day, 10)
+    const year = parseInt(dateComponents.year, 10)
+
+    if (
+      isNaN(month) ||
+      isNaN(day) ||
+      isNaN(year) ||
+      month < 1 ||
+      month > 12 ||
+      day < 1 ||
+      day > 31 ||
+      year < 1900 ||
+      year > 2100
+    ) {
+      throw new Error(`Invalid date values in: ${dateStr}`)
+    }
+
+    // Pad with leading zeros if necessary
+    const formattedMonth = month.toString().padStart(2, '0')
+    const formattedDay = day.toString().padStart(2, '0')
+
+    return `${formattedMonth}/${formattedDay}/${year}`
   } catch (error) {
     throw new Error(`Failed to transform date "${dateStr}"`)
   }
