@@ -157,7 +157,11 @@ export const AllResponsesView = () => {
           <ExportCsv
             render={<ToolbarButton />}
             options={{
-              fileName: `ctrl-responses-survey-v${id}-${new Date().toLocaleDateString()}${isFilter ? '-filtered' : ''}`,
+              fileName:
+                `ctrl-responses-survey-v${id}-${new Date().toISOString()}${isFilter ? '-filtered' : ''}`.replace(
+                  /:|\./g,
+                  '_',
+                ),
             }}
           >
             <FileDownload fontSize="small" />
