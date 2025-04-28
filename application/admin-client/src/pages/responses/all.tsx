@@ -20,7 +20,7 @@ import {
   gridFilterActiveItemsSelector,
   gridColumnVisibilityModelSelector,
 } from '@mui/x-data-grid'
-import { useMemo, useRef, useState } from 'react'
+import { useMemo } from 'react'
 import { List } from '@refinedev/mui'
 import { styled } from '@mui/material/styles'
 import { Badge, Divider, InputAdornment, TextField, Tooltip } from '@mui/material'
