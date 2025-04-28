@@ -127,9 +127,19 @@ export const AllResponsesView = () => {
     return (
       <Toolbar>
         <Tooltip title="Select Columns">
-          <ColumnsPanelTrigger render={<ToolbarButton />}>
-            <GridViewColumnIcon fontSize="small" />
-          </ColumnsPanelTrigger>
+          <ColumnsPanelTrigger
+            render={(props) => (
+              <ToolbarButton {...props} color="default">
+                <Badge
+                  badgeContent={Object.values(cols).filter((val) => !val).length}
+                  color="primary"
+                  variant="dot"
+                >
+                  <GridViewColumnIcon fontSize="small" />
+                </Badge>
+              </ToolbarButton>
+            )}
+          />
         </Tooltip>
         <Tooltip title="Filter Rows">
           <FilterPanelTrigger
