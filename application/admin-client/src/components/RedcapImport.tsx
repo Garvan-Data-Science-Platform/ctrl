@@ -15,26 +15,22 @@ import {
 import { useState } from 'react'
 import { Close, ArrowBack } from '@mui/icons-material'
 import ReactMarkdown from 'react-markdown'
-import { useNotification, useBack, useInvalidate } from '@refinedev/core'
-import { useNavigate } from 'react-router-dom'
-import { axiosInstance } from '../providers/dataProvider'
+import { useNotification, useBack } from '@refinedev/core'
 
 interface RedcapImportProps {
   type: 'survey' | 'participant'
   helpDocumentation: string
-  apiEndpoint: string
-  fileEndpoint: string
-  successRedirect?: string
   warningMessage: string
+  onSubmitFile: (file: File) => void
+  onSubmitApi: (formName: string, redcapAPIToken: string) => void
 }
 
 export const RedcapImport = ({
   type,
   helpDocumentation,
-  apiEndpoint,
-  fileEndpoint,
-  successRedirect,
   warningMessage,
+  onSubmitFile,
+  onSubmitApi,
 }: RedcapImportProps) => {
   const [file, setFile] = useState<File | null>(null)
   const [formName, setFormName] = useState<string>('')
@@ -43,10 +39,8 @@ export const RedcapImport = ({
   const [dialogOpen, setDialogOpen] = useState(false)
   const [dialogType, setDialogType] = useState<'FILE' | 'API'>('FILE')
 
-  const navigate = useNavigate()
   const { open } = useNotification()
   const back = useBack()
-  const invalidate = useInvalidate()
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -54,61 +48,17 @@ export const RedcapImport = ({
     }
   }
 
-  const getInitialEmails = async (file: File): Promise<string[]> => {
-    const content = await file.text()
-    const rows = content.split('\n').slice(1) // Skip header row
-    const uniqueEmails = new Set<string>()
-
-    rows.forEach((row: string) => {
-      const columns = row.split(',')
-      const participantEmail = columns[5] // ctrl_email index
-
-      if (participantEmail && participantEmail !== 'ctrl_email') {
-        uniqueEmails.add(participantEmail)
-      }
-    })
-
-    return Array.from(uniqueEmails)
-  }
-
-  const onSubmitFile = () => {
+  const handleFileSubmission = () => {
     closeDialog()
     if (!file) {
       open?.({ type: 'error', message: 'Please upload a file before proceeding' })
       return
     }
 
-    const formData = new FormData()
-    formData.append('file', file)
-
-    axiosInstance
-      .post(fileEndpoint, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-      .then(async (response) => {
-        const data = response.data
-        invalidate({ resource: `${type}s`, invalidates: ['resourceAll'] })
-        if (type == 'survey' && successRedirect) {
-          navigate(successRedirect.replace(':surveyId', data.id))
-        } else if (type == 'participant' && successRedirect) {
-          navigate(successRedirect, {
-            state: {
-              openInviteModal: true,
-              initialEmails: await getInitialEmails(file),
-            },
-          })
-        }
-      })
-      .catch((err) => {
-        console.error(err)
-        open?.({ type: 'error', message: 'Error uploading file' })
-        return
-      })
+    onSubmitFile(file)
   }
 
-  const onSubmitApi = () => {
+  const handleApiSubmission = () => {
     closeDialog()
 
     if (!formName) {
@@ -119,26 +69,7 @@ export const RedcapImport = ({
       return
     }
 
-    axiosInstance
-      .post(apiEndpoint, {
-        formName,
-        redcapAPIToken,
-      })
-      .then((response) => {
-        const data = response.data
-        invalidate({ resource: `${type}s`, invalidates: ['resourceAll'] })
-        if (successRedirect) {
-          navigate(successRedirect.replace(':id', data.id))
-        } else {
-          navigate(`/${type}s`)
-        }
-      })
-      .catch((response) => {
-        open?.({
-          type: 'error',
-          message: `Internal Server Error: ${response.response.data.message}`,
-        })
-      })
+    onSubmitApi(formName, redcapAPIToken)
   }
 
   const handleHelpPageOpen = () => setHelpPageOpen(true)
@@ -160,7 +91,7 @@ export const RedcapImport = ({
         <DialogActions>
           <Button onClick={closeDialog}>Cancel</Button>
           <Button
-            onClick={dialogType == 'API' ? onSubmitApi : onSubmitFile}
+            onClick={dialogType == 'API' ? handleApiSubmission : handleFileSubmission}
             color="error"
             autoFocus
           >
