@@ -23,6 +23,7 @@ interface RedcapImportProps {
   warningMessage: string
   onSubmitFile: (file: File) => void
   onSubmitApi: (formName: string, redcapAPIToken: string) => void
+  confirmDialog?: boolean
 }
 
 export const RedcapImport = ({
@@ -31,6 +32,7 @@ export const RedcapImport = ({
   warningMessage,
   onSubmitFile,
   onSubmitApi,
+  confirmDialog = true,
 }: RedcapImportProps) => {
   const [file, setFile] = useState<File | null>(null)
   const [formName, setFormName] = useState<string>('')
@@ -79,26 +81,28 @@ export const RedcapImport = ({
 
   return (
     <Box>
-      <Dialog open={dialogOpen} onClose={closeDialog} data-cy="confirmDialog">
-        <DialogTitle sx={{ textTransform: 'capitalize' }}>{`Confirm ${type} Import`}</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Warning: {warningMessage} The imported data from "
-            {dialogType == 'API' ? formName : file?.name}" will replace any existing content. Do you
-            want to continue?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={closeDialog}>Cancel</Button>
-          <Button
-            onClick={dialogType == 'API' ? handleApiSubmission : handleFileSubmission}
-            color="error"
-            autoFocus
-          >
-            Yes, Overwrite
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {confirmDialog && (
+        <Dialog open={dialogOpen} onClose={closeDialog} data-cy="confirmDialog">
+          <DialogTitle sx={{ textTransform: 'capitalize' }}>{`Confirm ${type} Import`}</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Warning: {warningMessage} The imported data from "
+              {dialogType == 'API' ? formName : file?.name}" will replace any existing content. Do
+              you want to continue?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={closeDialog}>Cancel</Button>
+            <Button
+              onClick={dialogType == 'API' ? handleApiSubmission : handleFileSubmission}
+              color="error"
+              autoFocus
+            >
+              Yes, Overwrite
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
       <IconButton
         sx={{
           position: 'relative',
@@ -146,8 +150,12 @@ export const RedcapImport = ({
                   variant="contained"
                   color="primary"
                   onClick={() => {
-                    setDialogType('FILE')
-                    openDialog()
+                    if (confirmDialog) {
+                      setDialogType('FILE')
+                      openDialog()
+                    } else {
+                      handleFileSubmission()
+                    }
                   }}
                   sx={{ mt: 2 }}
                 >
@@ -218,8 +226,12 @@ export const RedcapImport = ({
               variant="contained"
               color="primary"
               onClick={() => {
-                setDialogType('API')
-                openDialog()
+                if (confirmDialog) {
+                  setDialogType('API')
+                  openDialog()
+                } else {
+                  handleApiSubmission()
+                }
               }}
               disabled={!formName || !redcapAPIToken}
               data-cy="apiSubmit"

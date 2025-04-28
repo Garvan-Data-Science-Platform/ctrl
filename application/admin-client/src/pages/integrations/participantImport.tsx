@@ -108,6 +108,7 @@ export const ParticipantImport = () => {
       onSubmitFile={onSubmitFile}
       onSubmitApi={onSubmitApi}
       warningMessage="This will overwrite any duplicate participants."
+      confirmDialog={false}
     />
   )
 }
