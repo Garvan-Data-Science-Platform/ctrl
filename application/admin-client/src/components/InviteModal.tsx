@@ -23,9 +23,7 @@ export function InviteModal({ onSend, onCancel, initialEmails = [] }: InviteModa
     return r.test(email)
   }
 
-  const [emails, setEmails] = useState<string[]>(() =>
-    initialEmails.filter((email) => validateEmail(email)),
-  )
+  const [emails, setEmails] = useState<string[]>(() => initialEmails.filter(validateEmail))
   const [fieldValue, setFieldValue] = useState<string>('')
   const [invalid, setInvalid] = useState(false)
 
