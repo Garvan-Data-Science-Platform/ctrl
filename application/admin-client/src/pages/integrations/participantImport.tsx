@@ -57,7 +57,7 @@ export const ParticipantImport = () => {
         formName,
         redcapAPIToken,
       })
-      .then(async (response) => {
+      .then((response) => {
         const data = response.data
         if (data.error) {
           open?.({ type: 'error', message: data.error })
