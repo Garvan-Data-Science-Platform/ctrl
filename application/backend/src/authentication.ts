@@ -85,9 +85,14 @@ export function generateToken(user: { userId: number; roles: string[] }): string
     throw new Error('JWT_SECRET environment variable not set')
   }
 
-  // Generate JWT token
-  return jwt.sign({ userId: user.userId, scopes: user.roles }, process.env.JWT_SECRET, {
+  // Handle expiresIn with proper typing
+  const expiryValue = process.env.JWT_EXPIRY || '1h'
+
+  const options: jwt.SignOptions = {
     algorithm: 'HS256',
-    expiresIn: process.env.JWT_EXPIRY || '1h',
-  })
+    expiresIn: expiryValue as jwt.SignOptions['expiresIn'],
+  }
+
+  // Generate JWT token
+  return jwt.sign({ userId: user.userId, scopes: user.roles }, process.env.JWT_SECRET, options)
 }
