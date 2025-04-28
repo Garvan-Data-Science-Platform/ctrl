@@ -1,5 +1,0 @@
-node_modules
-
-application/*/dist
-application/*/jest.config.js
-application/backend/prisma/
