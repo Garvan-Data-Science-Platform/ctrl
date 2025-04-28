@@ -7,6 +7,7 @@ import {
 } from 'common/types/api/errors'
 import type {
   GetInvitesResponse,
+  GetInviteTextResponse,
   GetParticipantResponse,
   GetParticipantsResponse,
   InviteParticipantsRequest,
@@ -186,11 +187,11 @@ export class InvitesController extends Controller {
   public async createInvites(
     @Body() bodyRequest: InviteParticipantsRequest,
   ): Promise<InviteParticipantsResponse> {
-    const { subjectText, explantoryText } = bodyRequest
+    const { subjectText, explanatoryText } = bodyRequest
 
     await prisma.study.update({
       where: { id: 1 },
-      data: { inviteEmailSubject: subjectText, inviteEmailText: explantoryText },
+      data: { inviteEmailSubject: subjectText, inviteEmailText: explanatoryText },
     })
 
     const emails = [...new Set(bodyRequest.emails)]
@@ -325,6 +326,21 @@ export class InvitesController extends Controller {
       where: { id: invite.id },
       data: { status: InviteStatus.REVOKED },
     })
+  }
+  /**
+   * List all non-accepted invites
+   *
+   * @summary List all non-accepted invites
+   */
+  @Get('/text')
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
+  public async getInviteText(): Promise<GetInviteTextResponse> {
+    const inviteText = await prisma.study.findUniqueOrThrow({
+      where: { id: 1 },
+      select: { inviteEmailSubject: true, inviteEmailText: true },
+    })
+
+    return inviteText
   }
 
   private async sendInvites(emails: string[]): Promise<void> {

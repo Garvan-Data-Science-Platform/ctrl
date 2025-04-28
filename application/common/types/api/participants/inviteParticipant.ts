@@ -12,7 +12,7 @@ type Email = string
 export interface InviteParticipantsRequest {
   emails: Email[]
   subjectText: string
-  explantoryText: string
+  explanatoryText: string
 }
 
 export interface InviteParticipantsResponse {

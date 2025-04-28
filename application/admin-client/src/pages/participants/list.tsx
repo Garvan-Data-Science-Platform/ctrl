@@ -70,10 +70,10 @@ export const ParticipantList = () => {
     }
   }, [location])
 
-  const sendInvites = (emails: string[]) => {
+  const sendInvites = (emails: string[], subjectText: string, explanatoryText: string) => {
     setLoading(true)
     axiosInstance
-      .post('invites', { emails })
+      .post('invites', { emails, subjectText, explanatoryText })
       .then(() => {
         setModalOpen(false)
         open?.({ type: 'success', message: `Invites sent` })

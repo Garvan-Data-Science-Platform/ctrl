@@ -11,9 +11,11 @@ import {
 } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { generateInviteEmail } from '@common/src/generateInviteTemplate'
+import { axiosInstance } from '../providers/dataProvider'
+import { GetInviteTextResponse } from '@common/types/api/participants'
 
 interface InviteModalProps {
-  onSend: (emails: string[]) => void
+  onSend: (emails: string[], subjectText: string, explanatoryText: string) => void
   onCancel: () => void
   initialEmails?: string[]
 }
@@ -27,10 +29,8 @@ export function InviteModal({ onSend, onCancel, initialEmails = [] }: InviteModa
   const [emails, setEmails] = useState<string[]>(initialEmails.filter(validateEmail))
   const [fieldValue, setFieldValue] = useState<string>('')
   const [invalid, setInvalid] = useState(false)
-  const [emailText, setEmailText] = useState(
-    'You have been invited to register with CTRL dynamic consent platform.',
-  )
-  const [emailTitle, setEmailTitle] = useState('Invitation to CTRL')
+  const [emailText, setEmailText] = useState('')
+  const [emailTitle, setEmailTitle] = useState('')
 
   const handleAdd = () => {
     if (!validateEmail(fieldValue)) {
@@ -44,6 +44,14 @@ export function InviteModal({ onSend, onCancel, initialEmails = [] }: InviteModa
       setFieldValue('')
     }
   }
+
+  useEffect(() => {
+    axiosInstance.get('/invites/text').then((res) => {
+      const data: GetInviteTextResponse = res.data
+      setEmailText(data.inviteEmailText)
+      setEmailTitle(data.inviteEmailSubject)
+    })
+  }, [])
 
   useEffect(() => {
     if (invalid) {
@@ -139,6 +147,7 @@ export function InviteModal({ onSend, onCancel, initialEmails = [] }: InviteModa
           sx={{ mt: 3 }}
           value={emailTitle}
           onChange={(e) => setEmailTitle(e.target.value)}
+          data-cy="email-subject"
         />
         <TextField
           label="Email text"
@@ -149,6 +158,7 @@ export function InviteModal({ onSend, onCancel, initialEmails = [] }: InviteModa
           sx={{ mt: 1, mb: 2 }}
           value={emailText}
           onChange={(e) => setEmailText(e.target.value)}
+          data-cy="email-text"
         />
         <Box sx={{ mt: 2, justifyContent: 'space-between', display: 'flex', flexDirection: 'row' }}>
           <Button
@@ -159,10 +169,10 @@ export function InviteModal({ onSend, onCancel, initialEmails = [] }: InviteModa
                 if (!validateEmail(fieldValue)) {
                   setInvalid(true)
                 } else {
-                  onSend([...emails, fieldValue])
+                  onSend([...emails, fieldValue], emailTitle, emailText)
                 }
               } else {
-                onSend(emails)
+                onSend(emails, emailTitle, emailText)
               }
             }}
             data-cy="send-button"
@@ -184,7 +194,11 @@ export function InviteModal({ onSend, onCancel, initialEmails = [] }: InviteModa
           Email Preview
         </Typography>
         <Box sx={{ maxHeight: 600, overflow: 'auto' }}>
-          <div dangerouslySetInnerHTML={{ __html: emailPreview }}></div>
+          <div
+            dangerouslySetInnerHTML={{
+              __html: emailPreview.replaceAll('href="http://exampleregisterurl"', ''),
+            }}
+          ></div>
         </Box>
       </Box>
     </Box>

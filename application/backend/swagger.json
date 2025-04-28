@@ -1396,10 +1396,18 @@
 							"$ref": "#/components/schemas/Email"
 						},
 						"type": "array"
+					},
+					"subjectText": {
+						"type": "string"
+					},
+					"explanatoryText": {
+						"type": "string"
 					}
 				},
 				"required": [
-					"emails"
+					"emails",
+					"subjectText",
+					"explanatoryText"
 				],
 				"type": "object",
 				"additionalProperties": false,
@@ -1409,6 +1417,22 @@
 						"jane@email.com"
 					]
 				}
+			},
+			"GetInviteTextResponse": {
+				"properties": {
+					"inviteEmailSubject": {
+						"type": "string"
+					},
+					"inviteEmailText": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"inviteEmailSubject",
+					"inviteEmailText"
+				],
+				"type": "object",
+				"additionalProperties": false
 			},
 			"DefaultSelection_Prisma._36_OrganisationPayload_": {
 				"properties": {
@@ -3684,6 +3708,66 @@
 						}
 					}
 				]
+			}
+		},
+		"/invites/text": {
+			"get": {
+				"operationId": "GetInviteText",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetInviteTextResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UnauthorizedErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/NotFoundErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/InternalErrorResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "List all non-accepted invites",
+				"summary": "List all non-accepted invites",
+				"tags": [
+					"Invites"
+				],
+				"security": [
+					{
+						"jwt": [
+							"OrganisationAdmin"
+						]
+					}
+				],
+				"parameters": []
 			}
 		},
 		"/organisations": {

@@ -80,6 +80,8 @@ describe('Participant Invites', () => {
       .post('/invites')
       .send({
         emails: [participantRegisterRequestBody.email],
+        subjectText: 'Subject',
+        explanatoryText: 'Text',
       })
       .set({ Authorization: `Bearer ${orgAdminToken}` })
     const body: InviteParticipantsResponse = response.body
@@ -108,6 +110,8 @@ describe('Participant Invites', () => {
       .post('/invites')
       .send({
         emails: [participantRegisterRequestBody.email],
+        subjectText: 'Subject',
+        explanatoryText: 'Text',
       })
       .set({ Authorization: `Bearer ${orgAdminToken}` })
     expect(response.status).toBe(200)
@@ -148,6 +152,8 @@ describe('Participant Invites', () => {
       .post('/invites')
       .send({
         emails: [participantRegisterRequestBody.email],
+        subjectText: 'Subject',
+        explanatoryText: 'Text',
       })
       .set({ Authorization: `Bearer ${orgAdminToken}` })
 
@@ -207,6 +213,8 @@ describe('Participant Invites', () => {
       .post('/invites')
       .send({
         emails: [participantRegisterRequestBody.email],
+        subjectText: 'Subject',
+        explanatoryText: 'Text',
       })
       .set({ Authorization: `Bearer ${orgAdminToken}` })
     const body: InviteParticipantsResponse = response.body

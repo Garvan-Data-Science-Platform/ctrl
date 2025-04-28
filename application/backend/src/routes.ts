@@ -512,6 +512,17 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "emails": {"dataType":"array","array":{"dataType":"refAlias","ref":"Email"},"required":true},
+            "subjectText": {"dataType":"string","required":true},
+            "explanatoryText": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GetInviteTextResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "inviteEmailSubject": {"dataType":"string","required":true},
+            "inviteEmailText": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },
@@ -1711,6 +1722,36 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
 
               await templateService.apiHandler({
                 methodName: 'revokeInvite',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsInvitesController_getInviteText: Record<string, TsoaRoute.ParameterSchema> = {
+        };
+        app.get('/invites/text',
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(InvitesController)),
+            ...(fetchMiddlewares<RequestHandler>(InvitesController.prototype.getInviteText)),
+
+            async function InvitesController_getInviteText(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsInvitesController_getInviteText, request, response });
+
+                const controller = new InvitesController();
+
+              await templateService.apiHandler({
+                methodName: 'getInviteText',
                 controller,
                 response,
                 next,
