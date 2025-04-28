@@ -64,16 +64,6 @@ describe('REDCap Participant Upload', () => {
       // Click the initial confirm button
       cy.contains('button', 'Confirm').click()
 
-      // Verify dialog content
-      cy.get('[data-cy="confirmDialog"]').should('be.visible')
-      cy.contains('Warning: This will overwrite any duplicate participants.').should('be.visible')
-      cy.contains(`The imported data from "${fileName}" will replace any existing content`).should(
-        'be.visible',
-      )
-
-      // Click the confirmation button in dialog
-      cy.contains('button', 'Yes, Overwrite').click()
-
       // Intercept the upload request
       cy.intercept('POST', '**/integrations/redcap/participant/upload/csv', {
         statusCode: 201,
@@ -155,16 +145,6 @@ describe('REDCap Participant Upload', () => {
       cy.get('[data-cy="apiSubmit"]').should('be.visible').should('be.enabled')
 
       cy.contains('button', 'Import from API').click()
-
-      // Verify dialog content
-      cy.get('[data-cy="confirmDialog"]').should('be.visible')
-      cy.contains('Warning: This will overwrite any duplicate participants').should('be.visible')
-      cy.contains(`The imported data from "${formName}" will replace any existing content`).should(
-        'be.visible',
-      )
-
-      // Click the confirmation button in dialog
-      cy.contains('button', 'Yes, Overwrite').click()
 
       cy.intercept('POST', '**/integrations/redcap/instrument/upload/api', {
         statusCode: 200,
