@@ -17,18 +17,11 @@ import {
   GridViewColumnIcon,
 } from '@mui/x-data-grid'
 import { useMemo } from 'react'
-import { ExportButton, List } from '@refinedev/mui'
+import { List } from '@refinedev/mui'
 import { styled } from '@mui/material/styles'
-import {
-  Badge,
-  Button,
-  Divider,
-  InputAdornment,
-  TextField,
-  Tooltip,
-  Typography,
-} from '@mui/material'
+import { Badge, Divider, InputAdornment, TextField, Tooltip } from '@mui/material'
 import { Cancel, FileDownload } from '@mui/icons-material'
+import { ParticipantData } from '@common/types/api/surveys/getAllResponses'
 
 export const AllResponsesView = () => {
   const { queryResult } = useShow<GetAllResponsesResponse['data']>({
@@ -64,7 +57,7 @@ export const AllResponsesView = () => {
         field: 'profile',
         headerName: 'Participant',
         minWidth: 200,
-        valueGetter: (val) =>
+        valueGetter: (val: ParticipantData['profile']) =>
           `${val.firstName} ${val.lastName} (${new Date(val.dob).toLocaleDateString()})`,
       },
       {
@@ -90,10 +83,6 @@ export const AllResponsesView = () => {
     ],
     [questions],
   )
-
-  function TextInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
-    return <input {...props} />
-  }
 
   type OwnerState = {
     expanded: boolean

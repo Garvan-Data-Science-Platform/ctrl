@@ -67,11 +67,11 @@ export const UserList = () => {
         headerName: 'Created at',
         minWidth: 100,
         type: 'date',
-        valueGetter: (cell) => {
-          return new Date(cell.value)
+        valueGetter: (value) => {
+          return new Date(value)
         },
         renderCell: function render({ value }) {
-          return <DateField value={value} format="DD/MM/YYYY" />
+          return <DateField sx={{ p: 2 }} value={value} format="DD/MM/YYYY" />
         },
       },
       {

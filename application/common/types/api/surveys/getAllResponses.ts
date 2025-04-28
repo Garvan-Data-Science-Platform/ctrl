@@ -1,6 +1,6 @@
 import { SurveyStep, UserSurveyStepState } from '../../survey'
 
-interface ParticipantData {
+export interface ParticipantData {
   profile: { firstName: string; lastName: string; dob: Date; familyId: number }
   answers: UserSurveyStepState[]
   versionId: number

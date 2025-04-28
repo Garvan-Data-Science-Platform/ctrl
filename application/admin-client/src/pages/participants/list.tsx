@@ -153,7 +153,7 @@ export const ParticipantList = () => {
           return new Date(value)
         },
         renderCell: function render({ value }) {
-          return <DateField value={value} format="DD/MM/YYYY" />
+          return <DateField sx={{ p: 2 }} value={value} format="DD/MM/YYYY" />
         },
       },
       {
@@ -211,7 +211,7 @@ export const ParticipantList = () => {
           return new Date(value)
         },
         renderCell: function render({ value }) {
-          return <DateField value={value} format="DD/MM/YYYY" />
+          return <DateField sx={{ p: 2 }} value={value} format="DD/MM/YYYY" />
         },
       },
       {
@@ -308,7 +308,12 @@ export const ParticipantList = () => {
       </List>
       <Box sx={{ mt: 1 }} />
       <List headerProps={{ title: 'Invites' }}>
-        <DataGrid {...inviteGridProps} columns={inviteCols} autoHeight data-cy="pending-list" />
+        <DataGrid
+          {...inviteGridProps}
+          columns={inviteCols}
+          autoHeight
+          slotProps={{ root: { 'data-cy': 'pending-list' } }}
+        />
       </List>
     </>
   )
