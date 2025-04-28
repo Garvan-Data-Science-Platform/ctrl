@@ -5,9 +5,9 @@ import { participantUploadCSVDocumentation } from './helpPageRedcap'
 import { useNavigate } from 'react-router-dom'
 
 export const ParticipantImport = () => {
-  const fileEndpoint = '/integrations/redcap/participant/upload/csv'
-  const apiEndpoint = '/integrations/redcap/participant/upload/api'
-  const successRedirect = '/participants/'
+  const FILE_ENDPOINT = '/integrations/redcap/participant/upload/csv'
+  const API_ENDPOINT = '/integrations/redcap/participant/upload/api'
+  const SUCCESS_REDIRECT = '/participants/'
 
   const navigate = useNavigate()
   const { open } = useNotification()
@@ -18,7 +18,7 @@ export const ParticipantImport = () => {
     formData.append('file', file)
 
     axiosInstance
-      .post(fileEndpoint, formData, {
+      .post(FILE_ENDPOINT, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -34,7 +34,7 @@ export const ParticipantImport = () => {
           type: 'success',
           message: 'File uploaded successfully',
         })
-        navigate(successRedirect, {
+        navigate(SUCCESS_REDIRECT, {
           state: {
             openInviteModal: true,
             initialEmails: await getInitialEmails(file),
@@ -53,7 +53,7 @@ export const ParticipantImport = () => {
 
   const onSubmitApi = (formName: string, redcapAPIToken: string) => {
     axiosInstance
-      .post(apiEndpoint, {
+      .post(API_ENDPOINT, {
         formName,
         redcapAPIToken,
       })
@@ -69,7 +69,7 @@ export const ParticipantImport = () => {
           message: 'Data pulled from REDCap successfully',
         })
         invalidate({ resource: 'participants', invalidates: ['resourceAll'] })
-        navigate(successRedirect, {
+        navigate(SUCCESS_REDIRECT, {
           state: {
             openInviteModal: true,
             initialEmails: ['initial@email.com'], // TODO
