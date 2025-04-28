@@ -81,7 +81,31 @@ describe('REDCap Participant Upload', () => {
 
       cy.url({ timeout: 10000 }).should('include', '/participants/')
 
-      // Check updated draft metadata
+      // Check that the invite modal is opened and it has the correct emails
+      cy.get('[data-cy="invite-modal"]').should('be.visible')
+
+      const expectedEmailsInModal = [
+        'peter@louka.com',
+        'a@example.com',
+        'b@example.com',
+        'c@example.com',
+        'd@example.com',
+        'e@example.com',
+        'example@example.com',
+        'example2@example.com',
+      ]
+      cy.get('[data-cy="recipients-list"]').within(() => {
+        expectedEmailsInModal.forEach((email) => {
+          cy.contains(email).should('exist')
+        })
+        // Verify total number of emails matches expected
+        cy.get('[data-cy="remove-button"]').should('have.length', expectedEmailsInModal.length)
+      })
+
+      cy.get('[data-cy="send-button"]').should('be.visible').click()
+      cy.wait(20000)
+
+      // Check updated invites
       cy.request({
         method: 'GET',
         url: 'http://localhost:5001/invites',
@@ -101,7 +125,7 @@ describe('REDCap Participant Upload', () => {
           console.log('updatedInvites', updatedInvites)
           const num_new_invites = updatedInvites.length - initialInvites.length
           expect(initialInvites.length).to.be.lessThan(updatedInvites.length)
-          expect(num_new_invites).to.eq(3)
+          expect(num_new_invites).to.eq(8)
         })
       })
     })
@@ -112,7 +136,7 @@ describe('REDCap Participant Upload', () => {
       let updatedInvites
       cy.request({
         method: 'GET',
-        url: 'http://localhost:5001/participants',
+        url: 'http://localhost:5001/invites',
         headers: {
           Authorization: `Bearer ${window.localStorage.getItem('refine-auth')}`,
         },
@@ -148,10 +172,25 @@ describe('REDCap Participant Upload', () => {
 
       cy.url({ timeout: 10000 }).should('include', '/participants/')
 
-      // Check updated draft metadata
+      // Check that the invite modal is opened and it has the correct emails
+      cy.get('[data-cy="invite-modal"]').should('be.visible')
+
+      const expectedEmailsInModal = ['initial@email.com']
+      cy.get('[data-cy="recipients-list"]').within(() => {
+        expectedEmailsInModal.forEach((email) => {
+          cy.contains(email).should('exist')
+        })
+        // Verify total number of emails matches expected
+        cy.get('[data-cy="remove-button"]').should('have.length', expectedEmailsInModal.length)
+      })
+
+      cy.get('[data-cy="send-button"]').should('be.visible').click()
+      cy.wait(5000)
+
+      // Check updated updated list of invites
       cy.request({
         method: 'GET',
-        url: 'http://localhost:5001/participants',
+        url: 'http://localhost:5001/invites',
         headers: {
           Authorization: `Bearer ${window.localStorage.getItem('refine-auth')}`,
         },
@@ -166,7 +205,7 @@ describe('REDCap Participant Upload', () => {
         cy.get('@updatedInvites').then((updatedInvites) => {
           const num_new_invites = updatedInvites.length - initialInvites.length
           expect(initialInvites.length).to.be.lessThan(updatedInvites.length)
-          expect(num_new_invites).to.eq(3)
+          expect(num_new_invites).to.eq(1)
         })
       })
     })
