@@ -124,7 +124,7 @@ export class FamiliesController extends Controller {
 
     const currentSurvey = await prisma.surveyVersion.findFirstOrThrow({
       where: { status: 'PUBLISHED' },
-      orderBy: { versionNumber: 'desc' },
+      orderBy: { id: 'desc' },
     })
 
     const existingProfile = await prisma.participantProfile.findFirst({ where: { familyId } })

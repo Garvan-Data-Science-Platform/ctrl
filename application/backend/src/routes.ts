@@ -297,6 +297,14 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GetResponsesByIdResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "data": {"dataType":"nestedObjectLiteral","nestedProperties":{"derived_from":{"dataType":"string"},"steps":{"dataType":"array","array":{"dataType":"refObject","ref":"SurveyStep"},"required":true}},"required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "SurveyStepAnswerArray": {
         "dataType": "refAlias",
         "type": {"dataType":"array","array":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"boolean"},{"dataType":"enum","enums":[null]}]},"validators":{}},
@@ -326,14 +334,6 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "data": {"dataType":"nestedObjectLiteral","nestedProperties":{"participants":{"dataType":"array","array":{"dataType":"refObject","ref":"ParticipantData"},"required":true},"surveyData":{"dataType":"array","array":{"dataType":"refObject","ref":"SurveyStep"},"required":true}},"required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "GetResponsesByIdResponse": {
-        "dataType": "refObject",
-        "properties": {
-            "data": {"dataType":"nestedObjectLiteral","nestedProperties":{"derived_from":{"dataType":"string"},"steps":{"dataType":"array","array":{"dataType":"refObject","ref":"SurveyStep"},"required":true}},"required":true},
         },
         "additionalProperties": false,
     },
