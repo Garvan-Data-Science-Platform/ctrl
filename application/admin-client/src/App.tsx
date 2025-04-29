@@ -4,7 +4,7 @@ import { RefineKbar, RefineKbarProvider } from '@refinedev/kbar'
 
 import {
   ErrorComponent,
-  notificationProvider,
+  useNotificationProvider,
   RefineSnackbarProvider,
   ThemedLayoutV2,
   ThemedTitleV2,
@@ -46,7 +46,7 @@ function App() {
             <DevtoolsProvider>
               <Refine
                 dataProvider={dataProvider()}
-                notificationProvider={notificationProvider}
+                notificationProvider={useNotificationProvider}
                 routerProvider={routerBindings}
                 authProvider={authProvider}
                 resources={[

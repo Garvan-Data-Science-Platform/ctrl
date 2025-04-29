@@ -7,7 +7,7 @@ import {
   Card,
   CircularProgress,
   Container,
-  Grid2 as Grid,
+  Grid,
   Tooltip,
   Typography,
 } from '@mui/material'

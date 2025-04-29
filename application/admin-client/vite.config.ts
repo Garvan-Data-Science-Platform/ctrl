@@ -7,6 +7,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@common': path.resolve(__dirname, '../common'),
+      '@mui/material/Grid2': '@mui/material/Grid',
     },
   },
 })
