@@ -41,7 +41,7 @@ describe('FamiliesController', () => {
       expect(response.status).toBe(200)
       const body = response.body as GetFamilyResponse
       expect(body.data).toHaveLength(3)
-      expect(body.data[0].firstName).toBe('Test')
+      expect(body.data[0].firstName).toBe('Completed')
     })
     it('Should should return 404 if family not found', async () => {})
   })
