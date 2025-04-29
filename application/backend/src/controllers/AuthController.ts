@@ -134,7 +134,7 @@ export class AuthController extends Controller {
 
     const study = await prisma.study.create({})
     await this.surveyRepo.create({
-      data: { data: [], versionNumber: 1, status: 'DRAFT', studyId: study.id },
+      data: { data: [], status: 'DRAFT', studyId: study.id },
     })
 
     const token = await generateToken({ userId: insertedUser.id, roles: [insertedUser.role] })
@@ -300,7 +300,7 @@ export class AuthController extends Controller {
     // Fetch current survey
     const currentSurvey = await this.surveyRepo.findFirstOrThrow({
       where: { status: 'PUBLISHED' },
-      orderBy: { versionNumber: 'desc' },
+      orderBy: { id: 'desc' },
     })
 
     // Create profiles for dependents if no existing family ID

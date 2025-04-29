@@ -32,7 +32,6 @@ describe('Answer functions', () => {
     studyId: 1,
     updatedAt: new Date(),
     status: 'PUBLISHED',
-    versionNumber: 1,
     data: [prevStep1, prevStep2],
   }
 

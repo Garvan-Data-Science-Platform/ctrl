@@ -112,7 +112,6 @@ enum SurveyVersionStatus {
 
 model SurveyVersion {
   id                 Int                 @id @default(autoincrement())
-  versionNumber      Int
   /// ![PrismaJson.SurveyVersionData]
   data               Json
   status             SurveyVersionStatus @default(DRAFT)

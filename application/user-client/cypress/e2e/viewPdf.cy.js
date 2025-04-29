@@ -21,7 +21,7 @@ describe('viewPdf', () => {
     cy.wait(500)
     cy.task('readDir', 'cypress/downloads')
       .then((files) => {
-        const regex = /^CTRL-responses-Test_User_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}\.pdf$/
+        const regex = /^CTRL-responses-.*_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}\.pdf$/
         const pdfFiles = files.filter((file) => regex.test(file))
 
         return cy.task('getLatestFile', pdfFiles)

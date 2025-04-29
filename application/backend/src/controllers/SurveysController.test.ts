@@ -5,6 +5,7 @@ import { resetDB } from 'common/testing/TestHelpers'
 import { generateToken } from '../authentication'
 
 import {
+  GetAllResponsesResponse,
   GetSurveyVersionsResponse,
   GetUserSurveyStepResponse,
   GetUserSurveyStepsResponse,
@@ -52,7 +53,7 @@ describe('SurveysController', () => {
 
       const body: GetSurveyVersionsResponse = response.body
       expect(body.data[0].status).toBe('DRAFT')
-      expect(body.data[1].versionNumber).toBe(1)
+      expect(body.data[1].id).toBe(1)
     })
   })
 
@@ -286,6 +287,24 @@ describe('SurveysController', () => {
         .post('/surveys/publish/2')
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(422)
+    })
+  })
+  describe('GET /surveys/responses/all/{versionId}', () => {
+    it('Should get a list of all responses', async () => {
+      const response = await request(app)
+        .get('/surveys/responses/all/1')
+        .set({ Authorization: `Bearer ${token}` })
+
+      expect(response.status).toBe(200)
+
+      const data = response.body as GetAllResponsesResponse
+
+      expect(data.data.surveyData[0].text).toBe('This is an introduction video')
+      expect(data.data.surveyData).toHaveLength(2)
+      expect(data.data.participants).toHaveLength(4)
+      expect(data.data.participants[1].profile.firstName).toBe('Completed')
+      expect(data.data.participants[1].answers[0].answers).toEqual([])
+      expect(data.data.participants[1].answers[1].answers).toEqual([false, 'Choice 2'])
     })
   })
 })

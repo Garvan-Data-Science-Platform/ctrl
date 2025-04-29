@@ -148,12 +148,13 @@ export const ParticipantList = () => {
         headerName: 'Latest Survey Response',
         minWidth: 100,
         type: 'date',
-        valueGetter: (cell) => {
-          if (!cell.value) return null
-          return new Date(cell.value)
+        valueGetter: (value) => {
+          if (!value) return null
+          return new Date(value)
         },
         renderCell: function render({ value }) {
-          return <DateField value={value} format="DD/MM/YYYY" />
+          //TODO: Localisation
+          return <DateField sx={{ p: 2 }} value={value} format="DD/MM/YYYY" />
         },
       },
       {
@@ -206,12 +207,12 @@ export const ParticipantList = () => {
         headerName: 'Date Sent',
         flex: 1,
         type: 'date',
-        valueGetter: (cell) => {
-          if (!cell.value) return null
-          return new Date(cell.value)
+        valueGetter: (value) => {
+          if (!value) return null
+          return new Date(value)
         },
         renderCell: function render({ value }) {
-          return <DateField value={value} format="DD/MM/YYYY" />
+          return <DateField sx={{ p: 2 }} value={value} format="DD/MM/YYYY" />
         },
       },
       {
@@ -308,7 +309,12 @@ export const ParticipantList = () => {
       </List>
       <Box sx={{ mt: 1 }} />
       <List headerProps={{ title: 'Invites' }}>
-        <DataGrid {...inviteGridProps} columns={inviteCols} autoHeight data-cy="pending-list" />
+        <DataGrid
+          {...inviteGridProps}
+          columns={inviteCols}
+          autoHeight
+          slotProps={{ root: { 'data-cy': 'pending-list' } }}
+        />
       </List>
     </>
   )

@@ -330,10 +330,6 @@
 						"type": "number",
 						"format": "double"
 					},
-					"versionNumber": {
-						"type": "number",
-						"format": "double"
-					},
 					"published_date": {
 						"type": "string"
 					},
@@ -704,6 +700,115 @@
 						},
 						"required": [
 							"steps"
+						],
+						"type": "object"
+					}
+				},
+				"required": [
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"SurveyStepAnswerArray": {
+				"items": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "boolean"
+						}
+					],
+					"nullable": true
+				},
+				"type": "array"
+			},
+			"UserSurveyStepState": {
+				"properties": {
+					"status": {
+						"$ref": "#/components/schemas/SurveyStepStatus"
+					},
+					"answers": {
+						"$ref": "#/components/schemas/SurveyStepAnswerArray"
+					},
+					"last_updated": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"status",
+					"answers"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ParticipantData": {
+				"properties": {
+					"profile": {
+						"properties": {
+							"familyId": {
+								"type": "number",
+								"format": "double"
+							},
+							"dob": {
+								"type": "string",
+								"format": "date-time"
+							},
+							"lastName": {
+								"type": "string"
+							},
+							"firstName": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"familyId",
+							"dob",
+							"lastName",
+							"firstName"
+						],
+						"type": "object"
+					},
+					"answers": {
+						"items": {
+							"$ref": "#/components/schemas/UserSurveyStepState"
+						},
+						"type": "array"
+					},
+					"versionId": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"profile",
+					"answers",
+					"versionId"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetAllResponsesResponse": {
+				"properties": {
+					"data": {
+						"properties": {
+							"participants": {
+								"items": {
+									"$ref": "#/components/schemas/ParticipantData"
+								},
+								"type": "array"
+							},
+							"surveyData": {
+								"items": {
+									"$ref": "#/components/schemas/SurveyStep"
+								},
+								"type": "array"
+							}
+						},
+						"required": [
+							"participants",
+							"surveyData"
 						],
 						"type": "object"
 					}
@@ -2592,6 +2697,53 @@
 					}
 				],
 				"parameters": []
+			}
+		},
+		"/surveys/responses/all/{versionId}": {
+			"get": {
+				"operationId": "GetAllResponses",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetAllResponsesResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"404": {
+						"description": "Not Found"
+					},
+					"500": {
+						"description": "Internal Server Error"
+					}
+				},
+				"description": "Get all responses for a survey version",
+				"summary": "Get all responses of all participants for a survey version",
+				"tags": [
+					"Surveys"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "versionId",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
 			}
 		},
 		"/surveys/responses/{participantId}": {
