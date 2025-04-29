@@ -30,6 +30,7 @@ import {
 } from 'common/types/api/users/ParticipantProfile'
 import { FamilyMember } from 'common/types/api/users/getParticipantProfile'
 import { auditLog } from '../middlewares/AuditLog'
+import { recalculateAnswers } from '../utils/answers'
 
 @Route('profiles')
 @Tags('Profiles')
@@ -100,15 +101,15 @@ export class ProfilesController extends Controller {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { user, ...profile } = data
-    const { mobile, addressLine, postcode, suburb, firstName, lastName, id } = profile
+    const { mobile, addressLine, postcode, suburb, firstName, lastName, familyId, id } = profile
     const dob = profile.dob.toISOString()
     const state = profile.state as StateTerritory
     const participantType = profile.participantType as ParticipantType
     const preferredContact = profile.preferredContact as ContactMethod
 
     const familyMembers = (await this.participantProfileRepo.findMany({
-      where: { familyId: data.familyId, OR: [{ userId: null }, { NOT: { id: profileId } }] },
-      select: { firstName: true, lastName: true, participantType: true },
+      where: { familyId: data.familyId, NOT: { id: profileId } },
+      select: { firstName: true, lastName: true, id: true, participantType: true },
     })) as FamilyMember[]
 
     const responseData: GetParticipantProfileResponse = {
@@ -126,6 +127,7 @@ export class ProfilesController extends Controller {
         mobile,
         participantType,
         familyMembers,
+        familyId,
         nextOfKin: profile.nextOfKin as AlternativeContact,
       },
     }
@@ -183,6 +185,10 @@ export class ProfilesController extends Controller {
         where: { id: profile.userId },
         data: { email: email, firstName: bodyRequest.firstName, lastName: bodyRequest.lastName },
       })
+    }
+
+    if (bodyRequest.participantType) {
+      await recalculateAnswers(profile.familyId)
     }
   }
 }

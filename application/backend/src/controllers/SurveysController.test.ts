@@ -268,5 +268,24 @@ describe('SurveysController', () => {
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(500)
     })
+
+    it('should fail to publish an invalid survey', async () => {
+      await prisma.surveyVersion.update({
+        where: { id: 2 },
+        data: {
+          data: [
+            {
+              title: '',
+              text: '',
+              elements: [{ type: 'question-choices', data: { text: 'Q1', choices: [] } }],
+            },
+          ],
+        },
+      })
+      const response = await request(app)
+        .post('/surveys/publish/2')
+        .set({ Authorization: `Bearer ${token}` })
+      expect(response.status).toBe(422)
+    })
   })
 })

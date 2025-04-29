@@ -58,7 +58,13 @@ export class ParticipantsController extends Controller {
         id: true,
         answers: true,
         profile: {
-          select: { id: true, firstName: true, lastName: true, user: { select: { email: true } } },
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            familyId: true,
+            user: { select: { email: true } },
+          },
         },
       },
     })
@@ -80,6 +86,7 @@ export class ParticipantsController extends Controller {
         firstName: p.profile.firstName,
         lastName: p.profile.lastName,
         lastUpdated: lastUpdated ? new Date(lastUpdated).toLocaleDateString() : undefined,
+        familyId: p.profile.familyId,
         answers: p_answers.map((val) => ({
           surveyVersion: val.version.id,
           participantId: val.id,
@@ -102,7 +109,13 @@ export class ParticipantsController extends Controller {
   public async getParticipantById(@Path() profileId: number): Promise<GetParticipantResponse> {
     const profile = await this.profileRepo.findFirstOrThrow({
       where: { id: profileId },
-      select: { userId: true, firstName: true, lastName: true, user: { select: { email: true } } },
+      select: {
+        userId: true,
+        firstName: true,
+        lastName: true,
+        familyId: true,
+        user: { select: { email: true } },
+      },
     })
 
     const profileDataResponse = await new ProfilesController().getParticipantProfileByID(profileId)
@@ -121,6 +134,7 @@ export class ParticipantsController extends Controller {
         firstName: profile.firstName,
         lastName: profile.lastName,
         email: profile.user?.email,
+        familyId: profile.familyId,
         answers: p_answers.map((val) => ({
           surveyVersion: val.version.id,
           participantId: val.id,

@@ -15,10 +15,13 @@ import prisma from '../../src/PrismaClient'
 const api = new Api()
 const app = api.app
 
+let adminToken: string
+
 describe('Survey tests', () => {
   beforeAll(async () => {
     api.run()
     await resetDB()
+    adminToken = await generateToken({ userId: 1, roles: ['OrganisationAdmin'] })
   })
 
   afterAll(async () => {
@@ -60,6 +63,7 @@ describe('Survey tests', () => {
     expect(regRes.statusCode).toBe(201)
 
     const deps1 = await prisma.participantProfile.findMany({ where: { firstName: 'Child1' } })
+    console.log('FAMILY', deps1[0].familyId)
     expect(deps1).toHaveLength(1)
   })
 
@@ -121,5 +125,113 @@ describe('Survey tests', () => {
         })
       ).answers[1].answers,
     ).toEqual([null, 'Choice 1'])
+  })
+
+  it('Another dependent is registered and inherits the latest answers', async () => {
+    await request(app)
+      .post(`/families/2/add-dependent`)
+      .set({ Authorization: `Bearer ${adminToken}` })
+      .send({
+        firstName: 'New',
+        lastName: 'Dependent',
+        dob: '1990-01-02',
+        permanent: true,
+      })
+
+    const prof = await prisma.participantProfile.findFirstOrThrow({
+      where: { firstName: 'New', lastName: 'Dependent' },
+    })
+
+    const part = await prisma.surveyParticipant.findFirstOrThrow({
+      where: { profileId: prof.id },
+    })
+
+    expect(part.answers[1].answers).toEqual([null, 'Choice 1'])
+  })
+
+  it('A dependent is moved into this family and inherits the latests answers', async () => {
+    await request(app)
+      .post(`/families/1/add-dependent`)
+      .set({ Authorization: `Bearer ${adminToken}` })
+      .send({
+        firstName: 'New',
+        lastName: 'Dependent2',
+        dob: '1990-01-02',
+        permanent: true,
+      })
+
+    const prof = await prisma.participantProfile.findFirstOrThrow({
+      where: { firstName: 'New', lastName: 'Dependent2' },
+    })
+
+    let part = await prisma.surveyParticipant.findFirstOrThrow({
+      where: { profileId: prof.id },
+    })
+
+    expect(part.answers[1].answers).toEqual([null, null])
+
+    await request(app)
+      .post(`/families/2/add/${prof.id}`)
+      .set({ Authorization: `Bearer ${adminToken}` })
+
+    part = await prisma.surveyParticipant.findFirstOrThrow({
+      where: { profileId: prof.id },
+    })
+
+    expect(part.answers[1].answers).toEqual([null, 'Choice 1'])
+  })
+
+  it('Parent is changed to non-guardian, dependents answers are changed to only inherit from remaining parent', async () => {
+    const parentProfile = await prisma.participantProfile.findFirstOrThrow({
+      where: { user: { email: 'parent2@gmail.com' } },
+    })
+    const res = await request(app)
+      .patch(`/profiles/${parentProfile.id}`)
+      .send({ participantType: ParticipantType.STANDARD })
+      .set({ Authorization: `Bearer ${adminToken}` })
+
+    expect(res.status).toBe(204)
+
+    const depProfile = await prisma.participantProfile.findFirstOrThrow({
+      where: { firstName: 'New', lastName: 'Dependent2' },
+    })
+
+    let part = await prisma.surveyParticipant.findFirstOrThrow({
+      where: { profileId: depProfile.id },
+    })
+
+    expect(part.answers[1].answers).toEqual([true, 'Choice 1'])
+
+    //Set back to guardian
+    await request(app)
+      .patch(`/profiles/${parentProfile.id}`)
+      .send({ participantType: ParticipantType.GUARDIAN })
+      .set({ Authorization: `Bearer ${adminToken}` })
+
+    part = await prisma.surveyParticipant.findFirstOrThrow({
+      where: { profileId: depProfile.id },
+    })
+
+    expect(part.answers[1].answers).toEqual([null, 'Choice 1'])
+  })
+
+  it('A parent is removed from the family, and the dependents answers are changed to only inherit from remaining parent', async () => {
+    const parentProfile = await prisma.participantProfile.findFirstOrThrow({
+      where: { user: { email: 'parent2@gmail.com' } },
+    })
+
+    await request(app)
+      .post(`/families/remove/${parentProfile.id}`)
+      .set({ Authorization: `Bearer ${adminToken}` })
+
+    const depProfile = await prisma.participantProfile.findFirstOrThrow({
+      where: { firstName: 'New', lastName: 'Dependent2' },
+    })
+
+    const part = await prisma.surveyParticipant.findFirstOrThrow({
+      where: { profileId: depProfile.id },
+    })
+
+    expect(part.answers[1].answers).toEqual([true, 'Choice 1'])
   })
 })

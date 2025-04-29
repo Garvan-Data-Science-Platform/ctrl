@@ -131,6 +131,7 @@ model SurveyParticipant {
   profileId Int
   /// ![PrismaJson.SurveyAnswerData]
   answers   Json
+  derived   String?
 }
 
 model Invite {

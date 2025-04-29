@@ -211,7 +211,7 @@ export class SurveysController extends Controller {
    */
   @Get('/responses/current')
   @Response('404', 'Not Found')
-  public async getUserResponses(@Request() request: any): Promise<any> {
+  public async getUserResponses(@Request() request: any): Promise<GetResponsesByIdResponse> {
     const participantProfile = await this.profileRepo.findFirstOrThrow({
       where: { userId: request.user.userId },
     })
@@ -233,7 +233,7 @@ export class SurveysController extends Controller {
       stepData[step].last_updated = currentAnswers[step].last_updated
     }
 
-    return { data: stepData }
+    return { data: { steps: stepData, derived_from: surveyParticipant.derived || undefined } }
   }
 
   /**
@@ -262,7 +262,7 @@ export class SurveysController extends Controller {
       stepData[step].last_updated = currentAnswers[step].last_updated
     }
 
-    return { data: stepData }
+    return { data: { steps: stepData, derived_from: surveyParticipant.derived || undefined } }
   }
 
   /**
@@ -325,7 +325,7 @@ export class SurveysController extends Controller {
 
     await this.spRepo.update({
       where: { id: participant.id }, //
-      data: { answers },
+      data: { answers, derived: null },
     })
 
     //Also update any dependents
@@ -337,19 +337,24 @@ export class SurveysController extends Controller {
         },
       })
 
-      const coGuardian = await this.profileRepo.findFirst({
+      const coGuardians = await this.profileRepo.findMany({
         where: { NOT: { id: profile.id }, familyId: profile.familyId, participantType: 'GUARDIAN' },
       })
 
-      if (coGuardian) {
-        const coGuardianSP = await this.spRepo.findFirstOrThrow({
-          where: { profileId: coGuardian.id, versionId: participant.versionId },
-        })
-        const coGuardianAnswers = coGuardianSP.answers
-        answers[step].answers = combineGuardianAnswers(
-          answers[step].answers,
-          coGuardianAnswers[step].answers,
+      if (coGuardians) {
+        const coGuardianSPPromises = coGuardians.map(
+          async (val) =>
+            await this.spRepo.findFirstOrThrow({
+              where: { profileId: val.id, versionId: participant.versionId },
+            }),
         )
+        const coGuardianSP_ls = await Promise.all(coGuardianSPPromises)
+
+        //const coGuardianAnswers = coGuardianSP.answers
+        answers[step].answers = combineGuardianAnswers([
+          answers[step].answers,
+          ...coGuardianSP_ls.map((val) => val.answers[step].answers),
+        ])
       }
 
       for (const dep of dependents) {
@@ -358,7 +363,12 @@ export class SurveysController extends Controller {
         })
         await this.spRepo.update({
           where: { id: sp.id }, //
-          data: { answers },
+          data: {
+            answers,
+            derived: [profile, ...coGuardians]
+              .map((val) => `${val.firstName} ${val.lastName}`)
+              .join(','),
+          },
         })
       }
     }
@@ -398,6 +408,29 @@ export class SurveysController extends Controller {
 
     if (survey.status != 'DRAFT') {
       throw Error('Can only publish a draft survey')
+    }
+
+    //Validate questions
+    for (const step of survey.data) {
+      for (const element of step.elements) {
+        if (element.type == 'question-choices') {
+          if (element.data.choices.length == 0) {
+            throw new ValidateError(
+              { Question: { message: 'A multi-choice question is missing choices' } },
+              'Question is missing choices',
+            )
+          }
+        }
+        if (
+          (element.type == 'question-checkbox' || element.type == 'question-choices') &&
+          element.data.text == ''
+        ) {
+          throw new ValidateError(
+            { question: { message: 'A question is missing text' } },
+            'Missing question text',
+          )
+        }
+      }
     }
 
     await this.surveyRepo.create({

@@ -1,4 +1,4 @@
 import { SurveyStep } from '../../survey'
 export interface GetResponsesByIdResponse {
-  data: SurveyStep[]
+  data: { steps: SurveyStep[]; derived_from?: string }
 }

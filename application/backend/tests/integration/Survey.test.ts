@@ -98,8 +98,8 @@ describe('Survey tests', () => {
     expect(res3.statusCode).toBe(200)
 
     const data3 = res3.body as GetResponsesByIdResponse
-    expect(data3.data[0].last_updated).toBeTruthy()
-    expect(data3.data[1].last_updated).toBeUndefined()
+    expect(data3.data.steps[0].last_updated).toBeTruthy()
+    expect(data3.data.steps[1].last_updated).toBeUndefined()
 
     const res4 = await request(app)
       .get('/participants')
@@ -167,12 +167,12 @@ describe('Survey tests', () => {
     expect(res3.statusCode).toBe(200)
 
     const data3 = res3.body as GetResponsesByIdResponse
-    expect(data3.data[0].last_updated).toBeUndefined()
-    expect(data3.data[1].last_updated).toBeUndefined()
+    expect(data3.data.steps[0].last_updated).toBeUndefined()
+    expect(data3.data.steps[1].last_updated).toBeUndefined()
     //Previous answers should be carried across
-    expect(data3.data[1].elements[0].data.value).toBe(false)
+    expect(data3.data.steps[1].elements[0].data.value).toBe(false)
     //New questions should have null answer
-    expect(data3.data[1].elements[1].data.value).toBe(null)
+    expect(data3.data.steps[1].elements[1].data.value).toBe(null)
 
     const res4 = await request(app)
       .get('/participants')
