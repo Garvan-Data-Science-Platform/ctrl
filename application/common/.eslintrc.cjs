@@ -1,7 +1,9 @@
 /* eslint-env node */
 
-module.exports = {
+const config = {
   rules: {
     '@typescript-eslint/no-explicit-any': 'warn',
   },
 }
+
+export default config

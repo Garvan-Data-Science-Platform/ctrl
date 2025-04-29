@@ -99,7 +99,6 @@ export class ProfilesController extends Controller {
       },
     })
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { user, ...profile } = data
     const { mobile, addressLine, postcode, suburb, firstName, lastName, id } = profile
     const dob = profile.dob.toISOString()

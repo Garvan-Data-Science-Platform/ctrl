@@ -1,6 +1,6 @@
 /* eslint-env node */
 
-module.exports = {
+const config = {
   env: { browser: true, es2020: true },
   extends: [
     'eslint:recommended',
@@ -15,3 +15,5 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'warn',
   },
 }
+
+export default config
