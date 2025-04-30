@@ -20,7 +20,7 @@ import { useNotification, useBack } from '@refinedev/core'
 interface RedcapImportProps {
   type: 'survey' | 'participant'
   helpDocumentation: string
-  warningMessage: string
+  warningMessage?: string
   onSubmitFile: (file: File) => void
   onSubmitApi: (formName: string, redcapAPIToken: string) => void
   confirmDialog?: boolean
