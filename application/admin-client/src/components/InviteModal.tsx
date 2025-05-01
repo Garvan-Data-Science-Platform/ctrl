@@ -14,10 +14,16 @@ import { useEffect, useState } from 'react'
 interface InviteModalProps {
   onSend: (emails: string[]) => void
   onCancel: () => void
+  initialEmails?: string[]
 }
 
-export function InviteModal({ onSend, onCancel }: InviteModalProps) {
-  const [emails, setEmails] = useState<string[]>([])
+export function InviteModal({ onSend, onCancel, initialEmails = [] }: InviteModalProps) {
+  const validateEmail = (email: string) => {
+    const r = new RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) //eslint-disable-line
+    return r.test(email)
+  }
+
+  const [emails, setEmails] = useState<string[]>(initialEmails.filter(validateEmail))
   const [fieldValue, setFieldValue] = useState<string>('')
   const [invalid, setInvalid] = useState(false)
 
@@ -32,10 +38,6 @@ export function InviteModal({ onSend, onCancel }: InviteModalProps) {
       })
       setFieldValue('')
     }
-  }
-  const validateEmail = (email: string) => {
-    const r = new RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) //eslint-disable-line
-    return r.test(email)
   }
 
   useEffect(() => {

@@ -6,10 +6,10 @@ beforeEach(() => {
   cy.task('reset')
   cy.login(UserType.ADMIN)
   cy.visit('/integrations')
-  cy.contains('Import Instrument').should('exist').click()
+  cy.contains('Import Survey').should('exist').click()
 })
 
-describe('REDCap Instrument Upload', () => {
+describe('REDCap Survey Upload', () => {
   describe('Survey Import Page', () => {
     it('should display REDCap logo', () => {
       cy.get('img[alt="REDCap Logo"]')
@@ -18,7 +18,7 @@ describe('REDCap Instrument Upload', () => {
     })
 
     it('should display both import sections', () => {
-      cy.contains('Upload Instrument File').should('exist')
+      cy.contains('Upload survey File').should('exist')
       cy.contains('Import from REDCap API').should('exist')
     })
 
@@ -31,13 +31,13 @@ describe('REDCap Instrument Upload', () => {
     it('should handle file upload', () => {
       const fileName0 = 'test_instrument0.csv'
       cy.get('Confirm').should('not.exist')
-      cy.get('[data-cy="instrumentAttach"]').attachFile(fileName0)
+      cy.get('[data-cy="surveyAttach"]').attachFile(fileName0)
       cy.get('Confirm').should('not.exist')
       cy.contains(fileName0).should('be.visible')
 
       //
       const fileName1 = 'test_instrument1.csv'
-      cy.get('[data-cy="instrumentAttach"]').attachFile(fileName1)
+      cy.get('[data-cy="surveyAttach"]').attachFile(fileName1)
       cy.get('Confirm').should('not.exist')
       cy.contains(fileName1).should('be.visible')
     })
@@ -59,7 +59,7 @@ describe('REDCap Instrument Upload', () => {
       })
 
       const fileName = 'test_instrument0.csv'
-      cy.get('[data-cy="instrumentAttach"]').attachFile(fileName)
+      cy.get('[data-cy="surveyAttach"]').attachFile(fileName)
 
       // Click the initial confirm button
       cy.contains('button', 'Confirm').click()
@@ -161,7 +161,6 @@ describe('REDCap Instrument Upload', () => {
       })
 
       // Check that the survey has been updated
-      // Check that the survey has been updated
       cy.get('@initialDraft').then((initialDraft) => {
         cy.get('@updatedDraft').then((updatedDraft) => {
           expect(initialDraft.id).to.eq(updatedDraft.id)
@@ -170,7 +169,7 @@ describe('REDCap Instrument Upload', () => {
     })
 
     it('should open and close help modal', () => {
-      cy.contains('How to export instruments from REDCap').click()
+      cy.contains('How to export surveys from REDCap').click()
       cy.get('[data-cy="helpPage"]').should('be.visible')
       cy.get('[data-cy="closeHelpPage"]').click()
       cy.get('[data-cy="helpPage"]').should('not.exist')
