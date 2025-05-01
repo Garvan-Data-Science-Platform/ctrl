@@ -1,6 +1,6 @@
 {
   "name": "ctrl-next",
-  "packageManager": "yarn@4.0.2",
+  "packageManager": "yarn@4.9.1",
   "scripts": {
     "build": "yarn workspaces foreach --all run build",
     "start": "yarn workspaces foreach --all --parallel --interlaced run start",
@@ -22,7 +22,7 @@
     "eslint": "^8.56.0",
     "prettier": "^3.2.4",
     "start-server-and-test": "^2.0.9",
-    "typescript": "^5.3.3"
+    "typescript": "^5.8.3"
   },
   "resolutions": {
     "cross-spawn": "^7.0.5"

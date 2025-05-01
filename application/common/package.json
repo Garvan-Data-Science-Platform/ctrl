@@ -12,7 +12,7 @@
   "devDependencies": {
     "@types/winston": "^2.4.4",
     "jest": "^29.7.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.8.3"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
