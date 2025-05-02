@@ -12,4 +12,4 @@ runs:
       run: |
         echo "Reading .nvmrc..."
         VERSION=$(cat .nvmrc | tr -d 'v')
-        echo "$VERSION" >> "$GITHUB_OUTPUT"
+        echo "node_version=$VERSION" >> "$GITHUB_OUTPUT"
