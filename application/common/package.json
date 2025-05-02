@@ -5,6 +5,7 @@
   "packageManager": "yarn@4.0.2",
   "scripts": {
     "type-check": "tsc",
+    "lint": "eslint .",
     "build": "true",
     "dev": "true",
     "test": "jest"

@@ -5,6 +5,7 @@
     "build": "yarn prisma generate && esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --external:express --external:cors",
     "start": "node dist/index.js",
     "type-check": "tsc",
+    "lint": "eslint .",
     "test": "bash scripts/run_tests.sh",
     "tsoa:spec": "tsoa spec",
     "tsoa:routes": "tsoa routes",

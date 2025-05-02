@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "type-check": "tsc",
     "lint": "eslint .",
     "preview": "vite preview",
     "cy:open": "cypress open",

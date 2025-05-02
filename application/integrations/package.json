@@ -4,6 +4,7 @@
   "main": "./src/index.ts",
   "scripts": {
     "type-check": "tsc",
+    "lint": "eslint .",
     "build": "true",
     "dev": "true",
     "test": "jest"
