@@ -4,6 +4,7 @@ inputs: {}
 outputs:
   node_version:
     description: 'Node.js version from .nvmrc'
+    value: ${{ steps.get-node-version.outputs.node_version }}
 runs:
   using: 'composite'
   steps:
