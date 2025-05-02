@@ -7,17 +7,6 @@ on:
     types: [completed]
 
 jobs:
-  parse-node-version:
-    runs-on: ubuntu-latest
-    outputs:
-      node_version: ${{ steps.nvm.outputs.node_version }}
-    steps:
-      - name: Check out repository code
-        uses: actions/checkout@v4
-
-      - id: nvm
-        uses: ./.github/actions/parse-node-version
-
   release:
     name: build and push ${{ matrix.name }}
     runs-on: ubuntu-latest
@@ -45,6 +34,13 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
+      - name: Parse node version
+        id: nvm
+        uses: ./.github/actions/parse-node-version
+
+      - name: Check node version
+        run: echo "node_version=${{ steps.nvm.outputs.node_version }}"
+
       - name: Build and push ${{ matrix.name }}
         uses: docker/build-push-action@v3
         with:
@@ -57,4 +53,4 @@ jobs:
             australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-${{ matrix.name }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          build-args: NODE_VERSION=${{ needs.parse-node-version.outputs.node_version }}
+          build-args: NODE_VERSION=${{ steps.nvm.outputs.node_version }}
