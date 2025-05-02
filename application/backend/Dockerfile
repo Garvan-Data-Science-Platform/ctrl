@@ -1,6 +1,10 @@
-ARG NODE_VERSION=20.10.0
+ARG NODE_VERSION
 
 FROM node:${NODE_VERSION}-alpine
+
+# install openssl
+RUN apk update && apk upgrade
+RUN apk add --no-cache openssl
 
 ARG NODE_ENV=production
 ENV NODE_ENV $NODE_ENV

@@ -17,7 +17,6 @@ LOCAL_CONFIG:=demoMode.enabled=true,$\
 help:
 	@echo "--- List of available targets:"
 	@echo "- help           - print this help message."
-	@echo "- e2e            - spin up db/frontend/backend and run e2e tests"
 	@echo "- db             - spin up db"
 	@echo "- db-down        - bring down db"
 	@echo "- clean          - bring down docker containers and remove db volume"
@@ -30,21 +29,6 @@ help:
 	@echo "- uninstall      - local helm remove deployment"
 	@echo "---"
 
-e2e:
-	docker compose up -d db-test
-	yarn workspace backend build
-	yarn workspace user-client build
-	yarn workspace backend start & \
-	export BACKEND_PID=$$! ; \
-	yarn workspace user-client preview & \
-	export FRONTEND_PID=$$! ; \
-	yarn workspace user-client cy:run; \
-	export EXIT_CODE=$$?;\
-	kill $${FRONTEND_PID}; \
-	kill $${BACKEND_PID}; \
-    exit $$EXIT_CODE
-	docker compose down db-test
-
 # Check everything that will run in ci
 check:
 	yarn workspace backend build
@@ -55,8 +39,8 @@ check:
 	make e2e
 
 db: 
-	docker compose up -d db
-	docker compose up -d admin
+	NODE_VERSION=$(NODE_VERSION) docker compose up -d db
+	NODE_VERSION=$(NODE_VERSION) docker compose up -d admin
 
 db-down:
 	docker compose down
@@ -80,9 +64,9 @@ kube-delete:
 
 docker:
 	eval $$(minikube -p minikube docker-env) && \
-	docker build -t user-client -f application/user-client/Dockerfile . && \
-	docker build -t admin-client -f application/admin-client/Dockerfile . && \
-	docker build -t backend -f application/backend/Dockerfile .
+	docker build --build-arg NODE_VERSION=$(NODE_VERSION) -t user-client -f application/user-client/Dockerfile . && \
+	docker build --build-arg NODE_VERSION=$(NODE_VERSION) -t admin-client -f application/admin-client/Dockerfile . && \
+	docker build --build-arg NODE_VERSION=$(NODE_VERSION) -t backend -f application/backend/Dockerfile .
 
 install:
 	helm install $(LOCAL_DEPLOYMENT) .helm/ctrl \
