@@ -12,7 +12,6 @@ jobs:
       node_version: ${{ steps.nvm.outputs.node_version }}
     steps:
       - uses: actions/checkout@v4
-
       - id: nvm
         uses: ./.github/actions/parse-node-version
 
@@ -29,7 +28,7 @@ jobs:
       - name: Setup Nodejs and npm
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ needs.parse-node-version.outputs.NODE_VERSION }}
+          node-version: ${{ needs.parse-node-version.outputs.node_version }}
           cache: 'yarn'
       - run: yarn install && yarn prisma:generate
       - name: Check Types
