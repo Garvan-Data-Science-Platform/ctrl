@@ -6,6 +6,11 @@ ctrl-next is the next incarnation of the dynamic consent platform CTRL developed
 
 ctrl-next uses a recent Node.js version as specified in `.nvmrc` in combination with the yarn modern package manager through corepack.
 
+This `.nvmrc` is the single source of truth through out this app to specify the Node Version.
+For example: Dockerfiles, `run_tests.sh` scripts, the Makefile and multiple CI workflows all parse the node version from the `.nvmrc`.
+If you want to update node version, please only change the `.nvmrc`.
+If you find yourself specifying the node version somewhere else in the app, please continue the approach of parsing the `.nvmrc` file (or apply an improved approach throughout the rest of the app). 
+
 ### Install required software and packages
 
 The use of `nvm` to manage node versions is highly recommended. Install `nvm` using [these instructions](https://github.com/nvm-sh/nvm).
