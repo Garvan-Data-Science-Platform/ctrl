@@ -1,0 +1,15 @@
+name: Parse Node.js version from .nvmrc
+description: Reads the .nvmrc file and exposes the Node.js version as an output.
+inputs: {}
+outputs:
+  node_version:
+    description: 'Node.js version from .nvmrc'
+runs:
+  using: 'composite'
+  steps:
+    - id: get-node-version
+      shell: bash
+      run: |
+        echo "Reading .nvmrc..."
+        VERSION=$(cat .nvmrc | tr -d 'v')
+        echo "$VERSION" >> "$GITHUB_OUTPUT"

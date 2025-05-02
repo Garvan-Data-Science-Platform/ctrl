@@ -6,6 +6,16 @@ on:
       - '**'
 
 jobs:
+  parse-node-version:
+    runs-on: ubuntu-latest
+    outputs:
+      node_version: ${{ steps.nvm.outputs.node_version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: nvm
+        uses: ./.github/actions/parse-node-version
+
   build:
     name: build and check
     runs-on: ubuntu-22.04
@@ -19,7 +29,7 @@ jobs:
       - name: Setup Nodejs and npm
         uses: actions/setup-node@v4
         with:
-          node-version: '20.10.0'
+          node-version: ${{ needs.parse-node-version.outputs.NODE_VERSION }}
           cache: 'yarn'
       - run: yarn install && yarn prisma:generate
       - name: Check Types
@@ -47,7 +57,7 @@ jobs:
       - name: Setup Nodejs and npm
         uses: actions/setup-node@v4
         with:
-          node-version: '20.10.0'
+          node-version: ${{ needs.parse-node-version.outputs.node_version }}
           cache: 'yarn'
       - run: yarn install
       - name: Run Tests
