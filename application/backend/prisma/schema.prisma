@@ -141,6 +141,7 @@ model Invite {
   status    InviteStatus @default(PENDING)
   expiresAt DateTime
   createdAt DateTime     @default(now())
+  sentAt    DateTime?
 }
 
 enum InviteStatus {
@@ -148,6 +149,7 @@ enum InviteStatus {
   ACCEPTED
   EXPIRED
   REVOKED
+  FAILED_TO_SEND
 }
 
 model PasswordResetToken {
