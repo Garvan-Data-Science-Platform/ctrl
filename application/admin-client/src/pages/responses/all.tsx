@@ -97,7 +97,7 @@ export const AllResponsesView = () => {
     alignItems: 'center',
   })
 
-  const StyledToolbarButton = styled(ToolbarButton)<{ ownerState: OwnerState }>(
+  const StyledToolbarButton = styled(ToolbarButton as any)<{ ownerState: OwnerState }>(
     ({ theme, ownerState }) => ({
       gridArea: '1 / 1',
       width: 'min-content',
@@ -129,7 +129,7 @@ export const AllResponsesView = () => {
         <Tooltip title="Select Columns">
           <ColumnsPanelTrigger
             render={(props) => (
-              <ToolbarButton {...props} color="default">
+              <ToolbarButton {...(props as any)} color="default">
                 <Badge
                   badgeContent={Object.values(cols).filter((val) => !val).length}
                   color="primary"
@@ -144,7 +144,7 @@ export const AllResponsesView = () => {
         <Tooltip title="Filter Rows">
           <FilterPanelTrigger
             render={(props, state) => (
-              <ToolbarButton {...props} color="default">
+              <ToolbarButton {...(props as any)} color="default">
                 <Badge badgeContent={state.filterCount} color="primary" variant="dot">
                   <GridFilterListIcon fontSize="small" />
                 </Badge>
@@ -200,12 +200,7 @@ export const AllResponsesView = () => {
                     ),
                     endAdornment: state.value ? (
                       <InputAdornment position="end">
-                        <QuickFilterClear
-                          edge="end"
-                          size="small"
-                          aria-label="Clear search"
-                          material={{ sx: { marginRight: -0.75 } }}
-                        >
+                        <QuickFilterClear edge="end" size="small" aria-label="Clear search">
                           <Cancel fontSize="small" />
                         </QuickFilterClear>
                       </InputAdornment>
