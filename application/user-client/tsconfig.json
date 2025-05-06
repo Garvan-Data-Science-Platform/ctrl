@@ -6,6 +6,7 @@
     "baseUrl": ".",
     "paths": {
       "@common/*": ["../common/*"]
-    }
+    },
+    "esModuleInterop": true,
   }
 }

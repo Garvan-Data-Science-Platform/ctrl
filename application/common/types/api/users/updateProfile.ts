@@ -25,4 +25,4 @@ import { RegisterParticipantRequest } from '../auth'
  *  "dependents": []
  * }
  */
-export interface UpdateProfileRequest extends Partial<RegisterParticipantRequest> {}
+export type UpdateProfileRequest = Partial<RegisterParticipantRequest>
