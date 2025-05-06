@@ -200,11 +200,12 @@ export const ParticipantList = () => {
     [],
   )
 
-  const inviteStatusMap: { [key in InviteStatus]: string } = {
-    ACCEPTED: 'Accepted',
-    EXPIRED: 'Expired',
-    PENDING: 'Pending',
-    REVOKED: 'Revoked',
+  const inviteStatusMap: { [key in InviteStatus]: { label: string; color?: string } } = {
+    ACCEPTED: { label: 'Accepted' },
+    EXPIRED: { label: 'Expired' },
+    PENDING: { label: 'Pending' },
+    REVOKED: { label: 'Revoked' },
+    FAILED_TO_SEND: { label: 'Failed to send', color: 'error.main' },
   }
 
   const inviteCols = React.useMemo<GridColDef[]>(
@@ -215,7 +216,7 @@ export const ParticipantList = () => {
         flex: 2,
       },
       {
-        field: 'createdAt',
+        field: 'sentAt',
         headerName: 'Date Sent',
         flex: 1,
         type: 'date',
@@ -231,7 +232,11 @@ export const ParticipantList = () => {
         field: 'inviteStatus',
         headerName: 'Status',
         flex: 1,
-        renderCell: ({ value }) => inviteStatusMap[value as InviteStatus],
+        renderCell: ({ value }) => (
+          <Box sx={{ color: inviteStatusMap[value as InviteStatus].color }}>
+            {inviteStatusMap[value as InviteStatus].label}
+          </Box>
+        ),
         type: 'singleSelect',
         valueOptions: Object.keys(InviteStatus),
       },

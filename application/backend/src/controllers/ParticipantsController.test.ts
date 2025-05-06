@@ -161,7 +161,10 @@ describe('InvitesController', () => {
 
       const body: InviteParticipantsResponse = response.body
       expect(response.status).toBe(200)
-      expect(body.emailsToResendCount).toBe(1)
+      expect(body.emailsResentCount).toBe(1)
+      expect(body.alreadyAcceptedCount).toBe(0)
+      expect(body.newInvitesCount).toBe(0)
+      expect(body.failedEmailsCount).toBe(0)
 
       // Check emails were successfully sent
       const sentEmails = mockNodeMailer.mock.getSentMail()
@@ -201,7 +204,10 @@ describe('InvitesController', () => {
 
       const body: InviteParticipantsResponse = response.body
       expect(response.status).toBe(200)
-      expect(body.emailsToResendCount).toBe(1)
+      expect(body.emailsResentCount).toBe(1)
+      expect(body.alreadyAcceptedCount).toBe(0)
+      expect(body.newInvitesCount).toBe(0)
+      expect(body.failedEmailsCount).toBe(0)
 
       // Check email(s) were successfully sent
       const sentEmails = mockNodeMailer.mock.getSentMail()
