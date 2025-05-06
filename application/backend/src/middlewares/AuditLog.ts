@@ -33,7 +33,7 @@ export async function auditLog(req: Request, res: Response, next: NextFunction) 
 
     const num = req.url.split('/').filter((val) => /^-?\d+$/.test(val || ''))
 
-    const id = req.url.split('/').includes('current') ? 'current' : num.at(0)
+    const id = req.url.split('/').includes('current') ? 'current' : num.join(',')
 
     const resource = req.url
       .split('/')

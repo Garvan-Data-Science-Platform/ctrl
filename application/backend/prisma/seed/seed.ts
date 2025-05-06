@@ -21,12 +21,10 @@ const main = async () => {
     },
   })
 
-  // Ensure a Study record exists with id = 1
-  const defaultStudy = await prisma.study.upsert({
-    where: { id: 1 },
-    update: {},
-    create: {
-      id: 1, // Explicitly set the ID to match the default value in the schema
+  // Ensure a Study record exists
+  const defaultStudy = await prisma.study.create({
+    data: {
+      name: 'Seed Study',
     },
   })
 
@@ -36,6 +34,8 @@ const main = async () => {
 
   await prisma.surveyVersion.create({
     data: {
+      versionNumber: 1,
+      studyId: defaultStudy.id,
       status: 'PUBLISHED',
       data: SeedSurveyStepData as SurveyStep[],
     },
@@ -43,6 +43,8 @@ const main = async () => {
 
   await prisma.surveyVersion.create({
     data: {
+      versionNumber: 2,
+      studyId: defaultStudy.id,
       status: 'DRAFT',
       data: SeedSurveyStepData as SurveyStep[],
     },
@@ -217,6 +219,11 @@ const main = async () => {
                 lastName: 'McKinney',
                 email: 'jackmckinney@example.com',
                 mobile: '0412345679',
+              },
+            },
+            studies: {
+              create: {
+                studyId: defaultStudy.id,
               },
             },
             surveys: {

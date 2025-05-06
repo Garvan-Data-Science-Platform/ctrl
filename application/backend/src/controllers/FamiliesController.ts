@@ -148,7 +148,7 @@ export class FamiliesController extends Controller {
       },
     })
 
-    await prisma.surveyParticipant.create({
+    await prisma.surveyVersionAnswers.create({
       data: {
         profileId: depProfile.id,
         versionId: currentSurvey.id,

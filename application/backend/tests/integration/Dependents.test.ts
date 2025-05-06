@@ -29,11 +29,21 @@ describe('Survey tests', () => {
   })
 
   it('Two parents register, with two dependents', async () => {
-    await prisma.invite.create({
-      data: { email: 'parent1@gmail.com', expiresAt: new Date('2100-01-01'), status: 'PENDING' },
+    const parent1Invite = await prisma.invite.create({
+      data: {
+        email: 'parent1@gmail.com',
+        studyId: 1,
+        expiresAt: new Date('2100-01-01'),
+        status: 'PENDING',
+      },
     })
-    await prisma.invite.create({
-      data: { email: 'parent2@gmail.com', expiresAt: new Date('2100-01-01'), status: 'PENDING' },
+    const parent2Invite = await prisma.invite.create({
+      data: {
+        email: 'parent2@gmail.com',
+        studyId: 1,
+        expiresAt: new Date('2100-01-01'),
+        status: 'PENDING',
+      },
     })
 
     const reqBody: RegisterParticipantRequest = {
@@ -57,9 +67,13 @@ describe('Survey tests', () => {
     }
     const reqBody2 = { ...reqBody, email: 'parent2@gmail.com', firstName: 'X' }
 
-    let regRes = await request(app).post('/auth/register/participant').send(reqBody)
+    let regRes = await request(app)
+      .post(`/auth/register/participants/${parent1Invite.id}`)
+      .send(reqBody)
     expect(regRes.statusCode).toBe(201)
-    regRes = await request(app).post('/auth/register/participant').send(reqBody2)
+    regRes = await request(app)
+      .post(`/auth/register/participants/${parent2Invite.id}`)
+      .send(reqBody2)
     expect(regRes.statusCode).toBe(201)
 
     const deps1 = await prisma.participantProfile.findMany({ where: { firstName: 'Child1' } })
@@ -74,7 +88,7 @@ describe('Survey tests', () => {
     const reqBody: UpdateSurveyAnswersRequest = { step: 1, data: [true, 'Choice 1'] }
 
     const res = await request(app)
-      .post('/surveys/answers/')
+      .post('/studies/1/survey-answers')
       .set({ authorization: `Bearer ${p1Token}` })
       .send(reqBody)
 
@@ -82,7 +96,7 @@ describe('Survey tests', () => {
 
     expect(
       (
-        await prisma.surveyParticipant.findFirstOrThrow({
+        await prisma.surveyVersionAnswers.findFirstOrThrow({
           where: { profile: { firstName: 'Child1' } },
         })
       ).answers[1].answers,
@@ -90,7 +104,7 @@ describe('Survey tests', () => {
 
     expect(
       (
-        await prisma.surveyParticipant.findFirstOrThrow({
+        await prisma.surveyVersionAnswers.findFirstOrThrow({
           where: { profile: { firstName: 'Child2' } },
         })
       ).answers[1].answers,
@@ -104,7 +118,7 @@ describe('Survey tests', () => {
     const reqBody: UpdateSurveyAnswersRequest = { step: 1, data: [false, 'Choice 1'] }
 
     const res = await request(app)
-      .post('/surveys/answers/')
+      .post('/studies/1/survey-answers')
       .set({ authorization: `Bearer ${p2Token}` })
       .send(reqBody)
 
@@ -112,15 +126,22 @@ describe('Survey tests', () => {
 
     expect(
       (
-        await prisma.surveyParticipant.findFirstOrThrow({
-          where: { profile: { firstName: 'Child1' } },
+        await prisma.surveyVersionAnswers.findFirstOrThrow({
+          where: {
+            profile: {
+              firstName: 'Child1',
+            },
+            version: {
+              studyId: 1,
+            },
+          },
         })
       ).answers[1].answers,
     ).toEqual([null, 'Choice 1'])
 
     expect(
       (
-        await prisma.surveyParticipant.findFirstOrThrow({
+        await prisma.surveyVersionAnswers.findFirstOrThrow({
           where: { profile: { firstName: 'Child2' } },
         })
       ).answers[1].answers,
@@ -142,7 +163,7 @@ describe('Survey tests', () => {
       where: { firstName: 'New', lastName: 'Dependent' },
     })
 
-    const part = await prisma.surveyParticipant.findFirstOrThrow({
+    const part = await prisma.surveyVersionAnswers.findFirstOrThrow({
       where: { profileId: prof.id },
     })
 
@@ -164,7 +185,7 @@ describe('Survey tests', () => {
       where: { firstName: 'New', lastName: 'Dependent2' },
     })
 
-    let part = await prisma.surveyParticipant.findFirstOrThrow({
+    let part = await prisma.surveyVersionAnswers.findFirstOrThrow({
       where: { profileId: prof.id },
     })
 
@@ -174,7 +195,7 @@ describe('Survey tests', () => {
       .post(`/families/2/add/${prof.id}`)
       .set({ Authorization: `Bearer ${adminToken}` })
 
-    part = await prisma.surveyParticipant.findFirstOrThrow({
+    part = await prisma.surveyVersionAnswers.findFirstOrThrow({
       where: { profileId: prof.id },
     })
 
@@ -196,7 +217,7 @@ describe('Survey tests', () => {
       where: { firstName: 'New', lastName: 'Dependent2' },
     })
 
-    let part = await prisma.surveyParticipant.findFirstOrThrow({
+    let part = await prisma.surveyVersionAnswers.findFirstOrThrow({
       where: { profileId: depProfile.id },
     })
 
@@ -208,7 +229,7 @@ describe('Survey tests', () => {
       .send({ participantType: ParticipantType.GUARDIAN })
       .set({ Authorization: `Bearer ${adminToken}` })
 
-    part = await prisma.surveyParticipant.findFirstOrThrow({
+    part = await prisma.surveyVersionAnswers.findFirstOrThrow({
       where: { profileId: depProfile.id },
     })
 
@@ -228,7 +249,7 @@ describe('Survey tests', () => {
       where: { firstName: 'New', lastName: 'Dependent2' },
     })
 
-    const part = await prisma.surveyParticipant.findFirstOrThrow({
+    const part = await prisma.surveyVersionAnswers.findFirstOrThrow({
       where: { profileId: depProfile.id },
     })
 

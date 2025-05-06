@@ -25,12 +25,15 @@ import { apiClient } from '../apiClient'
 import ResponsesPdf from '../components/PdfExport'
 import { pdf } from '@react-pdf/renderer'
 
+// TODO: remove hardcoded study number (Dashboard will change to study selecting view any way)
+const studyId = 1
+
 export default function Dashboard() {
   const { isPending, error, data } = useQuery({
     queryKey: ['consent_forms'],
     queryFn: () =>
       apiClient
-        .get('/surveys/steps/1')
+        .get(`/studies/${studyId}/survey-steps`)
         .then((res) => res.data) as Promise<GetUserSurveyStepsResponse>,
   })
 
@@ -59,7 +62,7 @@ export default function Dashboard() {
         queryKey: ['surveys', 'get', profileData.data.id],
         queryFn: () =>
           apiClient
-            .get(`/surveys/responses/current`)
+            .get(`/studies/${studyId}/survey-answers`)
             .then((res) => res.data) as Promise<GetResponsesByIdResponse>,
       })
 

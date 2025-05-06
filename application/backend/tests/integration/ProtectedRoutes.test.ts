@@ -103,6 +103,34 @@ describe('Protected Routes', () => {
     },
   ]
 
+  const studyRoutes: Route[] = [
+    {
+      method: HttpMethod.GET,
+      url: '/studies',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.GET,
+      url: '/studies/1',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/studies',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.PATCH,
+      url: '/studies/1',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.DELETE,
+      url: '/studies/1',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+  ]
+
   const organisationRoutes: Route[] = [
     {
       method: HttpMethod.GET,
@@ -177,37 +205,27 @@ describe('Protected Routes', () => {
   const surveyRoutes: Route[] = [
     {
       method: HttpMethod.GET,
-      url: '/surveys',
-      rolesWhitelisted: [Role.OrganisationAdmin],
+      url: '/studies/1/surveys/1',
+      rolesWhitelisted: [],
     },
     {
       method: HttpMethod.GET,
-      url: '/surveys/1',
+      url: '/studies/1/survey-steps/1',
       rolesWhitelisted: [],
     },
     {
       method: HttpMethod.POST,
-      url: '/surveys/participant/1',
-      rolesWhitelisted: [Role.OrganisationAdmin],
-    },
-    {
-      method: HttpMethod.GET,
-      url: '/surveys/step/1/1',
-      rolesWhitelisted: [],
-    },
-    {
-      method: HttpMethod.POST,
-      url: '/surveys/answers',
+      url: '/studies/1/survey-answers',
       rolesWhitelisted: [],
     },
     {
       method: HttpMethod.PATCH,
-      url: '/surveys/1',
+      url: '/studies/1/surveys/1',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
     {
       method: HttpMethod.POST,
-      url: '/surveys/publish/1',
+      url: '/studies/1/surveys/1/publish',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
   ]
@@ -223,22 +241,22 @@ describe('Protected Routes', () => {
   const integrationRoutes: Route[] = [
     {
       method: HttpMethod.POST,
-      url: '/integrations/redcap/participant/upload/csv',
+      url: '/studies/1/integrations/redcap/participant/upload/csv',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
     {
       method: HttpMethod.POST,
-      url: '/integrations/redcap/participant/upload/api',
+      url: '/studies/1/integrations/redcap/participant/upload/api',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
     {
       method: HttpMethod.POST,
-      url: '/integrations/redcap/instrument/upload/csv',
+      url: '/studies/1/integrations/redcap/instrument/upload/csv',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
     {
       method: HttpMethod.POST,
-      url: '/integrations/redcap/instrument/upload/api',
+      url: '/studies/1/integrations/redcap/instrument/upload/api',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
   ]
@@ -259,28 +277,41 @@ describe('Protected Routes', () => {
   const inviteRoutes: Route[] = [
     {
       method: HttpMethod.GET,
-      url: '/invites',
+      url: '/studies/1/invites',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
     {
       method: HttpMethod.POST,
-      url: '/invites',
+      url: '/studies/1/invites',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
     {
       method: HttpMethod.POST,
-      url: '/invites/resend',
+      url: '/studies/1/invites/inviteId/resend',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
     {
       method: HttpMethod.POST,
-      url: '/invites/revoke/1',
+      url: '/studies/1/invites/resend',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/studies/1/invites/inviteId/revoke',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
   ]
 
   describe('User Routes', () => {
     userRoutes.forEach((route: Route) => {
+      it(`${route.method.toUpperCase()} ${route.url} should be a protected route`, async () => {
+        await checkProtectedRoutes(route)
+      })
+    })
+  })
+
+  describe('Study Routes', () => {
+    studyRoutes.forEach((route: Route) => {
       it(`${route.method.toUpperCase()} ${route.url} should be a protected route`, async () => {
         await checkProtectedRoutes(route)
       })

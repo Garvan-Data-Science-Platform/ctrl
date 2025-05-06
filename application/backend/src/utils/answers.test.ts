@@ -29,7 +29,8 @@ describe('Answer functions', () => {
   const prevVersion: SurveyVersion = {
     createdAt: new Date(),
     id: 1,
-    studyId: 1,
+    studyId: 1, // From `application/common/testing` seed data
+    versionNumber: 1, // From `application/commont/testing` seed data
     updatedAt: new Date(),
     status: 'PUBLISHED',
     data: [prevStep1, prevStep2],

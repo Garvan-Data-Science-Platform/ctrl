@@ -32,7 +32,7 @@ export async function seedTests(prisma: PrismaClient) {
 
   await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"Organisation"', 'id'), 2, false) FROM "Organisation";`
 
-  await prisma.study.create({ data: { id: 1 } })
+  const testStudy = await prisma.study.create({ data: { name: 'Test Study' } })
 
   // OperatorAdminUser
   await prisma.user.create({
@@ -131,6 +131,15 @@ export async function seedTests(prisma: PrismaClient) {
       preferredContact: 'EMAIL',
       state: 'VIC',
       suburb: 'M',
+      studies: {
+        create: {
+          study: {
+            connect: {
+              name: testStudy.name,
+            },
+          },
+        },
+      },
       userId: PARTICIPANT_UNANSWERED_ID,
       participantType: 'STANDARD',
     },
@@ -157,6 +166,15 @@ export async function seedTests(prisma: PrismaClient) {
       preferredContact: 'EMAIL',
       state: 'VIC',
       suburb: 'Melbourne',
+      studies: {
+        create: {
+          study: {
+            connect: {
+              name: testStudy.name,
+            },
+          },
+        },
+      },
       userId: PARTICIPANT_COMPLETED_ID,
       familyId: 100,
       participantType: 'GUARDIAN',
@@ -176,6 +194,15 @@ export async function seedTests(prisma: PrismaClient) {
       preferredContact: 'EMAIL',
       state: 'VIC',
       suburb: 'Melbourne',
+      studies: {
+        create: {
+          study: {
+            connect: {
+              name: testStudy.name,
+            },
+          },
+        },
+      },
       familyId: 100,
       userId: null,
       participantType: 'DEPENDENT_AGE',
@@ -195,6 +222,15 @@ export async function seedTests(prisma: PrismaClient) {
       preferredContact: 'EMAIL',
       state: 'VIC',
       suburb: 'Melbourne',
+      studies: {
+        create: {
+          study: {
+            connect: {
+              name: testStudy.name,
+            },
+          },
+        },
+      },
       familyId: 100,
       userId: SECOND_GUARDIAN_ID,
       participantType: 'GUARDIAN',
@@ -204,16 +240,20 @@ export async function seedTests(prisma: PrismaClient) {
   await prisma.surveyVersion.create({
     data: {
       status: 'PUBLISHED',
+      versionNumber: 1,
       data: ExampleSurveyStepData as SurveyStep[],
+      studyId: testStudy.id,
     },
   })
   await prisma.surveyVersion.create({
     data: {
       status: 'DRAFT',
+      versionNumber: 2,
       data: ExampleSurveyStepData as SurveyStep[],
+      studyId: testStudy.id,
     },
   })
-  await prisma.surveyParticipant.create({
+  await prisma.surveyVersionAnswers.create({
     data: {
       versionId: 1,
       profileId: PARTICIPANT_UNANSWERED_ID,
@@ -223,7 +263,7 @@ export async function seedTests(prisma: PrismaClient) {
       ],
     },
   })
-  await prisma.surveyParticipant.create({
+  await prisma.surveyVersionAnswers.create({
     data: {
       versionId: 1,
       profileId: PARTICIPANT_COMPLETED_ID,
@@ -238,7 +278,7 @@ export async function seedTests(prisma: PrismaClient) {
     },
   })
 
-  await prisma.surveyParticipant.create({
+  await prisma.surveyVersionAnswers.create({
     data: {
       versionId: 1,
       profileId: DEPENDENT_ID,
@@ -253,7 +293,7 @@ export async function seedTests(prisma: PrismaClient) {
     },
   })
 
-  await prisma.surveyParticipant.create({
+  await prisma.surveyVersionAnswers.create({
     data: {
       versionId: 1,
       profileId: SECOND_GUARDIAN_ID,
@@ -296,37 +336,44 @@ export async function seedTests(prisma: PrismaClient) {
       {
         email: 'invite1@pending.com',
         status: InviteStatus.PENDING,
+        studyId: testStudy.id,
         expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
       },
       {
         email: 'invite2@accepted.com',
         status: InviteStatus.ACCEPTED,
+        studyId: testStudy.id,
         expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day in the past
       },
       {
         email: 'invite3@revoked.com',
         status: InviteStatus.REVOKED,
+        studyId: testStudy.id,
         expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
       },
       {
         email: 'invite4@expired.com',
         status: InviteStatus.EXPIRED,
+        studyId: testStudy.id,
         expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day in the past
       },
       // Pending invites for testing
       {
         email: 'john@example.com',
         status: InviteStatus.PENDING,
+        studyId: testStudy.id,
         expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
       },
       {
         email: 'jenny@gmail.com',
         status: InviteStatus.PENDING,
+        studyId: testStudy.id,
         expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
       },
       {
         email: 'abcsdfwefijsdf@gjiodsf.com',
         status: InviteStatus.PENDING,
+        studyId: testStudy.id,
         expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
       },
     ],

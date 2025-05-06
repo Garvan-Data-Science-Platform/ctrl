@@ -31,11 +31,12 @@ describe('IntegrationsController', () => {
     api.stop()
   })
 
-  describe('POST /integrations/redcap/participant/upload/csv', () => {
+  describe('POST /studies/{studyId}/integrations/redcap/participant/upload/csv', () => {
     it('should create a new participant from a given csv', async () => {
+      const studyId = 1
       const csvPath = path.resolve(__dirname, '../../tests/test_data/one_user.csv')
       const response = await request(app)
-        .post('/integrations/redcap/participant/upload/csv')
+        .post(`/studies/${studyId}/integrations/redcap/participant/upload/csv`)
         .set({ Authorization: `Bearer ${token}` })
         .attach('file', csvPath) // Attach the file with the field name 'file'
 
@@ -47,24 +48,39 @@ describe('IntegrationsController', () => {
         profilesAlreadyExistedCount: 0,
       })
 
-      const createdParticipant = await prisma.participantProfile.findFirst({
-        where: { firstName: 'John' },
+      const createdParticipant = await prisma.participantProfile.findFirstOrThrow({
+        where: {
+          firstName: 'John',
+          studies: {
+            some: {
+              studyId: studyId,
+            },
+          },
+        },
       })
 
       expect(createdParticipant).not.toBe(null)
     })
     it('should register multiple users from one csv', async () => {
       const initialLen = await prisma.participantProfile.count()
-
+      const studyId = 1
       const csvPath = path.resolve(__dirname, '../../tests/test_data/90_users.csv')
       const response = await request(app)
-        .post('/integrations/redcap/participant/upload/csv')
+        .post(`/studies/${studyId}/integrations/redcap/participant/upload/csv`)
         .set({ Authorization: `Bearer ${token}` })
         .attach('file', csvPath) // Attach the file with the field name 'file'
 
       expect(response.status).toBe(201)
 
-      const postCreationLen = await prisma.participantProfile.count()
+      const postCreationLen = await prisma.participantProfile.count({
+        where: {
+          studies: {
+            some: {
+              studyId: studyId,
+            },
+          },
+        },
+      })
 
       expect(postCreationLen - initialLen).toBe(90) // test still passes if db seed changes
 
@@ -72,6 +88,7 @@ describe('IntegrationsController', () => {
     }, 15000)
 
     it('should not create a profile for details that already have a user', async () => {
+      const studyId = 1
       const user = await prisma.user.create({
         data: {
           firstName: 'John',
@@ -91,6 +108,15 @@ describe('IntegrationsController', () => {
           suburb: 'Anytown',
           state: 'NSW',
           postcode: '12345',
+          studies: {
+            create: {
+              study: {
+                connect: {
+                  id: studyId,
+                },
+              },
+            },
+          },
           participantType: 'STANDARD',
           preferredContact: 'EMAIL',
           user: { connect: { id: user.id } },
@@ -100,7 +126,7 @@ describe('IntegrationsController', () => {
       const csvPath = path.resolve(__dirname, '../../tests/test_data/one_user.csv')
 
       const response = await request(app)
-        .post('/integrations/redcap/participant/upload/csv')
+        .post(`/studies/${studyId}/integrations/redcap/participant/upload/csv`)
         .set({ Authorization: `Bearer ${token}` })
         .attach('file', csvPath)
 
@@ -111,7 +137,7 @@ describe('IntegrationsController', () => {
 
     it('should throw a 400 error if no file is given', async () => {
       const response = await request(app)
-        .post('/integrations/redcap/participant/upload/csv')
+        .post('/studies/1/integrations/redcap/participant/upload/csv')
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(400)
       const body = response.body
@@ -121,7 +147,7 @@ describe('IntegrationsController', () => {
     it('should throw a 400 error if given an empty file', async () => {
       const csvPath = path.resolve(__dirname, '../../tests/test_data/empty_file.csv')
       const response = await request(app)
-        .post('/integrations/redcap/participant/upload/csv')
+        .post('/studies/1/integrations/redcap/participant/upload/csv')
         .set({ Authorization: `Bearer ${token}` })
         .attach('file', csvPath)
       expect(response.status).toBe(400)
@@ -132,26 +158,32 @@ describe('IntegrationsController', () => {
     it('should throw an error if the file is not a csv', async () => {
       const csvPath = path.resolve(__dirname, '../../tests/test_data/not_a_csv.txt')
       const response = await request(app)
-        .post('/integrations/redcap/participant/upload/csv')
+        .post('/studies/1/integrations/redcap/participant/upload/csv')
         .set({ Authorization: `Bearer ${token}` })
         .attach('file', csvPath)
       expect(response.status).toBe(400)
     })
   })
 
-  describe('POST integrations/redcap/instrument/upload/csv', () => {
+  describe('POST studies/{studyId}/integrations/redcap/instrument/upload/csv', () => {
     it('should update a valid draft survey from instrument csv', async () => {
+      const studyId = 1
       const csvPath = path.resolve(__dirname, '../../tests/test_data/instrument.csv')
       const response = await request(app)
-        .post('/integrations/redcap/instrument/upload/csv')
+        .post(`/studies/${studyId}/integrations/redcap/instrument/upload/csv`)
         .set({ Authorization: `Bearer ${token}` })
         .attach('file', csvPath)
       expect(response.status).toBe(201)
 
       // updates the pre-existing draft survey
-      expect(response.body.id).toBe(2)
+      expect(response.body.versionNumber).toBe(2)
 
-      const survey = await prisma.surveyVersion.findFirst({ where: { id: 2 } })
+      const survey = await prisma.surveyVersion.findFirst({
+        where: {
+          versionNumber: 2,
+          studyId: studyId,
+        },
+      })
 
       // test that subheading type converts into the heading of a survey step
       expect(survey?.data[0].title).toStrictEqual('Contact')
@@ -178,29 +210,9 @@ describe('IntegrationsController', () => {
       expect(survey?.data.length).toBe(4)
     })
 
-    it('should create a new draft survey if one doesnt already exist', async () => {
-      // In the seed data the second seed is the draft survey - we remove it to test creating a new survey
-      await prisma.surveyVersion.update({ where: { id: 2 }, data: { status: 'PUBLISHED' } })
-
-      const csvPath = path.resolve(__dirname, '../../tests/test_data/instrument.csv')
-      const response = await request(app)
-        .post('/integrations/redcap/instrument/upload/csv')
-        .set({ Authorization: `Bearer ${token}` })
-        .attach('file', csvPath)
-      expect(response.status).toBe(201)
-
-      // creates a new draft survey
-      expect(response.body.id).toBe(3)
-
-      // should create a new draft survey!
-      const survey = await prisma.surveyVersion.findFirst({ where: { id: 3 } })
-
-      expect(survey?.data.length).toBe(4)
-    })
-
     it('should throw a 400 error if no file is given', async () => {
       const response = await request(app)
-        .post('/integrations/redcap/instrument/upload/csv')
+        .post('/studies/1/integrations/redcap/instrument/upload/csv')
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(400)
       expect(response.body.message).toBe("Cannot read properties of undefined (reading 'file')")
@@ -209,7 +221,7 @@ describe('IntegrationsController', () => {
     it('should throw a 404 error if given an empty file', async () => {
       const csvPath = path.resolve(__dirname, '../../tests/test_data/empty_file.csv')
       const response = await request(app)
-        .post('/integrations/redcap/instrument/upload/csv')
+        .post('/studies/1/integrations/redcap/instrument/upload/csv')
         .set({ Authorization: `Bearer ${token}` })
         .attach('file', csvPath)
       expect(response.status).toBe(400)
@@ -219,25 +231,42 @@ describe('IntegrationsController', () => {
     it('should throw a 400 error if the file is not a csv', async () => {
       const csvPath = path.resolve(__dirname, '../../tests/test_data/not_a_csv.txt')
       const response = await request(app)
-        .post('/integrations/redcap/instrument/upload/csv')
+        .post('/studies/1/integrations/redcap/instrument/upload/csv')
         .set({ Authorization: `Bearer ${token}` })
         .attach('file', csvPath)
       expect(response.status).toBe(400)
     })
   })
 
-  describe('POST integrations/redcap/participant/upload/api', () => {
+  describe('POST /studies/{studyId}/integrations/redcap/participant/upload/api', () => {
     it('should register multiple users from one api call', async () => {
-      const initialLen = await prisma.participantProfile.count()
+      const studyId = 1
+      const initialLen = await prisma.participantProfile.count({
+        where: {
+          studies: {
+            some: {
+              studyId: studyId,
+            },
+          },
+        },
+      })
 
       const response = await request(app)
-        .post('/integrations/redcap/participant/upload/api')
-        .send({ formName: 'ctrl_test_1' })
+        .post(`/studies/${studyId}/integrations/redcap/participant/upload/api`)
+        .send({ formName: 'ctrl_test_1', })
         .set({ Authorization: `Bearer ${token}` })
 
       expect(response.status).toBe(201)
 
-      const postCreationLen = await prisma.participantProfile.count()
+      const postCreationLen = await prisma.participantProfile.count({
+        where: {
+          studies: {
+            some: {
+              studyId: studyId,
+            },
+          },
+        },
+      })
 
       expect(postCreationLen - initialLen).toBe(10) // adds the 10 users in ctrl_test_1
 
@@ -251,22 +280,28 @@ describe('IntegrationsController', () => {
         .mockRejectedValueOnce({ message: 'API offline or unavailable', status: 500 })
 
       const response = await request(app)
-        .post('/integrations/redcap/participant/upload/api')
-        .send({ formName: 'ctrl_test_1' })
+        .post('/studies/1/integrations/redcap/participant/upload/api')
+        .send({ formName: 'ctrl_test_1', })
         .set({ Authorization: `Bearer ${token}` })
 
       expect(response.status).toBe(502)
     })
   })
 
-  describe('POST integrations/redcap/instrument/upload/api', () => {
+  describe('POST /studies/{studyId}/integrations/redcap/instrument/upload/api', () => {
     it('should create a survey when given a form using the redcap api', async () => {
+      const studyId = 1
       const response = await request(app)
-        .post('/integrations/redcap/instrument/upload/api')
-        .send({ formName: 'ctrl_test_2' })
+        .post(`/studies/${studyId}/integrations/redcap/instrument/upload/api`)
+        .send({ formName: 'ctrl_test_2', })
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(201)
-      const survey = await prisma.surveyVersion.findFirst({ where: { id: 2 } })
+      const survey = await prisma.surveyVersion.findFirst({
+        where: {
+          id: 2,
+          studyId: studyId,
+        },
+      })
 
       expect(survey?.data[0].elements[1]).toStrictEqual({
         data: {
@@ -279,35 +314,9 @@ describe('IntegrationsController', () => {
       expect(survey?.data[0].elements.length).toBe(2)
     })
 
-    it('should create a new draft survey if one doesnt already exist using the redcap api', async () => {
-      // In the seed data the second seed is the draft survey - we remove it to test creating a new survey
-      await prisma.surveyVersion.update({ where: { id: 2 }, data: { status: 'PUBLISHED' } })
-
-      const response = await request(app)
-        .post('/integrations/redcap/instrument/upload/api')
-        .send({ formName: 'ctrl_test_2' })
-        .set({ Authorization: `Bearer ${token}` })
-      expect(response.status).toBe(201)
-
-      // creates a new draft survey
-      expect(response.body.id).toBe(3)
-
-      // should create a new draft survey!
-      const survey = await prisma.surveyVersion.findFirst({ where: { id: 3 } })
-
-      expect(survey?.data[0].elements[1]).toStrictEqual({
-        data: {
-          choices: ['0. test', '1. testing', '2. testing again'],
-          text: 'TEST checkbox',
-          value: '0. test',
-        },
-        type: 'question-choices',
-      })
-    })
-
     it('should throw an error if no form is given', async () => {
       const response = await request(app)
-        .post('/integrations/redcap/instrument/upload/api/')
+        .post('/studies/1/integrations/redcap/instrument/upload/api/')
         .send({})
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(422)
@@ -320,8 +329,8 @@ describe('IntegrationsController', () => {
         .mockRejectedValueOnce({ message: 'API offline or unavailable', status: 500 })
 
       const response = await request(app)
-        .post('/integrations/redcap/instrument/upload/api')
-        .send({ formName: 'ctrl_test_1' })
+        .post('/studies/1/integrations/redcap/instrument/upload/api')
+        .send({ formName: 'ctrl_test_1', })
         .set({ Authorization: `Bearer ${token}` })
 
       expect(response.status).toBe(502)

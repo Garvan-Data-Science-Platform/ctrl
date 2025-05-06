@@ -6,13 +6,13 @@ import { generateToken } from '../authentication'
 
 import {
   GetAllResponsesResponse,
-  GetSurveyVersionsResponse,
   GetUserSurveyStepResponse,
   GetUserSurveyStepsResponse,
+  GetSurveyVersionsResponse,
   UpdateSurveyAnswersRequest,
   UpdateSurveyRequest,
+  GetSurveyVersionByVersionNumberResponse,
 } from 'common/types/api/surveys'
-import { GetSurveyVersionByIdResponse } from 'common/types/api/surveys/getSurveyVersionById'
 import {
   DEPENDENT_ID,
   ORG_ADMIN_ID,
@@ -43,36 +43,34 @@ describe('SurveysController', () => {
   afterAll(async () => {
     api.stop()
   })
-
-  describe('GET /surveys', () => {
-    it('should return a list of surveys', async () => {
+  describe('GET /studies/{studyId}/surveys', () => {
+    it('should return all survey versions', async () => {
       const response = await request(app)
-        .get('/surveys')
+        .get('/studies/1/surveys')
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(200)
-
       const body: GetSurveyVersionsResponse = response.body
-      expect(body.data[0].status).toBe('DRAFT')
-      expect(body.data[1].id).toBe(1)
+      // There are two survey versions created in application/common/testing/seed.ts
+      expect(body.data.length).toBe(2)
     })
   })
 
-  describe('GET /surveys/{surveyId}', () => {
+  describe('GET /studies/{studyId}/surveys/{versionNumber}', () => {
     it('should return a survey version', async () => {
       const response = await request(app)
-        .get('/surveys/1')
+        .get('/studies/1/surveys/1')
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(200)
-      const body: GetSurveyVersionByIdResponse = response.body
+      const body: GetSurveyVersionByVersionNumberResponse = response.body
       expect(body.data.status).toBe('PUBLISHED')
       expect(body.data.data.length).toBeGreaterThan(0)
     })
   })
 
-  describe('GET /surveys/step/:study/:step', () => {
+  describe('GET /surveys/{studyId}/survey-steps/{stepId}', () => {
     it('should return questions and current answers for a survey step', async () => {
       const response = await request(app)
-        .get('/surveys/step/1/1')
+        .get('/studies/1/survey-steps/1')
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(200)
       const body: GetUserSurveyStepResponse = response.body
@@ -83,7 +81,7 @@ describe('SurveysController', () => {
     })
     it('should return null when the user has not answered yet', async () => {
       const response = await request(app)
-        .get('/surveys/step/1/1')
+        .get('/studies/1/survey-steps/1')
         .set({ Authorization: `Bearer ${tokenNoAnswers}` })
       expect(response.status).toBe(200)
       const body: GetUserSurveyStepResponse = response.body
@@ -92,22 +90,22 @@ describe('SurveysController', () => {
 
     it('should fail if step does not exist', async () => {
       const response = await request(app)
-        .get('/surveys/step/1/3')
+        .get('/studies/1/survey-steps/3')
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(422)
     })
     it('should fail if user is not assigned to a study', async () => {
       const response = await request(app)
-        .get('/surveys/step/1/2')
+        .get('/studies/1/survey-steps/2')
         .set({ Authorization: `Bearer ${tokenNoProfile}` })
       expect(response.status).toBe(404)
     })
   })
 
-  describe('GET /surveys/steps/:study', () => {
+  describe('GET /studies/{studyId}/survey-steps', () => {
     it('should get a list of survey steps with state and last updated date for current user', async () => {
       const response = await request(app)
-        .get('/surveys/steps/1')
+        .get('/studies/1/survey-steps')
         .set({ Authorization: `Bearer ${token}` })
       const body: GetUserSurveyStepsResponse = response.body
       expect(response.status).toBe(200)
@@ -118,31 +116,43 @@ describe('SurveysController', () => {
     })
   })
 
-  describe('POST /surveys/answers', () => {
+  describe('POST /studies/{studyId}/survey-answers', () => {
     it('should update survey answers successfully when answers match questions', async () => {
       const reqBody: UpdateSurveyAnswersRequest = {
         step: 1,
         data: [true, 'Choice 1'],
       }
       const response = await request(app)
-        .post('/surveys/answers')
+        .post('/studies/1/survey-answers')
         .set({ Authorization: `Bearer ${token}` })
         .send(reqBody)
       expect(response.status).toBe(204)
-      const participant = await prisma.surveyParticipant.findFirst({
-        where: { profileId: PARTICIPANT_COMPLETED_ID },
+      const participant = await prisma.surveyVersionAnswers.findFirst({
+        where: {
+          profileId: PARTICIPANT_COMPLETED_ID,
+          version: {
+            studyId: 1,
+          },
+        },
       })
       expect(participant?.answers[1].answers).toEqual([true, 'Choice 1'])
       const aLog = await prisma.auditLog.findFirstOrThrow({
         where: { userId: PARTICIPANT_COMPLETED_ID },
       })
-      expect(aLog.resource).toBe('surveys/answers')
+      expect(aLog.resource).toBe('studies/survey-answers')
       expect(aLog.operation).toBe('UPDATE')
       expect((aLog.meta as any).bodyData).toStrictEqual(reqBody)
     })
 
     it('should change status from requires_review after submission', async () => {
-      let participant = await prisma.surveyParticipant.findUniqueOrThrow({ where: { id: 1 } })
+      let participant = await prisma.surveyVersionAnswers.findUniqueOrThrow({
+        where: {
+          id: 1,
+          version: {
+            studyId: 1,
+          },
+        },
+      })
       const answersBefore = participant.answers
       expect(answersBefore[0].status).toBe('review_required')
       const reqBody: UpdateSurveyAnswersRequest = {
@@ -150,12 +160,19 @@ describe('SurveysController', () => {
         data: [],
       }
       const response = await request(app)
-        .post('/surveys/answers')
+        .post('/studies/1/survey-answers')
         .set({ Authorization: `Bearer ${tokenNoAnswers}` })
         .send(reqBody)
       expect(response.status).toBe(204)
 
-      participant = await prisma.surveyParticipant.findUniqueOrThrow({ where: { id: 1 } })
+      participant = await prisma.surveyVersionAnswers.findUniqueOrThrow({
+        where: {
+          id: 1,
+          version: {
+            studyId: 1,
+          },
+        },
+      })
       const answersAfter = participant.answers
       expect(answersAfter[0].status).toBe('viewed')
     })
@@ -165,7 +182,7 @@ describe('SurveysController', () => {
         data: ['Choic3e', false],
       }
       const response = await request(app)
-        .post('/surveys/answers')
+        .post('/studies/1/survey-answers')
         .set({ Authorization: `Bearer ${token}` })
         .send(reqBody)
       expect(response.status).toBe(422)
@@ -182,37 +199,23 @@ describe('SurveysController', () => {
         data: [false, 'Choice 1'], //Other parent answer is [false, 'Choice 2']
       }
       const response = await request(app)
-        .post('/surveys/answers')
+        .post('/studies/1/survey-answers')
         .set({ Authorization: `Bearer ${secondGuardianToken}` })
         .send(reqBody)
       expect(response.status).toBe(204)
-      const dependentAnswers = await prisma.surveyParticipant.findFirstOrThrow({
-        where: { profileId: DEPENDENT_ID },
+      const dependentAnswers = await prisma.surveyVersionAnswers.findFirstOrThrow({
+        where: {
+          profileId: DEPENDENT_ID,
+          version: {
+            studyId: 1,
+          },
+        },
       })
       expect(dependentAnswers.answers[1].answers).toEqual([false, null])
     })
   })
 
-  describe('POST /surveys/participant/{surveyId}', () => {
-    it('should add the current user as a survey participant', async () => {
-      await prisma.surveyParticipant.deleteMany({})
-      const response = await request(app)
-        .post('/surveys/participant/1')
-        .set({ Authorization: `Bearer ${token}` })
-      expect(response.status).toBe(204)
-      const participant = await prisma.surveyParticipant.findFirstOrThrow({
-        where: { profileId: 99 },
-      })
-      expect(participant.answers[1].answers[0]).toBe(null)
-      const aLog = await prisma.auditLog.findFirstOrThrow({
-        where: { userId: 99 },
-      })
-      expect(aLog.resource).toBe('surveys/participant')
-      expect(aLog.operation).toBe('UPDATE')
-    })
-  })
-
-  describe('PATCH /surveys/{surveyId}', () => {
+  describe('PATCH /studies/{studyId}/surveys/{versionNumber}', () => {
     it('should successfully update a draft survey', async () => {
       const reqBody: UpdateSurveyRequest = {
         data: [
@@ -227,52 +230,69 @@ describe('SurveysController', () => {
         ],
       }
       const response = await request(app)
-        .patch('/surveys/2')
+        .patch('/studies/1/surveys/2')
         .set({ Authorization: `Bearer ${token}` })
         .send(reqBody)
       expect(response.status).toBe(204)
-      const survey = await prisma.surveyVersion.findFirst({ where: { id: 2 } })
+      const survey = await prisma.surveyVersion.findUniqueOrThrow({
+        where: {
+          studyId_versionNumber: {
+            studyId: 1,
+            versionNumber: 2,
+          },
+        },
+      })
       expect(survey?.data[0].elements[1].data.text).toBe('Question 1')
 
       const aLog = await prisma.auditLog.findFirstOrThrow({
         where: { userId: PARTICIPANT_COMPLETED_ID },
       })
-      expect(aLog.resource).toBe('surveys')
+      expect(aLog.resource).toBe('studies/surveys')
       expect(aLog.operation).toBe('UPDATE')
       expect((aLog.meta as any).bodyData).toStrictEqual(reqBody)
-      expect((aLog.meta as any).resourceId).toBe('2')
+      expect((aLog.meta as any).resourceId).toBe('1,2')
     })
 
     it('should fail to update a published survey', async () => {
       const response = await request(app)
-        .patch('/surveys/1')
+        .patch('/studies/1/surveys/1')
         .set({ Authorization: `Bearer ${token}` })
         .send({ data: [] })
       expect(response.status).toBe(500)
     })
   })
 
-  describe('POST /surveys/publish/{surveyId}', () => {
+  describe('POST /studies/{studyId}/surveys/{versionNumber}/publish', () => {
     it('should successfully publish a draft survey', async () => {
       const response = await request(app)
-        .post('/surveys/publish/2')
+        .post('/studies/1/surveys/2/publish')
         .set({ Authorization: `Bearer ${token}` })
 
       expect(response.status).toBe(204)
-      const survey = await prisma.surveyVersion.findFirst({ where: { id: 2 } })
+      const survey = await prisma.surveyVersion.findUniqueOrThrow({
+        where: {
+          studyId_versionNumber: {
+            studyId: 1,
+            versionNumber: 2,
+          },
+        },
+      })
       expect(survey?.status).toBe('PUBLISHED')
     })
 
     it('should fail to publish an already published survey', async () => {
       const response = await request(app)
-        .post('/surveys/publish/1')
+        .post('/studies/1/surveys/1/publish')
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(500)
     })
 
     it('should fail to publish an invalid survey', async () => {
       await prisma.surveyVersion.update({
-        where: { id: 2 },
+        where: {
+          id: 2,
+          studyId: 1,
+        },
         data: {
           data: [
             {
@@ -284,15 +304,15 @@ describe('SurveysController', () => {
         },
       })
       const response = await request(app)
-        .post('/surveys/publish/2')
+        .post('/studies/1/surveys/2/publish')
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(422)
     })
   })
-  describe('GET /surveys/responses/all/{versionId}', () => {
+  describe('GET /studies/{studyId}/surveys/{versionNumber}/participants/answers', () => {
     it('Should get a list of all responses', async () => {
       const response = await request(app)
-        .get('/surveys/responses/all/1')
+        .get('/studies/1/surveys/1/participants/answers')
         .set({ Authorization: `Bearer ${token}` })
 
       expect(response.status).toBe(200)

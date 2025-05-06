@@ -7,7 +7,7 @@ import { useInvalidate, useNotification } from '@refinedev/core'
 export const SurveyImport = () => {
   const apiEndpoint = '/integrations/redcap/instrument/upload/api'
   const fileEndpoint = '/integrations/redcap/instrument/upload/csv'
-  const successRedirect = '/surveys/edit/:surveyId'
+  const successRedirect = '/surveys/edit/:surveyId' // TODO: change to versionNumber
 
   const navigate = useNavigate()
   const { open } = useNotification()
@@ -24,7 +24,7 @@ export const SurveyImport = () => {
       .then((response) => {
         console.log(response)
         invalidate({ resource: 'surveys', invalidates: ['resourceAll'] })
-        navigate(successRedirect.replace(':surveyId', response.data.id))
+        navigate(successRedirect.replace(':surveyId', response.data.id)) // TODO: see note about versionNumber above
       })
       .catch((err) => {
         console.error(err)
@@ -39,7 +39,7 @@ export const SurveyImport = () => {
       })
       .then((response) => {
         invalidate({ resource: 'surveys', invalidates: ['resourceAll'] })
-        navigate(successRedirect.replace(':surveyId', response.data.id))
+        navigate(successRedirect.replace(':surveyId', response.data.id)) // TODO: see note about versionNumber above
       })
       .catch((response) => {
         open?.({
