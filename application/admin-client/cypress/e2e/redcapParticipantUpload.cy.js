@@ -93,6 +93,7 @@ describe('REDCap Participant Upload', () => {
       })
 
       cy.get('[data-cy="send-button"]').should('be.visible').click()
+      cy.wait(5000)
 
       // Check updated invites
       cy.request({
@@ -136,20 +137,18 @@ describe('REDCap Participant Upload', () => {
       })
 
       const formName = 'test_form'
-      cy.get('[data-cy="redcapAPIToken"]')
-        .should('be.visible')
-        .type(Cypress.env('REDCAP_API_TOKEN'))
+      cy.get('[data-cy="redcapAPIToken"]').should('be.visible').type('DUMMY_TOKEN')
       cy.get('[data-cy="apiSubmit"]').should('be.visible').should('be.disabled')
       cy.get('[data-cy="formName"]').should('be.visible').type(formName)
       cy.get('[data-cy="apiSubmit"]').should('be.visible').should('be.enabled')
 
-      cy.contains('button', 'Import from API').click()
-
-      cy.intercept('POST', '**/integrations/redcap/instrument/upload/api', {
+      cy.intercept('POST', '**/integrations/redcap/participant/upload/api', {
         statusCode: 200,
       })
 
-      cy.url({ timeout: 10000 }).should('include', '/participants/')
+      cy.contains('button', 'Import from API').click()
+
+      cy.url().should('include', '/participants/')
 
       // Check that the invite modal is opened and it has the correct emails
       cy.get('[data-cy="invite-modal"]').should('be.visible')
