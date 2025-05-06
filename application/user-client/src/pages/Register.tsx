@@ -14,7 +14,7 @@ import {
   Typography,
 } from '@mui/material'
 import { useForm, useFieldArray } from 'react-hook-form'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../auth'
 import { RegisterParticipantRequest, RegisterParticipantResponse } from '@common/types/api/auth'
 import { checkPasswordStrength } from '@common/src/PasswordStrength'
@@ -47,6 +47,8 @@ interface FormValues {
 }
 
 export default function Register() {
+  const { inviteId } = useParams<{ inviteId: string }>()
+
   const {
     register,
     control,
@@ -89,8 +91,7 @@ export default function Register() {
       },
       dependents: data['dependents'],
     }
-
-    fetch(import.meta.env.VITE_BACKEND_URL + '/auth/register/participant', {
+    fetch(import.meta.env.VITE_BACKEND_URL + `/auth/register/participants/${inviteId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(reqData),

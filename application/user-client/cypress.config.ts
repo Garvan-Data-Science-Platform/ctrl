@@ -6,6 +6,7 @@ import {
   readPdf,
   deleteFile,
   updateLogo,
+  getInviteId,
 } from 'common/testing/TestHelpers'
 import { PASSWORD_RESET_USER_EMAIL } from 'common/testing/seed'
 import { defineConfig } from 'cypress'
@@ -40,6 +41,9 @@ export default defineConfig({
         },
         updateLogo(filePath: string) {
           return updateLogo(filePath)
+        },
+        getInviteIdtask({ email, studyId }) {
+          return getInviteId(email, studyId)
         },
       })
     },

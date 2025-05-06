@@ -13,6 +13,7 @@ import Register from './pages/Register'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import ErrorPage from './pages/Error'
+import RegisterErrorPage from './pages/RegisterError'
 
 const router = createBrowserRouter([
   {
@@ -58,8 +59,17 @@ const router = createBrowserRouter([
     element: <Login />,
   },
   {
-    path: '/register',
-    element: <Register />,
+    errorElement: <RegisterErrorPage />,
+    children: [
+      {
+        path: '/register/:inviteId',
+        element: <Register />,
+      },
+      {
+        path: '/register',
+        element: <RegisterErrorPage />,
+      },
+    ],
   },
   {
     path: '/forgot',

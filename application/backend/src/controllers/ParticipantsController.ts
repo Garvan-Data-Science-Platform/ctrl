@@ -43,7 +43,7 @@ import { auditLog } from '../middlewares/AuditLog'
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 @Middlewares(auditLog)
 export class ParticipantsController extends Controller {
-  participantRepo = prisma.surveyParticipant
+  svaRepo = prisma.surveyVersionAnswers
   profileRepo = prisma.participantProfile
 
   /**
@@ -53,7 +53,7 @@ export class ParticipantsController extends Controller {
    */
   @Get('/')
   public async getParticipants(): Promise<GetParticipantsResponse> {
-    const unique_participants = await this.participantRepo.findMany({
+    const unique_participants = await this.svaRepo.findMany({
       distinct: ['profileId'],
       select: {
         id: true,
@@ -73,7 +73,7 @@ export class ParticipantsController extends Controller {
     const participants: GetParticipantsResponse['data'] = []
 
     for (const p of unique_participants) {
-      const p_answers = await this.participantRepo.findMany({
+      const p_answers = await this.svaRepo.findMany({
         where: { profileId: p.profile.id },
         select: { answers: true, version: { select: { id: true, updatedAt: true } }, id: true },
         orderBy: { versionId: 'asc' },
@@ -122,7 +122,7 @@ export class ParticipantsController extends Controller {
     const profileDataResponse = await new ProfilesController().getParticipantProfileByID(profileId)
     const profileData = profileDataResponse.data
 
-    const p_answers = await this.participantRepo.findMany({
+    const p_answers = await this.svaRepo.findMany({
       where: { profileId: profileId },
       select: { answers: true, version: { select: { id: true, updatedAt: true } }, id: true },
       orderBy: { versionId: 'asc' },
@@ -146,7 +146,7 @@ export class ParticipantsController extends Controller {
   }
 }
 
-@Route('invites')
+@Route('studies/{studyId}')
 @Tags('Invites')
 @Security('jwt', ['OrganisationAdmin'])
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
@@ -157,18 +157,24 @@ export class InvitesController extends Controller {
   /**
    * List all non-accepted invites
    *
-   * @summary List all non-accepted invites
+   * @summary List all non-accepted invites for a study
    */
-  @Get('/')
+  @Get('/invites')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
-  public async getInvites(): Promise<GetInvitesResponse> {
-    const invites = await this.invitesRepo.findMany({ where: { status: { not: 'ACCEPTED' } } })
+  public async getInvites(@Path() studyId: number): Promise<GetInvitesResponse> {
+    const invites = await this.invitesRepo.findMany({
+      where: {
+        status: { not: 'ACCEPTED' },
+        studyId: studyId,
+      },
+    })
 
     // Map to response
     const data = invites.map((invite) => ({
       id: invite.id,
       email: invite.email,
+      studyId: invite.studyId,
       createdAt: invite.createdAt.toISOString(),
       expiresAt: invite.expiresAt.toISOString(),
       sentAt: invite.sentAt ? invite.sentAt.toISOString() : undefined,
@@ -181,17 +187,19 @@ export class InvitesController extends Controller {
   /**
    * Create invites
    *
-   * @summary Creates invites for a list of participant emails sends it to them
+   * @summary Creates invites for a list of participant emails and sends it to them
+   *
    */
-  @Post('/')
+  @Post('/invites')
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
   public async createInvites(
+    @Path() studyId: number,
     @Body() bodyRequest: InviteParticipantsRequest,
   ): Promise<InviteParticipantsResponse> {
     const { subjectText, explanatoryText } = bodyRequest
 
     await prisma.study.update({
-      where: { id: 1 },
+      where: { id: studyId },
       data: { inviteEmailSubject: subjectText, inviteEmailText: explanatoryText },
     })
 
@@ -200,7 +208,10 @@ export class InvitesController extends Controller {
 
     // Fetch existing invites
     const existingInvites = await this.invitesRepo.findMany({
-      where: { email: { in: emails } },
+      where: {
+        email: { in: emails },
+        studyId: studyId,
+      },
     })
 
     const newEmails = emails.filter(
@@ -228,7 +239,7 @@ export class InvitesController extends Controller {
             return
           }
 
-          const emailSent = await this.sendInvite(invite.email)
+          const emailSent = await this.sendInvite(invite.email, studyId)
           if (!emailSent) {
             logger.error(`Failed to send email to ${invite.email}`)
             await this.invitesRepo.update({
@@ -274,7 +285,7 @@ export class InvitesController extends Controller {
     if (newEmails.length > 0) {
       const emailResults = await Promise.all(
         newEmails.map(async (email) => {
-          const success = await this.sendInvite(email)
+          const success = await this.sendInvite(email, studyId)
           if (!success) {
             logger.error(`Failed to send email to ${email}`)
             failedEmails.push(email)
@@ -296,12 +307,14 @@ export class InvitesController extends Controller {
         data: [
           ...successfulEmails.map((email) => ({
             email,
+            studyId: studyId,
             expiresAt,
             sentAt: new Date(),
             status: InviteStatus.PENDING,
           })),
           ...newFailedEmails.map((email) => ({
             email,
+            studyId: studyId,
             expiresAt,
             status: InviteStatus.FAILED_TO_SEND,
           })),
@@ -326,22 +339,32 @@ export class InvitesController extends Controller {
   }
 
   /**
-   * Resend invite by ID
+   * Resend invite by ID and StudyID
    *
-   * @summary Resend invite
+   * @summary Resend invite by ID and StudyID
    */
-  @Post('/resend/{inviteId}')
-  public async resendInviteById(@Path() inviteId: number): Promise<void> {
+  @Post('/invites/{inviteId}/resend')
+  public async resendInviteById(
+    @Path() studyId: number,
+    @Path() inviteId: string, // String because this is uuid
+  ): Promise<void> {
     // Get all pending invitations
     const pendingInvite = await this.invitesRepo.findUniqueOrThrow({
-      where: { id: inviteId, status: { not: InviteStatus.ACCEPTED } },
+      where: {
+        id: inviteId,
+        studyId: studyId,
+        status: { not: InviteStatus.ACCEPTED },
+      },
       select: { id: true, email: true },
     })
 
     // Send email and check if failed
-    if (!(await this.sendInvite(pendingInvite.email))) {
+    if (!(await this.sendInvite(pendingInvite.email, studyId))) {
       await this.invitesRepo.update({
-        where: { id: pendingInvite.id },
+        where: {
+          id: pendingInvite.id,
+          studyId: studyId,
+        },
         data: {
           status: InviteStatus.FAILED_TO_SEND,
         },
@@ -352,21 +375,27 @@ export class InvitesController extends Controller {
     logger.info(`Resent email to pending invite ${pendingInvite.email}`)
 
     await this.invitesRepo.update({
-      where: { id: inviteId },
+      where: {
+        id: inviteId,
+        studyId: studyId,
+      },
       data: { status: InviteStatus.PENDING, sentAt: new Date() },
     })
   }
 
   /**
-   * Resend all pending invites
+   * Resend all pending invites for a study
    *
-   * @summary Resend invites that are currently pending
+   * @summary Resend invites that are currently pending for a study
    */
-  @Post('/resend')
-  public async resendPendingInvites(): Promise<void> {
+  @Post('/invites/resend')
+  public async resendPendingInvites(@Path() studyId: number): Promise<void> {
     // Get all pending invitations
     const pendingEmails = await this.invitesRepo.findMany({
-      where: { status: InviteStatus.PENDING },
+      where: {
+        status: InviteStatus.PENDING,
+        studyId: studyId,
+      },
       select: { email: true },
     })
 
@@ -375,9 +404,9 @@ export class InvitesController extends Controller {
     // Send emails
     const emailResults = await Promise.all(
       pendingEmailList.map(async (email) => {
-        const success = await this.sendInvite(email)
+        const success = await this.sendInvite(email, studyId)
         if (!success) {
-          logger.error(`Failed to send email to ${email}`)
+          logger.error(`Failed to send email to ${email} for ${studyId}`)
         }
         return { email, success }
       }),
@@ -394,6 +423,7 @@ export class InvitesController extends Controller {
     // Update invites with appropriate status
     await this.invitesRepo.updateMany({
       where: {
+        studyId: studyId,
         email: { in: successfulEmails },
         status: InviteStatus.PENDING,
       },
@@ -405,6 +435,7 @@ export class InvitesController extends Controller {
 
     await this.invitesRepo.updateMany({
       where: {
+        studyId: studyId,
         email: { in: failedEmails },
         status: InviteStatus.PENDING,
       },
@@ -414,49 +445,68 @@ export class InvitesController extends Controller {
     })
 
     // Log sent emails
-    logger.info(`Resent ${successfulEmails.length} emails to pending invites`)
-    logger.info(`Failed to send ${failedEmails.length} emails to pending invites`)
+    logger.info(
+      `Resent ${successfulEmails.length} emails to pending invites for studyId: ${studyId}`,
+    )
+    logger.info(
+      `Failed to send ${failedEmails.length} emails to pending invites for studyId: ${studyId}`,
+    )
   }
 
   /**
    * Revoke invite
    *
-   * @summary Revoke an invite by id
+   * @summary Revoke an invite by inviteId and studyId
    */
-  @Post('/revoke/{inviteID}')
+  @Post('/invites/{inviteId}/revoke')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  public async revokeInvite(@Path() inviteID: number): Promise<void> {
-    const invite = await this.invitesRepo.findFirst({ where: { id: inviteID } })
+  public async revokeInvite(@Path() studyId: number, @Path() inviteId: string): Promise<void> {
+    const invite = await this.invitesRepo.findFirst({
+      where: {
+        id: inviteId,
+        studyId: studyId,
+      },
+    })
 
     if (!invite) {
       throw new NotFoundError('Invite not found')
     }
 
     await this.invitesRepo.update({
-      where: { id: invite.id },
+      where: {
+        id: invite.id,
+        studyId: studyId,
+      },
       data: { status: InviteStatus.REVOKED },
     })
   }
+
   /**
    * Get invite email subject and text
    *
    * @summary Get invite email subject and text
    */
-  @Get('/text')
+  //TODO: make invite register link include inviteId uuid string
+  @Get('/invites/text')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  public async getInviteText(): Promise<GetInviteTextResponse> {
+  public async getInviteText(@Path() studyId: number): Promise<GetInviteTextResponse> {
     const inviteText = await prisma.study.findUniqueOrThrow({
-      where: { id: 1 },
+      where: { id: studyId },
       select: { inviteEmailSubject: true, inviteEmailText: true },
     })
 
     return inviteText
   }
 
-  private async sendInvite(email: string): Promise<boolean> {
+  //TODO: make registerLink include inviteId uuid string
+  private async sendInvite(email: string, studyId: number): Promise<boolean> {
     try {
       const registerLink = `${process.env.HOSTNAME}/register`
-      const study = await prisma.study.findFirstOrThrow({})
+      const study = await prisma.study.findFirstOrThrow({
+        where: {
+          id: studyId,
+        },
+      })
       const subjectText = study?.inviteEmailSubject
       const explanatoryText = study?.inviteEmailText
       const mailerTransporter = await createMailerTransporter()

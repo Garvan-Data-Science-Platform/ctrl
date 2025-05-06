@@ -11,6 +11,7 @@ import {
   ParticipantType,
   StateTerritory,
 } from 'common/types/api/users/ParticipantProfile'
+import prisma from '../../src/PrismaClient'
 import { Role } from '@prisma/client'
 
 const api = new Api()
@@ -117,8 +118,15 @@ describe('Auth', () => {
       dependents: [],
     }
 
+    const participantInviteId = await prisma.invite.findFirstOrThrow({
+      where: {
+        email: participantRequest.email,
+        studyId: 1, // From application/common/testing/seed.ts
+      },
+    })
+
     const participantResponse = await request(app)
-      .post('/auth/register/participant')
+      .post(`/auth/register/participants/${participantInviteId.id}`)
       .send(participantRequest)
     expect(participantResponse.status).toEqual(201)
 

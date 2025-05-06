@@ -82,10 +82,10 @@ describe('InvitesController', () => {
     api.stop()
   })
 
-  describe('GET /invites', () => {
-    it('should return a list of all existing invites', async () => {
+  describe('GET /studies/{studyId}/invites', () => {
+    it('should return a list of all existing invites for a study', async () => {
       const response = await request(app)
-        .get('/invites')
+        .get('/studies/1/invites')
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
       expect(response.status).toBe(200)
 
@@ -100,12 +100,12 @@ describe('InvitesController', () => {
     })
   })
 
-  describe('POST /invites', () => {
-    it('should create new invites from a list of emails, return data about how many new invites were created, and send the invites to their emails', async () => {
+  describe('POST /studies/{studyId}/invites', () => {
+    it('should create new study invites from a list of emails, return data about how many new invites were created, and send the invites to their emails', async () => {
       const emails = ['invite5@new.com', 'invite6@new.com']
 
       const response = await request(app)
-        .post('/invites')
+        .post('/studies/1/invites')
         .send({ emails, subjectText: 'Subject Text', explanatoryText: 'Explanatory Text' })
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
@@ -124,13 +124,20 @@ describe('InvitesController', () => {
         expect(email.html).toContain('Explanatory Text')
       })
 
-      const study = await prisma.study.findFirstOrThrow({})
+      const study = await prisma.study.findFirstOrThrow({
+        where: { id: 1 },
+      })
       expect(study.inviteEmailSubject).toBe('Subject Text')
       expect(study.inviteEmailText).toBe('Explanatory Text')
 
       // Check invites were created
       for (const email of emails) {
-        const createdInvite = await prisma.invite.findUnique({ where: { email } })
+        const createdInvite = await prisma.invite.findUnique({
+          where: {
+            email,
+            studyId: 1,
+          },
+        })
         expect(createdInvite).toBeDefined()
 
         // See link about non-null assertion operator https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-0.html#non-null-assertion-operator
@@ -145,7 +152,10 @@ describe('InvitesController', () => {
     it('should change a status REVOKED invite to status PENDING and reset the expiry', async () => {
       // Check the status REVOKED invite
       const invite = await prisma.invite.findUnique({
-        where: { email: 'invite3@revoked.com' },
+        where: {
+          email: 'invite3@revoked.com',
+          studyId: 1,
+        },
       })
 
       expect(invite).toBeDefined()
@@ -155,7 +165,7 @@ describe('InvitesController', () => {
 
       // Create invite for revoked
       const response = await request(app)
-        .post('/invites')
+        .post('/studies/1/invites')
         .send({ emails: ['invite3@revoked.com'], subjectText: 'ABC', explanatoryText: '123' })
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
@@ -174,7 +184,10 @@ describe('InvitesController', () => {
 
       // Check invite status was changed to PENDING
       const updatedInvite = await prisma.invite.findUnique({
-        where: { email: 'invite3@revoked.com' },
+        where: {
+          email: 'invite3@revoked.com',
+          studyId: 1,
+        },
       })
       expect(updatedInvite).toBeDefined()
 
@@ -189,7 +202,10 @@ describe('InvitesController', () => {
 
       // Check the status REVOKED invite
       const invite = await prisma.invite.findUnique({
-        where: { email: emailPendingInvite },
+        where: {
+          email: emailPendingInvite,
+          studyId: 1,
+        },
       })
 
       expect(invite).toBeDefined()
@@ -198,7 +214,7 @@ describe('InvitesController', () => {
       const oldExpiresAt = invite!.expiresAt
 
       const response = await request(app)
-        .post('/invites')
+        .post('/studies/1/invites')
         .send({ emails: [emailPendingInvite], subjectText: 'ABC', explanatoryText: '123' })
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
@@ -217,7 +233,10 @@ describe('InvitesController', () => {
 
       // Check invite status was is still PENDING
       const updatedInvite = await prisma.invite.findUnique({
-        where: { email: emailPendingInvite },
+        where: {
+          email: emailPendingInvite,
+          studyId: 1,
+        },
       })
 
       expect(updatedInvite).toBeDefined()
@@ -236,7 +255,7 @@ describe('InvitesController', () => {
       const emailAcceptedInvite = 'invite2@accepted.com'
 
       const response = await request(app)
-        .post('/invites')
+        .post('/studies/1/invites')
         .send({ emails: [emailAcceptedInvite], subjectText: 'ABC', explanatoryText: '123' })
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
@@ -250,7 +269,10 @@ describe('InvitesController', () => {
 
       // Check invite status was is still ACCEPTED
       const updatedInvite = await prisma.invite.findUnique({
-        where: { email: emailAcceptedInvite },
+        where: {
+          email: emailAcceptedInvite,
+          studyId: 1,
+        },
       })
 
       expect(updatedInvite).toBeDefined()
@@ -270,7 +292,7 @@ describe('InvitesController', () => {
       ]
 
       const response = await request(app)
-        .post('/invites')
+        .post('/studies/1/invites')
         .send({
           emails: emails.map((e) => e.email),
           subjectText: 'Subject Text',
@@ -294,7 +316,12 @@ describe('InvitesController', () => {
 
       // Verify invites were still created in database despite email failure
       for (const e of emails) {
-        const createdInvite = await prisma.invite.findUnique({ where: { email: e.email } })
+        const createdInvite = await prisma.invite.findUnique({
+          where: {
+            email: e.email,
+            studyId: 1,
+          },
+        })
         expect(createdInvite).toBeDefined()
         expect(createdInvite!.status).toBe(e.expectedStatus)
       }
@@ -304,7 +331,7 @@ describe('InvitesController', () => {
     })
   })
 
-  describe('POST /invites/resend', () => {
+  describe('POST /studies/{studyId}/invites/resend', () => {
     it('should resend all invites of status PENDING and reset their expiry', async () => {
       const emailPendingInvite = 'invite1@pending.com'
 
@@ -314,7 +341,7 @@ describe('InvitesController', () => {
       })
 
       const response = await request(app)
-        .post('/invites/resend')
+        .post('/studies/1/invites/resend')
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       expect(response.status).toBe(204)
@@ -331,42 +358,48 @@ describe('InvitesController', () => {
     })
   })
 
-  describe('POST /invites/revoke', () => {
+  describe('POST /studies/{studyId}/invites/{inviteId}/revoke', () => {
     it('should change invites status from PENDING to REVOKED given email(s)', async () => {
       const emailPendingInvite = 'invite1@pending.com'
 
       const invite = await prisma.invite.findUnique({
-        where: { email: emailPendingInvite },
+        where: {
+          email: emailPendingInvite,
+          studyId: 1,
+        },
       })
 
       expect(invite).toBeDefined()
       expect(invite!.status).toBe('PENDING')
 
       const response = await request(app)
-        .post(`/invites/revoke/${invite!.id}`)
+        .post(`/studies/1/invites/${invite!.id}/revoke`)
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       expect(response.status).toBe(204)
 
       // Check invite status was changed to REVOKED
       const updatedInvite = await prisma.invite.findUnique({
-        where: { email: emailPendingInvite },
+        where: {
+          email: emailPendingInvite,
+          studyId: 1,
+        },
       })
       expect(updatedInvite).toBeDefined()
       expect(updatedInvite!.status).toBe('REVOKED')
     })
 
     it('should return error if revoking an invite that does not exist', async () => {
+      const fakeInviteId = 'notValidUuid'
       const response = await request(app)
-        .post('/invites/revoke')
-        .send({ inviteId: expectedNumberOfInvites + 1 })
+        .post(`/studies/1/invites/${fakeInviteId}/revoke`)
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       expect(response.status).toBe(404)
     })
   })
 
-  describe('GET /invites/text', () => {
+  describe('GET /studies/{studyId}/invites/text', () => {
     it('should return current invites text', async () => {
       await prisma.study.update({
         where: { id: 1 },
@@ -374,7 +407,7 @@ describe('InvitesController', () => {
       })
 
       const response = await request(app)
-        .get('/invites/text')
+        .get('/studies/1/invites/text')
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       expect(response.body).toStrictEqual({

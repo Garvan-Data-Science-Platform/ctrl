@@ -16,6 +16,7 @@ import {
   StateTerritory,
 } from 'common/types/api/users/ParticipantProfile'
 import { GetParticipantsResponse } from 'common/types/api/participants'
+import prisma from '../../src/PrismaClient'
 import { ORG_ADMIN_ID } from 'common/testing/seed'
 
 const api = new Api()
@@ -35,7 +36,7 @@ describe('Survey tests', () => {
     api.stop()
   })
 
-  it('User registers and sees current survey version', async () => {
+  it('User registers, is added to a study, and sees current survey version', async () => {
     const reqBody: RegisterParticipantRequest = {
       addressLine: 'abc',
       dob: '1990-01-01',
@@ -52,11 +53,19 @@ describe('Survey tests', () => {
       suburb: 'ABCKDF',
       dependents: [],
     }
-    const regRes = await request(app).post('/auth/register/participant').send(reqBody)
+
+    const invite = await prisma.invite.findUniqueOrThrow({
+      where: {
+        email: reqBody.email,
+        studyId: 1,
+      },
+    })
+
+    const regRes = await request(app).post(`/auth/register/participants/${invite.id}`).send(reqBody)
     expect(regRes.statusCode).toBe(201)
 
     const res = await request(app)
-      .get('/surveys/steps/1')
+      .get('/studies/1/survey-steps')
       .set({ authorization: `Bearer ${participantToken}` })
     expect(res.statusCode).toBe(200)
     const data = res.body as GetUserSurveyStepsResponse
@@ -65,7 +74,7 @@ describe('Survey tests', () => {
     expect(data.data[1].status).toBe('review_required')
 
     const res2 = await request(app)
-      .get('/surveys/step/1/1')
+      .get('/studies/1/survey-steps/1')
       .set({ authorization: `Bearer ${participantToken}` })
     const data2 = res2.body as GetUserSurveyStepResponse
     expect(data2.data.total_steps).toBe(2)
@@ -76,14 +85,14 @@ describe('Survey tests', () => {
     const reqBody: UpdateSurveyAnswersRequest = { step: 0, data: [] }
 
     const res = await request(app)
-      .post('/surveys/answers/')
+      .post('/studies/1/survey-answers')
       .set({ authorization: `Bearer ${participantToken}` })
       .send(reqBody)
 
     expect(res.statusCode).toBe(204)
 
     const res2 = await request(app)
-      .get('/surveys/steps/0')
+      .get('/studies/1/survey-steps') // Not sure why this was previously study 0
       .set({ authorization: `Bearer ${participantToken}` })
     expect(res2.statusCode).toBe(200)
     const data = res2.body as GetUserSurveyStepsResponse
@@ -93,7 +102,7 @@ describe('Survey tests', () => {
     expect(data.data[1].last_updated).toBeUndefined()
 
     const res3 = await request(app)
-      .get('/surveys/responses/5') //Participant 3 corresponds to the latests survey
+      .get('/studies/1/surveys/current/participants/1/answers') //All the seed ParticipantProfiles have ids like 98,99
       .set({ authorization: `Bearer ${adminToken}` })
     expect(res3.statusCode).toBe(200)
 
@@ -141,18 +150,18 @@ describe('Survey tests', () => {
     }
 
     const res1 = await request(app)
-      .patch('/surveys/2')
+      .patch('/studies/1/surveys/2')
       .set({ authorization: `Bearer ${adminToken}` })
       .send(reqBody)
     expect(res1.statusCode).toBe(204)
 
     const resPublish = await request(app)
-      .post('/surveys/publish/2')
+      .post('/studies/1/surveys/2/publish')
       .set({ authorization: `Bearer ${adminToken}` })
     expect(resPublish.statusCode).toBe(204)
 
     const res2 = await request(app)
-      .get('/surveys/steps/0')
+      .get('/studies/1/survey-steps')
       .set({ authorization: `Bearer ${participantToken}` })
     expect(res2.statusCode).toBe(200)
     const data = res2.body as GetUserSurveyStepsResponse
@@ -162,7 +171,7 @@ describe('Survey tests', () => {
     expect(data.data[1].last_updated).toBeUndefined()
 
     const res3 = await request(app)
-      .get('/surveys/responses/7')
+      .get('/studies/1/surveys/current/participants/99/answers')
       .set({ authorization: `Bearer ${adminToken}` })
     expect(res3.statusCode).toBe(200)
 
@@ -186,7 +195,7 @@ describe('Survey tests', () => {
     const reqBody: UpdateSurveyAnswersRequest = { step: 0, data: [false, 'Choice 1b'] }
 
     await request(app)
-      .post('/surveys/answers/')
+      .post('/studies/1/survey-answers')
       .set({ authorization: `Bearer ${participantToken}` })
       .send(reqBody)
 
@@ -202,7 +211,7 @@ describe('Survey tests', () => {
     const reqBody: UpdateSurveyAnswersRequest = { step: 1, data: [false, true] }
 
     await request(app)
-      .post('/surveys/answers/')
+      .post('/studies/1/survey-answers')
       .set({ authorization: `Bearer ${participantToken}` })
       .send(reqBody)
 
@@ -214,7 +223,7 @@ describe('Survey tests', () => {
     expect(data2.data[4].answers[1].status).toBe('complete')
 
     const res3 = await request(app)
-      .get('/surveys/steps/0')
+      .get('/studies/1/survey-steps')
       .set({ authorization: `Bearer ${participantToken}` })
     expect(res3.statusCode).toBe(200)
     const data3 = res3.body as GetUserSurveyStepsResponse

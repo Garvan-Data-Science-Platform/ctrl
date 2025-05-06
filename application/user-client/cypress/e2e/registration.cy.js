@@ -26,21 +26,33 @@ describe('registration', () => {
   }
 
   it('open registration page and register a user', () => {
-    cy.visit('/register')
+    cy.task('getInviteIdtask', { email: 'invite1@pending.com', studyId: 1 })
+      .as('inviteId')
+      .then((inviteId) => {
+        cy.visit(`/register/${inviteId}`)
+      })
     fillValid()
     cy.get('[data-cy="reg-button"]').click()
     cy.contains('Welcome FIRST').should('exist')
   })
 
   it('Enter some fields, try to register and empty field is focused', () => {
-    cy.visit('/register')
+    cy.task('getInviteIdtask', { email: 'invite1@pending.com', studyId: 1 })
+      .as('inviteId')
+      .then((inviteId) => {
+        cy.visit(`/register/${inviteId}`)
+      })
     cy.get('[data-cy="reg-first"]').type('BOB')
     cy.get('[data-cy="reg-button"]').click()
     cy.get('[data-cy="reg-last"] input').should('be.focused')
   })
 
   it('Input some invalid data and get correct error messages', () => {
-    cy.visit('/register')
+    cy.task('getInviteIdtask', { email: 'invite1@pending.com', studyId: 1 })
+      .as('inviteId')
+      .then((inviteId) => {
+        cy.visit(`/register/${inviteId}`)
+      })
     cy.get('[data-cy="reg-password"]').type('ABC')
     cy.get('[data-cy="reg-confirm-password"]').type('A')
     cy.get('[data-cy="reg-postcode"]').type('AB13')
@@ -54,7 +66,7 @@ describe('registration', () => {
   })
 
   it('Attempt to register existing email (i.e. no invite) and get correct error message', () => {
-    cy.visit('/register')
+    cy.visit('/register/not-a-real-inviteId')
     fillValid()
     const testEmail = 'test1@example.com'
     cy.get('[data-cy="reg-email"]').clear()
@@ -64,7 +76,11 @@ describe('registration', () => {
   })
 
   it('Add dependents, check errors and valid submission', () => {
-    cy.visit('/register')
+    cy.task('getInviteIdtask', { email: 'invite1@pending.com', studyId: 1 })
+      .as('inviteId')
+      .then((inviteId) => {
+        cy.visit(`/register/${inviteId}`)
+      })
     fillValid()
     cy.get('[data-cy="add-dependent"]').click()
     cy.get('[data-cy="reg-button"]').click()

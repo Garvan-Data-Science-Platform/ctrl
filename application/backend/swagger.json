@@ -325,6 +325,10 @@
             "type": "number",
             "format": "double"
           },
+          "versionNumber": {
+            "type": "number",
+            "format": "double"
+          },
           "published_date": {
             "type": "string"
           },
@@ -333,6 +337,7 @@
           }
         },
         "required": [
+          "versionNumber",
           "status"
         ],
         "type": "object",
@@ -588,7 +593,7 @@
         "type": "object",
         "additionalProperties": false
       },
-      "GetSurveyVersionByIdResponse": {
+      "GetSurveyVersionByVersionNumberResponse": {
         "properties": {
           "data": {
             "$ref": "#/components/schemas/SurveyVersion"
@@ -853,6 +858,98 @@
         "required": [
           "data"
         ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "Study": {
+        "description": "Model Study",
+        "properties": {
+          "inviteEmailText": {
+            "type": "string"
+          },
+          "inviteEmailSubject": {
+            "type": "string"
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "number",
+            "format": "double"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "inviteEmailText",
+          "inviteEmailSubject",
+          "deleted",
+          "id",
+          "name"
+        ],
+        "type": "object"
+      },
+      "GetAllStudiesResponse": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/Study"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "GetStudyByIdResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Study"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "CreateStudyResponse": {
+        "properties": {
+          "id": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "CreateStudyRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UpdateStudyRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
         "type": "object",
         "additionalProperties": false
       },
@@ -1458,18 +1555,22 @@
                 "createdAt": {
                   "type": "string"
                 },
+                "studyId": {
+                  "type": "number",
+                  "format": "double"
+                },
                 "email": {
                   "type": "string"
                 },
                 "id": {
-                  "type": "number",
-                  "format": "double"
+                  "type": "string"
                 }
               },
               "required": [
                 "inviteStatus",
                 "expiresAt",
                 "createdAt",
+                "studyId",
                 "email",
                 "id"
               ],
@@ -1554,7 +1655,9 @@
           "emails": [
             "john.doe@email.com",
             "jane@email.com"
-          ]
+          ],
+          "subjectText": "Invitation to Study",
+          "explanatoryText": "You have been invited to participate in this Study. Please click this link to provide consent."
         }
       },
       "GetInviteTextResponse": {
@@ -1576,44 +1679,6 @@
       "Organisation": {
         "description": "Model Organisation",
         "properties": {
-          "logo": {
-            "type": "string",
-            "format": "byte",
-            "nullable": true
-          },
-          "redcapURL": {
-            "type": "string",
-            "nullable": true
-          },
-          "redcapToken": {
-            "type": "string",
-            "nullable": true
-          },
-          "secondaryColour": {
-            "type": "string",
-            "nullable": true
-          },
-          "primaryColour": {
-            "type": "string",
-            "nullable": true
-          },
-          "mailerPassword": {
-            "type": "string",
-            "nullable": true
-          },
-          "mailerUser": {
-            "type": "string",
-            "nullable": true
-          },
-          "mailerPort": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "mailerHost": {
-            "type": "string",
-            "nullable": true
-          },
           "updatedAt": {
             "type": "string",
             "format": "date-time"
@@ -1631,15 +1696,6 @@
           }
         },
         "required": [
-          "logo",
-          "redcapURL",
-          "redcapToken",
-          "secondaryColour",
-          "primaryColour",
-          "mailerPassword",
-          "mailerUser",
-          "mailerPort",
-          "mailerHost",
           "updatedAt",
           "createdAt",
           "id",
@@ -2020,10 +2076,15 @@
           "id": {
             "type": "number",
             "format": "double"
+          },
+          "versionNumber": {
+            "type": "number",
+            "format": "double"
           }
         },
         "required": [
-          "id"
+          "id",
+          "versionNumber"
         ],
         "type": "object",
         "additionalProperties": false
@@ -2634,7 +2695,7 @@
         }
       }
     },
-    "/surveys": {
+    "/studies/{studyId}/surveys": {
       "get": {
         "operationId": "GetAllSurveys",
         "responses": {
@@ -2655,8 +2716,8 @@
             "description": "Internal Server Error"
           }
         },
-        "description": "Get all Surveys",
-        "summary": "Get all Surveys",
+        "description": "Get all Survey versions",
+        "summary": "Get all Survey versions",
         "tags": [
           "Surveys"
         ],
@@ -2667,19 +2728,29 @@
             ]
           }
         ],
-        "parameters": []
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
       }
     },
-    "/surveys/{surveyID}": {
+    "/studies/{studyId}/surveys/{versionNumber}": {
       "get": {
-        "operationId": "GetSurveyVersionById",
+        "operationId": "GetSurveyVersionByVersionNumber",
         "responses": {
           "200": {
             "description": "Ok",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetSurveyVersionByIdResponse"
+                  "$ref": "#/components/schemas/GetSurveyVersionByVersionNumberResponse"
                 }
               }
             }
@@ -2694,7 +2765,7 @@
             "description": "Internal Server Error"
           }
         },
-        "description": "Gets a Specific Survey using their ID",
+        "description": "Gets a specific survey version for a study using their VersionNumber",
         "summary": "Get Specific Survey",
         "tags": [
           "Surveys"
@@ -2707,7 +2778,16 @@
         "parameters": [
           {
             "in": "path",
-            "name": "surveyID",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "versionNumber",
             "required": true,
             "schema": {
               "format": "double",
@@ -2715,11 +2795,9 @@
             }
           }
         ]
-      }
-    },
-    "/surveys/participant/{surveyId}": {
-      "post": {
-        "operationId": "AddParticipant",
+      },
+      "patch": {
+        "operationId": "UpdateSurvey",
         "responses": {
           "204": {
             "description": "No content"
@@ -2730,11 +2808,21 @@
           "404": {
             "description": "Not Found"
           },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal Server Error"
           }
         },
-        "summary": "Add participant to survey",
+        "summary": "Update draft survey by versionNumber",
         "tags": [
           "Surveys"
         ],
@@ -2748,17 +2836,36 @@
         "parameters": [
           {
             "in": "path",
-            "name": "surveyId",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "versionNumber",
             "required": true,
             "schema": {
               "format": "double",
               "type": "number"
             }
           }
-        ]
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSurveyRequest"
+              }
+            }
+          }
+        }
       }
     },
-    "/surveys/steps/{study}": {
+    "/studies/{studyId}/survey-steps": {
       "get": {
         "operationId": "GetUserSurveySteps",
         "responses": {
@@ -2795,7 +2902,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "study",
+            "name": "studyId",
             "required": true,
             "schema": {
               "format": "double",
@@ -2805,7 +2912,7 @@
         ]
       }
     },
-    "/surveys/step/{study}/{step}": {
+    "/studies/{studyId}/survey-steps/{stepId}": {
       "get": {
         "operationId": "GetUserSurveyStep",
         "responses": {
@@ -2842,7 +2949,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "study",
+            "name": "studyId",
             "required": true,
             "schema": {
               "format": "double",
@@ -2851,7 +2958,7 @@
           },
           {
             "in": "path",
-            "name": "step",
+            "name": "stepId",
             "required": true,
             "schema": {
               "format": "double",
@@ -2861,7 +2968,7 @@
         ]
       }
     },
-    "/surveys/responses/current": {
+    "/studies/{studyId}/survey-answers": {
       "get": {
         "operationId": "GetUserResponses",
         "responses": {
@@ -2886,44 +2993,7 @@
           }
         },
         "description": "Get responses for current user",
-        "summary": "Get all responses for current user by token",
-        "tags": [
-          "Surveys"
-        ],
-        "security": [
-          {
-            "jwt": []
-          }
-        ],
-        "parameters": []
-      }
-    },
-    "/surveys/responses/all/{versionId}": {
-      "get": {
-        "operationId": "GetAllResponses",
-        "responses": {
-          "200": {
-            "description": "Ok",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetAllResponsesResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not Found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "description": "Get all responses for a survey version",
-        "summary": "Get all responses of all participants for a survey version",
+        "summary": "Get current answers for current user by token",
         "tags": [
           "Surveys"
         ],
@@ -2935,7 +3005,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "versionId",
+            "name": "studyId",
             "required": true,
             "schema": {
               "format": "double",
@@ -2943,58 +3013,7 @@
             }
           }
         ]
-      }
-    },
-    "/surveys/responses/{participantId}": {
-      "get": {
-        "operationId": "GetResponsesById",
-        "responses": {
-          "200": {
-            "description": "Ok",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetResponsesByIdResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not Found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "description": "Get responses",
-        "summary": "Get all responses for a survey participant",
-        "tags": [
-          "Surveys"
-        ],
-        "security": [
-          {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "participantId",
-            "required": true,
-            "schema": {
-              "format": "double",
-              "type": "number"
-            }
-          }
-        ]
-      }
-    },
-    "/surveys/answers": {
+      },
       "post": {
         "operationId": "UpdateSurveyAnswers",
         "responses": {
@@ -3022,7 +3041,7 @@
           }
         },
         "description": "Update survey answers",
-        "summary": "Update a Survey",
+        "summary": "Update survey answers for current user by token",
         "tags": [
           "Surveys"
         ],
@@ -3031,7 +3050,17 @@
             "jwt": []
           }
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -3044,12 +3073,19 @@
         }
       }
     },
-    "/surveys/{surveyId}": {
-      "patch": {
-        "operationId": "UpdateSurvey",
+    "/studies/{studyId}/surveys/{versionNumber}/participants/answers": {
+      "get": {
+        "operationId": "GetAllResponses",
         "responses": {
-          "204": {
-            "description": "No content"
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllResponsesResponse"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -3057,21 +3093,68 @@
           "404": {
             "description": "Not Found"
           },
-          "422": {
-            "description": "Validation Failed",
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Get all responses for a survey version number",
+        "summary": "Get all participants answers for a survey version",
+        "tags": [
+          "Surveys"
+        ],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "versionNumber",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/studies/{studyId}/surveys/current/participants/{participantId}/answers": {
+      "get": {
+        "operationId": "GetResponsesById",
+        "responses": {
+          "200": {
+            "description": "Ok",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                  "$ref": "#/components/schemas/GetResponsesByIdResponse"
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
           },
           "500": {
             "description": "Internal Server Error"
           }
         },
-        "summary": "Update draft survey",
+        "description": "Get responses",
+        "summary": "Get current answers for a survey participant",
         "tags": [
           "Surveys"
         ],
@@ -3085,27 +3168,26 @@
         "parameters": [
           {
             "in": "path",
-            "name": "surveyId",
+            "name": "participantId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "studyId",
             "required": true,
             "schema": {
               "format": "double",
               "type": "number"
             }
           }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateSurveyRequest"
-              }
-            }
-          }
-        }
+        ]
       }
     },
-    "/surveys/publish/{surveyId}": {
+    "/studies/{studyId}/surveys/{versionNumber}/publish": {
       "post": {
         "operationId": "PublishSurvey",
         "responses": {
@@ -3146,7 +3228,301 @@
         "parameters": [
           {
             "in": "path",
-            "name": "surveyId",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "versionNumber",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/studies": {
+      "get": {
+        "operationId": "GetAllStudies",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllStudiesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Get all Studies",
+        "summary": "Get all Studies",
+        "tags": [
+          "Studies"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": []
+      },
+      "post": {
+        "operationId": "CreateStudy",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateStudyResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Create a new study.",
+        "summary": "Create a new Study",
+        "tags": [
+          "Studies"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStudyRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/studies/{studyId}": {
+      "get": {
+        "operationId": "GetStudyById",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetStudyByIdResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Gets a Specific Study by ID",
+        "summary": "Get Specific Study by Id",
+        "tags": [
+          "Studies"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "UpdateStudy",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Update an existing study.",
+        "summary": "Update an existing Study",
+        "tags": [
+          "Studies"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStudyRequest"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "DeleteStudy",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Delete a study",
+        "summary": "Delete a study",
+        "tags": [
+          "Studies"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
             "required": true,
             "schema": {
               "format": "double",
@@ -3854,7 +4230,7 @@
         ]
       }
     },
-    "/invites": {
+    "/studies/{studyId}/invites": {
       "get": {
         "operationId": "GetInvites",
         "responses": {
@@ -3910,7 +4286,7 @@
           }
         },
         "description": "List all non-accepted invites",
-        "summary": "List all non-accepted invites",
+        "summary": "List all non-accepted invites for a study",
         "tags": [
           "Invites"
         ],
@@ -3921,7 +4297,17 @@
             ]
           }
         ],
-        "parameters": []
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
       },
       "post": {
         "operationId": "CreateInvites",
@@ -3968,7 +4354,7 @@
           }
         },
         "description": "Create invites",
-        "summary": "Creates invites for a list of participant emails sends it to them",
+        "summary": "Creates invites for a list of participant emails and sends it to them",
         "tags": [
           "Invites"
         ],
@@ -3979,7 +4365,17 @@
             ]
           }
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -3992,7 +4388,7 @@
         }
       }
     },
-    "/invites/resend/{inviteId}": {
+    "/studies/{studyId}/invites/{inviteId}/resend": {
       "post": {
         "operationId": "ResendInviteById",
         "responses": {
@@ -4020,8 +4416,8 @@
             }
           }
         },
-        "description": "Resend invite by ID",
-        "summary": "Resend invite",
+        "description": "Resend invite by ID and StudyID",
+        "summary": "Resend invite by ID and StudyID",
         "tags": [
           "Invites"
         ],
@@ -4035,17 +4431,25 @@
         "parameters": [
           {
             "in": "path",
-            "name": "inviteId",
+            "name": "studyId",
             "required": true,
             "schema": {
               "format": "double",
               "type": "number"
             }
+          },
+          {
+            "in": "path",
+            "name": "inviteId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ]
       }
     },
-    "/invites/resend": {
+    "/studies/{studyId}/invites/resend": {
       "post": {
         "operationId": "ResendPendingInvites",
         "responses": {
@@ -4073,8 +4477,8 @@
             }
           }
         },
-        "description": "Resend all pending invites",
-        "summary": "Resend invites that are currently pending",
+        "description": "Resend all pending invites for a study",
+        "summary": "Resend invites that are currently pending for a study",
         "tags": [
           "Invites"
         ],
@@ -4085,10 +4489,20 @@
             ]
           }
         ],
-        "parameters": []
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
       }
     },
-    "/invites/revoke/{inviteID}": {
+    "/studies/{studyId}/invites/{inviteId}/revoke": {
       "post": {
         "operationId": "RevokeInvite",
         "responses": {
@@ -4127,7 +4541,7 @@
           }
         },
         "description": "Revoke invite",
-        "summary": "Revoke an invite by id",
+        "summary": "Revoke an invite by inviteId and studyId",
         "tags": [
           "Invites"
         ],
@@ -4141,17 +4555,25 @@
         "parameters": [
           {
             "in": "path",
-            "name": "inviteID",
+            "name": "studyId",
             "required": true,
             "schema": {
               "format": "double",
               "type": "number"
             }
+          },
+          {
+            "in": "path",
+            "name": "inviteId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ]
       }
     },
-    "/invites/text": {
+    "/studies/{studyId}/invites/text": {
       "get": {
         "operationId": "GetInviteText",
         "responses": {
@@ -4208,7 +4630,17 @@
             ]
           }
         ],
-        "parameters": []
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
       }
     },
     "/organisations": {
@@ -4964,7 +5396,7 @@
         }
       }
     },
-    "/auth/register/participant": {
+    "/auth/register/participants/{inviteId}": {
       "post": {
         "operationId": "RegisterParticipant",
         "responses": {
@@ -5005,7 +5437,16 @@
           "Auth"
         ],
         "security": [],
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "inviteId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -5082,7 +5523,7 @@
         }
       }
     },
-    "/integrations/redcap/participant/upload/csv": {
+    "/studies/{studyId}/integrations/redcap/participant/upload/csv": {
       "post": {
         "operationId": "UploadRedcapParticipantCSV",
         "responses": {
@@ -5127,7 +5568,17 @@
             ]
           }
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -5149,7 +5600,7 @@
         }
       }
     },
-    "/integrations/redcap/participant/upload/api": {
+    "/studies/{studyId}/integrations/redcap/participant/upload/api": {
       "post": {
         "operationId": "UploadRedcapParticipantAPI",
         "responses": {
@@ -5194,7 +5645,17 @@
             ]
           }
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -5207,7 +5668,7 @@
         }
       }
     },
-    "/integrations/redcap/instrument/upload/csv": {
+    "/studies/{studyId}/integrations/redcap/instrument/upload/csv": {
       "post": {
         "operationId": "UploadRedcapInstrumentCSV",
         "responses": {
@@ -5252,7 +5713,17 @@
             ]
           }
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -5274,7 +5745,7 @@
         }
       }
     },
-    "/integrations/redcap/instrument/upload/api": {
+    "/studies/{studyId}/integrations/redcap/instrument/upload/api": {
       "post": {
         "operationId": "UploadRedcapInstrumentAPI",
         "responses": {
@@ -5319,7 +5790,17 @@
             ]
           }
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {

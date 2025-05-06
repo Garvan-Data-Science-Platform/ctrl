@@ -66,7 +66,7 @@ describe('FamiliesController', () => {
       expect(newProf.familyId).toBe(102)
     })
     it('Dependent answers should be recalculated on family change', async () => {
-      let depSP = await prisma.surveyParticipant.findFirstOrThrow({
+      let depSP = await prisma.surveyVersionAnswers.findFirstOrThrow({
         where: { profileId: DEPENDENT_ID },
         orderBy: { versionId: 'desc' },
       })
@@ -77,7 +77,7 @@ describe('FamiliesController', () => {
         .post(`/families/remove/${SECOND_GUARDIAN_ID}`)
         .set({ Authorization: `Bearer ${registeredUserToken}` })
 
-      depSP = await prisma.surveyParticipant.findFirstOrThrow({
+      depSP = await prisma.surveyVersionAnswers.findFirstOrThrow({
         where: { profileId: DEPENDENT_ID },
         orderBy: { versionId: 'desc' },
       })
@@ -99,7 +99,7 @@ describe('FamiliesController', () => {
     })
 
     it('Dependent answers should be recalculated', async () => {
-      let depSP = await prisma.surveyParticipant.findFirstOrThrow({
+      let depSP = await prisma.surveyVersionAnswers.findFirstOrThrow({
         where: { profileId: DEPENDENT_ID },
         orderBy: { versionId: 'desc' },
       })
@@ -110,7 +110,7 @@ describe('FamiliesController', () => {
         .post(`/families/100/add/${PARTICIPANT_UNANSWERED_ID}`)
         .set({ Authorization: `Bearer ${registeredUserToken}` })
 
-      depSP = await prisma.surveyParticipant.findFirstOrThrow({
+      depSP = await prisma.surveyVersionAnswers.findFirstOrThrow({
         where: { profileId: DEPENDENT_ID },
         orderBy: { versionId: 'desc' },
       })
@@ -177,7 +177,7 @@ describe('FamiliesController', () => {
         where: { firstName: 'New', lastName: 'Dependent' },
       })
 
-      const part = await prisma.surveyParticipant.findFirstOrThrow({
+      const part = await prisma.surveyVersionAnswers.findFirstOrThrow({
         where: { profileId: prof.id },
       })
 
