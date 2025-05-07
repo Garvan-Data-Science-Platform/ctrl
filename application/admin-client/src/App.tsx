@@ -25,7 +25,6 @@ import { SurveyList, SurveyEditor } from './pages/surveys'
 import { ColorModeContextProvider } from './contexts/color-mode'
 import { Header } from './components/header'
 import { Login } from './pages/login'
-import { Register } from './pages/register'
 import { ForgotPassword } from './pages/forgotPassword'
 import { authProvider } from './providers/authProvider'
 import { ParticipantList, ParticipantShow } from './pages/participants'
@@ -193,7 +192,6 @@ function App() {
                   >
                     <Route path="/login" element={<Login />} />
                     <Route path="/setup" element={<SetupPage />} />
-                    <Route path="/register" element={<Register />} />
                     <Route path="/forgot-password" element={<ForgotPassword />} />
                   </Route>
                 </Routes>
