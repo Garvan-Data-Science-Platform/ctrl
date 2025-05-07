@@ -23,5 +23,8 @@
     "authenticationModule": "src/authentication.ts",
     "basePath": "/",
     "routesDir": "src"
+  },
+  "compilerOptions": {
+    "strictNullChecks": true
   }
 }

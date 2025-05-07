@@ -119,6 +119,7 @@ function App() {
                   {
                     name: 'settings',
                     list: '/settings',
+                    edit: '/settings',
                     meta: {
                       icon: <Settings />,
                     },

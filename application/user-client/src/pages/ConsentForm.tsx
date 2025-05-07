@@ -118,6 +118,7 @@ export default function ConsentForm() {
       } else if (elements[i].type == 'video') {
         results.push(
           <iframe
+            key={`if_${i}`}
             width="100%"
             height="500"
             src={`https://${elements[i].data.link.replace('https://', '')}`}

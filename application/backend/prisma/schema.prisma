@@ -94,6 +94,14 @@ enum ContactMethod {
 model Organisation {
   id        Int      @id @default(autoincrement())
   name      String   @unique
+  mailerHost String?
+  mailerPort Int?
+  mailerUser String?
+  mailerPassword String?
+  primaryColour String?
+  secondaryColour String?
+  redcapURL String?
+  redcapToken String?
   users     User[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
