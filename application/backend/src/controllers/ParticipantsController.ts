@@ -328,9 +328,9 @@ export class InvitesController extends Controller {
     })
   }
   /**
-   * List all non-accepted invites
+   * Get invite email subject and text
    *
-   * @summary List all non-accepted invites
+   * @summary Get invite email subject and text
    */
   @Get('/text')
   @Response<NotFoundErrorResponse>('404', 'Not Found')

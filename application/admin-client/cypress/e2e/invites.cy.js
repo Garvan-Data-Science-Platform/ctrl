@@ -44,7 +44,7 @@ describe('', () => {
       .should('contain.text', 'email2@g.co')
   })
 
-  it('Text is loaded from backend correctly', () => {
+  it('Should load text from the backend correctly', () => {
     cy.visit('/participants')
     cy.get('[data-cy="invite-button"]').click()
     cy.get('[data-cy="email-subject"]').should('contain.text', 'Invitation to CTRL')
