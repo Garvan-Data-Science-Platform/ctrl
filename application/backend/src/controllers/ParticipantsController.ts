@@ -453,7 +453,7 @@ export class InvitesController extends Controller {
     return inviteText
   }
 
-  private async sendInvites(email: string): Promise<Boolean> {
+  private async sendInvite(email: string): Promise<Boolean> {
     try {
       const registerLink = `${process.env.HOSTNAME}/register`
       const study = await prisma.study.findFirstOrThrow({})
