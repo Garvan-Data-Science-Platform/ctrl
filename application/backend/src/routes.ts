@@ -481,13 +481,13 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "InviteStatus": {
         "dataType": "refEnum",
-        "enums": ["PENDING","ACCEPTED","EXPIRED","REVOKED"],
+        "enums": ["PENDING","ACCEPTED","EXPIRED","REVOKED","FAILED_TO_SEND"],
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "GetInvitesResponse": {
         "dataType": "refObject",
         "properties": {
-            "data": {"dataType":"array","array":{"dataType":"nestedObjectLiteral","nestedProperties":{"inviteStatus":{"ref":"InviteStatus","required":true},"expiresAt":{"dataType":"string","required":true},"createdAt":{"dataType":"string","required":true},"email":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}}},"required":true},
+            "data": {"dataType":"array","array":{"dataType":"nestedObjectLiteral","nestedProperties":{"inviteStatus":{"ref":"InviteStatus","required":true},"sentAt":{"dataType":"string"},"expiresAt":{"dataType":"string","required":true},"createdAt":{"dataType":"string","required":true},"email":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}}},"required":true},
         },
         "additionalProperties": false,
     },
@@ -497,7 +497,9 @@ const models: TsoaRoute.Models = {
         "properties": {
             "resendEmailRequestCount": {"dataType":"double","required":true},
             "newInvitesCount": {"dataType":"double","required":true},
-            "emailsToResendCount": {"dataType":"double","required":true},
+            "emailsResentCount": {"dataType":"double","required":true},
+            "failedEmails": {"dataType":"array","array":{"dataType":"string"},"required":true},
+            "failedEmailsCount": {"dataType":"double","required":true},
             "alreadyAcceptedCount": {"dataType":"double","required":true},
         },
         "additionalProperties": false,

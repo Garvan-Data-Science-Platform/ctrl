@@ -18,6 +18,8 @@ export interface InviteParticipantsRequest {
 export interface InviteParticipantsResponse {
   resendEmailRequestCount: number
   newInvitesCount: number
-  emailsToResendCount: number
+  emailsResentCount: number
+  failedEmails: string[]
+  failedEmailsCount: number
   alreadyAcceptedCount: number
 }

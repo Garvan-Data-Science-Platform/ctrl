@@ -161,7 +161,10 @@ describe('InvitesController', () => {
 
       const body: InviteParticipantsResponse = response.body
       expect(response.status).toBe(200)
-      expect(body.emailsToResendCount).toBe(1)
+      expect(body.emailsResentCount).toBe(1)
+      expect(body.alreadyAcceptedCount).toBe(0)
+      expect(body.newInvitesCount).toBe(0)
+      expect(body.failedEmailsCount).toBe(0)
 
       // Check emails were successfully sent
       const sentEmails = mockNodeMailer.mock.getSentMail()
@@ -201,7 +204,10 @@ describe('InvitesController', () => {
 
       const body: InviteParticipantsResponse = response.body
       expect(response.status).toBe(200)
-      expect(body.emailsToResendCount).toBe(1)
+      expect(body.emailsResentCount).toBe(1)
+      expect(body.alreadyAcceptedCount).toBe(0)
+      expect(body.newInvitesCount).toBe(0)
+      expect(body.failedEmailsCount).toBe(0)
 
       // Check email(s) were successfully sent
       const sentEmails = mockNodeMailer.mock.getSentMail()
@@ -252,6 +258,49 @@ describe('InvitesController', () => {
       expect(updatedInvite!.status).toBe('ACCEPTED')
 
       // Check expiry(s) were not reset (TODO: FIX)
+    })
+
+    it('should handle failed email sends correctly', async () => {
+      mockNodeMailer.mock.setShouldFail(true)
+      const emails = [
+        { email: 'will.fail0@email.com', expectedStatus: 'FAILED_TO_SEND' },
+        { email: 'will.fail1@email.com', expectedStatus: 'FAILED_TO_SEND' },
+        { email: 'will.fail2@email.com', expectedStatus: 'FAILED_TO_SEND' },
+        { email: 'will.fail3@email.com', expectedStatus: 'FAILED_TO_SEND' },
+      ]
+
+      const response = await request(app)
+        .post('/invites')
+        .send({
+          emails: emails.map((e) => e.email),
+          subjectText: 'Subject Text',
+          explanatoryText: 'Explanatory Text',
+        })
+        .set({ Authorization: `Bearer ${organisationAdminToken}` })
+
+      const body: InviteParticipantsResponse = response.body
+      console.log('Response body:', body)
+      expect(response.status).toBe(200)
+
+      // Check counters in response
+      expect(body.newInvitesCount).toBe(4) // Invites are created even if email fails
+      expect(body.failedEmailsCount).toBe(4) // One email failed to send
+      expect(body.emailsResentCount).toBe(0)
+      expect(body.alreadyAcceptedCount).toBe(0)
+
+      // Check emails attempts
+      const sentEmails = mockNodeMailer.mock.getSentMail()
+      expect(sentEmails.length).toBe(0)
+
+      // Verify invites were still created in database despite email failure
+      for (const e of emails) {
+        const createdInvite = await prisma.invite.findUnique({ where: { email: e.email } })
+        expect(createdInvite).toBeDefined()
+        expect(createdInvite!.status).toBe(e.expectedStatus)
+      }
+
+      // Reset mock for other tests
+      mockNodeMailer.mock.reset()
     })
   })
 

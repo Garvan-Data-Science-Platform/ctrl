@@ -6,6 +6,7 @@ export interface GetInvitesResponse {
     email: string
     createdAt: string
     expiresAt: string
+    sentAt?: string
     inviteStatus: InviteStatus
   }[]
 }
