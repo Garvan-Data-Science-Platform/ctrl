@@ -721,7 +721,6 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "formName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
-            "redcapAPIToken": {"dataType":"string","validators":{"minLength":{"value":1}}},
         },
         "additionalProperties": false,
     },
@@ -738,7 +737,6 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "formName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
-            "redcapAPIToken": {"dataType":"string","validators":{"minLength":{"value":1}}},
         },
         "additionalProperties": false,
     },
