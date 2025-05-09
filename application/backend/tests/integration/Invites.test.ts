@@ -80,6 +80,8 @@ describe('Participant Invites', () => {
       .post('/invites')
       .send({
         emails: [participantRegisterRequestBody.email],
+        subjectText: 'Subject',
+        explanatoryText: 'Text',
       })
       .set({ Authorization: `Bearer ${orgAdminToken}` })
     const body: InviteParticipantsResponse = response.body
@@ -108,6 +110,8 @@ describe('Participant Invites', () => {
       .post('/invites')
       .send({
         emails: [participantRegisterRequestBody.email],
+        subjectText: 'Subject',
+        explanatoryText: 'Text',
       })
       .set({ Authorization: `Bearer ${orgAdminToken}` })
     expect(response.status).toBe(200)
@@ -127,6 +131,15 @@ describe('Participant Invites', () => {
       (invite) => invite.inviteStatus === InviteStatus.PENDING,
     ).length
 
+    const sentEmails0 = mockNodeMailer.mock.getSentMail()
+
+    // Check if participant email is in the sent emails
+    const sentEmail0 = sentEmails0.find(
+      (email) => email.to === participantRegisterRequestBody.email,
+    )
+
+    expect(sentEmail0).toBeUndefined()
+
     // Resend invites ()
     const resendResponse = await request(app)
       .post(`/invites/resend`)
@@ -134,12 +147,18 @@ describe('Participant Invites', () => {
     expect(resendResponse.status).toBe(204)
 
     // Check emails were successfully sent again
-    const sentEmails = mockNodeMailer.mock.getSentMail()
-    expect(sentEmails.length).toBe(pendingCount)
-    // adjust count to be used as index
-    expect(sentEmails[pendingCount - 1].to).toBe(participantRegisterRequestBody.email)
-    // adjust count to be used as index
-    expect(sentEmails[pendingCount - 1].from).toBe(`CTRL <noreply@${process.env.HOSTNAME}>`)
+    const sentEmails1 = mockNodeMailer.mock.getSentMail()
+    expect(sentEmails1.length).toBe(pendingCount)
+
+    // Check if participant email is in the sent emails
+    const sentEmail1 = sentEmails1.find(
+      (email) => email.to === participantRegisterRequestBody.email,
+    )
+
+    expect(sentEmail1?.to).toBe(participantRegisterRequestBody.email)
+    expect(sentEmail1?.from).toBe(`CTRL <noreply@${process.env.HOSTNAME}>`)
+    expect(sentEmail1?.subject).toBe('Subject')
+    expect(sentEmail1?.text).toContain('Text')
   })
 
   it('should allow an OrganisationAdmin user to REVOKE invites to participants with status PENDING', async () => {
@@ -148,6 +167,8 @@ describe('Participant Invites', () => {
       .post('/invites')
       .send({
         emails: [participantRegisterRequestBody.email],
+        subjectText: 'Subject',
+        explanatoryText: 'Text',
       })
       .set({ Authorization: `Bearer ${orgAdminToken}` })
 
@@ -207,6 +228,8 @@ describe('Participant Invites', () => {
       .post('/invites')
       .send({
         emails: [participantRegisterRequestBody.email],
+        subjectText: 'Subject',
+        explanatoryText: 'Text',
       })
       .set({ Authorization: `Bearer ${orgAdminToken}` })
     const body: InviteParticipantsResponse = response.body

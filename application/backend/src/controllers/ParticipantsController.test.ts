@@ -106,7 +106,7 @@ describe('InvitesController', () => {
 
       const response = await request(app)
         .post('/invites')
-        .send({ emails })
+        .send({ emails, subjectText: 'Subject Text', explanatoryText: 'Explanatory Text' })
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       const body: InviteParticipantsResponse = response.body
@@ -120,7 +120,13 @@ describe('InvitesController', () => {
       sentEmails.forEach((email) => {
         expect(email.from).toBe(`CTRL <noreply@${process.env.HOSTNAME}>`)
         expect(emails).toContain(email.to)
+        expect(email.subject).toBe('Subject Text')
+        expect(email.html).toContain('Explanatory Text')
       })
+
+      const study = await prisma.study.findFirstOrThrow({})
+      expect(study.inviteEmailSubject).toBe('Subject Text')
+      expect(study.inviteEmailText).toBe('Explanatory Text')
 
       // Check invites were created
       for (const email of emails) {
@@ -150,12 +156,15 @@ describe('InvitesController', () => {
       // Create invite for revoked
       const response = await request(app)
         .post('/invites')
-        .send({ emails: ['invite3@revoked.com'] })
+        .send({ emails: ['invite3@revoked.com'], subjectText: 'ABC', explanatoryText: '123' })
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       const body: InviteParticipantsResponse = response.body
       expect(response.status).toBe(200)
-      expect(body.emailsToResendCount).toBe(1)
+      expect(body.emailsResentCount).toBe(1)
+      expect(body.alreadyAcceptedCount).toBe(0)
+      expect(body.newInvitesCount).toBe(0)
+      expect(body.failedEmailsCount).toBe(0)
 
       // Check emails were successfully sent
       const sentEmails = mockNodeMailer.mock.getSentMail()
@@ -190,12 +199,15 @@ describe('InvitesController', () => {
 
       const response = await request(app)
         .post('/invites')
-        .send({ emails: [emailPendingInvite] })
+        .send({ emails: [emailPendingInvite], subjectText: 'ABC', explanatoryText: '123' })
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       const body: InviteParticipantsResponse = response.body
       expect(response.status).toBe(200)
-      expect(body.emailsToResendCount).toBe(1)
+      expect(body.emailsResentCount).toBe(1)
+      expect(body.alreadyAcceptedCount).toBe(0)
+      expect(body.newInvitesCount).toBe(0)
+      expect(body.failedEmailsCount).toBe(0)
 
       // Check email(s) were successfully sent
       const sentEmails = mockNodeMailer.mock.getSentMail()
@@ -225,7 +237,7 @@ describe('InvitesController', () => {
 
       const response = await request(app)
         .post('/invites')
-        .send({ emails: [emailAcceptedInvite] })
+        .send({ emails: [emailAcceptedInvite], subjectText: 'ABC', explanatoryText: '123' })
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       const body: InviteParticipantsResponse = response.body
@@ -247,11 +259,59 @@ describe('InvitesController', () => {
 
       // Check expiry(s) were not reset (TODO: FIX)
     })
+
+    it('should handle failed email sends correctly', async () => {
+      mockNodeMailer.mock.setShouldFail(true)
+      const emails = [
+        { email: 'will.fail0@email.com', expectedStatus: 'FAILED_TO_SEND' },
+        { email: 'will.fail1@email.com', expectedStatus: 'FAILED_TO_SEND' },
+        { email: 'will.fail2@email.com', expectedStatus: 'FAILED_TO_SEND' },
+        { email: 'will.fail3@email.com', expectedStatus: 'FAILED_TO_SEND' },
+      ]
+
+      const response = await request(app)
+        .post('/invites')
+        .send({
+          emails: emails.map((e) => e.email),
+          subjectText: 'Subject Text',
+          explanatoryText: 'Explanatory Text',
+        })
+        .set({ Authorization: `Bearer ${organisationAdminToken}` })
+
+      const body: InviteParticipantsResponse = response.body
+      console.log('Response body:', body)
+      expect(response.status).toBe(200)
+
+      // Check counters in response
+      expect(body.newInvitesCount).toBe(4) // Invites are created even if email fails
+      expect(body.failedEmailsCount).toBe(4) // One email failed to send
+      expect(body.emailsResentCount).toBe(0)
+      expect(body.alreadyAcceptedCount).toBe(0)
+
+      // Check emails attempts
+      const sentEmails = mockNodeMailer.mock.getSentMail()
+      expect(sentEmails.length).toBe(0)
+
+      // Verify invites were still created in database despite email failure
+      for (const e of emails) {
+        const createdInvite = await prisma.invite.findUnique({ where: { email: e.email } })
+        expect(createdInvite).toBeDefined()
+        expect(createdInvite!.status).toBe(e.expectedStatus)
+      }
+
+      // Reset mock for other tests
+      mockNodeMailer.mock.reset()
+    })
   })
 
   describe('POST /invites/resend', () => {
     it('should resend all invites of status PENDING and reset their expiry', async () => {
       const emailPendingInvite = 'invite1@pending.com'
+
+      await prisma.study.update({
+        where: { id: 1 },
+        data: { inviteEmailSubject: 'New Subject', inviteEmailText: 'New Text' },
+      })
 
       const response = await request(app)
         .post('/invites/resend')
@@ -264,6 +324,9 @@ describe('InvitesController', () => {
       expect(sentEmails.length).toBe(4)
       expect(sentEmails[0]).toHaveProperty('to', emailPendingInvite)
       expect(sentEmails[0]).toHaveProperty('from', `CTRL <noreply@${process.env.HOSTNAME}>`)
+      expect(sentEmails[0].subject).toBe('New Subject')
+      expect(sentEmails[0].html).toContain('New Text')
+      expect(sentEmails[0].text).toContain('New Text')
     })
   })
 
@@ -299,6 +362,24 @@ describe('InvitesController', () => {
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       expect(response.status).toBe(404)
+    })
+  })
+
+  describe('GET /invites/text', () => {
+    it('should return current invites text', async () => {
+      await prisma.study.update({
+        where: { id: 1 },
+        data: { inviteEmailSubject: 'Subject', inviteEmailText: 'Text' },
+      })
+
+      const response = await request(app)
+        .get('/invites/text')
+        .set({ Authorization: `Bearer ${organisationAdminToken}` })
+
+      expect(response.body).toStrictEqual({
+        inviteEmailSubject: 'Subject',
+        inviteEmailText: 'Text',
+      })
     })
   })
 })

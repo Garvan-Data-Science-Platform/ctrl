@@ -7,6 +7,7 @@ import {
 } from 'common/types/api/errors'
 import type {
   GetInvitesResponse,
+  GetInviteTextResponse,
   GetParticipantResponse,
   GetParticipantsResponse,
   InviteParticipantsRequest,
@@ -28,9 +29,9 @@ import {
 import { Participant } from 'common/types/api/participants/participant'
 import mailerTransporter, { fromAddress } from '../utils/mailer'
 import nodemailer from 'nodemailer'
-import { generateInviteEmail } from '../utils/generateInviteTemplate'
-import { InviteStatus } from '../../../common/types/api/participants/invite'
-import { NotFoundError } from '../middlewares/ErrorHandler'
+import { generateInviteEmail } from 'common/src/generateInviteTemplate'
+import { InviteStatus } from 'common/types/api/participants/invite'
+import { BadGatewayError, NotFoundError } from '../middlewares/ErrorHandler'
 import { determineLastUpdated, determineStatus } from '../utils/answers'
 import { ProfilesController } from './ProfilesController'
 import { auditLog } from '../middlewares/AuditLog'
@@ -170,6 +171,7 @@ export class InvitesController extends Controller {
       email: invite.email,
       createdAt: invite.createdAt.toISOString(),
       expiresAt: invite.expiresAt.toISOString(),
+      sentAt: invite.sentAt ? invite.sentAt.toISOString() : undefined,
       inviteStatus: invite.status as InviteStatus,
     }))
 
@@ -186,8 +188,15 @@ export class InvitesController extends Controller {
   public async createInvites(
     @Body() bodyRequest: InviteParticipantsRequest,
   ): Promise<InviteParticipantsResponse> {
-    const emails = bodyRequest.emails
-    const expiresAt = new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000) // MAKE EXPIRY CONFIGURABLE
+    const { subjectText, explanatoryText } = bodyRequest
+
+    await prisma.study.update({
+      where: { id: 1 },
+      data: { inviteEmailSubject: subjectText, inviteEmailText: explanatoryText },
+    })
+
+    const emails = [...new Set(bodyRequest.emails)]
+    const expiresAt = new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000) // TODO: MAKE EXPIRY CONFIGURABLE
 
     // Fetch existing invites
     const existingInvites = await this.invitesRepo.findMany({
@@ -201,61 +210,118 @@ export class InvitesController extends Controller {
     const responseData = {
       resendEmailRequestCount: emails.length,
       newInvitesCount: newEmails.length,
-      emailsToResendCount: undefined!, // this gets assigned below
-      alreadyAcceptedCount: undefined!, // this gets assigned below
+      emailsResentCount: 0, // this gets assigned below
+      alreadyAcceptedCount: 0, // this gets assigned below
+      failedEmailsCount: 0, // this gets assigned below
+      failedEmails: [], // this gets assigned below
     }
+
+    const emailsResent: string[] = []
+    const failedEmails: string[] = []
 
     // Resend invites for existing emails
     if (existingInvites.length > 0) {
-      const emailsToResend: string[] = []
       // If status is REVOKED, reset expiresAt and update status to PENDING
-      for (const invite of existingInvites) {
-        if (invite.status === 'REVOKED' || invite.status === 'EXPIRED') {
-          await this.invitesRepo.update({
-            where: { id: invite.id },
-            data: {
-              status: 'PENDING',
-              expiresAt: expiresAt,
-            },
-          })
+      await Promise.all(
+        existingInvites.map(async (invite) => {
+          if (invite.status === InviteStatus.ACCEPTED) {
+            return
+          }
 
-          // Add to list of emails to resend
-          emailsToResend.push(invite.email)
-        } else if (invite.status === 'PENDING') {
-          // Update expiry datetime
-          await this.invitesRepo.update({
-            where: { id: invite.id },
-            data: {
-              expiresAt: expiresAt,
-            },
-          })
+          const emailSent = await this.sendInvite(invite.email)
+          if (!emailSent) {
+            logger.error(`Failed to send email to ${invite.email}`)
+            await this.invitesRepo.update({
+              where: { id: invite.id },
+              data: {
+                status: InviteStatus.FAILED_TO_SEND,
+              },
+            })
+            failedEmails.push(invite.email)
+            return
+          }
 
-          // Add to list of emails to resend
-          emailsToResend.push(invite.email)
-        } else if (invite.status === 'ACCEPTED') {
-          continue
-        }
-      }
+          logger.info(`Resent email to existing invite ${invite.email}`)
+          emailsResent.push(invite.email)
 
-      Object.assign(responseData, {
-        emailsToResendCount: emailsToResend.length,
-        alreadyAcceptedCount: existingInvites.length - emailsToResend.length,
-      })
-
-      await this.sendInvites(emailsToResend)
+          if (
+            invite.status === InviteStatus.REVOKED ||
+            invite.status === InviteStatus.EXPIRED ||
+            invite.status === InviteStatus.FAILED_TO_SEND
+          ) {
+            await this.invitesRepo.update({
+              where: { id: invite.id },
+              data: {
+                status: InviteStatus.PENDING,
+                expiresAt: expiresAt,
+                sentAt: new Date(),
+              },
+            })
+          } else if (invite.status === InviteStatus.PENDING) {
+            await this.invitesRepo.update({
+              where: { id: invite.id },
+              data: {
+                expiresAt,
+                sentAt: new Date(),
+              },
+            })
+          }
+        }),
+      )
     }
 
     // Create new invites
     if (newEmails.length > 0) {
-      await this.invitesRepo.createMany({
-        data: newEmails.map((email) => ({ email, expiresAt, status: 'PENDING' })),
-      })
+      const emailResults = await Promise.all(
+        newEmails.map(async (email) => {
+          const success = await this.sendInvite(email)
+          if (!success) {
+            logger.error(`Failed to send email to ${email}`)
+            failedEmails.push(email)
+          }
+          return { email, success }
+        }),
+      )
 
-      // Send emails for new invites
-      await this.sendInvites(newEmails)
+      const successfulEmails = emailResults
+        .filter((result) => result.success)
+        .map((result) => result.email)
+
+      const newFailedEmails = emailResults
+        .filter((result) => !result.success)
+        .map((result) => result.email)
+
+      // Create invites with appropriate status
+      await this.invitesRepo.createMany({
+        data: [
+          ...successfulEmails.map((email) => ({
+            email,
+            expiresAt,
+            sentAt: new Date(),
+            status: InviteStatus.PENDING,
+          })),
+          ...newFailedEmails.map((email) => ({
+            email,
+            expiresAt,
+            status: InviteStatus.FAILED_TO_SEND,
+          })),
+        ],
+        skipDuplicates: true,
+      })
     }
 
-    logger.info({ ...responseData })
+    Object.assign(responseData, {
+      emailsResentCount: emailsResent.length,
+      alreadyAcceptedCount: Math.max(
+        0,
+        existingInvites.length - emailsResent.length - failedEmails.length,
+      ),
+      failedEmailsCount: failedEmails.length,
+      failedEmails,
+    })
+
+    // Log the result
+    logger.info(responseData)
     return responseData
   }
 
@@ -267,20 +333,30 @@ export class InvitesController extends Controller {
   @Post('/resend/{inviteId}')
   public async resendInviteById(@Path() inviteId: number): Promise<void> {
     // Get all pending invitations
-
     const pendingInvite = await this.invitesRepo.findUniqueOrThrow({
-      where: { id: inviteId, status: { not: 'ACCEPTED' } },
-      select: { email: true },
+      where: { id: inviteId, status: { not: InviteStatus.ACCEPTED } },
+      select: { id: true, email: true },
     })
 
-    // Send emails
-    await this.sendInvites([pendingInvite.email])
+    // Send email and check if failed
+    if (!(await this.sendInvite(pendingInvite.email))) {
+      await this.invitesRepo.update({
+        where: { id: pendingInvite.id },
+        data: {
+          status: InviteStatus.FAILED_TO_SEND,
+        },
+      })
+      throw new BadGatewayError(`Failed to send email to ${pendingInvite.email}`)
+    }
+
+    logger.info(`Resent email to pending invite ${pendingInvite.email}`)
 
     await this.invitesRepo.update({
       where: { id: inviteId },
-      data: { status: InviteStatus.PENDING },
+      data: { status: InviteStatus.PENDING, sentAt: new Date() },
     })
   }
+
   /**
    * Resend all pending invites
    *
@@ -290,14 +366,56 @@ export class InvitesController extends Controller {
   public async resendPendingInvites(): Promise<void> {
     // Get all pending invitations
     const pendingEmails = await this.invitesRepo.findMany({
-      where: { status: 'PENDING' },
+      where: { status: InviteStatus.PENDING },
       select: { email: true },
     })
 
     const pendingEmailList = pendingEmails.map(({ email }) => email)
 
     // Send emails
-    await this.sendInvites(pendingEmailList)
+    const emailResults = await Promise.all(
+      pendingEmailList.map(async (email) => {
+        const success = await this.sendInvite(email)
+        if (!success) {
+          logger.error(`Failed to send email to ${email}`)
+        }
+        return { email, success }
+      }),
+    )
+
+    const successfulEmails = emailResults
+      .filter((result) => result.success)
+      .map((result) => result.email)
+
+    const failedEmails = emailResults
+      .filter((result) => !result.success)
+      .map((result) => result.email)
+
+    // Update invites with appropriate status
+    await this.invitesRepo.updateMany({
+      where: {
+        email: { in: successfulEmails },
+        status: InviteStatus.PENDING,
+      },
+      data: {
+        status: InviteStatus.PENDING,
+        sentAt: new Date(),
+      },
+    })
+
+    await this.invitesRepo.updateMany({
+      where: {
+        email: { in: failedEmails },
+        status: InviteStatus.PENDING,
+      },
+      data: {
+        status: InviteStatus.FAILED_TO_SEND,
+      },
+    })
+
+    // Log sent emails
+    logger.info(`Resent ${successfulEmails.length} emails to pending invites`)
+    logger.info(`Failed to send ${failedEmails.length} emails to pending invites`)
   }
 
   /**
@@ -319,22 +437,43 @@ export class InvitesController extends Controller {
       data: { status: InviteStatus.REVOKED },
     })
   }
+  /**
+   * Get invite email subject and text
+   *
+   * @summary Get invite email subject and text
+   */
+  @Get('/text')
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
+  public async getInviteText(): Promise<GetInviteTextResponse> {
+    const inviteText = await prisma.study.findUniqueOrThrow({
+      where: { id: 1 },
+      select: { inviteEmailSubject: true, inviteEmailText: true },
+    })
 
-  private async sendInvites(emails: string[]): Promise<void> {
-    const registerLink = `${process.env.HOSTNAME}/register`
+    return inviteText
+  }
 
-    for (const email of emails) {
-      // TODO: Make the email contents configurable
-      const { html, text } = generateInviteEmail(registerLink)
+  private async sendInvite(email: string): Promise<boolean> {
+    try {
+      const registerLink = `${process.env.HOSTNAME}/register`
+      const study = await prisma.study.findFirstOrThrow({})
+      const subjectText = study?.inviteEmailSubject
+      const explanatoryText = study?.inviteEmailText
+      const { html, text } = generateInviteEmail(registerLink, subjectText, explanatoryText)
 
       const mailOptions: nodemailer.SendMailOptions = {
         from: fromAddress,
         to: email,
-        subject: 'Invitation to CTRL - dynamic consent platform',
+        subject: subjectText,
         text,
         html,
       }
+
       await mailerTransporter.sendMail(mailOptions)
+      return true
+    } catch (error) {
+      logger.error(`Failed to send email to ${email}:`, error)
+      return false
     }
   }
 }

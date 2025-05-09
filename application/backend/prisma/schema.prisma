@@ -101,6 +101,8 @@ model Organisation {
 
 model Study {
   id       Int                  @id @default(autoincrement())
+  inviteEmailSubject String @default("Invitation to CTRL - Dynamic Consent Platform")
+  inviteEmailText String @default("You have been invited to register with CTRL dynamic consent platform.")
   surveys  SurveyVersion[]
   profiles ParticipantProfile[]
 }
@@ -139,6 +141,7 @@ model Invite {
   status    InviteStatus @default(PENDING)
   expiresAt DateTime
   createdAt DateTime     @default(now())
+  sentAt    DateTime?
 }
 
 enum InviteStatus {
@@ -146,6 +149,7 @@ enum InviteStatus {
   ACCEPTED
   EXPIRED
   REVOKED
+  FAILED_TO_SEND
 }
 
 model PasswordResetToken {

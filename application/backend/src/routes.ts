@@ -481,13 +481,13 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "InviteStatus": {
         "dataType": "refEnum",
-        "enums": ["PENDING","ACCEPTED","EXPIRED","REVOKED"],
+        "enums": ["PENDING","ACCEPTED","EXPIRED","REVOKED","FAILED_TO_SEND"],
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "GetInvitesResponse": {
         "dataType": "refObject",
         "properties": {
-            "data": {"dataType":"array","array":{"dataType":"nestedObjectLiteral","nestedProperties":{"inviteStatus":{"ref":"InviteStatus","required":true},"expiresAt":{"dataType":"string","required":true},"createdAt":{"dataType":"string","required":true},"email":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}}},"required":true},
+            "data": {"dataType":"array","array":{"dataType":"nestedObjectLiteral","nestedProperties":{"inviteStatus":{"ref":"InviteStatus","required":true},"sentAt":{"dataType":"string"},"expiresAt":{"dataType":"string","required":true},"createdAt":{"dataType":"string","required":true},"email":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}}},"required":true},
         },
         "additionalProperties": false,
     },
@@ -497,7 +497,9 @@ const models: TsoaRoute.Models = {
         "properties": {
             "resendEmailRequestCount": {"dataType":"double","required":true},
             "newInvitesCount": {"dataType":"double","required":true},
-            "emailsToResendCount": {"dataType":"double","required":true},
+            "emailsResentCount": {"dataType":"double","required":true},
+            "failedEmails": {"dataType":"array","array":{"dataType":"string"},"required":true},
+            "failedEmailsCount": {"dataType":"double","required":true},
             "alreadyAcceptedCount": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
@@ -512,13 +514,24 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "emails": {"dataType":"array","array":{"dataType":"refAlias","ref":"Email"},"required":true},
+            "subjectText": {"dataType":"string","required":true},
+            "explanatoryText": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GetInviteTextResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "inviteEmailSubject": {"dataType":"string","required":true},
+            "inviteEmailText": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "DefaultSelection_Prisma._36_OrganisationPayload_": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"updatedAt":{"dataType":"datetime","required":true},"createdAt":{"dataType":"datetime","required":true},"id":{"dataType":"double","required":true},"name":{"dataType":"string","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"redcapToken":{"dataType":"string","required":true},"redcapURL":{"dataType":"string","required":true},"secondaryColour":{"dataType":"string","required":true},"primaryColour":{"dataType":"string","required":true},"mailerPassword":{"dataType":"string","required":true},"mailerUser":{"dataType":"string","required":true},"mailerPort":{"dataType":"double","required":true},"mailerHost":{"dataType":"string","required":true},"updatedAt":{"dataType":"datetime","required":true},"createdAt":{"dataType":"datetime","required":true},"id":{"dataType":"double","required":true},"name":{"dataType":"string","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Organisation": {
@@ -1711,6 +1724,36 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
 
               await templateService.apiHandler({
                 methodName: 'revokeInvite',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsInvitesController_getInviteText: Record<string, TsoaRoute.ParameterSchema> = {
+        };
+        app.get('/invites/text',
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(InvitesController)),
+            ...(fetchMiddlewares<RequestHandler>(InvitesController.prototype.getInviteText)),
+
+            async function InvitesController_getInviteText(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsInvitesController_getInviteText, request, response });
+
+                const controller = new InvitesController();
+
+              await templateService.apiHandler({
+                methodName: 'getInviteText',
                 controller,
                 response,
                 next,
