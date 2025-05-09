@@ -14,8 +14,9 @@ export const PASSWORD_RESET_USER_ID = 105
 export const PASSWORD_RESET_USER_EMAIL = 'test-reset-password@example.com'
 
 export async function seedTests(prisma: PrismaClient) {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const ExampleSurveyStepData = require('../src/surveys/exampleSurveyStepData.json')
+  const ExampleSurveyStepData = await import('../src/surveys/exampleSurveyStepData.json', {
+    assert: { type: 'json' },
+  }).then((module) => module.default)
   await prisma.organisation.create({
     data: {
       id: 99,

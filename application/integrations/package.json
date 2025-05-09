@@ -4,6 +4,7 @@
   "main": "./src/index.ts",
   "scripts": {
     "type-check": "tsc",
+    "lint": "eslint .",
     "build": "true",
     "dev": "true",
     "test": "jest"
@@ -13,6 +14,6 @@
   ],
   "devDependencies": {
     "jest": "^29.7.0",
-    "typescript": "^5.7.2"
+    "typescript": "^5.8.3"
   }
 }

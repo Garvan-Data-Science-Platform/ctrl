@@ -1,0 +1,29 @@
+name: Parse Node.js version from .nvmrc
+description: Reads the .nvmrc file and exposes the Node.js version as an output.
+inputs: {}
+outputs:
+  node_version:
+    description: 'Node.js version from .nvmrc'
+    value: ${{ steps.get-node-version.outputs.node_version }}
+runs:
+  using: 'composite'
+  steps:
+    - id: get-node-version
+      shell: bash
+      run: |
+        echo "Checking if .nvmrc exists..."
+        if [ ! -f .nvmrc ]; then
+          echo "❌ .nvmrc file not found!"
+          exit 1
+        fi
+
+        echo "Reading .nvmrc..."
+        VERSION=$(tr -d '\r' < .nvmrc | tr -d 'v')  # Remove carriage returns & 'v'
+
+        if [ -z "$VERSION" ]; then
+          echo "❌ ERROR: Extracted Node version is empty!"
+          exit 1
+        fi
+
+        echo "✅ Node version extracted: $VERSION"
+        echo "node_version=$VERSION" >> "$GITHUB_OUTPUT"

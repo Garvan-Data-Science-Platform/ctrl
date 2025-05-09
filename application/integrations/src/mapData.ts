@@ -177,7 +177,7 @@ export function transformDate(dateStr: string): string {
     const formattedDay = day.toString().padStart(2, '0')
 
     return `${formattedMonth}/${formattedDay}/${year}`
-  } catch (error) {
+  } catch {
     throw new Error(`Failed to transform date "${dateStr}"`)
   }
 }
