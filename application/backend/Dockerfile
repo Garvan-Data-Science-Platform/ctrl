@@ -2,9 +2,9 @@ ARG NODE_VERSION
 
 FROM node:${NODE_VERSION}-alpine
 
-# install openssl
-RUN apk update && apk upgrade
-RUN apk add --no-cache openssl
+# Create openssl symlink if required (it was required when this line was added)
+# https://github.com/prisma/prisma/issues/25817
+RUN [ ! -e /lib/libssl.so.3 ] && ln -s /usr/lib/libssl.so.3 /lib/libssl.so.3 || echo "Link already exists"
 
 ARG NODE_ENV=production
 ENV NODE_ENV $NODE_ENV
