@@ -312,7 +312,10 @@ export class InvitesController extends Controller {
 
     Object.assign(responseData, {
       emailsResentCount: emailsResent.length,
-      alreadyAcceptedCount: existingInvites.length - emailsResent.length - failedEmails.length,
+      alreadyAcceptedCount: Math.max(
+        0,
+        existingInvites.length - emailsResent.length - failedEmails.length,
+      ),
       failedEmailsCount: failedEmails.length,
       failedEmails,
     })
