@@ -25,6 +25,7 @@
     "react-hook-form": "^7.30.0",
     "react-markdown": "^10.0.1",
     "react-router-dom": "^6.8.1",
+    "react-router-hash-link": "^2.4.3",
     "zustand": "^5.0.0"
   },
   "devDependencies": {

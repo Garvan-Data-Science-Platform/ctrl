@@ -51,11 +51,10 @@ export const ParticipantImport = () => {
       })
   }
 
-  const onSubmitApi = (formName: string, redcapAPIToken: string) => {
+  const onSubmitApi = (formName: string) => {
     axiosInstance
       .post(API_ENDPOINT, {
         formName,
-        redcapAPIToken,
       })
       .then((response) => {
         const data = response.data

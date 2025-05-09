@@ -1,8 +1,9 @@
 import { Box, Button, Container, TextField, Typography } from '@mui/material'
-import { useNotification, useSelect } from '@refinedev/core'
+import { useNotification } from '@refinedev/core'
 import { useForm } from '@refinedev/react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { axiosInstance } from '../../providers/dataProvider'
+import { SensitiveTextField } from '../../components/SensitiveTextField'
 
 const SettingsPage = () => {
   type FieldValues = {
@@ -101,13 +102,12 @@ const SettingsPage = () => {
             label={'SMTP Username'}
             name="mailerUser"
           />
-          <TextField
+          <SensitiveTextField
             {...register('mailerPassword', {})}
             error={!!(errors as any)?.title}
             helperText={(errors as any)?.title?.message}
             margin="dense"
             InputLabelProps={{ shrink: true }}
-            type="text"
             label={'SMTP Password'}
             name="mailerPassword"
           />
@@ -160,21 +160,25 @@ const SettingsPage = () => {
           />
         </Box>
         <Typography sx={{ mt: 2 }}>Redcap Integration</Typography>
-        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column' }} id="redcap">
           <TextField
-            {...register('redcapURL', {})}
-            error={!!(errors as any)?.title}
-            helperText={(errors as any)?.title?.message}
+            {...register('redcapURL', {
+              pattern: {
+                value:
+                  /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/, //eslint-disable-line
+                message: 'Invalid url, must include http(s)://...',
+              },
+            })}
+            error={!!(errors as any)?.redcapURL}
+            helperText={(errors as any)?.redcapURL?.message}
             margin="normal"
             InputLabelProps={{ shrink: true }}
             type="text"
             label={'Redcap API URL'}
             name="redcapURL"
           />
-          <TextField
+          <SensitiveTextField
             {...register('redcapToken', {})}
-            error={!!(errors as any)?.title}
-            helperText={(errors as any)?.title?.message}
             margin="dense"
             InputLabelProps={{ shrink: true }}
             type="text"
@@ -198,6 +202,7 @@ const SettingsPage = () => {
           </Button>
         </Box>
       </Box>
+      <Box sx={{ height: 300 }} />
     </Container>
   )
 }

@@ -12,17 +12,20 @@ import {
   DialogContentText,
   DialogActions,
 } from '@mui/material'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Close, ArrowBack } from '@mui/icons-material'
 import ReactMarkdown from 'react-markdown'
 import { useNotification, useBack } from '@refinedev/core'
+import { GetSettingsResponse } from '@common/types/api/settings'
+import { HashLink } from 'react-router-hash-link'
+import { axiosInstance } from '../providers/dataProvider'
 
 interface RedcapImportProps {
   type: 'survey' | 'participant'
   helpDocumentation: string
   warningMessage?: string
   onSubmitFile: (file: File) => void
-  onSubmitApi: (formName: string, redcapAPIToken: string) => void
+  onSubmitApi: (formName: string) => void
   confirmDialog?: boolean
 }
 
@@ -36,7 +39,6 @@ export const RedcapImport = ({
 }: RedcapImportProps) => {
   const [file, setFile] = useState<File | null>(null)
   const [formName, setFormName] = useState<string>('')
-  const [redcapAPIToken, setRedcapAPIToken] = useState<string>('')
   const [openHelpPage, setHelpPageOpen] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [dialogType, setDialogType] = useState<'FILE' | 'API'>('FILE')
@@ -66,18 +68,26 @@ export const RedcapImport = ({
     if (!formName) {
       open?.({ type: 'error', message: 'Please enter a form to pull from REDCap' })
       return
-    } else if (!redcapAPIToken) {
-      open?.({ type: 'error', message: 'Please enter a REDCap API Token' })
-      return
     }
 
-    onSubmitApi(formName, redcapAPIToken)
+    onSubmitApi(formName)
   }
 
   const handleHelpPageOpen = () => setHelpPageOpen(true)
   const handleHelpPageClose = () => setHelpPageOpen(false)
   const openDialog = () => setDialogOpen(true)
   const closeDialog = () => setDialogOpen(false)
+
+  const [redcapIsSetup, setRedcapIsSetup] = useState(true)
+
+  useEffect(() => {
+    axiosInstance.get('/settings').then((res) => {
+      const settings = res.data.data as GetSettingsResponse['data']
+      if (!settings.redcapToken || !settings.redcapURL) {
+        setRedcapIsSetup(false)
+      }
+    })
+  }, [])
 
   return (
     <Box>
@@ -205,39 +215,41 @@ export const RedcapImport = ({
             <Typography variant="h6" gutterBottom>
               Import from REDCap API
             </Typography>
-            <TextField
-              label="REDCap API Token"
-              variant="outlined"
-              value={redcapAPIToken}
-              onChange={(e) => setRedcapAPIToken(e.target.value)}
-              sx={{ mb: 2 }}
-              type="password"
-              data-cy="redcapAPIToken"
-            />
-            <TextField
-              label="Form Name"
-              variant="outlined"
-              value={formName}
-              onChange={(e) => setFormName(e.target.value)}
-              sx={{ mb: 2 }}
-              data-cy="formName"
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => {
-                if (confirmDialog) {
-                  setDialogType('API')
-                  openDialog()
-                } else {
-                  handleApiSubmission()
-                }
-              }}
-              disabled={!formName || !redcapAPIToken}
-              data-cy="apiSubmit"
-            >
-              Import from API
-            </Button>
+            {redcapIsSetup ? (
+              <>
+                <TextField
+                  label="Form Name"
+                  variant="outlined"
+                  value={formName}
+                  onChange={(e) => setFormName(e.target.value)}
+                  sx={{ mb: 2 }}
+                  data-cy="formName"
+                />
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => {
+                    if (confirmDialog) {
+                      setDialogType('API')
+                      openDialog()
+                    } else {
+                      handleApiSubmission()
+                    }
+                  }}
+                  disabled={!formName}
+                  data-cy="apiSubmit"
+                >
+                  Import from API
+                </Button>
+              </>
+            ) : (
+              <>
+                <Typography>Redcap API is not set up</Typography>
+                <Button component={HashLink} to="/settings#redcap">
+                  Redcap settings
+                </Button>
+              </>
+            )}
           </Box>
         </Box>
       </Box>

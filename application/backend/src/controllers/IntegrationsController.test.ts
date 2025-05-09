@@ -11,8 +11,6 @@ const api = new Api()
 const app = api.app
 let token: string
 
-const REDCAP_API_TOKEN = process.env.REDCAP_API_TOKEN
-
 describe('IntegrationsController', () => {
   beforeAll(async () => {
     token = await generateToken({ userId: PARTICIPANT_COMPLETED_ID, roles: ['OrganisationAdmin'] })
@@ -234,7 +232,7 @@ describe('IntegrationsController', () => {
 
       const response = await request(app)
         .post('/integrations/redcap/participant/upload/api')
-        .send({ formName: 'ctrl_test_1', redcapAPIToken: REDCAP_API_TOKEN })
+        .send({ formName: 'ctrl_test_1' })
         .set({ Authorization: `Bearer ${token}` })
 
       expect(response.status).toBe(201)
@@ -254,7 +252,7 @@ describe('IntegrationsController', () => {
 
       const response = await request(app)
         .post('/integrations/redcap/participant/upload/api')
-        .send({ formName: 'ctrl_test_1', redcapAPIToken: REDCAP_API_TOKEN })
+        .send({ formName: 'ctrl_test_1' })
         .set({ Authorization: `Bearer ${token}` })
 
       expect(response.status).toBe(502)
@@ -265,7 +263,7 @@ describe('IntegrationsController', () => {
     it('should create a survey when given a form using the redcap api', async () => {
       const response = await request(app)
         .post('/integrations/redcap/instrument/upload/api')
-        .send({ formName: 'ctrl_test_2', redcapAPIToken: REDCAP_API_TOKEN })
+        .send({ formName: 'ctrl_test_2' })
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(201)
       const survey = await prisma.surveyVersion.findFirst({ where: { id: 2 } })
@@ -287,7 +285,7 @@ describe('IntegrationsController', () => {
 
       const response = await request(app)
         .post('/integrations/redcap/instrument/upload/api')
-        .send({ formName: 'ctrl_test_2', redcapAPIToken: REDCAP_API_TOKEN })
+        .send({ formName: 'ctrl_test_2' })
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(201)
 
@@ -323,7 +321,7 @@ describe('IntegrationsController', () => {
 
       const response = await request(app)
         .post('/integrations/redcap/instrument/upload/api')
-        .send({ formName: 'ctrl_test_1', redcapAPIToken: REDCAP_API_TOKEN })
+        .send({ formName: 'ctrl_test_1' })
         .set({ Authorization: `Bearer ${token}` })
 
       expect(response.status).toBe(502)

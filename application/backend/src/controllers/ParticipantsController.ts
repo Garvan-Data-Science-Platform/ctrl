@@ -27,7 +27,7 @@ import {
   Middlewares,
 } from 'tsoa'
 import { Participant } from 'common/types/api/participants/participant'
-import mailerTransporter, { fromAddress } from '../utils/mailer'
+import { createMailerTransporter, fromAddress } from '../utils/mailer'
 import nodemailer from 'nodemailer'
 import { generateInviteEmail } from 'common/src/generateInviteTemplate'
 import { InviteStatus } from 'common/types/api/participants/invite'
@@ -453,12 +453,14 @@ export class InvitesController extends Controller {
     return inviteText
   }
 
-  private async sendInvite(email: string): Promise<boolean> {
+  private async sendInvites(email: string): Promise<Boolean> {
     try {
       const registerLink = `${process.env.HOSTNAME}/register`
       const study = await prisma.study.findFirstOrThrow({})
       const subjectText = study?.inviteEmailSubject
       const explanatoryText = study?.inviteEmailText
+      const mailerTransporter = await createMailerTransporter()
+
       const { html, text } = generateInviteEmail(registerLink, subjectText, explanatoryText)
 
       const mailOptions: nodemailer.SendMailOptions = {

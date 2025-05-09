@@ -137,7 +137,6 @@ describe('REDCap Participant Upload', () => {
       })
 
       const formName = 'test_form'
-      cy.get('[data-cy="redcapAPIToken"]').should('be.visible').type('DUMMY_TOKEN')
       cy.get('[data-cy="apiSubmit"]').should('be.visible').should('be.disabled')
       cy.get('[data-cy="formName"]').should('be.visible').type(formName)
       cy.get('[data-cy="apiSubmit"]').should('be.visible').should('be.enabled')
@@ -163,7 +162,6 @@ describe('REDCap Participant Upload', () => {
       })
 
       cy.get('[data-cy="send-button"]').should('be.visible').click()
-      cy.wait(5000)
 
       // Check updated updated list of invites
       cy.request({

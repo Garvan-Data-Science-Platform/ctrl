@@ -1,4 +1,4 @@
-import { Color, createTheme, PaletteColorOptions } from '@mui/material'
+import { createTheme } from '@mui/material'
 
 interface ThemeProps {
   primary: string

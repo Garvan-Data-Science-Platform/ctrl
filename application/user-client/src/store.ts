@@ -9,7 +9,7 @@ interface AppState {
 }
 
 function standardize_color(str: string) {
-  var ctx = document.createElement('canvas').getContext('2d') as any
+  const ctx = document.createElement('canvas').getContext('2d') as any
   ctx.fillStyle = str
   return ctx.fillStyle
 }

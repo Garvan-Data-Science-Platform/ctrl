@@ -1,36 +1,16 @@
-import logger from 'common/src/logger'
 import prisma from '../PrismaClient'
 import {
   UnauthorizedErrorResponse,
   InternalErrorResponse,
-  NotFoundErrorResponse,
   ValidateErrorResponse,
 } from 'common/types/api/errors'
-import type { GetParticipantProfileResponse, UpdateProfileRequest } from 'common/types/api/users'
-import { NotFoundError } from '../middlewares/ErrorHandler'
-import {
-  Route,
-  Tags,
-  Security,
-  Controller,
-  Get,
-  Path,
-  Response,
-  Request,
-  Patch,
-  Body,
-  Middlewares,
-  NoSecurity,
-} from 'tsoa'
-import * as express from 'express'
+import { Route, Tags, Controller, Get, Response, Patch, Body, Middlewares, NoSecurity } from 'tsoa'
 import type {
   GetSettingsResponse,
   GetThemeResponse,
   UpdateSettingsRequest,
 } from 'common/types/api/settings'
-import { FamilyMember } from 'common/types/api/users/getParticipantProfile'
 import { auditLog } from '../middlewares/AuditLog'
-import { recalculateAnswers } from '../utils/answers'
 
 @Route('settings')
 @Tags('Settings')
