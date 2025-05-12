@@ -37,7 +37,7 @@ export const ParticipantImport = () => {
         navigate(SUCCESS_REDIRECT, {
           state: {
             openInviteModal: true,
-            initialEmails: await getInitialEmails(file),
+            initialEmails: await getInitialEmailsFromFile(file),
           },
         })
       })
@@ -51,12 +51,10 @@ export const ParticipantImport = () => {
       })
   }
 
-  const onSubmitApi = (formName: string) => {
+  const onSubmitApi = () => {
     axiosInstance
-      .post(API_ENDPOINT, {
-        formName,
-      })
-      .then((response) => {
+      .post(API_ENDPOINT)
+      .then(async (response) => {
         const data = response.data
         if (data.error) {
           open?.({ type: 'error', message: data.error })
@@ -71,7 +69,7 @@ export const ParticipantImport = () => {
         navigate(SUCCESS_REDIRECT, {
           state: {
             openInviteModal: true,
-            initialEmails: ['initial@email.com'], // TODO
+            initialEmails: await getInitialEmailsFromApi(data.newInvites),
           },
         })
       })
@@ -83,7 +81,7 @@ export const ParticipantImport = () => {
       })
   }
 
-  const getInitialEmails = async (file: File): Promise<string[]> => {
+  const getInitialEmailsFromFile = async (file: File): Promise<string[]> => {
     const content = await file.text()
     const rows = content.split('\n').slice(1) // Skip header row
     const uniqueEmails = new Set<string>()
@@ -100,6 +98,11 @@ export const ParticipantImport = () => {
     return Array.from(uniqueEmails)
   }
 
+  const getInitialEmailsFromApi = async (newInvites: string[]): Promise<string[]> => {
+    const uniqueEmails = new Set<string>(newInvites)
+    return Array.from(uniqueEmails)
+  }
+
   return (
     <RedcapImport
       type="participant"
@@ -107,6 +110,7 @@ export const ParticipantImport = () => {
       onSubmitFile={onSubmitFile}
       onSubmitApi={onSubmitApi}
       confirmDialog={false}
+      formNameInput={false}
     />
   )
 }

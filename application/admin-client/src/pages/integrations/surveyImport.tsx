@@ -32,7 +32,7 @@ export const SurveyImport = () => {
       })
   }
 
-  const handleApiSubmit = (formName: string) => {
+  const handleApiSubmit = (formName?: string) => {
     axiosInstance
       .post(apiEndpoint, {
         formName,
