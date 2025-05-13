@@ -46,7 +46,7 @@ export default function NavBar() {
           <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
           <Box>
             <img
-              src="/australian-genomics-logo.png"
+              src={import.meta.env.VITE_BACKEND_URL + '/settings/logo'}
               height={30}
               onClick={() => nav('/')}
               style={{ marginRight: 20, cursor: 'pointer' }}

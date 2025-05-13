@@ -4,7 +4,20 @@ import {
   InternalErrorResponse,
   ValidateErrorResponse,
 } from 'common/types/api/errors'
-import { Route, Tags, Controller, Get, Response, Patch, Body, Middlewares, NoSecurity } from 'tsoa'
+import {
+  Route,
+  Tags,
+  Controller,
+  Get,
+  Response,
+  Patch,
+  Body,
+  Middlewares,
+  NoSecurity,
+  Post,
+  UploadedFile,
+} from 'tsoa'
+import { Readable } from 'stream'
 import type {
   GetSettingsResponse,
   GetThemeResponse,
@@ -58,5 +71,35 @@ export class SettingsController extends Controller {
       },
     })
     return { data: themedata }
+  }
+
+  @Post('/logo')
+  @Response<ValidateErrorResponse>('422', 'Validation Failed')
+  public async uploadLogo(@UploadedFile() file: Express.Multer.File) {
+    const sharp = require('sharp')
+    const buffer = await sharp(file.buffer).resize(200).png().toBuffer()
+    await prisma.organisation.update({ where: { id: 1 }, data: { logo: buffer } })
+  }
+
+  @Get('/logo')
+  @NoSecurity()
+  @Response<ValidateErrorResponse>('422', 'Validation Failed')
+  public async getLogo(): Promise<Readable> {
+    const org = await prisma.organisation.findFirstOrThrow({
+      where: { id: 1 },
+      select: { logo: true },
+    })
+
+    if (!org.logo) {
+      const sharp = require('sharp')
+      const blankLogo = await sharp({
+        create: { width: 200, height: 100, channels: 3, background: { r: 255, g: 255, b: 255 } },
+      })
+        .png()
+        .toBuffer()
+      return Readable.from(blankLogo)
+    }
+
+    return Readable.from(org.logo as Buffer)
   }
 }

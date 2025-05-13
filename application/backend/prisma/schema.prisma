@@ -102,6 +102,7 @@ model Organisation {
   secondaryColour String?
   redcapURL String?
   redcapToken String?
+  logo Bytes?
   users     User[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

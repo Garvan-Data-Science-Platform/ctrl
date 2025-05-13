@@ -15,7 +15,7 @@ import { useState } from 'react'
 import { GeneratePasswordResetLinkRequest } from '@common/types/api/users'
 
 export default function ForgotPassword() {
-  const logoPath = './australian-genomics-logo.png'
+  const logoPath = import.meta.env.VITE_BACKEND_URL + '/settings/logo'
 
   const {
     register,

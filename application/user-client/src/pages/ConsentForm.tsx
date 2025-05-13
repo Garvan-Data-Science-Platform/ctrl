@@ -242,7 +242,7 @@ export default function ConsentForm() {
       </Modal>
       <Box sx={{ position: 'absolute', top: 10, left: 40 }}>
         <img
-          src="/australian-genomics-logo.png"
+          src={import.meta.env.VITE_BACKEND_URL + '/settings/logo'}
           height={30}
           onClick={() => nav('/')}
           style={{ marginRight: 20, cursor: 'pointer' }}

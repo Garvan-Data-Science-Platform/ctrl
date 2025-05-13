@@ -4,6 +4,7 @@ import { useForm } from '@refinedev/react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { axiosInstance } from '../../providers/dataProvider'
 import { SensitiveTextField } from '../../components/SensitiveTextField'
+import { useState } from 'react'
 
 const SettingsPage = () => {
   type FieldValues = {
@@ -59,11 +60,31 @@ const SettingsPage = () => {
     return s.color !== ''
   }
 
+  const [reloader, setReloader] = useState('')
+
+  const uploadLogo = async (file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    try {
+      await axiosInstance.post('/settings/logo', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+      open?.({ type: 'success', message: 'Updated logo' })
+      setReloader('#' + Math.random())
+    } catch (e: any) {
+      open?.({ type: 'error', message: `Failed to update logo: ${e.response.data.details}` })
+    }
+  }
+
   return (
     <Container maxWidth="sm" sx={{ ml: 1, mt: 3 }}>
       <Typography variant="h4" gutterBottom>
         Settings
       </Typography>
+
       <Box
         component="form"
         onSubmit={handleSubmit(handleSave)}
@@ -116,7 +137,24 @@ const SettingsPage = () => {
             data-cy="mailerPassword"
           />
         </Box>
-        <Typography sx={{ mt: 2 }}>Colour scheme (User portal)</Typography>
+        <Box sx={{ mt: 2 }}>
+          <Typography>Logo</Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Button variant="outlined" component="label" sx={{ mr: 3, height: 40 }}>
+              UPLOAD FILE
+              <input
+                type="file"
+                hidden
+                accept=".png,.jpg,.jpeg,.tif"
+                onChange={(e) => {
+                  uploadLogo(e.target.files?.item(0) as File)
+                }}
+              />
+            </Button>
+            <img src={import.meta.env.VITE_BACKEND_URL + '/settings/logo' + reloader} height={60} />
+          </Box>
+        </Box>
+        <Typography sx={{ mt: 2 }}>Colour Scheme (User Portal)</Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <TextField
             {...register('primaryColour', {
@@ -165,6 +203,7 @@ const SettingsPage = () => {
             }}
           />
         </Box>
+
         <Typography sx={{ mt: 2 }}>Redcap Integration</Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column' }} id="redcap">
           <TextField
@@ -216,6 +255,7 @@ const SettingsPage = () => {
           </Button>
         </Box>
       </Box>
+
       <Box sx={{ height: 300 }} />
     </Container>
   )
