@@ -24,7 +24,6 @@ describe('REDCap Participant Upload', () => {
 
     it('should have upload button and API form', () => {
       cy.contains('UPLOAD FILE').should('be.visible')
-      cy.get('[data-cy="formName"]').should('be.visible')
       cy.contains('button', 'Import from API').should('be.visible')
     })
 
@@ -64,11 +63,6 @@ describe('REDCap Participant Upload', () => {
       // Click the initial confirm button
       cy.contains('button', 'Confirm').click()
 
-      // Intercept the upload request
-      cy.intercept('POST', '**/integrations/redcap/participant/upload/csv', {
-        statusCode: 201,
-      }).as('uploadFile')
-
       cy.url({ timeout: 10000 }).should('include', '/participants/')
 
       // Check that the invite modal is opened and it has the correct emails
@@ -93,7 +87,7 @@ describe('REDCap Participant Upload', () => {
       })
 
       cy.get('[data-cy="send-button"]').should('be.visible').click()
-      cy.wait(5000)
+      cy.wait(10000)
 
       // Check updated invites
       cy.request({
@@ -136,13 +130,18 @@ describe('REDCap Participant Upload', () => {
         cy.wrap(initialInvites).as('initialInvites')
       })
 
-      const formName = 'test_form'
       cy.get('[data-cy="apiSubmit"]').should('be.visible').should('be.disabled')
-      cy.get('[data-cy="formName"]').should('be.visible').type(formName)
+      cy.get('[data-cy="redcapAPIToken"]').should('be.visible').type('DUMMY_TOKEN')
       cy.get('[data-cy="apiSubmit"]').should('be.visible').should('be.enabled')
 
       cy.intercept('POST', '**/integrations/redcap/participant/upload/api', {
         statusCode: 200,
+        body: {
+          profilesCreatedCount: 3,
+          profilesAlreadyExistedCount: 0,
+          ids: [],
+          newInvites: ['rishi@sanjobanjo.com', 'example@example.com', 'new@email.com'],
+        },
       })
 
       cy.contains('button', 'Import from API').click()
@@ -152,7 +151,7 @@ describe('REDCap Participant Upload', () => {
       // Check that the invite modal is opened and it has the correct emails
       cy.get('[data-cy="invite-modal"]').should('be.visible')
 
-      const expectedEmailsInModal = ['initial@email.com']
+      const expectedEmailsInModal = ['rishi@sanjobanjo.com', 'example@example.com', 'new@email.com']
       cy.get('[data-cy="recipients-list"]').within(() => {
         expectedEmailsInModal.forEach((email) => {
           cy.contains(email).should('exist')
@@ -174,15 +173,6 @@ describe('REDCap Participant Upload', () => {
         expect(response.status).to.eq(200)
         updatedInvites = response.body.data
         cy.wrap(updatedInvites).as('updatedInvites')
-      })
-
-      // Check that the participant has been updated
-      cy.get('@initialInvites').then((initialInvites) => {
-        cy.get('@updatedInvites').then((updatedInvites) => {
-          //const num_new_invites = updatedInvites.length - initialInvites.length
-          //expect(initialInvites.length).to.be.lessThan(updatedInvites.length)
-          //expect(num_new_invites).to.eq(1)
-        })
       })
     })
 
