@@ -81,6 +81,7 @@ const SettingsPage = () => {
             type="text"
             label={'SMTP Host'}
             name="mailerHost"
+            data-cy="mailerHost"
           />
           <TextField
             {...register('mailerPort', {})}
@@ -91,6 +92,7 @@ const SettingsPage = () => {
             type="text"
             label={'SMTP Port'}
             name="mailerPort"
+            data-cy="mailerPort"
           />
           <TextField
             {...register('mailerUser', {})}
@@ -101,6 +103,7 @@ const SettingsPage = () => {
             type="text"
             label={'SMTP Username'}
             name="mailerUser"
+            data-cy="mailerUser"
           />
           <SensitiveTextField
             {...register('mailerPassword', {})}
@@ -110,6 +113,7 @@ const SettingsPage = () => {
             InputLabelProps={{ shrink: true }}
             label={'SMTP Password'}
             name="mailerPassword"
+            data-cy="mailerPassword"
           />
         </Box>
         <Typography sx={{ mt: 2 }}>Colour scheme (User portal)</Typography>
@@ -130,6 +134,7 @@ const SettingsPage = () => {
             placeholder="#a1b2c3   /  rgb(10, 20, 30)"
             label={'Primary Colour'}
             name="primaryColour"
+            data-cy="primaryColour"
             slotProps={{
               input: {
                 endAdornment: <Box sx={{ width: 20, height: 20, bgcolor: primaryColor }} />,
@@ -152,6 +157,7 @@ const SettingsPage = () => {
             placeholder="#a1b2c3   /  rgb(10, 20, 30)"
             label={'Secondary Colour'}
             name="secondaryColour"
+            data-cy="secondaryColour"
             slotProps={{
               input: {
                 endAdornment: <Box sx={{ width: 20, height: 20, bgcolor: secondaryColor }} />,
@@ -176,6 +182,7 @@ const SettingsPage = () => {
             type="text"
             label={'Redcap API URL'}
             name="redcapURL"
+            data-cy="redcapURL"
           />
           <SensitiveTextField
             {...register('redcapToken', {})}
@@ -184,10 +191,16 @@ const SettingsPage = () => {
             type="text"
             label={'Redcap API Token'}
             name="redcapToken"
+            data-cy="redcapToken"
           />
         </Box>
         <Box sx={{ display: 'flex' }}>
-          <Button variant="contained" sx={{ mt: 3, mr: 1, flex: 1 }} type="submit">
+          <Button
+            variant="contained"
+            sx={{ mt: 3, mr: 1, flex: 1 }}
+            type="submit"
+            data-cy="save-button"
+          >
             Save
           </Button>
           <Button
@@ -197,6 +210,7 @@ const SettingsPage = () => {
             onClick={() => {
               nav(0)
             }}
+            data-cy="discard-button"
           >
             Discard Changes
           </Button>
