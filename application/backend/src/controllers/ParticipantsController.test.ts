@@ -185,7 +185,7 @@ describe('InvitesController', () => {
     }, 100000)
 
     it('should resend emails for status PENDING invites and reset the expiry', async () => {
-      const emailPendingInvite = 'invite1@pending.com'
+      const emailPendingInvite = 'john@example.com'
 
       // Check the status REVOKED invite
       const invite = await prisma.invite.findUnique({
