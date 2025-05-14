@@ -149,9 +149,15 @@ const SettingsPage = () => {
                 onChange={(e) => {
                   uploadLogo(e.target.files?.item(0) as File)
                 }}
+                data-cy="logo-upload"
               />
             </Button>
-            <img src={import.meta.env.VITE_BACKEND_URL + '/settings/logo' + reloader} height={60} />
+            <img
+              src={import.meta.env.VITE_BACKEND_URL + '/settings/logo' + reloader}
+              height={60}
+              data-cy="logo-preview"
+              id="logo-preview"
+            />
           </Box>
         </Box>
         <Typography sx={{ mt: 2 }}>Colour Scheme (User Portal)</Typography>

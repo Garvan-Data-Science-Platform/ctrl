@@ -50,6 +50,7 @@ export default function NavBar() {
               height={30}
               onClick={() => nav('/')}
               style={{ marginRight: 20, cursor: 'pointer' }}
+              data-cy="logo"
             />
           </Box>
 

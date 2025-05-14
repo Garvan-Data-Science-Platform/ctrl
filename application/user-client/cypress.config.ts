@@ -5,6 +5,7 @@ import {
   getLatestFile,
   readPdf,
   deleteFile,
+  updateLogo,
 } from 'common/testing/TestHelpers'
 import { PASSWORD_RESET_USER_EMAIL } from 'common/testing/seed'
 import { defineConfig } from 'cypress'
@@ -36,6 +37,9 @@ export default defineConfig({
         },
         deleteFile(filePath: string) {
           return deleteFile(filePath)
+        },
+        updateLogo(filePath: string) {
+          return updateLogo(filePath)
         },
       })
     },

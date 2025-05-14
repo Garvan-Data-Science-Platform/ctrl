@@ -1570,6 +1570,11 @@
       "Organisation": {
         "description": "Model Organisation",
         "properties": {
+          "logo": {
+            "type": "string",
+            "format": "byte",
+            "nullable": true
+          },
           "redcapURL": {
             "type": "string",
             "nullable": true
@@ -1620,6 +1625,7 @@
           }
         },
         "required": [
+          "logo",
           "redcapURL",
           "redcapToken",
           "secondaryColour",
@@ -3269,6 +3275,125 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Settings"
+        ],
+        "security": [],
+        "parameters": []
+      }
+    },
+    "/settings/logo": {
+      "post": {
+        "operationId": "UploadLogo",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "GetLogo",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
                 }
               }
             }

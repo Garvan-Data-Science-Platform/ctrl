@@ -6,7 +6,7 @@ beforeEach(() => {
   cy.task('reset')
 })
 
-describe('Publish and complete', () => {
+describe('Settings page', () => {
   const fieldMap = {
     mailerHost: 'host.com',
     mailerPort: '123',
@@ -105,5 +105,23 @@ describe('Publish and complete', () => {
     cy.contains('Redcap API is not set up').should('exist')
     cy.contains('Redcap settings').click()
     cy.url().should('contain', '/settings#redcap')
+  })
+
+  it('Can update logo', () => {
+    cy.login(UserType.ADMIN)
+    cy.visit('/settings')
+    cy.get('[data-cy="logo-upload"]').attachFile('valid_logo.png')
+    cy.contains('Updated logo').should('exist')
+    cy.get('[data-cy="logo-preview"]').invoke('prop', 'naturalWidth').should('be.greaterThan', 0)
+    cy.get('[data-cy="logo-preview"]').invoke('prop', 'naturalHeight').should('equal', 85)
+  })
+
+  it('Invalid logo fails to update', () => {
+    cy.login(UserType.ADMIN)
+    cy.visit('/settings')
+    cy.get('[data-cy="logo-upload"]').attachFile('invalid_logo.png')
+    cy.contains('Failed').should('exist')
+    cy.get('[data-cy="logo-preview"]').invoke('prop', 'naturalWidth').should('be.greaterThan', 0)
+    cy.get('[data-cy="logo-preview"]').invoke('prop', 'naturalHeight').should('equal', 100)
   })
 })
