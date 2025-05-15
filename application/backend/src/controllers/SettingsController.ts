@@ -33,9 +33,9 @@ import sharp from 'sharp'
 @Middlewares(auditLog)
 export class SettingsController extends Controller {
   /**
-   * Get the current Participants Profile
+   * Get the current organisation
    *
-   * @summary Get the current Participants Profile
+   * @summary Get the current organisation settings
    */
   @Get('/')
   public async getSettings(): Promise<GetSettingsResponse> {
