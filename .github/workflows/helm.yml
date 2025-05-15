@@ -23,7 +23,7 @@ jobs:
         uses: azure/setup-helm@v4.3.0
 
       - name: install from helm
-        run: helm dependency build .helm/ctrl && helm install --wait --set nginx-ingress.enabled=false --set userClient.image.tag=latest --set adminClient.image.tag=latest --set backend.image.tag=latest ctrl .helm/ctrl
+        run: helm repo add jetstack https://charts.jetstack.io --force-update && helm dependency build .helm/ctrl && helm install --wait --set nginx-ingress.enabled=false --set userClient.image.tag=latest --set adminClient.image.tag=latest --set backend.image.tag=latest ctrl .helm/ctrl
 
       - name: test installation
         run: helm test ctrl --logs
@@ -48,7 +48,7 @@ jobs:
         uses: azure/setup-helm@v4.3.0
 
       - name: install previous version with helm
-        run: helm dependency build .helm/ctrl && helm install --wait --set nginx-ingress.enabled=false ctrl oci://australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl:0.1.17
+        run: helm repo add jetstack https://charts.jetstack.io --force-update && helm dependency build .helm/ctrl && helm install --wait --set nginx-ingress.enabled=false ctrl oci://australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl:0.1.17
 
       - name: seed
         run: kubectl exec deployment/backend -- yarn prisma:seed
