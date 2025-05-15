@@ -53,8 +53,7 @@ describe('ProfilesController', () => {
         state: 'VIC',
         suburb: 'Melbourne',
         email: 'test3@example.com',
-        familyId: 100,
-        firstName: 'Test',
+        firstName: 'Completed',
         lastName: 'User',
         familyMembers: [
           { id: 100, firstName: 'Test', lastName: 'Dependent', participantType: 'DEPENDENT_AGE' },
@@ -96,7 +95,7 @@ describe('ProfilesController', () => {
         state: 'VIC',
         suburb: 'Melbourne',
         email: 'test3@example.com',
-        firstName: 'Test',
+        firstName: 'Completed',
         lastName: 'User',
       })
 

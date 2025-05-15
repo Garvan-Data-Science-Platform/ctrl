@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "type-check": "tsc",
     "lint": "eslint .",
     "preview": "vite preview",
     "cy:open": "cypress open",
@@ -40,8 +41,8 @@
     "eslint-plugin-react-refresh": "^0.4.9",
     "globals": "^15.9.0",
     "start-server-and-test": "^2.0.9",
-    "typescript": "^5.5.3",
-    "typescript-eslint": "^8.0.1",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.31.1",
     "vite": "^5.4.1",
     "winston": "^3.17.0"
   }

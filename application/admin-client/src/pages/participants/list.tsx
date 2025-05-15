@@ -11,8 +11,8 @@ import {
 } from '@mui/material'
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import { DateField, EditButton, List, ShowButton, useDataGrid } from '@refinedev/mui'
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { InviteModal } from '../../components/InviteModal'
 import { axiosInstance } from '../../providers/dataProvider'
 import { useInvalidate, useNotification } from '@refinedev/core'
@@ -47,7 +47,10 @@ export const ParticipantList = () => {
     sorters: { mode: 'off' },
   })
 
+  const location = useLocation()
   const invalidate = useInvalidate()
+
+  const [initialEmails, setInitialEmails] = useState<string[]>([])
 
   const [modalOpen, setModalOpen] = useState(false)
 
@@ -58,10 +61,19 @@ export const ParticipantList = () => {
 
   const { open } = useNotification()
 
-  const sendInvites = (emails: string[]) => {
+  useEffect(() => {
+    if (location.state?.openInviteModal) {
+      setModalOpen(true)
+      setInitialEmails(location.state.initialEmails || [])
+      // Clear the navigation state
+      window.history.replaceState({}, document.title)
+    }
+  }, [location])
+
+  const sendInvites = (emails: string[], subjectText: string, explanatoryText: string) => {
     setLoading(true)
     axiosInstance
-      .post('invites', { emails })
+      .post('invites', { emails, subjectText, explanatoryText })
       .then(() => {
         setModalOpen(false)
         open?.({ type: 'success', message: `Invites sent` })
@@ -148,12 +160,13 @@ export const ParticipantList = () => {
         headerName: 'Latest Survey Response',
         minWidth: 100,
         type: 'date',
-        valueGetter: (cell) => {
-          if (!cell.value) return null
-          return new Date(cell.value)
+        valueGetter: (value) => {
+          if (!value) return null
+          return new Date(value)
         },
         renderCell: function render({ value }) {
-          return <DateField value={value} format="DD/MM/YYYY" />
+          //TODO: Localisation
+          return <DateField sx={{ p: 2 }} value={value} format="DD/MM/YYYY" />
         },
       },
       {
@@ -187,11 +200,12 @@ export const ParticipantList = () => {
     [],
   )
 
-  const inviteStatusMap: { [key in InviteStatus]: string } = {
-    ACCEPTED: 'Accepted',
-    EXPIRED: 'Expired',
-    PENDING: 'Pending',
-    REVOKED: 'Revoked',
+  const inviteStatusMap: { [key in InviteStatus]: { label: string; color?: string } } = {
+    ACCEPTED: { label: 'Accepted' },
+    EXPIRED: { label: 'Expired' },
+    PENDING: { label: 'Pending' },
+    REVOKED: { label: 'Revoked' },
+    FAILED_TO_SEND: { label: 'Failed to send', color: 'error.main' },
   }
 
   const inviteCols = React.useMemo<GridColDef[]>(
@@ -202,23 +216,27 @@ export const ParticipantList = () => {
         flex: 2,
       },
       {
-        field: 'createdAt',
+        field: 'sentAt',
         headerName: 'Date Sent',
         flex: 1,
         type: 'date',
-        valueGetter: (cell) => {
-          if (!cell.value) return null
-          return new Date(cell.value)
+        valueGetter: (value) => {
+          if (!value) return null
+          return new Date(value)
         },
         renderCell: function render({ value }) {
-          return <DateField value={value} format="DD/MM/YYYY" />
+          return <DateField sx={{ p: 2 }} value={value} format="DD/MM/YYYY" />
         },
       },
       {
         field: 'inviteStatus',
         headerName: 'Status',
         flex: 1,
-        renderCell: ({ value }) => inviteStatusMap[value as InviteStatus],
+        renderCell: ({ value }) => (
+          <Box sx={{ color: inviteStatusMap[value as InviteStatus].color }}>
+            {inviteStatusMap[value as InviteStatus].label}
+          </Box>
+        ),
         type: 'singleSelect',
         valueOptions: Object.keys(InviteStatus),
       },
@@ -279,6 +297,7 @@ export const ParticipantList = () => {
               setModalOpen(false)
             }}
             onSend={sendInvites}
+            initialEmails={initialEmails}
           />
         </Box>
       </Modal>
@@ -308,7 +327,12 @@ export const ParticipantList = () => {
       </List>
       <Box sx={{ mt: 1 }} />
       <List headerProps={{ title: 'Invites' }}>
-        <DataGrid {...inviteGridProps} columns={inviteCols} autoHeight data-cy="pending-list" />
+        <DataGrid
+          {...inviteGridProps}
+          columns={inviteCols}
+          autoHeight
+          slotProps={{ root: { 'data-cy': 'pending-list' } }}
+        />
       </List>
     </>
   )

@@ -1,6 +1,10 @@
-ARG NODE_VERSION=20.10.0
+ARG NODE_VERSION
 
 FROM node:${NODE_VERSION}-alpine
+
+# Create openssl symlink if required (it was required when this line was added)
+# https://github.com/prisma/prisma/issues/25817
+RUN [ ! -e /lib/libssl.so.3 ] && ln -s /usr/lib/libssl.so.3 /lib/libssl.so.3 || echo "Link already exists"
 
 ARG NODE_ENV=production
 ENV NODE_ENV $NODE_ENV

@@ -16,10 +16,15 @@ jobs:
         run: corepack enable
       - name: Configure Environment
         run: cp ./application/backend/.env.test ./application/backend/.env
+      - name: Parse node version
+        id: nvm
+        uses: ./.github/actions/parse-node-version
+      - name: Check node version
+        run: echo "node_version=${{ steps.nvm.outputs.node_version }}"
       - name: Setup Nodejs and npm
         uses: actions/setup-node@v4
         with:
-          node-version: '20.10.0'
+          node-version: ${{ steps.nvm.outputs.node_version }}
           cache: 'yarn'
       - run: yarn install && yarn prisma:generate
       - name: Check Types
@@ -44,10 +49,15 @@ jobs:
         run: corepack enable
       - name: Configure Environment
         run: cp ./application/backend/.env.test ./application/backend/.env
+      - name: Parse node version
+        id: nvm
+        uses: ./.github/actions/parse-node-version
+      - name: Check node version
+        run: echo "node_version=${{ steps.nvm.outputs.node_version }}"
       - name: Setup Nodejs and npm
         uses: actions/setup-node@v4
         with:
-          node-version: '20.10.0'
+          node-version: ${{ steps.nvm.outputs.node_version }}
           cache: 'yarn'
       - run: yarn install
       - name: Run Tests

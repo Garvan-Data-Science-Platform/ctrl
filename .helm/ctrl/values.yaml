@@ -45,11 +45,21 @@ mailer:
 redcap:
   apiUrl:
 
+cert-manager: #Use to enable https
+  enabled: false
+  crds:
+    enabled: true
+
+letsencryptEmail: #Required if using cert-manager
+
 ingress:
   enabled: true
   className: 'nginx'
   annotations:
-    { nginx.org/rewrites: 'serviceName=backend rewrite=/' }
+    nginx.org/rewrites: 'serviceName=backend rewrite=/'
+    #ingress.kubernetes.io/ssl-redirect: 'false'
+    acme.cert-manager.io/http01-edit-in-place: 'true'
+    cert-manager.io/issuer: 'letsencrypt-prod'
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:

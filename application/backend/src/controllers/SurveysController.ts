@@ -17,6 +17,7 @@ import {
 } from 'tsoa'
 import logger from 'common/src/logger'
 import type {
+  GetAllResponsesResponse,
   GetResponsesByIdResponse,
   GetSurveyVersionsResponse,
   GetUserSurveyStepResponse,
@@ -64,7 +65,7 @@ export class SurveysController extends Controller {
     if (surveys.length == 0) {
       const study = await prisma.study.create({})
       const initial_survey = await this.surveyRepo.create({
-        data: { versionNumber: 1, data: [], status: 'DRAFT', studyId: study.id },
+        data: { data: [], status: 'DRAFT', studyId: study.id },
       })
       surveys.push(initial_survey)
     }
@@ -234,6 +235,31 @@ export class SurveysController extends Controller {
     }
 
     return { data: { steps: stepData, derived_from: surveyParticipant.derived || undefined } }
+  }
+
+  /**
+   * Get all responses for a survey version
+   *
+   * @summary Get all responses of all participants for a survey version
+   */
+  @Get('/responses/all/:versionId')
+  @Response('404', 'Not Found')
+  public async getAllResponses(@Path() versionId: number): Promise<GetAllResponsesResponse> {
+    const participants = await this.spRepo.findMany({
+      where: { versionId: versionId },
+      select: {
+        answers: true,
+        versionId: true,
+        profile: { select: { firstName: true, lastName: true, dob: true, familyId: true } },
+      },
+    })
+
+    const survey = await this.surveyRepo.findUniqueOrThrow({
+      where: { id: versionId },
+      select: { data: true },
+    })
+
+    return { data: { surveyData: survey.data, participants } }
   }
 
   /**
@@ -434,7 +460,7 @@ export class SurveysController extends Controller {
     }
 
     await this.surveyRepo.create({
-      data: { status: 'DRAFT', data: survey.data, versionNumber: survey.versionNumber + 1 },
+      data: { status: 'DRAFT', data: survey.data },
     })
 
     await this.surveyRepo.update({

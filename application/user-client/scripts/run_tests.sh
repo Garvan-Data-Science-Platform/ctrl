@@ -1,5 +1,8 @@
 set -e
 
+# Parse node version
+NODE_VERSION=$(cat ../../.nvmrc | tr -d 'v')
+
 # Default mode is 'run' if no argument is provider
 
 if [ "$CYPRESS_MODE" != "open" ] && [ "$CYPRESS_MODE" != "run" ]; then
@@ -10,7 +13,7 @@ fi
 echo "Running tests in cypress $CYPRESS_MODE mode"
 
 # Spin-up backend and db
-docker compose up --build -d --wait db-test backend-test
+NODE_VERSION=$NODE_VERSION docker compose up --build -d --wait db-test backend-test
 
 # Generate prisma types
 yarn workspace backend prisma:generate
@@ -19,4 +22,5 @@ yarn workspace backend prisma:generate
 npx dotenv -e ../backend/.env.test start-server-and-test 'vite --port 5002 --host 0.0.0.0' http://localhost:5002 cy:$CYPRESS_MODE
 
 # Tear down
-docker compose down db-test backend-test
+#   Adding node version to silence a warning
+NODE_VERSION=$NODE_VERSION docker compose down db-test backend-test

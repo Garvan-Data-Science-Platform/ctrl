@@ -1,6 +1,6 @@
 #Must be built from top directory
 
-ARG NODE_VERSION=20.10.0
+ARG NODE_VERSION
 
 FROM node:${NODE_VERSION}-alpine AS build
 

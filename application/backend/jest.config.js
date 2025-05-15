@@ -1,12 +1,13 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 
-module.exports = {
+export default {
   clearMocks: true,
   preset: 'ts-jest',
   testEnvironment: 'node',
   moduleNameMapper: {
     '^@common/(.*)$': '<rootDir>/../common/$1',
   },
+  extensionsToTreatAsEsm: ['.ts', '.tsx'],
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
   },

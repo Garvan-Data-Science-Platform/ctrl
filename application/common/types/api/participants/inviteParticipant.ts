@@ -11,11 +11,15 @@ type Email = string
  */
 export interface InviteParticipantsRequest {
   emails: Email[]
+  subjectText: string
+  explanatoryText: string
 }
 
 export interface InviteParticipantsResponse {
   resendEmailRequestCount: number
   newInvitesCount: number
-  emailsToResendCount: number
+  emailsResentCount: number
+  failedEmails: string[]
+  failedEmailsCount: number
   alreadyAcceptedCount: number
 }

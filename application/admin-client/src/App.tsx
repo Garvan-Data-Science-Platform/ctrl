@@ -25,15 +25,15 @@ import { SurveyList, SurveyEditor } from './pages/surveys'
 import { ColorModeContextProvider } from './contexts/color-mode'
 import { Header } from './components/header'
 import { Login } from './pages/login'
-import { Register } from './pages/register'
 import { ForgotPassword } from './pages/forgotPassword'
 import { authProvider } from './providers/authProvider'
 import { ParticipantList, ParticipantShow } from './pages/participants'
-import { SurveyImport, IntegrationsHome } from './pages/integrations'
+import { SurveyImport, IntegrationsHome, ParticipantImport } from './pages/integrations'
 import { ResponsesView } from './pages/responses'
 import { ListAlt, Person, RecentActors, DatasetLinked } from '@mui/icons-material'
 import { ParticipantEdit } from './pages/participants/edit'
 import { SetupPage } from './pages/setup'
+import { AllResponsesView } from './pages/responses/all'
 import { FamilyEdit } from './pages/family/edit'
 
 function App() {
@@ -98,6 +98,13 @@ function App() {
                   {
                     name: 'surveys/responses',
                     show: '/responses/:id',
+                    meta: {
+                      canDelete: true,
+                    },
+                  },
+                  {
+                    name: 'surveys/responses/all',
+                    show: '/responses/all/:id',
                     meta: {
                       canDelete: true,
                     },
@@ -170,7 +177,9 @@ function App() {
                     <Route path="/integrations">
                       <Route index element={<IntegrationsHome />} />
                       <Route path="redcap/survey/import" element={<SurveyImport />} />
+                      <Route path="redcap/participant/import" element={<ParticipantImport />} />
                     </Route>
+                    <Route path="/responses/all/:id" index element={<AllResponsesView />} />
                     <Route path="/responses/:id" index element={<ResponsesView />} />
                     <Route path="*" element={<ErrorComponent />} />
                   </Route>
@@ -183,7 +192,6 @@ function App() {
                   >
                     <Route path="/login" element={<Login />} />
                     <Route path="/setup" element={<SetupPage />} />
-                    <Route path="/register" element={<Register />} />
                     <Route path="/forgot-password" element={<ForgotPassword />} />
                   </Route>
                 </Routes>

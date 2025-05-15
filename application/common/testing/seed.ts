@@ -14,8 +14,9 @@ export const PASSWORD_RESET_USER_ID = 105
 export const PASSWORD_RESET_USER_EMAIL = 'test-reset-password@example.com'
 
 export async function seedTests(prisma: PrismaClient) {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const ExampleSurveyStepData = require('../src/surveys/exampleSurveyStepData.json')
+  const ExampleSurveyStepData = await import('../src/surveys/exampleSurveyStepData.json', {
+    assert: { type: 'json' },
+  }).then((module) => module.default)
   await prisma.organisation.create({
     data: {
       id: 99,
@@ -112,10 +113,10 @@ export async function seedTests(prisma: PrismaClient) {
   await prisma.participantProfile.create({
     data: {
       id: PARTICIPANT_UNANSWERED_ID,
-      firstName: 'Test',
+      firstName: 'Unanswered',
       lastName: 'User',
       addressLine: '123 smith st',
-      dob: new Date('1980-01-23'),
+      dob: new Date('1980-01-24'),
       mobile: '0412345678',
       postcode: '1234',
       preferredContact: 'EMAIL',
@@ -138,7 +139,7 @@ export async function seedTests(prisma: PrismaClient) {
   await prisma.participantProfile.create({
     data: {
       id: PARTICIPANT_COMPLETED_ID,
-      firstName: 'Test',
+      firstName: 'Completed',
       lastName: 'User',
       addressLine: '123 smith st',
       dob: new Date('1980-01-23'),
@@ -193,14 +194,12 @@ export async function seedTests(prisma: PrismaClient) {
 
   await prisma.surveyVersion.create({
     data: {
-      versionNumber: 1,
       status: 'PUBLISHED',
       data: ExampleSurveyStepData as SurveyStep[],
     },
   })
   await prisma.surveyVersion.create({
     data: {
-      versionNumber: 2,
       status: 'DRAFT',
       data: ExampleSurveyStepData as SurveyStep[],
     },
