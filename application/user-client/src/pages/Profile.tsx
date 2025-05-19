@@ -6,6 +6,7 @@ import type { GetParticipantProfileResponse } from '@common/types/api/users'
 import { Link } from 'react-router-dom'
 import { apiClient } from '../apiClient'
 import { familyMap } from '@common/src/familyMap'
+import { useEffect } from 'react'
 
 export default function Profile() {
   const {
@@ -19,6 +20,10 @@ export default function Profile() {
         .get('/profiles/current')
         .then((res) => res.data) as Promise<GetParticipantProfileResponse>,
   })
+
+  useEffect(() => {
+    document.title = 'Personal Details | CTRL'
+  }, [])
 
   if (isLoading || !pdata) return 'Loading'
 

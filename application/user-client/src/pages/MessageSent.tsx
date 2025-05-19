@@ -1,7 +1,11 @@
 import { Container, Typography } from '@mui/material'
 import NavBar from '../components/NavBar'
+import { useEffect } from 'react'
 
 export default function MessageSent() {
+  useEffect(() => {
+    document.title = 'Message Sent | CTRL'
+  }, [])
   return (
     <>
       <NavBar />
