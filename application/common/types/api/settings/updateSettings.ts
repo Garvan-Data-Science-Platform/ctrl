@@ -1,2 +1,2 @@
 import { GetSettingsResponse } from './getSettings'
-export interface UpdateSettingsRequest extends Partial<GetSettingsResponse['data']> {}
+export type UpdateSettingsRequest = Partial<GetSettingsResponse['data']>

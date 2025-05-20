@@ -245,6 +245,8 @@ export const RedcapImport = ({
             ) : (
               <>
                 <Typography>Redcap API is not set up</Typography>
+                {/* 
+                // @ts-ignore */}
                 <Button component={HashLink} to="/settings#redcap">
                   Redcap settings
                 </Button>
