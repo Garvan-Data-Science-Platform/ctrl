@@ -6,6 +6,21 @@ import { createDefaultAnswers } from '../../src/utils/answers'
 const prisma = new PrismaClient()
 
 const main = async () => {
+  await prisma.organisation.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
+      id: 1,
+      name: 'OrgName',
+      mailerHost: process.env.MAILER_HOST,
+      mailerPort: process.env.MAILER_PORT ? Number(process.env.MAILER_PORT) : null,
+      mailerUser: process.env.MAILER_USER,
+      mailerPassword: process.env.MAILER_PASSWORD,
+      redcapURL: process.env.REDCAP_API_URL,
+      redcapToken: process.env.REDCAP_API_TOKEN,
+    },
+  })
+
   // Ensure a Study record exists with id = 1
   const defaultStudy = await prisma.study.upsert({
     where: { id: 1 },

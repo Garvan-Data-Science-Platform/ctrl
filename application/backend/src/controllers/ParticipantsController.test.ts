@@ -322,13 +322,12 @@ describe('InvitesController', () => {
       // Check email(s) were successfully sent
       const sentEmails = mockNodeMailer.mock.getSentMail()
       expect(sentEmails.length).toBe(4)
-      expect(sentEmails).toEqual(
-        expect.arrayContaining([expect.objectContaining({ to: emailPendingInvite })]),
-      )
-      expect(sentEmails[0]).toHaveProperty('from', `CTRL <noreply@${process.env.HOSTNAME}>`)
-      expect(sentEmails[0].subject).toBe('New Subject')
-      expect(sentEmails[0].html).toContain('New Text')
-      expect(sentEmails[0].text).toContain('New Text')
+      const targetEmail = sentEmails.find((email) => email.to === emailPendingInvite)
+      expect(targetEmail).toBeDefined()
+      expect(targetEmail).toHaveProperty('from', `CTRL <noreply@${process.env.HOSTNAME}>`)
+      expect(targetEmail!.subject).toBe('New Subject')
+      expect(targetEmail!.html).toContain('New Text')
+      expect(targetEmail!.text).toContain('New Text')
     })
   })
 
