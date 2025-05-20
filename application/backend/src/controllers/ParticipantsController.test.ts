@@ -185,7 +185,7 @@ describe('InvitesController', () => {
     }, 100000)
 
     it('should resend emails for status PENDING invites and reset the expiry', async () => {
-      const emailPendingInvite = 'invite1@pending.com'
+      const emailPendingInvite = 'john@example.com'
 
       // Check the status REVOKED invite
       const invite = await prisma.invite.findUnique({
@@ -322,11 +322,12 @@ describe('InvitesController', () => {
       // Check email(s) were successfully sent
       const sentEmails = mockNodeMailer.mock.getSentMail()
       expect(sentEmails.length).toBe(4)
-      expect(sentEmails[0]).toHaveProperty('to', emailPendingInvite)
-      expect(sentEmails[0]).toHaveProperty('from', `CTRL <noreply@${process.env.HOSTNAME}>`)
-      expect(sentEmails[0].subject).toBe('New Subject')
-      expect(sentEmails[0].html).toContain('New Text')
-      expect(sentEmails[0].text).toContain('New Text')
+      const targetEmail = sentEmails.find((email) => email.to === emailPendingInvite)
+      expect(targetEmail).toBeDefined()
+      expect(targetEmail).toHaveProperty('from', `CTRL <noreply@${process.env.HOSTNAME}>`)
+      expect(targetEmail!.subject).toBe('New Subject')
+      expect(targetEmail!.html).toContain('New Text')
+      expect(targetEmail!.text).toContain('New Text')
     })
   })
 

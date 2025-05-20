@@ -12,7 +12,7 @@ import {
   QuickFilterClear,
   QuickFilterControl,
   QuickFilterTrigger,
-  ToolbarButton,
+  ToolbarButton as TB,
   Toolbar,
   GridViewColumnIcon,
   useGridApiContext,
@@ -26,6 +26,8 @@ import { styled } from '@mui/material/styles'
 import { Badge, Divider, InputAdornment, TextField, Tooltip } from '@mui/material'
 import { Cancel, FileDownload } from '@mui/icons-material'
 import { ParticipantData } from '@common/types/api/surveys/getAllResponses'
+
+const ToolbarButton = TB as any
 
 export const AllResponsesView = () => {
   const { queryResult } = useShow<GetAllResponsesResponse['data']>({

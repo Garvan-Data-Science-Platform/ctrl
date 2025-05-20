@@ -9,7 +9,7 @@ import * as express from 'express'
 import prisma from '../PrismaClient'
 import { Role } from '@prisma/client'
 import { NotFoundError } from '../middlewares/ErrorHandler'
-import mailerTransporter, { fromAddress } from '../utils/mailer'
+import { createMailerTransporter, fromAddress } from '../utils/mailer'
 import nodemailer from 'nodemailer'
 import logger from 'common/src/logger'
 import { auditLog } from '../middlewares/AuditLog'
@@ -45,7 +45,8 @@ export class MailerController extends Controller {
       select: { email: true },
     })
 
-    // Check the mailer is available
+    const mailerTransporter = await createMailerTransporter()
+
     await mailerTransporter.verify()
 
     // Get the organisation admins email(s)

@@ -27,6 +27,13 @@ Cypress.Commands.add('login', (type: UserType) => {
     window.localStorage.setItem('access_token', res.body.token)
   })
 })
+
+Cypress.Commands.add('login_expired', () => {
+  window.localStorage.setItem(
+    'access_token',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjk3LCJzY29wZXMiOlsiT3JnYW5pc2F0aW9uQWRtaW4iXSwiaWF0IjoxNzM3MzQ3OTAyLCJleHAiOjE3MzczNTE1MDJ9.RmKfHb3SX-RRyue7tJ46Nkg-KcQOceDIiWCNSqlV4wc',
+  )
+})
 //
 // -- This is a child command --
 // Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })

@@ -32,11 +32,10 @@ export const SurveyImport = () => {
       })
   }
 
-  const handleApiSubmit = (formName: string, redcapAPIToken: string) => {
+  const handleApiSubmit = (formName: string) => {
     axiosInstance
       .post(apiEndpoint, {
         formName,
-        redcapAPIToken,
       })
       .then((response) => {
         invalidate({ resource: 'surveys', invalidates: ['resourceAll'] })

@@ -30,11 +30,12 @@ import { authProvider } from './providers/authProvider'
 import { ParticipantList, ParticipantShow } from './pages/participants'
 import { SurveyImport, IntegrationsHome, ParticipantImport } from './pages/integrations'
 import { ResponsesView } from './pages/responses'
-import { ListAlt, Person, RecentActors, DatasetLinked } from '@mui/icons-material'
+import { ListAlt, Person, RecentActors, DatasetLinked, Settings } from '@mui/icons-material'
 import { ParticipantEdit } from './pages/participants/edit'
 import { SetupPage } from './pages/setup'
 import { AllResponsesView } from './pages/responses/all'
 import { FamilyEdit } from './pages/family/edit'
+import SettingsPage from './pages/settings'
 
 function App() {
   return (
@@ -115,6 +116,14 @@ function App() {
                   {
                     name: 'families',
                   },
+                  {
+                    name: 'settings',
+                    list: '/settings',
+                    edit: '/settings',
+                    meta: {
+                      icon: <Settings />,
+                    },
+                  },
                 ]}
                 options={{
                   syncWithLocation: true,
@@ -181,8 +190,10 @@ function App() {
                     </Route>
                     <Route path="/responses/all/:id" index element={<AllResponsesView />} />
                     <Route path="/responses/:id" index element={<ResponsesView />} />
+                    <Route path="/settings" index element={<SettingsPage />} />
                     <Route path="*" element={<ErrorComponent />} />
                   </Route>
+
                   <Route
                     element={
                       <Authenticated key="authenticated-outer" fallback={<Outlet />}>
