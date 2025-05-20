@@ -913,7 +913,7 @@
         "type": "object",
         "additionalProperties": false
       },
-      "UpdateSettingsRequest": {
+      "Partial_GetSettingsResponse-at-data_": {
         "properties": {
           "mailerHost": {
             "type": "string",
@@ -950,7 +950,10 @@
           }
         },
         "type": "object",
-        "additionalProperties": false
+        "description": "Make all properties in T optional"
+      },
+      "UpdateSettingsRequest": {
+        "$ref": "#/components/schemas/Partial_GetSettingsResponse-at-data_"
       },
       "GetThemeResponse": {
         "properties": {
@@ -1162,7 +1165,7 @@
         "type": "object",
         "additionalProperties": false
       },
-      "UpdateProfileRequest": {
+      "Partial_RegisterParticipantRequest_": {
         "properties": {
           "firstName": {
             "type": "string",
@@ -1223,7 +1226,10 @@
           }
         },
         "type": "object",
-        "additionalProperties": false,
+        "description": "Make all properties in T optional"
+      },
+      "UpdateProfileRequest": {
+        "$ref": "#/components/schemas/Partial_RegisterParticipantRequest_",
         "example": {
           "firstName": "John",
           "middleName": "James",
@@ -3185,8 +3191,8 @@
             }
           }
         },
-        "description": "Get the current Participants Profile",
-        "summary": "Get the current Participants Profile",
+        "description": "Get the current organisation",
+        "summary": "Get the current organisation settings",
         "tags": [
           "Settings"
         ],
