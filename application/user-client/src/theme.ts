@@ -1,15 +1,15 @@
-import { createTheme, PaletteColorOptions } from '@mui/material'
+import { createTheme } from '@mui/material'
 
 interface ThemeProps {
-  primary?: PaletteColorOptions
-  secondary?: PaletteColorOptions
+  primary: string
+  secondary: string
 }
 
 function customTheme(props: ThemeProps) {
   return createTheme({
     palette: {
-      primary: props.primary,
-      secondary: props.secondary,
+      primary: { main: props.primary },
+      secondary: { main: props.secondary },
       text: { primary: '#272952' },
     },
     typography: {

@@ -19,7 +19,7 @@ const app = api.app
 describe('OrganisationsController', () => {
   let orgAdmintoken: string
 
-  const testOrganisationId: number = 99
+  const testOrganisationId: number = 1
 
   beforeAll(async () => {
     api.run()
@@ -208,13 +208,13 @@ describe('OrganisationsController', () => {
   describe('GET /organisations/:OrgID/users', () => {
     it('should return a list of users for an organisation', async () => {
       const response = await request(app)
-        .get('/organisations/99/users')
+        .get(`/organisations/${testOrganisationId}/users`)
         .set({ Authorization: `Bearer ${orgAdmintoken}` })
       expect(response.status).toBe(200)
 
       const body: GetOrganisationUsersResponse = response.body
 
-      expect(body.data.length).toBe(2)
+      expect(body.data.length).toBe(3)
       expect(body.data[0].id).toBe(ORG_ADMIN_ID)
     })
 

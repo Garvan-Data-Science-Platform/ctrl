@@ -115,3 +115,9 @@ export async function deleteFile(filePath: string) {
     return `Error deleting file: ${errorMessage}`
   }
 }
+
+export async function updateLogo(filePath: string) {
+  const fs = await import('fs')
+  await prisma.organisation.update({ where: { id: 1 }, data: { logo: fs.readFileSync(filePath) } })
+  return null
+}

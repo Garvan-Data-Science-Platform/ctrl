@@ -1,4 +1,5 @@
 import { ParticipantAnswerStatus } from '@common/types/api/participants/participant'
+import { GetSettingsResponse } from '@common/types/api/settings'
 import {
   Box,
   Button,
@@ -8,6 +9,7 @@ import {
   MenuItem,
   Modal,
   Tooltip,
+  Typography,
 } from '@mui/material'
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import { DateField, EditButton, List, ShowButton, useDataGrid } from '@refinedev/mui'
@@ -61,7 +63,23 @@ export const ParticipantList = () => {
 
   const { open } = useNotification()
 
+  const [emailIsSetup, setEmailIsSetup] = useState(true)
+
   useEffect(() => {
+    axiosInstance.get('/settings').then((res) => {
+      const settings = res.data.data as GetSettingsResponse['data']
+      if (
+        !(
+          settings.mailerHost &&
+          settings.mailerPassword &&
+          settings.mailerPort &&
+          settings.mailerUser
+        )
+      ) {
+        setEmailIsSetup(false)
+      }
+    })
+
     if (location.state?.openInviteModal) {
       setModalOpen(true)
       setInitialEmails(location.state.initialEmails || [])
@@ -279,7 +297,7 @@ export const ParticipantList = () => {
           }}
         />
       </Modal>
-      <Modal open={modalOpen}>
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <Box
           sx={{
             position: 'absolute',
@@ -292,13 +310,24 @@ export const ParticipantList = () => {
             borderRadius: 2,
           }}
         >
-          <InviteModal
-            onCancel={() => {
-              setModalOpen(false)
-            }}
-            onSend={sendInvites}
-            initialEmails={initialEmails}
-          />
+          {emailIsSetup ? (
+            <InviteModal
+              onCancel={() => {
+                setModalOpen(false)
+              }}
+              onSend={sendInvites}
+              initialEmails={initialEmails}
+            />
+          ) : (
+            <Box>
+              <Typography>
+                You need to set up your email SMTP settings to invite participants
+              </Typography>
+              <Button component={Link} to="/settings">
+                Go to settings
+              </Button>
+            </Box>
+          )}
         </Box>
       </Modal>
 

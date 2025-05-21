@@ -19,10 +19,19 @@ export async function seedTests(prisma: PrismaClient) {
   }).then((module) => module.default)
   await prisma.organisation.create({
     data: {
-      id: 99,
+      id: 1,
       name: 'Test Organisation',
+      mailerHost: 'smtp.ethereal.email',
+      mailerPort: 587,
+      mailerPassword: 'b7nS4Ge8gCvHUzq6Rf',
+      mailerUser: 'eduardo.boyer@ethereal.email',
+      redcapToken: 'ABC',
+      redcapURL: 'http://redcaptest.com',
     },
   })
+
+  await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"Organisation"', 'id'), 2, false) FROM "Organisation";`
+
   await prisma.study.create({ data: { id: 1 } })
 
   // OperatorAdminUser
@@ -48,7 +57,7 @@ export async function seedTests(prisma: PrismaClient) {
       role: Role.OrganisationAdmin,
       organisations: {
         connect: {
-          id: 99,
+          id: 1,
         },
       },
     },
@@ -65,7 +74,7 @@ export async function seedTests(prisma: PrismaClient) {
       role: Role.OrganisationAdmin,
       organisations: {
         connect: {
-          id: 99,
+          id: 1,
         },
       },
     },
@@ -81,8 +90,8 @@ export async function seedTests(prisma: PrismaClient) {
       password: hashPassword('password'),
       role: Role.Participant,
       organisations: {
-        create: {
-          name: 'Another Organisation',
+        connect: {
+          id: 1,
         },
       },
     },

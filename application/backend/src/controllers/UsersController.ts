@@ -40,7 +40,7 @@ import { checkPasswordStrength } from 'common/src/PasswordStrength'
 import { generatePasswordResetEmail } from '../utils/passwordResetTemplate'
 import crypto from 'crypto'
 import nodemailer from 'nodemailer'
-import mailerTransporter, { fromAddress } from '../utils/mailer'
+import { createMailerTransporter, fromAddress } from '../utils/mailer'
 import { auditLog } from '../middlewares/AuditLog'
 
 @Route('users')
@@ -248,6 +248,8 @@ export class UsersController extends Controller {
       text,
       html,
     }
+
+    const mailerTransporter = await createMailerTransporter()
 
     await mailerTransporter.sendMail(mailToUserOptions)
   }

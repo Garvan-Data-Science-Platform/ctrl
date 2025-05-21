@@ -1,15 +1,25 @@
 import nodemailer from 'nodemailer'
+import prisma from '../PrismaClient'
 
 export const fromAddress = `CTRL <noreply@${process.env.HOSTNAME}>`
 
-const mailerTransporter: nodemailer.Transporter = nodemailer.createTransport({
-  pool: true,
-  host: process.env.MAILER_HOST,
-  port: Number(process.env.MAILER_PORT),
-  auth: {
-    user: process.env.MAILER_USERNAME,
-    pass: process.env.MAILER_PASSWORD,
-  },
-})
+export async function createMailerTransporter() {
+  const mailSettings = await prisma.organisation.findFirstOrThrow({
+    where: { id: 1 },
+    select: { mailerHost: true, mailerPassword: true, mailerPort: true, mailerUser: true },
+  })
 
-export default mailerTransporter
+  if (!Object.values(mailSettings).every((val) => !!val)) {
+    throw new Error('SMTP settings not configured')
+  }
+  // Check the mailer is available
+  return nodemailer.createTransport({
+    pool: true,
+    host: mailSettings.mailerHost,
+    port: mailSettings.mailerPort,
+    auth: {
+      user: mailSettings.mailerUser,
+      pass: mailSettings.mailerPassword,
+    },
+  } as nodemailer.TransportOptions)
+}

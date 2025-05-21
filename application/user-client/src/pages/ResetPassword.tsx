@@ -28,7 +28,7 @@ export default function ResetPassword() {
   const query = useQuery()
   const token = query.get('token')
 
-  const logoPath = './australian-genomics-logo.png'
+  const logoPath = import.meta.env.VITE_BACKEND_URL + '/settings/logo'
 
   const {
     register,

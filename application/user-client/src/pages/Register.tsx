@@ -116,7 +116,7 @@ export default function Register() {
         <Card sx={{ maxWidth: 500, mr: 'auto', ml: 'auto', mt: 10, p: 2 }}>
           <form onSubmit={handleSubmit(onSubmit)}>
             <Box sx={{ mt: 5, mb: 2 }}>
-              <img src="/australian-genomics-logo.png" height={40} />
+              <img src={import.meta.env.VITE_BACKEND_URL + '/settings/logo'} height={40} />
             </Box>
             {Object.keys(errors) && <Typography>{}</Typography>}
             <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>

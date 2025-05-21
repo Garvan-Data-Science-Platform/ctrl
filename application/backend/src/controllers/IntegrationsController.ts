@@ -42,7 +42,6 @@ export class IntegrationsController extends Controller {
   surveyRepo = prisma.surveyVersion
   spRepo = prisma.surveyParticipant
   integrationService = new Integrations(REDCapMapping)
-  REDCAP_API_URL: string = ''
 
   @Post('/redcap/participant/upload/csv')
   @SuccessResponse('201', 'Created Participants from CSV')
@@ -63,10 +62,19 @@ export class IntegrationsController extends Controller {
   public async uploadRedcapParticipantAPI(
     @Body() bodyRequest: UploadRedcapParticipantAPIRequest,
   ): Promise<UploadRedcapParticipantResponse> {
-    this.REDCAP_API_URL = this.validateRedcapConfig()
-    const { formName, redcapAPIToken } = bodyRequest
+    const { formName } = bodyRequest
     const params = new URLSearchParams()
-    params.append('token', redcapAPIToken || (process.env.REDCAP_API_TOKEN as string))
+
+    const redcapSettings = await prisma.organisation.findFirstOrThrow({
+      where: { id: 1 },
+      select: { redcapToken: true, redcapURL: true },
+    })
+
+    if (!redcapSettings.redcapToken || !redcapSettings.redcapURL) {
+      throw new Error('Redcap API not configured')
+    }
+
+    params.append('token', redcapSettings.redcapToken)
     params.append('content', 'record')
     params.append('format', 'json')
     /**
@@ -82,7 +90,7 @@ export class IntegrationsController extends Controller {
      */
     params.append('form[0]', formName)
 
-    const participantData = await fetch(this.REDCAP_API_URL, {
+    const participantData = await fetch(redcapSettings.redcapURL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -127,10 +135,12 @@ export class IntegrationsController extends Controller {
   public async uploadRedcapInstrumentAPI(
     @Body() bodyRequest: UploadRedcapInstrumentAPIRequest,
   ): Promise<UploadRedcapInstrumentResponse> {
-    this.REDCAP_API_URL = this.validateRedcapConfig()
-    const { formName, redcapAPIToken } = bodyRequest
+    const { formName } = bodyRequest
+
+    const redcapSettings = await this.getRedcapConfig()
+
     const params = new URLSearchParams()
-    params.append('token', redcapAPIToken || (process.env.REDCAP_API_TOKEN as string))
+    params.append('token', redcapSettings.redcapToken)
     params.append('content', 'metadata')
     params.append('format', 'json')
 
@@ -143,7 +153,7 @@ export class IntegrationsController extends Controller {
      */
     params.append('forms[0]', formName)
 
-    const surveyData = await fetch(this.REDCAP_API_URL, {
+    const surveyData = await fetch(redcapSettings.redcapURL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -254,10 +264,15 @@ export class IntegrationsController extends Controller {
     return { id: survey.id }
   }
 
-  private validateRedcapConfig() {
-    if (!process.env.REDCAP_API_URL) {
-      throw new BadGatewayError('Redcap API not configured: missing REDCAP_API_URL')
+  private async getRedcapConfig(): Promise<{ redcapToken: string; redcapURL: string }> {
+    const redcapSettings = await prisma.organisation.findFirstOrThrow({
+      where: { id: 1 },
+      select: { redcapToken: true, redcapURL: true },
+    })
+
+    if (!redcapSettings.redcapToken || !redcapSettings.redcapURL) {
+      throw new Error('Redcap API not configured')
     }
-    return process.env.REDCAP_API_URL
+    return redcapSettings as any
   }
 }
