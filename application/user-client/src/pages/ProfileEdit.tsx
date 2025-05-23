@@ -63,6 +63,10 @@ export default function ProfileEdit() {
     if (error) setError('root.serverError', error)
   }, [error])
 
+  useEffect(() => {
+    document.title = 'Edit Profile | CTRL'
+  }, [])
+
   if (!pdata) return 'Loading'
   const data = pdata.data
 
@@ -145,7 +149,7 @@ export default function ProfileEdit() {
                     value: data?.email,
                     pattern: {
                       value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, //eslint-disable-line
-                      message: 'Entered a valid email',
+                      message: 'Enter a valid email',
                     },
                   })}
                 />

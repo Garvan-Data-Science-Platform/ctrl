@@ -11,7 +11,7 @@ import {
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { apiClient } from '../apiClient'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { GeneratePasswordResetLinkRequest } from '@common/types/api/users'
 
 export default function ForgotPassword() {
@@ -25,6 +25,10 @@ export default function ForgotPassword() {
   } = useForm<GeneratePasswordResetLinkRequest>()
 
   const [status, setStatus] = useState<'unsent' | 'pending' | 'sent'>('unsent')
+
+  useEffect(() => {
+    document.title = 'Forgot Password | CTRL'
+  }, [])
 
   const onSubmit = (data: GeneratePasswordResetLinkRequest) => {
     // Set to pending before the request
@@ -58,7 +62,7 @@ export default function ForgotPassword() {
           {status === 'sent' ? (
             <Box>
               <Box sx={{ mt: 5, mb: 2 }}>
-                <img src={logoPath} height={40} />
+                <img alt="logo" src={logoPath} height={40} />
               </Box>
               <Typography>
                 If your email is in our system you will be sent a link to reset your password.
@@ -74,7 +78,7 @@ export default function ForgotPassword() {
             <form onSubmit={handleSubmit(onSubmit)}>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <Box sx={{ mt: 5, mb: 2 }}>
-                  <img src={logoPath} height={40} />
+                  <img alt="logo" src={logoPath} height={40} />
                 </Box>
                 <Typography>
                   Please enter the email address you registered with to receive a link to reset your

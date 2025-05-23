@@ -3,6 +3,7 @@ import NavBar from '../components/NavBar'
 import EmailIcon from '@mui/icons-material/Email'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAppStore } from '../store'
+import { useEffect } from 'react'
 
 export default function Contact() {
   const store = useAppStore()
@@ -12,6 +13,9 @@ export default function Contact() {
     store.updateContactMessageText('')
     nav('/message_sent')
   }
+  useEffect(() => {
+    document.title = 'Contact us | CTRL'
+  }, [])
   return (
     <>
       <NavBar />
