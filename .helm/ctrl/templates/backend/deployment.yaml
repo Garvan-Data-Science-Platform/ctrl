@@ -54,20 +54,6 @@ spec:
                 secretKeyRef:
                   name: jwt
                   key: jwt
-            - name: ADMIN_EMAIL
-              value: {{ .Values.auth.admin.email }}
-            - name: ADMIN_PASSWORD
-              value: {{ .Values.auth.admin.password }}
-            - name: MAILER_HOST
-              value: {{ .Values.mailer.host }}
-            - name: MAILER_PORT
-              value: {{ .Values.mailer.port }}
-            - name: MAILER_USERNAME
-              value: {{ .Values.mailer.username }}
-            - name: MAILER_PASSWORD
-              value: {{ .Values.mailer.password }}
-            - name: REDCAP_API_URL
-              value: {{ .Values.redcap.apiUrl }}
             
           ports:
             - name: http
