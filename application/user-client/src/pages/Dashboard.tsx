@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Alert,
   alpha,
@@ -8,6 +8,7 @@ import {
   CircularProgress,
   Container,
   Grid2 as Grid,
+  IconButton,
   Tooltip,
   Typography,
 } from '@mui/material'
@@ -45,6 +46,10 @@ export default function Dashboard() {
   const [showPdfError, setShowPdfError] = useState(false)
 
   const queryClient = useQueryClient()
+
+  useEffect(() => {
+    document.title = 'Dashboard | CTRL'
+  }, [])
 
   const generatePdf = async () => {
     setIsLoading(true)
@@ -127,88 +132,94 @@ export default function Dashboard() {
         <Typography variant="h3" textAlign="left" sx={{ mt: 3, mb: 3 }}>
           Welcome {profileData?.data?.firstName}
         </Typography>
-        {data?.data.map((val, idx) => (
-          <Card
-            key={idx}
-            sx={{
-              boxShadow: '0',
-              p: 3,
-              mt: 1,
-              backgroundColor: (theme) => alpha(theme.palette.primary.light, 0.05),
-            }}
-            data-cy={`step-card-${idx}`}
-          >
-            <Grid container spacing={5}>
-              <Grid size={{ xs: 12, sm: 5 }}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    height: '100%',
-                  }}
-                >
-                  <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
-                    <Box
-                      sx={{
-                        width: 24,
-                        minWidth: 24,
-                        height: 24,
-                        borderRadius: '50%',
-                        border: '2px solid',
-                        borderColor: 'primary.light',
-                        bgcolor: 'primary.main',
-                        color: 'white',
-                      }}
-                    >
-                      <Typography lineHeight="24px" fontWeight="bold">
-                        {idx + 1}
-                      </Typography>
+        <Box component="ol" sx={{ pl: 0, mb: 0 }}>
+          {data?.data.map((val, idx) => (
+            <Card
+              key={idx}
+              component="li"
+              sx={{
+                boxShadow: '0',
+                p: 3,
+                mt: 1,
+                backgroundColor: (theme) => alpha(theme.palette.primary.light, 0.05),
+              }}
+              data-cy={`step-card-${idx}`}
+            >
+              <Grid container spacing={5}>
+                <Grid size={{ xs: 12, sm: 5 }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      height: '100%',
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
+                      <Box
+                        sx={{
+                          width: 24,
+                          minWidth: 24,
+                          height: 24,
+                          borderRadius: '50%',
+                          border: '2px solid',
+                          borderColor: 'primary.light',
+                          bgcolor: 'primary.main',
+                          color: 'white',
+                        }}
+                      >
+                        <Typography lineHeight="24px" fontWeight="bold">
+                          {idx + 1}
+                        </Typography>
+                      </Box>
+                      <Typography lineHeight="24px">{val.title}</Typography>
                     </Box>
-                    <Typography lineHeight="24px">{val.title}</Typography>
+                    {val.tooltip && (
+                      <Tooltip title={val.tooltip} describeChild>
+                        <IconButton>
+                          <InfoOutlined />
+                        </IconButton>
+                      </Tooltip>
+                    )}
                   </Box>
-                  {val.tooltip && (
-                    <Tooltip title={val.tooltip}>
-                      <InfoOutlined />
-                    </Tooltip>
-                  )}
-                </Box>
+                </Grid>
+                <Grid size={{ xs: 12, sm: 5 }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      height: '100%',
+                    }}
+                  >
+                    {renderReviewStatus(val.status)}
+                    <Typography>
+                      {val.last_updated
+                        ? new Date(Date.parse(val.last_updated)).toLocaleDateString()
+                        : '-'}
+                    </Typography>
+                  </Box>
+                </Grid>
+                <Grid size={{ xs: 12, sm: 2 }} sx={{ alignContent: 'center' }}>
+                  <Button
+                    component={Link}
+                    to={`/consent_form/${idx}`}
+                    fullWidth
+                    variant="contained"
+                    data-cy={`step-button-${idx}`}
+                  >
+                    {val.status == 'completed'
+                      ? 'Edit'
+                      : val.status == 'review_required'
+                        ? 'Review'
+                        : 'View'}
+                  </Button>
+                </Grid>
               </Grid>
-              <Grid size={{ xs: 12, sm: 5 }}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    height: '100%',
-                  }}
-                >
-                  {renderReviewStatus(val.status)}
-                  <Typography>
-                    {val.last_updated
-                      ? new Date(Date.parse(val.last_updated)).toLocaleDateString()
-                      : '-'}
-                  </Typography>
-                </Box>
-              </Grid>
-              <Grid size={{ xs: 12, sm: 2 }}>
-                <Button
-                  component={Link}
-                  to={`/consent_form/${idx}`}
-                  fullWidth
-                  variant="contained"
-                  data-cy={`step-button-${idx}`}
-                >
-                  {val.status == 'completed'
-                    ? 'Edit'
-                    : val.status == 'review_required'
-                      ? 'Review'
-                      : 'View'}
-                </Button>
-              </Grid>
-            </Grid>
-          </Card>
-        ))}
+            </Card>
+          ))}
+        </Box>
+
         <Box sx={{ display: 'flex' }}>
           <Box sx={{ flexGrow: 1 }} />
           {showPdfError ? (
