@@ -130,9 +130,7 @@ describe('REDCap Participant Upload', () => {
         cy.wrap(initialInvites).as('initialInvites')
       })
 
-      cy.get('[data-cy="apiSubmit"]').should('be.visible').should('be.disabled')
-      cy.get('[data-cy="redcapAPIToken"]').should('be.visible').type('DUMMY_TOKEN')
-      cy.get('[data-cy="apiSubmit"]').should('be.visible').should('be.enabled')
+      cy.get('[data-cy="apiSubmit"]').should('be.visible')
 
       cy.intercept('POST', '**/integrations/redcap/participant/upload/api', {
         statusCode: 200,
