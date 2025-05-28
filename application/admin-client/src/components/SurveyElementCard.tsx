@@ -138,12 +138,14 @@ export function SurveyElementCard({
                         handleUpdateField('duoCodes', newDuoCodes)
                       }}
                       label={duoEntry?.Label}
+                      disabled={disabled}
                       sx={{ textTransform: 'capitalize' }}
                     />
                   </Tooltip>
                 )
               })}
               <IconButton
+                disabled={disabled}
                 onClick={() => {
                   setDuoOpen(true)
                 }}
