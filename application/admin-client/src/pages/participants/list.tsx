@@ -213,7 +213,7 @@ export const ParticipantList = () => {
         },
         align: 'center',
         headerAlign: 'center',
-        minWidth: 80,
+        minWidth: 140,
       },
     ],
     [],
