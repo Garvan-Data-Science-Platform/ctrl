@@ -2,186 +2,56 @@
 
 ctrl-next is the next incarnation of the dynamic consent platform CTRL developed by Australian Genomics and the Garvan Institute of Medical Research, designed to deliver new features in a faster and more robust way through the use of modern web technologies.
 
-## Running locally via node
+> BADGES
 
-ctrl-next uses a recent Node.js version as specified in `.nvmrc` in combination with the yarn modern package manager through corepack.
+## About CTRL
+CTRL is a secure, web-based dynamic consent platform that empowers research participants to manage their consent preferences, update personal details, and make informed decisions about the use of their genomic and health data. For research organizations, CTRL streamlines consent management by replacing paper records with electronic ones, offering interoperability with databases like REDCap, and managing permissions using international standards.
 
-This `.nvmrc` is the single source of truth through out this app to specify the Node Version.
-For example: Dockerfiles, `run_tests.sh` scripts, the Makefile and multiple CI workflows all parse the node version from the `.nvmrc`.
-If you want to update node version, please only change the `.nvmrc`.
-If you find yourself specifying the node version somewhere else in the app, please continue the approach of parsing the `.nvmrc` file (or apply an improved approach throughout the rest of the app). 
+CTRL has recently undergone a major upgrade, featuring a modern interface, scalable backend, and new capabilities for both participants and research teams. The platform supports automated consent capture, secure audit logging, and flexible integration options.
 
-### Install required software and packages
+**Current capabilities:**
+- Participant Portal for managing consent preferences
+- Automated digital consent capture and secure audit logging
+- Integration with REDCap and standalone operation
 
-The use of `nvm` to manage node versions is highly recommended. Install `nvm` using [these instructions](https://github.com/nvm-sh/nvm).
+**Upcoming features:**
+- Enhanced consent transition management (e.g., for participants reaching adulthood)
+- Automated participant communications
+- Real-time dashboards and analytics
+- Expanded integrations (including Elsa)
+- A revamped Admin Portal with real-time monitoring, automated alerts, and improved security
 
-Then from the root of the `ctrl-next` repository run the following commands:
+**Guardians Affiliation**
 
-```bash
-# Install the required node version, will do nothing if already installed.
-nvm install
+INFO ABOUT GUARDIANS
 
-# Use the required node version, as specified in the file .nvmrc
-nvm use
+[Newsletter update &rarr;](https://www.australiangenomics.org.au/streamlined-consent-management-inside-the-new-ctrl-platform/)
 
-# Enable corepack to use "yarn modern"
-corepack enable
+[Video Demonstration &rarr;](https://www.youtube.com/watch?v=peQf_Gxhvq4)
 
-# Finally install all project dependencies
-yarn install
-```
+[Learn more about CTRL &rarr;](https://www.australiangenomics.org.au/tools-and-resources/dynamic-consent-and-ctrl/)
 
-### Run servers
+## Demo Environment
 
-Run the backend and frontend servers in development mode (with hot reload):
+#### Participant Portal
 
-`yarn dev`
+The Participant Portal allows individuals to provide, review, and update their consent preferences at any time, ensuring active engagement throughout a study.
 
-In another terminal, migrate and seed the database using:
 
-`make seed`
+[Participant Portal Demo Site &rarr;](https://ctrldemo.dsp.garvan.org.au/login)
 
-In your browser open:
-- http://localhost:5173 to see application frontend
-- http://localhost:5000/docs to see Swagger UI for the API
-- http://localhost:5174 to see admin portal
-- http://localhost:8080 for 'Adminer' browser database interface
+![Participant Portal Screeshot](docs/participant-portal.png)
 
-Seed data is intended for development only, NOT PRODUCTION.
-Seed data contains infomation to support tests, and also two users to made development easy:
-1. an example admin account
-2. an example user account
+#### Admin Portal
+The Admin Portal enables research teams to efficiently manage participant registrations, monitor consent completions, and track changes in real time, with enhanced security and workflow tools.
 
-The email and password information for these two accounts are specified in `application/backend/.env`.
-If you change this information, you will need to cancel `yarn dev`, run `make clean`, then restart the servers and re-seed the database.
+[Admin Portal Demo Site &rarr;](https://admin.ctrldemo.dsp.garvan.org.au/login)
 
-### Other available yarn targets
+![Admin Portal Screeshot](docs/admin-portal.png)
 
-You can use yarn to perform these additional development tasks:
+_**NOTE:** Demo sites are under active development and may not work as expected at times._
 
-```bash
-# Perform a full project build.
-yarn build
+## Want to contribute?
+Have a look through existing [issues](https://github.com/Garvan-Data-Science-Platform/ctrl-next/issues) for anything that you could help with. If you'd like to request a feature or report a bug, please create a GitHub Issue using one of the templates provided.
 
-# Run the application (API and UI) from the build.
-yarn start
-
-# Run the Typescript compiler (i.e. perform a type-check on the code).
-yarn type-check
-
-# Run prettier to format the code.
-yarn format
-
-# Run eslint to lint the code.
-yarn lint
-
-# Run tests for each workspace the code.
-yarn test
-
-# Build docs for each workspace
-yarn build-docs
-```
-
-## Running locally via docker
-
-A docker image of `ctrl-next` can be built and used to run the built application (as with the command `yarn start`) or any of the `yarn` commands listed above. Along with the [Dockerfile](Dockerfile), a [Makefile](Makefile) is provided to facilitate running common docker commands:
-
-```bash
-# Build the ctrl-next docker image (with tag 'latest')
-make docker-build
-
-# If you know what you're doing you might use the Dockerfile directly,
-# e.g. to specify alternative Node versions or docker tags.
-docker build \
-  --build-arg="NODE_VERSION=X.Y.Z" \  # Must pass a valid Node.js version
-  -t ctrl-next:latest
-  -f Dockerfile .
-```
-
-## Prisma Database Management
-
-```bash
-# Copy example env variables and fill out with correct values
-cp application/backend/.env.example application/backend/.env
-
-# Run db
-make db
-
-# Run migrations and seed database (Note: do not seed database in production)
-make seed
-```
-
-### Mailer
-
-As part of the ctrl-next app, a mailer can be configured for users to submit a contact us request.
-
-#### Setup
-
-Environemnt variables involved in setting up the mailer are as follows:
-
-```bash
-MAILER_HOST=
-MAILER_PORT=
-MAILER_USERNAME=
-MAILER_PASSWORD=
-```
-
-#### Testing Mailer Service
-
-To test the mailer, we can use [ethereal](ethereal.email) which is a fake SMTP service which is an anti-transactional email service meaning that messages are never delivered. This allows us to preview the sent message whilst no emails are actually delivered.
-
-To use [ethereal](ethereal.email), we need to setup the related environment variables as follows:
-
-```bash
-MAILER_HOST=smtp.ethereal.email
-MAILER_PORT=587
-MAILER_USERNAME={generated username from ethereal}
-MAILER_PASSWORD={generated password from ethereal}
-```
-
-_**NOTE**: You can generate an account by clicking 'Create Ethereal Account' and copy pasting the account details into the related environment variables above._
-
-### Migrations
-
-#### Purpose
-
-As software is developed, previous decisions around schema design are often reconsidered and changed to meet new project requirements. Reworking the database schema is a process known as migrations, it is important to plan and take care to ensure that data is accessible, consistent, compatible and without loss. In an attempt to ensure the safety of our data, we want to document and plan our database migrations carefully.
-
-#### Strategy
-
-1. Get started by editing the `schema.prisma` file.
-
-   _E.g. We have a user model. We don’t currently capture the middle name of the user but we would like to in the future if the user has a middle name. We can simply edit the `schema.prisma` file like so:_
-
-   ```typescript
-   ...
-
-   model User {
-     id            Int      @id @default(autoincrement())
-     firstName     String
-     lastName      String
-   ++middleName    String? <<<<<<<<<<<<
-     email         String   @unique
-     role          String
-     organisations String[]
-     createdAt     DateTime @default(now())
-     updatedAt     DateTime @updatedAt
-   }
-
-   ...
-   ```
-
-2. Run `yarn prisma:migrate --create-only` to create the migration (optionally add: `--name {an appropriate migration name}`) and name the migration something that explains what updates to the schema we intend to perform.  
-   **NOTE: `--create-only` here is used to ensure that we do not apply the new migration directly, but instead just create it in order to edit it.**  
-   _E.g. name to be used in this example `add_middle_name_to_user`_
-
-3. A new folder under `prisma/migrations` will be created with the timestamp and name of your migration, in which a `migration.sql` is also created. It is necessary to open the `migration.sql` file and ensure that the migration is doing exactly as you expected.  
-   _E.g. In our case, the generated migration looks like the following, which correctly implements the optional new `middleName` column:_
-
-   ```SQL
-   -- AlterTable
-   ALTER TABLE "User" ADD COLUMN "middleName" TEXT;
-   ```
-
-4. Apply the new migration to our database by running: `yarn prisma:migrate`.
-5. Now our database is up to date with our prisma schema, we can ensure data safety.
+[See contribution guide &rarr;](https://github.com/Garvan-Data-Science-Platform/ctrl-next/blob/main/docs/CONTRIBUTING.md)
