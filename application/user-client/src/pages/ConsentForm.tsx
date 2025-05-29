@@ -7,7 +7,9 @@ import {
   Checkbox,
   CircularProgress,
   Container,
+  FormControl,
   FormControlLabel,
+  FormHelperText,
   IconButton,
   Modal,
   Radio,
@@ -39,24 +41,13 @@ export default function ConsentForm() {
   const [modalOpen, setModalOpen] = useState(false)
   const [modalAction, setModalAction] = useState<'save' | 'next'>('save')
   const [showError, setShowError] = useState(false)
+  const [blankRadios, setBlankRadios] = useState<string[]>([])
 
   const { isPending, data } = useQuery({
     queryKey: ['form_step', currentStep],
     queryFn: async () => {
       try {
         const surveyStep = await apiClient.get(`/surveys/step/1/${currentStep}`)
-
-        //Set default values if not answered
-        for (const i in surveyStep.data.data.elements) {
-          const e = surveyStep.data.data.elements[i] as SurveyElement
-          if (e.type == 'question-checkbox' && e.data.value == null) {
-            surveyStep.data.data.elements[i].data.value = true
-          }
-          if (e.type == 'question-choices' && e.data.value == null) {
-            surveyStep.data.data.elements[i].data.value =
-              surveyStep.data.data.elements[i].data.choices[0]
-          }
-        }
 
         return surveyStep.data.data as GetUserSurveyStepResponse['data']
         // eslint-disable-next-line
@@ -69,6 +60,23 @@ export default function ConsentForm() {
     placeholderData: keepPreviousData,
   })
 
+  useEffect(() => {
+    if (blankRadios.length > 0) {
+      checkRadios()
+    }
+  }, [formState])
+
+  const checkRadios = () => {
+    const blankRadiosTmp: string[] = []
+    for (const i in data?.elements || []) {
+      if (data?.elements[i].type == 'question-choices' && !data?.elements[i].data.value) {
+        blankRadiosTmp.push(i)
+      }
+    }
+    setBlankRadios(blankRadiosTmp)
+    return blankRadiosTmp.length > 0
+  }
+
   const saveForm = async (action: 'save' | 'next', isModal?: boolean) => {
     for (const i in data?.elements || []) {
       if (!isModal && data?.elements[i].data.required && !data?.elements[i].data.value) {
@@ -77,6 +85,9 @@ export default function ConsentForm() {
         return
       }
     }
+
+    if (checkRadios()) return
+
     try {
       await apiClient.post(`/surveys/answers`, {
         step: currentStep,
@@ -180,26 +191,31 @@ export default function ConsentForm() {
         )}
         {type == 'question-choices' && (
           <Box>
-            <RadioGroup value={data.value}>
-              {data.choices?.map((val: string, i: number) => {
-                return (
-                  <FormControlLabel
-                    key={`choice_${idx}_${i}`}
-                    value={val}
-                    control={<Radio />}
-                    label={val}
-                    sx={(theme) => ({ [theme.breakpoints.up('sm')]: { minWidth: 110 } })}
-                    onChange={() => {
-                      setFormState((state) => {
-                        const s = [...state]
-                        s[idx].data.value = val
-                        return s
-                      })
-                    }}
-                  />
-                )
-              })}
-            </RadioGroup>
+            <FormControl error={blankRadios.includes(String(idx))}>
+              <RadioGroup value={formState[idx].data.value}>
+                {data.choices?.map((val: string, i: number) => {
+                  return (
+                    <FormControlLabel
+                      key={`choice_${idx}_${i}`}
+                      value={val}
+                      control={<Radio />}
+                      label={val}
+                      sx={(theme) => ({ [theme.breakpoints.up('sm')]: { minWidth: 110 } })}
+                      onChange={() => {
+                        setFormState((state) => {
+                          const s = [...state]
+                          s[idx].data.value = val
+                          return s
+                        })
+                      }}
+                    />
+                  )
+                })}
+              </RadioGroup>
+              {blankRadios.includes(String(idx)) && (
+                <FormHelperText>Please select an option</FormHelperText>
+              )}
+            </FormControl>
           </Box>
         )}
       </Card>

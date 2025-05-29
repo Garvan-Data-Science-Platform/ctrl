@@ -22,7 +22,7 @@
       { "type": "subheading", "data": { "text": "SUBHEADING text" } },
       {
         "type": "question-choices",
-        "data": { "text": "Question 2", "choices": ["Choice 1", "Choice 2"], "value": "Choice 1" }
+        "data": { "text": "Question 2", "choices": ["Choice 1", "Choice 2"] }
       },
       {
         "type": "video",
