@@ -6,17 +6,17 @@
 [![Release](https://github.com/Garvan-Data-Science-Platform/ctrl-next/actions/workflows/release.yml/badge.svg)](https://github.com/Garvan-Data-Science-Platform/ctrl-next/actions/workflows/release.yml)
 
 </div>
-ctrl-next is the next incarnation of the dynamic consent platform CTRL developed by Australian Genomics and the Garvan Institute of Medical Research, designed to deliver new features in a faster and more robust way through the use of modern web technologies.
+ctrl-next is the next incarnation of the dynamic consent platform CTRL developed by [Australian Genomics](https://www.australiangenomics.org.au/) and the [Garvan Institute of Medical Research](https://www.garvan.org.au/), designed to deliver new features in a faster and more robust way through the use of modern web technologies.
 
 ## About CTRL
-CTRL is a secure, web-based dynamic consent platform that empowers research participants to manage their consent preferences, update personal details, and make informed decisions about the use of their genomic and health data. For research organizations, CTRL streamlines consent management by replacing paper records with electronic ones, offering interoperability with databases like REDCap, and managing permissions using international standards.
+CTRL is a secure, web-based dynamic consent platform that empowers research participants to manage their consent preferences, update personal details, and make informed decisions about the use of their genomic and health data. For research organizations, CTRL streamlines consent management by replacing paper records with electronic ones, offering interoperability with databases like [REDCap](https://projectredcap.org/), and managing permissions using international standards.
 
 CTRL has recently undergone a major upgrade, featuring a modern interface, scalable backend, and new capabilities for both participants and research teams. The platform supports automated consent capture, secure audit logging, and flexible integration options.
 
 **Current capabilities:**
 - Participant Portal for managing consent preferences
 - Automated digital consent capture and secure audit logging
-- Integration with REDCap and standalone operation
+- Integration with [REDCap](https://projectredcap.org/) and standalone operation
 
 **Upcoming features:**
 - Enhanced consent transition management (e.g., for participants reaching adulthood)
