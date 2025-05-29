@@ -36,9 +36,9 @@ INFO ABOUT GUARDIANS: ASK KATHERINE
 [Learn more about CTRL &rarr;](https://www.australiangenomics.org.au/tools-and-resources/dynamic-consent-and-ctrl/)
 
 <div align="center">
-  <img src="docs/garvan-logo.png" alt="Garvan Logo" width="200"/>
-  <img src="docs/australian-genomics-logo.png" alt="Australian Genomics Logo" width="200"/>
-  <img src="docs/australian-biocommons-logo.png" alt="Australian Biocommons Logo" width="200"/>
+  <img src="docs/garvan-logo.png" alt="Garvan Logo" width="200" style="margin: 0 20px;"/>
+  <img src="docs/australian-genomics-logo.png" alt="Australian Genomics Logo" width="200" style="margin: 0 20px;"/>
+  <img src="docs/australian-biocommons-logo.png" alt="Australian Biocommons Logo" width="200" style="margin: 0 20px;"/>
 </div>
 
 ## Demo Environment
