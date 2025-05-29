@@ -27,7 +27,13 @@ CTRL has recently undergone a major upgrade, featuring a modern interface, scala
 
 **Guardians Affiliation**
 
-INFO ABOUT GUARDIANS
+INFO ABOUT GUARDIANS: ASK KATHERINE
+
+<div align="center">
+  <img src="docs/australian-genomics-logo.png" alt="Australian Genomics Logo" width="140"/>
+  <img src="docs/garvan-logo.png" alt="Garvan Logo" width="140"/>
+  <img src="docs/australian-biocommons-logo.png" alt="Australian Biocommons Logo" width="140"/>
+</div>
 
 [Newsletter update &rarr;](https://www.australiangenomics.org.au/streamlined-consent-management-inside-the-new-ctrl-platform/)
 
