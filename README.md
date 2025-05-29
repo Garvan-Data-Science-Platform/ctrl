@@ -29,17 +29,17 @@ CTRL has recently undergone a major upgrade, featuring a modern interface, scala
 
 INFO ABOUT GUARDIANS: ASK KATHERINE
 
-<div align="center">
-  <img src="docs/garvan-logo.png" alt="Garvan Logo" width="200"/>
-  <img src="docs/australian-genomics-logo.png" alt="Australian Genomics Logo" width="200"/>
-  <img src="docs/australian-biocommons-logo.png" alt="Australian Biocommons Logo" width="200"/>
-</div>
-
 [Newsletter update &rarr;](https://www.australiangenomics.org.au/streamlined-consent-management-inside-the-new-ctrl-platform/)
 
 [Video Demonstration &rarr;](https://www.youtube.com/watch?v=peQf_Gxhvq4)
 
 [Learn more about CTRL &rarr;](https://www.australiangenomics.org.au/tools-and-resources/dynamic-consent-and-ctrl/)
+
+<div align="center">
+  <img src="docs/garvan-logo.png" alt="Garvan Logo" width="200"/>
+  <img src="docs/australian-genomics-logo.png" alt="Australian Genomics Logo" width="200"/>
+  <img src="docs/australian-biocommons-logo.png" alt="Australian Biocommons Logo" width="200"/>
+</div>
 
 ## Demo Environment
 
