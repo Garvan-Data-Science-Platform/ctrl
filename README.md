@@ -1,10 +1,9 @@
 <div align="center">
 
   <h1>ctrl-next</h1>
+  
   Dynamic Consent Management Platform
-
-  <br>
-
+  
   [![Build checks](https://github.com/Garvan-Data-Science-Platform/ctrl-next/actions/workflows/check.yml/badge.svg)](https://github.com/Garvan-Data-Science-Platform/ctrl-next/actions/workflows/check.yml)
   [![Release](https://github.com/Garvan-Data-Science-Platform/ctrl-next/actions/workflows/release.yml/badge.svg)](https://github.com/Garvan-Data-Science-Platform/ctrl-next/actions/workflows/release.yml)
 
