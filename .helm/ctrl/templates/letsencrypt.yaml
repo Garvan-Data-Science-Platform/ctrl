@@ -1,0 +1,19 @@
+{{- if .Values.traefik.letsencryptEmail }}
+
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    certificatesResolvers:
+      myresolver:
+        acme:
+          email: {{ .Values.traefik.letsencryptEmail }}
+          storage: /data/acme.json
+          httpChallenge:
+            # used during the challenge
+            entryPoint: web
+
+{{- end }}

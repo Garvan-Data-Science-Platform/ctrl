@@ -28,24 +28,18 @@ backend:
     # Overrides the image tag whose default is the chart appVersion.
     tag: #
 
-nginx-ingress:
-  enabled: true
-
-cert-manager: #Use to enable https
-  enabled: false
-  crds:
-    enabled: true
-
-letsencryptEmail: #Required if using cert-manager
+traefik:
+  letencryptEmail: #Required if using traefik
 
 ingress:
   enabled: true
-  className: 'nginx'
+  className:
   annotations:
-    nginx.org/rewrites: 'serviceName=backend rewrite=/'
+    #nginx.org/rewrites: 'serviceName=backend rewrite=/'
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.tls: 'true'
+    traefik.ingress.kubernetes.io/router.tls.certresolver: myresolver
     #ingress.kubernetes.io/ssl-redirect: 'false'
-    acme.cert-manager.io/http01-edit-in-place: 'true'
-    cert-manager.io/issuer: 'letsencrypt-prod'
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:

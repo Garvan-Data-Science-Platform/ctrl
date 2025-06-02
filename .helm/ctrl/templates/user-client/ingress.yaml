@@ -21,20 +21,11 @@ metadata:
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
+    
   {{- end }}
 spec:
   {{- if and .Values.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
   ingressClassName: {{ .Values.ingress.className }}
-  {{- end }}
-  {{- if index .Values "cert-manager" "enabled" }}
-  tls:
-  - hosts:
-    - {{ .Values.ingress.hosts.userClient.hostname }}
-    secretName: cert-manager-user-tls 
-  - hosts:
-    - {{ .Values.ingress.hosts.adminClient.hostname }}
-    secretName: cert-manager-admin-tls
-    
   {{- end }}
   rules:
     {{- range .Values.ingress.hosts }}
