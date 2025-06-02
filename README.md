@@ -13,9 +13,9 @@
     <a href="https://admin.ctrldemo.dsp.garvan.org.au/login"><b>Admin Portal Demo</b></a>
     |
     <a href=""><b>Documentation</b></a>
+    <!-- TODO: LINK DOCUMENTATION  -->
     |
     <a href="https://www.australiangenomics.org.au/tools-and-resources/dynamic-consent-and-ctrl/"><b>Website</b></a>
-    <!-- TODO: LINK DOCUMENTATION  -->
   </div>
   <br/>
   <img src="docs/participant-portal.png" alt="GIF" width="100%" style="margin: 0 20px;"/>
@@ -48,25 +48,7 @@ corepack enable
 yarn install
 ```
 
-## Running CTRL
-
-### Running locally via docker
-
-A docker image of `ctrl-next` can be built and used to run the built application (as with the command `yarn start`) or any of the `yarn` commands listed above. Along with the [Dockerfile](Dockerfile), a [Makefile](Makefile) is provided to facilitate running common docker commands:
-
-```bash
-# Build the ctrl-next docker image (with tag 'latest')
-make docker-build
-
-# If you know what you're doing you might use the Dockerfile directly,
-# e.g. to specify alternative Node versions or docker tags.
-docker build \
-  --build-arg="NODE_VERSION=X.Y.Z" \  # Must pass a valid Node.js version
-  -t ctrl-next:latest
-  -f Dockerfile .
-```
-
-### Running locally via node
+## Running CTRL Locally (Node)
 
 ctrl-next uses a recent Node.js version as specified in `.nvmrc` in combination with the yarn modern package manager through corepack.
 
