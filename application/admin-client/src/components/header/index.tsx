@@ -1,3 +1,4 @@
+import { Box } from '@mui/material'
 import AppBar from '@mui/material/AppBar'
 import Stack from '@mui/material/Stack'
 import Toolbar from '@mui/material/Toolbar'
@@ -10,6 +11,7 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({ sticky = tru
       <Toolbar>
         <Stack direction="row" width="100%" justifyContent="flex-start" alignItems="center">
           <HamburgerMenu />
+          <Box> Study Dropdown</Box>
         </Stack>
       </Toolbar>
     </AppBar>
