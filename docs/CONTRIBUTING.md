@@ -1,5 +1,13 @@
 # Guidance for contributing to `ctrl-next`
 
+- [Guidance for contributing to `ctrl-next`](#guidance-for-contributing-to-ctrl-next)
+  - [Welcome](#welcome)
+  - [Development Tooling](#development-tooling)
+  - [Git + GitHub](#git--github)
+  - [API Documentation](#api-documentation)
+    - [Swagger](#swagger)
+    - [Editing Swagger Documentation](#editing-swagger-documentation)
+
 ## Welcome
 
 Thank you for being interested in contributing to this project!
@@ -41,9 +49,9 @@ yarn run dev
 make docker-run
 ```
 
-_**NOTE**: If you want to run the server using Yarn, you should also setup the postgres database container using, `make docker-run-db`._
+_**NOTE**: If you want to run the server using Yarn, you should also setup the postgres database container using, `make db`._
 
-2. Open Your Browser: Navigate to the Swagger UI by visiting:
+1. Open Your Browser: Navigate to the Swagger UI by visiting:
 
 ```bash
 http://localhost:{port}/docs
