@@ -3,10 +3,12 @@ import { RedcapImport } from '../../components/RedcapImport'
 import { axiosInstance } from '../../providers/dataProvider'
 import { participantUploadCSVDocumentation } from './helpPageRedcap'
 import { useNavigate } from 'react-router-dom'
+import { useCurrentStudyId } from '../../studyStore'
 
 export const ParticipantImport = () => {
-  const FILE_ENDPOINT = '/integrations/redcap/participant/upload/csv'
-  const API_ENDPOINT = '/integrations/redcap/participant/upload/api'
+  const studyId = useCurrentStudyId()
+  const FILE_ENDPOINT = `studies/${studyId}/integrations/redcap/participant/upload/csv`
+  const API_ENDPOINT = `studies/${studyId}/integrations/redcap/participant/upload/api`
   const SUCCESS_REDIRECT = '/participants/'
 
   const navigate = useNavigate()

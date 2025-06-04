@@ -60,14 +60,14 @@ describe('', () => {
   })
   it('Can revoke an invite', () => {
     cy.visit('/participants')
-    cy.get('[data-cy="pending-list"]').get('[data-id="1"]').should('contain.text', 'Pending')
+    cy.get('[data-cy="pending-list"]').get('[data-rowindex="0"]').should('contain.text', 'Pending')
     cy.get('[data-cy="invite-actions"]').first().click()
     cy.get('[data-cy="revoke-button"]').click()
-    cy.get('[data-cy="pending-list"]').get('[data-id="1"]').should('contain.text', 'Revoked')
+    cy.get('[data-cy="pending-list"]').get('[data-rowindex="0"]').should('contain.text', 'Revoked')
   })
   it('Can resend an invite', () => {
     cy.visit('/participants')
-    cy.get('[data-cy="pending-list"]').get('[data-id="1"]').should('contain.text', 'Pending')
+    cy.get('[data-cy="pending-list"]').get('[data-rowindex="0"]').should('contain.text', 'Pending')
     cy.get('[data-cy="invite-actions"]').first().click()
     cy.get('[data-cy="resend-button"]').click()
     cy.contains('Invite Resent', { timeout: 10000 }).should('exist')

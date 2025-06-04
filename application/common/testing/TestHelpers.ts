@@ -124,7 +124,7 @@ export async function updateLogo(filePath: string) {
   const fs = await import('fs')
   await prisma.organisation.update({ where: { id: 1 }, data: { logo: fs.readFileSync(filePath) } })
   return null
-  }
+}
 
 export async function getInviteId(email: string, studyId: number): Promise<string> {
   try {

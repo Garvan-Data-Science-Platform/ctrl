@@ -36,6 +36,7 @@ import { SetupPage } from './pages/setup'
 import { AllResponsesView } from './pages/responses/all'
 import { FamilyEdit } from './pages/family/edit'
 import SettingsPage from './pages/settings'
+import { StudyLoader } from './components/StudyLoader'
 
 function App() {
   return (
@@ -153,14 +154,16 @@ function App() {
                         key="authenticated-inner"
                         fallback={<CatchAllNavigate to="/login" />}
                       >
-                        <ThemedLayoutV2
-                          Header={Header}
-                          Title={({ collapsed }) => (
-                            <ThemedTitleV2 collapsed={collapsed} text="CTRL Admin Portal" />
-                          )}
-                        >
-                          <Outlet />
-                        </ThemedLayoutV2>
+                        <StudyLoader>
+                          <ThemedLayoutV2
+                            Header={Header}
+                            Title={({ collapsed }) => (
+                              <ThemedTitleV2 collapsed={collapsed} text="CTRL Admin Portal" />
+                            )}
+                          >
+                            <Outlet />
+                          </ThemedLayoutV2>
+                        </StudyLoader>
                       </Authenticated>
                     }
                   >

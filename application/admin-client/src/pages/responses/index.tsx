@@ -1,20 +1,26 @@
-import { useShow } from '@refinedev/core'
+import { useCustom, useParsed } from '@refinedev/core'
 import { GetResponsesByIdResponse } from '@common/types/api/surveys'
 import { Box, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material'
+import { useCurrentStudyId } from '../../studyStore'
 
 export const ResponsesView = () => {
-  const { queryResult } = useShow<GetResponsesByIdResponse['data']>({
-    resource: 'surveys/responses',
+  const { id } = useParsed()
+
+  const studyId = useCurrentStudyId()
+
+  const { data } = useCustom<GetResponsesByIdResponse>({
+    url: `studies/${studyId}/surveys/current/participants/${id}/answers`,
+    method: 'get',
   })
 
-  const derived_from = queryResult.data?.data.derived_from
+  const derived_from = data?.data.data.derived_from
 
   return (
     <Box>
       {derived_from && (
         <Typography sx={{ mb: 2 }}>{`Derived from answers of: ${derived_from}`}</Typography>
       )}
-      {queryResult.data?.data.steps.map((val, idx) => {
+      {data?.data.data.steps.map((val, idx) => {
         return (
           <Box key={idx}>
             <Typography>{val.title}</Typography>
