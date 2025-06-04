@@ -60,6 +60,7 @@ export class SurveysController extends Controller {
   @Security('jwt', ['OrganisationAdmin'])
   public async getAllSurveys(@Path() studyId: number): Promise<GetSurveyVersionsResponse> {
     const surveys: SurveyVersionPrisma[] = await this.surveyRepo.findMany({
+      where: { studyId },
       orderBy: [{ versionNumber: 'desc' }],
     })
     if (surveys.length == 0) {

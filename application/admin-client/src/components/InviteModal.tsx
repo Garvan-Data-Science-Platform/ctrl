@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react'
 import { generateInviteEmail } from '@common/src/generateInviteTemplate'
 import { axiosInstance } from '../providers/dataProvider'
 import { GetInviteTextResponse } from '@common/types/api/participants'
+import { useCurrentStudyId } from '../studyStore'
 
 interface InviteModalProps {
   onSend: (emails: string[], subjectText: string, explanatoryText: string) => void
@@ -31,6 +32,7 @@ export function InviteModal({ onSend, onCancel, initialEmails = [] }: InviteModa
   const [invalid, setInvalid] = useState(false)
   const [emailText, setEmailText] = useState('')
   const [emailTitle, setEmailTitle] = useState('')
+  const studyId = useCurrentStudyId()
 
   const handleAdd = () => {
     if (!validateEmail(fieldValue)) {
@@ -46,7 +48,7 @@ export function InviteModal({ onSend, onCancel, initialEmails = [] }: InviteModa
   }
 
   useEffect(() => {
-    axiosInstance.get('/invites/text').then((res) => {
+    axiosInstance.get(`/studies/${studyId}/invites/text`).then((res) => {
       const data: GetInviteTextResponse = res.data
       setEmailText(data.inviteEmailText)
       setEmailTitle(data.inviteEmailSubject)

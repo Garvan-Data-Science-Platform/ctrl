@@ -18,7 +18,7 @@ export const SurveyList = () => {
         flex: 1,
         headerName: 'Version',
         minWidth: 200,
-        renderCell: ({ row }) => (row.status == 'DRAFT' ? 'Current Draft' : row.id),
+        renderCell: ({ row }) => (row.status == 'DRAFT' ? 'Current Draft' : row.versionNumber),
       },
       {
         field: 'actions',
@@ -27,18 +27,18 @@ export const SurveyList = () => {
         disableColumnMenu: true,
         renderCell: function render({ row }) {
           return row.status == 'DRAFT' ? (
-            <EditButton data-cy="edit-button" hideText recordItemId={row.id} />
+            <EditButton data-cy="edit-button" hideText recordItemId={row.versionNumber} />
           ) : (
             <>
               <ShowButton
                 title="View survey questions"
                 data-cy="view-button"
                 hideText
-                recordItemId={row.id}
+                recordItemId={row.versionNumber}
               />
               <IconButton
                 component={Link}
-                to={`/responses/all/${row.id}`}
+                to={`/responses/all/${row.versionNumber}`}
                 title="View responses"
                 color="primary"
                 data-cy="response-icon-button"
@@ -63,7 +63,7 @@ export const SurveyList = () => {
           <Button
             variant="contained"
             component={Link}
-            to={`/responses/all/${dataGridProps.rows.at(0)?.id - 1}`}
+            to={`/responses/all/${dataGridProps.rows.at(0)?.versionNumber - 1}`}
             data-cy="view-all-responses-button"
           >
             View All Responses
@@ -72,7 +72,7 @@ export const SurveyList = () => {
           <Button
             variant="contained"
             component={Link}
-            to={`/surveys/edit/${dataGridProps.rows.at(0)?.id}`}
+            to={`/surveys/edit/${dataGridProps.rows.at(0)?.versionNumber}`}
             data-cy="invite-button"
           >
             Edit current draft

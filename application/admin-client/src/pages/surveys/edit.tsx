@@ -25,6 +25,7 @@ import { SurveyElementCard, SurveyDropSpace } from '../../components/SurveyEleme
 import { useSurveyStore } from '../../surveyStore'
 import { axiosInstance } from '../../providers/dataProvider'
 import { useResource, useShow, useUpdate, useNavigation, useNotification } from '@refinedev/core'
+import { useCurrentStudyId } from '../../studyStore'
 
 export const SurveyEditor = () => {
   const {
@@ -64,6 +65,8 @@ export const SurveyEditor = () => {
   const { queryResult } = useShow({ resource: 'surveys' })
 
   const { open } = useNotification()
+
+  const studyId = useCurrentStudyId()
 
   const { mutate } = useUpdate({
     resource: 'surveys',
@@ -121,7 +124,7 @@ export const SurveyEditor = () => {
 
   const handlePublish = () => {
     axiosInstance
-      .post(`surveys/publish/${id}`)
+      .post(`studies/${studyId}/surveys/${id}/publish`)
       .then(() => {
         list('surveys')
       })

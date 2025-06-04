@@ -506,7 +506,7 @@ const models: TsoaRoute.Models = {
     "ParticipantAnswerStatus": {
         "dataType": "refObject",
         "properties": {
-            "surveyVersion": {"dataType":"double","required":true},
+            "surveyVersionNumber": {"dataType":"double","required":true},
             "participantId": {"dataType":"double","required":true},
             "status": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["complete"]},{"dataType":"enum","enums":["partially_complete"]},{"dataType":"enum","enums":["incomplete"]}],"required":true},
         },
@@ -600,7 +600,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "DefaultSelection_Prisma._36_OrganisationPayload_": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"updatedAt":{"dataType":"datetime","required":true},"createdAt":{"dataType":"datetime","required":true},"id":{"dataType":"double","required":true},"name":{"dataType":"string","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"logo":{"dataType":"union","subSchemas":[{"dataType":"buffer"},{"dataType":"enum","enums":[null]}],"required":true},"redcapURL":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"redcapToken":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"secondaryColour":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"primaryColour":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"mailerPassword":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"mailerUser":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"mailerPort":{"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},"mailerHost":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"updatedAt":{"dataType":"datetime","required":true},"createdAt":{"dataType":"datetime","required":true},"id":{"dataType":"double","required":true},"name":{"dataType":"string","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Organisation": {
@@ -1877,8 +1877,9 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsParticipantsController_getParticipants: Record<string, TsoaRoute.ParameterSchema> = {
+                studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
         };
-        app.get('/participants',
+        app.get('/studies/:studyId/participants',
             authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(ParticipantsController)),
             ...(fetchMiddlewares<RequestHandler>(ParticipantsController.prototype.getParticipants)),
@@ -1909,7 +1910,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         const argsParticipantsController_getParticipantById: Record<string, TsoaRoute.ParameterSchema> = {
                 profileId: {"in":"path","name":"profileId","required":true,"dataType":"double"},
         };
-        app.get('/participants/:profileId',
+        app.get('/studies/:studyId/participants/:profileId',
             authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(ParticipantsController)),
             ...(fetchMiddlewares<RequestHandler>(ParticipantsController.prototype.getParticipantById)),

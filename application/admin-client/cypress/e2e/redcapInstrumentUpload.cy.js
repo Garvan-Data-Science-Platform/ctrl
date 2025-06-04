@@ -48,7 +48,7 @@ describe('REDCap Survey Upload', () => {
       let updatedDraft
       cy.request({
         method: 'GET',
-        url: 'http://localhost:5001/surveys',
+        url: 'http://localhost:5001/studies/1/surveys',
         headers: {
           Authorization: `Bearer ${window.localStorage.getItem('refine-auth')}`,
         },
@@ -86,7 +86,7 @@ describe('REDCap Survey Upload', () => {
       // Check updated draft metadata
       cy.request({
         method: 'GET',
-        url: 'http://localhost:5001/surveys',
+        url: 'http://localhost:5001/studies/1/surveys',
         headers: {
           Authorization: `Bearer ${window.localStorage.getItem('refine-auth')}`,
         },
@@ -111,7 +111,7 @@ describe('REDCap Survey Upload', () => {
       let updatedDraft
       cy.request({
         method: 'GET',
-        url: 'http://localhost:5001/surveys',
+        url: 'http://localhost:5001/studies/1/surveys',
         headers: {
           Authorization: `Bearer ${window.localStorage.getItem('refine-auth')}`,
         },
@@ -149,7 +149,7 @@ describe('REDCap Survey Upload', () => {
       // Check updated draft metadata
       cy.request({
         method: 'GET',
-        url: 'http://localhost:5001/surveys',
+        url: 'http://localhost:5001/studies/1/surveys',
         headers: {
           Authorization: `Bearer ${window.localStorage.getItem('refine-auth')}`,
         },
