@@ -36,7 +36,7 @@ import { determineLastUpdated, determineStatus } from '../utils/answers'
 import { ProfilesController } from './ProfilesController'
 import { auditLog } from '../middlewares/AuditLog'
 
-@Route('participants')
+@Route('studies/{studyId}')
 @Tags('Participants')
 @Security('jwt', ['OrganisationAdmin'])
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
@@ -51,10 +51,11 @@ export class ParticipantsController extends Controller {
    *
    * @summary List participants
    */
-  @Get('/')
-  public async getParticipants(): Promise<GetParticipantsResponse> {
+  @Get('/participants')
+  public async getParticipants(@Path() studyId: number): Promise<GetParticipantsResponse> {
     const unique_participants = await this.svaRepo.findMany({
       distinct: ['profileId'],
+      where: { version: { studyId } },
       select: {
         id: true,
         answers: true,
@@ -75,7 +76,11 @@ export class ParticipantsController extends Controller {
     for (const p of unique_participants) {
       const p_answers = await this.svaRepo.findMany({
         where: { profileId: p.profile.id },
-        select: { answers: true, version: { select: { id: true, updatedAt: true } }, id: true },
+        select: {
+          answers: true,
+          version: { select: { versionNumber: true, updatedAt: true } },
+          id: true,
+        },
         orderBy: { versionId: 'asc' },
       })
       const lastUpdated = Math.max(
@@ -89,7 +94,7 @@ export class ParticipantsController extends Controller {
         lastUpdated: lastUpdated ? new Date(lastUpdated).toLocaleDateString() : undefined,
         familyId: p.profile.familyId,
         answers: p_answers.map((val) => ({
-          surveyVersion: val.version.id,
+          surveyVersionNumber: val.version.versionNumber,
           participantId: val.id,
           status: determineStatus(val.answers, new Date(val.version.updatedAt)),
         })),
@@ -105,7 +110,7 @@ export class ParticipantsController extends Controller {
    *
    * @summary Get a  Participant by ID
    */
-  @Get('/{profileId}')
+  @Get('/participants/{profileId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async getParticipantById(@Path() profileId: number): Promise<GetParticipantResponse> {
     const profile = await this.profileRepo.findFirstOrThrow({
@@ -124,7 +129,11 @@ export class ParticipantsController extends Controller {
 
     const p_answers = await this.svaRepo.findMany({
       where: { profileId: profileId },
-      select: { answers: true, version: { select: { id: true, updatedAt: true } }, id: true },
+      select: {
+        answers: true,
+        version: { select: { versionNumber: true, updatedAt: true } },
+        id: true,
+      },
       orderBy: { versionId: 'asc' },
     })
 
@@ -137,7 +146,7 @@ export class ParticipantsController extends Controller {
         email: profile.user?.email,
         familyId: profile.familyId,
         answers: p_answers.map((val) => ({
-          surveyVersion: val.version.id,
+          surveyVersionNumber: val.version.versionNumber,
           participantId: val.id,
           status: determineStatus(val.answers, new Date(val.version.updatedAt)),
         })),

@@ -3,10 +3,12 @@ import { RedcapImport } from '../../components/RedcapImport'
 import { axiosInstance } from '../../providers/dataProvider'
 import { instrumentUploadCSVDocumentation } from './helpPageRedcap'
 import { useInvalidate, useNotification } from '@refinedev/core'
+import { useCurrentStudyId } from '../../studyStore'
 
 export const SurveyImport = () => {
-  const apiEndpoint = '/integrations/redcap/instrument/upload/api'
-  const fileEndpoint = '/integrations/redcap/instrument/upload/csv'
+  const studyId = useCurrentStudyId()
+  const apiEndpoint = `studies/${studyId}/integrations/redcap/instrument/upload/api`
+  const fileEndpoint = `studies/${studyId}/integrations/redcap/instrument/upload/csv`
   const successRedirect = '/surveys/edit/:surveyId' // TODO: change to versionNumber
 
   const navigate = useNavigate()

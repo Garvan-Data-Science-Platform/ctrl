@@ -20,6 +20,7 @@ import { axiosInstance } from '../../providers/dataProvider'
 import { useInvalidate, useNotification } from '@refinedev/core'
 import { InviteStatus } from '@common/types/api/participants/invite'
 import { MoreVert, People } from '@mui/icons-material'
+import { useCurrentStudyId } from '../../studyStore'
 
 export const statusMap = {
   incomplete: {
@@ -53,17 +54,15 @@ export const ParticipantList = () => {
   const invalidate = useInvalidate()
 
   const [initialEmails, setInitialEmails] = useState<string[]>([])
-
   const [modalOpen, setModalOpen] = useState(false)
-
   const [loading, setLoading] = useState(false)
-
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const [inviteRowId, setInviteRowId] = useState(0)
+  const [inviteRowId, setInviteRowId] = useState('')
+  const [emailIsSetup, setEmailIsSetup] = useState(true)
 
   const { open } = useNotification()
 
-  const [emailIsSetup, setEmailIsSetup] = useState(true)
+  const studyId = useCurrentStudyId()
 
   useEffect(() => {
     axiosInstance.get('/settings').then((res) => {
@@ -91,7 +90,7 @@ export const ParticipantList = () => {
   const sendInvites = (emails: string[], subjectText: string, explanatoryText: string) => {
     setLoading(true)
     axiosInstance
-      .post('invites', { emails, subjectText, explanatoryText })
+      .post(`/studies/${studyId}/invites`, { emails, subjectText, explanatoryText })
       .then(() => {
         setModalOpen(false)
         open?.({ type: 'success', message: `Invites sent` })
@@ -109,9 +108,9 @@ export const ParticipantList = () => {
     setAnchorEl(null)
   }
 
-  const revokeInvite = (id: number) => {
+  const revokeInvite = (id: string) => {
     axiosInstance
-      .post(`invites/revoke/${id}`)
+      .post(`studies/${studyId}/invites/${id}/revoke`)
       .then(() => {
         open?.({ type: 'success', message: 'Invite Revoked' })
         invalidate({ resource: 'invites', invalidates: ['list'] })
@@ -121,9 +120,9 @@ export const ParticipantList = () => {
       })
     closeInviteActionMenu()
   }
-  const resendInvite = (id: number) => {
+  const resendInvite = (id: string) => {
     axiosInstance
-      .post(`invites/resend/${id}`)
+      .post(`studies/${studyId}/invites/${id}/resend`)
       .then(() => {
         open?.({ type: 'success', message: 'Invite Resent' })
         invalidate({ resource: 'invites', invalidates: ['list'] })
@@ -138,7 +137,9 @@ export const ParticipantList = () => {
     return (
       <Link key={answer.participantId} to={`/responses/${answer.participantId}`}>
         <Tooltip title={statusMap[answer.status].tooltip}>
-          <Button sx={{ color: statusMap[answer.status].color }}>V{answer.surveyVersion}</Button>
+          <Button sx={{ color: statusMap[answer.status].color }}>
+            V{answer.surveyVersionNumber}
+          </Button>
         </Tooltip>
       </Link>
     )
