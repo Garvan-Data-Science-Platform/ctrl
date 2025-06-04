@@ -111,7 +111,7 @@ describe('Survey tests', () => {
     expect(data3.data.steps[1].last_updated).toBeUndefined()
 
     const res4 = await request(app)
-      .get('/participants')
+      .get('/studies/1/participants')
       .set({ authorization: `Bearer ${adminToken}` })
 
     const data4 = res4.body as GetParticipantsResponse
@@ -184,7 +184,7 @@ describe('Survey tests', () => {
     expect(data3.data.steps[1].elements[1].data.value).toBe(null)
 
     const res4 = await request(app)
-      .get('/participants')
+      .get('/studies/1/participants')
       .set({ authorization: `Bearer ${adminToken}` })
 
     const data4 = res4.body as GetParticipantsResponse
@@ -200,7 +200,7 @@ describe('Survey tests', () => {
       .send(reqBody)
 
     const res2 = await request(app)
-      .get('/participants')
+      .get('/studies/1/participants')
       .set({ authorization: `Bearer ${adminToken}` })
 
     const data2 = res2.body as GetParticipantsResponse
@@ -216,7 +216,7 @@ describe('Survey tests', () => {
       .send(reqBody)
 
     const res2 = await request(app)
-      .get('/participants')
+      .get('/studies/1/participants')
       .set({ authorization: `Bearer ${adminToken}` })
 
     const data2 = res2.body as GetParticipantsResponse

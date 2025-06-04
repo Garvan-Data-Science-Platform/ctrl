@@ -264,12 +264,12 @@ describe('Protected Routes', () => {
   const participantRoutes: Route[] = [
     {
       method: HttpMethod.GET,
-      url: '/participants',
+      url: '/studies/1/participants',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
     {
       method: HttpMethod.GET,
-      url: '/participants/1',
+      url: '/studies/1/participants/1',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
   ]

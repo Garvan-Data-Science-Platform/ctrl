@@ -42,7 +42,7 @@ describe('ParticipantsController', () => {
   describe('GET /participants', () => {
     it('Returns participant list', async () => {
       const response = await request(app)
-        .get('/participants')
+        .get('/studies/1/participants')
         .set({ Authorization: `Bearer ${registeredUserToken}` })
       const body: GetParticipantsResponse = response.body
       expect(response.status).toBe(200)
