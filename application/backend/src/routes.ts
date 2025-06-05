@@ -696,14 +696,7 @@ const models: TsoaRoute.Models = {
             "profilesCreatedCount": {"dataType":"double","required":true},
             "profilesAlreadyExistedCount": {"dataType":"double","required":true},
             "ids": {"dataType":"array","array":{"dataType":"double"},"required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "UploadRedcapParticipantAPIRequest": {
-        "dataType": "refObject",
-        "properties": {
-            "formName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
+            "newInvites": {"dataType":"array","array":{"dataType":"string"},"required":true},
         },
         "additionalProperties": false,
     },
@@ -2404,7 +2397,6 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsIntegrationsController_uploadRedcapParticipantAPI: Record<string, TsoaRoute.ParameterSchema> = {
-                bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"UploadRedcapParticipantAPIRequest"},
         };
         app.post('/integrations/redcap/participant/upload/api',
             authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),

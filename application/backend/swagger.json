@@ -1991,26 +1991,19 @@
               "format": "double"
             },
             "type": "array"
+          },
+          "newInvites": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           }
         },
         "required": [
           "profilesCreatedCount",
           "profilesAlreadyExistedCount",
-          "ids"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "UploadRedcapParticipantAPIRequest": {
-        "description": "This is the name of the redcap instrument you are importing from.\nNOTE: These 'forms' are not the form label values that are seen on the webpages,\nbut instead they are the unique form names seen in Column B of the data dictionary.",
-        "properties": {
-          "formName": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "required": [
-          "formName"
+          "ids",
+          "newInvites"
         ],
         "type": "object",
         "additionalProperties": false
@@ -5194,17 +5187,7 @@
             ]
           }
         ],
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UploadRedcapParticipantAPIRequest"
-              }
-            }
-          }
-        }
+        "parameters": []
       }
     },
     "/integrations/redcap/instrument/upload/csv": {
