@@ -138,7 +138,7 @@ describe('REDCap Participant Upload', () => {
           profilesCreatedCount: 3,
           profilesAlreadyExistedCount: 0,
           ids: [],
-          newInvites: ['rishi@sanjobanjo.com', 'example@example.com', 'new@email.com'],
+          newInvites: ['first@example.com', 'example@example.com', 'new@email.com'],
         },
       })
 
@@ -149,7 +149,7 @@ describe('REDCap Participant Upload', () => {
       // Check that the invite modal is opened and it has the correct emails
       cy.get('[data-cy="invite-modal"]').should('be.visible')
 
-      const expectedEmailsInModal = ['rishi@sanjobanjo.com', 'example@example.com', 'new@email.com']
+      const expectedEmailsInModal = ['first@example.com', 'example@example.com', 'new@email.com']
       cy.get('[data-cy="recipients-list"]').within(() => {
         expectedEmailsInModal.forEach((email) => {
           cy.contains(email).should('exist')
