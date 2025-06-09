@@ -278,6 +278,20 @@ describe('SurveysController', () => {
         },
       })
       expect(survey?.status).toBe('PUBLISHED')
+
+      // Check that version number incremented correctly
+      const maxSurveyVersion = await prisma.surveyVersion.findFirstOrThrow({
+        where: {
+          studyId: 1,
+        },
+        orderBy: [
+          {
+            versionNumber: 'desc',
+          },
+        ],
+        take: 1,
+      })
+      expect(maxSurveyVersion.versionNumber).toBe(survey.versionNumber + 1)
     })
 
     it('should fail to publish an already published survey', async () => {
