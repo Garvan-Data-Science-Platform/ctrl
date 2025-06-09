@@ -173,7 +173,7 @@ export class AuthController extends Controller {
     const { firstName, middleName, lastName, email, password, ...participantInfo } = bodyRequest
 
     // Check that the Participant has an invitation
-    const invite = await this.inviteRepo.findFirst({ where: { id: inviteId } })
+    const invite = await this.inviteRepo.findFirst({ where: { id: inviteId, email } })
     if (!invite || invite.status !== 'PENDING') {
       throw new NotFoundError(`Invite for ${email} not found`)
     }

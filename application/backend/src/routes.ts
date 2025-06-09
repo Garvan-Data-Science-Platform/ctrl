@@ -2729,9 +2729,10 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsFamiliesController_getFamilyById: Record<string, TsoaRoute.ParameterSchema> = {
+                studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
                 familyId: {"in":"path","name":"familyId","required":true,"dataType":"double"},
         };
-        app.get('/families/:familyId',
+        app.get('/studies/:studyId/families/:familyId',
             authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(FamiliesController)),
             ...(fetchMiddlewares<RequestHandler>(FamiliesController.prototype.getFamilyById)),
@@ -2760,9 +2761,10 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsFamiliesController_removeMember: Record<string, TsoaRoute.ParameterSchema> = {
+                studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
                 profileId: {"in":"path","name":"profileId","required":true,"dataType":"double"},
         };
-        app.post('/families/remove/:profileId',
+        app.post('/studies/:studyId/families/remove/:profileId',
             authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(FamiliesController)),
             ...(fetchMiddlewares<RequestHandler>(FamiliesController.prototype.removeMember)),
@@ -2791,10 +2793,11 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsFamiliesController_addExistingMember: Record<string, TsoaRoute.ParameterSchema> = {
+                studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
                 familyId: {"in":"path","name":"familyId","required":true,"dataType":"double"},
                 profileId: {"in":"path","name":"profileId","required":true,"dataType":"double"},
         };
-        app.post('/families/:familyId/add/:profileId',
+        app.post('/studies/:studyId/families/:familyId/add/:profileId',
             authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(FamiliesController)),
             ...(fetchMiddlewares<RequestHandler>(FamiliesController.prototype.addExistingMember)),
@@ -2823,10 +2826,11 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsFamiliesController_addNewDependent: Record<string, TsoaRoute.ParameterSchema> = {
+                studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
                 familyId: {"in":"path","name":"familyId","required":true,"dataType":"double"},
                 bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"AddDependentRequest"},
         };
-        app.post('/families/:familyId/add-dependent',
+        app.post('/studies/:studyId/families/:familyId/add-dependent',
             authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(FamiliesController)),
             ...(fetchMiddlewares<RequestHandler>(FamiliesController.prototype.addNewDependent)),

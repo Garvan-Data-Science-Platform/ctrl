@@ -13,6 +13,7 @@ import { GetFamilyResponse } from 'common/types/api/families'
 
 const api = new Api()
 const app = api.app
+const studyId = 1
 
 describe('FamiliesController', () => {
   let registeredUserToken: string
@@ -33,10 +34,10 @@ describe('FamiliesController', () => {
     api.stop()
   })
 
-  describe('GET /families/:familyId', () => {
+  describe('GET /studies/{studyId}/families/{familyId}', () => {
     it('Should return list of family members', async () => {
       const response = await request(app)
-        .get('/families/100')
+        .get(`/studies/${studyId}/families/100`)
         .set({ Authorization: `Bearer ${registeredUserToken}` })
       expect(response.status).toBe(200)
       const body = response.body as GetFamilyResponse
@@ -46,10 +47,10 @@ describe('FamiliesController', () => {
     it('Should should return 404 if family not found', async () => {})
   })
 
-  describe('POST /families/remove/:profileId', () => {
+  describe('POST /studies/{studyId}/families/remove/{profileId}', () => {
     it('Should remove member from a family and give auto-incremented ID', async () => {
       const response = await request(app)
-        .post(`/families/remove/${SECOND_GUARDIAN_ID}`)
+        .post(`/studies/${studyId}/families/remove/${SECOND_GUARDIAN_ID}`)
         .set({ Authorization: `Bearer ${registeredUserToken}` })
 
       expect(response.status).toBe(204)
@@ -74,7 +75,7 @@ describe('FamiliesController', () => {
       expect(depSP.answers[1].answers).toEqual([null, null])
 
       await request(app)
-        .post(`/families/remove/${SECOND_GUARDIAN_ID}`)
+        .post(`/studies/${studyId}/families/remove/${SECOND_GUARDIAN_ID}`)
         .set({ Authorization: `Bearer ${registeredUserToken}` })
 
       depSP = await prisma.surveyVersionAnswers.findFirstOrThrow({
@@ -86,10 +87,10 @@ describe('FamiliesController', () => {
     })
   })
 
-  describe('POST /families/:familyId/add/:profileId', () => {
+  describe('POST /studies/{studyId}/families/:familyId/add/:profileId', () => {
     it('Should move a member into the family', async () => {
       await request(app)
-        .post(`/families/100/add/${PARTICIPANT_UNANSWERED_ID}`)
+        .post(`/studies/${studyId}/families/100/add/${PARTICIPANT_UNANSWERED_ID}`)
         .set({ Authorization: `Bearer ${registeredUserToken}` })
 
       const newMemberProfile = await prisma.participantProfile.findUniqueOrThrow({
@@ -107,7 +108,7 @@ describe('FamiliesController', () => {
       expect(depSP.answers[1].answers).toEqual([null, null])
 
       await request(app)
-        .post(`/families/100/add/${PARTICIPANT_UNANSWERED_ID}`)
+        .post(`/studies/${studyId}/families/100/add/${PARTICIPANT_UNANSWERED_ID}`)
         .set({ Authorization: `Bearer ${registeredUserToken}` })
 
       depSP = await prisma.surveyVersionAnswers.findFirstOrThrow({
@@ -119,10 +120,10 @@ describe('FamiliesController', () => {
     })
   })
 
-  describe('POST /families/:famliyId/add-dependent', () => {
+  describe('POST /studies/{studyId}/families/:familyId/add-dependent', () => {
     it('Should add a new dependent to the family', async () => {
       const res = await request(app)
-        .post(`/families/100/add-dependent`)
+        .post(`/studies/${studyId}/families/100/add-dependent`)
         .set({ Authorization: `Bearer ${registeredUserToken}` })
         .send({
           firstName: 'New',
@@ -138,7 +139,7 @@ describe('FamiliesController', () => {
     })
     it('Existing dependent should return error', async () => {
       const res = await request(app)
-        .post(`/families/100/add-dependent`)
+        .post(`/studies/${studyId}/families/100/add-dependent`)
         .set({ Authorization: `Bearer ${registeredUserToken}` })
         .send({
           firstName: 'Test',
@@ -151,7 +152,7 @@ describe('FamiliesController', () => {
     })
     it('Invalid form should return error', async () => {
       const res = await request(app)
-        .post(`/families/100/add-dependent`)
+        .post(`/studies/${studyId}/families/100/add-dependent`)
         .set({ Authorization: `Bearer ${registeredUserToken}` })
         .send({
           firstName: 'New',
@@ -163,7 +164,7 @@ describe('FamiliesController', () => {
     })
     it('Dependent answers should be immediately calculated', async () => {
       const res = await request(app)
-        .post(`/families/100/add-dependent`)
+        .post(`/studies/${studyId}/families/100/add-dependent`)
         .set({ Authorization: `Bearer ${registeredUserToken}` })
         .send({
           firstName: 'New',

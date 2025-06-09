@@ -6,6 +6,7 @@ import {
   RegisterResponse,
 } from 'common/types/api/auth'
 import { resetDB } from 'common/testing/TestHelpers'
+import { TEST_STUDY_NAME } from 'common/testing/seed'
 import {
   ContactMethod,
   ParticipantType,
@@ -121,7 +122,7 @@ describe('Auth', () => {
     const participantInviteId = await prisma.invite.findFirstOrThrow({
       where: {
         email: participantRequest.email,
-        studyId: 1, // From application/common/testing/seed.ts
+        study: { name: TEST_STUDY_NAME },
       },
     })
 

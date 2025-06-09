@@ -11,6 +11,7 @@ import type {
 import prisma from '../PrismaClient'
 import { Role } from '@prisma/client'
 import { resetDB, wipeDB } from 'common/testing/TestHelpers'
+import { TEST_STUDY_NAME } from 'common/testing/seed'
 import {
   ContactMethod,
   ParticipantType,
@@ -254,7 +255,9 @@ describe('AuthController', () => {
       const participantInviteId = await prisma.invite.findFirstOrThrow({
         where: {
           email: registerParticipantRequestBase.email,
-          studyId: 1, // From application/common/testing/seed.ts
+          study: {
+            name: TEST_STUDY_NAME,
+          },
         },
       })
 

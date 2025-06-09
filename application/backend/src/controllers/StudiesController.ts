@@ -78,7 +78,6 @@ export class StudiesController extends Controller {
    */
   @Post('/')
   @SuccessResponse('201', 'Created')
-  @Security('jwt', ['OrganisationAdmin'])
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
   public async createStudy(@Body() bodyRequest: CreateStudyRequest): Promise<CreateStudyResponse> {
     try {

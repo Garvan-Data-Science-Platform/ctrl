@@ -12,6 +12,7 @@ export const DEPENDENT_ID = 100
 export const SECOND_GUARDIAN_ID = 102
 export const PASSWORD_RESET_USER_ID = 105
 export const PASSWORD_RESET_USER_EMAIL = 'test-reset-password@example.com'
+export const TEST_STUDY_NAME = 'Test Study'
 
 export async function seedTests(prisma: PrismaClient) {
   const ExampleSurveyStepData = await import('../src/surveys/exampleSurveyStepData.json', {
@@ -32,7 +33,7 @@ export async function seedTests(prisma: PrismaClient) {
 
   await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"Organisation"', 'id'), 2, false) FROM "Organisation";`
 
-  const testStudy = await prisma.study.create({ data: { name: 'Test Study' } })
+  const testStudy = await prisma.study.create({ data: { name: TEST_STUDY_NAME } })
 
   // OperatorAdminUser
   await prisma.user.create({

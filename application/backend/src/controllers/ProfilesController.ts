@@ -188,7 +188,27 @@ export class ProfilesController extends Controller {
     }
 
     if (bodyRequest.participantType) {
-      await recalculateAnswers(profile.familyId)
+      const studies = await prisma.study.findMany({
+        where: {
+          profiles: {
+            some: {
+              participantProfile: {
+                familyId: profile.familyId,
+              },
+            },
+          },
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      })
+
+      if (studies.length === 0) return
+
+      for (const study of studies) {
+        await recalculateAnswers(profile.familyId, study.id)
+      }
     }
   }
 }

@@ -7,10 +7,9 @@ const prisma = new PrismaClient()
 
 const main = async () => {
   await prisma.organisation.upsert({
-    where: { id: 1 },
+    where: { name: 'OrgName' },
     update: {},
     create: {
-      id: 1,
       name: 'OrgName',
       mailerHost: process.env.MAILER_HOST,
       mailerPort: process.env.MAILER_PORT ? Number(process.env.MAILER_PORT) : null,

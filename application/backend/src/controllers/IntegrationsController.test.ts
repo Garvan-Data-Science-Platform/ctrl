@@ -253,7 +253,7 @@ describe('IntegrationsController', () => {
 
       const response = await request(app)
         .post(`/studies/${studyId}/integrations/redcap/participant/upload/api`)
-        .send({ formName: 'ctrl_test_1', })
+        .send({ formName: 'ctrl_test_1' })
         .set({ Authorization: `Bearer ${token}` })
 
       expect(response.status).toBe(201)
@@ -281,7 +281,7 @@ describe('IntegrationsController', () => {
 
       const response = await request(app)
         .post('/studies/1/integrations/redcap/participant/upload/api')
-        .send({ formName: 'ctrl_test_1', })
+        .send({ formName: 'ctrl_test_1' })
         .set({ Authorization: `Bearer ${token}` })
 
       expect(response.status).toBe(502)
@@ -293,7 +293,7 @@ describe('IntegrationsController', () => {
       const studyId = 1
       const response = await request(app)
         .post(`/studies/${studyId}/integrations/redcap/instrument/upload/api`)
-        .send({ formName: 'ctrl_test_2', })
+        .send({ formName: 'ctrl_test_2' })
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(201)
       const survey = await prisma.surveyVersion.findFirst({
@@ -330,7 +330,7 @@ describe('IntegrationsController', () => {
 
       const response = await request(app)
         .post('/studies/1/integrations/redcap/instrument/upload/api')
-        .send({ formName: 'ctrl_test_1', })
+        .send({ formName: 'ctrl_test_1' })
         .set({ Authorization: `Bearer ${token}` })
 
       expect(response.status).toBe(502)
