@@ -85,7 +85,7 @@ export class SurveysController extends Controller {
     @Path() studyId: number,
     @Path() versionNumber: number,
   ): Promise<GetSurveyVersionByVersionNumberResponse> {
-    const survey: SurveyVersionPrisma | null = await this.surveyRepo.findUnique({
+    const survey: SurveyVersionPrisma | null = await this.surveyRepo.findUniqueOrThrow({
       where: {
         studyId_versionNumber: {
           versionNumber: versionNumber,
@@ -93,15 +93,7 @@ export class SurveysController extends Controller {
         },
       },
     })
-    if (!survey) {
-      const error = {
-        message: `Survey with versionNumber: ${versionNumber} not found in study: ${studyId}`,
-        data: survey,
-      }
-      logger.error({ ...error })
-      this.setStatus(404)
-      throw Error('NO GOOD')
-    }
+
     const responseData: GetSurveyVersionByVersionNumberResponse = {
       data: {
         id: survey.id,
@@ -110,7 +102,6 @@ export class SurveysController extends Controller {
         data: survey.data as unknown as SurveyStep[],
       },
     }
-    logger.info({ ...responseData })
     return responseData
   }
 
@@ -430,7 +421,7 @@ export class SurveysController extends Controller {
       }
 
       for (const dep of dependents) {
-        const sp = await this.svaRepo.findFirstOrThrow({
+        const sva = await this.svaRepo.findFirstOrThrow({
           where: {
             profileId: dep.id,
             versionId: participantAnswers.versionId,
@@ -441,7 +432,7 @@ export class SurveysController extends Controller {
         })
         await this.svaRepo.update({
           where: {
-            id: sp.id,
+            id: sva.id,
             version: {
               studyId: studyId,
             },

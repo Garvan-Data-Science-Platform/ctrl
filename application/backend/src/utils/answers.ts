@@ -114,14 +114,32 @@ export function combineGuardianAnswers(answers_ls: SurveyStepAnswerArray[]): Sur
 
 //Recalculates answers for all dependents in the family
 // Does this need studyId as an input arg?
-export async function recalculateAnswers(familyId: number) {
+export async function recalculateAnswers(familyId: number, studyId: number) {
   const dependents = await prisma.participantProfile.findMany({
-    where: { familyId: familyId, participantType: { in: ['DEPENDENT_AGE', 'DEPENDENT_OTHER'] } },
+    where: {
+      familyId: familyId,
+      studies: {
+        some: {
+          studyId: studyId,
+        },
+      },
+      participantType: {
+        in: ['DEPENDENT_AGE', 'DEPENDENT_OTHER'],
+      },
+    },
   })
   if (!dependents) return
 
   const guardians = await prisma.participantProfile.findMany({
-    where: { familyId: familyId, participantType: 'GUARDIAN' },
+    where: {
+      familyId: familyId,
+      studies: {
+        some: {
+          studyId: studyId,
+        },
+      },
+      participantType: 'GUARDIAN',
+    },
   })
 
   if (guardians.length == 0) return
@@ -151,11 +169,11 @@ export async function recalculateAnswers(familyId: number) {
   }
 
   for (const dep of dependents) {
-    const sp = await prisma.surveyVersionAnswers.findFirstOrThrow({
+    const sva = await prisma.surveyVersionAnswers.findFirstOrThrow({
       where: { profileId: dep.id, versionId: latestSurveyVersionAnswers.versionId },
     })
     await prisma.surveyVersionAnswers.update({
-      where: { id: sp.id }, //
+      where: { id: sva.id }, //
       data: {
         answers,
         derived: guardians.map((val) => `${val.firstName} ${val.lastName}`).join(', '),

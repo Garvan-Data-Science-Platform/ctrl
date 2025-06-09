@@ -150,7 +150,7 @@ describe('Survey tests', () => {
 
   it('Another dependent is registered and inherits the latest answers', async () => {
     await request(app)
-      .post(`/families/2/add-dependent`)
+      .post(`/studies/1/families/2/add-dependent`)
       .set({ Authorization: `Bearer ${adminToken}` })
       .send({
         firstName: 'New',
@@ -172,7 +172,7 @@ describe('Survey tests', () => {
 
   it('A dependent is moved into this family and inherits the latests answers', async () => {
     await request(app)
-      .post(`/families/1/add-dependent`)
+      .post(`/studies/1/families/1/add-dependent`)
       .set({ Authorization: `Bearer ${adminToken}` })
       .send({
         firstName: 'New',
@@ -192,7 +192,7 @@ describe('Survey tests', () => {
     expect(part.answers[1].answers).toEqual([null, null])
 
     await request(app)
-      .post(`/families/2/add/${prof.id}`)
+      .post(`/studies/1/families/2/add/${prof.id}`)
       .set({ Authorization: `Bearer ${adminToken}` })
 
     part = await prisma.surveyVersionAnswers.findFirstOrThrow({
@@ -242,7 +242,7 @@ describe('Survey tests', () => {
     })
 
     await request(app)
-      .post(`/families/remove/${parentProfile.id}`)
+      .post(`/studies/1/families/remove/${parentProfile.id}`)
       .set({ Authorization: `Bearer ${adminToken}` })
 
     const depProfile = await prisma.participantProfile.findFirstOrThrow({

@@ -162,6 +162,7 @@ export class ParticipantsController extends Controller {
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 export class InvitesController extends Controller {
   invitesRepo = prisma.invite
+  studyRepo = prisma.study
 
   /**
    * List all non-accepted invites
@@ -207,7 +208,7 @@ export class InvitesController extends Controller {
   ): Promise<InviteParticipantsResponse> {
     const { subjectText, explanatoryText } = bodyRequest
 
-    await prisma.study.update({
+    await this.studyRepo.update({
       where: { id: studyId },
       data: { inviteEmailSubject: subjectText, inviteEmailText: explanatoryText },
     })
@@ -316,14 +317,14 @@ export class InvitesController extends Controller {
         data: [
           ...successfulEmails.map((email) => ({
             email,
-            studyId: studyId,
+            studyId,
             expiresAt,
             sentAt: new Date(),
             status: InviteStatus.PENDING,
           })),
           ...newFailedEmails.map((email) => ({
             email,
-            studyId: studyId,
+            studyId,
             expiresAt,
             status: InviteStatus.FAILED_TO_SEND,
           })),
@@ -499,7 +500,7 @@ export class InvitesController extends Controller {
   @Get('/invites/text')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async getInviteText(@Path() studyId: number): Promise<GetInviteTextResponse> {
-    const inviteText = await prisma.study.findUniqueOrThrow({
+    const inviteText = await this.studyRepo.findUniqueOrThrow({
       where: { id: studyId },
       select: { inviteEmailSubject: true, inviteEmailText: true },
     })
@@ -511,7 +512,7 @@ export class InvitesController extends Controller {
   private async sendInvite(email: string, studyId: number): Promise<boolean> {
     try {
       const registerLink = `${process.env.HOSTNAME}/register`
-      const study = await prisma.study.findFirstOrThrow({
+      const study = await this.studyRepo.findFirstOrThrow({
         where: {
           id: studyId,
         },

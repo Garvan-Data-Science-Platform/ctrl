@@ -1353,7 +1353,7 @@
       },
       "ParticipantAnswerStatus": {
         "properties": {
-          "surveyVersion": {
+          "surveyVersionNumber": {
             "type": "number",
             "format": "double"
           },
@@ -1371,7 +1371,7 @@
           }
         },
         "required": [
-          "surveyVersion",
+          "surveyVersionNumber",
           "participantId",
           "status"
         ],
@@ -1679,6 +1679,44 @@
       "Organisation": {
         "description": "Model Organisation",
         "properties": {
+          "logo": {
+            "type": "string",
+            "format": "byte",
+            "nullable": true
+          },
+          "redcapURL": {
+            "type": "string",
+            "nullable": true
+          },
+          "redcapToken": {
+            "type": "string",
+            "nullable": true
+          },
+          "secondaryColour": {
+            "type": "string",
+            "nullable": true
+          },
+          "primaryColour": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailerPassword": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailerUser": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailerPort": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "mailerHost": {
+            "type": "string",
+            "nullable": true
+          },
           "updatedAt": {
             "type": "string",
             "format": "date-time"
@@ -1696,6 +1734,15 @@
           }
         },
         "required": [
+          "logo",
+          "redcapURL",
+          "redcapToken",
+          "secondaryColour",
+          "primaryColour",
+          "mailerPassword",
+          "mailerUser",
+          "mailerPort",
+          "mailerHost",
           "updatedAt",
           "createdAt",
           "id",
@@ -4110,7 +4157,7 @@
         }
       }
     },
-    "/participants": {
+    "/studies/{studyId}/participants": {
       "get": {
         "operationId": "GetParticipants",
         "responses": {
@@ -4157,10 +4204,20 @@
             ]
           }
         ],
-        "parameters": []
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
       }
     },
-    "/participants/{profileId}": {
+    "/studies/{studyId}/participants/{profileId}": {
       "get": {
         "operationId": "GetParticipantById",
         "responses": {
@@ -5837,7 +5894,7 @@
         "parameters": []
       }
     },
-    "/families/{familyId}": {
+    "/studies/{studyId}/families/{familyId}": {
       "get": {
         "operationId": "GetFamilyById",
         "responses": {
@@ -5895,6 +5952,15 @@
         "parameters": [
           {
             "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
             "name": "familyId",
             "required": true,
             "schema": {
@@ -5905,7 +5971,7 @@
         ]
       }
     },
-    "/families/remove/{profileId}": {
+    "/studies/{studyId}/families/remove/{profileId}": {
       "post": {
         "operationId": "RemoveMember",
         "responses": {
@@ -5958,6 +6024,15 @@
         "parameters": [
           {
             "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
             "name": "profileId",
             "required": true,
             "schema": {
@@ -5968,7 +6043,7 @@
         ]
       }
     },
-    "/families/{familyId}/add/{profileId}": {
+    "/studies/{studyId}/families/{familyId}/add/{profileId}": {
       "post": {
         "operationId": "AddExistingMember",
         "responses": {
@@ -6021,6 +6096,15 @@
         "parameters": [
           {
             "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
             "name": "familyId",
             "required": true,
             "schema": {
@@ -6040,7 +6124,7 @@
         ]
       }
     },
-    "/families/{familyId}/add-dependent": {
+    "/studies/{studyId}/families/{familyId}/add-dependent": {
       "post": {
         "operationId": "AddNewDependent",
         "responses": {
@@ -6101,6 +6185,15 @@
           }
         ],
         "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
           {
             "in": "path",
             "name": "familyId",
