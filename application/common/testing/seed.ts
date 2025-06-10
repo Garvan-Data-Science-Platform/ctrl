@@ -34,6 +34,7 @@ export async function seedTests(prisma: PrismaClient) {
   await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"Organisation"', 'id'), 2, false) FROM "Organisation";`
 
   const testStudy = await prisma.study.create({ data: { name: TEST_STUDY_NAME } })
+  await prisma.study.create({ data: { name: 'Study 2' } })
 
   // OperatorAdminUser
   await prisma.user.create({
