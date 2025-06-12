@@ -62,6 +62,7 @@ export const SurveyList = () => {
         <>
           <Button
             variant="contained"
+            disabled={dataGridProps.rows.length < 2}
             component={Link}
             to={`/responses/all/${dataGridProps.rows.at(0)?.versionNumber - 1}`}
             data-cy="view-all-responses-button"
@@ -73,7 +74,7 @@ export const SurveyList = () => {
             variant="contained"
             component={Link}
             to={`/surveys/edit/${dataGridProps.rows.at(0)?.versionNumber}`}
-            data-cy="invite-button"
+            data-cy="edit-draft-button"
           >
             Edit current draft
           </Button>

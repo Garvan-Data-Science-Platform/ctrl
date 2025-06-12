@@ -61,9 +61,10 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({ sticky = tru
               label="Study Name"
               value={newStudyName}
               onChange={(e) => setNewStudyName(e.target.value)}
+              data-cy="study-name"
             />
             <Stack direction="row" justifyContent="space-between">
-              <Button variant="contained" type="submit">
+              <Button variant="contained" type="submit" data-cy="study-create">
                 Create
               </Button>
               <Button onClick={handleCloseNewStudyDialog}>Cancel</Button>
@@ -86,6 +87,7 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({ sticky = tru
             sx={{ ml: 2, textTransform: 'none' }}
             endIcon={<ArrowDropDownIcon />}
             disabled={resource?.name == 'surveys' && action == 'edit'}
+            data-cy="study-dropdown"
           >
             {studies[activeStudyIndex].name}
           </Button>
@@ -118,6 +120,7 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({ sticky = tru
                 handleCloseStudyMenu()
                 setNewStudyDialogOpen(true)
               }}
+              data-cy="new-study-button"
             >
               Add new study
             </MenuItem>

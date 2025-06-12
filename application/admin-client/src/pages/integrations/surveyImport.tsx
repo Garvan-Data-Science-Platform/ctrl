@@ -9,7 +9,7 @@ export const SurveyImport = () => {
   const studyId = useCurrentStudyId()
   const apiEndpoint = `studies/${studyId}/integrations/redcap/instrument/upload/api`
   const fileEndpoint = `studies/${studyId}/integrations/redcap/instrument/upload/csv`
-  const successRedirect = '/surveys/edit/:surveyId' // TODO: change to versionNumber
+  const successRedirect = '/surveys/edit/:versionNumber'
 
   const navigate = useNavigate()
   const { open } = useNotification()
@@ -24,9 +24,8 @@ export const SurveyImport = () => {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       .then((response) => {
-        console.log(response)
         invalidate({ resource: 'surveys', invalidates: ['resourceAll'] })
-        navigate(successRedirect.replace(':surveyId', response.data.id)) // TODO: see note about versionNumber above
+        navigate(successRedirect.replace(':versionNumber', response.data.versionNumber))
       })
       .catch((err) => {
         console.error(err)
@@ -41,7 +40,7 @@ export const SurveyImport = () => {
       })
       .then((response) => {
         invalidate({ resource: 'surveys', invalidates: ['resourceAll'] })
-        navigate(successRedirect.replace(':surveyId', response.data.id)) // TODO: see note about versionNumber above
+        navigate(successRedirect.replace(':surveyId', response.data.versionNumber))
       })
       .catch((response) => {
         open?.({

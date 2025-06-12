@@ -111,7 +111,7 @@ export function SurveyElementCard({
           fullWidth
           sx={{ mt: 2 }}
           label="Tooltip (optional)"
-          value={data.tooltip}
+          value={data.tooltip || ''}
           disabled={disabled}
           onChange={(e) => {
             handleUpdateField('tooltip', e.target.value)
@@ -141,7 +141,7 @@ export function SurveyElementCard({
           fullWidth
           sx={{ mt: 2 }}
           label="Tooltip (optional)"
-          value={data.tooltip}
+          value={data.tooltip || ''}
           disabled={disabled}
           onChange={(e) => {
             handleUpdateField('tooltip', e.target.value)
@@ -236,7 +236,6 @@ export function SurveyElementCard({
           <DragIndicator />
         </Box>
       )}
-
       {contentRenderer[element.type]()}
       <Box sx={{ flexGrow: 1 }} />
       <IconButton disabled={disabled} sx={{ width: 50, height: 50 }} onClick={handleDelete}>
