@@ -353,7 +353,12 @@ export const ParticipantList = () => {
           </Button>
         }
       >
-        <DataGrid {...dataGridProps} columns={columns} autoHeight />
+        <DataGrid
+          {...dataGridProps}
+          columns={columns}
+          autoHeight
+          slotProps={{ root: { 'data-cy': 'participants-list' } }}
+        />
       </List>
       <Box sx={{ mt: 1 }} />
       <List headerProps={{ title: 'Invites' }}>

@@ -262,7 +262,7 @@ export const SurveyEditor = () => {
             <Divider sx={{ mt: 3, mb: 1 }} />
             <SurveyDropSpace key={`space_${activeStep}_${-1}`} index={-1} />
             {surveyData[activeStep].elements.map((val, idx) => (
-              <Box key={`el_${activeStep}_${idx}`}>
+              <Box key={`el_${studyId}_${activeStep}_${idx}`}>
                 <SurveyElementCard
                   element={val}
                   disabled={disabled}

@@ -8,13 +8,19 @@ export const StudyLoader: React.FC<PropsWithChildren> = ({ children }) => {
     method: 'get',
     queryOptions: { queryKey: ['studies'] },
   })
-  const { studies, setStudies } = useStudyStore()
+  const { studies, setStudies, activeStudyIndex, setActiveStudyIndex } = useStudyStore()
 
   useEffect(() => {
     if (data) {
+      const studiesLength = studies.length
       setStudies(data.data.data as any)
+      if (data.data.data.length - studiesLength == 1) setActiveStudyIndex(studies.length) // Ie new study created
     }
   }, [data])
+
+  useEffect(() => {
+    localStorage.setItem('activeStudyIndex', String(activeStudyIndex))
+  }, [activeStudyIndex])
 
   return studies.length > 0 && children
 }

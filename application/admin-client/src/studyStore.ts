@@ -15,7 +15,7 @@ interface StudyState {
 
 export const useStudyStore = create<StudyState>((set) => ({
   studies: [],
-  activeStudyIndex: 0,
+  activeStudyIndex: Number(localStorage.getItem('activeStudyIndex') || 0),
   setActiveStudyIndex: (index: number) =>
     set(
       produce((state) => {
