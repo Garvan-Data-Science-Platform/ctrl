@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
 }
 
 generator json {
@@ -160,13 +161,15 @@ model SurveyVersionAnswers {
 
 model Invite {
   id        String       @id @default(uuid())
-  email     String       @unique
+  email     String
   status    InviteStatus @default(PENDING)
   studyId   Int
   study     Study        @relation(fields: [studyId], references: [id], onDelete: Cascade)
   expiresAt DateTime
   createdAt DateTime     @default(now())
   sentAt    DateTime?
+
+  @@unique([studyId, email])
 }
 
 enum InviteStatus {

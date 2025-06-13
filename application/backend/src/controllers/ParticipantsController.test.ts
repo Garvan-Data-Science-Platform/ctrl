@@ -7,9 +7,16 @@ import {
   GetParticipantsResponse,
   InviteParticipantsResponse,
 } from 'common/types/api/participants'
-import { ORG_ADMIN_ID } from 'common/testing/seed'
-import { InviteStatus } from '@prisma/client'
+import {
+  ORG_ADMIN_ID,
+  PARTICIPANT_UNANSWERED_ID,
+  PARTICIPANT_UNANSWERED_EMAIL,
+  SECOND_TEST_STUDY,
+  PASSWORD_RESET_USER_ID,
+} from 'common/testing/seed'
+import { InviteStatus, Role } from '@prisma/client'
 import prisma from '../PrismaClient'
+import { hashPassword } from '../authentication'
 import * as nodemailer from 'nodemailer'
 import { NodemailerMock } from 'nodemailer-mock'
 const mockNodeMailer = nodemailer as unknown as NodemailerMock
@@ -20,10 +27,10 @@ const app = api.app
 const expectedNumberOfInvites = 6
 
 describe('ParticipantsController', () => {
-  let registeredUserToken: string
+  let organisationAdminToken: string
 
   beforeAll(async () => {
-    registeredUserToken = await generateToken({
+    organisationAdminToken = await generateToken({
       userId: ORG_ADMIN_ID,
       roles: ['OrganisationAdmin'],
     })
@@ -43,7 +50,7 @@ describe('ParticipantsController', () => {
     it('Returns participant list', async () => {
       const response = await request(app)
         .get('/studies/1/participants')
-        .set({ Authorization: `Bearer ${registeredUserToken}` })
+        .set({ Authorization: `Bearer ${organisationAdminToken}` })
       const body: GetParticipantsResponse = response.body
       expect(response.status).toBe(200)
 
@@ -134,8 +141,10 @@ describe('InvitesController', () => {
       for (const email of emails) {
         const createdInvite = await prisma.invite.findUnique({
           where: {
-            email,
-            studyId: 1,
+            studyId_email: {
+              email,
+              studyId: 1,
+            },
           },
         })
         expect(createdInvite).toBeDefined()
@@ -153,8 +162,10 @@ describe('InvitesController', () => {
       // Check the status REVOKED invite
       const invite = await prisma.invite.findUnique({
         where: {
-          email: 'invite3@revoked.com',
-          studyId: 1,
+          studyId_email: {
+            email: 'invite3@revoked.com',
+            studyId: 1,
+          },
         },
       })
 
@@ -185,8 +196,10 @@ describe('InvitesController', () => {
       // Check invite status was changed to PENDING
       const updatedInvite = await prisma.invite.findUnique({
         where: {
-          email: 'invite3@revoked.com',
-          studyId: 1,
+          studyId_email: {
+            email: 'invite3@revoked.com',
+            studyId: 1,
+          },
         },
       })
       expect(updatedInvite).toBeDefined()
@@ -203,8 +216,10 @@ describe('InvitesController', () => {
       // Check the status REVOKED invite
       const invite = await prisma.invite.findUnique({
         where: {
-          email: emailPendingInvite,
-          studyId: 1,
+          studyId_email: {
+            email: emailPendingInvite,
+            studyId: 1,
+          },
         },
       })
 
@@ -234,8 +249,10 @@ describe('InvitesController', () => {
       // Check invite status was is still PENDING
       const updatedInvite = await prisma.invite.findUnique({
         where: {
-          email: emailPendingInvite,
-          studyId: 1,
+          studyId_email: {
+            email: emailPendingInvite,
+            studyId: 1,
+          },
         },
       })
 
@@ -270,8 +287,10 @@ describe('InvitesController', () => {
       // Check invite status was is still ACCEPTED
       const updatedInvite = await prisma.invite.findUnique({
         where: {
-          email: emailAcceptedInvite,
-          studyId: 1,
+          studyId_email: {
+            email: emailAcceptedInvite,
+            studyId: 1,
+          },
         },
       })
 
@@ -318,8 +337,10 @@ describe('InvitesController', () => {
       for (const e of emails) {
         const createdInvite = await prisma.invite.findUnique({
           where: {
-            email: e.email,
-            studyId: 1,
+            studyId_email: {
+              email: e.email,
+              studyId: 1,
+            },
           },
         })
         expect(createdInvite).toBeDefined()
@@ -364,8 +385,10 @@ describe('InvitesController', () => {
 
       const invite = await prisma.invite.findUnique({
         where: {
-          email: emailPendingInvite,
-          studyId: 1,
+          studyId_email: {
+            email: emailPendingInvite,
+            studyId: 1,
+          },
         },
       })
 
@@ -379,10 +402,12 @@ describe('InvitesController', () => {
       expect(response.status).toBe(204)
 
       // Check invite status was changed to REVOKED
-      const updatedInvite = await prisma.invite.findUnique({
+      const updatedInvite = await prisma.invite.findUniqueOrThrow({
         where: {
-          email: emailPendingInvite,
-          studyId: 1,
+          studyId_email: {
+            email: emailPendingInvite,
+            studyId: 1,
+          },
         },
       })
       expect(updatedInvite).toBeDefined()
@@ -414,6 +439,176 @@ describe('InvitesController', () => {
         inviteEmailSubject: 'Subject',
         inviteEmailText: 'Text',
       })
+    })
+  })
+
+  describe('POST /invites/accept/{inviteId}', () => {
+    it('should fail if inviteId does not exist', async () => {
+      const token = await generateToken({
+        userId: PARTICIPANT_UNANSWERED_ID,
+        roles: ['Participant'],
+      })
+
+      const response = await request(app)
+        .post(`/invites/accept/this-is-fake-id-string`)
+        .set({ Authorization: `Bearer ${token}` })
+      expect(response.status).toEqual(404)
+
+      const body = response.body
+      expect(body.message).toBe('Pending invite not found')
+    })
+
+    it('should fail if invite has already been accepted', async () => {
+      const invite = await prisma.invite.findFirstOrThrow({
+        where: {
+          email: PARTICIPANT_UNANSWERED_EMAIL,
+        },
+      })
+
+      // change invite to accepted. try to accept
+      await prisma.invite.update({
+        where: {
+          id: invite.id,
+          email: PARTICIPANT_UNANSWERED_EMAIL,
+        },
+        data: { status: 'ACCEPTED' },
+      })
+
+      const token = await generateToken({
+        userId: PARTICIPANT_UNANSWERED_ID,
+        roles: ['Participant'],
+      })
+
+      const response = await request(app)
+        .post(`/invites/accept/${invite.id}`)
+        .set({ Authorization: `Bearer ${token}` })
+      expect(response.status).toEqual(404)
+
+      const body = response.body
+      expect(body.message).toBe('Pending invite not found')
+    })
+
+    it('should fail if users email does not match invite', async () => {
+      // generate token for different user. use valid inviteId
+      const invite = await prisma.invite.findFirstOrThrow({
+        where: {
+          email: PARTICIPANT_UNANSWERED_EMAIL,
+        },
+      })
+
+      // Incorrect ID
+      const token = await generateToken({ userId: PASSWORD_RESET_USER_ID, roles: ['Participant'] })
+
+      const response = await request(app)
+        .post(`/invites/accept/${invite.id}`)
+        .set({ Authorization: `Bearer ${token}` })
+      expect(response.status).toEqual(404)
+
+      const body = response.body
+      expect(body.message).toBe('User does not match invite')
+    })
+
+    it('should fail if profile does not exist for user', async () => {
+      const user = await prisma.user.create({
+        data: {
+          email: 'usernoprofile@example.com',
+          firstName: 'User',
+          lastName: 'NoProfile',
+          password: hashPassword('password'),
+          role: Role.Participant,
+        },
+      })
+
+      const invite = await prisma.invite.create({
+        data: {
+          email: user.email,
+          status: InviteStatus.PENDING,
+          study: {
+            connect: {
+              name: SECOND_TEST_STUDY,
+            },
+          },
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
+        },
+      })
+
+      // Incorrect ID
+      const token = await generateToken({ userId: user.id, roles: ['Participant'] })
+
+      const response = await request(app)
+        .post(`/invites/accept/${invite.id}`)
+        .set({ Authorization: `Bearer ${token}` })
+      expect(response.status).toEqual(404)
+
+      const body = response.body
+      expect(body.message).toBe('Profile not found for user')
+    })
+
+    it('should add user to study and accept invite', async () => {
+      const invite = await prisma.invite.findFirstOrThrow({
+        where: {
+          email: PARTICIPANT_UNANSWERED_EMAIL,
+        },
+      })
+
+      // need valid invite and token for user that does exist
+      const token = await generateToken({
+        userId: PARTICIPANT_UNANSWERED_ID,
+        roles: ['Participant'],
+      })
+
+      const response = await request(app)
+        .post(`/invites/accept/${invite.id}`)
+        .set({ Authorization: `Bearer ${token}` })
+      expect(response.status).toEqual(200)
+    })
+  })
+
+  describe('GET /invites/pending', () => {
+    it('should return correct number of invites where appropriate', async () => {
+      // One initial invite
+      const token = await generateToken({
+        userId: PARTICIPANT_UNANSWERED_ID,
+        roles: ['Participant'],
+      })
+
+      const response = await request(app)
+        .get(`/invites/pending`)
+        .set({ Authorization: `Bearer ${token}` })
+      expect(response.status).toEqual(200)
+
+      const body = response.body
+      expect(body.data).toHaveLength(1)
+
+      // zero
+      // change invite to accepted.
+      await prisma.invite.update({
+        where: {
+          studyId_email: {
+            email: PARTICIPANT_UNANSWERED_EMAIL,
+            studyId: 2,
+          },
+        },
+        data: { status: 'ACCEPTED' },
+      })
+
+      const responseZero = await request(app)
+        .get(`/invites/pending`)
+        .set({ Authorization: `Bearer ${token}` })
+      expect(responseZero.status).toEqual(200)
+
+      const bodyZero = responseZero.body
+      expect(bodyZero.data).toHaveLength(0)
+    })
+    it('should fail user is not a participant', async () => {
+      const response = await request(app)
+        .get(`/invites/pending`)
+        .set({ Authorization: `Bearer ${organisationAdminToken}` })
+
+      expect(response.status).toEqual(401)
+      console.log('Response:', response)
+      const body = response.body
+      expect(body.message).toBe('Incorrect Permissions')
     })
   })
 })

@@ -7,12 +7,14 @@ export const OPERATOR_ADMIN_ID = 96
 export const ORG_ADMIN_ID = 97
 export const ORG_ADMIN_2_ID = 101
 export const PARTICIPANT_UNANSWERED_ID = 98
+export const PARTICIPANT_UNANSWERED_EMAIL = 'test2@example.com'
 export const PARTICIPANT_COMPLETED_ID = 99
 export const DEPENDENT_ID = 100
 export const SECOND_GUARDIAN_ID = 102
 export const PASSWORD_RESET_USER_ID = 105
 export const PASSWORD_RESET_USER_EMAIL = 'test-reset-password@example.com'
-export const TEST_STUDY_NAME = 'Test Study'
+export const TEST_STUDY = 'Test Study'
+export const SECOND_TEST_STUDY = 'Study 2'
 
 export async function seedTests(prisma: PrismaClient) {
   const ExampleSurveyStepData = await import('../src/surveys/exampleSurveyStepData.json', {
@@ -33,8 +35,17 @@ export async function seedTests(prisma: PrismaClient) {
 
   await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"Organisation"', 'id'), 2, false) FROM "Organisation";`
 
-  const testStudy = await prisma.study.create({ data: { name: TEST_STUDY_NAME } })
-  await prisma.study.create({ data: { name: 'Study 2' } })
+  // Create two studies
+  const testStudy = await prisma.study.create({
+    data: {
+      name: TEST_STUDY,
+    },
+  })
+  const secondTestStudy = await prisma.study.create({
+    data: {
+      name: SECOND_TEST_STUDY,
+    },
+  })
 
   // OperatorAdminUser
   await prisma.user.create({
@@ -86,7 +97,7 @@ export async function seedTests(prisma: PrismaClient) {
   await prisma.user.create({
     data: {
       id: PARTICIPANT_UNANSWERED_ID,
-      email: 'test2@example.com',
+      email: PARTICIPANT_UNANSWERED_EMAIL,
       firstName: 'Test',
       lastName: 'User',
       password: hashPassword('password'),
@@ -331,8 +342,7 @@ export async function seedTests(prisma: PrismaClient) {
     },
   })
 
-  // Setup 4 invites
-  // Setup 4 invites
+  // Setup invites
   await prisma.invite.createMany({
     data: [
       {
@@ -376,6 +386,13 @@ export async function seedTests(prisma: PrismaClient) {
         email: 'abcsdfwefijsdf@gjiodsf.com',
         status: InviteStatus.PENDING,
         studyId: testStudy.id,
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
+      },
+      // Invite to test multistudy auth
+      {
+        email: PARTICIPANT_UNANSWERED_EMAIL,
+        status: InviteStatus.PENDING,
+        studyId: secondTestStudy.id,
         expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
       },
     ],

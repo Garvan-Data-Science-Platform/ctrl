@@ -11,7 +11,7 @@ import type {
 import prisma from '../PrismaClient'
 import { Role } from '@prisma/client'
 import { resetDB, wipeDB } from 'common/testing/TestHelpers'
-import { TEST_STUDY_NAME } from 'common/testing/seed'
+import { TEST_STUDY } from 'common/testing/seed'
 import {
   ContactMethod,
   ParticipantType,
@@ -256,7 +256,7 @@ describe('AuthController', () => {
         where: {
           email: registerParticipantRequestBase.email,
           study: {
-            name: TEST_STUDY_NAME,
+            name: TEST_STUDY,
           },
         },
       })

@@ -1528,6 +1528,53 @@
         "type": "object",
         "additionalProperties": false
       },
+      "GetUserInvitesResponse": {
+        "properties": {
+          "data": {
+            "items": {
+              "properties": {
+                "studyName": {
+                  "type": "string"
+                },
+                "sentAt": {
+                  "type": "string"
+                },
+                "expiresAt": {
+                  "type": "string"
+                },
+                "createdAt": {
+                  "type": "string"
+                },
+                "studyId": {
+                  "type": "number",
+                  "format": "double"
+                },
+                "email": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "studyName",
+                "expiresAt",
+                "createdAt",
+                "studyId",
+                "email",
+                "id"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
       "InviteStatus": {
         "enum": [
           "PENDING",
@@ -4282,6 +4329,143 @@
             "schema": {
               "format": "double",
               "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/invites/pending": {
+      "get": {
+        "operationId": "GetUserInvites",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetUserInvitesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "List all pending invites for a user",
+        "summary": "List all pending invites for a logged in user",
+        "tags": [
+          "Invites"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "Participant"
+            ]
+          }
+        ],
+        "parameters": []
+      }
+    },
+    "/invites/accept/{inviteId}": {
+      "post": {
+        "operationId": "AcceptInvite",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "acceptedInvite": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "acceptedInvite"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Accept an invitation",
+        "summary": "Accept an invite for an existing participant to join a new study",
+        "tags": [
+          "Invites"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "Participant"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "inviteId",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ]

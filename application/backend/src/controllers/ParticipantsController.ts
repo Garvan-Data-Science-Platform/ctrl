@@ -6,6 +6,7 @@ import {
   ValidateErrorResponse,
 } from 'common/types/api/errors'
 import type {
+  GetUserInvitesResponse,
   GetInvitesResponse,
   GetInviteTextResponse,
   GetParticipantResponse,
@@ -21,10 +22,12 @@ import {
   Controller,
   Get,
   Response,
+  SuccessResponse,
   Body,
   Path,
   Post,
   Middlewares,
+  Request,
 } from 'tsoa'
 import { Participant } from 'common/types/api/participants/participant'
 import { createMailerTransporter, fromAddress } from '../utils/mailer'
@@ -35,6 +38,7 @@ import { BadGatewayError, NotFoundError } from '../middlewares/ErrorHandler'
 import { determineLastUpdated, determineStatus } from '../utils/answers'
 import { ProfilesController } from './ProfilesController'
 import { auditLog } from '../middlewares/AuditLog'
+import { Role } from '@prisma/client'
 
 @Route('studies/{studyId}')
 @Tags('Participants')
@@ -155,7 +159,7 @@ export class ParticipantsController extends Controller {
   }
 }
 
-@Route('studies/{studyId}')
+@Route('/')
 @Tags('Invites')
 @Security('jwt', ['OrganisationAdmin'])
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
@@ -163,13 +167,135 @@ export class ParticipantsController extends Controller {
 export class InvitesController extends Controller {
   invitesRepo = prisma.invite
   studyRepo = prisma.study
+  profileRepo = prisma.participantProfile
+  userRepo = prisma.user
+
+  /**
+   * List all pending invites for a user
+   *
+   * @summary List all pending invites for a logged in user
+   */
+  @Get('/invites/pending')
+  @Security('jwt', ['Participant'])
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
+  @Response<ValidateErrorResponse>('422', 'Validation Failed')
+  public async getUserInvites(@Request() request: any): Promise<GetUserInvitesResponse> {
+    const user = await this.userRepo.findFirstOrThrow({
+      where: {
+        id: request.user.userId,
+      },
+    })
+    if (user.role !== Role.Participant) {
+      throw new NotFoundError(`Logged in user is not participant`)
+    }
+
+    const invites = await this.invitesRepo.findMany({
+      where: {
+        email: user.email,
+        status: InviteStatus.PENDING,
+      },
+      include: {
+        study: {
+          select: {
+            name: true,
+            // In the future other details could be pulled through here too,
+            // e.g. blurb about study
+          },
+        },
+      },
+    })
+
+    // Map to response
+    const data = invites.map((invite) => ({
+      id: invite.id,
+      email: invite.email,
+      studyId: invite.studyId,
+      createdAt: invite.createdAt.toISOString(),
+      expiresAt: invite.expiresAt.toISOString(),
+      sentAt: invite.sentAt ? invite.sentAt.toISOString() : undefined,
+      studyName: invite.study.name,
+    }))
+
+    return { data }
+  }
+
+  /**
+   * Accept an invitation
+   *
+   * @summary Accept an invite for an existing participant to join a new study
+   */
+  @Post('/invites/accept/{inviteId}')
+  @Security('jwt', ['Participant'])
+  @SuccessResponse('201', 'Invite Accepted')
+  public async acceptInvite(@Request() request: any, @Path() inviteId: string) {
+    // check inviteId exists and is not yet accepted
+    const invite = await this.invitesRepo.findFirst({
+      where: {
+        id: inviteId,
+      },
+    })
+    if (!invite || invite.status !== InviteStatus.PENDING) {
+      throw new NotFoundError(`Pending invite not found`)
+    }
+
+    // check invite email matches user's email (via token)
+    const user = await this.userRepo.findFirstOrThrow({
+      where: {
+        id: request.user.userId,
+      },
+    })
+    if (!user || invite.email !== user.email) {
+      throw new NotFoundError(`User does not match invite`)
+    }
+
+    // add as studyParticipant
+    const existingProfile = await this.profileRepo.findFirst({
+      where: {
+        userId: user.id,
+      },
+    })
+
+    if (!existingProfile) {
+      throw new NotFoundError('Profile not found for user')
+    }
+
+    await this.profileRepo.update({
+      where: {
+        id: existingProfile.id,
+      },
+      data: {
+        studies: {
+          create: {
+            study: {
+              connect: {
+                id: invite.studyId,
+              },
+            },
+          },
+        },
+      },
+    })
+
+    // accept invite
+    const res = await this.invitesRepo.update({
+      where: { id: inviteId },
+      data: { status: 'ACCEPTED' },
+    })
+
+    if (!res) {
+      throw new NotFoundError(`Error accepting invite`)
+    }
+    return {
+      acceptedInvite: invite.id,
+    }
+  }
 
   /**
    * List all non-accepted invites
    *
    * @summary List all non-accepted invites for a study
    */
-  @Get('/invites')
+  @Get('/studies/{studyId}/invites')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
   public async getInvites(@Path() studyId: number): Promise<GetInvitesResponse> {
@@ -200,7 +326,7 @@ export class InvitesController extends Controller {
    * @summary Creates invites for a list of participant emails and sends it to them
    *
    */
-  @Post('/invites')
+  @Post('/studies/{studyId}/invites')
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
   public async createInvites(
     @Path() studyId: number,
@@ -353,7 +479,7 @@ export class InvitesController extends Controller {
    *
    * @summary Resend invite by ID and StudyID
    */
-  @Post('/invites/{inviteId}/resend')
+  @Post('/studies/{studyId}/invites/{inviteId}/resend')
   public async resendInviteById(
     @Path() studyId: number,
     @Path() inviteId: string, // String because this is uuid
@@ -398,7 +524,7 @@ export class InvitesController extends Controller {
    *
    * @summary Resend invites that are currently pending for a study
    */
-  @Post('/invites/resend')
+  @Post('/studies/{studyId}/invites/resend')
   public async resendPendingInvites(@Path() studyId: number): Promise<void> {
     // Get all pending invitations
     const pendingEmails = await this.invitesRepo.findMany({
@@ -468,7 +594,7 @@ export class InvitesController extends Controller {
    *
    * @summary Revoke an invite by inviteId and studyId
    */
-  @Post('/invites/{inviteId}/revoke')
+  @Post('/studies/{studyId}/invites/{inviteId}/revoke')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async revokeInvite(@Path() studyId: number, @Path() inviteId: string): Promise<void> {
     const invite = await this.invitesRepo.findFirst({
@@ -497,7 +623,7 @@ export class InvitesController extends Controller {
    * @summary Get invite email subject and text
    */
   //TODO: make invite register link include inviteId uuid string
-  @Get('/invites/text')
+  @Get('/studies/{studyId}/invites/text')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async getInviteText(@Path() studyId: number): Promise<GetInviteTextResponse> {
     const inviteText = await this.studyRepo.findUniqueOrThrow({

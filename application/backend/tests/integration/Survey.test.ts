@@ -56,8 +56,10 @@ describe('Survey tests', () => {
 
     const invite = await prisma.invite.findUniqueOrThrow({
       where: {
-        email: reqBody.email,
-        studyId: 1,
+        studyId_email: {
+          email: reqBody.email,
+          studyId: 1,
+        },
       },
     })
 
