@@ -41,9 +41,14 @@ describe('Multi-study features', () => {
     cy.contains('Participants').click()
     cy.get('[data-cy="participants-list"]').should('contain.text', 'Second')
     cy.get('[data-cy="pending-list"]').should('contain.text', 'Pending')
+    cy.get('[data-cy="pending-list"]').should('contain.text', 'Revoked')
+    cy.get('[data-cy="pending-list"]').should('contain.text', 'Expired')
     changeStudy('Study 2')
     cy.get('[data-cy="participants-list"]').should('not.contain.text', 'Second')
-    cy.get('[data-cy="pending-list"]').should('not.contain.text', 'Pending')
+    cy.get('[data-cy="pending-list"]').should('contain.text', 'Pending')
+    cy.get('[data-cy="pending-list"]').should('not.contain.text', 'Revoked')
+    cy.get('[data-cy="pending-list"]').should('not.contain.text', 'Expired')
+    cy.get('[data-cy="pending-list"]').should('contain.text', 'test2@example.com')
   })
 
   it('Maintains active study between browsing sessions', () => {
