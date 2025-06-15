@@ -442,15 +442,17 @@ describe('InvitesController', () => {
     })
   })
 
-  describe('POST /invites/accept/{inviteId}', () => {
+  describe('POST /invites/{inviteId}/accept', () => {
     it('should fail if inviteId does not exist', async () => {
       const token = await generateToken({
         userId: PARTICIPANT_UNANSWERED_ID,
         roles: ['Participant'],
       })
 
+      const fakeIdString = 'this-is-not-real'
+
       const response = await request(app)
-        .post(`/invites/accept/this-is-fake-id-string`)
+        .post(`/invites/${fakeIdString}/accept`)
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toEqual(404)
 
@@ -480,7 +482,7 @@ describe('InvitesController', () => {
       })
 
       const response = await request(app)
-        .post(`/invites/accept/${invite.id}`)
+        .post(`/invites/${invite.id}/accept`)
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toEqual(404)
 
@@ -500,7 +502,7 @@ describe('InvitesController', () => {
       const token = await generateToken({ userId: PASSWORD_RESET_USER_ID, roles: ['Participant'] })
 
       const response = await request(app)
-        .post(`/invites/accept/${invite.id}`)
+        .post(`/invites/${invite.id}/accept`)
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toEqual(404)
 
@@ -536,7 +538,7 @@ describe('InvitesController', () => {
       const token = await generateToken({ userId: user.id, roles: ['Participant'] })
 
       const response = await request(app)
-        .post(`/invites/accept/${invite.id}`)
+        .post(`/invites/${invite.id}/accept`)
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toEqual(404)
 
@@ -558,9 +560,9 @@ describe('InvitesController', () => {
       })
 
       const response = await request(app)
-        .post(`/invites/accept/${invite.id}`)
+        .post(`/invites/${invite.id}/accept`)
         .set({ Authorization: `Bearer ${token}` })
-      expect(response.status).toEqual(200)
+      expect(response.status).toEqual(201)
     })
   })
 

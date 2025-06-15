@@ -1981,7 +1981,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 request: {"in":"request","name":"request","required":true,"dataType":"object"},
                 inviteId: {"in":"path","name":"inviteId","required":true,"dataType":"string"},
         };
-        app.post('/invites/accept/:inviteId',
+        app.post('/invites/:inviteId/accept',
             authenticateMiddleware([{"jwt":["Participant"]}]),
             ...(fetchMiddlewares<RequestHandler>(InvitesController)),
             ...(fetchMiddlewares<RequestHandler>(InvitesController.prototype.acceptInvite)),
@@ -2002,7 +2002,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 response,
                 next,
                 validatedArgs,
-                successStatus: undefined,
+                successStatus: 201,
               });
             } catch (err) {
                 return next(err);

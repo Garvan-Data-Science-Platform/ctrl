@@ -4404,12 +4404,12 @@
         "parameters": []
       }
     },
-    "/invites/accept/{inviteId}": {
+    "/invites/{inviteId}/accept": {
       "post": {
         "operationId": "AcceptInvite",
         "responses": {
-          "200": {
-            "description": "Ok",
+          "201": {
+            "description": "Invite Accepted",
             "content": {
               "application/json": {
                 "schema": {

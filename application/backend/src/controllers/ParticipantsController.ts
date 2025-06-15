@@ -224,7 +224,7 @@ export class InvitesController extends Controller {
    *
    * @summary Accept an invite for an existing participant to join a new study
    */
-  @Post('/invites/accept/{inviteId}')
+  @Post('/invites/{inviteId}/accept')
   @Security('jwt', ['Participant'])
   @SuccessResponse('201', 'Invite Accepted')
   public async acceptInvite(@Request() request: any, @Path() inviteId: string) {
