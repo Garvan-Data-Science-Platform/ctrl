@@ -31,7 +31,7 @@ describe('Multi-study features', () => {
     cy.get('[role="rowgroup"]').children().should('have.length', 1)
     //Survey version data is updated correctly
     cy.get('[data-cy="edit-draft-button"]').click()
-    cy.get('[data-cy="step-list"]').children().should('have.length', 0)
+    cy.get('[data-cy="step-list"]').children().should('have.length', 1)
     cy.get('[data-cy="study-dropdown"]').should('be.disabled')
     cy.contains('Surveys').click()
     changeStudy('Test Study')
