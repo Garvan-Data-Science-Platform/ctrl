@@ -9,6 +9,9 @@ import {
   Container,
   Grid2 as Grid,
   IconButton,
+  Menu,
+  MenuItem,
+  Stack,
   Tooltip,
   Typography,
 } from '@mui/material'
@@ -24,17 +27,19 @@ import { GetResponsesByIdResponse } from '@common/types/api/surveys'
 import { apiClient } from '../apiClient'
 import ResponsesPdf from '../components/PdfExport'
 import { pdf } from '@react-pdf/renderer'
-
-// TODO: remove hardcoded study number (Dashboard will change to study selecting view any way)
-const studyId = 1
+import { useAppStore, useCurrentStudyId } from '../store'
 
 export default function Dashboard() {
+  const studyId = useCurrentStudyId()
+  const { studies, activeStudyIndex, setActiveStudyIndex } = useAppStore()
+
   const { isPending, error, data } = useQuery({
-    queryKey: ['consent_forms'],
-    queryFn: () =>
-      apiClient
+    queryKey: ['steps'],
+    queryFn: () => {
+      return apiClient
         .get(`/studies/${studyId}/survey-steps`)
-        .then((res) => res.data) as Promise<GetUserSurveyStepsResponse>,
+        .then((res) => res.data) as Promise<GetUserSurveyStepsResponse>
+    },
   })
 
   const { data: profileData } = useQuery({
@@ -47,8 +52,12 @@ export default function Dashboard() {
 
   const [isLoading, setIsLoading] = useState(false)
   const [showPdfError, setShowPdfError] = useState(false)
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const studyMenuOpen = Boolean(anchorEl)
 
   const queryClient = useQueryClient()
+
+  const handleCloseStudyMenu = () => setAnchorEl(null)
 
   useEffect(() => {
     document.title = 'Dashboard | CTRL'
@@ -135,6 +144,42 @@ export default function Dashboard() {
         <Typography variant="h3" textAlign="left" sx={{ mt: 3, mb: 3 }}>
           Welcome {profileData?.data?.firstName}
         </Typography>
+        <Stack direction="row" spacing={3}>
+          <Typography variant="h5" textAlign="left">
+            {studies[activeStudyIndex].name}
+          </Typography>
+          {studies.length > 1 && (
+            <Button data-cy="change-study" onClick={(e) => setAnchorEl(e.currentTarget)}>
+              Change Study
+            </Button>
+          )}
+        </Stack>
+        <Menu
+          anchorEl={anchorEl}
+          open={studyMenuOpen}
+          onClose={handleCloseStudyMenu}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+          sx={{ p: 3 }}
+        >
+          {studies.map((study, idx) => {
+            return (
+              <MenuItem
+                key={study.id}
+                onClick={() => {
+                  setActiveStudyIndex(idx)
+                  handleCloseStudyMenu()
+                }}
+                sx={{
+                  fontWeight: activeStudyIndex == idx ? 'bold' : 'normal',
+                  minWidth: 120,
+                  justifyContent: 'center',
+                }}
+              >
+                {study.name}
+              </MenuItem>
+            )
+          })}
+        </Menu>
         <Box component="ol" sx={{ pl: 0, mb: 0 }}>
           {data?.data.map((val, idx) => (
             <Card
