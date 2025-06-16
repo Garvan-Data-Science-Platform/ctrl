@@ -261,6 +261,7 @@ export async function seedTests(prisma: PrismaClient) {
 
   const study2version = await prisma.surveyVersion.create({
     data: {
+      id: 10,
       status: 'PUBLISHED',
       versionNumber: 1,
       data: [
