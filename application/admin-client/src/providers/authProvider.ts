@@ -2,6 +2,8 @@ import type { AuthProvider } from '@refinedev/core'
 
 export const TOKEN_KEY = 'refine-auth'
 
+export const clientType = 'admin-client'
+
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
 export const authProvider: AuthProvider = {
@@ -10,7 +12,7 @@ export const authProvider: AuthProvider = {
       const res = await fetch(BACKEND_URL + '/auth/login', {
         method: 'POST',
         body: JSON.stringify({ email, password }),
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-client-type': clientType },
       })
       if (res.ok) {
         const data = await res.json()
