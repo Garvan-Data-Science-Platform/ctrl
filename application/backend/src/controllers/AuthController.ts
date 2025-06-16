@@ -19,6 +19,7 @@ import {
   Response,
   ValidateError,
   Get,
+  Header,
   Middlewares,
   NoSecurity,
 } from 'tsoa'
@@ -32,7 +33,11 @@ import type {
   UnauthorizedErrorResponse,
   ValidateErrorResponse,
 } from 'common/types/api/errors'
-import { InvalidCredentialsError, NotFoundError } from '../middlewares/ErrorHandler'
+import {
+  IncorrectPermissionsError,
+  InvalidCredentialsError,
+  NotFoundError,
+} from '../middlewares/ErrorHandler'
 import { ParticipantType } from 'common/types/api/users/ParticipantProfile'
 import { createDefaultAnswers } from '../utils/answers'
 import { auditLog } from '../middlewares/AuditLog'
@@ -221,11 +226,28 @@ export class AuthController extends Controller {
   @Post('/login')
   @NoSecurity()
   @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
-  public async login(@Body() bodyRequest: LoginRequest): Promise<LoginResponse> {
+  public async login(
+    @Body() bodyRequest: LoginRequest,
+    @Header('x-client-type') clientType?: string,
+  ): Promise<LoginResponse> {
     // Check if user exists and password matches
     const user = await this.userRepo.findUnique({ where: { email: bodyRequest.email } })
 
-    if (!user || !(await verifyPassword(user.password, bodyRequest.password))) {
+    if (!user) {
+      throw new InvalidCredentialsError('User not found')
+    }
+
+    console.log('Client Type: ', clientType)
+
+    // Check client type and roles
+    if (clientType === 'admin-client' && user.role !== 'OrganisationAdmin') {
+      throw new IncorrectPermissionsError('User does not have admin privileges')
+    }
+    if (clientType === 'user-client' && user.role !== 'Participant') {
+      throw new IncorrectPermissionsError('User is not a participant')
+    }
+
+    if (!(await verifyPassword(user.password, bodyRequest.password))) {
       throw new InvalidCredentialsError('Invalid credentials provided')
     }
 

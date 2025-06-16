@@ -5062,7 +5062,16 @@
           "Auth"
         ],
         "security": [],
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-client-type",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
