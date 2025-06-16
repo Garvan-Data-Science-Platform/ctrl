@@ -9,9 +9,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { apiClient } from './apiClient.ts'
 
-function App() {
-  const queryClient = new QueryClient()
+const queryClient = new QueryClient()
 
+function App() {
   const [theme, setTheme] = useState<Theme | null>(null)
 
   function standardize_color(str: string) {

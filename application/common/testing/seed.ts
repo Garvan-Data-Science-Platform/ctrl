@@ -258,6 +258,21 @@ export async function seedTests(prisma: PrismaClient) {
       studyId: testStudy.id,
     },
   })
+
+  const study2version = await prisma.surveyVersion.create({
+    data: {
+      status: 'PUBLISHED',
+      versionNumber: 1,
+      data: [
+        {
+          title: 'Study2step',
+          text: '',
+          elements: [{ type: 'question-checkbox', data: { text: 'Hello' } }],
+        },
+      ] as SurveyStep[],
+      studyId: secondTestStudy.id,
+    },
+  })
   await prisma.surveyVersion.create({
     data: {
       status: 'DRAFT',
@@ -274,6 +289,13 @@ export async function seedTests(prisma: PrismaClient) {
         { status: 'review_required', answers: [] },
         { status: 'review_required', answers: [null, null] },
       ],
+    },
+  })
+  await prisma.surveyVersionAnswers.create({
+    data: {
+      versionId: study2version.id,
+      profileId: PARTICIPANT_UNANSWERED_ID,
+      answers: [{ status: 'review_required', answers: [null] }],
     },
   })
   await prisma.surveyVersionAnswers.create({
