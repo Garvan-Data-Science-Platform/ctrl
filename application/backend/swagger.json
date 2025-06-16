@@ -1140,7 +1140,13 @@
           "firstName": {
             "type": "string"
           },
+          "middleName": {
+            "type": "string"
+          },
           "lastName": {
+            "type": "string"
+          },
+          "dob": {
             "type": "string"
           },
           "id": {
@@ -1154,6 +1160,7 @@
         "required": [
           "firstName",
           "lastName",
+          "dob",
           "id",
           "participantType"
         ],
@@ -1531,42 +1538,57 @@
       "GetUserInvitesResponse": {
         "properties": {
           "data": {
-            "items": {
-              "properties": {
-                "studyName": {
-                  "type": "string"
+            "properties": {
+              "dependents": {
+                "items": {
+                  "$ref": "#/components/schemas/FamilyMember"
                 },
-                "sentAt": {
-                  "type": "string"
-                },
-                "expiresAt": {
-                  "type": "string"
-                },
-                "createdAt": {
-                  "type": "string"
-                },
-                "studyId": {
-                  "type": "number",
-                  "format": "double"
-                },
-                "email": {
-                  "type": "string"
-                },
-                "id": {
-                  "type": "string"
-                }
+                "type": "array"
               },
-              "required": [
-                "studyName",
-                "expiresAt",
-                "createdAt",
-                "studyId",
-                "email",
-                "id"
-              ],
-              "type": "object"
+              "invites": {
+                "items": {
+                  "properties": {
+                    "studyName": {
+                      "type": "string"
+                    },
+                    "sentAt": {
+                      "type": "string"
+                    },
+                    "expiresAt": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    },
+                    "studyId": {
+                      "type": "number",
+                      "format": "double"
+                    },
+                    "email": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "studyName",
+                    "expiresAt",
+                    "createdAt",
+                    "studyId",
+                    "email",
+                    "id"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              }
             },
-            "type": "array"
+            "required": [
+              "dependents",
+              "invites"
+            ],
+            "type": "object"
           }
         },
         "required": [

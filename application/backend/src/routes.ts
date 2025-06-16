@@ -467,7 +467,9 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "firstName": {"dataType":"string","required":true},
+            "middleName": {"dataType":"string"},
             "lastName": {"dataType":"string","required":true},
+            "dob": {"dataType":"string","required":true},
             "id": {"dataType":"double","required":true},
             "participantType": {"ref":"ParticipantType","required":true},
         },
@@ -551,7 +553,7 @@ const models: TsoaRoute.Models = {
     "GetUserInvitesResponse": {
         "dataType": "refObject",
         "properties": {
-            "data": {"dataType":"array","array":{"dataType":"nestedObjectLiteral","nestedProperties":{"studyName":{"dataType":"string","required":true},"sentAt":{"dataType":"string"},"expiresAt":{"dataType":"string","required":true},"createdAt":{"dataType":"string","required":true},"studyId":{"dataType":"double","required":true},"email":{"dataType":"string","required":true},"id":{"dataType":"string","required":true}}},"required":true},
+            "data": {"dataType":"nestedObjectLiteral","nestedProperties":{"dependents":{"dataType":"array","array":{"dataType":"refObject","ref":"FamilyMember"},"required":true},"invites":{"dataType":"array","array":{"dataType":"nestedObjectLiteral","nestedProperties":{"studyName":{"dataType":"string","required":true},"sentAt":{"dataType":"string"},"expiresAt":{"dataType":"string","required":true},"createdAt":{"dataType":"string","required":true},"studyId":{"dataType":"double","required":true},"email":{"dataType":"string","required":true},"id":{"dataType":"string","required":true}}},"required":true}},"required":true},
         },
         "additionalProperties": false,
     },

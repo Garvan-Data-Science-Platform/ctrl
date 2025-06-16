@@ -9,6 +9,7 @@ export const ORG_ADMIN_2_ID = 101
 export const PARTICIPANT_UNANSWERED_ID = 98
 export const PARTICIPANT_UNANSWERED_EMAIL = 'test2@example.com'
 export const PARTICIPANT_COMPLETED_ID = 99
+export const PARTICIPANT_COMPLETED_EMAIL = 'test3@example.com'
 export const DEPENDENT_ID = 100
 export const SECOND_GUARDIAN_ID = 102
 export const PASSWORD_RESET_USER_ID = 105
@@ -125,7 +126,7 @@ export async function seedTests(prisma: PrismaClient) {
   await prisma.user.create({
     data: {
       id: PARTICIPANT_COMPLETED_ID,
-      email: 'test3@example.com',
+      email: PARTICIPANT_COMPLETED_EMAIL,
       firstName: 'Test',
       lastName: 'User',
       password: hashPassword('password'),

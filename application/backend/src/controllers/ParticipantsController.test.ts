@@ -11,6 +11,8 @@ import {
   ORG_ADMIN_ID,
   PARTICIPANT_UNANSWERED_ID,
   PARTICIPANT_UNANSWERED_EMAIL,
+  PARTICIPANT_COMPLETED_ID,
+  PARTICIPANT_COMPLETED_EMAIL,
   SECOND_TEST_STUDY,
   PASSWORD_RESET_USER_ID,
 } from 'common/testing/seed'
@@ -580,7 +582,7 @@ describe('InvitesController', () => {
       expect(response.status).toEqual(200)
 
       const body = response.body
-      expect(body.data).toHaveLength(1)
+      expect(body.data.invites).toHaveLength(1)
 
       // zero
       // change invite to accepted.
@@ -600,8 +602,38 @@ describe('InvitesController', () => {
       expect(responseZero.status).toEqual(200)
 
       const bodyZero = responseZero.body
-      expect(bodyZero.data).toHaveLength(0)
+      expect(bodyZero.data.invites).toHaveLength(0)
     })
+
+    it('should return correct dependent info', async () => {
+      await prisma.invite.create({
+        data: {
+          email: PARTICIPANT_COMPLETED_EMAIL,
+          status: InviteStatus.PENDING,
+          study: {
+            connect: {
+              name: SECOND_TEST_STUDY,
+            },
+          },
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
+        },
+      })
+
+      // One initial invite
+      const token = await generateToken({
+        userId: PARTICIPANT_COMPLETED_ID,
+        roles: ['Participant'],
+      })
+
+      const response = await request(app)
+        .get(`/invites/pending`)
+        .set({ Authorization: `Bearer ${token}` })
+      expect(response.status).toEqual(200)
+
+      const body = response.body
+      expect(body.data.dependents).toHaveLength(1)
+    })
+
     it('should fail user is not a participant', async () => {
       const response = await request(app)
         .get(`/invites/pending`)
