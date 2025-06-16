@@ -290,6 +290,13 @@ export async function seedTests(prisma: PrismaClient) {
   })
   await prisma.surveyVersionAnswers.create({
     data: {
+      versionId: study2version.id,
+      profileId: PARTICIPANT_UNANSWERED_ID,
+      answers: [{ status: 'review_required', answers: [null] }],
+    },
+  })
+  await prisma.surveyVersionAnswers.create({
+    data: {
       versionId: 1,
       profileId: PARTICIPANT_COMPLETED_ID,
       answers: [
