@@ -14,21 +14,21 @@ export const authProvider: AuthProvider = {
         body: JSON.stringify({ email, password }),
         headers: { 'Content-Type': 'application/json', 'x-client-type': clientType },
       })
+      const data = await res.json()
       if (res.ok) {
-        const data = await res.json()
         localStorage.setItem(TOKEN_KEY, data.token)
-      } else {
         return {
-          success: false,
-          error: {
-            name: 'LoginError',
-            message: 'Invalid username or password',
-          },
+          success: true,
+          redirectTo: '/',
         }
       }
+      // Handle invalid credentials
       return {
-        success: true,
-        redirectTo: '/',
+        success: false,
+        error: {
+          name: 'LoginError',
+          message: `Error Logging In: ${JSON.stringify(data.message)}`,
+        },
       }
     }
 

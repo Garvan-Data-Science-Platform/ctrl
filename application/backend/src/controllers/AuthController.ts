@@ -237,8 +237,6 @@ export class AuthController extends Controller {
       throw new InvalidCredentialsError('User not found')
     }
 
-    console.log('Client Type: ', clientType)
-
     // Check client type and roles
     if (clientType === 'admin-client' && user.role !== 'OrganisationAdmin') {
       throw new IncorrectPermissionsError('User does not have admin privileges')
