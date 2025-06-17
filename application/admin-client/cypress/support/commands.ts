@@ -26,11 +26,17 @@ Cypress.Commands.add('login', (type: UserType) => {
     method: 'POST',
     url: `localhost:5001/auth/login`,
     body: { email: type, password: 'password' },
+    headers: {
+      'x-client-type': 'admin-client',
+    },
   }).then((res) => {
+    expect(res.status).to.equal(200)
+    expect(res.body.token).to.exist
     console.log('TOKEN', res.body.token)
     window.localStorage.setItem('refine-auth', res.body.token)
   })
 })
+
 Cypress.Commands.add('login_expired', () => {
   window.localStorage.setItem(
     'refine-auth',
