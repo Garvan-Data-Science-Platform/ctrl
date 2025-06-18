@@ -1,6 +1,5 @@
 /// <reference types="cypress" />
 
-const { isTemplateLiteralTypeSpan } = require('typescript')
 const { UserType } = require('../support/commands')
 
 beforeEach(() => {
