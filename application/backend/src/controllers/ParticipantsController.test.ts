@@ -134,7 +134,7 @@ describe('InvitesController', () => {
       expect(response.status).toBe(404)
 
       expect(response.body.message).toBe(
-        `No published survey found for study ${studyId}. A published survey required before invites can be sent.`,
+        `No published survey found for study ${studyId}. A published survey is required before invites can be sent.`,
       )
     })
 
@@ -597,7 +597,7 @@ describe('InvitesController', () => {
   })
 
   describe('GET /invites/pending', () => {
-    it('should return correct number of invites where appropriate', async () => {
+    it('should return correct number of invites', async () => {
       // One initial invite
       const token = await generateToken({
         userId: PARTICIPANT_UNANSWERED_ID,
@@ -662,7 +662,7 @@ describe('InvitesController', () => {
       expect(body.data.dependents).toHaveLength(1)
     })
 
-    it('should fail user is not a participant', async () => {
+    it('should fail if user is not a participant', async () => {
       const response = await request(app)
         .get(`/invites/pending`)
         .set({ Authorization: `Bearer ${organisationAdminToken}` })

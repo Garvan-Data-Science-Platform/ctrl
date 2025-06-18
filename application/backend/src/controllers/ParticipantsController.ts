@@ -272,12 +272,7 @@ export class InvitesController extends Controller {
   @Post('/invites/{inviteId}/accept')
   @Security('jwt', ['Participant'])
   @SuccessResponse('201', 'Invite Accepted')
-  public async acceptInvite(
-    @Request() request: any,
-    @Path() inviteId: string,
-    // TODO: add optional body for list of dependents to include when accepting
-    // @Body() bodyRequest: FamilyMember[],
-  ) {
+  public async acceptInvite(@Request() request: any, @Path() inviteId: string) {
     // check inviteId exists and is not yet accepted
     const invite = await this.invitesRepo.findFirst({
       where: {
@@ -304,7 +299,6 @@ export class InvitesController extends Controller {
         userId: user.id,
       },
     })
-
     if (!existingProfile) {
       throw new NotFoundError('Profile not found for user')
     }
@@ -316,7 +310,6 @@ export class InvitesController extends Controller {
       },
       orderBy: { id: 'desc' },
     })
-
     if (!currentSurvey) {
       throw new NotFoundError(`No published survey found for study ${invite.studyId}`)
     }
@@ -351,7 +344,6 @@ export class InvitesController extends Controller {
       where: { id: inviteId },
       data: { status: 'ACCEPTED' },
     })
-
     if (!res) {
       throw new NotFoundError(`Error accepting invite`)
     }
