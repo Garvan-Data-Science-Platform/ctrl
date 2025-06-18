@@ -36,7 +36,7 @@ import nodemailer from 'nodemailer'
 import { generateInviteEmail } from 'common/src/generateInviteTemplate'
 import { InviteStatus } from 'common/types/api/participants/invite'
 import { BadGatewayError, NotFoundError } from '../middlewares/ErrorHandler'
-import { determineLastUpdated, determineStatus } from '../utils/answers'
+import { createDefaultAnswers, determineLastUpdated, determineStatus } from '../utils/answers'
 import { ProfilesController } from './ProfilesController'
 import { auditLog } from '../middlewares/AuditLog'
 import { ParticipantType, Role } from '@prisma/client'
@@ -170,6 +170,7 @@ export class InvitesController extends Controller {
   studyRepo = prisma.study
   profileRepo = prisma.participantProfile
   userRepo = prisma.user
+  surveyRepo = prisma.surveyVersion
 
   /**
    * List all pending invites for a user
@@ -271,9 +272,12 @@ export class InvitesController extends Controller {
   @Post('/invites/{inviteId}/accept')
   @Security('jwt', ['Participant'])
   @SuccessResponse('201', 'Invite Accepted')
-  public async acceptInvite(@Request() request: any, @Path() inviteId: string) {
+  public async acceptInvite(
+    @Request() request: any,
+    @Path() inviteId: string,
     // TODO: add optional body for list of dependents to include when accepting
-
+    // @Body() bodyRequest: FamilyMember[],
+  ) {
     // check inviteId exists and is not yet accepted
     const invite = await this.invitesRepo.findFirst({
       where: {
@@ -305,6 +309,18 @@ export class InvitesController extends Controller {
       throw new NotFoundError('Profile not found for user')
     }
 
+    const currentSurvey = await this.surveyRepo.findFirstOrThrow({
+      where: {
+        status: 'PUBLISHED',
+        studyId: invite.studyId,
+      },
+      orderBy: { id: 'desc' },
+    })
+
+    if (!currentSurvey) {
+      throw new NotFoundError(`No published survey found for study ${invite.studyId}`)
+    }
+
     await this.profileRepo.update({
       where: {
         id: existingProfile.id,
@@ -319,6 +335,14 @@ export class InvitesController extends Controller {
             },
           },
         },
+      },
+    })
+
+    await prisma.surveyVersionAnswers.create({
+      data: {
+        profileId: existingProfile.id,
+        versionId: currentSurvey.id,
+        answers: createDefaultAnswers(currentSurvey.data),
       },
     })
 
@@ -379,6 +403,21 @@ export class InvitesController extends Controller {
     @Body() bodyRequest: InviteParticipantsRequest,
   ): Promise<InviteParticipantsResponse> {
     const { subjectText, explanatoryText } = bodyRequest
+
+    // Check if a published survey exists
+    const currentSurvey = await this.surveyRepo.findFirst({
+      where: {
+        status: 'PUBLISHED',
+        studyId: studyId,
+      },
+      orderBy: { id: 'desc' },
+    })
+
+    if (!currentSurvey) {
+      throw new NotFoundError(
+        `No published survey found for study ${studyId}. A published survey is required before invites can be sent.`,
+      )
+    }
 
     await this.studyRepo.update({
       where: { id: studyId },

@@ -110,6 +110,34 @@ describe('InvitesController', () => {
   })
 
   describe('POST /studies/{studyId}/invites', () => {
+    it('should not create invites if a study does not yet have a published survey', async () => {
+      const emails = ['invite5@new.com', 'invite6@new.com']
+      const studyId = 2
+
+      await prisma.surveyVersion.update({
+        where: {
+          studyId_versionNumber: {
+            studyId: studyId,
+            versionNumber: 1,
+          },
+        },
+        data: {
+          status: 'DRAFT',
+        },
+      })
+
+      const response = await request(app)
+        .post(`/studies/${studyId}/invites`)
+        .send({ emails, subjectText: 'Subject Text', explanatoryText: 'Explanatory Text' })
+        .set({ Authorization: `Bearer ${organisationAdminToken}` })
+
+      expect(response.status).toBe(404)
+
+      expect(response.body.message).toBe(
+        `No published survey found for study ${studyId}. A published survey required before invites can be sent.`,
+      )
+    })
+
     it('should create new study invites from a list of emails, return data about how many new invites were created, and send the invites to their emails', async () => {
       const emails = ['invite5@new.com', 'invite6@new.com']
 

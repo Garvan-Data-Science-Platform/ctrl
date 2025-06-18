@@ -398,4 +398,14 @@ export async function seedTests(prisma: PrismaClient) {
       },
     ],
   })
+
+  // publish a survey for study 2
+  await prisma.surveyVersion.create({
+    data: {
+      status: 'PUBLISHED',
+      versionNumber: 1,
+      data: ExampleSurveyStepData as SurveyStep[],
+      studyId: secondTestStudy.id,
+    },
+  })
 }
