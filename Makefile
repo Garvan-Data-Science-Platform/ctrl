@@ -50,7 +50,7 @@ seed:
 	yarn prisma:seed
 
 clean: db-down
-	docker volume rm ctrl-next_ctrl-db
+	docker volume rm ctrl_ctrl-db
 
 # Local deployment via minikube and helm
 
