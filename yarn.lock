@@ -6590,9 +6590,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ctrl-next@workspace:.":
+"ctrl@workspace:.":
   version: 0.0.0-use.local
-  resolution: "ctrl-next@workspace:."
+  resolution: "ctrl@workspace:."
   dependencies:
     "@react-pdf/renderer": "npm:^4.2.2"
     "@types/node": "npm:^22.1.0"
