@@ -2,6 +2,8 @@ import type { AuthProvider } from '@refinedev/core'
 
 export const TOKEN_KEY = 'refine-auth'
 
+export const clientType = 'admin-client'
+
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
 export const authProvider: AuthProvider = {
@@ -10,23 +12,23 @@ export const authProvider: AuthProvider = {
       const res = await fetch(BACKEND_URL + '/auth/login', {
         method: 'POST',
         body: JSON.stringify({ email, password }),
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-client-type': clientType },
       })
+      const data = await res.json()
       if (res.ok) {
-        const data = await res.json()
         localStorage.setItem(TOKEN_KEY, data.token)
-      } else {
         return {
-          success: false,
-          error: {
-            name: 'LoginError',
-            message: 'Invalid username or password',
-          },
+          success: true,
+          redirectTo: '/',
         }
       }
+      // Handle invalid credentials
       return {
-        success: true,
-        redirectTo: '/',
+        success: false,
+        error: {
+          name: 'LoginError',
+          message: `Error Logging In: ${JSON.stringify(data.message)}`,
+        },
       }
     }
 
