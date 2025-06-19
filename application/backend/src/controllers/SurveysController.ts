@@ -329,6 +329,11 @@ export class SurveysController extends Controller {
     const profile = await this.profileRepo.findFirstOrThrow({
       where: {
         userId: request.user.userId,
+        studies: {
+          some: {
+            studyId,
+          },
+        },
       },
     })
 
@@ -384,18 +389,30 @@ export class SurveysController extends Controller {
     })
 
     //Also update any dependents
-    // TODO: Double check this logic is what we want for multiple studies
     if (profile.participantType == 'GUARDIAN') {
       const dependents = await this.profileRepo.findMany({
         where: {
           familyId: profile.familyId,
+          studies: {
+            some: {
+              studyId,
+            },
+          },
           OR: [{ participantType: 'DEPENDENT_AGE' }, { participantType: 'DEPENDENT_OTHER' }],
         },
       })
 
-      // TODO: what does dependent inheritence look like with multiple studies?
       const coGuardians = await this.profileRepo.findMany({
-        where: { NOT: { id: profile.id }, familyId: profile.familyId, participantType: 'GUARDIAN' },
+        where: {
+          NOT: { id: profile.id },
+          familyId: profile.familyId,
+          participantType: 'GUARDIAN',
+          studies: {
+            some: {
+              studyId,
+            },
+          },
+        },
       })
 
       if (coGuardians) {

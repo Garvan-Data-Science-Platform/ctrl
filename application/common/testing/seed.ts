@@ -404,7 +404,21 @@ export async function seedTests(prisma: PrismaClient) {
     data: {
       status: 'PUBLISHED',
       versionNumber: 1,
-      data: ExampleSurveyStepData as SurveyStep[],
+      data: [
+        {
+          title: 'Study2step',
+          text: '',
+          elements: [
+            {
+              type: 'question-checkbox',
+              data: {
+                text: 'Hello',
+                value: null,
+              },
+            },
+          ],
+        },
+      ] as SurveyStep[],
       studyId: secondTestStudy.id,
     },
   })
