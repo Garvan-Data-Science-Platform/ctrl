@@ -25,6 +25,7 @@ import {
   StateTerritory,
 } from '@common/types/api/users/ParticipantProfile'
 import { AddCircle, Close } from '@mui/icons-material'
+import { useEffect } from 'react'
 
 interface FormValues {
   firstName: string
@@ -62,6 +63,10 @@ export default function Register() {
 
   const { login } = useAuth()
   const nav = useNavigate()
+
+  useEffect(() => {
+    document.title = 'Register | CTRL'
+  }, [])
 
   const onSubmit = (data: FormValues) => {
     const reqData: RegisterParticipantRequest = {
@@ -116,13 +121,18 @@ export default function Register() {
         <Card sx={{ maxWidth: 500, mr: 'auto', ml: 'auto', mt: 10, p: 2 }}>
           <form onSubmit={handleSubmit(onSubmit)}>
             <Box sx={{ mt: 5, mb: 2 }}>
-              <img src={import.meta.env.VITE_BACKEND_URL + '/settings/logo'} height={40} />
+              <img
+                src={import.meta.env.VITE_BACKEND_URL + '/settings/logo'}
+                height={40}
+                alt="logo"
+              />
             </Box>
             {Object.keys(errors) && <Typography>{}</Typography>}
             <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
               <TextField
                 sx={{ m: 1, flexGrow: 1 }}
                 label="First Name"
+                autoComplete="given-name"
                 error={Boolean(errors.firstName)}
                 helperText={errors.firstName?.message}
                 data-cy="reg-first"
@@ -131,6 +141,7 @@ export default function Register() {
               <TextField
                 sx={{ m: 1, flexGrow: 1 }}
                 label="Family Name"
+                autoComplete="family-name"
                 error={Boolean(errors.lastName)}
                 helperText={errors.lastName?.message}
                 data-cy="reg-last"
@@ -141,6 +152,7 @@ export default function Register() {
                 fullWidth
                 sx={{ m: 1 }}
                 label="Email"
+                autoComplete="email"
                 error={Boolean(errors.email)}
                 helperText={errors.email?.message}
                 data-cy="reg-email"
@@ -148,7 +160,7 @@ export default function Register() {
                   required: 'This field is required',
                   pattern: {
                     value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, //eslint-disable-line
-                    message: 'Entered a valid email',
+                    message: 'Enter a valid email',
                   },
                 })}
               />
@@ -156,6 +168,7 @@ export default function Register() {
                 sx={{ m: 1, flexGrow: 1 }}
                 type="password"
                 label="Password"
+                autoComplete="new-password"
                 error={Boolean(errors.password)}
                 helperText={errors.password?.message}
                 data-cy="reg-password"
@@ -173,6 +186,7 @@ export default function Register() {
                 sx={{ m: 1, flexGrow: 1 }}
                 type="password"
                 label="Confirm Password"
+                autoComplete="new-password"
                 error={Boolean(errors.confirm_password)}
                 helperText={errors.confirm_password?.message}
                 data-cy="reg-confirm-password"
@@ -190,6 +204,7 @@ export default function Register() {
                 type="date"
                 sx={{ m: 1 }}
                 label="Date of Birth"
+                autoComplete="bday"
                 error={Boolean(errors.dob)}
                 helperText={errors.dob?.message}
                 data-cy="reg-dob"
@@ -199,6 +214,7 @@ export default function Register() {
               <TextField
                 sx={{ m: 1, flexGrow: 1 }}
                 label="Address Line"
+                autoComplete="address-level-3"
                 error={Boolean(errors.addressLine)}
                 helperText={errors.addressLine?.message}
                 data-cy="reg-address-line"
@@ -208,6 +224,7 @@ export default function Register() {
                 sx={{ m: 1 }}
                 label="Suburb"
                 data-cy="reg-suburb"
+                autoComplete="address-level-2"
                 error={Boolean(errors.suburb)}
                 helperText={errors.suburb?.message}
                 {...register('suburb', { required: 'This field is required' })}
@@ -234,6 +251,7 @@ export default function Register() {
               <TextField
                 sx={{ m: 1, flexGrow: 1 }}
                 label="Postcode"
+                autoComplete="postal-code"
                 error={Boolean(errors.postcode)}
                 helperText={errors.postcode?.message}
                 data-cy="reg-postcode"
@@ -248,6 +266,7 @@ export default function Register() {
               <TextField
                 sx={{ m: 1, flexGrow: 1 }}
                 label="Mobile"
+                autoComplete="mobile tel"
                 error={Boolean(errors.mobile)}
                 helperText={errors.mobile?.message}
                 data-cy="reg-mobile"

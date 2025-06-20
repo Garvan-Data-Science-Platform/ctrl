@@ -1,7 +1,11 @@
 import { Box, Container } from '@mui/material'
 import NavBar from '../components/NavBar'
+import { useEffect } from 'react'
 
 export default function News() {
+  useEffect(() => {
+    document.title = 'News and Information | CTRL'
+  }, [])
   return (
     <>
       <NavBar />

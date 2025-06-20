@@ -1,5 +1,5 @@
 {
-  "name": "ctrl-next",
+  "name": "ctrl",
   "packageManager": "yarn@4.9.1",
   "scripts": {
     "build": "yarn workspaces foreach --all run build",

@@ -45,6 +45,7 @@ describe('IntegrationsController', () => {
         profilesCreatedCount: 1,
         ids: [1],
         profilesAlreadyExistedCount: 0,
+        newInvites: ['example@example.com'],
       })
 
       const createdParticipant = await prisma.participantProfile.findFirst({
@@ -232,14 +233,12 @@ describe('IntegrationsController', () => {
 
       const response = await request(app)
         .post('/integrations/redcap/participant/upload/api')
-        .send({ formName: 'ctrl_test_1' })
         .set({ Authorization: `Bearer ${token}` })
-
       expect(response.status).toBe(201)
 
       const postCreationLen = await prisma.participantProfile.count()
 
-      expect(postCreationLen - initialLen).toBe(10) // adds the 10 users in ctrl_test_1
+      expect(postCreationLen - initialLen).toBe(10) // adds the 10 users
 
       // check correct response message
       expect(response.body.ids.length).toBe(10)
@@ -252,7 +251,6 @@ describe('IntegrationsController', () => {
 
       const response = await request(app)
         .post('/integrations/redcap/participant/upload/api')
-        .send({ formName: 'ctrl_test_1' })
         .set({ Authorization: `Bearer ${token}` })
 
       expect(response.status).toBe(502)

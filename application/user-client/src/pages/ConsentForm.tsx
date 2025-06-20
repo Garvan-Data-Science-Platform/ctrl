@@ -8,6 +8,7 @@ import {
   CircularProgress,
   Container,
   FormControlLabel,
+  IconButton,
   Modal,
   Radio,
   RadioGroup,
@@ -102,8 +103,8 @@ export default function ConsentForm() {
   }
 
   useEffect(() => {
-    console.log('GOT DATA', data)
     setFormState(data?.elements || [])
+    document.title = data?.title || 'CTRL'
   }, [data])
 
   const renderElements = (elements: SurveyElement[]) => {
@@ -149,16 +150,23 @@ export default function ConsentForm() {
           },
         })}
       >
-        <Typography sx={{ flexGrow: 1, textAlign: 'left' }}>{data.text}</Typography>
+        {/* 
+          // @ts-ignore */}
+        <Typography component="label" for={`input_${idx}`} sx={{ flexGrow: 1, textAlign: 'left' }}>
+          {data.text}
+        </Typography>
         {data.tooltip ? (
           <Tooltip title={<Typography fontSize={13}>{data.tooltip}</Typography>}>
-            <Info />
+            <IconButton>
+              <Info />
+            </IconButton>
           </Tooltip>
         ) : (
           <Box width={10} />
         )}
         {type == 'question-checkbox' && (
           <Checkbox
+            id={`input_${idx}`}
             checked={formState[idx].data.value}
             data-cy={`checkbox-${idx}`}
             onClick={() =>
@@ -246,6 +254,7 @@ export default function ConsentForm() {
           height={30}
           onClick={() => nav('/')}
           style={{ marginRight: 20, cursor: 'pointer' }}
+          alt="logo"
         />
       </Box>
       <Stepper activeStep={Number(params.step)} sx={{ mt: 6, mb: 4 }}>
@@ -268,7 +277,7 @@ export default function ConsentForm() {
         {isPending ? (
           <CircularProgress />
         ) : (
-          <>
+          <Box component="form">
             <Typography variant="h4">{data?.title}</Typography>
             <Typography sx={{ mt: 3, mb: 3, whiteSpace: 'preserve', textAlign: 'justify' }}>
               {data?.text}
@@ -294,7 +303,7 @@ export default function ConsentForm() {
                 </Button>
               )}
             </Box>
-          </>
+          </Box>
         )}
       </Card>
     </Container>

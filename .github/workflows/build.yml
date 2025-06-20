@@ -25,7 +25,7 @@ jobs:
       - name: 'Authenticate to Google Cloud'
         uses: 'google-github-actions/auth@v2'
         with:
-          workload_identity_provider: 'projects/43338454952/locations/global/workloadIdentityPools/ctrl-next-id-pool/providers/github-provider'
+          workload_identity_provider: 'projects/43338454952/locations/global/workloadIdentityPools/ctrl-id-pool/providers/github-provider'
           service_account: 'ctrl-ci-sa@ctrl-358804.iam.gserviceaccount.com'
 
       - name: 'Docker auth'

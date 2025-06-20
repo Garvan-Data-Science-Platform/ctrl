@@ -13,7 +13,7 @@ variable "project" {
 
 variable "repo" {
   description = "GitHub Repo"
-  default = "ctrl-next"
+  default = "ctrl"
   type        = string
   nullable    = false
 }

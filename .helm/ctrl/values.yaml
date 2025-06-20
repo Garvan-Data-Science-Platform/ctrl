@@ -7,11 +7,6 @@ replicaCount: 1
 demoMode:
   enabled: false
 
-auth:
-  admin: #Default admin credentials
-    email:
-    password:
-
 userClient:
   image:
     repository: australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-user-client
@@ -35,15 +30,6 @@ backend:
 
 nginx-ingress:
   enabled: true
-
-mailer:
-  host:
-  port:
-  username:
-  password:
-
-redcap:
-  apiUrl:
 
 cert-manager: #Use to enable https
   enabled: false

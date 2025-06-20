@@ -13,7 +13,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { ResetPasswordRequest } from '@common/types/api/users'
 import { checkPasswordStrength } from '@common/src/PasswordStrength'
 import { apiClient } from '../apiClient'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface FormValues {
   newPassword: string
@@ -40,13 +40,17 @@ export default function ResetPassword() {
 
   const [status, setStatus] = useState<'unsent' | 'pending' | 'error' | 'sent'>('unsent')
 
+  useEffect(() => {
+    document.title = 'Reset Password | CTRL'
+  }, [])
+
   if (!token) {
     return (
       <Container>
         <Card sx={{ maxWidth: 400, mr: 'auto', ml: 'auto', mt: 10, p: 2 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Box sx={{ mt: 5, mb: 2 }}>
-              <img src={logoPath} height={40} />
+              <img alt="logo" src={logoPath} height={40} />
             </Box>
             <Alert severity="error">
               Missing token. Please check your reset password email link.
@@ -98,7 +102,7 @@ export default function ResetPassword() {
         {status === 'sent' ? (
           <Box>
             <Box sx={{ mt: 5, mb: 2 }}>
-              <img src={logoPath} height={40} />
+              <img alt="logo" src={logoPath} height={40} />
             </Box>
             <Typography>Password reset was successful.</Typography>
           </Box>
@@ -111,7 +115,7 @@ export default function ResetPassword() {
           </Box>
         ) : status === 'error' ? (
           <Box sx={{ mt: 5, mb: 2 }}>
-            <img src={logoPath} height={40} />
+            <img alt="logo" src={logoPath} height={40} />
             <Alert severity="error">
               Invalid token. Please check your reset password email link.
             </Alert>
@@ -120,13 +124,14 @@ export default function ResetPassword() {
           <form onSubmit={handleSubmit(onSubmit)}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <Box sx={{ mt: 5, mb: 2 }}>
-                <img src={logoPath} height={40} />
+                <img alt="logo" src={logoPath} height={40} />
               </Box>
               <Typography>Please enter and confirm your new password</Typography>
               <TextField
                 type="password"
                 fullWidth
                 label="New password"
+                autoComplete="new-password"
                 error={Boolean(errors.newPassword)}
                 helperText={errors.newPassword?.message}
                 data-cy="new-password"
@@ -144,6 +149,7 @@ export default function ResetPassword() {
                 type="password"
                 fullWidth
                 label="Confirm password"
+                autoComplete="new-password"
                 error={Boolean(errors.confirmPassword)}
                 helperText={errors.confirmPassword?.message}
                 data-cy="confirm-password"

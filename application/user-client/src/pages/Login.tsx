@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth'
 import { LoginRequest, LoginResponse } from '@common/types/api/auth'
+import { useEffect } from 'react'
 
 export default function Login() {
   const {
@@ -14,13 +15,12 @@ export default function Login() {
   const { login } = useAuth()
   const nav = useNavigate()
 
+  const clientType = 'user-client'
+
   const onSubmit = (data: unknown) => {
-    //login('TOKEN')
-    //nav('/')
-    console.log('DATA', data)
     fetch(import.meta.env.VITE_BACKEND_URL + '/auth/login', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-client-type': clientType },
       body: JSON.stringify(data as LoginRequest),
     })
       .then((res) => {
@@ -43,6 +43,10 @@ export default function Login() {
       })
   }
 
+  useEffect(() => {
+    document.title = 'Login | CTRL'
+  }, [])
+
   return (
     <>
       <Container>
@@ -50,7 +54,11 @@ export default function Login() {
           <form onSubmit={handleSubmit(onSubmit)}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <Box sx={{ mt: 5, mb: 2 }}>
-                <img src={import.meta.env.VITE_BACKEND_URL + '/settings/logo'} height={40} />
+                <img
+                  src={import.meta.env.VITE_BACKEND_URL + '/settings/logo'}
+                  height={40}
+                  alt="logo"
+                />
               </Box>
               <TextField
                 type="email"
