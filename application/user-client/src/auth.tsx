@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState } from 'react'
 import { Outlet, Navigate } from 'react-router-dom'
+import { StudyLoader } from './components/StudyLoader'
 
 const AuthContext = createContext({
   isAuthenticated: true,
@@ -35,5 +36,11 @@ export const useAuth = () => {
 
 export const ProtectedRoutes = () => {
   const { isAuthenticated } = useAuth()
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" />
+  return isAuthenticated ? (
+    <StudyLoader>
+      <Outlet />
+    </StudyLoader>
+  ) : (
+    <Navigate to="/login" />
+  )
 }

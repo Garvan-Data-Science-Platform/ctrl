@@ -80,7 +80,7 @@ export class ParticipantsController extends Controller {
 
     for (const p of unique_participants) {
       const p_answers = await this.svaRepo.findMany({
-        where: { profileId: p.profile.id },
+        where: { profileId: p.profile.id, version: { studyId } },
         select: {
           answers: true,
           version: { select: { versionNumber: true, updatedAt: true } },

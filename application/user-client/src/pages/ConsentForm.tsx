@@ -28,15 +28,15 @@ import { Info } from '@mui/icons-material'
 import { useEffect, useState } from 'react'
 import { SurveyElement } from '@common/types/survey'
 import { extractSurveyStepAnswers } from '@common/src/surveys/extractSurveyStepAnswers'
-
-// TODO: remove hardcoded study number (Dashboard will change to study selecting view any way)
-const studyId = 1
+import { useCurrentStudyId } from '../store'
 
 export default function ConsentForm() {
   const nav = useNavigate()
 
   const params = useParams()
   const currentStep = Number(params.step)
+
+  const studyId = useCurrentStudyId()
 
   const [formState, setFormState] = useState<SurveyElement[]>([])
   const [modalOpen, setModalOpen] = useState(false)
