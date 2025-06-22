@@ -6,8 +6,8 @@ import { useSearchParams } from 'react-router-dom'
 export const StudyLoader: React.FC<PropsWithChildren> = ({ children }) => {
   const { data } = {
     data: [
-      { name: 'Study 1', id: 1 },
-      { name: 'Study 2', id: 2 },
+      { name: 'Test Study', id: 1 },
+      { name: 'Study FE', id: 3 },
     ],
   }
   const { studies, activeStudyIndex, setStudies, setActiveStudyIndex } = useAppStore()

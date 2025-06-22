@@ -16,6 +16,7 @@ export const PASSWORD_RESET_USER_ID = 105
 export const PASSWORD_RESET_USER_EMAIL = 'test-reset-password@example.com'
 export const TEST_STUDY = 'Test Study'
 export const SECOND_TEST_STUDY = 'Study 2'
+export const FE_TEST_STUDY = 'Study FE'
 
 export async function seedTests(prisma: PrismaClient) {
   const ExampleSurveyStepData = await import('../src/surveys/exampleSurveyStepData.json', {
@@ -36,15 +37,24 @@ export async function seedTests(prisma: PrismaClient) {
 
   await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"Organisation"', 'id'), 2, false) FROM "Organisation";`
 
-  // Create two studies
+  // Create three studies
   const testStudy = await prisma.study.create({
     data: {
       name: TEST_STUDY,
     },
   })
+
+  // This study will have a survey, but no participant users and no draft answers (mostly for backend integration testing)
   const secondTestStudy = await prisma.study.create({
     data: {
       name: SECOND_TEST_STUDY,
+    },
+  })
+
+  // This study will have a survey, a participant user and draft answers (mostly for frontend testing)
+  const frontendTestStudy = await prisma.study.create({
+    data: {
+      name: FE_TEST_STUDY,
     },
   })
 
@@ -133,7 +143,7 @@ export async function seedTests(prisma: PrismaClient) {
       role: Role.Participant,
     },
   })
-  await prisma.participantProfile.create({
+  const participantUnansweredProfile = await prisma.participantProfile.create({
     data: {
       id: PARTICIPANT_UNANSWERED_ID,
       firstName: 'Unanswered',
@@ -260,21 +270,6 @@ export async function seedTests(prisma: PrismaClient) {
     },
   })
 
-  const study2version = await prisma.surveyVersion.create({
-    data: {
-      id: 10,
-      status: 'PUBLISHED',
-      versionNumber: 1,
-      data: [
-        {
-          title: 'Study2step',
-          text: '',
-          elements: [{ type: 'question-checkbox', data: { text: 'Hello' } }],
-        },
-      ] as SurveyStep[],
-      studyId: secondTestStudy.id,
-    },
-  })
   await prisma.surveyVersion.create({
     data: {
       status: 'DRAFT',
@@ -291,13 +286,6 @@ export async function seedTests(prisma: PrismaClient) {
         { status: 'review_required', answers: [] },
         { status: 'review_required', answers: [null, null] },
       ],
-    },
-  })
-  await prisma.surveyVersionAnswers.create({
-    data: {
-      versionId: study2version.id,
-      profileId: PARTICIPANT_UNANSWERED_ID,
-      answers: [{ status: 'review_required', answers: [null] }],
     },
   })
   await prisma.surveyVersionAnswers.create({
@@ -443,6 +431,47 @@ export async function seedTests(prisma: PrismaClient) {
         },
       ] as SurveyStep[],
       studyId: secondTestStudy.id,
+    },
+  })
+
+  // Frontend multistudy test seed data
+  const frontendTestSurveryVersion = await prisma.surveyVersion.create({
+    data: {
+      status: 'PUBLISHED',
+      versionNumber: 1,
+      data: [
+        {
+          title: 'Frontend study step',
+          text: '',
+          elements: [{ type: 'question-checkbox', data: { text: 'Hello' } }],
+        },
+      ] as SurveyStep[],
+      studyId: frontendTestStudy.id,
+    },
+  })
+
+  await prisma.participantProfile.update({
+    where: {
+      id: participantUnansweredProfile.id,
+    },
+    data: {
+      studies: {
+        create: {
+          study: {
+            connect: {
+              name: frontendTestStudy.name,
+            },
+          },
+        },
+      },
+    },
+  })
+
+  await prisma.surveyVersionAnswers.create({
+    data: {
+      versionId: frontendTestSurveryVersion.id,
+      profileId: PARTICIPANT_UNANSWERED_ID,
+      answers: [{ status: 'review_required', answers: [null] }],
     },
   })
 }
