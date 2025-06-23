@@ -14,7 +14,6 @@ import type {
   InviteParticipantsRequest,
   InviteParticipantsResponse,
 } from 'common/types/api/participants'
-import type { FamilyMember } from 'common/types/api/users'
 import logger from 'common/src/logger'
 import {
   Route,
@@ -39,7 +38,7 @@ import { BadGatewayError, NotFoundError } from '../middlewares/ErrorHandler'
 import { createDefaultAnswers, determineLastUpdated, determineStatus } from '../utils/answers'
 import { ProfilesController } from './ProfilesController'
 import { auditLog } from '../middlewares/AuditLog'
-import { ParticipantType, Role } from '@prisma/client'
+import { Role } from '@prisma/client'
 
 @Route('studies/{studyId}')
 @Tags('Participants')
@@ -207,34 +206,38 @@ export class InvitesController extends Controller {
       },
     })
 
-    const userProfile = await this.profileRepo.findFirstOrThrow({
-      where: { userId: user.id },
-      select: { familyId: true },
-    })
+    // NOTE: I've left this code in below, but commented out.
+    // I have not implemented the endpoint for users to add dependents to studies
+    //  Not sure if this functionality is what study managers would want (and is complicated by ID question).
 
-    // Get dependents info (if any) to the response so frontend can show this to choose which dependents can be included
-    const dependents = await this.profileRepo.findMany({
-      where: {
-        OR: [
-          {
-            familyId: userProfile.familyId,
-            participantType: ParticipantType.DEPENDENT_AGE,
-          },
-          {
-            familyId: userProfile.familyId,
-            participantType: ParticipantType.DEPENDENT_OTHER,
-          },
-        ],
-      },
-      select: {
-        firstName: true,
-        middleName: true,
-        lastName: true,
-        dob: true,
-        id: true,
-        participantType: true,
-      },
-    })
+    // const userProfile = await this.profileRepo.findFirstOrThrow({
+    //   where: { userId: user.id },
+    //   select: { familyId: true },
+    // })
+
+    // // Get dependents info (if any) to the response so frontend can show this to choose which dependents can be included
+    // const dependents = await this.profileRepo.findMany({
+    //   where: {
+    //     OR: [
+    //       {
+    //         familyId: userProfile.familyId,
+    //         participantType: ParticipantType.DEPENDENT_AGE,
+    //       },
+    //       {
+    //         familyId: userProfile.familyId,
+    //         participantType: ParticipantType.DEPENDENT_OTHER,
+    //       },
+    //     ],
+    //   },
+    //   select: {
+    //     firstName: true,
+    //     middleName: true,
+    //     lastName: true,
+    //     dob: true,
+    //     id: true,
+    //     participantType: true,
+    //   },
+    // })
 
     // Map to response
     const formattedInvites = invites.map((invite) => ({
@@ -247,19 +250,19 @@ export class InvitesController extends Controller {
       studyName: invite.study.name,
     }))
 
-    const formattedDependents = dependents.map((dependent) => ({
-      firstName: dependent.firstName,
-      middleName: dependent.middleName ? dependent.middleName : undefined,
-      lastName: dependent.lastName,
-      dob: dependent.dob.toISOString(),
-      id: dependent.id,
-      participantType: dependent.participantType as ParticipantType,
-    })) as FamilyMember[]
+    // const formattedDependents = dependents.map((dependent) => ({
+    //   firstName: dependent.firstName,
+    //   middleName: dependent.middleName ? dependent.middleName : undefined,
+    //   lastName: dependent.lastName,
+    //   dob: dependent.dob.toISOString(),
+    //   id: dependent.id,
+    //   participantType: dependent.participantType as ParticipantType,
+    // })) as FamilyMember[]
 
     return {
       data: {
         invites: formattedInvites,
-        dependents: formattedDependents,
+        // dependents: formattedDependents,
       },
     }
   }

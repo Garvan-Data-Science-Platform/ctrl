@@ -1,5 +1,5 @@
 import { InviteStatus } from './invite'
-import { FamilyMember } from '../users/getParticipantProfile'
+// import { FamilyMember } from '../users/getParticipantProfile'
 
 export interface GetInvitesResponse {
   data: {
@@ -24,6 +24,6 @@ export interface GetUserInvitesResponse {
       sentAt?: string
       studyName: string // may be other fields here in future
     }[]
-    dependents: FamilyMember[]
+    //    dependents: FamilyMember[]
   }
 }
