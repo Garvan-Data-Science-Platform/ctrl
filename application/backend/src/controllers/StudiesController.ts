@@ -8,6 +8,7 @@ import {
   Tags,
   Path,
   Response,
+  Request,
   SuccessResponse,
   Middlewares,
   Controller,
@@ -39,6 +40,8 @@ import { auditLog } from '../middlewares/AuditLog'
 @Middlewares(auditLog)
 export class StudiesController extends Controller {
   studyRepo = prisma.study
+  studyParticipantRepo = prisma.studyParticipant
+  profileRepo = prisma.participantProfile
 
   /**
    * Get all Studies
@@ -48,6 +51,33 @@ export class StudiesController extends Controller {
   @Get('/')
   public async getAllStudies(): Promise<GetAllStudiesResponse> {
     const studies: Study[] = await this.studyRepo.findMany({})
+    const responseData = { data: studies }
+    logger.info({ ...responseData })
+    return responseData
+  }
+
+  /**
+   * List users Studies
+   *
+   * @summary List all Studies that a user is participating in, by token (doesn't include pending invitations)
+   */
+  @Get('/list')
+  @Security('jwt', ['Participant'])
+  public async listStudies(@Request() request: any): Promise<GetAllStudiesResponse> {
+    // get profile id from token
+    const participantProfile = await this.profileRepo.findFirstOrThrow({
+      where: { userId: request.user.userId },
+    })
+
+    const studies: Study[] = await this.studyRepo.findMany({
+      where: {
+        profiles: {
+          some: {
+            participantProfileId: participantProfile.id,
+          },
+        },
+      },
+    })
     const responseData = { data: studies }
     logger.info({ ...responseData })
     return responseData

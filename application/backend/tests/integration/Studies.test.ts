@@ -9,6 +9,7 @@ import {
   ParticipantType,
   StateTerritory,
 } from 'common/types/api/users/ParticipantProfile'
+import { GetAllStudiesResponse } from 'common/types/api/studies'
 
 import prisma from '../../src/PrismaClient'
 
@@ -182,6 +183,26 @@ describe('Studies tests', () => {
       roles: ['Participant'],
     })
 
+    // list pending invites
+    const pendingInviteRes = await request(app)
+      .get(`/invites/pending`)
+      .set({ Authorization: `Bearer ${token}` })
+    expect(pendingInviteRes.statusCode).toBe(200)
+
+    const body = pendingInviteRes.body
+    expect(body.data.invites).toHaveLength(1)
+
+    // list studies before accepting
+    const response = await request(app)
+      .get('/studies/list')
+      .set({ Authorization: `Bearer ${token}` })
+    expect(response.status).toBe(200)
+
+    const studyBody: GetAllStudiesResponse = response.body
+    expect(Array.isArray(studyBody.data)).toBeTruthy()
+    expect(studyBody.data.length).toEqual(1)
+
+    // accept invites
     const acceptInviteRes = await request(app)
       .post(`/invites/${parent1Invite.id}/accept`)
       .set({ Authorization: `Bearer ${token}` })
@@ -202,6 +223,16 @@ describe('Studies tests', () => {
       },
     })
     expect(correctStudyParticipants).toHaveLength(1)
+
+    // list studies after accepting
+    const studyListResponse = await request(app)
+      .get('/studies/list')
+      .set({ Authorization: `Bearer ${token}` })
+    expect(studyListResponse.status).toBe(200)
+
+    const studyListBody: GetAllStudiesResponse = studyListResponse.body
+    expect(Array.isArray(studyListBody.data)).toBeTruthy()
+    expect(studyListBody.data.length).toEqual(2)
   })
 
   it('Parent is able to view and answer study 2 questions. Dependent answers (in study 1) do not get added or modified', async () => {

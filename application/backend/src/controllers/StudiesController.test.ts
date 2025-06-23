@@ -7,6 +7,7 @@ import {
   CreateStudyRequest,
   UpdateStudyRequest,
 } from 'common/types/api/studies'
+import { PARTICIPANT_UNANSWERED_ID, PARTICIPANT_COMPLETED_ID } from 'common/testing/seed'
 import { resetDB } from 'common/testing/TestHelpers'
 import { generateToken } from '../authentication'
 import { ORG_ADMIN_ID } from 'common/testing/seed'
@@ -42,7 +43,8 @@ describe('StudiesController', () => {
 
       const body: GetAllStudiesResponse = response.body
       expect(Array.isArray(body.data)).toBeTruthy()
-      expect(body.data.length).toBeGreaterThan(0)
+      console.log(body.data)
+      expect(body.data.length).toEqual(3)
     })
 
     it('should return a 500 error if a database error occurs', async () => {
@@ -53,6 +55,47 @@ describe('StudiesController', () => {
         .get('/studies')
         .set({ Authorization: `Bearer ${orgAdminToken}` })
       expect(response.status).toBe(500)
+    })
+  })
+
+  describe('GET /studies/list', () => {
+    it('should return a list of studies for logged in user', async () => {
+      const token = await generateToken({
+        userId: PARTICIPANT_UNANSWERED_ID,
+        roles: ['Participant'],
+      })
+
+      const response = await request(app)
+        .get('/studies/list')
+        .set({ Authorization: `Bearer ${token}` })
+      expect(response.status).toBe(200)
+
+      const body: GetAllStudiesResponse = response.body
+      expect(Array.isArray(body.data)).toBeTruthy()
+      expect(body.data.length).toEqual(2)
+    })
+
+    it('should not return anything for org admin', async () => {
+      const response = await request(app)
+        .get('/studies/list')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(response.status).toBe(401)
+    })
+
+    it('should return a different list of studies for a different logged in user', async () => {
+      const token = await generateToken({
+        userId: PARTICIPANT_COMPLETED_ID,
+        roles: ['Participant'],
+      })
+
+      const response = await request(app)
+        .get('/studies/list')
+        .set({ Authorization: `Bearer ${token}` })
+      expect(response.status).toBe(200)
+
+      const body: GetAllStudiesResponse = response.body
+      expect(Array.isArray(body.data)).toBeTruthy()
+      expect(body.data.length).toEqual(1)
     })
   })
 

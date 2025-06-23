@@ -1539,12 +1539,6 @@
         "properties": {
           "data": {
             "properties": {
-              "dependents": {
-                "items": {
-                  "$ref": "#/components/schemas/FamilyMember"
-                },
-                "type": "array"
-              },
               "invites": {
                 "items": {
                   "properties": {
@@ -1585,7 +1579,6 @@
               }
             },
             "required": [
-              "dependents",
               "invites"
             ],
             "type": "object"
@@ -3465,6 +3458,49 @@
             }
           }
         }
+      }
+    },
+    "/studies/list": {
+      "get": {
+        "operationId": "ListStudies",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllStudiesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "List users Studies",
+        "summary": "List all Studies that a user is participating in, by token (doesn't include pending invitations)",
+        "tags": [
+          "Studies"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "Participant"
+            ]
+          }
+        ],
+        "parameters": []
       }
     },
     "/studies/{studyId}": {

@@ -553,7 +553,7 @@ const models: TsoaRoute.Models = {
     "GetUserInvitesResponse": {
         "dataType": "refObject",
         "properties": {
-            "data": {"dataType":"nestedObjectLiteral","nestedProperties":{"dependents":{"dataType":"array","array":{"dataType":"refObject","ref":"FamilyMember"},"required":true},"invites":{"dataType":"array","array":{"dataType":"nestedObjectLiteral","nestedProperties":{"studyName":{"dataType":"string","required":true},"sentAt":{"dataType":"string"},"expiresAt":{"dataType":"string","required":true},"createdAt":{"dataType":"string","required":true},"studyId":{"dataType":"double","required":true},"email":{"dataType":"string","required":true},"id":{"dataType":"string","required":true}}},"required":true}},"required":true},
+            "data": {"dataType":"nestedObjectLiteral","nestedProperties":{"invites":{"dataType":"array","array":{"dataType":"nestedObjectLiteral","nestedProperties":{"studyName":{"dataType":"string","required":true},"sentAt":{"dataType":"string"},"expiresAt":{"dataType":"string","required":true},"createdAt":{"dataType":"string","required":true},"studyId":{"dataType":"double","required":true},"email":{"dataType":"string","required":true},"id":{"dataType":"string","required":true}}},"required":true}},"required":true},
         },
         "additionalProperties": false,
     },
@@ -1437,6 +1437,37 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
 
               await templateService.apiHandler({
                 methodName: 'getAllStudies',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsStudiesController_listStudies: Record<string, TsoaRoute.ParameterSchema> = {
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
+        };
+        app.get('/studies/list',
+            authenticateMiddleware([{"jwt":["Participant"]}]),
+            ...(fetchMiddlewares<RequestHandler>(StudiesController)),
+            ...(fetchMiddlewares<RequestHandler>(StudiesController.prototype.listStudies)),
+
+            async function StudiesController_listStudies(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsStudiesController_listStudies, request, response });
+
+                const controller = new StudiesController();
+
+              await templateService.apiHandler({
+                methodName: 'listStudies',
                 controller,
                 response,
                 next,
