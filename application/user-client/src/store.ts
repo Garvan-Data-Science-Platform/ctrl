@@ -1,10 +1,6 @@
 import { create } from 'zustand'
 import { produce } from 'immer'
-
-interface StudyEntry {
-  id: number
-  name: string
-}
+import { Study } from '@prisma/client'
 
 interface AppState {
   primaryColour: string | null
@@ -12,10 +8,10 @@ interface AppState {
   contactMessageText: string
   updateContactMessageText: (newText: string) => void
   updateTheme: (primaryColor: string | null, secondaryColour: string | null) => void
-  studies: StudyEntry[]
+  studies: Study[]
   activeStudyIndex: number
   setActiveStudyIndex: (index: number) => void
-  setStudies: (studies: StudyEntry[]) => void
+  setStudies: (studies: Study[]) => void
 }
 
 function standardize_color(str: string) {
@@ -44,7 +40,7 @@ export const useAppStore = create<AppState>((set) => ({
       }),
     )
   },
-  setStudies: (studies: StudyEntry[]) =>
+  setStudies: (studies: Study[]) =>
     set(
       produce((state) => {
         state.studies = studies
