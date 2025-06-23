@@ -23,6 +23,7 @@ import InfoOutlined from '@mui/icons-material/InfoOutlined'
 import Circle from '@mui/icons-material/Circle'
 import { Link } from 'react-router-dom'
 import { GetParticipantProfileResponse } from '@common/types/api/users'
+import { GetUserInvitesResponse } from '@common/types/api/participants'
 import { GetResponsesByIdResponse } from '@common/types/api/surveys'
 import { apiClient } from '../apiClient'
 import ResponsesPdf from '../components/PdfExport'
@@ -48,6 +49,12 @@ export default function Dashboard() {
       apiClient
         .get('/profiles/current')
         .then((res) => res.data) as Promise<GetParticipantProfileResponse>,
+  })
+
+  const { data: invites } = useQuery({
+    queryKey: ['invites', 'get'],
+    queryFn: () =>
+      apiClient.get('/invites/pending').then((res) => res.data) as Promise<GetUserInvitesResponse>,
   })
 
   const [isLoading, setIsLoading] = useState(false)
@@ -132,6 +139,17 @@ export default function Dashboard() {
         <NavBar />
         <Container>
           <Typography>Error: {error.message}</Typography>
+        </Container>
+      </>
+    )
+  }
+
+  if (invites?.data.invites.length) {
+    return (
+      <>
+        <NavBar />
+        <Container>
+          <Typography>Open modal about invites</Typography>
         </Container>
       </>
     )
