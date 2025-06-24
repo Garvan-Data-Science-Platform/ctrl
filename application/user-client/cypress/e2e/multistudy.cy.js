@@ -48,6 +48,7 @@ describe('multistudy', () => {
     cy.login(UserType.PARTICIPANT_UNANSWERED)
     cy.task('createInvite', { email: 'test2@example.com', studyId: 2 })
     cy.visit('/')
+    cy.get('[data-cy="step-card-0"]').should('exist')
     cy.get('[data-cy="accept-invite"]').should('exist').click()
     cy.contains('Accepted').should('exist')
     cy.contains('Close').click()
