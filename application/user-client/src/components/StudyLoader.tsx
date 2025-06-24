@@ -29,14 +29,14 @@ export const StudyLoader: React.FC<PropsWithChildren> = ({ children }) => {
         setActiveStudyIndex(data.data.findIndex((val) => val.id == Number(studyId)))
       }
     }
-  }, [data, studyId, setStudies, setActiveStudyIndex, activeStudyIndex])
+  }, [data])
 
   useEffect(() => {
-    if (prevStudiesLengthRef.current > 0) {
+    if (prevStudiesLengthRef.current > 0 && studies.length > prevStudiesLengthRef.current) {
       //A new study was added after old studies already loaded
       setActiveStudyIndex(studies.length - 1)
     }
-    prevStudiesLengthRef.current = studies.length - 1
+    prevStudiesLengthRef.current = studies.length
   }, [studies])
 
   useEffect(() => {

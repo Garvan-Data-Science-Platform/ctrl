@@ -278,6 +278,30 @@ export async function seedTests(prisma: PrismaClient) {
       studyId: testStudy.id,
     },
   })
+  // publish a survey for study 2
+  const study2survey = await prisma.surveyVersion.create({
+    data: {
+      status: 'PUBLISHED',
+      versionNumber: 1,
+      data: [
+        {
+          title: 'Study2step',
+          text: '',
+          elements: [
+            {
+              type: 'question-checkbox',
+              data: {
+                text: 'Hello',
+                value: null,
+              },
+            },
+          ],
+        },
+      ] as SurveyStep[],
+      studyId: secondTestStudy.id,
+    },
+  })
+
   await prisma.surveyVersionAnswers.create({
     data: {
       versionId: 1,
@@ -290,7 +314,7 @@ export async function seedTests(prisma: PrismaClient) {
   })
   await prisma.surveyVersionAnswers.create({
     data: {
-      versionId: study2version.id,
+      versionId: study2survey.id,
       profileId: PARTICIPANT_UNANSWERED_ID,
       answers: [{ status: 'review_required', answers: [null] }],
     },
@@ -407,38 +431,7 @@ export async function seedTests(prisma: PrismaClient) {
         studyId: testStudy.id,
         expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
       },
-      // Invite to test multistudy auth
-      {
-        email: PARTICIPANT_UNANSWERED_EMAIL,
-        status: InviteStatus.PENDING,
-        studyId: secondTestStudy.id,
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
-      },
     ],
-  })
-
-  // publish a survey for study 2
-  await prisma.surveyVersion.create({
-    data: {
-      status: 'PUBLISHED',
-      versionNumber: 1,
-      data: [
-        {
-          title: 'Study2step',
-          text: '',
-          elements: [
-            {
-              type: 'question-checkbox',
-              data: {
-                text: 'Hello',
-                value: null,
-              },
-            },
-          ],
-        },
-      ] as SurveyStep[],
-      studyId: secondTestStudy.id,
-    },
   })
 
   // Frontend multistudy test seed data

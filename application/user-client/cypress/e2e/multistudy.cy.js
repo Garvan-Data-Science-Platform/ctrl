@@ -43,4 +43,17 @@ describe('multistudy', () => {
     cy.contains('Reviewed').should('exist')
     cy.contains('Study FE').should('exist')
   })
+
+  it('Can accept an invite to a new study', () => {
+    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.task('createInvite', { email: 'test2@example.com', studyId: 2 })
+    cy.visit('/')
+    cy.get('[data-cy="accept-invite"]').should('exist').click()
+    cy.contains('Accepted').should('exist')
+    cy.contains('Close').click()
+    cy.contains('Accepted').should('not.exist')
+    //Changes to the right study
+    cy.contains('Study 2').should('exist')
+    cy.contains('Study2step').should('exist')
+  })
 })

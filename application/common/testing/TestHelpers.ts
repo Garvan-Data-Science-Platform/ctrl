@@ -141,3 +141,10 @@ export async function getInviteId(email: string, studyId: number): Promise<strin
     return `Error finding invite for ${email} in study ${studyId}: ${errorMessage}`
   }
 }
+
+export async function inviteUser(email: string, studyId: number) {
+  await prisma.invite.create({
+    data: { email, studyId, expiresAt: new Date('2100-01-01'), status: 'PENDING' },
+  })
+  return null
+}

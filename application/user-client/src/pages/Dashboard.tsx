@@ -59,12 +59,6 @@ export default function Dashboard() {
         .then((res) => res.data) as Promise<GetParticipantProfileResponse>,
   })
 
-  // const { data: invites } = useQuery({
-  //   queryKey: ['invites', 'get'],
-  //   queryFn: () =>
-  //     apiClient.get('/invites/pending').then((res) => res.data) as Promise<GetUserInvitesResponse>,
-  // })
-
   const [isLoading, setIsLoading] = useState(false)
   const [showPdfError, setShowPdfError] = useState(false)
   const [studyInvitesOpen, setStudyInvitesOpen] = useState(false)
@@ -80,7 +74,7 @@ export default function Dashboard() {
   }, [])
 
   useEffect(() => {
-    if ((invitesData?.data.length || 0) > 0) {
+    if ((invitesData?.data.invites.length || 0) > 0) {
       setStudyInvitesOpen(true)
     }
   }, [invitesData])
@@ -179,8 +173,11 @@ export default function Dashboard() {
         </Typography>
         <StudyInvitesDialog
           open={studyInvitesOpen}
-          invites={invitesData?.data || []}
-          onClose={() => setStudyInvitesOpen(false)}
+          invites={invitesData?.data.invites || []}
+          onClose={() => {
+            queryClient.invalidateQueries({ queryKey: ['invites'] })
+            setStudyInvitesOpen(false)
+          }}
         />
         <Stack direction="row" spacing={3}>
           <Typography variant="h5" textAlign="left">

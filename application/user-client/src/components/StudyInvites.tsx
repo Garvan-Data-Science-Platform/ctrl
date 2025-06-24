@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -11,7 +11,6 @@ import {
   Typography,
   Stack,
 } from '@mui/material'
-import { useAppStore } from '../store'
 import { useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '../apiClient'
 
@@ -32,21 +31,25 @@ export const StudyInvitesDialog: React.FC<StudyInvitesDialogProps> = ({
   invites,
   onClose,
 }) => {
-  const { setActiveStudyIndex } = useAppStore()
-
   const queryClient = useQueryClient()
   const [invitesStatus, setInvitesStatus] = useState<any>({})
 
   const onAccept = async (invite: StudyInvite) => {
     await apiClient.post(`/invites/${invite.id}/accept`)
     setInvitesStatus({ ...invitesStatus, [invite.id]: 'Accepted' })
-    queryClient.invalidateQueries({ queryKey: ['invites'] })
     queryClient.invalidateQueries({ queryKey: ['studies'] })
   }
   const onDecline = async (invite: StudyInvite) => {
     await apiClient.post(`/invites/${invite.id}/decline`)
     setInvitesStatus({ ...invitesStatus, [invite.id]: 'Declined' })
   }
+
+  useEffect(() => {
+    if (invites.length < 1) {
+      onClose()
+    }
+  }, [invites])
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>You've been invited to join a new study</DialogTitle>
@@ -64,6 +67,7 @@ export const StudyInvitesDialog: React.FC<StudyInvitesDialogProps> = ({
                     color="primary"
                     onClick={() => onAccept(invite)}
                     size="small"
+                    data-cy="accept-invite"
                   >
                     Accept
                   </Button>
