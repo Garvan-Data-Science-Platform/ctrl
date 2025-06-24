@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useEffect } from 'react'
+import React, { PropsWithChildren, useEffect, useRef } from 'react'
 import { useAppStore } from '../store'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
@@ -20,6 +20,7 @@ export const StudyLoader: React.FC<PropsWithChildren> = ({ children }) => {
 
   const [searchParams] = useSearchParams()
   const studyId = searchParams.get('studyId')
+  const prevStudiesLengthRef = useRef(0)
 
   useEffect(() => {
     if (data?.data) {
@@ -29,6 +30,14 @@ export const StudyLoader: React.FC<PropsWithChildren> = ({ children }) => {
       }
     }
   }, [data, studyId, setStudies, setActiveStudyIndex, activeStudyIndex])
+
+  useEffect(() => {
+    if (prevStudiesLengthRef.current > 0) {
+      //A new study was added after old studies already loaded
+      setActiveStudyIndex(studies.length - 1)
+    }
+    prevStudiesLengthRef.current = studies.length - 1
+  }, [studies])
 
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: ['steps'] })

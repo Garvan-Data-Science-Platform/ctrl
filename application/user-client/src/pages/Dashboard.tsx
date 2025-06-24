@@ -25,10 +25,12 @@ import { Link } from 'react-router-dom'
 import { GetParticipantProfileResponse } from '@common/types/api/users'
 // import { GetUserInvitesResponse } from '@common/types/api/participants'
 import { GetResponsesByIdResponse } from '@common/types/api/surveys'
+import { GetUserInvitesResponse } from '@common/types/api/participants'
 import { apiClient } from '../apiClient'
 import ResponsesPdf from '../components/PdfExport'
 import { pdf } from '@react-pdf/renderer'
 import { useAppStore, useCurrentStudyId } from '../store'
+import { StudyInvitesDialog } from '../components/StudyInvites'
 
 export default function Dashboard() {
   const studyId = useCurrentStudyId()
@@ -41,6 +43,12 @@ export default function Dashboard() {
         .get(`/studies/${studyId}/survey-steps`)
         .then((res) => res.data) as Promise<GetUserSurveyStepsResponse>
     },
+  })
+
+  const { data: invitesData } = useQuery({
+    queryKey: ['invites', 'get'],
+    queryFn: () =>
+      apiClient.get(`/invites/pending`).then((res) => res.data) as Promise<GetUserInvitesResponse>,
   })
 
   const { data: profileData } = useQuery({
@@ -59,6 +67,7 @@ export default function Dashboard() {
 
   const [isLoading, setIsLoading] = useState(false)
   const [showPdfError, setShowPdfError] = useState(false)
+  const [studyInvitesOpen, setStudyInvitesOpen] = useState(false)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const studyMenuOpen = Boolean(anchorEl)
 
@@ -69,6 +78,12 @@ export default function Dashboard() {
   useEffect(() => {
     document.title = 'Dashboard | CTRL'
   }, [])
+
+  useEffect(() => {
+    if ((invitesData?.data.length || 0) > 0) {
+      setStudyInvitesOpen(true)
+    }
+  }, [invitesData])
 
   const generatePdf = async () => {
     setIsLoading(true)
@@ -162,6 +177,11 @@ export default function Dashboard() {
         <Typography variant="h3" textAlign="left" sx={{ mt: 3, mb: 3 }}>
           Welcome {profileData?.data?.firstName}
         </Typography>
+        <StudyInvitesDialog
+          open={studyInvitesOpen}
+          invites={invitesData?.data || []}
+          onClose={() => setStudyInvitesOpen(false)}
+        />
         <Stack direction="row" spacing={3}>
           <Typography variant="h5" textAlign="left">
             {studies[activeStudyIndex].name}
