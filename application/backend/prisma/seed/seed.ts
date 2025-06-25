@@ -22,13 +22,7 @@ const main = async () => {
   })
 
   // Ensure a Study record exists with id = 1
-  const defaultStudy = await prisma.study.upsert({
-    where: { id: 1 },
-    update: {},
-    create: {
-      id: 1, // Explicitly set the ID to match the default value in the schema
-    },
-  })
+  const defaultStudy = await prisma.study.create({})
 
   console.log('Default Study created:', defaultStudy)
 
@@ -58,16 +52,6 @@ const main = async () => {
       lastName: 'Doe',
       role: 'OrganisationAdmin',
       password: 'SomePassword123',
-      organisations: {
-        create: [
-          {
-            name: 'Garvan Institute of Medical Research',
-          },
-          {
-            name: 'University of New South Wales',
-          },
-        ],
-      },
     },
   })
   console.log('Added the following users:', john)
@@ -81,13 +65,6 @@ const main = async () => {
       lastName: 'Smith',
       role: 'OperatorAdmin',
       password: 'SomePassword123',
-      organisations: {
-        connect: [
-          {
-            name: 'University of New South Wales',
-          },
-        ],
-      },
     },
   })
   console.log('Added the following users:', jane)
@@ -116,13 +93,6 @@ const main = async () => {
       lastName: 'Brown',
       role: 'OrganisationAdmin',
       password: 'SomePassword123',
-      organisations: {
-        connect: [
-          {
-            name: 'Garvan Institute of Medical Research',
-          },
-        ],
-      },
     },
   })
   console.log('Added the following users:', bob)
@@ -136,18 +106,6 @@ const main = async () => {
       lastName: 'Davis',
       role: 'OperatorAdmin',
       password: 'SomePassword123',
-      organisations: {
-        connect: [
-          {
-            name: 'Garvan Institute of Medical Research',
-          },
-        ],
-        create: [
-          {
-            name: 'Apple Inc.',
-          },
-        ],
-      },
     },
   })
   console.log('Added the following users:', emily)
@@ -175,13 +133,6 @@ const main = async () => {
       lastName: 'Admin',
       role: 'OrganisationAdmin',
       password: hashPassword(String(process.env.EXAMPLE_ADMIN_PASSWORD)),
-      organisations: {
-        connect: [
-          {
-            name: 'Garvan Institute of Medical Research',
-          },
-        ],
-      },
     },
   })
   console.log('Added the following users:', exampleAdmin)
