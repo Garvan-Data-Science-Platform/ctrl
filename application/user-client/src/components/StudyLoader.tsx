@@ -20,7 +20,7 @@ export const StudyLoader: React.FC<PropsWithChildren> = ({ children }) => {
 
   const [searchParams] = useSearchParams()
   const studyId = searchParams.get('studyId')
-  const prevStudiesLengthRef = useRef(0)
+  const prevStudiesRef = useRef<any>([])
 
   useEffect(() => {
     if (data?.data) {
@@ -32,11 +32,13 @@ export const StudyLoader: React.FC<PropsWithChildren> = ({ children }) => {
   }, [data])
 
   useEffect(() => {
-    if (prevStudiesLengthRef.current > 0 && studies.length > prevStudiesLengthRef.current) {
+    if (prevStudiesRef.current.length > 0 && studies.length > prevStudiesRef.current.length) {
       //A new study was added after old studies already loaded
-      setActiveStudyIndex(studies.length - 1)
+      const old_ids = prevStudiesRef.current.map((v: any) => v.id)
+      const newStudyIdx = studies.findIndex((s) => !old_ids.includes(s.id))
+      setActiveStudyIndex(newStudyIdx)
     }
-    prevStudiesLengthRef.current = studies.length
+    prevStudiesRef.current = studies
   }, [studies])
 
   useEffect(() => {
