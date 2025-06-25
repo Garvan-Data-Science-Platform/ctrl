@@ -45,13 +45,14 @@ export async function seedTests(prisma: PrismaClient) {
   })
 
   // This study will have a survey, but no participant users and no draft answers (mostly for backend integration testing)
+  // Used to test inviting user to new study (they are invited to this one)
   const secondTestStudy = await prisma.study.create({
     data: {
       name: SECOND_TEST_STUDY,
     },
   })
 
-  // This study will have a survey, a participant user and draft answers (mostly for frontend testing)
+  // This study will have a survey, a participant user and draft answers (mostly for frontend multistudy testing)
   const frontendTestStudy = await prisma.study.create({
     data: {
       name: FE_TEST_STUDY,
