@@ -66,4 +66,4 @@ jobs:
           MAILER_PASSWORD: ${{ secrets.TEST_MAILER_PASSWORD }}
           CYPRESS_REDCAP_API_TOKEN: ${{ secrets.REDCAP_API_TOKEN }}
         run: yarn workspace ${{ matrix.workspace }} test
-      - run: yarn prisma:seed
+      - run: make db && yarn prisma:migrate && yarn prisma:seed
