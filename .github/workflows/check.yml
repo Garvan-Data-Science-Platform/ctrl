@@ -33,6 +33,7 @@ jobs:
         run: yarn format
       - name: Lint Code
         run: yarn lint
+      - run: make db && cp ./application/backend/.env.example ./application/backend/.env && yarn prisma:migrate && yarn prisma:seed
 
   test:
     needs: build
@@ -66,4 +67,3 @@ jobs:
           MAILER_PASSWORD: ${{ secrets.TEST_MAILER_PASSWORD }}
           CYPRESS_REDCAP_API_TOKEN: ${{ secrets.REDCAP_API_TOKEN }}
         run: yarn workspace ${{ matrix.workspace }} test
-      - run: make db && yarn prisma:migrate && yarn prisma:seed
