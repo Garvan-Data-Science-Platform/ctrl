@@ -33,7 +33,8 @@
     "pg": "^8.12.0",
     "sharp": "^0.34.1",
     "swagger-ui-express": "^5.0.1",
-    "tsoa": "^6.6.0"
+    "tsoa": "^6.6.0",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
@@ -45,6 +46,7 @@
     "@types/pg": "^8.11.6",
     "@types/supertest": "^6.0.2",
     "@types/swagger-ui-express": "^4.1.8",
+    "@types/uuid": "^10.0.0",
     "@yarnpkg/pnpify": "^4.1.1",
     "common": "workspace:^",
     "esbuild": "^0.20.0",
