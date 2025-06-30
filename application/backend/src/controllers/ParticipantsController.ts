@@ -39,6 +39,7 @@ import { createDefaultAnswers, determineLastUpdated, determineStatus } from '../
 import { ProfilesController } from './ProfilesController'
 import { auditLog } from '../middlewares/AuditLog'
 import { Role } from '@prisma/client'
+import { v4 as uuidv4 } from 'uuid'
 
 @Route('studies/{studyId}')
 @Tags('Participants')
@@ -455,7 +456,7 @@ export class InvitesController extends Controller {
             return
           }
 
-          const emailSent = await this.sendInvite(invite.email, studyId)
+          const emailSent = await this.sendInvite(invite.email, studyId, invite.id)
           if (!emailSent) {
             logger.error(`Failed to send email to ${invite.email}`)
             await this.invitesRepo.update({
@@ -499,37 +500,40 @@ export class InvitesController extends Controller {
 
     // Create new invites
     if (newEmails.length > 0) {
-      const emailResults = await Promise.all(
+      const inviteResults = await Promise.all(
         newEmails.map(async (email) => {
-          const success = await this.sendInvite(email, studyId)
+          const inviteId: string = uuidv4()
+          const success = await this.sendInvite(email, studyId, inviteId)
           if (!success) {
             logger.error(`Failed to send email to ${email}`)
             failedEmails.push(email)
           }
-          return { email, success }
+          return { email, id: inviteId, success }
         }),
       )
 
-      const successfulEmails = emailResults
-        .filter((result) => result.success)
-        .map((result) => result.email)
+      const successfulInvites = inviteResults
+        .filter((invite) => invite.success)
+        .map((invite) => ({ emailString: invite.email, id: invite.id }))
 
-      const newFailedEmails = emailResults
-        .filter((result) => !result.success)
-        .map((result) => result.email)
+      const newFailedInvites = inviteResults
+        .filter((invite) => !invite.success)
+        .map((invite) => ({ emailString: invite.email, id: invite.id }))
 
       // Create invites with appropriate status
       await this.invitesRepo.createMany({
         data: [
-          ...successfulEmails.map((email) => ({
-            email,
+          ...successfulInvites.map((invite) => ({
+            id: invite.id,
+            email: invite.emailString,
             studyId,
             expiresAt,
             sentAt: new Date(),
             status: InviteStatus.PENDING,
           })),
-          ...newFailedEmails.map((email) => ({
-            email,
+          ...newFailedInvites.map((invite) => ({
+            id: invite.id,
+            email: invite.emailString,
             studyId,
             expiresAt,
             status: InviteStatus.FAILED_TO_SEND,
@@ -575,7 +579,7 @@ export class InvitesController extends Controller {
     })
 
     // Send email and check if failed
-    if (!(await this.sendInvite(pendingInvite.email, studyId))) {
+    if (!(await this.sendInvite(pendingInvite.email, studyId, pendingInvite.id))) {
       await this.invitesRepo.update({
         where: {
           id: pendingInvite.id,
@@ -607,24 +611,22 @@ export class InvitesController extends Controller {
   @Post('/studies/{studyId}/invites/resend')
   public async resendPendingInvites(@Path() studyId: number): Promise<void> {
     // Get all pending invitations
-    const pendingEmails = await this.invitesRepo.findMany({
+    const pendingInvites = await this.invitesRepo.findMany({
       where: {
         status: InviteStatus.PENDING,
         studyId: studyId,
       },
-      select: { email: true },
+      select: { email: true, id: true },
     })
-
-    const pendingEmailList = pendingEmails.map(({ email }) => email)
 
     // Send emails
     const emailResults = await Promise.all(
-      pendingEmailList.map(async (email) => {
-        const success = await this.sendInvite(email, studyId)
+      pendingInvites.map(async (invite) => {
+        const success = await this.sendInvite(invite.email, studyId, invite.id)
         if (!success) {
-          logger.error(`Failed to send email to ${email} for ${studyId}`)
+          logger.error(`Failed to send email to ${invite.email} for ${studyId}`)
         }
-        return { email, success }
+        return { email: invite.email, success }
       }),
     )
 
@@ -715,9 +717,9 @@ export class InvitesController extends Controller {
   }
 
   //TODO: make registerLink include inviteId uuid string
-  private async sendInvite(email: string, studyId: number): Promise<boolean> {
+  private async sendInvite(email: string, studyId: number, inviteId: string): Promise<boolean> {
     try {
-      const registerLink = `${process.env.HOSTNAME}/register`
+      const registerLink = `${process.env.HOSTNAME}/register/${inviteId}`
       const study = await this.studyRepo.findFirstOrThrow({
         where: {
           id: studyId,
