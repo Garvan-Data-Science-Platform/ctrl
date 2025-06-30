@@ -45,13 +45,14 @@ export async function seedTests(prisma: PrismaClient) {
   })
 
   // This study will have a survey, but no participant users and no draft answers (mostly for backend integration testing)
+  // Used to test inviting user to new study (they are invited to this one)
   const secondTestStudy = await prisma.study.create({
     data: {
       name: SECOND_TEST_STUDY,
     },
   })
 
-  // This study will have a survey, a participant user and draft answers (mostly for frontend testing)
+  // This study will have a survey, a participant user and draft answers (mostly for frontend multistudy testing)
   const frontendTestStudy = await prisma.study.create({
     data: {
       name: FE_TEST_STUDY,
@@ -278,6 +279,30 @@ export async function seedTests(prisma: PrismaClient) {
       studyId: testStudy.id,
     },
   })
+  // publish a survey for study 2
+  const study2survey = await prisma.surveyVersion.create({
+    data: {
+      status: 'PUBLISHED',
+      versionNumber: 1,
+      data: [
+        {
+          title: 'Study2step',
+          text: '',
+          elements: [
+            {
+              type: 'question-checkbox',
+              data: {
+                text: 'Hello',
+                value: null,
+              },
+            },
+          ],
+        },
+      ] as SurveyStep[],
+      studyId: secondTestStudy.id,
+    },
+  })
+
   await prisma.surveyVersionAnswers.create({
     data: {
       versionId: 1,
@@ -286,6 +311,13 @@ export async function seedTests(prisma: PrismaClient) {
         { status: 'review_required', answers: [] },
         { status: 'review_required', answers: [null, null] },
       ],
+    },
+  })
+  await prisma.surveyVersionAnswers.create({
+    data: {
+      versionId: study2survey.id,
+      profileId: PARTICIPANT_UNANSWERED_ID,
+      answers: [{ status: 'review_required', answers: [null] }],
     },
   })
   await prisma.surveyVersionAnswers.create({
@@ -400,38 +432,7 @@ export async function seedTests(prisma: PrismaClient) {
         studyId: testStudy.id,
         expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
       },
-      // Invite to test multistudy auth
-      {
-        email: PARTICIPANT_UNANSWERED_EMAIL,
-        status: InviteStatus.PENDING,
-        studyId: secondTestStudy.id,
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
-      },
     ],
-  })
-
-  // publish a survey for study 2
-  await prisma.surveyVersion.create({
-    data: {
-      status: 'PUBLISHED',
-      versionNumber: 1,
-      data: [
-        {
-          title: 'Study2step',
-          text: '',
-          elements: [
-            {
-              type: 'question-checkbox',
-              data: {
-                text: 'Hello',
-                value: null,
-              },
-            },
-          ],
-        },
-      ] as SurveyStep[],
-      studyId: secondTestStudy.id,
-    },
   })
 
   // Frontend multistudy test seed data

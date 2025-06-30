@@ -7,6 +7,7 @@ import {
   deleteFile,
   updateLogo,
   getInviteId,
+  inviteUser,
 } from 'common/testing/TestHelpers'
 import { PASSWORD_RESET_USER_EMAIL } from 'common/testing/seed'
 import { defineConfig } from 'cypress'
@@ -44,6 +45,9 @@ export default defineConfig({
         },
         getInviteIdtask({ email, studyId }) {
           return getInviteId(email, studyId)
+        },
+        createInvite({ email, studyId }) {
+          return inviteUser(email, studyId)
         },
       })
     },

@@ -1,6 +1,6 @@
 import { generateToken } from '../authentication'
 import { Api } from '../Api'
-import { resetDB } from 'common/testing/TestHelpers'
+import { resetDB, inviteUser } from 'common/testing/TestHelpers'
 import request from 'supertest'
 import {
   GetInvitesResponse,
@@ -471,6 +471,10 @@ describe('InvitesController', () => {
   })
 
   describe('POST /invites/{inviteId}/accept', () => {
+    beforeEach(async () => {
+      await inviteUser(PARTICIPANT_UNANSWERED_EMAIL, 2)
+    })
+
     it('should fail if inviteId does not exist', async () => {
       const token = await generateToken({
         userId: PARTICIPANT_UNANSWERED_ID,
@@ -595,6 +599,9 @@ describe('InvitesController', () => {
   })
 
   describe('GET /invites/pending', () => {
+    beforeEach(async () => {
+      await inviteUser(PARTICIPANT_UNANSWERED_EMAIL, 2)
+    })
     it('should return correct number of invites', async () => {
       // One initial invite
       const token = await generateToken({
