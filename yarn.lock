@@ -5607,6 +5607,7 @@ __metadata:
     "@types/pg": "npm:^8.11.6"
     "@types/supertest": "npm:^6.0.2"
     "@types/swagger-ui-express": "npm:^4.1.8"
+    "@types/uuid": "npm:^10.0.0"
     "@yarnpkg/pnpify": "npm:^4.1.1"
     common: "workspace:^"
     cors: "npm:^2.8.5"
@@ -5632,6 +5633,7 @@ __metadata:
     tsoa: "npm:^6.6.0"
     tsx: "npm:^4.19.4"
     typescript: "npm:^5.8.3"
+    uuid: "npm:^11.1.0"
   languageName: unknown
   linkType: soft
 
@@ -6660,7 +6662,6 @@ __metadata:
   dependencies:
     "@react-pdf/renderer": "npm:^4.2.2"
     "@types/node": "npm:^22.1.0"
-    "@types/uuid": "npm:^10.0.0"
     "@typescript-eslint/eslint-plugin": "npm:^8.31.1"
     "@typescript-eslint/parser": "npm:^8.31.1"
     eslint: "npm:^8.56.0"
@@ -15261,6 +15262,15 @@ __metadata:
   version: 1.0.1
   resolution: "utils-merge@npm:1.0.1"
   checksum: 10c0/02ba649de1b7ca8854bfe20a82f1dfbdda3fb57a22ab4a8972a63a34553cf7aa51bc9081cf7e001b035b88186d23689d69e71b510e610a09a4c66f68aa95b672
+  languageName: node
+  linkType: hard
+
+"uuid@npm:^11.1.0":
+  version: 11.1.0
+  resolution: "uuid@npm:11.1.0"
+  bin:
+    uuid: dist/esm/bin/uuid
+  checksum: 10c0/34aa51b9874ae398c2b799c88a127701408cd581ee89ec3baa53509dd8728cbb25826f2a038f9465f8b7be446f0fbf11558862965b18d21c993684297628d4d3
   languageName: node
   linkType: hard
 
