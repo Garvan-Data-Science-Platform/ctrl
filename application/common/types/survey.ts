@@ -1,7 +1,13 @@
+export interface DuoCode {
+  code: string
+  relatedAnswer: string | boolean
+}
+
 export interface SurveyQuestionCheckbox {
   text: string
   tooltip?: string
   required: boolean
+  duoCodes?: DuoCode[]
 }
 
 export interface SurveyQuestionChoices {
@@ -9,6 +15,7 @@ export interface SurveyQuestionChoices {
   tooltip?: string
   required: boolean
   choices: string[]
+  duoCodes?: DuoCode[]
 }
 
 export interface SurveySubHeading {

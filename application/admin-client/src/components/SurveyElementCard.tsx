@@ -6,17 +6,29 @@ import {
   SurveySubHeading,
   SurveyVideo,
 } from '@common/types/survey'
-import { Add, Close, Delete, DragIndicator } from '@mui/icons-material'
+import { Add, ArrowDropDown, Close, Delete, DragIndicator } from '@mui/icons-material'
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Box,
   Checkbox,
+  Chip,
   FormControlLabel,
   IconButton,
   InputAdornment,
+  Stack,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material'
 import { useDrag, useDrop } from 'react-dnd'
+import { DUOEntry, DUOModal } from './DUOModal'
+import { useState } from 'react'
+import duoJson from './duo.json'
+import { useNotification } from '@refinedev/core'
+
+const duoEntries = duoJson as DUOEntry[]
 
 /**
  * Your Component
@@ -46,6 +58,9 @@ export function SurveyElementCard({
   handleUpdateField,
   disabled,
 }: SurveyElementCardProps) {
+  const { open } = useNotification()
+  const [duoOpen, setDuoOpen] = useState(false)
+
   const [{ opacity }, dragRef] = useDrag(
     () => ({
       type: 'CARD',
@@ -62,7 +77,90 @@ export function SurveyElementCard({
     [],
   )
 
-  function SubHeading(data: SurveySubHeading) {
+  function renderAdvancedOptions(data: SurveyQuestionCheckbox | SurveyQuestionChoices) {
+    return (
+      <Box>
+        <DUOModal
+          open={duoOpen}
+          answers={'choices' in data ? data.choices : ['True', 'False']}
+          questionText={data.text}
+          onClose={() => {
+            setDuoOpen(false)
+          }}
+          onConfirm={(duoEntry, relatedAnswer) => {
+            const newDuoCodes = [...(data.duoCodes || []), { code: duoEntry.ID, relatedAnswer }]
+            handleUpdateField('duoCodes', newDuoCodes)
+            setDuoOpen(false)
+          }}
+        />
+        <Accordion sx={{ mt: 1, bgcolor: 'transparent', boxShadow: 0, border: 0 }}>
+          <AccordionSummary
+            expandIcon={<ArrowDropDown />}
+            sx={{ padding: 0, flexDirection: 'row-reverse' }}
+            data-cy="advanced-toggle"
+          >
+            <Typography component="span">Advanced Options</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            {'required' in data && (
+              <FormControlLabel
+                sx={{ mt: -2, mb: 1 }}
+                control={
+                  <Checkbox
+                    checked={data.required}
+                    disabled={disabled}
+                    onChange={() => handleUpdateField('required', !data.required)}
+                  />
+                }
+                label="Mandatory question (user is prompted if they fail to answer)"
+              />
+            )}
+            <Typography sx={{ fontSize: 15 }}>DUO Codes</Typography>
+            <Stack direction="row" sx={{ alignItems: 'center' }}>
+              {data.duoCodes?.map((duo) => {
+                const duoEntry = duoEntries.find((val) => val.ID == duo.code)
+                return (
+                  <Tooltip
+                    key={`duo_${duo.code}`}
+                    data-cy="duo-chip"
+                    title={
+                      <Typography fontSize={12}>
+                        {duo.code} <br />
+                        Applies when answer is: {duo.relatedAnswer} <br />
+                        {duoEntry?.Description}
+                      </Typography>
+                    }
+                  >
+                    <Chip
+                      onClick={() => {}}
+                      onDelete={() => {
+                        const newDuoCodes = data.duoCodes?.filter((val) => val.code != duoEntry?.ID)
+                        handleUpdateField('duoCodes', newDuoCodes)
+                      }}
+                      label={duoEntry?.Label}
+                      disabled={disabled}
+                      sx={{ textTransform: 'capitalize' }}
+                    />
+                  </Tooltip>
+                )
+              })}
+              <IconButton
+                disabled={disabled}
+                onClick={() => {
+                  setDuoOpen(true)
+                }}
+                data-cy="add-duo"
+              >
+                <Add />
+              </IconButton>
+            </Stack>
+          </AccordionDetails>
+        </Accordion>
+      </Box>
+    )
+  }
+
+  function renderSubHeading(data: SurveySubHeading) {
     return (
       <Box sx={{ width: '100%' }}>
         <Typography fontWeight="bold">Subheading</Typography>
@@ -81,20 +179,10 @@ export function SurveyElementCard({
     )
   }
 
-  function QuestionCheckbox(data: SurveyQuestionCheckbox) {
+  function renderQuestionCheckbox(data: SurveyQuestionCheckbox) {
     return (
       <Box sx={{ width: '100%' }}>
         <Typography fontWeight="bold">Checkbox Question</Typography>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={data.required}
-              disabled={disabled}
-              onChange={() => handleUpdateField('required', !data.required)}
-            />
-          }
-          label="Mandatory"
-        />
         <TextField
           multiline
           fullWidth
@@ -117,11 +205,24 @@ export function SurveyElementCard({
             handleUpdateField('tooltip', e.target.value)
           }}
         />
+        {renderAdvancedOptions(data)}
       </Box>
     )
   }
 
-  function QuestionChoices(data: SurveyQuestionChoices) {
+  function renderQuestionChoices(data: SurveyQuestionChoices) {
+    //Removes DUO codes if an answer is changed or removed
+    const checkDuos = (answer: string) => {
+      const nonMatchingDUOs = data.duoCodes?.filter((duoVal) => duoVal.relatedAnswer != answer)
+      if (nonMatchingDUOs?.length != data.duoCodes?.length) {
+        open?.({
+          type: 'error',
+          message: 'DUO Codes associated with this answer have been removed.',
+        })
+        handleUpdateField('duoCodes', nonMatchingDUOs)
+      }
+    }
+
     return (
       <Box sx={{ width: '100%' }}>
         <Typography fontWeight="bold">Multi-choice Question</Typography>
@@ -157,14 +258,23 @@ export function SurveyElementCard({
               <TextField
                 value={val}
                 disabled={disabled}
-                onChange={(e) => handleUpdateChoice && handleUpdateChoice(idx, e.target.value)}
+                onChange={(e) => {
+                  checkDuos(val)
+                  //eslint-disable-next-line
+                  handleUpdateChoice && handleUpdateChoice(idx, e.target.value)
+                }}
+                data-cy="choice-text"
                 slotProps={{
                   input: {
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
                           disabled={disabled}
-                          onClick={() => handleDeleteChoice && handleDeleteChoice(idx)}
+                          onClick={() => {
+                            checkDuos(val)
+                            //eslint-disable-next-line
+                            handleDeleteChoice && handleDeleteChoice(idx)
+                          }}
                         >
                           <Close />
                         </IconButton>
@@ -181,11 +291,12 @@ export function SurveyElementCard({
             </IconButton>
           )}
         </Box>
+        {renderAdvancedOptions(data)}
       </Box>
     )
   }
 
-  function Video(data: SurveyVideo) {
+  function renderVideo(data: SurveyVideo) {
     return (
       <Box sx={{ width: '100%' }}>
         <Typography fontWeight="bold">Video/Embedded</Typography>
@@ -209,10 +320,10 @@ export function SurveyElementCard({
   }
 
   const contentRenderer: ContentRenderer = {
-    'question-choices': () => QuestionChoices(element.data),
-    'question-checkbox': () => QuestionCheckbox(element.data),
-    video: () => Video(element.data),
-    subheading: () => SubHeading(element.data),
+    'question-choices': () => renderQuestionChoices(element.data),
+    'question-checkbox': () => renderQuestionCheckbox(element.data),
+    video: () => renderVideo(element.data),
+    subheading: () => renderSubHeading(element.data),
   }
   return (
     <Box

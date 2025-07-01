@@ -25,8 +25,8 @@ type DefaultElementData = {
 const defaultElementData: DefaultElementData = {
   video: { link: '' },
   subheading: { text: '' },
-  'question-checkbox': { text: '', value: true, required: true },
-  'question-choices': { choices: [], required: true, text: '', value: '' },
+  'question-checkbox': { text: '', value: true, required: false },
+  'question-choices': { choices: [], text: '', value: '' },
 }
 
 export const useSurveyStore = create<SurveyState>((set) => ({

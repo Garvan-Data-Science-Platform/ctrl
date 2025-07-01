@@ -89,4 +89,38 @@ describe('Survey Editor', () => {
     cy.get('[data-cy="publish-confirm"]').click()
     cy.contains('2').should('exist')
   })
+  it('DUO Code Lookup', () => {
+    cy.login(UserType.ADMIN)
+    cy.visit('/surveys/edit/2')
+    cy.contains('Step 2').click()
+
+    //DUO for checkbox question
+    cy.get('[data-cy="advanced-toggle"]').eq(0).click()
+    cy.get('[data-cy="add-duo"]').eq(0).click()
+    cy.get('[data-cy="duo-filter"]').type('ancestry')
+    cy.get('[data-cy="duo-results"] li').should('have.length', 4).first().click()
+    cy.get('[data-cy="confirm-duo"]').should('be.disabled')
+    cy.get('[data-cy="duo-answer"]').click()
+    cy.contains('False').click()
+    cy.get('[data-cy="confirm-duo"]').should('be.enabled').click()
+    cy.contains('no restriction').should('exist')
+
+    //Remove DUO Code
+
+    cy.get('[data-cy="duo-chip"] svg').click()
+    cy.contains('no restriction').should('not.exist')
+    cy.get('[data-cy="advanced-toggle"]').eq(0).click()
+
+    cy.get('[data-cy="advanced-toggle"]').eq(1).click()
+    cy.get('[data-cy="add-duo"]').eq(1).click()
+    cy.get('[data-cy="duo-results"] li').first().click()
+    cy.get('[data-cy="confirm-duo"]').should('be.disabled')
+    cy.get('[data-cy="duo-answer"]').click()
+    cy.contains('Choice 1').click()
+    cy.get('[data-cy="confirm-duo"]').should('be.enabled').click()
+    cy.contains('population origins').should('exist')
+    //Editing choice will remove the duo code
+    cy.get('[data-cy="choice-text"]').first().type('B')
+    cy.contains('population origins').should('not.exist')
+  })
 })
