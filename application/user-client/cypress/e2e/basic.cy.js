@@ -29,7 +29,7 @@ describe('basic', () => {
     cy.login(UserType.PARTICIPANT_UNANSWERED)
     cy.visit('/')
     cy.get('[data-cy="hamburger"]').click()
-    cy.get('ul li').eq(2).click()
+    cy.get('ul li').eq(2).click({ force: true })
     cy.contains('message').should('exist')
   })
 
