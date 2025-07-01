@@ -48,7 +48,6 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({ sticky = tru
   const { resource, action } = useParsed()
 
   const { studies, activeStudyIndex, setActiveStudyIndex } = useStudyStore()
-  const invalidate = useInvalidate()
 
   return (
     <AppBar position={sticky ? 'sticky' : 'relative'}>
