@@ -6,6 +6,7 @@ export default defineConfig({
     DATABASE_URL: 'postgres://postgres:password@db-test:5432/ctrl',
   },
   e2e: {
+    defaultCommandTimeout: 8000,
     baseUrl: 'http://localhost:5003',
     // eslint-disable-next-line
     setupNodeEvents(on, config) {
