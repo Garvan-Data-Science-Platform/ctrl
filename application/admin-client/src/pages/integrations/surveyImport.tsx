@@ -3,11 +3,13 @@ import { RedcapImport } from '../../components/RedcapImport'
 import { axiosInstance } from '../../providers/dataProvider'
 import { instrumentUploadCSVDocumentation } from './helpPageRedcap'
 import { useInvalidate, useNotification } from '@refinedev/core'
+import { useCurrentStudyId } from '../../studyStore'
 
 export const SurveyImport = () => {
-  const apiEndpoint = '/integrations/redcap/instrument/upload/api'
-  const fileEndpoint = '/integrations/redcap/instrument/upload/csv'
-  const successRedirect = '/surveys/edit/:surveyId'
+  const studyId = useCurrentStudyId()
+  const apiEndpoint = `studies/${studyId}/integrations/redcap/instrument/upload/api`
+  const fileEndpoint = `studies/${studyId}/integrations/redcap/instrument/upload/csv`
+  const successRedirect = '/surveys/edit/:versionNumber'
 
   const navigate = useNavigate()
   const { open } = useNotification()
@@ -22,9 +24,8 @@ export const SurveyImport = () => {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       .then((response) => {
-        console.log(response)
         invalidate({ resource: 'surveys', invalidates: ['resourceAll'] })
-        navigate(successRedirect.replace(':surveyId', response.data.id))
+        navigate(successRedirect.replace(':versionNumber', response.data.versionNumber))
       })
       .catch((err) => {
         console.error(err)
@@ -39,7 +40,7 @@ export const SurveyImport = () => {
       })
       .then((response) => {
         invalidate({ resource: 'surveys', invalidates: ['resourceAll'] })
-        navigate(successRedirect.replace(':surveyId', response.data.id))
+        navigate(successRedirect.replace(':surveyId', response.data.versionNumber))
       })
       .catch((response) => {
         open?.({

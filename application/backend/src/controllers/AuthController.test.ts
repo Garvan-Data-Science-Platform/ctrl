@@ -11,6 +11,7 @@ import type {
 import prisma from '../PrismaClient'
 import { Role } from '@prisma/client'
 import { resetDB, wipeDB } from 'common/testing/TestHelpers'
+import { TEST_STUDY } from 'common/testing/seed'
 import {
   ContactMethod,
   ParticipantType,
@@ -232,7 +233,7 @@ describe('AuthController', () => {
     })
   })
 
-  describe('POST /auth/register/participant', () => {
+  describe('POST /auth/register/participant/{inviteId}', () => {
     const registerParticipantRequestBase: RegisterParticipantRequest = {
       firstName: 'John',
       lastName: 'Doe',
@@ -251,10 +252,18 @@ describe('AuthController', () => {
     }
 
     it('should register a new user returning a token', async () => {
-      const participantResponse = await request(app)
-        .post('/auth/register/participant')
-        .send(registerParticipantRequestBase)
+      const participantInviteId = await prisma.invite.findFirstOrThrow({
+        where: {
+          email: registerParticipantRequestBase.email,
+          study: {
+            name: TEST_STUDY,
+          },
+        },
+      })
 
+      const participantResponse = await request(app)
+        .post(`/auth/register/participants/${participantInviteId.id}`)
+        .send(registerParticipantRequestBase)
       expect(participantResponse.status).toEqual(201)
 
       const participantBody: RegisterParticipantResponse = participantResponse.body
@@ -265,9 +274,15 @@ describe('AuthController', () => {
         ...registerParticipantRequestBase,
         password: 'weakpassword',
       }
+      const participantInviteId = await prisma.invite.findFirstOrThrow({
+        where: {
+          email: registerParticipantRequestBase.email,
+          studyId: 1,
+        },
+      })
 
       const registerParticipantResponse = await request(app)
-        .post('/auth/register/participant')
+        .post(`/auth/register/participants/${participantInviteId.id}`)
         .send(registerParticipantRequest)
       expect(registerParticipantResponse.status).toEqual(422)
 
@@ -287,8 +302,15 @@ describe('AuthController', () => {
         mobile: '12341234',
       }
 
+      const participantInviteId = await prisma.invite.findFirstOrThrow({
+        where: {
+          email: registerParticipantRequestBase.email,
+          studyId: 1,
+        },
+      })
+
       const registerParticipantResponse = await request(app)
-        .post('/auth/register/participant')
+        .post(`/auth/register/participants/${participantInviteId.id}`)
         .send(registerParticipantRequest)
       expect(registerParticipantResponse.status).toEqual(422)
 
@@ -306,6 +328,7 @@ describe('AuthController', () => {
         },
       })
     })
+
     it('Should add dependent profiles if provided, should have same family id', async () => {
       const registerParticipantRequest: RegisterParticipantRequest = {
         ...registerParticipantRequestBase,
@@ -314,7 +337,17 @@ describe('AuthController', () => {
           { firstName: 'B', lastName: 'B', dob: '2020-01-01', permanent: false },
         ],
       }
-      await request(app).post('/auth/register/participant').send(registerParticipantRequest)
+
+      const participantInviteId = await prisma.invite.findFirstOrThrow({
+        where: {
+          email: registerParticipantRequest.email,
+          studyId: 1,
+        },
+      })
+
+      await request(app)
+        .post(`/auth/register/participants/${participantInviteId.id}`)
+        .send(registerParticipantRequest)
 
       const registered = await prisma.participantProfile.findFirstOrThrow({
         where: { firstName: 'John', lastName: 'Doe' },
@@ -336,14 +369,32 @@ describe('AuthController', () => {
         ...registerParticipantRequestBase,
         dependents: [{ firstName: 'A', lastName: 'B', dob: '2020-01-01', permanent: false }],
       }
+      const participantInviteId1 = await prisma.invite.findFirstOrThrow({
+        where: {
+          email: registerParticipantRequest1.email,
+          studyId: 1,
+        },
+      })
+
       const registerParticipantRequest2: RegisterParticipantRequest = {
         ...registerParticipantRequestBase,
         firstName: 'Jenny',
         email: 'jenny@gmail.com',
         dependents: [{ firstName: 'A', lastName: 'B', dob: '2020-01-01', permanent: false }],
       }
-      await request(app).post('/auth/register/participant').send(registerParticipantRequest1)
-      await request(app).post('/auth/register/participant').send(registerParticipantRequest2)
+      const participantInviteId2 = await prisma.invite.findFirstOrThrow({
+        where: {
+          email: registerParticipantRequest2.email,
+          studyId: 1,
+        },
+      })
+
+      await request(app)
+        .post(`/auth/register/participants/${participantInviteId1.id}`)
+        .send(registerParticipantRequest1)
+      await request(app)
+        .post(`/auth/register/participants/${participantInviteId2.id}`)
+        .send(registerParticipantRequest2)
 
       const registered1 = await prisma.participantProfile.findFirstOrThrow({
         where: { firstName: 'John', lastName: 'Doe' },

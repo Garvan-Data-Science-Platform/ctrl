@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
 }
 
 generator json {
@@ -42,11 +43,11 @@ enum Role {
 }
 
 model ParticipantProfile {
-  id               Int                 @id @default(autoincrement())
+  id               Int                    @id @default(autoincrement())
   firstName        String
   middleName       String?
   lastName         String
-  dob              DateTime            @db.Date
+  dob              DateTime               @db.Date
   mobile           String
   addressLine      String
   suburb           String
@@ -55,12 +56,20 @@ model ParticipantProfile {
   participantType  ParticipantType
   nextOfKin        AlternativeContact?
   preferredContact ContactMethod
-  study            Study               @relation(fields: [studyId], references: [id], onDelete: Cascade)
-  studyId          Int                 @default(1)
-  familyId         Int                 @default(autoincrement())
+  studies          StudyParticipant[]
+  familyId         Int                    @default(autoincrement())
   userId           Int?
-  user             User?               @relation(fields: [userId], references: [id])
-  surveys          SurveyParticipant[]
+  user             User?                  @relation(fields: [userId], references: [id])
+  surveys          SurveyVersionAnswers[]
+}
+
+model StudyParticipant {
+  participantProfile   ParticipantProfile @relation(fields: [participantProfileId], references: [id], onDelete: Cascade)
+  participantProfileId Int
+  study                Study              @relation(fields: [studyId], references: [id], onDelete: Cascade)
+  studyId              Int
+
+  @@id([participantProfileId, studyId])
 }
 
 model AlternativeContact {
@@ -109,11 +118,14 @@ model Organisation {
 }
 
 model Study {
-  id       Int                  @id @default(autoincrement())
-  inviteEmailSubject String @default("Invitation to CTRL - Dynamic Consent Platform")
-  inviteEmailText String @default("You have been invited to register with CTRL dynamic consent platform.")
-  surveys  SurveyVersion[]
-  profiles ParticipantProfile[]
+  id                 Int                  @id @default(autoincrement())
+  name               String               @unique
+  inviteEmailSubject String               @default("Invitation to CTRL - Dynamic Consent Platform")
+  inviteEmailText    String               @default("You have been invited to register with CTRL dynamic consent platform.")
+  surveys            SurveyVersion[]
+  profiles           StudyParticipant[]
+  invites            Invite[]
+  deleted             Boolean              @default(false)
 }
 
 enum SurveyVersionStatus {
@@ -122,18 +134,21 @@ enum SurveyVersionStatus {
 }
 
 model SurveyVersion {
-  id                 Int                 @id @default(autoincrement())
+  id                   Int                    @id @default(autoincrement())
+  versionNumber        Int
   /// ![PrismaJson.SurveyVersionData]
-  data               Json
-  status             SurveyVersionStatus @default(DRAFT)
-  surveyParticipants SurveyParticipant[]
-  study              Study               @relation(fields: [studyId], references: [id], onDelete: Cascade)
-  studyId            Int                 @default(1)
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
+  data                 Json
+  status               SurveyVersionStatus    @default(DRAFT)
+  surveyVersionAnswers SurveyVersionAnswers[]
+  study                Study                  @relation(fields: [studyId], references: [id], onDelete: Cascade)
+  studyId              Int
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+
+  @@unique([studyId, versionNumber])
 }
 
-model SurveyParticipant {
+model SurveyVersionAnswers {
   id        Int                @id @default(autoincrement())
   version   SurveyVersion      @relation(fields: [versionId], references: [id], onDelete: Cascade)
   versionId Int
@@ -145,12 +160,16 @@ model SurveyParticipant {
 }
 
 model Invite {
-  id        Int          @id @default(autoincrement())
-  email     String       @unique
+  id        String       @id @default(uuid())
+  email     String
   status    InviteStatus @default(PENDING)
+  studyId   Int
+  study     Study        @relation(fields: [studyId], references: [id], onDelete: Cascade)
   expiresAt DateTime
   createdAt DateTime     @default(now())
   sentAt    DateTime?
+
+  @@unique([studyId, email])
 }
 
 enum InviteStatus {

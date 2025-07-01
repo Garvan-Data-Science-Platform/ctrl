@@ -19,9 +19,10 @@ import logger from 'common/src/logger'
 import type {
   GetAllResponsesResponse,
   GetResponsesByIdResponse,
-  GetSurveyVersionsResponse,
   GetUserSurveyStepResponse,
   GetUserSurveyStepsResponse,
+  GetSurveyVersionsResponse,
+  GetSurveyVersionByVersionNumberResponse,
   UpdateSurveyAnswersRequest,
   UpdateSurveyRequest,
 } from 'common/types/api/surveys'
@@ -29,7 +30,6 @@ import { SurveyVersion as SurveyVersionPrisma } from '@prisma/client'
 import { SurveyElementType, SurveyStep, SurveyStepStatus } from 'common/types/survey'
 import prisma from '../PrismaClient'
 import '../jsontypes'
-import { GetSurveyVersionByIdResponse } from 'common/types/api/surveys/getSurveyVersionById'
 import { validateAnswers } from 'common/src/surveys/validateSurveyAnswers'
 import { populateSurveyStepAnswers } from 'common/src/surveys/populateSurveyStepAnswers'
 import { ValidateErrorResponse } from 'common/types/api/errors'
@@ -40,32 +40,32 @@ import {
 } from '../utils/answers'
 import { auditLog } from '../middlewares/AuditLog'
 
-@Route('surveys')
+@Route('studies/{studyId}')
 @Tags('Surveys')
 @Response('500', 'Internal Server Error')
 @Response('401', 'Unauthorized')
 @Middlewares(auditLog)
 export class SurveysController extends Controller {
   surveyRepo = prisma.surveyVersion
-  spRepo = prisma.surveyParticipant
+  svaRepo = prisma.surveyVersionAnswers
   profileRepo = prisma.participantProfile
   auditLogRepo = prisma.auditLog
 
   /**
-   * Get all Surveys
+   * Get all Survey versions
    *
-   * @summary Get all Surveys
+   * @summary Get all Survey versions
    */
-  @Get('/')
+  @Get('/surveys')
   @Security('jwt', ['OrganisationAdmin'])
-  public async getAllSurveys(): Promise<GetSurveyVersionsResponse> {
+  public async getAllSurveys(@Path() studyId: number): Promise<GetSurveyVersionsResponse> {
     const surveys: SurveyVersionPrisma[] = await this.surveyRepo.findMany({
-      orderBy: [{ id: 'desc' }],
+      where: { studyId },
+      orderBy: [{ versionNumber: 'desc' }],
     })
     if (surveys.length == 0) {
-      const study = await prisma.study.create({})
       const initial_survey = await this.surveyRepo.create({
-        data: { data: [], status: 'DRAFT', studyId: study.id },
+        data: { data: [], status: 'DRAFT', studyId: studyId, versionNumber: 1 },
       })
       surveys.push(initial_survey)
     }
@@ -75,58 +75,34 @@ export class SurveysController extends Controller {
   }
 
   /**
-   * Gets a Specific Survey using their ID
+   * Gets a specific survey version for a study using their VersionNumber
    *
    * @summary Get Specific Survey
    */
-  @Get('/{surveyID}')
+  @Get('/surveys/{versionNumber}')
   @Response('404', 'Not Found')
-  public async getSurveyVersionById(
-    @Path() surveyID: number,
-  ): Promise<GetSurveyVersionByIdResponse> {
-    const survey: SurveyVersionPrisma | null = await this.surveyRepo.findUnique({
-      where: { id: surveyID },
-    })
-    if (!survey) {
-      const error = { message: `Survey with ID: ${surveyID} not found`, data: survey }
-      logger.error({ ...error })
-      this.setStatus(404)
-      throw Error('NO GOOD')
-    }
-    const responseData: GetSurveyVersionByIdResponse = {
-      data: { id: surveyID, status: survey.status, data: survey.data as unknown as SurveyStep[] },
-    }
-    logger.info({ ...responseData })
-    return responseData
-  }
-
-  /**
-   *
-   * @summary Add participant to survey
-   */
-  @Post('/participant/{surveyId}')
-  @Response('404', 'Not Found')
-  @Security('jwt', ['OrganisationAdmin'])
-  public async addParticipant(@Request() request: any, @Path() surveyId: number) {
-    const survey = await this.surveyRepo.findUniqueOrThrow({ where: { id: surveyId } })
-
-    if (survey.status != 'PUBLISHED') {
-      throw Error('Can only add to a published survey')
-    }
-
-    const profile = await this.profileRepo.findFirstOrThrow({
-      where: { userId: request.user.userId }, //TODO: STUDYID
-    })
-
-    const defaultAnswers = createDefaultAnswers(survey.data)
-
-    await this.spRepo.create({
-      data: {
-        profileId: profile.id,
-        versionId: survey.id,
-        answers: defaultAnswers,
+  public async getSurveyVersionByVersionNumber(
+    @Path() studyId: number,
+    @Path() versionNumber: number,
+  ): Promise<GetSurveyVersionByVersionNumberResponse> {
+    const survey: SurveyVersionPrisma | null = await this.surveyRepo.findUniqueOrThrow({
+      where: {
+        studyId_versionNumber: {
+          versionNumber: versionNumber,
+          studyId: studyId,
+        },
       },
     })
+
+    const responseData: GetSurveyVersionByVersionNumberResponse = {
+      data: {
+        id: survey.id,
+        version_number: survey.versionNumber,
+        status: survey.status,
+        data: survey.data as unknown as SurveyStep[],
+      },
+    }
+    return responseData
   }
 
   /**
@@ -134,30 +110,35 @@ export class SurveysController extends Controller {
    *
    * @summary Get survey steps for current user
    */
-  @Get('/steps/:study')
+  @Get('/survey-steps')
   @Response('404', 'Not Found')
   public async getUserSurveySteps(
     @Request() request: any,
     //eslint-disable-next-line
-    @Path() study: number,
+    @Path() studyId: number,
   ): Promise<GetUserSurveyStepsResponse> {
     const profile = await this.profileRepo.findFirstOrThrow({
       where: { userId: request.user.userId },
     })
 
-    const surveyParticipant = await this.spRepo.findFirstOrThrow({
-      where: { profileId: profile.id },
+    const surveyVersionAnswers = await this.svaRepo.findFirstOrThrow({
+      where: {
+        profileId: profile.id,
+        version: {
+          studyId: studyId,
+        },
+      },
       orderBy: { versionId: 'desc' },
     })
 
-    const surveyVersionId = surveyParticipant.versionId
+    const surveyVersionId = surveyVersionAnswers.versionId
 
     const survey = await this.surveyRepo.findUniqueOrThrow({ where: { id: surveyVersionId } })
 
     const responseData: GetUserSurveyStepsResponse['data'] = survey.data.map((val, idx) => {
       return {
-        status: surveyParticipant.answers[idx].status,
-        last_updated: surveyParticipant.answers[idx].last_updated,
+        status: surveyVersionAnswers.answers[idx].status,
+        last_updated: surveyVersionAnswers.answers[idx].last_updated,
         title: val.title,
         tooltip: val.text,
       }
@@ -171,61 +152,75 @@ export class SurveysController extends Controller {
    *
    * @summary Get questions and current answers for step of a survey
    */
-  @Get('/step/:study/:step')
+  @Get('/survey-steps/{stepId}')
   @Response('404', 'Not Found')
   public async getUserSurveyStep(
     @Request() request: any,
-    @Path() study: number,
-    @Path() step: number,
+    @Path() studyId: number,
+    @Path() stepId: number,
   ): Promise<GetUserSurveyStepResponse> {
     const profile = await this.profileRepo.findFirstOrThrow({
       where: { userId: request.user.userId },
     })
 
-    const surveyParticipant = await this.spRepo.findFirstOrThrow({
-      where: { profileId: profile.id },
+    const surveyVersionAnswers = await this.svaRepo.findFirstOrThrow({
+      where: {
+        profileId: profile.id,
+        version: {
+          studyId: studyId,
+        },
+      },
       orderBy: { versionId: 'desc' },
     })
 
-    const surveyVersionId = surveyParticipant.versionId
+    const surveyVersionId = surveyVersionAnswers.versionId
 
     const survey = await this.surveyRepo.findUniqueOrThrow({ where: { id: surveyVersionId } })
 
-    const currentAnswers = surveyParticipant.answers
+    const currentAnswers = surveyVersionAnswers.answers
 
     const stepData = survey.data
-    if (stepData.length < step || step < 0) {
+    if (stepData.length < stepId || stepId < 0) {
       throw new ValidateError({}, 'Invalid step')
     }
 
     if (currentAnswers) {
-      stepData[step] = populateSurveyStepAnswers(stepData[step], currentAnswers[step].answers)
+      stepData[stepId] = populateSurveyStepAnswers(stepData[stepId], currentAnswers[stepId].answers)
     }
 
-    return { data: { ...stepData[step], current_step: step, total_steps: stepData.length } }
+    return { data: { ...stepData[stepId], current_step: stepId, total_steps: stepData.length } }
   }
 
   /**
    * Get responses for current user
    *
-   * @summary Get all responses for current user by token
+   * @summary Get current answers for current user by token
    */
-  @Get('/responses/current')
+  @Get('/survey-answers')
   @Response('404', 'Not Found')
-  public async getUserResponses(@Request() request: any): Promise<GetResponsesByIdResponse> {
+  public async getUserResponses(
+    @Request() request: any,
+    @Path() studyId: number,
+  ): Promise<GetResponsesByIdResponse> {
     const participantProfile = await this.profileRepo.findFirstOrThrow({
       where: { userId: request.user.userId },
     })
 
-    const surveyParticipant = await this.spRepo.findFirstOrThrow({
-      where: { profileId: participantProfile.id },
+    const surveyVersionAnswers = await this.svaRepo.findFirstOrThrow({
+      where: {
+        profileId: participantProfile.id,
+        version: {
+          studyId: studyId,
+        },
+      },
+      orderBy: { versionId: 'desc' },
     })
 
     const survey = await this.surveyRepo.findUniqueOrThrow({
-      where: { id: surveyParticipant.versionId },
+      where: { id: surveyVersionAnswers.versionId, studyId: studyId },
     })
 
-    const currentAnswers = surveyParticipant.answers
+    const currentAnswers = surveyVersionAnswers.answers
 
     const stepData = survey.data
 
@@ -234,19 +229,27 @@ export class SurveysController extends Controller {
       stepData[step].last_updated = currentAnswers[step].last_updated
     }
 
-    return { data: { steps: stepData, derived_from: surveyParticipant.derived || undefined } }
+    return { data: { steps: stepData, derived_from: surveyVersionAnswers.derived || undefined } }
   }
 
   /**
-   * Get all responses for a survey version
+   * Get all responses for a survey version number
    *
-   * @summary Get all responses of all participants for a survey version
+   * @summary Get all participants answers for a survey version
    */
-  @Get('/responses/all/:versionId')
+  @Get('/surveys/{versionNumber}/participants/answers')
   @Response('404', 'Not Found')
-  public async getAllResponses(@Path() versionId: number): Promise<GetAllResponsesResponse> {
-    const participants = await this.spRepo.findMany({
-      where: { versionId: versionId },
+  public async getAllResponses(
+    @Path() versionNumber: number,
+    @Path() studyId: number,
+  ): Promise<GetAllResponsesResponse> {
+    const participants = await this.svaRepo.findMany({
+      where: {
+        version: {
+          studyId: studyId,
+          versionNumber: versionNumber,
+        },
+      },
       select: {
         answers: true,
         versionId: true,
@@ -255,7 +258,12 @@ export class SurveysController extends Controller {
     })
 
     const survey = await this.surveyRepo.findUniqueOrThrow({
-      where: { id: versionId },
+      where: {
+        studyId_versionNumber: {
+          versionNumber: versionNumber,
+          studyId: studyId,
+        },
+      },
       select: { data: true },
     })
 
@@ -265,21 +273,33 @@ export class SurveysController extends Controller {
   /**
    * Get responses
    *
-   * @summary Get all responses for a survey participant
+   * @summary Get current answers for a survey participant
    */
-  @Get('/responses/:participantId')
+  @Get('/surveys/current/participants/{participantId}/answers')
   @Response('404', 'Not Found')
   @Security('jwt', ['OrganisationAdmin'])
-  public async getResponsesById(@Path() participantId: number): Promise<GetResponsesByIdResponse> {
-    const surveyParticipant = await this.spRepo.findUniqueOrThrow({
-      where: { id: participantId },
+  public async getResponsesById(
+    @Path() participantId: number,
+    @Path() studyId: number,
+  ): Promise<GetResponsesByIdResponse> {
+    const surveyVersionAnswers = await this.svaRepo.findFirstOrThrow({
+      where: {
+        profileId: participantId,
+        version: {
+          studyId: studyId,
+        },
+      },
+      orderBy: { versionId: 'desc' },
     })
 
     const survey = await this.surveyRepo.findUniqueOrThrow({
-      where: { id: surveyParticipant.versionId },
+      where: {
+        id: surveyVersionAnswers.versionId,
+        studyId: studyId,
+      },
     })
 
-    const currentAnswers = surveyParticipant.answers
+    const currentAnswers = surveyVersionAnswers.answers
 
     const stepData = survey.data
 
@@ -288,35 +308,47 @@ export class SurveysController extends Controller {
       stepData[step].last_updated = currentAnswers[step].last_updated
     }
 
-    return { data: { steps: stepData, derived_from: surveyParticipant.derived || undefined } }
+    return { data: { steps: stepData, derived_from: surveyVersionAnswers.derived || undefined } }
   }
 
   /**
    * Update survey answers
    *
-   * @summary Update a Survey
+   * @summary Update survey answers for current user by token
    */
-  @Post('/answers')
+  @Post('/survey-answers')
   @Response('404', 'Not Found')
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
   public async updateSurveyAnswers(
     @Request() request: any,
+    @Path() studyId: number,
     @Body() body: UpdateSurveyAnswersRequest,
   ) {
     const { step, data } = body
 
     const profile = await this.profileRepo.findFirstOrThrow({
-      //TODO STUDY ID
-      where: { userId: request.user.userId },
+      where: {
+        userId: request.user.userId,
+        studies: {
+          some: {
+            studyId,
+          },
+        },
+      },
     })
 
-    const participant = await this.spRepo.findFirstOrThrow({
-      where: { profileId: profile.id },
+    const participantAnswers = await this.svaRepo.findFirstOrThrow({
+      where: {
+        profileId: profile.id,
+        version: {
+          studyId: studyId,
+        },
+      },
       orderBy: { versionId: 'desc' },
     })
 
     const survey = await this.surveyRepo.findUniqueOrThrow({
-      where: { id: participant.versionId },
+      where: { id: participantAnswers.versionId, studyId: studyId },
     })
 
     if (survey.status !== 'PUBLISHED') {
@@ -325,7 +357,7 @@ export class SurveysController extends Controller {
 
     const surveySteps = survey.data
 
-    const answers = participant.answers
+    const answers = participantAnswers.answers
 
     type StatusMap = {
       [key in SurveyElementType]: SurveyStepStatus
@@ -349,8 +381,10 @@ export class SurveysController extends Controller {
     answers[step].answers = data
     answers[step].last_updated = new Date().toISOString()
 
-    await this.spRepo.update({
-      where: { id: participant.id }, //
+    await this.svaRepo.update({
+      where: {
+        id: participantAnswers.id,
+      },
       data: { answers, derived: null },
     })
 
@@ -359,19 +393,39 @@ export class SurveysController extends Controller {
       const dependents = await this.profileRepo.findMany({
         where: {
           familyId: profile.familyId,
+          studies: {
+            some: {
+              studyId,
+            },
+          },
           OR: [{ participantType: 'DEPENDENT_AGE' }, { participantType: 'DEPENDENT_OTHER' }],
         },
       })
 
       const coGuardians = await this.profileRepo.findMany({
-        where: { NOT: { id: profile.id }, familyId: profile.familyId, participantType: 'GUARDIAN' },
+        where: {
+          NOT: { id: profile.id },
+          familyId: profile.familyId,
+          participantType: 'GUARDIAN',
+          studies: {
+            some: {
+              studyId,
+            },
+          },
+        },
       })
 
       if (coGuardians) {
         const coGuardianSPPromises = coGuardians.map(
           async (val) =>
-            await this.spRepo.findFirstOrThrow({
-              where: { profileId: val.id, versionId: participant.versionId },
+            await this.svaRepo.findFirstOrThrow({
+              where: {
+                profileId: val.id,
+                versionId: participantAnswers.versionId,
+                version: {
+                  studyId: studyId,
+                },
+              },
             }),
         )
         const coGuardianSP_ls = await Promise.all(coGuardianSPPromises)
@@ -384,11 +438,22 @@ export class SurveysController extends Controller {
       }
 
       for (const dep of dependents) {
-        const sp = await this.spRepo.findFirstOrThrow({
-          where: { profileId: dep.id, versionId: participant.versionId },
+        const sva = await this.svaRepo.findFirstOrThrow({
+          where: {
+            profileId: dep.id,
+            versionId: participantAnswers.versionId,
+            version: {
+              studyId: studyId,
+            },
+          },
         })
-        await this.spRepo.update({
-          where: { id: sp.id }, //
+        await this.svaRepo.update({
+          where: {
+            id: sva.id,
+            version: {
+              studyId: studyId,
+            },
+          },
           data: {
             answers,
             derived: [profile, ...coGuardians]
@@ -402,21 +467,37 @@ export class SurveysController extends Controller {
 
   /**
    *
-   * @summary Update draft survey
+   * @summary Update draft survey by versionNumber
    */
-  @Patch('/{surveyId}')
+  @Patch('/surveys/{versionNumber}')
   @Response('404', 'Not Found')
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
   @Security('jwt', ['OrganisationAdmin'])
-  public async updateSurvey(@Path() surveyId: number, @Body() bodyRequest: UpdateSurveyRequest) {
-    const survey = await this.surveyRepo.findUniqueOrThrow({ where: { id: surveyId } })
+  public async updateSurvey(
+    @Path() studyId: number,
+    @Path() versionNumber: number,
+    @Body() bodyRequest: UpdateSurveyRequest,
+  ) {
+    const survey = await this.surveyRepo.findUniqueOrThrow({
+      where: {
+        studyId_versionNumber: {
+          studyId: studyId,
+          versionNumber: versionNumber,
+        },
+      },
+    })
 
     if (survey.status == 'PUBLISHED') {
       throw Error('Cannot edit a published survey')
     }
 
     await this.surveyRepo.update({
-      where: { id: surveyId },
+      where: {
+        studyId_versionNumber: {
+          studyId: studyId,
+          versionNumber: versionNumber,
+        },
+      },
       data: { data: bodyRequest.data as any },
     })
   }
@@ -425,12 +506,19 @@ export class SurveysController extends Controller {
    *
    * @summary Publish a draft survey
    */
-  @Post('/publish/{surveyId}')
+  @Post('/surveys/{versionNumber}/publish')
   @Response('404', 'Not Found')
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
   @Security('jwt', ['OrganisationAdmin'])
-  public async publishSurvey(@Path() surveyId: number) {
-    const survey = await this.surveyRepo.findUniqueOrThrow({ where: { id: surveyId } })
+  public async publishSurvey(@Path() studyId: number, @Path() versionNumber: number) {
+    const survey = await this.surveyRepo.findUniqueOrThrow({
+      where: {
+        studyId_versionNumber: {
+          studyId: studyId,
+          versionNumber: versionNumber,
+        },
+      },
+    })
 
     if (survey.status != 'DRAFT') {
       throw Error('Can only publish a draft survey')
@@ -459,38 +547,62 @@ export class SurveysController extends Controller {
       }
     }
 
-    await this.surveyRepo.create({
-      data: { status: 'DRAFT', data: survey.data },
+    const newSurveyVersion = await this.surveyRepo.create({
+      // Increment versionNumber
+      data: {
+        status: 'DRAFT',
+        data: survey.data,
+        studyId: studyId,
+        versionNumber: survey.versionNumber + 1,
+      },
     })
 
     await this.surveyRepo.update({
-      where: { id: surveyId },
+      where: {
+        studyId_versionNumber: {
+          studyId: studyId,
+          versionNumber: versionNumber,
+        },
+      },
       data: { status: 'PUBLISHED' },
     })
 
-    const profiles = await this.profileRepo.findMany({})
+    const profiles = await this.profileRepo.findMany({
+      where: {
+        studies: {
+          some: {
+            studyId: studyId,
+          },
+        },
+      },
+    })
 
     //Carry across answers from previous if they exist
 
     const participants = profiles.map(async (val) => {
-      const previousSurveyParticipant = await this.spRepo.findFirst({
-        where: { profileId: val.id },
+      const previousSurveyVersionAnswers = await this.svaRepo.findFirst({
+        where: {
+          profileId: val.id,
+          version: {
+            studyId: studyId,
+          },
+        },
         orderBy: { versionId: 'desc' },
         select: { answers: true, version: { select: { createdAt: true, id: true } } },
       })
 
       let answers
-      if (previousSurveyParticipant) {
+      if (previousSurveyVersionAnswers) {
         const previousSurveyVersion = await this.surveyRepo.findFirstOrThrow({
-          where: { id: previousSurveyParticipant.version.id },
-        })
-        const currentSurveyVersion = await this.surveyRepo.findFirstOrThrow({
-          where: { id: surveyId },
+          where: {
+            id: previousSurveyVersionAnswers.version.id,
+            studyId: studyId,
+          },
         })
         answers = answersFromPreviousSurvey(
           previousSurveyVersion,
-          currentSurveyVersion,
-          previousSurveyParticipant.answers,
+          newSurveyVersion, // Created above with incremented VersionNumber
+          previousSurveyVersionAnswers.answers,
         )
       } else {
         answers = createDefaultAnswers(survey.data)
@@ -503,6 +615,6 @@ export class SurveysController extends Controller {
       }
     })
 
-    await this.spRepo.createMany({ data: await Promise.all(participants) })
+    await this.svaRepo.createMany({ data: await Promise.all(participants) })
   }
 }

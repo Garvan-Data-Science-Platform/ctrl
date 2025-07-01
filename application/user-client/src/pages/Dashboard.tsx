@@ -9,6 +9,9 @@ import {
   Container,
   Grid2 as Grid,
   IconButton,
+  Menu,
+  MenuItem,
+  Stack,
   Tooltip,
   Typography,
 } from '@mui/material'
@@ -20,18 +23,32 @@ import InfoOutlined from '@mui/icons-material/InfoOutlined'
 import Circle from '@mui/icons-material/Circle'
 import { Link } from 'react-router-dom'
 import { GetParticipantProfileResponse } from '@common/types/api/users'
+// import { GetUserInvitesResponse } from '@common/types/api/participants'
 import { GetResponsesByIdResponse } from '@common/types/api/surveys'
+import { GetUserInvitesResponse } from '@common/types/api/participants'
 import { apiClient } from '../apiClient'
 import ResponsesPdf from '../components/PdfExport'
 import { pdf } from '@react-pdf/renderer'
+import { useAppStore, useCurrentStudyId } from '../store'
+import { StudyInvitesDialog } from '../components/StudyInvites'
 
 export default function Dashboard() {
+  const studyId = useCurrentStudyId()
+  const { studies, activeStudyIndex, setActiveStudyIndex } = useAppStore()
+
   const { isPending, error, data } = useQuery({
-    queryKey: ['consent_forms'],
+    queryKey: ['steps'],
+    queryFn: () => {
+      return apiClient
+        .get(`/studies/${studyId}/survey-steps`)
+        .then((res) => res.data) as Promise<GetUserSurveyStepsResponse>
+    },
+  })
+
+  const { data: invitesData } = useQuery({
+    queryKey: ['invites', 'get'],
     queryFn: () =>
-      apiClient
-        .get('/surveys/steps/1')
-        .then((res) => res.data) as Promise<GetUserSurveyStepsResponse>,
+      apiClient.get(`/invites/pending`).then((res) => res.data) as Promise<GetUserInvitesResponse>,
   })
 
   const { data: profileData } = useQuery({
@@ -44,12 +61,23 @@ export default function Dashboard() {
 
   const [isLoading, setIsLoading] = useState(false)
   const [showPdfError, setShowPdfError] = useState(false)
+  const [studyInvitesOpen, setStudyInvitesOpen] = useState(false)
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const studyMenuOpen = Boolean(anchorEl)
 
   const queryClient = useQueryClient()
+
+  const handleCloseStudyMenu = () => setAnchorEl(null)
 
   useEffect(() => {
     document.title = 'Dashboard | CTRL'
   }, [])
+
+  useEffect(() => {
+    if ((invitesData?.data.invites.length || 0) > 0) {
+      setStudyInvitesOpen(true)
+    }
+  }, [invitesData])
 
   const generatePdf = async () => {
     setIsLoading(true)
@@ -59,7 +87,7 @@ export default function Dashboard() {
         queryKey: ['surveys', 'get', profileData.data.id],
         queryFn: () =>
           apiClient
-            .get(`/surveys/responses/current`)
+            .get(`/studies/${studyId}/survey-answers`)
             .then((res) => res.data) as Promise<GetResponsesByIdResponse>,
       })
 
@@ -125,6 +153,17 @@ export default function Dashboard() {
     )
   }
 
+  // if (invites?.data.invites.length) {
+  //   return (
+  //     <>
+  //       <NavBar />
+  //       <Container>
+  //         <Typography>Open modal about invites</Typography>
+  //       </Container>
+  //     </>
+  //   )
+  // }
+
   return (
     <>
       <NavBar />
@@ -132,6 +171,50 @@ export default function Dashboard() {
         <Typography variant="h3" textAlign="left" sx={{ mt: 3, mb: 3 }}>
           Welcome {profileData?.data?.firstName}
         </Typography>
+        <StudyInvitesDialog
+          open={studyInvitesOpen}
+          invites={invitesData?.data.invites || []}
+          onClose={() => {
+            queryClient.invalidateQueries({ queryKey: ['invites'] })
+            setStudyInvitesOpen(false)
+          }}
+        />
+        <Stack direction="row" spacing={3}>
+          <Typography variant="h5" textAlign="left">
+            {studies[activeStudyIndex].name}
+          </Typography>
+          {studies.length > 1 && (
+            <Button data-cy="change-study" onClick={(e) => setAnchorEl(e.currentTarget)}>
+              Change Study
+            </Button>
+          )}
+        </Stack>
+        <Menu
+          anchorEl={anchorEl}
+          open={studyMenuOpen}
+          onClose={handleCloseStudyMenu}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+          sx={{ p: 3 }}
+        >
+          {studies.map((study, idx) => {
+            return (
+              <MenuItem
+                key={study.id}
+                onClick={() => {
+                  setActiveStudyIndex(idx)
+                  handleCloseStudyMenu()
+                }}
+                sx={{
+                  fontWeight: activeStudyIndex == idx ? 'bold' : 'normal',
+                  minWidth: 120,
+                  justifyContent: 'center',
+                }}
+              >
+                {study.name}
+              </MenuItem>
+            )
+          })}
+        </Menu>
         <Box component="ol" sx={{ pl: 0, mb: 0 }}>
           {data?.data.map((val, idx) => (
             <Card

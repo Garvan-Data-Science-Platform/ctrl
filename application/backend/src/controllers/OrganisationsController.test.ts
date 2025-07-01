@@ -138,13 +138,13 @@ describe('OrganisationsController', () => {
 
   describe('PATCH /organisations/:OrgID', () => {
     it('should update an existing organisation', async () => {
-      const organisaitonName: string = 'Test Organisation'
+      const organisationName: string = 'Test Organisation'
       // Check test organisation exists
       const existingOrg = await prisma.organisation.findFirst({
-        where: { name: organisaitonName },
+        where: { name: organisationName },
       })
 
-      expect(existingOrg?.name).toBe(organisaitonName)
+      expect(existingOrg?.name).toBe(organisationName)
 
       const updatedOrganisationName = 'Updated Test Organisation'
 

@@ -18,7 +18,10 @@ export async function resetDB(): Promise<null> {
 
 export async function publishNewVersion() {
   const sc = new SurveysController()
-  await sc.publishSurvey(2)
+  await sc.publishSurvey(
+    1, // StudyId
+    2, // Survey versionNumber
+  )
   return null
 }
 
@@ -26,6 +29,7 @@ export async function partiallyCompleteSurvey() {
   const sc = new SurveysController()
   await sc.updateSurveyAnswers(
     { user: { userId: PARTICIPANT_UNANSWERED_ID } },
+    1, // StudyId
     { data: [], step: 0 },
   )
   return null
@@ -119,5 +123,28 @@ export async function deleteFile(filePath: string) {
 export async function updateLogo(filePath: string) {
   const fs = await import('fs')
   await prisma.organisation.update({ where: { id: 1 }, data: { logo: fs.readFileSync(filePath) } })
+  return null
+}
+
+export async function getInviteId(email: string, studyId: number): Promise<string> {
+  try {
+    const invite = await prisma.invite.findFirstOrThrow({
+      where: {
+        email: email,
+        studyId: studyId,
+      },
+    })
+    return invite.id //String as this is a uuid
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+
+    return `Error finding invite for ${email} in study ${studyId}: ${errorMessage}`
+  }
+}
+
+export async function inviteUser(email: string, studyId: number) {
+  await prisma.invite.create({
+    data: { email, studyId, expiresAt: new Date('2100-01-01'), status: 'PENDING' },
+  })
   return null
 }

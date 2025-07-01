@@ -2,6 +2,7 @@
   inputs = {
     # pin a version of nixos-unstable that has node_22
     nixpkgs.url = "github:NixOS/nixpkgs/423d2df5b04b4ee7688c3d71396e872afa236a89";
+    # node_20
     # nixpkgs.url = "github:NixOS/nixpkgs/3492680c7307336670aa778f4ff796459d4f24a6";
     systems.url = "github:nix-systems/default";
   };
@@ -39,13 +40,13 @@
           then pkgs.${nodejsAttr}
           else throw "Unsupported Node.js version: ${version}. Check if this version is available in your pinned nixpkgs.";
           
-      nodejs = getNodejs nodeVersion;
+      nodejs_nvmrc = getNodejs nodeVersion;
 
     in {
     
       default = pkgs.mkShell {
         buildInputs = [
-          pkgs.nodejs_22
+          nodejs_nvmrc
 
           # You can choose pnpm, yarn, or none (npm).
           #pkgs.nodePackages.pnpm

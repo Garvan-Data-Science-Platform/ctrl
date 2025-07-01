@@ -23,8 +23,11 @@ import { ArrowBack, Delete } from '@mui/icons-material'
 import { Link } from 'react-router-dom'
 import { FamilyMember } from '@common/types/api/users/getParticipantProfile'
 import { axiosInstance } from '../../providers/dataProvider'
+import { useCurrentStudyId } from '../../studyStore'
 
 export const FamilyEdit = () => {
+  const studyId = useCurrentStudyId()
+
   const { id } = useParsed()
 
   const invalidate = useInvalidate()
@@ -52,7 +55,7 @@ export const FamilyEdit = () => {
 
   const handleRemove = async (profileId: number) => {
     try {
-      await axiosInstance.post(`/families/remove/${profileId}`)
+      await axiosInstance.post(`/studies/${studyId}/families/remove/${profileId}`)
       open?.({ type: 'success', message: 'Removed member from family' })
       invalidate({ resource: 'families', invalidates: ['all'] })
       resetForm()
@@ -63,7 +66,7 @@ export const FamilyEdit = () => {
 
   const handleAdd = async (profileId: number) => {
     try {
-      await axiosInstance.post(`/families/${id}/add/${profileId}`)
+      await axiosInstance.post(`/studies/${studyId}/families/${id}/add/${profileId}`)
       open?.({ type: 'success', message: 'Added member to family' })
       invalidate({ resource: 'families', invalidates: ['all'] })
       invalidate({ resource: 'participants', invalidates: ['all'] })
@@ -78,7 +81,7 @@ export const FamilyEdit = () => {
 
   const onSubmitNewDependent = async (data: any) => {
     try {
-      await axiosInstance.post(`/families/${id}/add-dependent`, data)
+      await axiosInstance.post(`/studies/${studyId}/families/${id}/add-dependent`, data)
       open?.({ type: 'success', message: 'Added dependent to family' })
       invalidate({ resource: 'families', invalidates: ['all'] })
       resetForm()
@@ -161,7 +164,7 @@ export const FamilyEdit = () => {
             onClick={() => setAction('ADD')}
             data-cy="add-member-button"
           >
-            Add member to this family
+            Add family member to this study
           </Button>
           <Button
             sx={{ ml: 1 }}
@@ -169,7 +172,7 @@ export const FamilyEdit = () => {
             onClick={() => setAction('REMOVE')}
             data-cy="remove-member-button"
           >
-            Remove member from this family
+            Remove family member from this study
           </Button>
         </Box>
 
@@ -204,7 +207,7 @@ export const FamilyEdit = () => {
             {newMemberStatus == 'NEW' && (
               <>
                 <FormControl>
-                  <FormLabel>The new member is a:</FormLabel>
+                  <FormLabel>The new family member is a:</FormLabel>
                   <RadioGroup
                     row
                     value={newMemberType}

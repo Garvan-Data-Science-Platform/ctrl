@@ -7,6 +7,9 @@ beforeEach(() => {
 const { UserType } = require('../support/commands')
 const downloadsPath = 'cypress/downloads/'
 
+// TODO: Add multistudy pdf tests
+const studyId = 1
+
 describe('viewPdf', () => {
   // Function to:
   //  - click 'View responses' button,
@@ -15,7 +18,7 @@ describe('viewPdf', () => {
   //  - parse PDF
   //  - check contents include specific text_string parameter.
   function assertPdfContains(text_string) {
-    cy.intercept('GET', '/surveys/responses/current').as('requestPdf')
+    cy.intercept('GET', `/studies/${studyId}/survey-answers`).as('requestPdf')
     cy.get('[data-cy="view-pdf"]').click()
     cy.wait('@requestPdf')
     cy.wait(500)
@@ -90,7 +93,7 @@ describe('viewPdf', () => {
     cy.visit('/')
 
     // Mock the API response to return an error
-    cy.intercept('GET', '/surveys/responses/current', {
+    cy.intercept('GET', `/studies/${studyId}/survey-answers`, {
       statusCode: 500,
       body: { error: 'Server error' },
     }).as('getResponses')

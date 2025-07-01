@@ -25,6 +25,7 @@ import { SurveyElementCard, SurveyDropSpace } from '../../components/SurveyEleme
 import { useSurveyStore } from '../../surveyStore'
 import { axiosInstance } from '../../providers/dataProvider'
 import { useResource, useShow, useUpdate, useNavigation, useNotification } from '@refinedev/core'
+import { useCurrentStudyId } from '../../studyStore'
 
 export const SurveyEditor = () => {
   const {
@@ -64,6 +65,8 @@ export const SurveyEditor = () => {
   const { queryResult } = useShow({ resource: 'surveys' })
 
   const { open } = useNotification()
+
+  const studyId = useCurrentStudyId()
 
   const { mutate } = useUpdate({
     resource: 'surveys',
@@ -121,7 +124,7 @@ export const SurveyEditor = () => {
 
   const handlePublish = () => {
     axiosInstance
-      .post(`surveys/publish/${id}`)
+      .post(`studies/${studyId}/surveys/${id}/publish`)
       .then(() => {
         list('surveys')
       })
@@ -259,7 +262,7 @@ export const SurveyEditor = () => {
             <Divider sx={{ mt: 3, mb: 1 }} />
             <SurveyDropSpace key={`space_${activeStep}_${-1}`} index={-1} />
             {surveyData[activeStep].elements.map((val, idx) => (
-              <Box key={`el_${activeStep}_${idx}`}>
+              <Box key={`el_${studyId}_${activeStep}_${idx}`}>
                 <SurveyElementCard
                   element={val}
                   disabled={disabled}

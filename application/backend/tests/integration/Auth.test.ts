@@ -6,11 +6,13 @@ import {
   RegisterResponse,
 } from 'common/types/api/auth'
 import { resetDB } from 'common/testing/TestHelpers'
+import { TEST_STUDY_NAME } from 'common/testing/seed'
 import {
   ContactMethod,
   ParticipantType,
   StateTerritory,
 } from 'common/types/api/users/ParticipantProfile'
+import prisma from '../../src/PrismaClient'
 import { Role } from '@prisma/client'
 
 const api = new Api()
@@ -132,8 +134,15 @@ describe('Auth', () => {
       dependents: [],
     }
 
+    const participantInviteId = await prisma.invite.findFirstOrThrow({
+      where: {
+        email: participantRequest.email,
+        study: { name: TEST_STUDY_NAME },
+      },
+    })
+
     const participantResponse = await request(app)
-      .post('/auth/register/participant')
+      .post(`/auth/register/participants/${participantInviteId.id}`)
       .send(participantRequest)
     expect(participantResponse.status).toEqual(201)
 

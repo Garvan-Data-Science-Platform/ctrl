@@ -1,5 +1,5 @@
 import './App.css'
-import { ThemeProvider } from '@mui/material'
+import { Theme, ThemeProvider } from '@mui/material'
 import customTheme from './theme'
 
 import { RouterProvider } from 'react-router-dom'
@@ -8,26 +8,32 @@ import { AuthProvider } from './auth'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { apiClient } from './apiClient.ts'
-import { useAppStore } from './store.ts'
+
+const queryClient = new QueryClient()
 
 function App() {
-  const queryClient = new QueryClient()
-  const [loading, setLoading] = useState(true)
-  const store = useAppStore()
-  const theme = customTheme({
-    primary: store.primaryColour || '#2196f3',
-    secondary: store.secondaryColour || '#2196f3',
-  })
+  const [theme, setTheme] = useState<Theme | null>(null)
+
+  function standardize_color(str: string) {
+    const ctx = document.createElement('canvas').getContext('2d') as any
+    ctx.fillStyle = str
+    return ctx.fillStyle
+  }
 
   useEffect(() => {
     apiClient.get('/settings/theme').then((res) => {
-      store.updateTheme(res.data.data.primaryColour, res.data.data.secondaryColour)
-      setLoading(false)
+      const { primaryColour: primary, secondaryColour: secondary } = res.data.data
+      setTheme(
+        customTheme({
+          primary: primary ? standardize_color(primary) : '#2196f3',
+          secondary: secondary ? res.data.data.secondaryColour(secondary) : '#2196f3',
+        }),
+      )
     })
   }, [])
 
   return (
-    !loading && (
+    theme && (
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <ThemeProvider theme={theme}>

@@ -7,7 +7,9 @@ import {
 
 export interface FamilyMember {
   firstName: string
+  middleName?: string
   lastName: string
+  dob: string
   id: number
   participantType: ParticipantType
 }

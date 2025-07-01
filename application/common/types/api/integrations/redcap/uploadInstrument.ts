@@ -12,4 +12,5 @@ export interface UploadRedcapInstrumentAPIRequest {
 
 export interface UploadRedcapInstrumentResponse {
   id: number
+  versionNumber: number
 }

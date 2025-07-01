@@ -71,11 +71,11 @@ function getPreviousAnswer(
 
 export function answersFromPreviousSurvey(
   previousSurveyVersion: SurveyVersion,
-  currentSurveyVersion: SurveyVersion,
+  newSurveyVersion: SurveyVersion,
   previousAnswers: PrismaJson.SurveyAnswerData,
 ) {
   const result: UserSurveyStepState[] = []
-  for (const step of currentSurveyVersion.data) {
+  for (const step of newSurveyVersion.data) {
     const stepAnswers = []
     for (const el of step.elements) {
       if (el.type == 'question-checkbox' || el.type == 'question-choices') {
@@ -113,31 +113,50 @@ export function combineGuardianAnswers(answers_ls: SurveyStepAnswerArray[]): Sur
 }
 
 //Recalculates answers for all dependents in the family
-export async function recalculateAnswers(familyId: number) {
+// Does this need studyId as an input arg?
+export async function recalculateAnswers(familyId: number, studyId: number) {
   const dependents = await prisma.participantProfile.findMany({
-    where: { familyId: familyId, participantType: { in: ['DEPENDENT_AGE', 'DEPENDENT_OTHER'] } },
+    where: {
+      familyId: familyId,
+      studies: {
+        some: {
+          studyId: studyId,
+        },
+      },
+      participantType: {
+        in: ['DEPENDENT_AGE', 'DEPENDENT_OTHER'],
+      },
+    },
   })
   if (!dependents) return
 
   const guardians = await prisma.participantProfile.findMany({
-    where: { familyId: familyId, participantType: 'GUARDIAN' },
+    where: {
+      familyId: familyId,
+      studies: {
+        some: {
+          studyId: studyId,
+        },
+      },
+      participantType: 'GUARDIAN',
+    },
   })
 
   if (guardians.length == 0) return
 
   let answers: PrismaJson.SurveyAnswerData
 
-  const latestSurveyParticipant = await prisma.surveyParticipant.findFirstOrThrow({
+  const latestSurveyVersionAnswers = await prisma.surveyVersionAnswers.findFirstOrThrow({
     where: { profileId: guardians[0].id },
     orderBy: { versionId: 'desc' },
   })
 
   if (guardians.length == 1) {
-    answers = latestSurveyParticipant.answers
+    answers = latestSurveyVersionAnswers.answers
   } else {
     const promises = guardians.map(async (coGuardian) => {
-      const coGuardianSP = await prisma.surveyParticipant.findFirstOrThrow({
-        where: { profileId: coGuardian.id, versionId: latestSurveyParticipant.versionId },
+      const coGuardianSP = await prisma.surveyVersionAnswers.findFirstOrThrow({
+        where: { profileId: coGuardian.id, versionId: latestSurveyVersionAnswers.versionId },
       })
       return coGuardianSP.answers
     })
@@ -150,11 +169,11 @@ export async function recalculateAnswers(familyId: number) {
   }
 
   for (const dep of dependents) {
-    const sp = await prisma.surveyParticipant.findFirstOrThrow({
-      where: { profileId: dep.id, versionId: latestSurveyParticipant.versionId },
+    const sva = await prisma.surveyVersionAnswers.findFirstOrThrow({
+      where: { profileId: dep.id, versionId: latestSurveyVersionAnswers.versionId },
     })
-    await prisma.surveyParticipant.update({
-      where: { id: sp.id }, //
+    await prisma.surveyVersionAnswers.update({
+      where: { id: sva.id }, //
       data: {
         answers,
         derived: guardians.map((val) => `${val.firstName} ${val.lastName}`).join(', '),

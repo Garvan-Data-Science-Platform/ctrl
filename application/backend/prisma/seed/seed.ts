@@ -7,10 +7,9 @@ const prisma = new PrismaClient()
 
 const main = async () => {
   await prisma.organisation.upsert({
-    where: { id: 1 },
+    where: { name: 'OrgName' },
     update: {},
     create: {
-      id: 1,
       name: 'OrgName',
       mailerHost: process.env.MAILER_HOST,
       mailerPort: process.env.MAILER_PORT ? Number(process.env.MAILER_PORT) : null,
@@ -21,8 +20,12 @@ const main = async () => {
     },
   })
 
-  // Ensure a Study record exists with id = 1
-  const defaultStudy = await prisma.study.create({})
+  // Ensure a Study record exists
+  const defaultStudy = await prisma.study.create({
+    data: {
+      name: 'Seed Study',
+    },
+  })
 
   console.log('Default Study created:', defaultStudy)
 
@@ -30,6 +33,9 @@ const main = async () => {
 
   await prisma.surveyVersion.create({
     data: {
+      id: 1000,
+      versionNumber: 1,
+      studyId: defaultStudy.id,
       status: 'PUBLISHED',
       data: SeedSurveyStepData as SurveyStep[],
     },
@@ -37,6 +43,9 @@ const main = async () => {
 
   await prisma.surveyVersion.create({
     data: {
+      id: 2000,
+      versionNumber: 2,
+      studyId: defaultStudy.id,
       status: 'DRAFT',
       data: SeedSurveyStepData as SurveyStep[],
     },
@@ -119,7 +128,6 @@ const main = async () => {
       lastName: 'Wilson',
       role: 'Participant',
       password: 'SomePassword123',
-      organisations: {},
     },
   })
   console.log('Added the following users:', michael)
@@ -147,7 +155,6 @@ const main = async () => {
       lastName: 'Wright',
       role: 'Participant',
       password: hashPassword(String(process.env.EXAMPLE_PARTICIPANT_PASSWORD)),
-      organisations: {},
       profiles: {
         create: [
           {
@@ -170,9 +177,14 @@ const main = async () => {
                 mobile: '0412345679',
               },
             },
+            studies: {
+              create: {
+                studyId: defaultStudy.id,
+              },
+            },
             surveys: {
               create: {
-                versionId: 1,
+                versionId: 1000,
                 answers: createDefaultAnswers(SeedSurveyStepData),
               },
             },

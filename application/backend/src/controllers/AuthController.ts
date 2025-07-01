@@ -13,6 +13,7 @@ import {
   Route,
   Tags,
   Controller,
+  Path,
   Body,
   Post,
   SuccessResponse,
@@ -50,8 +51,9 @@ import { auditLog } from '../middlewares/AuditLog'
 export class AuthController extends Controller {
   userRepo = prisma.user
   profileRepo = prisma.participantProfile
+  studyRepo = prisma.study
   surveyRepo = prisma.surveyVersion
-  spRepo = prisma.surveyParticipant
+  svaRepo = prisma.surveyVersionAnswers
   inviteRepo = prisma.invite
 
   /**
@@ -137,9 +139,20 @@ export class AuthController extends Controller {
       },
     })
 
-    const study = await prisma.study.create({})
+    const org = await prisma.organisation.create({ data: { name: 'Default org' } })
+
+    // TODO: Currently creates an initial study (similar to how initial surveyVersion is created below).
+    //       Maybe this could be changed to go immediately to a study creation page where they can set
+    //       their desired study name and logo etc.
+    const study = await prisma.study.create({
+      data: {
+        id: 1,
+        name: 'Default Study',
+      },
+    })
+    // Create initial surveyVersion
     await this.surveyRepo.create({
-      data: { data: [], status: 'DRAFT', studyId: study.id },
+      data: { data: [], status: 'DRAFT', studyId: study.id, versionNumber: 1 },
     })
 
     const token = await generateToken({ userId: insertedUser.id, roles: [insertedUser.role] })
@@ -156,17 +169,18 @@ export class AuthController extends Controller {
    *
    * @summary Register a participant
    */
-  @Post('/register/participant')
+  @Post('/register/participants/{inviteId}')
   @NoSecurity()
   @SuccessResponse('201', 'Participant Created')
   public async registerParticipant(
+    @Path() inviteId: string,
     @Body() bodyRequest: RegisterParticipantRequest,
   ): Promise<RegisterParticipantResponse> {
     // Extract info for user creation
     const { firstName, middleName, lastName, email, password, ...participantInfo } = bodyRequest
 
     // Check that the Participant has an invitation
-    const invite = await this.inviteRepo.findFirst({ where: { email } })
+    const invite = await this.inviteRepo.findFirst({ where: { id: inviteId, email } })
     if (!invite || invite.status !== 'PENDING') {
       throw new NotFoundError(`Invite for ${email} not found`)
     }
@@ -192,7 +206,8 @@ export class AuthController extends Controller {
 
     // Extract info for participant creation
     const participantData: CreateParticipantRequest = { firstName, lastName, ...participantInfo }
-    await this.createParticipant(participantData, insertedUser)
+    const study = await this.studyRepo.findFirstOrThrow({ where: { id: invite.studyId } })
+    await this.createParticipant(participantData, study.id, insertedUser)
     logger.info(`Participant ${insertedUser.id} created`)
 
     // Generate token
@@ -206,7 +221,7 @@ export class AuthController extends Controller {
     // Once a participant has been registered, we need
     // to update their invitation status to ACCEPTED
     const res = await this.inviteRepo.update({
-      where: { email },
+      where: { id: inviteId },
       data: { status: 'ACCEPTED' },
     })
 
@@ -261,6 +276,7 @@ export class AuthController extends Controller {
 
   public async createParticipant(
     participantData: CreateParticipantRequest,
+    studyId: number,
     user?: User,
   ): Promise<CreateParticipantResponse> {
     // Extract user and profile data
@@ -312,6 +328,15 @@ export class AuthController extends Controller {
         lastName: lastName,
         dob: new Date(dob),
         familyId,
+        studies: {
+          create: {
+            study: {
+              connect: {
+                id: studyId,
+              },
+            },
+          },
+        },
         participantType:
           dependents.length > 0 ? ParticipantType.GUARDIAN : ParticipantType.STANDARD,
       },
@@ -319,7 +344,10 @@ export class AuthController extends Controller {
 
     // Fetch current survey
     const currentSurvey = await this.surveyRepo.findFirstOrThrow({
-      where: { status: 'PUBLISHED' },
+      where: {
+        status: 'PUBLISHED',
+        studyId: studyId,
+      },
       orderBy: { id: 'desc' },
     })
 
@@ -334,13 +362,22 @@ export class AuthController extends Controller {
             lastName: dep.lastName,
             dob: new Date(dep.dob),
             familyId: profile.familyId,
+            studies: {
+              create: {
+                study: {
+                  connect: {
+                    id: studyId,
+                  },
+                },
+              },
+            },
             participantType: dep.permanent
               ? ParticipantType.DEPENDENT_OTHER
               : ParticipantType.DEPENDENT_AGE,
           },
         })
         if (currentSurvey) {
-          await this.spRepo.create({
+          await this.svaRepo.create({
             data: {
               profileId: depProfile.id,
               versionId: currentSurvey.id,
@@ -353,7 +390,7 @@ export class AuthController extends Controller {
 
     // Assign survey to the main profile
     if (currentSurvey) {
-      await this.spRepo.create({
+      await this.svaRepo.create({
         data: {
           profileId: profile.id,
           versionId: currentSurvey.id,

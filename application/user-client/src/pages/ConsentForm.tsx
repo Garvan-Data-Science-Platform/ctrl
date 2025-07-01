@@ -28,12 +28,15 @@ import { Info } from '@mui/icons-material'
 import { useEffect, useState } from 'react'
 import { SurveyElement } from '@common/types/survey'
 import { extractSurveyStepAnswers } from '@common/src/surveys/extractSurveyStepAnswers'
+import { useCurrentStudyId } from '../store'
 
 export default function ConsentForm() {
   const nav = useNavigate()
 
   const params = useParams()
   const currentStep = Number(params.step)
+
+  const studyId = useCurrentStudyId()
 
   const [formState, setFormState] = useState<SurveyElement[]>([])
   const [modalOpen, setModalOpen] = useState(false)
@@ -44,7 +47,7 @@ export default function ConsentForm() {
     queryKey: ['form_step', currentStep],
     queryFn: async () => {
       try {
-        const surveyStep = await apiClient.get(`/surveys/step/1/${currentStep}`)
+        const surveyStep = await apiClient.get(`/studies/${studyId}/survey-steps/${currentStep}`)
 
         //Set default values if not answered
         for (const i in surveyStep.data.data.elements) {
@@ -78,7 +81,7 @@ export default function ConsentForm() {
       }
     }
     try {
-      await apiClient.post(`/surveys/answers`, {
+      await apiClient.post(`/studies/${studyId}/survey-answers`, {
         step: currentStep,
         data: extractSurveyStepAnswers(formState),
       })

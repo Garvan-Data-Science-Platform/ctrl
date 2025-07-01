@@ -1,5 +1,5 @@
 import type { GetUserByIdResponse } from './getUserById'
-import type { GetParticipantProfileResponse } from './getParticipantProfile'
+import type { GetParticipantProfileResponse, FamilyMember } from './getParticipantProfile'
 import type { GetAllUsersResponse } from './getAllUsers'
 import type { CreateUserRequest, CreateUserResponse } from './createUser'
 import type { UpdateUserRequest } from './updateUser'
@@ -10,6 +10,7 @@ import type { GeneratePasswordResetLinkRequest, ResetPasswordRequest } from './p
 export {
   GetUserByIdResponse,
   GetParticipantProfileResponse,
+  FamilyMember,
   GetAllUsersResponse,
   CreateUserRequest,
   CreateUserResponse,
