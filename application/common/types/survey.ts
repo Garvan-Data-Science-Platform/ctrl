@@ -1,14 +1,12 @@
 export interface SurveyQuestionCheckbox {
   text: string
   tooltip?: string
-  value: boolean
   required: boolean
 }
 
 export interface SurveyQuestionChoices {
   text: string
   tooltip?: string
-  value: string
   required: boolean
   choices: string[]
 }
