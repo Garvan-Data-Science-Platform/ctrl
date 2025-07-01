@@ -134,13 +134,15 @@ export class AuthController extends Controller {
       },
     })
 
+    const org = await prisma.organisation.create({ data: { name: 'Default org' } })
+
     // TODO: Currently creates an initial study (similar to how initial surveyVersion is created below).
     //       Maybe this could be changed to go immediately to a study creation page where they can set
     //       their desired study name and logo etc.
     const study = await prisma.study.create({
       data: {
         id: 1,
-        name: 'Placeholder Study Name',
+        name: 'Default Study',
       },
     })
     // Create initial surveyVersion
