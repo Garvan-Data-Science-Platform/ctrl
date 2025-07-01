@@ -68,7 +68,10 @@ export class IntegrationsController extends Controller {
     const { formName } = bodyRequest
     const params = new URLSearchParams()
 
-    const redcapSettings = await this.getRedcapConfig()
+    const redcapSettings = await prisma.organisation.findFirstOrThrow({
+      where: { id: 1 },
+      select: { redcapToken: true, redcapURL: true },
+    })
 
     if (!redcapSettings.redcapToken || !redcapSettings.redcapURL) {
       throw new Error('Redcap API not configured')
@@ -81,6 +84,14 @@ export class IntegrationsController extends Controller {
      * flat - output as one record per row [default]
      */
     params.append('type', 'flat')
+
+    /**
+     * an array of form names you wish to pull records for.
+     * If the form name has a space in it, replace the space
+     * with an underscore
+     * (by default, all records from all data collection instruments is pulled)
+     */
+    params.append('form[0]', formName)
 
     const participantData = await fetch(redcapSettings.redcapURL, {
       method: 'POST',
@@ -97,7 +108,7 @@ export class IntegrationsController extends Controller {
         return data
       })
       .catch((error) => {
-        throw new BadGatewayError(error.message, error)
+        throw new BadGatewayError('Error communicating with REDCap API', error)
       })
 
     return await this.processParticipantData(studyId, participantData)
