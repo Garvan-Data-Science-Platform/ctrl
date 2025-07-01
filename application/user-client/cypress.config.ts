@@ -18,6 +18,7 @@ export default defineConfig({
     PASSWORD_RESET_USER_EMAIL: PASSWORD_RESET_USER_EMAIL,
   },
   e2e: {
+    defaultCommandTimeout: 8000,
     baseUrl: 'http://localhost:5002',
     // eslint-disable-next-line
     setupNodeEvents(on, config) {
