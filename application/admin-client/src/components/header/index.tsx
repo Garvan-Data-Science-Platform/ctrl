@@ -15,7 +15,7 @@ import { HamburgerMenu, RefineThemedLayoutV2HeaderProps } from '@refinedev/mui'
 import React, { useState } from 'react'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import { useStudyStore } from '../../studyStore'
-import { useInvalidate, useParsed } from '@refinedev/core'
+import { useParsed } from '@refinedev/core'
 import { axiosInstance } from '../../providers/dataProvider'
 import { useQueryClient } from '@tanstack/react-query'
 
@@ -48,7 +48,6 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({ sticky = tru
   const { resource, action } = useParsed()
 
   const { studies, activeStudyIndex, setActiveStudyIndex } = useStudyStore()
-  const invalidate = useInvalidate()
 
   return (
     <AppBar position={sticky ? 'sticky' : 'relative'}>
@@ -104,7 +103,6 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({ sticky = tru
                   key={study.id}
                   onClick={() => {
                     setActiveStudyIndex(idx)
-                    invalidate({ invalidates: ['all'] })
                     handleCloseStudyMenu()
                   }}
                   sx={{ fontWeight: activeStudyIndex == idx ? 'bold' : 'normal' }}
