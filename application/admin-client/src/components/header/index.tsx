@@ -104,7 +104,6 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({ sticky = tru
                   key={study.id}
                   onClick={() => {
                     setActiveStudyIndex(idx)
-                    invalidate({ invalidates: ['all'] })
                     handleCloseStudyMenu()
                   }}
                   sx={{ fontWeight: activeStudyIndex == idx ? 'bold' : 'normal' }}

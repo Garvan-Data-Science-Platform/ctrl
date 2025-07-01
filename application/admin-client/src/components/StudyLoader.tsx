@@ -1,4 +1,4 @@
-import { useCustom } from '@refinedev/core'
+import { useCustom, useInvalidate } from '@refinedev/core'
 import React, { PropsWithChildren, useEffect } from 'react'
 import { useStudyStore } from '../studyStore'
 
@@ -9,6 +9,7 @@ export const StudyLoader: React.FC<PropsWithChildren> = ({ children }) => {
     queryOptions: { queryKey: ['studies'] },
   })
   const { studies, setStudies, activeStudyIndex, setActiveStudyIndex } = useStudyStore()
+  const invalidate = useInvalidate()
 
   useEffect(() => {
     if (data) {
@@ -20,6 +21,7 @@ export const StudyLoader: React.FC<PropsWithChildren> = ({ children }) => {
 
   useEffect(() => {
     localStorage.setItem('activeStudyIndex', String(activeStudyIndex))
+    invalidate({ invalidates: ['all'] })
   }, [activeStudyIndex])
 
   return studies.length > 0 && children
