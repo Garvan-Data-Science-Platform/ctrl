@@ -53,16 +53,6 @@ export function expressAuthentication(
   return Promise.resolve(undefined)
 }
 
-export function getUserIdFromToken(token: string): number {
-  const decoded = jwt.decode(token) as jwt.JwtPayload | null
-
-  if (decoded && typeof decoded === 'object' && 'userId' in decoded) {
-    return decoded.userId as number
-  }
-
-  throw new Error('UserID not encoded in token.')
-}
-
 export function hashPassword(password: string): string {
   const salt = crypto.randomBytes(16)
   const derived = crypto.scryptSync(password, salt, 64)

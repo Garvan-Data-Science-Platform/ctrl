@@ -25,8 +25,9 @@ interface RedcapImportProps {
   helpDocumentation: string
   warningMessage?: string
   onSubmitFile: (file: File) => void
-  onSubmitApi: (formName: string) => void
+  onSubmitApi: (formName?: string) => void
   confirmDialog?: boolean
+  formNameInput?: boolean
 }
 
 export const RedcapImport = ({
@@ -36,6 +37,7 @@ export const RedcapImport = ({
   onSubmitFile,
   onSubmitApi,
   confirmDialog = true,
+  formNameInput = true,
 }: RedcapImportProps) => {
   const [file, setFile] = useState<File | null>(null)
   const [formName, setFormName] = useState<string>('')
@@ -65,7 +67,7 @@ export const RedcapImport = ({
   const handleApiSubmission = () => {
     closeDialog()
 
-    if (!formName) {
+    if (formNameInput && !formName) {
       open?.({ type: 'error', message: 'Please enter a form to pull from REDCap' })
       return
     }
@@ -217,14 +219,16 @@ export const RedcapImport = ({
             </Typography>
             {redcapIsSetup ? (
               <>
-                <TextField
-                  label="Form Name"
-                  variant="outlined"
-                  value={formName}
-                  onChange={(e) => setFormName(e.target.value)}
-                  sx={{ mb: 2 }}
-                  data-cy="formName"
-                />
+                {formNameInput && (
+                  <TextField
+                    label="Form Name"
+                    variant="outlined"
+                    value={formName}
+                    onChange={(e) => setFormName(e.target.value)}
+                    sx={{ mb: 2 }}
+                    data-cy="formName"
+                  />
+                )}
                 <Button
                   variant="contained"
                   color="primary"
@@ -236,7 +240,7 @@ export const RedcapImport = ({
                       handleApiSubmission()
                     }
                   }}
-                  disabled={!formName}
+                  disabled={formNameInput && !formName}
                   data-cy="apiSubmit"
                 >
                   Import from API

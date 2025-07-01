@@ -19,12 +19,20 @@ const api = new Api()
 const app = api.app
 
 describe('Auth', () => {
-  const testUser: RegisterRequest = {
+  const testAdmin: RegisterRequest = {
     firstName: 'Test',
-    lastName: 'User',
-    email: 'test@user.com',
+    lastName: 'Admin',
+    email: 'test@admin.com',
     password: 'Password123',
     role: Role.OrganisationAdmin,
+  }
+
+  const testParticipant: RegisterRequest = {
+    firstName: 'Test',
+    lastName: 'Participant',
+    email: 'test@participant.com',
+    password: 'Password123',
+    role: Role.Participant,
   }
 
   beforeAll(async () => {
@@ -34,10 +42,17 @@ describe('Auth', () => {
   beforeEach(async () => {
     await resetDB()
 
-    // Register user
-    const registerResponse = await request(app).post('/auth/register').send(testUser)
-    const body: RegisterResponse = registerResponse.body
-    if (!body.token) throw new Error('User could not be registered')
+    // Register Admin
+    const registerAdminResponse = await request(app).post('/auth/register').send(testAdmin)
+    const adminBody: RegisterResponse = registerAdminResponse.body
+    if (!adminBody.token) throw new Error('User could not be registered')
+
+    // Register Participant
+    const registerParticipantResponse = await request(app)
+      .post('/auth/register')
+      .send(testParticipant)
+    const participantBody: RegisterResponse = registerParticipantResponse.body
+    if (!participantBody.token) throw new Error('User could not be registered')
   })
 
   afterAll(async () => {
@@ -58,7 +73,7 @@ describe('Auth', () => {
     // Generate a valid token that will expire in 1 second
     const loginResponse = await request(app)
       .post('/auth/login')
-      .send({ email: testUser.email, password: testUser.password })
+      .send({ email: testAdmin.email, password: testAdmin.password })
 
     expect(loginResponse.status).toBe(200)
     const token = loginResponse.body.token
@@ -140,5 +155,43 @@ describe('Auth', () => {
       .set({ Authorization: `Bearer ${participantBody.token}` })
 
     expect(protectedRouteResponse2.status).toEqual(200)
+  })
+
+  it('should prevent a participant from accessing the admin portal', async () => {
+    // Try to login as a participant from an external client
+    const participantLoginSuccessResponse = await request(app)
+      .post('/auth/login')
+      .send({ email: testParticipant.email, password: testParticipant.password })
+
+    expect(participantLoginSuccessResponse.status).toBe(200) // Should login successfully
+    expect(participantLoginSuccessResponse.body.token).toBeDefined()
+
+    // Try to login as a participant from the admin portal
+    const participantLoginResponse = await request(app)
+      .post('/auth/login')
+      .set({ 'x-client-type': 'admin-client' }) // Set the client type to admin-client
+      .send({ email: testParticipant.email, password: testParticipant.password })
+
+    expect(participantLoginResponse.status).toBe(401) // Should not allow login
+    expect(participantLoginResponse.body.message).toBe('Incorrect Permissions')
+  })
+
+  it('should prevent an admin from accessing the participant portal', async () => {
+    // Try to login as a admin from an external client
+    const adminLoginSuccessResponse = await request(app)
+      .post('/auth/login')
+      .send({ email: testAdmin.email, password: testAdmin.password })
+
+    expect(adminLoginSuccessResponse.status).toBe(200) // Should login successfully
+    expect(adminLoginSuccessResponse.body.token).toBeDefined()
+
+    // Try to login as a admin from the admin portal
+    const adminLoginResponse = await request(app)
+      .post('/auth/login')
+      .set({ 'x-client-type': 'user-client' }) // Set the client type to user-client
+      .send({ email: testAdmin.email, password: testAdmin.password })
+
+    expect(adminLoginResponse.status).toBe(401) // Should not allow login
+    expect(adminLoginResponse.body.message).toBe('Incorrect Permissions')
   })
 })

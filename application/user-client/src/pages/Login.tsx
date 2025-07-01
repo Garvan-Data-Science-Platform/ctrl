@@ -15,10 +15,12 @@ export default function Login() {
   const { login } = useAuth()
   const nav = useNavigate()
 
+  const clientType = 'user-client'
+
   const onSubmit = (data: unknown) => {
     fetch(import.meta.env.VITE_BACKEND_URL + '/auth/login', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-client-type': clientType },
       body: JSON.stringify(data as LoginRequest),
     })
       .then((res) => {

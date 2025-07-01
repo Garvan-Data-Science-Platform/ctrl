@@ -19,7 +19,6 @@ import type {
   UploadRedcapInstrumentResponse,
   UploadRedcapInstrumentAPIRequest,
   UploadRedcapParticipantResponse,
-  UploadRedcapParticipantAPIRequest,
 } from 'common/types/api/integrations/redcap'
 import { BadGatewayError } from '../middlewares/ErrorHandler'
 import { UnauthorizedErrorResponse, InternalErrorResponse } from 'common/types/api/errors'
@@ -68,10 +67,7 @@ export class IntegrationsController extends Controller {
     const { formName } = bodyRequest
     const params = new URLSearchParams()
 
-    const redcapSettings = await prisma.organisation.findFirstOrThrow({
-      where: { id: 1 },
-      select: { redcapToken: true, redcapURL: true },
-    })
+    const redcapSettings = await this.getRedcapConfig()
 
     if (!redcapSettings.redcapToken || !redcapSettings.redcapURL) {
       throw new Error('Redcap API not configured')
@@ -84,14 +80,6 @@ export class IntegrationsController extends Controller {
      * flat - output as one record per row [default]
      */
     params.append('type', 'flat')
-
-    /**
-     * an array of form names you wish to pull records for.
-     * If the form name has a space in it, replace the space
-     * with an underscore
-     * (by default, all records from all data collection instruments is pulled)
-     */
-    params.append('form[0]', formName)
 
     const participantData = await fetch(redcapSettings.redcapURL, {
       method: 'POST',
@@ -108,7 +96,7 @@ export class IntegrationsController extends Controller {
         return data
       })
       .catch((error) => {
-        throw new BadGatewayError('Error communicating with REDCap API', error)
+        throw new BadGatewayError(error.message, error)
       })
 
     return await this.processParticipantData(studyId, participantData)
@@ -172,10 +160,13 @@ export class IntegrationsController extends Controller {
         if (data.error) {
           throw new BadGatewayError('Error communicating with REDCap API')
         }
+        if (!this.allFormNamesMatch(data, formName)) {
+          throw new BadGatewayError('Invalid form name provided to REDCap API')
+        }
         return data
       })
       .catch((error) => {
-        throw new BadGatewayError('Error communicating with REDCap API', error)
+        throw new BadGatewayError(error.message, error)
       })
     return await this.processInstrumentData(studyId, surveyData, true)
   }
@@ -194,10 +185,12 @@ export class IntegrationsController extends Controller {
     const ids: number[] = []
     let profilesCreatedCount = 0
     let profilesAlreadyExistedCount = 0
+    const newInvites: string[] = []
 
     for (const participant of data) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { email, password, middleName, ...participantData } = participant
+      newInvites.push(email)
       const user = await this.userRepo.findFirst({
         where: { email: email },
         select: { id: true, profiles: true },
@@ -249,7 +242,7 @@ export class IntegrationsController extends Controller {
       }
     }
 
-    return { profilesCreatedCount, profilesAlreadyExistedCount, ids }
+    return { profilesCreatedCount, profilesAlreadyExistedCount, ids, newInvites }
   }
 
   private async processInstrumentData(
@@ -300,5 +293,19 @@ export class IntegrationsController extends Controller {
       throw new Error('Redcap API not configured')
     }
     return redcapSettings as any
+  }
+
+  private allFormNamesMatch(
+    data: { form_name: string; [key: string]: any }[],
+    formName: string,
+  ): boolean {
+    console.log('data', data)
+    const res = data.every(
+      (item: { form_name: string; [key: string]: any }) => item.form_name === formName,
+    )
+
+    console.log('res', res)
+
+    return res
   }
 }
