@@ -15,7 +15,7 @@ import { HamburgerMenu, RefineThemedLayoutV2HeaderProps } from '@refinedev/mui'
 import React, { useState } from 'react'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import { useStudyStore } from '../../studyStore'
-import { useInvalidate, useParsed } from '@refinedev/core'
+import { useParsed } from '@refinedev/core'
 import { axiosInstance } from '../../providers/dataProvider'
 import { useQueryClient } from '@tanstack/react-query'
 
