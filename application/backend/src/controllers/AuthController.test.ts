@@ -17,12 +17,18 @@ import {
   ParticipantType,
   StateTerritory,
 } from 'common/types/api/users/ParticipantProfile'
+import { generateToken } from '../authentication'
 
 const api = new Api()
 const app = api.app
+var orgAdminToken: string
 
 describe('AuthController', () => {
   beforeAll(async () => {
+    orgAdminToken = await generateToken({
+      userId: 555,
+      roles: ['OrganisationAdmin'],
+    })
     api.run()
   })
 
@@ -54,7 +60,10 @@ describe('AuthController', () => {
       }
 
       // Register user
-      const registerResponse = await request(app).post('/auth/register').send(registerRequest)
+      const registerResponse = await request(app)
+        .post('/auth/register')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .send(registerRequest)
       expect(registerResponse.status).toEqual(201)
 
       const registerBody: RegisterResponse = registerResponse.body
@@ -83,7 +92,10 @@ describe('AuthController', () => {
       expect(existingUser).toBeNull()
 
       // Register user
-      const response = await request(app).post('/auth/register').send(registerRequest)
+      const response = await request(app)
+        .post('/auth/register')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .send(registerRequest)
       expect(response.status).toEqual(201)
       const body: RegisterResponse = response.body
       expect(body.token).not.toBeNull()
@@ -103,7 +115,10 @@ describe('AuthController', () => {
         role: Role.Participant,
       }
 
-      const response = await request(app).post('/auth/register').send(registerRequest)
+      const response = await request(app)
+        .post('/auth/register')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .send(registerRequest)
       expect(response.status).toEqual(422)
 
       const body = response.body
@@ -120,10 +135,16 @@ describe('AuthController', () => {
       }
 
       // Register user
-      await request(app).post('/auth/register').send(registerRequest)
+      await request(app)
+        .post('/auth/register')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .send(registerRequest)
 
       // Try to register again with the same email
-      const response = await request(app).post('/auth/register').send(registerRequest)
+      const response = await request(app)
+        .post('/auth/register')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .send(registerRequest)
       expect(response.status).toEqual(500)
     })
 
@@ -136,7 +157,10 @@ describe('AuthController', () => {
         role: Role.Participant,
       }
 
-      const response = await request(app).post('/auth/register').send(registerRequest)
+      const response = await request(app)
+        .post('/auth/register')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .send(registerRequest)
       expect(response.status).toEqual(422)
 
       const body = response.body
@@ -158,7 +182,10 @@ describe('AuthController', () => {
         role: Role.Participant,
       }
 
-      const response = await request(app).post('/auth/register').send(registerRequest)
+      const response = await request(app)
+        .post('/auth/register')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .send(registerRequest)
       expect(response.status).toEqual(422)
 
       const body = response.body
@@ -180,7 +207,10 @@ describe('AuthController', () => {
         role: Role.Participant,
       }
 
-      const response = await request(app).post('/auth/register').send(registerRequest)
+      const response = await request(app)
+        .post('/auth/register')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .send(registerRequest)
       expect(response.status).toEqual(422)
 
       const body = response.body
@@ -202,7 +232,10 @@ describe('AuthController', () => {
         role: Role.Participant,
       }
 
-      const response = await request(app).post('/auth/register').send(registerRequest)
+      const response = await request(app)
+        .post('/auth/register')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .send(registerRequest)
       expect(response.status).toEqual(422)
 
       const body = response.body
@@ -424,7 +457,10 @@ describe('AuthController', () => {
         role: Role.OrganisationAdmin,
       }
 
-      const response = await request(app).post('/auth/register').send(registerRequest)
+      const response = await request(app)
+        .post('/auth/register')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .send(registerRequest)
       if (response.status != 201) throw Error('Could not register user!')
     })
 
