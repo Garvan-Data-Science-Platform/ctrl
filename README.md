@@ -21,7 +21,20 @@
 
 </div>
 
+
 CTRL, developed by [Garvan Institute of Medical Research](https://www.garvan.org.au/), is a secure, web-based dynamic consent platform that empowers research participants to manage their consent preferences, update personal details, and make informed decisions about the use of their genomic and health data. For research organizations, CTRL streamlines consent management by replacing paper records with electronic ones, offering interoperability with databases like [REDCap](https://projectredcap.org/), and managing permissions.
+
+**Demo Login Information**
+
+**User Portal**  
+URL: [http://ctrldemo.dsp.garvan.org.au/](http://ctrldemo.dsp.garvan.org.au/)  
+Login: `user@example.com`  
+Password: `Testpassword2`  
+
+**Admin Portal**  
+URL: [http://admin.ctrldemo.dsp.garvan.org.au/](http://admin.ctrldemo.dsp.garvan.org.au/)  
+Login: `admin@example.com`  
+Password: `Testpassword1`
 
 ## Installation 
 
