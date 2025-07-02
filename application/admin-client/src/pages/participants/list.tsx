@@ -145,6 +145,17 @@ export const ParticipantList = () => {
     )
   }
 
+  // const handleInviteButtonClick = () => {
+  //   axiosInstance
+  //     .get(`/studies/${studyId}/survey`)
+  //     .then((response) => {
+  //       // Check if the survey is set up
+  //     })
+  //     .catch((error) => {
+  //       open?.({ type: 'error', message: `Could not revoke invite: ${error}` })
+  //     })
+  // }
+
   const columns = React.useMemo<GridColDef[]>(
     () => [
       {
