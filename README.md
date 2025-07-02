@@ -48,34 +48,7 @@ yarn install
 ```
 
 ## Running CTRL Locally (Node)
-
-### Run servers
-
-Run the backend and frontend servers in development mode (with hot reload):
-
-`yarn dev`
-
-In another terminal, migrate and seed the database using:
-
-`make seed`
-
-In your browser open:
-- http://localhost:5173 to see application frontend
-- http://localhost:5000/docs to see Swagger UI for the API
-- http://localhost:5174 to see admin portal
-- http://localhost:8080 for 'Adminer' browser database interface
-
-_**NOTE:** These are the default ports and may change based on app configuration._
-
-Seed data is intended for development only, NOT PRODUCTION.
-Seed data contains infomation to support tests, and also two users to made development easy:
-1. an example admin account
-2. an example user account
-
-The email and password information for these two accounts are specified in `application/backend/.env`.
-If you change this information, you will need to cancel `yarn dev`, run `make clean`, then restart the servers and re-seed the database.
-
-### Prisma Database Management
+### Run the Database
 
 ```bash
 # Copy example env variables and fill out with correct values
@@ -84,9 +57,36 @@ cp application/backend/.env.example application/backend/.env
 # Run db
 make db
 
+# Run migrations
+yarn prisma:migrate
+
 # Run migrations and seed database (Note: do not seed database in production)
 make seed
 ```
+
+> _**Note:** After starting the database you should run `make seed` to apply migrations and seed the database with initial data. This is required for development and testing. **Do not run `make seed` in production environments.**_
+
+### Run servers
+
+Run the backend and frontend servers in development mode (with hot reload):
+
+`yarn dev`
+
+In your browser open:
+- http://localhost:5173 to see application frontend
+- http://localhost:5000/docs to see Swagger UI for the API
+- http://localhost:5174 to see admin portal
+- http://localhost:8080 for 'Adminer' browser database interface
+
+> _**Note:** These are the default ports and may change based on app configuration._
+
+Seed data is intended for development only, NOT PRODUCTION.
+Seed data contains infomation to support tests, and also two users to made development easy:
+1. an example admin account
+2. an example user account
+
+The email and password information for these two accounts are specified in `application/backend/.env`.
+If you change this information, you will need to cancel `yarn dev`, run `make clean`, then restart the servers and re-seed the database.
 
 #### Other available yarn targets
 
