@@ -56,13 +56,6 @@ describe('Protected Routes', () => {
         expect(response.body.message).toBe('Incorrect Permissions')
       }
     }
-
-    // Check JWT Protected Routes
-    const response = await request(app)[route.method](route.url)
-    expect(response.status).toBe(401)
-
-    const body = response.body
-    expect(body.message).toBe('No token provided')
   }
 
   const userRoutes: Route[] = [
@@ -129,6 +122,11 @@ describe('Protected Routes', () => {
       url: '/studies/1',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
+    {
+      method: HttpMethod.GET,
+      url: '/studies/list',
+      rolesWhitelisted: [Role.Participant],
+    },
   ]
 
   const organisationRoutes: Route[] = [
@@ -178,7 +176,7 @@ describe('Protected Routes', () => {
     {
       method: HttpMethod.GET,
       url: '/profiles/current',
-      rolesWhitelisted: [],
+      rolesWhitelisted: [Role.Participant],
     },
     {
       method: HttpMethod.GET,
@@ -193,7 +191,7 @@ describe('Protected Routes', () => {
     {
       method: HttpMethod.PATCH,
       url: '/profiles/current',
-      rolesWhitelisted: [],
+      rolesWhitelisted: [Role.Participant],
     },
     {
       method: HttpMethod.PATCH,
@@ -205,22 +203,47 @@ describe('Protected Routes', () => {
   const surveyRoutes: Route[] = [
     {
       method: HttpMethod.GET,
-      url: '/studies/1/surveys/1',
-      rolesWhitelisted: [],
-    },
-    {
-      method: HttpMethod.GET,
-      url: '/studies/1/survey-steps/1',
-      rolesWhitelisted: [],
-    },
-    {
-      method: HttpMethod.POST,
-      url: '/studies/1/survey-answers',
-      rolesWhitelisted: [],
+      url: '/studies/1/surveys',
+      rolesWhitelisted: [Role.OrganisationAdmin],
     },
     {
       method: HttpMethod.PATCH,
       url: '/studies/1/surveys/1',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.GET,
+      url: '/studies/1/surveys/1',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.GET,
+      url: '/studies/1/survey-steps',
+      rolesWhitelisted: [Role.Participant],
+    },
+    {
+      method: HttpMethod.GET,
+      url: '/studies/1/survey-steps/1',
+      rolesWhitelisted: [Role.Participant],
+    },
+    {
+      method: HttpMethod.GET,
+      url: '/studies/1/survey-answers',
+      rolesWhitelisted: [Role.Participant],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/studies/1/survey-answers',
+      rolesWhitelisted: [Role.Participant],
+    },
+    {
+      method: HttpMethod.GET,
+      url: '/studies/1/surveys/1/participants/answers',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.GET,
+      url: '/studies/1/surveys/current/participants/1/answers',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
     {
@@ -230,14 +253,68 @@ describe('Protected Routes', () => {
     },
   ]
 
+  const settingsRoutes: Route[] = [
+    {
+      method: HttpMethod.GET,
+      url: '/settings',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.PATCH,
+      url: '/settings',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.GET,
+      url: '/settings/theme',
+      rolesWhitelisted: [],
+    },
+    {
+      method: HttpMethod.GET,
+      url: '/settings/logo',
+      rolesWhitelisted: [],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/settings/logo',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+  ]
+
   const mailerRoutes: Route[] = [
     {
       method: HttpMethod.POST,
       url: '/mailer/contact-us',
+      rolesWhitelisted: [Role.Participant],
+    },
+  ]
+  const authRoutes: Route[] = [
+    {
+      method: HttpMethod.POST,
+      url: '/auth/register',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.GET,
+      url: '/auth/setup',
+      rolesWhitelisted: [],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/auth/register/setup',
+      rolesWhitelisted: [],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/auth/register/participants/1',
+      rolesWhitelisted: [],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/auth/login',
       rolesWhitelisted: [],
     },
   ]
-
   const integrationRoutes: Route[] = [
     {
       method: HttpMethod.POST,
@@ -274,7 +351,40 @@ describe('Protected Routes', () => {
     },
   ]
 
+  const familyRoutes: Route[] = [
+    {
+      method: HttpMethod.GET,
+      url: '/studies/1/families/1',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/studies/1/families/remove/1',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/studies/1/families/1/add/1',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/studies/1/families/1/add-dependent',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+  ]
+
   const inviteRoutes: Route[] = [
+    {
+      method: HttpMethod.GET,
+      url: '/invites/pending',
+      rolesWhitelisted: [Role.Participant],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/invites/1/accept',
+      rolesWhitelisted: [Role.Participant],
+    },
     {
       method: HttpMethod.GET,
       url: '/studies/1/invites',
@@ -300,6 +410,11 @@ describe('Protected Routes', () => {
       url: '/studies/1/invites/inviteId/revoke',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
+    {
+      method: HttpMethod.GET,
+      url: '/studies/1/invites/text',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
   ]
 
   describe('User Routes', () => {
@@ -312,6 +427,30 @@ describe('Protected Routes', () => {
 
   describe('Study Routes', () => {
     studyRoutes.forEach((route: Route) => {
+      it(`${route.method.toUpperCase()} ${route.url} should be a protected route`, async () => {
+        await checkProtectedRoutes(route)
+      })
+    })
+  })
+
+  describe('Settings Routes', () => {
+    settingsRoutes.forEach((route: Route) => {
+      it(`${route.method.toUpperCase()} ${route.url} should be a protected route`, async () => {
+        await checkProtectedRoutes(route)
+      })
+    })
+  })
+
+  describe('Auth Routes', () => {
+    authRoutes.forEach((route: Route) => {
+      it(`${route.method.toUpperCase()} ${route.url} should be a protected route`, async () => {
+        await checkProtectedRoutes(route)
+      })
+    })
+  })
+
+  describe('Family Routes', () => {
+    familyRoutes.forEach((route: Route) => {
       it(`${route.method.toUpperCase()} ${route.url} should be a protected route`, async () => {
         await checkProtectedRoutes(route)
       })

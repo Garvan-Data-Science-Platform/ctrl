@@ -1,4 +1,4 @@
-import { Response, Controller, Tags, Route, Post, Body, Request, Middlewares } from 'tsoa'
+import { Response, Controller, Tags, Route, Post, Body, Request, Middlewares, Security } from 'tsoa'
 import {
   InternalErrorResponse,
   UnauthorizedErrorResponse,
@@ -28,6 +28,7 @@ export class MailerController extends Controller {
    * @summary ContactUs
    */
   @Post('/contact-us')
+  @Security('jwt', ['Participant'])
   @Response<ValidateErrorResponse>('422', 'Invalid Request')
   public async contactUs(
     @Body() bodyRequest: ContactUsRequest,

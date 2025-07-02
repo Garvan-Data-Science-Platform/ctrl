@@ -80,6 +80,7 @@ export class SurveysController extends Controller {
    * @summary Get Specific Survey
    */
   @Get('/surveys/{versionNumber}')
+  @Security('jwt', ['OrganisationAdmin'])
   @Response('404', 'Not Found')
   public async getSurveyVersionByVersionNumber(
     @Path() studyId: number,
@@ -111,6 +112,7 @@ export class SurveysController extends Controller {
    * @summary Get survey steps for current user
    */
   @Get('/survey-steps')
+  @Security('jwt', ['Participant'])
   @Response('404', 'Not Found')
   public async getUserSurveySteps(
     @Request() request: any,
@@ -153,6 +155,7 @@ export class SurveysController extends Controller {
    * @summary Get questions and current answers for step of a survey
    */
   @Get('/survey-steps/{stepId}')
+  @Security('jwt', ['Participant'])
   @Response('404', 'Not Found')
   public async getUserSurveyStep(
     @Request() request: any,
@@ -197,6 +200,7 @@ export class SurveysController extends Controller {
    * @summary Get current answers for current user by token
    */
   @Get('/survey-answers')
+  @Security('jwt', ['Participant'])
   @Response('404', 'Not Found')
   public async getUserResponses(
     @Request() request: any,
@@ -238,6 +242,7 @@ export class SurveysController extends Controller {
    * @summary Get all participants answers for a survey version
    */
   @Get('/surveys/{versionNumber}/participants/answers')
+  @Security('jwt', ['OrganisationAdmin'])
   @Response('404', 'Not Found')
   public async getAllResponses(
     @Path() versionNumber: number,
@@ -317,6 +322,7 @@ export class SurveysController extends Controller {
    * @summary Update survey answers for current user by token
    */
   @Post('/survey-answers')
+  @Security('jwt', ['Participant'])
   @Response('404', 'Not Found')
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
   public async updateSurveyAnswers(

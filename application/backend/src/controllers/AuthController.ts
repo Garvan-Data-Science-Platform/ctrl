@@ -23,6 +23,7 @@ import {
   Header,
   Middlewares,
   NoSecurity,
+  Security,
 } from 'tsoa'
 import prisma from '../PrismaClient'
 import logger from 'common/src/logger'
@@ -62,7 +63,7 @@ export class AuthController extends Controller {
    * @summary Register a new user
    */
   @Post('/register')
-  @NoSecurity()
+  @Security('jwt', ['OrganisationAdmin'])
   @SuccessResponse('201', 'User Created')
   public async registerUser(@Body() bodyRequest: RegisterRequest): Promise<RegisterResponse> {
     const { password, ...userDetails } = bodyRequest
