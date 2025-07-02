@@ -29,6 +29,8 @@ CTRL, developed by [Garvan Institute of Medical Research](https://www.garvan.org
 
 The use of `nvm` to manage node versions is highly recommended. Install `nvm` using [these instructions](https://github.com/nvm-sh/nvm).
 
+Docker is required to run this project locally to containerise and manage the application's services, including the frontend clients (user-client, admin-client), backend API, and supporting services like PostgreSQL. Each main component has its own Dockerfile for building optimized images, and docker-compose.yml is used to orchestrate local environments, making it easy to spin up, test, and manage dependencies consistently across different setups.
+
 Then from the root of the `ctrl-next` repository run the following commands:
 
 ```bash
