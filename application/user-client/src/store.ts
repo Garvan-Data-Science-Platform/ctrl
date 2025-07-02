@@ -35,7 +35,7 @@ export const useAppStore = create<AppState>((set) => ({
   setActiveStudyIndex: (index: number) => {
     localStorage.setItem('activeStudyIndex', String(index))
     set(
-      produce((state) => {
+      produce((state: any) => {
         state.activeStudyIndex = index
       }),
     )
