@@ -21,7 +21,7 @@ import { generateToken } from '../authentication'
 
 const api = new Api()
 const app = api.app
-var orgAdminToken: string
+let orgAdminToken: string
 
 describe('AuthController', () => {
   beforeAll(async () => {
