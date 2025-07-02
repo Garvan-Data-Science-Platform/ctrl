@@ -4,6 +4,7 @@
   - [Welcome](#welcome)
   - [Development Tooling](#development-tooling)
   - [Git + GitHub](#git--github)
+  - [Node.js](#nodejs)
   - [API Documentation](#api-documentation)
     - [Swagger](#swagger)
     - [Editing Swagger Documentation](#editing-swagger-documentation)
@@ -32,6 +33,14 @@ Submit [pull requests](https://docs.github.com/en/pull-requests) to the `dev` br
 We are using branch protection rules so that all work must be reviewed before it can be merged into the `dev` branch.
 Commits in `feature` branches will be squashed when merged into the `dev` branch.
 Code review helps improve code quality and performance.
+
+## Node.js
+ctrl-next uses a recent Node.js version as specified in `.nvmrc` in combination with the yarn modern package manager through corepack.
+
+This `.nvmrc` is the single source of truth through out this app to specify the Node Version.
+For example: Dockerfiles, `run_tests.sh` scripts, the Makefile and multiple CI workflows all parse the node version from the `.nvmrc`.
+If you want to update node version, please only change the `.nvmrc`.
+If you find yourself specifying the node version somewhere else in the app, please continue the approach of parsing the `.nvmrc` file (or apply an improved approach throughout the rest of the app).
 
 ## API Documentation
 
