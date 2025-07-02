@@ -1141,7 +1141,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 versionNumber: {"in":"path","name":"versionNumber","required":true,"dataType":"double"},
         };
         app.get('/studies/:studyId/surveys/:versionNumber',
-            authenticateMiddleware([{"jwt":[]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(SurveysController)),
             ...(fetchMiddlewares<RequestHandler>(SurveysController.prototype.getSurveyVersionByVersionNumber)),
 
@@ -1173,7 +1173,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
         };
         app.get('/studies/:studyId/survey-steps',
-            authenticateMiddleware([{"jwt":[]}]),
+            authenticateMiddleware([{"jwt":["Participant"]}]),
             ...(fetchMiddlewares<RequestHandler>(SurveysController)),
             ...(fetchMiddlewares<RequestHandler>(SurveysController.prototype.getUserSurveySteps)),
 
@@ -1206,7 +1206,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 stepId: {"in":"path","name":"stepId","required":true,"dataType":"double"},
         };
         app.get('/studies/:studyId/survey-steps/:stepId',
-            authenticateMiddleware([{"jwt":[]}]),
+            authenticateMiddleware([{"jwt":["Participant"]}]),
             ...(fetchMiddlewares<RequestHandler>(SurveysController)),
             ...(fetchMiddlewares<RequestHandler>(SurveysController.prototype.getUserSurveyStep)),
 
@@ -1238,7 +1238,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
         };
         app.get('/studies/:studyId/survey-answers',
-            authenticateMiddleware([{"jwt":[]}]),
+            authenticateMiddleware([{"jwt":["Participant"]}]),
             ...(fetchMiddlewares<RequestHandler>(SurveysController)),
             ...(fetchMiddlewares<RequestHandler>(SurveysController.prototype.getUserResponses)),
 
@@ -1270,7 +1270,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
         };
         app.get('/studies/:studyId/surveys/:versionNumber/participants/answers',
-            authenticateMiddleware([{"jwt":[]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(SurveysController)),
             ...(fetchMiddlewares<RequestHandler>(SurveysController.prototype.getAllResponses)),
 
@@ -1335,7 +1335,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 body: {"in":"body","name":"body","required":true,"ref":"UpdateSurveyAnswersRequest"},
         };
         app.post('/studies/:studyId/survey-answers',
-            authenticateMiddleware([{"jwt":[]}]),
+            authenticateMiddleware([{"jwt":["Participant"]}]),
             ...(fetchMiddlewares<RequestHandler>(SurveysController)),
             ...(fetchMiddlewares<RequestHandler>(SurveysController.prototype.updateSurveyAnswers)),
 
@@ -1616,7 +1616,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         const argsSettingsController_getSettings: Record<string, TsoaRoute.ParameterSchema> = {
         };
         app.get('/settings',
-            authenticateMiddleware([{"jwt":[]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(SettingsController)),
             ...(fetchMiddlewares<RequestHandler>(SettingsController.prototype.getSettings)),
 
@@ -1647,7 +1647,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"UpdateSettingsRequest"},
         };
         app.patch('/settings',
-            authenticateMiddleware([{"jwt":[]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(SettingsController)),
             ...(fetchMiddlewares<RequestHandler>(SettingsController.prototype.updateSettings)),
 
@@ -1707,7 +1707,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 file: {"in":"formData","name":"file","required":true,"dataType":"file"},
         };
         app.post('/settings/logo',
-            authenticateMiddleware([{"jwt":[]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             upload.fields([
                 {
                     name: "file",
@@ -1773,7 +1773,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 request: {"in":"request","name":"request","required":true,"dataType":"object"},
         };
         app.get('/profiles/current',
-            authenticateMiddleware([{"jwt":[]}]),
+            authenticateMiddleware([{"jwt":["Participant"]}]),
             ...(fetchMiddlewares<RequestHandler>(ProfilesController)),
             ...(fetchMiddlewares<RequestHandler>(ProfilesController.prototype.getCurrentParticipantProfile)),
 
@@ -1867,7 +1867,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 request: {"in":"request","name":"request","required":true,"dataType":"object"},
         };
         app.patch('/profiles/current',
-            authenticateMiddleware([{"jwt":[]}]),
+            authenticateMiddleware([{"jwt":["Participant"]}]),
             ...(fetchMiddlewares<RequestHandler>(ProfilesController)),
             ...(fetchMiddlewares<RequestHandler>(ProfilesController.prototype.updateCurrentProfile)),
 
@@ -2495,7 +2495,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 request: {"in":"request","name":"request","required":true,"dataType":"object"},
         };
         app.post('/mailer/contact-us',
-            authenticateMiddleware([{"jwt":[]}]),
+            authenticateMiddleware([{"jwt":["Participant"]}]),
             ...(fetchMiddlewares<RequestHandler>(MailerController)),
             ...(fetchMiddlewares<RequestHandler>(MailerController.prototype.contactUs)),
 
@@ -2526,6 +2526,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"RegisterRequest"},
         };
         app.post('/auth/register',
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(AuthController)),
             ...(fetchMiddlewares<RequestHandler>(AuthController.prototype.registerUser)),
 

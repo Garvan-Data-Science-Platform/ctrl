@@ -102,16 +102,6 @@ describe('ProfilesController', () => {
       const body: GetParticipantProfileResponse = response.body
       expect(body.data).toEqual(expectedProfileData)
     })
-
-    it('should return a 404 error if the authenticated user does not have a profile', async () => {
-      const response = await request(app)
-        .get('/profiles/current')
-        .set({ Authorization: `Bearer ${orgAdminToken}` })
-
-      expect(response.status).toBe(404)
-      const body = response.body
-      expect(body.message).toBe(`Record not found`)
-    })
   })
 
   describe('GET /profiles/current and GET /profiles/:userId', () => {

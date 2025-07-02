@@ -23,16 +23,16 @@ import {
 
 const api = new Api()
 const app = api.app
-let token: string, tokenNoAnswers: string, tokenNoProfile: string
+let token: string, tokenNoAnswers: string, tokenAdmin: string
 
 describe('SurveysController', () => {
   beforeAll(async () => {
-    token = await generateToken({ userId: PARTICIPANT_COMPLETED_ID, roles: ['OrganisationAdmin'] })
+    token = await generateToken({ userId: PARTICIPANT_COMPLETED_ID, roles: ['Participant'] })
     tokenNoAnswers = await generateToken({
       userId: PARTICIPANT_UNANSWERED_ID,
-      roles: ['OrganisationAdmin'],
+      roles: ['Participant'],
     })
-    tokenNoProfile = await generateToken({ userId: ORG_ADMIN_ID, roles: ['OrganisationAdmin'] })
+    tokenAdmin = await generateToken({ userId: ORG_ADMIN_ID, roles: ['OrganisationAdmin'] })
     api.run()
   })
 
@@ -47,7 +47,7 @@ describe('SurveysController', () => {
     it('should return all survey versions', async () => {
       const response = await request(app)
         .get('/studies/1/surveys')
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${tokenAdmin}` })
       expect(response.status).toBe(200)
       const body: GetSurveyVersionsResponse = response.body
       // There are two survey versions created in application/common/testing/seed.ts
@@ -59,7 +59,7 @@ describe('SurveysController', () => {
     it('should return a survey version', async () => {
       const response = await request(app)
         .get('/studies/1/surveys/1')
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${tokenAdmin}` })
       expect(response.status).toBe(200)
       const body: GetSurveyVersionByVersionNumberResponse = response.body
       expect(body.data.status).toBe('PUBLISHED')
@@ -93,12 +93,6 @@ describe('SurveysController', () => {
         .get('/studies/1/survey-steps/3')
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(422)
-    })
-    it('should fail if user is not assigned to a study', async () => {
-      const response = await request(app)
-        .get('/studies/1/survey-steps/2')
-        .set({ Authorization: `Bearer ${tokenNoProfile}` })
-      expect(response.status).toBe(404)
     })
   })
 
@@ -231,7 +225,7 @@ describe('SurveysController', () => {
       }
       const response = await request(app)
         .patch('/studies/1/surveys/2')
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${tokenAdmin}` })
         .send(reqBody)
       expect(response.status).toBe(204)
       const survey = await prisma.surveyVersion.findUniqueOrThrow({
@@ -245,7 +239,7 @@ describe('SurveysController', () => {
       expect(survey?.data[0].elements[1].data.text).toBe('Question 1')
 
       const aLog = await prisma.auditLog.findFirstOrThrow({
-        where: { userId: PARTICIPANT_COMPLETED_ID },
+        where: { userId: ORG_ADMIN_ID },
       })
       expect(aLog.resource).toBe('studies/surveys')
       expect(aLog.operation).toBe('UPDATE')
@@ -256,7 +250,7 @@ describe('SurveysController', () => {
     it('should fail to update a published survey', async () => {
       const response = await request(app)
         .patch('/studies/1/surveys/1')
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${tokenAdmin}` })
         .send({ data: [] })
       expect(response.status).toBe(500)
     })
@@ -266,7 +260,7 @@ describe('SurveysController', () => {
     it('should successfully publish a draft survey', async () => {
       const response = await request(app)
         .post('/studies/1/surveys/2/publish')
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${tokenAdmin}` })
 
       expect(response.status).toBe(204)
       const survey = await prisma.surveyVersion.findUniqueOrThrow({
@@ -297,7 +291,7 @@ describe('SurveysController', () => {
     it('should fail to publish an already published survey', async () => {
       const response = await request(app)
         .post('/studies/1/surveys/1/publish')
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${tokenAdmin}` })
       expect(response.status).toBe(500)
     })
 
@@ -319,7 +313,7 @@ describe('SurveysController', () => {
       })
       const response = await request(app)
         .post('/studies/1/surveys/2/publish')
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${tokenAdmin}` })
       expect(response.status).toBe(422)
     })
   })
@@ -327,7 +321,7 @@ describe('SurveysController', () => {
     it('Should get a list of all responses', async () => {
       const response = await request(app)
         .get('/studies/1/surveys/1/participants/answers')
-        .set({ Authorization: `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${tokenAdmin}` })
 
       expect(response.status).toBe(200)
 

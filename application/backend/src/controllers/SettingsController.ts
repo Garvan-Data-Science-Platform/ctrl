@@ -16,6 +16,7 @@ import {
   NoSecurity,
   Post,
   UploadedFile,
+  Security,
 } from 'tsoa'
 import { Readable } from 'stream'
 import type {
@@ -38,6 +39,7 @@ export class SettingsController extends Controller {
    * @summary Get the current organisation settings
    */
   @Get('/')
+  @Security('jwt', ['OrganisationAdmin'])
   public async getSettings(): Promise<GetSettingsResponse> {
     const orgdata = await prisma.organisation.findFirstOrThrow({
       where: { id: 1 },
@@ -56,6 +58,7 @@ export class SettingsController extends Controller {
   }
 
   @Patch('/')
+  @Security('jwt', ['OrganisationAdmin'])
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
   public async updateSettings(@Body() bodyRequest: UpdateSettingsRequest) {
     await prisma.organisation.update({ where: { id: 1 }, data: bodyRequest })
@@ -75,6 +78,7 @@ export class SettingsController extends Controller {
   }
 
   @Post('/logo')
+  @Security('jwt', ['OrganisationAdmin'])
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
   public async uploadLogo(@UploadedFile() file: Express.Multer.File) {
     const buffer = await sharp(file.buffer).resize(200).png().toBuffer()
