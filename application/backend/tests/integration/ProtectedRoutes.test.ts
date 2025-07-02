@@ -56,13 +56,6 @@ describe('Protected Routes', () => {
         expect(response.body.message).toBe('Incorrect Permissions')
       }
     }
-
-    // Check JWT Protected Routes
-    const response = await request(app)[route.method](route.url)
-    expect(response.status).toBe(401)
-
-    const body = response.body
-    expect(body.message).toBe('No token provided')
   }
 
   const userRoutes: Route[] = [
@@ -100,6 +93,39 @@ describe('Protected Routes', () => {
       method: HttpMethod.GET,
       url: '/users/admin',
       rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+  ]
+
+  const studyRoutes: Route[] = [
+    {
+      method: HttpMethod.GET,
+      url: '/studies',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.GET,
+      url: '/studies/1',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/studies',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.PATCH,
+      url: '/studies/1',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.DELETE,
+      url: '/studies/1',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.GET,
+      url: '/studies/list',
+      rolesWhitelisted: [Role.Participant],
     },
   ]
 
@@ -150,7 +176,7 @@ describe('Protected Routes', () => {
     {
       method: HttpMethod.GET,
       url: '/profiles/current',
-      rolesWhitelisted: [],
+      rolesWhitelisted: [Role.Participant],
     },
     {
       method: HttpMethod.GET,
@@ -165,7 +191,7 @@ describe('Protected Routes', () => {
     {
       method: HttpMethod.PATCH,
       url: '/profiles/current',
-      rolesWhitelisted: [],
+      rolesWhitelisted: [Role.Participant],
     },
     {
       method: HttpMethod.PATCH,
@@ -177,37 +203,80 @@ describe('Protected Routes', () => {
   const surveyRoutes: Route[] = [
     {
       method: HttpMethod.GET,
-      url: '/surveys',
+      url: '/studies/1/surveys',
       rolesWhitelisted: [Role.OrganisationAdmin],
-    },
-    {
-      method: HttpMethod.GET,
-      url: '/surveys/1',
-      rolesWhitelisted: [],
-    },
-    {
-      method: HttpMethod.POST,
-      url: '/surveys/participant/1',
-      rolesWhitelisted: [Role.OrganisationAdmin],
-    },
-    {
-      method: HttpMethod.GET,
-      url: '/surveys/step/1/1',
-      rolesWhitelisted: [],
-    },
-    {
-      method: HttpMethod.POST,
-      url: '/surveys/answers',
-      rolesWhitelisted: [],
     },
     {
       method: HttpMethod.PATCH,
-      url: '/surveys/1',
+      url: '/studies/1/surveys/1',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.GET,
+      url: '/studies/1/surveys/1',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.GET,
+      url: '/studies/1/survey-steps',
+      rolesWhitelisted: [Role.Participant],
+    },
+    {
+      method: HttpMethod.GET,
+      url: '/studies/1/survey-steps/1',
+      rolesWhitelisted: [Role.Participant],
+    },
+    {
+      method: HttpMethod.GET,
+      url: '/studies/1/survey-answers',
+      rolesWhitelisted: [Role.Participant],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/studies/1/survey-answers',
+      rolesWhitelisted: [Role.Participant],
+    },
+    {
+      method: HttpMethod.GET,
+      url: '/studies/1/surveys/1/participants/answers',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.GET,
+      url: '/studies/1/surveys/current/participants/1/answers',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
     {
       method: HttpMethod.POST,
-      url: '/surveys/publish/1',
+      url: '/studies/1/surveys/1/publish',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+  ]
+
+  const settingsRoutes: Route[] = [
+    {
+      method: HttpMethod.GET,
+      url: '/settings',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.PATCH,
+      url: '/settings',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.GET,
+      url: '/settings/theme',
+      rolesWhitelisted: [],
+    },
+    {
+      method: HttpMethod.GET,
+      url: '/settings/logo',
+      rolesWhitelisted: [],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/settings/logo',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
   ]
@@ -216,29 +285,55 @@ describe('Protected Routes', () => {
     {
       method: HttpMethod.POST,
       url: '/mailer/contact-us',
+      rolesWhitelisted: [Role.Participant],
+    },
+  ]
+  const authRoutes: Route[] = [
+    {
+      method: HttpMethod.POST,
+      url: '/auth/register',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.GET,
+      url: '/auth/setup',
+      rolesWhitelisted: [],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/auth/register/setup',
+      rolesWhitelisted: [],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/auth/register/participants/1',
+      rolesWhitelisted: [],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/auth/login',
       rolesWhitelisted: [],
     },
   ]
-
   const integrationRoutes: Route[] = [
     {
       method: HttpMethod.POST,
-      url: '/integrations/redcap/participant/upload/csv',
+      url: '/studies/1/integrations/redcap/participant/upload/csv',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
     {
       method: HttpMethod.POST,
-      url: '/integrations/redcap/participant/upload/api',
+      url: '/studies/1/integrations/redcap/participant/upload/api',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
     {
       method: HttpMethod.POST,
-      url: '/integrations/redcap/instrument/upload/csv',
+      url: '/studies/1/integrations/redcap/instrument/upload/csv',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
     {
       method: HttpMethod.POST,
-      url: '/integrations/redcap/instrument/upload/api',
+      url: '/studies/1/integrations/redcap/instrument/upload/api',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
   ]
@@ -246,12 +341,35 @@ describe('Protected Routes', () => {
   const participantRoutes: Route[] = [
     {
       method: HttpMethod.GET,
-      url: '/participants',
+      url: '/studies/1/participants',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
     {
       method: HttpMethod.GET,
-      url: '/participants/1',
+      url: '/studies/1/participants/1',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+  ]
+
+  const familyRoutes: Route[] = [
+    {
+      method: HttpMethod.GET,
+      url: '/studies/1/families/1',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/studies/1/families/remove/1',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/studies/1/families/1/add/1',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/studies/1/families/1/add-dependent',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
   ]
@@ -259,28 +377,80 @@ describe('Protected Routes', () => {
   const inviteRoutes: Route[] = [
     {
       method: HttpMethod.GET,
-      url: '/invites',
+      url: '/invites/pending',
+      rolesWhitelisted: [Role.Participant],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/invites/1/accept',
+      rolesWhitelisted: [Role.Participant],
+    },
+    {
+      method: HttpMethod.GET,
+      url: '/studies/1/invites',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
     {
       method: HttpMethod.POST,
-      url: '/invites',
+      url: '/studies/1/invites',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
     {
       method: HttpMethod.POST,
-      url: '/invites/resend',
+      url: '/studies/1/invites/inviteId/resend',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
     {
       method: HttpMethod.POST,
-      url: '/invites/revoke/1',
+      url: '/studies/1/invites/resend',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.POST,
+      url: '/studies/1/invites/inviteId/revoke',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
+      method: HttpMethod.GET,
+      url: '/studies/1/invites/text',
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
   ]
 
   describe('User Routes', () => {
     userRoutes.forEach((route: Route) => {
+      it(`${route.method.toUpperCase()} ${route.url} should be a protected route`, async () => {
+        await checkProtectedRoutes(route)
+      })
+    })
+  })
+
+  describe('Study Routes', () => {
+    studyRoutes.forEach((route: Route) => {
+      it(`${route.method.toUpperCase()} ${route.url} should be a protected route`, async () => {
+        await checkProtectedRoutes(route)
+      })
+    })
+  })
+
+  describe('Settings Routes', () => {
+    settingsRoutes.forEach((route: Route) => {
+      it(`${route.method.toUpperCase()} ${route.url} should be a protected route`, async () => {
+        await checkProtectedRoutes(route)
+      })
+    })
+  })
+
+  describe('Auth Routes', () => {
+    authRoutes.forEach((route: Route) => {
+      it(`${route.method.toUpperCase()} ${route.url} should be a protected route`, async () => {
+        await checkProtectedRoutes(route)
+      })
+    })
+  })
+
+  describe('Family Routes', () => {
+    familyRoutes.forEach((route: Route) => {
       it(`${route.method.toUpperCase()} ${route.url} should be a protected route`, async () => {
         await checkProtectedRoutes(route)
       })

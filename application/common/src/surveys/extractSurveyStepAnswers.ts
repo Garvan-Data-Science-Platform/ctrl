@@ -4,7 +4,7 @@ export function extractSurveyStepAnswers(elements: SurveyElement[]): SurveyStepA
   const answers: SurveyStepAnswerArray = []
   for (const element of elements) {
     if (['question-checkbox', 'question-choices'].includes(element.type)) {
-      answers.push(element.data.value)
+      answers.push(element.data.value || false)
     }
   }
   return answers

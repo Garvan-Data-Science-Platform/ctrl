@@ -47,7 +47,7 @@ describe('REDCap Participant Upload', () => {
       let updatedInvites
       cy.request({
         method: 'GET',
-        url: 'http://localhost:5001/invites',
+        url: 'http://localhost:5001/studies/1/invites',
         headers: {
           Authorization: `Bearer ${window.localStorage.getItem('refine-auth')}`,
         },
@@ -92,7 +92,7 @@ describe('REDCap Participant Upload', () => {
       // Check updated invites
       cy.request({
         method: 'GET',
-        url: 'http://localhost:5001/invites',
+        url: 'http://localhost:5001/studies/1/invites',
         headers: {
           Authorization: `Bearer ${window.localStorage.getItem('refine-auth')}`,
         },
@@ -120,7 +120,7 @@ describe('REDCap Participant Upload', () => {
       let updatedInvites
       cy.request({
         method: 'GET',
-        url: 'http://localhost:5001/invites',
+        url: 'http://localhost:5001/studies/1/invites',
         headers: {
           Authorization: `Bearer ${window.localStorage.getItem('refine-auth')}`,
         },
@@ -163,7 +163,7 @@ describe('REDCap Participant Upload', () => {
       // Check updated updated list of invites
       cy.request({
         method: 'GET',
-        url: 'http://localhost:5001/invites',
+        url: 'http://localhost:5001/studies/1/invites',
         headers: {
           Authorization: `Bearer ${window.localStorage.getItem('refine-auth')}`,
         },

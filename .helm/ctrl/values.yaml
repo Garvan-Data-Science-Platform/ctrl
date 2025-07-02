@@ -63,7 +63,7 @@ ingress:
           pathType: Prefix
           backend:
             service:
-              name: ctrl
+              name: user-client
               port:
                 number: 80
 
@@ -74,7 +74,7 @@ ingress:
           pathType: Prefix
           backend:
             service:
-              name: admin
+              name: admin-client
               port:
                 number: 80
         - path: /api/

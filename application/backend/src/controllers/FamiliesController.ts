@@ -23,7 +23,7 @@ import { auditLog } from '../middlewares/AuditLog'
 import { ParticipantType } from '@prisma/client'
 import { createDefaultAnswers, recalculateAnswers } from '../utils/answers'
 
-@Route('families')
+@Route('studies/{studyId}/families')
 @Tags('Families')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
@@ -35,9 +35,19 @@ export class FamiliesController extends Controller {
 
   @Get('/{familyId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  public async getFamilyById(@Path() familyId: number): Promise<GetFamilyResponse> {
+  public async getFamilyById(
+    @Path() studyId: number,
+    @Path() familyId: number,
+  ): Promise<GetFamilyResponse> {
     const members = (await prisma.participantProfile.findMany({
-      where: { familyId },
+      where: {
+        familyId,
+        studies: {
+          some: {
+            studyId: studyId,
+          },
+        },
+      },
       select: { firstName: true, lastName: true, id: true, participantType: true },
       orderBy: { dob: 'asc' },
     })) as FamilyMember[]
@@ -51,8 +61,17 @@ export class FamiliesController extends Controller {
    */
   @Post('/remove/{profileId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  public async removeMember(@Path() profileId: number) {
-    const profile = await prisma.participantProfile.findUniqueOrThrow({ where: { id: profileId } })
+  public async removeMember(@Path() studyId: number, @Path() profileId: number) {
+    const profile = await prisma.participantProfile.findUniqueOrThrow({
+      where: {
+        id: profileId,
+        studies: {
+          some: {
+            studyId: studyId,
+          },
+        },
+      },
+    })
 
     const lastFam = await prisma.participantProfile.findFirstOrThrow({
       orderBy: { familyId: 'desc' },
@@ -61,10 +80,17 @@ export class FamiliesController extends Controller {
 
     const oldId = profile.familyId
 
-    const newId = lastFam.familyId + 1
+    const newId = lastFam.familyId + 1 //TODO: this is succeptable to race conditions right?
 
     await prisma.participantProfile.update({
-      where: { id: profileId },
+      where: {
+        id: profileId,
+        studies: {
+          some: {
+            studyId: studyId,
+          },
+        },
+      },
       data: { familyId: newId },
     })
 
@@ -72,7 +98,7 @@ export class FamiliesController extends Controller {
     await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"ParticipantProfile"', 'familyId'), coalesce(max("familyId")+1, 1), false) FROM "ParticipantProfile";`
 
     //Recalculate answers for any dependents in the old family (if any)
-    await recalculateAnswers(oldId)
+    await recalculateAnswers(oldId, studyId)
 
     return
   }
@@ -84,18 +110,38 @@ export class FamiliesController extends Controller {
    */
   @Post('/{familyId}/add/{profileId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  public async addExistingMember(@Path() familyId: number, @Path() profileId: number) {
-    const profile = await prisma.participantProfile.findUniqueOrThrow({ where: { id: profileId } })
+  public async addExistingMember(
+    @Path() studyId: number,
+    @Path() familyId: number,
+    @Path() profileId: number,
+  ) {
+    const profile = await prisma.participantProfile.findUniqueOrThrow({
+      where: {
+        id: profileId,
+        studies: {
+          some: {
+            studyId: studyId,
+          },
+        },
+      },
+    })
     const oldId = profile.familyId
 
     await prisma.participantProfile.update({
-      where: { id: profileId },
+      where: {
+        id: profileId,
+        studies: {
+          some: {
+            studyId: studyId,
+          },
+        },
+      },
       data: { familyId },
     })
 
     //Recalculate answers for any dependents in the new or old families
-    await recalculateAnswers(familyId)
-    await recalculateAnswers(oldId)
+    await recalculateAnswers(familyId, studyId)
+    await recalculateAnswers(oldId, studyId)
 
     return
   }
@@ -108,13 +154,22 @@ export class FamiliesController extends Controller {
   @Post('/{familyId}/add-dependent')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
-  public async addNewDependent(@Path() familyId: number, @Body() bodyRequest: AddDependentRequest) {
+  public async addNewDependent(
+    @Path() studyId: number,
+    @Path() familyId: number,
+    @Body() bodyRequest: AddDependentRequest,
+  ) {
     //Check dependent doesn't already exist
     const depCheck = await prisma.participantProfile.findFirst({
       where: {
         firstName: bodyRequest.firstName,
         lastName: bodyRequest.lastName,
         dob: new Date(bodyRequest.dob),
+        studies: {
+          some: {
+            studyId: studyId,
+          },
+        },
       },
     })
 
@@ -123,14 +178,26 @@ export class FamiliesController extends Controller {
     }
 
     const currentSurvey = await prisma.surveyVersion.findFirstOrThrow({
-      where: { status: 'PUBLISHED' },
+      where: {
+        status: 'PUBLISHED',
+        studyId: studyId,
+      },
       orderBy: { id: 'desc' },
     })
 
-    const existingProfile = await prisma.participantProfile.findFirst({ where: { familyId } })
+    const existingProfile = await prisma.participantProfile.findFirst({
+      where: {
+        familyId,
+        studies: {
+          some: {
+            studyId: studyId,
+          },
+        },
+      },
+    })
 
     if (!existingProfile) {
-      throw new Error('This family has no existing members')
+      throw new Error('This family has no existing members in this study')
     }
 
     const participantType = bodyRequest.permanent
@@ -140,15 +207,25 @@ export class FamiliesController extends Controller {
     const depProfile = await prisma.participantProfile.create({
       data: {
         ...existingProfile,
+        userId: null, // Null userId for dependents
         firstName: bodyRequest.firstName,
         lastName: bodyRequest.lastName,
         dob: new Date(bodyRequest.dob),
         id: undefined,
         participantType,
+        studies: {
+          create: {
+            study: {
+              connect: {
+                id: studyId,
+              },
+            },
+          },
+        },
       },
     })
 
-    await prisma.surveyParticipant.create({
+    await prisma.surveyVersionAnswers.create({
       data: {
         profileId: depProfile.id,
         versionId: currentSurvey.id,
@@ -156,7 +233,7 @@ export class FamiliesController extends Controller {
       },
     })
 
-    await recalculateAnswers(familyId)
+    await recalculateAnswers(familyId, studyId)
 
     return
   }

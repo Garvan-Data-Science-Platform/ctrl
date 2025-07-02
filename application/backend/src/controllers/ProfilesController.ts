@@ -47,6 +47,7 @@ export class ProfilesController extends Controller {
    * @summary Get the current Participants Profile
    */
   @Get('/current')
+  @Security('jwt', ['Participant'])
   public async getCurrentParticipantProfile(
     @Request() request: express.Request,
   ): Promise<GetParticipantProfileResponse> {
@@ -136,6 +137,7 @@ export class ProfilesController extends Controller {
   }
 
   @Patch('/current')
+  @Security('jwt', ['Participant'])
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
   public async updateCurrentProfile(
     @Body() bodyRequest: UpdateProfileRequest,
@@ -188,7 +190,27 @@ export class ProfilesController extends Controller {
     }
 
     if (bodyRequest.participantType) {
-      await recalculateAnswers(profile.familyId)
+      const studies = await prisma.study.findMany({
+        where: {
+          profiles: {
+            some: {
+              participantProfile: {
+                familyId: profile.familyId,
+              },
+            },
+          },
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      })
+
+      if (studies.length === 0) return
+
+      for (const study of studies) {
+        await recalculateAnswers(profile.familyId, study.id)
+      }
     }
   }
 }

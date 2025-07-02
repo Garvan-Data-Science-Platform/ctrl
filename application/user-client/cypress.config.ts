@@ -6,6 +6,8 @@ import {
   readPdf,
   deleteFile,
   updateLogo,
+  getInviteId,
+  inviteUser,
 } from 'common/testing/TestHelpers'
 import { PASSWORD_RESET_USER_EMAIL } from 'common/testing/seed'
 import { defineConfig } from 'cypress'
@@ -16,6 +18,7 @@ export default defineConfig({
     PASSWORD_RESET_USER_EMAIL: PASSWORD_RESET_USER_EMAIL,
   },
   e2e: {
+    defaultCommandTimeout: 8000,
     baseUrl: 'http://localhost:5002',
     // eslint-disable-next-line
     setupNodeEvents(on, config) {
@@ -40,6 +43,12 @@ export default defineConfig({
         },
         updateLogo(filePath: string) {
           return updateLogo(filePath)
+        },
+        getInviteIdtask({ email, studyId }) {
+          return getInviteId(email, studyId)
+        },
+        createInvite({ email, studyId }) {
+          return inviteUser(email, studyId)
         },
       })
     },

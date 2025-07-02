@@ -67,3 +67,13 @@ jobs:
           MAILER_PASSWORD: ${{ secrets.TEST_MAILER_PASSWORD }}
           CYPRESS_REDCAP_API_TOKEN: ${{ secrets.REDCAP_API_TOKEN }}
         run: yarn workspace ${{ matrix.workspace }} test
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: application/${{matrix.workspace}}/cypress/screenshots
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-videos
+          path: application/${{matrix.workspace}}/cypress/videos

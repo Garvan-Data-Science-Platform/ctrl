@@ -65,8 +65,10 @@ describe('Participant Invites', () => {
 
   it('should not allow participants to register without an invite', async () => {
     // Register a participant without an invite
+    const missingInviteId = 'notValid'
+
     const response = await request(app)
-      .post('/auth/register/participant')
+      .post(`/auth/register/participants/${missingInviteId}`)
       .send(participantRegisterRequestBody)
     expect(response.status).toBe(404)
     expect(response.body.message).toBe(
@@ -77,7 +79,7 @@ describe('Participant Invites', () => {
   it('should allow an OrganisationAdmin user to create and send invites to new participants', async () => {
     // Create an invite
     const response = await request(app)
-      .post('/invites')
+      .post('/studies/1/invites')
       .send({
         emails: [participantRegisterRequestBody.email],
         subjectText: 'Subject',
@@ -96,7 +98,12 @@ describe('Participant Invites', () => {
 
     // Check invites were created
     const createdInvite = await prisma.invite.findUnique({
-      where: { email: participantRegisterRequestBody.email },
+      where: {
+        studyId_email: {
+          email: participantRegisterRequestBody.email,
+          studyId: 1,
+        },
+      },
     })
 
     expect(createdInvite).toBeDefined()
@@ -107,7 +114,7 @@ describe('Participant Invites', () => {
   it('should allow an OrganisationAdmin user to resend invites with status PENDING', async () => {
     // Send a new invite
     const response = await request(app)
-      .post('/invites')
+      .post('/studies/1/invites')
       .send({
         emails: [participantRegisterRequestBody.email],
         subjectText: 'Subject',
@@ -121,7 +128,7 @@ describe('Participant Invites', () => {
 
     // get number of PENDING invites from seed to avoid hardcoding
     const pendingResponse = await request(app)
-      .get('/invites')
+      .get('/studies/1/invites')
       .set({ Authorization: `Bearer ${orgAdminToken}` })
     expect(pendingResponse.status).toBe(200)
 
@@ -142,7 +149,7 @@ describe('Participant Invites', () => {
 
     // Resend invites ()
     const resendResponse = await request(app)
-      .post(`/invites/resend`)
+      .post(`/studies/1/invites/resend`)
       .set({ Authorization: `Bearer ${orgAdminToken}` })
     expect(resendResponse.status).toBe(204)
 
@@ -164,7 +171,7 @@ describe('Participant Invites', () => {
   it('should allow an OrganisationAdmin user to REVOKE invites to participants with status PENDING', async () => {
     // Send a new invite
     const response = await request(app)
-      .post('/invites')
+      .post('/studies/1/invites')
       .send({
         emails: [participantRegisterRequestBody.email],
         subjectText: 'Subject',
@@ -178,7 +185,12 @@ describe('Participant Invites', () => {
 
     // Check the invite exists
     const invite = await prisma.invite.findUnique({
-      where: { email: participantRegisterRequestBody.email },
+      where: {
+        studyId_email: {
+          email: participantRegisterRequestBody.email,
+          studyId: 1,
+        },
+      },
     })
 
     expect(invite).toBeDefined()
@@ -186,34 +198,134 @@ describe('Participant Invites', () => {
 
     // Revoke an invite
     const revokedResponse = await request(app)
-      .post(`/invites/revoke/${invite!.id}`)
+      .post(`/studies/1/invites/${invite!.id}/revoke`)
       .set({ Authorization: `Bearer ${orgAdminToken}` })
 
     expect(revokedResponse.status).toBe(204)
 
     // Check invite was revoked
     const revokedInvite = await prisma.invite.findUnique({
-      where: { email: participantRegisterRequestBody.email },
+      where: {
+        studyId_email: {
+          email: participantRegisterRequestBody.email,
+          studyId: 1,
+        },
+      },
     })
 
     expect(revokedInvite?.status).toBe('REVOKED')
   })
 
-  it('should not allow participants to register using an EXPIRED or REVOKED invite', async () => {
+  it('should not allow participants to register using a REVOKED invite', async () => {
+    // Send a new invite
+    const responseToBeRevoked = await request(app)
+      .post('/studies/1/invites')
+      .send({
+        emails: [participantRegisterRequestBody.email],
+        subjectText: 'Subject',
+        explanatoryText: 'Text',
+      })
+      .set({ Authorization: `Bearer ${orgAdminToken}` })
+
+    const body: InviteParticipantsResponse = responseToBeRevoked.body
+    expect(responseToBeRevoked.status).toBe(200)
+    expect(body.newInvitesCount).toBe(1)
+
+    // Check the invite exists
+    const invite = await prisma.invite.findUnique({
+      where: {
+        studyId_email: {
+          email: participantRegisterRequestBody.email,
+          studyId: 1,
+        },
+      },
+    })
+
+    expect(invite).toBeDefined()
+    expect(invite!.status).toBe('PENDING')
+
+    // Revoke an invite
+    const revokedResponse = await request(app)
+      .post(`/studies/1/invites/${invite!.id}/revoke`)
+      .set({ Authorization: `Bearer ${orgAdminToken}` })
+
+    expect(revokedResponse.status).toBe(204)
+
+    // Confirm it is revoked
+    const inviteRevoked = await prisma.invite.findUnique({
+      where: {
+        studyId_email: {
+          email: participantRegisterRequestBody.email,
+          studyId: 1,
+        },
+      },
+    })
+
+    expect(inviteRevoked).toBeDefined()
+    expect(inviteRevoked!.status).toBe('REVOKED')
+
     // Register a participant with a revoked invite
-    const response2 = await request(app)
-      .post('/auth/register/participant')
+    const response = await request(app)
+      .post(`/auth/register/participants/${inviteRevoked!.id}`)
       .send(participantRegisterRequestBody)
 
-    expect(response2.status).toBe(404)
-    expect(response2.body.message).toBe(
+    expect(response.status).toBe(404)
+    expect(response.body.message).toBe(
       `Invite for ${participantRegisterRequestBody.email} not found`,
     )
+  })
 
-    // Register a participant with an expired invite
-    participantRegisterRequestBody.email = 'invite4@expired.com'
+  it('should not allow participants to register using an EXPIRED invite', async () => {
+    // Send a new invite
+    const responseToBeExpired = await request(app)
+      .post('/studies/1/invites')
+      .send({
+        emails: [participantRegisterRequestBody.email],
+        subjectText: 'Subject',
+        explanatoryText: 'Text',
+      })
+      .set({ Authorization: `Bearer ${orgAdminToken}` })
+
+    const body: InviteParticipantsResponse = responseToBeExpired.body
+    expect(responseToBeExpired.status).toBe(200)
+    expect(body.newInvitesCount).toBe(1)
+
+    // Check the invite exists
+    const invite = await prisma.invite.findUnique({
+      where: {
+        studyId_email: {
+          email: participantRegisterRequestBody.email,
+          studyId: 1,
+        },
+      },
+    })
+
+    expect(invite).toBeDefined()
+    expect(invite!.status).toBe('PENDING')
+
+    // Set to be expired
+    await prisma.invite.update({
+      where: { id: invite!.id },
+      data: {
+        status: 'EXPIRED',
+      },
+    })
+
+    // Confirm it is expired
+    const inviteExpired = await prisma.invite.findUnique({
+      where: {
+        studyId_email: {
+          email: participantRegisterRequestBody.email,
+          studyId: 1,
+        },
+      },
+    })
+
+    expect(inviteExpired).toBeDefined()
+    expect(inviteExpired!.status).toBe('EXPIRED')
+
     const response = await request(app)
-      .post('/auth/register/participant')
+      .post(`/auth/register/participants/${inviteExpired!.id}`)
       .send(participantRegisterRequestBody)
 
     expect(response.status).toBe(404)
@@ -225,7 +337,7 @@ describe('Participant Invites', () => {
   it('should allow participants to register using a PENDING invite', async () => {
     // Send a new invite
     const response = await request(app)
-      .post('/invites')
+      .post('/studies/1/invites')
       .send({
         emails: [participantRegisterRequestBody.email],
         subjectText: 'Subject',
@@ -239,14 +351,19 @@ describe('Participant Invites', () => {
 
     // Check the invite exists
     const invite = await prisma.invite.findUnique({
-      where: { email: participantRegisterRequestBody.email },
+      where: {
+        studyId_email: {
+          email: participantRegisterRequestBody.email,
+          studyId: 1,
+        },
+      },
     })
 
     expect(invite).toBeDefined()
     expect(invite!.status).toBe('PENDING')
     // Register a participant with an invite
     const registerResponse = await request(app)
-      .post('/auth/register/participant')
+      .post(`/auth/register/participants/${invite!.id}`)
       .send(participantRegisterRequestBody)
 
     expect(registerResponse.status).toBe(201)

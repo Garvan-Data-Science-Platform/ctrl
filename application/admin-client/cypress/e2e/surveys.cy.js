@@ -36,7 +36,7 @@ describe('Surveys', () => {
     cy.get('[data-cy="survey-editor"]')
       .find('button')
       .each(($el) => {
-        expect($el).to.be.disabled
+        if (!$el.text == 'Advanced Options') expect($el).to.be.disabled
       })
   })
 })

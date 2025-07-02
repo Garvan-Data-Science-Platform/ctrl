@@ -1,5 +1,6 @@
 import {
   Post,
+  Path,
   Route,
   Tags,
   Security,
@@ -18,6 +19,7 @@ import type {
   UploadRedcapInstrumentResponse,
   UploadRedcapInstrumentAPIRequest,
   UploadRedcapParticipantResponse,
+  UploadRedcapParticipantAPIRequest,
 } from 'common/types/api/integrations/redcap'
 import { BadGatewayError } from '../middlewares/ErrorHandler'
 import { UnauthorizedErrorResponse, InternalErrorResponse } from 'common/types/api/errors'
@@ -29,7 +31,7 @@ import logger from 'common/src/logger'
 import { AuthController } from './AuthController'
 import { auditLog } from '../middlewares/AuditLog'
 
-@Route('integrations')
+@Route('studies/{studyId}/integrations')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 @Tags('Integrations')
@@ -39,12 +41,13 @@ export class IntegrationsController extends Controller {
   userRepo = prisma.user
   profileRepo = prisma.participantProfile
   surveyRepo = prisma.surveyVersion
-  spRepo = prisma.surveyParticipant
+  svaRepo = prisma.surveyVersionAnswers
   integrationService = new Integrations(REDCapMapping)
 
   @Post('/redcap/participant/upload/csv')
   @SuccessResponse('201', 'Created Participants from CSV')
   public async uploadRedcapParticipantCSV(
+    @Path() studyId: number,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<UploadRedcapParticipantResponse> {
     logger.info({ message: 'This is the file that has been uploaded', file })
@@ -53,15 +56,22 @@ export class IntegrationsController extends Controller {
     const readableStream = Readable.from(file.buffer.toString())
     const csvData: Record<string, string>[] = await parseCSV(readableStream)
 
-    return await this.processParticipantData(csvData)
+    return await this.processParticipantData(studyId, csvData)
   }
 
   @Post('/redcap/participant/upload/api')
   @SuccessResponse('201', 'Created Participants from REDCap API')
-  public async uploadRedcapParticipantAPI(): Promise<UploadRedcapParticipantResponse> {
+  public async uploadRedcapParticipantAPI(
+    @Path() studyId: number,
+    @Body() bodyRequest: UploadRedcapParticipantAPIRequest,
+  ): Promise<UploadRedcapParticipantResponse> {
+    const { formName } = bodyRequest
     const params = new URLSearchParams()
 
-    const redcapSettings = await this.getRedcapConfig()
+    const redcapSettings = await prisma.organisation.findFirstOrThrow({
+      where: { id: 1 },
+      select: { redcapToken: true, redcapURL: true },
+    })
 
     if (!redcapSettings.redcapToken || !redcapSettings.redcapURL) {
       throw new Error('Redcap API not configured')
@@ -74,6 +84,14 @@ export class IntegrationsController extends Controller {
      * flat - output as one record per row [default]
      */
     params.append('type', 'flat')
+
+    /**
+     * an array of form names you wish to pull records for.
+     * If the form name has a space in it, replace the space
+     * with an underscore
+     * (by default, all records from all data collection instruments is pulled)
+     */
+    params.append('form[0]', formName)
 
     const participantData = await fetch(redcapSettings.redcapURL, {
       method: 'POST',
@@ -90,15 +108,16 @@ export class IntegrationsController extends Controller {
         return data
       })
       .catch((error) => {
-        throw new BadGatewayError(error.message, error)
+        throw new BadGatewayError('Error communicating with REDCap API', error)
       })
 
-    return await this.processParticipantData(participantData)
+    return await this.processParticipantData(studyId, participantData)
   }
 
   @Post('/redcap/instrument/upload/csv')
   @SuccessResponse('201', 'Upserted Survey from Instrument CSV')
   public async uploadRedcapInstrumentCSV(
+    @Path() studyId: number,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<UploadRedcapInstrumentResponse> {
     await validateFile(file, [
@@ -112,12 +131,13 @@ export class IntegrationsController extends Controller {
     const readableStream = Readable.from(file.buffer.toString())
     const csvData: Record<string, string>[] = await parseCSV(readableStream)
 
-    return await this.processInstrumentData(csvData, false)
+    return await this.processInstrumentData(studyId, csvData, false)
   }
 
   @Post('/redcap/instrument/upload/api')
   @SuccessResponse('201', 'Created Survey from Redcap API')
   public async uploadRedcapInstrumentAPI(
+    @Path() studyId: number,
     @Body() bodyRequest: UploadRedcapInstrumentAPIRequest,
   ): Promise<UploadRedcapInstrumentResponse> {
     const { formName } = bodyRequest
@@ -160,10 +180,10 @@ export class IntegrationsController extends Controller {
       .catch((error) => {
         throw new BadGatewayError(error.message, error)
       })
-    return await this.processInstrumentData(surveyData, true)
+    return await this.processInstrumentData(studyId, surveyData, true)
   }
 
-  private async processParticipantData(rawData: Record<string, string>[]) {
+  private async processParticipantData(studyId: number, rawData: Record<string, string>[]) {
     let data: RegisterParticipantRequest[] = []
     try {
       data = this.integrationService.mapRecordToParticipantRequests(rawData)
@@ -191,7 +211,10 @@ export class IntegrationsController extends Controller {
       // If user doesn't exist, create a participant using the authController and send an invitation, otherwise create a profile and attach it to the user.
       if (!user) {
         try {
-          const participantResponse = await authController.createParticipant(participantData)
+          const participantResponse = await authController.createParticipant(
+            participantData,
+            studyId,
+          )
           ids.push(participantResponse.id)
           profilesCreatedCount++
         } catch (err) {
@@ -206,6 +229,15 @@ export class IntegrationsController extends Controller {
               ...participantData,
               user: {
                 connect: { id: user.id },
+              },
+              studies: {
+                create: {
+                  study: {
+                    connect: {
+                      id: studyId,
+                    },
+                  },
+                },
               },
               nextOfKin: participantData.nextOfKin
                 ? {
@@ -225,7 +257,11 @@ export class IntegrationsController extends Controller {
     return { profilesCreatedCount, profilesAlreadyExistedCount, ids, newInvites }
   }
 
-  private async processInstrumentData(data: Record<string, string>[], isRawData: boolean) {
+  private async processInstrumentData(
+    studyId: number,
+    data: Record<string, string>[],
+    isRawData: boolean,
+  ) {
     let steps: SurveyStep[] = []
     try {
       steps = this.integrationService.mapInstrumentCSVToSurvey(data, isRawData)
@@ -236,22 +272,27 @@ export class IntegrationsController extends Controller {
     }
 
     const existingSurvey = await this.surveyRepo.findFirst({
-      where: { status: 'DRAFT' },
+      where: { status: 'DRAFT', studyId: studyId },
     })
 
     // prisma doesn't let you use where to find a non-unique id here so we have to use find first in the previous ine
     const survey = await this.surveyRepo.upsert({
-      where: { id: existingSurvey ? existingSurvey.id : -1 }, // Use a non-existent id for creation
+      where: { id: existingSurvey ? existingSurvey.id : -1 }, // TODO: check that survey gets created before REDCAP integration is allowed
       update: {
         data: steps,
       },
       create: {
         status: 'DRAFT',
         data: steps,
+        studyId: studyId,
+        versionNumber: existingSurvey ? existingSurvey.versionNumber + 1 : 1,
       },
     })
 
-    return { id: survey.id }
+    return {
+      id: survey.id,
+      versionNumber: survey.versionNumber,
+    }
   }
 
   private async getRedcapConfig(): Promise<{ redcapToken: string; redcapURL: string }> {

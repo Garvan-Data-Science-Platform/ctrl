@@ -39,18 +39,18 @@ check:
 	make e2e
 
 db: 
-	docker compose up -d db
-	docker compose up -d admin
+	NODE_VERSION=$(NODE_VERSION) docker compose up -d db
+	NODE_VERSION=$(NODE_VERSION) docker compose up -d admin
 
 db-down:
-	docker compose down
+	NODE_VERSION=$(NODE_VERSION) docker compose down
 
 seed:
 	yarn prisma:migrate
 	yarn prisma:seed
 
 clean: db-down
-	docker volume rm ctrl_ctrl-db
+	NODE_VERSION=$(NODE_VERSION) docker volume rm ctrl-next_ctrl-db
 
 # Local deployment via minikube and helm
 

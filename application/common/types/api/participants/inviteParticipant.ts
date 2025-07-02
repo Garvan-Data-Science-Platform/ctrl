@@ -6,7 +6,9 @@ type Email = string
 /**
  *
  * @example {
- *  "emails": ["john.doe@email.com", "jane@email.com"]
+ *  "emails": ["john.doe@email.com", "jane@email.com"],
+ *  "subjectText": "Invitation to Study",
+ *  "explanatoryText": "You have been invited to participate in this Study. Please click this link to provide consent."
  * }
  */
 export interface InviteParticipantsRequest {

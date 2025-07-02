@@ -8,7 +8,7 @@ const prisma = new PrismaClient()
 /***********************************/
 
 prisma.$use(async (params, next) => {
-  if (params.model == 'User') {
+  if (params.model == 'User' || params.model == 'Study') {
     if (params.action === 'findUnique' || params.action === 'findFirst') {
       // Change to findFirst - you cannot filter
       // by anything except ID / unique with findUnique()

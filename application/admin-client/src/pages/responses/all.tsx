@@ -1,4 +1,4 @@
-import { useParsed, useShow } from '@refinedev/core'
+import { useCustom, useParsed } from '@refinedev/core'
 import { GetAllResponsesResponse } from '@common/types/api/surveys'
 import {
   ColumnsPanelTrigger,
@@ -26,21 +26,25 @@ import { styled } from '@mui/material/styles'
 import { Badge, Divider, InputAdornment, TextField, Tooltip } from '@mui/material'
 import { Cancel, FileDownload } from '@mui/icons-material'
 import { ParticipantData } from '@common/types/api/surveys/getAllResponses'
+import { useCurrentStudyId } from '../../studyStore'
 
 const ToolbarButton = TB as any
 
 export const AllResponsesView = () => {
-  const { queryResult } = useShow<GetAllResponsesResponse['data']>({
-    resource: 'surveys/responses/all',
-  })
-
   const { id } = useParsed()
 
-  const rows = useMemo(() => {
-    return queryResult.data?.data.participants || []
-  }, [queryResult.data])
+  const studyId = useCurrentStudyId()
 
-  const questions = queryResult.data?.data.surveyData
+  const { data } = useCustom<GetAllResponsesResponse>({
+    url: `studies/${studyId}/surveys/${id}/participants/answers`,
+    method: 'get',
+  })
+
+  const rows = useMemo(() => {
+    return data?.data.data.participants || []
+  }, [data])
+
+  const questions = data?.data.data.surveyData
     .flatMap((val) => val.elements)
     .filter((val) => val.type.includes('question'))
     .map((val) => val.data.text)

@@ -15,7 +15,7 @@ export type ParticipantWithProfile = Participant & {
 }
 
 export interface ParticipantAnswerStatus {
-  surveyVersion: number
+  surveyVersionNumber: number
   participantId: number
   status: 'complete' | 'partially_complete' | 'incomplete'
 }

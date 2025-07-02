@@ -9,6 +9,7 @@
 .DS_Store
 .vscode
 application/**/.env
+application/**/.vite
 application/**/cypress.env.json
 
 # Dependency directories
@@ -19,3 +20,4 @@ application/*/coverage/
 *.tgz
 
 application/user-client/cypress/downloads
+application/backend/prisma/generated
