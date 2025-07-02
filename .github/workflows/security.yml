@@ -9,8 +9,53 @@ on:
 
 jobs:
   security-checks:
-    name: Security Audit
-    uses: Garvan-Data-Science-Platform/reusable-ci-actions/.github/workflows/security-audit.yml@main
-    with:
-      policy-path: .snyk
-    secrets: inherit
+    runs-on: ubuntu-latest
+    env:
+      SNYK_OUTPUT_FILE: snyk_test.json
+      POLICY_PATH: .snyk
+    steps:
+      - uses: actions/checkout@master
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --json-file-output=${{ env.SNYK_OUTPUT_FILE }} --all-projects --severity-threshold=high --policy-path=${{ env.POLICY_PATH }}
+      - name: Upload scan as Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: snyk-json-report
+          path: ${{ env.SNYK_OUTPUT_FILE }}
+      - name: Generate Snyk Report Summary
+        if: always()
+        run: |
+          # Input file
+          input_file=${{ env.SNYK_OUTPUT_FILE }}
+
+          # Check if file exists
+          if [ ! -f "$input_file" ]; then
+            echo "File not found! Cannot generate SNYK report!"
+            exit 1
+          fi
+
+          {
+            # Print the title and table headers
+            echo "# Vulnerabilities Report"
+            echo ""
+            echo "| ID                            | Severity | CVSS Score | Package Name    |"
+            echo "|-------------------------------|----------|------------|-----------------|"
+
+            # Use jq to extract ID, Severity, CVSSScore, and Package name from vulnerabilities,
+            # then make sure the vulnerabilities are unique based on the ID
+            jq -r '
+              .[] | .vulnerabilities[] | 
+              select(.id != null) |    # Ensure ID exists
+              [.id, .severity, .cvssScore, .packageName] | 
+              @tsv
+            ' "$input_file" | awk '!seen[$1]++' | while IFS=$'\t' read -r id severity cvssScore packageName; do
+              printf "| %-30s | %-8s | %-10s | %-15s |\n" "$id" "$severity" "$cvssScore" "$packageName"
+            done
+          } >> $GITHUB_STEP_SUMMARY
+        env:
+          GITHUB_ACTION_PATH: ${{ github.action_path }}
