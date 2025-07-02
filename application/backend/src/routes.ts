@@ -192,14 +192,23 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "DuoCode": {
+        "dataType": "refObject",
+        "properties": {
+            "code": {"dataType":"string","required":true},
+            "relatedAnswer": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"boolean"}],"required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "SurveyQuestionChoices": {
         "dataType": "refObject",
         "properties": {
             "text": {"dataType":"string","required":true},
             "tooltip": {"dataType":"string"},
-            "value": {"dataType":"string","required":true},
             "required": {"dataType":"boolean","required":true},
             "choices": {"dataType":"array","array":{"dataType":"string"},"required":true},
+            "duoCodes": {"dataType":"array","array":{"dataType":"refObject","ref":"DuoCode"}},
         },
         "additionalProperties": false,
     },
@@ -209,8 +218,8 @@ const models: TsoaRoute.Models = {
         "properties": {
             "text": {"dataType":"string","required":true},
             "tooltip": {"dataType":"string"},
-            "value": {"dataType":"boolean","required":true},
             "required": {"dataType":"boolean","required":true},
+            "duoCodes": {"dataType":"array","array":{"dataType":"refObject","ref":"DuoCode"}},
         },
         "additionalProperties": false,
     },
@@ -362,7 +371,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "DefaultSelection_Prisma._36_StudyPayload_": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"inviteEmailText":{"dataType":"string","required":true},"inviteEmailSubject":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"inviteEmailText":{"dataType":"string","required":true},"inviteEmailSubject":{"dataType":"string","required":true},"deleted":{"dataType":"boolean","required":true},"id":{"dataType":"double","required":true},"name":{"dataType":"string","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Study": {
@@ -759,7 +768,14 @@ const models: TsoaRoute.Models = {
             "profilesCreatedCount": {"dataType":"double","required":true},
             "profilesAlreadyExistedCount": {"dataType":"double","required":true},
             "ids": {"dataType":"array","array":{"dataType":"double"},"required":true},
-            "newInvites": {"dataType":"array","array":{"dataType":"string"},"required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "UploadRedcapParticipantAPIRequest": {
+        "dataType": "refObject",
+        "properties": {
+            "formName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
         },
         "additionalProperties": false,
     },
