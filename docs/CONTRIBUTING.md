@@ -1,5 +1,14 @@
 # Guidance for contributing to `ctrl-next`
 
+- [Guidance for contributing to `ctrl-next`](#guidance-for-contributing-to-ctrl-next)
+  - [Welcome](#welcome)
+  - [Development Tooling](#development-tooling)
+  - [Git + GitHub](#git--github)
+  - [Node.js](#nodejs)
+  - [API Documentation](#api-documentation)
+    - [Swagger](#swagger)
+    - [Editing Swagger Documentation](#editing-swagger-documentation)
+
 ## Welcome
 
 Thank you for being interested in contributing to this project!
@@ -25,6 +34,14 @@ We are using branch protection rules so that all work must be reviewed before it
 Commits in `feature` branches will be squashed when merged into the `dev` branch.
 Code review helps improve code quality and performance.
 
+## Node.js
+ctrl-next uses a recent Node.js version as specified in `.nvmrc` in combination with the yarn modern package manager through corepack.
+
+This `.nvmrc` is the single source of truth through out this app to specify the Node Version.
+For example: Dockerfiles, `run_tests.sh` scripts, the Makefile and multiple CI workflows all parse the node version from the `.nvmrc`.
+If you want to update node version, please only change the `.nvmrc`.
+If you find yourself specifying the node version somewhere else in the app, please continue the approach of parsing the `.nvmrc` file (or apply an improved approach throughout the rest of the app).
+
 ## API Documentation
 
 ### Swagger
@@ -41,9 +58,9 @@ yarn run dev
 make docker-run
 ```
 
-_**NOTE**: If you want to run the server using Yarn, you should also setup the postgres database container using, `make docker-run-db`._
+_**NOTE**: If you want to run the server using Yarn, you should also setup the postgres database container using, `make db`._
 
-2. Open Your Browser: Navigate to the Swagger UI by visiting:
+1. Open Your Browser: Navigate to the Swagger UI by visiting:
 
 ```bash
 http://localhost:{port}/docs

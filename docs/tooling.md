@@ -2,15 +2,15 @@
 
 The following is a list of technologies and tools used in this repository, with some explanation of why they were chosen.
 
-- [Development environment](#development-environment)
-  - [Node.js](#node.js)
-  - [nvm](#nvm)
-  - [Yarn](#yarn)
-  - [TypeScript](#typescript)
-- [Validation and testing](#validation-and-testing)
-  - [Pre-commit checks](#pre-commit-checks)
-- [CI/CD](#ci/cd)
-- [Containerisation](#containerisation)
+- [Tooling documentation](#tooling-documentation)
+    - [Development environment](#development-environment)
+      - [Node.js](#nodejs)
+      - [Node Version Manager (nvm)](#node-version-manager-nvm)
+      - [Yarn](#yarn)
+      - [TypeScript](#typescript)
+    - [Validation and testing](#validation-and-testing)
+      - [Pre-commit checks](#pre-commit-checks)
+    - [CI/CD](#cicd)
 
 ### Development environment
 
@@ -25,7 +25,7 @@ There is an `.nvmrc` in this repository to specify which version of node to use.
 
 #### Yarn
 
-Rationale to come
+Yarn is used as the package manager for this repository because it offers faster and more reliable dependency installations compared to npm. Yarn also provides better support for monorepos and workspaces, which is useful for managing the multiple packages within this project.
 
 #### TypeScript
 
@@ -41,8 +41,6 @@ The pre-commit checks will run each time you run `git commit`.
 
 ### CI/CD
 
-Details to come
+Continuous Integration (CI) pipelines are implemented through Github Actions to ensure that code changes are automatically tested and built. This helps maintain code quality, catch issues early, and streamline the release process, making development more efficient and reliable.
 
-### Containerisation
-
-Details to come
+Continuous Deployment (CD) is implemented through helm and terraform, automating the majority of deployment tasks including building, packaging and spinning up infrastructure, yet still limiting to a manual deployment ensuring details are checked by human eyes.
