@@ -356,7 +356,7 @@ export const ParticipantList = () => {
                 </Box>
               )}
               {!publishedSurvey && (
-                <Box>
+                <Box data-cy="no-published-survey-modal">
                   <Typography sx={{ mb: 1 }}>
                     You need to publish a survey before inviting participants
                   </Typography>

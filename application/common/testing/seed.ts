@@ -17,6 +17,7 @@ export const PASSWORD_RESET_USER_EMAIL = 'test-reset-password@example.com'
 export const TEST_STUDY = 'Test Study'
 export const SECOND_TEST_STUDY = 'Study 2'
 export const FE_TEST_STUDY = 'Study FE'
+export const EMPTY_TEST_STUDY = 'Empty Study'
 
 export async function seedTests(prisma: PrismaClient) {
   const ExampleSurveyStepData = await import('../src/surveys/exampleSurveyStepData.json', {
@@ -37,7 +38,7 @@ export async function seedTests(prisma: PrismaClient) {
 
   await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"Organisation"', 'id'), 2, false) FROM "Organisation";`
 
-  // Create three studies
+  // Create four studies
   const testStudy = await prisma.study.create({
     data: {
       name: TEST_STUDY,
@@ -56,6 +57,13 @@ export async function seedTests(prisma: PrismaClient) {
   const frontendTestStudy = await prisma.study.create({
     data: {
       name: FE_TEST_STUDY,
+    },
+  })
+
+  // This study will be empty
+  await prisma.study.create({
+    data: {
+      name: EMPTY_TEST_STUDY,
     },
   })
 
@@ -144,6 +152,7 @@ export async function seedTests(prisma: PrismaClient) {
       role: Role.Participant,
     },
   })
+
   const participantUnansweredProfile = await prisma.participantProfile.create({
     data: {
       id: PARTICIPANT_UNANSWERED_ID,
