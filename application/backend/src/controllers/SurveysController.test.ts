@@ -63,9 +63,10 @@ describe('SurveysController', () => {
 
       expect(response.status).toBe(200)
       const body: GetSurveyVersionsResponse = response.body
-      // There is one published survey version created in application/common/testing/seed.ts
       expect(body.data.length).toBe(1)
-      expect(body.data[1].status).toBe('PUBLISHED')
+      body.data.forEach((survey) => {
+        expect(survey.status).toBe('PUBLISHED')
+      })
     })
   })
 
