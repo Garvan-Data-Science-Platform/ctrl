@@ -75,6 +75,34 @@ export class SurveysController extends Controller {
   }
 
   /**
+   * Get all published Survey versions
+   *
+   * @summary Get all published Survey versions
+   */
+  @Get('/surveys/published')
+  @Security('jwt', ['OrganisationAdmin'])
+  public async getAllPublishedSurveys(@Path() studyId: number): Promise<GetSurveyVersionsResponse> {
+    const surveys = await this.surveyRepo.findMany({
+      where: { studyId, status: 'PUBLISHED' },
+      orderBy: [{ versionNumber: 'desc' }],
+      select: {
+        id: true,
+        versionNumber: true,
+        status: true,
+      },
+    })
+
+    const responseData: GetSurveyVersionsResponse = {
+      data: surveys.map((survey) => ({
+        id: survey.id,
+        versionNumber: survey.versionNumber,
+        status: survey.status,
+      })),
+    }
+    return responseData
+  }
+
+  /**
    * Gets a specific survey version for a study using their VersionNumber
    *
    * @summary Get Specific Survey
