@@ -1,5 +1,6 @@
 import { ParticipantAnswerStatus } from '@common/types/api/participants/participant'
 import { GetSettingsResponse } from '@common/types/api/settings'
+import { GetSurveyVersionsResponse } from '@common/types/api/surveys'
 import {
   Box,
   Button,
@@ -59,12 +60,14 @@ export const ParticipantList = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [inviteRowId, setInviteRowId] = useState('')
   const [emailIsSetup, setEmailIsSetup] = useState(true)
+  const [publishedSurvey, setPublishedSurvey] = useState(true)
 
   const { open } = useNotification()
 
   const studyId = useCurrentStudyId()
 
   useEffect(() => {
+    // Check Mailer Settings
     axiosInstance.get('/settings').then((res) => {
       const settings = res.data.data as GetSettingsResponse['data']
       if (
@@ -79,13 +82,23 @@ export const ParticipantList = () => {
       }
     })
 
+    // Check Published Survey
+    axiosInstance.get(`/studies/${studyId}/surveys/published`).then((response) => {
+      const publishedSurveys = response.data.data as GetSurveyVersionsResponse['data']
+      console.log(publishedSurveys.length)
+      setPublishedSurvey(true)
+      if (publishedSurveys.length === 0) {
+        setPublishedSurvey(false)
+      }
+    })
+
     if (location.state?.openInviteModal) {
       setModalOpen(true)
       setInitialEmails(location.state.initialEmails || [])
       // Clear the navigation state
       window.history.replaceState({}, document.title)
     }
-  }, [location])
+  }, [location, studyId])
 
   const sendInvites = (emails: string[], subjectText: string, explanatoryText: string) => {
     setLoading(true)
@@ -144,17 +157,6 @@ export const ParticipantList = () => {
       </Link>
     )
   }
-
-  // const handleInviteButtonClick = () => {
-  //   axiosInstance
-  //     .get(`/studies/${studyId}/survey`)
-  //     .then((response) => {
-  //       // Check if the survey is set up
-  //     })
-  //     .catch((error) => {
-  //       open?.({ type: 'error', message: `Could not revoke invite: ${error}` })
-  //     })
-  // }
 
   const columns = React.useMemo<GridColDef[]>(
     () => [
@@ -322,7 +324,7 @@ export const ParticipantList = () => {
             borderRadius: 2,
           }}
         >
-          {emailIsSetup ? (
+          {emailIsSetup && publishedSurvey ? (
             <InviteModal
               onCancel={() => {
                 setModalOpen(false)
@@ -332,12 +334,43 @@ export const ParticipantList = () => {
             />
           ) : (
             <Box>
-              <Typography>
-                You need to set up your email SMTP settings to invite participants
-              </Typography>
-              <Button component={Link} to="/settings">
-                Go to settings
-              </Button>
+              {!emailIsSetup && (
+                <Box sx={{ mb: !publishedSurvey ? 3 : 0 }}>
+                  <Typography sx={{ mb: 1 }}>
+                    You need to set up your email SMTP settings to invite participants
+                  </Typography>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    component={Link}
+                    to="/settings"
+                    sx={{ textTransform: 'none' }}
+                  >
+                    Go to settings
+                  </Button>
+                </Box>
+              )}
+              {!emailIsSetup && !publishedSurvey && (
+                <Box sx={{ my: 2 }}>
+                  <hr style={{ border: 0, borderTop: '1px solid #eee' }} />
+                </Box>
+              )}
+              {!publishedSurvey && (
+                <Box>
+                  <Typography sx={{ mb: 1 }}>
+                    You need to publish a survey before inviting participants
+                  </Typography>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    component={Link}
+                    to="/surveys"
+                    sx={{ textTransform: 'none' }}
+                  >
+                    Go to surveys
+                  </Button>
+                </Box>
+              )}
             </Box>
           )}
         </Box>
