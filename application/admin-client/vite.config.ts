@@ -9,4 +9,9 @@ export default defineConfig({
       '@common': path.resolve(__dirname, '../common'),
     },
   },
+  server: {
+    watch: {
+      ignored: ['**/cypress/reports/**', '**/cypress/screenshots/**'],
+    },
+  },
 })
