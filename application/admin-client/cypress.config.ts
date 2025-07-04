@@ -1,5 +1,6 @@
 import { partiallyCompleteSurvey, resetDB, wipeDB } from 'common/testing/TestHelpers'
 import { defineConfig } from 'cypress'
+import path from 'path'
 
 export default defineConfig({
   env: {
@@ -21,6 +22,13 @@ export default defineConfig({
           return wipeDB()
         },
       })
+    },
+    reporter: path.resolve(__dirname, '../../node_modules/mochawesome'),
+    reporterOptions: {
+      reportDir: 'cypress/reports',
+      overwrite: false,
+      html: true,
+      json: true,
     },
   },
 })
