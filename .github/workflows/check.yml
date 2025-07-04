@@ -87,6 +87,7 @@ jobs:
 
   cypress-report:
     needs: test
+    if: always()
     runs-on: ubuntu-22.04
     steps:
       - name: Check out repository code
