@@ -67,13 +67,43 @@ jobs:
           MAILER_PASSWORD: ${{ secrets.TEST_MAILER_PASSWORD }}
           CYPRESS_REDCAP_API_TOKEN: ${{ secrets.REDCAP_API_TOKEN }}
         run: yarn workspace ${{ matrix.workspace }} test
-      - uses: actions/upload-artifact@v4
+      - name: Upload Cypress Screenshots
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: cypress-screenshots
           path: application/${{matrix.workspace}}/cypress/screenshots
-      - uses: actions/upload-artifact@v4
+      - name: Upload Cypress Videos
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: cypress-videos
           path: application/${{matrix.workspace}}/cypress/videos
+
+  cypress-report:
+    needs: test
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Merge Mochawesome JSON reports
+        run: |
+          npx mochawesome-merge \
+            "application/*/cypress/reports/*.json" > merged-report.json
+
+      - name: Generate HTML report
+        run: |
+          npx marge merged-report.json -f merged-report -o .
+
+      - name: Upload merged Cypress HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-merged-report
+          path: merged-report.html
