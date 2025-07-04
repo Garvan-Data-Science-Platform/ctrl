@@ -79,6 +79,11 @@ jobs:
         with:
           name: cypress-videos
           path: application/${{matrix.workspace}}/cypress/videos
+      - name: Upload Cypress Mochawesome Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-mochawesome-reports-${{ matrix.workspace }}
+          path: application/${{ matrix.workspace }}/cypress/reports
 
   cypress-report:
     needs: test
@@ -93,10 +98,15 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
+      - name: Download all Cypress Mochawesome Reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: cypress-mochawesome-reports-*
+          path: ./downloaded-reports
+
       - name: Merge Mochawesome JSON reports
         run: |
-          npx mochawesome-merge \
-            "application/*/cypress/reports/*.json" > merged-report.json
+          npx mochawesome-merge "downloaded-reports/**/*.json" > merged-report.json
 
       - name: Generate HTML report
         run: |
