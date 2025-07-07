@@ -50,5 +50,5 @@ export const useAppStore = create<AppState>((set) => ({
 
 export const useCurrentStudyId = () => {
   const { activeStudyIndex, studies } = useAppStore()
-  return studies && studies[activeStudyIndex].id
+  return studies[activeStudyIndex]?.id
 }

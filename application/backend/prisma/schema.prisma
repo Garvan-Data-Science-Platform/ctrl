@@ -119,7 +119,9 @@ model Organisation {
 
 model Study {
   id                 Int                  @id @default(autoincrement())
-  name               String               @unique
+  name               String               
+  description        String?
+  logo               Bytes?
   inviteEmailSubject String               @default("Invitation to CTRL - Dynamic Consent Platform")
   inviteEmailText    String               @default("You have been invited to register with CTRL dynamic consent platform.")
   surveys            SurveyVersion[]

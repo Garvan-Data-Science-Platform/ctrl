@@ -12,6 +12,7 @@ import AdbIcon from '@mui/icons-material/Adb'
 import { Button, Tab, Tabs } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth'
+import { useCurrentStudyId } from '../store'
 
 const pages = [
   { name: 'My Activities', route: '/' },
@@ -25,10 +26,13 @@ export default function NavBar() {
   const location = useLocation()
   const nav = useNavigate()
   const { logout } = useAuth()
+  const studyId = useCurrentStudyId()
+
   const activePage =
     pages
       .filter((val) => val.route == location.pathname || val.alt?.includes(location.pathname))
       .at(0) || pages[0]
+
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null)
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -47,7 +51,7 @@ export default function NavBar() {
             <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
             <Box>
               <img
-                src={import.meta.env.VITE_BACKEND_URL + '/settings/logo'}
+                src={studyId ? import.meta.env.VITE_BACKEND_URL + `/studies/${studyId}/logo` : ''}
                 height={30}
                 onClick={() => nav('/')}
                 style={{ marginRight: 20, cursor: 'pointer' }}
