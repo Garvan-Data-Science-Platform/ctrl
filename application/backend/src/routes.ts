@@ -1136,37 +1136,6 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsSurveysController_getAllPublishedSurveys: Record<string, TsoaRoute.ParameterSchema> = {
-                studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
-        };
-        app.get('/studies/:studyId/surveys/published',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
-            ...(fetchMiddlewares<RequestHandler>(SurveysController)),
-            ...(fetchMiddlewares<RequestHandler>(SurveysController.prototype.getAllPublishedSurveys)),
-
-            async function SurveysController_getAllPublishedSurveys(request: ExRequest, response: ExResponse, next: any) {
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsSurveysController_getAllPublishedSurveys, request, response });
-
-                const controller = new SurveysController();
-
-              await templateService.apiHandler({
-                methodName: 'getAllPublishedSurveys',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: undefined,
-              });
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsSurveysController_getSurveyVersionByVersionNumber: Record<string, TsoaRoute.ParameterSchema> = {
                 studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
                 versionNumber: {"in":"path","name":"versionNumber","required":true,"dataType":"double"},

@@ -55,21 +55,6 @@ describe('SurveysController', () => {
     })
   })
 
-  describe('GET /studies/{studyId}/surveys/published', () => {
-    it('should return all published survey versions', async () => {
-      const response = await request(app)
-        .get('/studies/1/surveys/published')
-        .set({ Authorization: `Bearer ${tokenAdmin}` })
-
-      expect(response.status).toBe(200)
-      const body: GetSurveyVersionsResponse = response.body
-      expect(body.data.length).toBe(1)
-      body.data.forEach((survey) => {
-        expect(survey.status).toBe('PUBLISHED')
-      })
-    })
-  })
-
   describe('GET /studies/{studyId}/surveys/{versionNumber}', () => {
     it('should return a survey version', async () => {
       const response = await request(app)
