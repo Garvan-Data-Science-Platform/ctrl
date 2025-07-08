@@ -364,7 +364,7 @@ export const ParticipantList = () => {
                     fullWidth
                     variant="contained"
                     component={Link}
-                    to="/surveys"
+                    to="/surveys/edit/1"
                     sx={{ textTransform: 'none' }}
                   >
                     Go to surveys
