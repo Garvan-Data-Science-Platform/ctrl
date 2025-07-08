@@ -329,7 +329,7 @@
             "type": "number",
             "format": "double"
           },
-          "published_date": {
+          "publishedAt": {
             "type": "string"
           },
           "status": {

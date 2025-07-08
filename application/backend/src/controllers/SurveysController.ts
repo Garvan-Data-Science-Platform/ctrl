@@ -69,7 +69,15 @@ export class SurveysController extends Controller {
       })
       surveys.push(initial_survey)
     }
-    const responseData = { data: surveys }
+
+    const formattedSurveys = surveys.map((survey) => ({
+      id: survey.id,
+      versionNumber: survey.versionNumber,
+      publishedAt: survey.publishedAt ? survey.publishedAt.toISOString() : undefined,
+      status: survey.status,
+    }))
+
+    const responseData: GetSurveyVersionsResponse = { data: formattedSurveys }
     logger.info({ ...responseData })
     return responseData
   }
@@ -570,7 +578,7 @@ export class SurveysController extends Controller {
           versionNumber: versionNumber,
         },
       },
-      data: { status: 'PUBLISHED' },
+      data: { status: 'PUBLISHED', publishedAt: new Date() },
     })
 
     const profiles = await this.profileRepo.findMany({
