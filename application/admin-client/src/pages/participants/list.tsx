@@ -83,9 +83,9 @@ export const ParticipantList = () => {
     })
 
     // Check Published Survey
-    axiosInstance.get(`/studies/${studyId}/surveys/published`).then((response) => {
-      const publishedSurveys = response.data.data as GetSurveyVersionsResponse['data']
-      console.log(publishedSurveys.length)
+    axiosInstance.get(`/studies/${studyId}/surveys`).then((response) => {
+      const allSurveys = response.data.data as GetSurveyVersionsResponse['data']
+      const publishedSurveys = allSurveys.filter((survey) => survey.status === 'PUBLISHED')
       setPublishedSurvey(true)
       if (publishedSurveys.length === 0) {
         setPublishedSurvey(false)
