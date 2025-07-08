@@ -332,12 +332,20 @@
           "publishedAt": {
             "type": "string"
           },
+          "updatedAt": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
           "status": {
             "$ref": "#/components/schemas/SurveyVersionStatus"
           }
         },
         "required": [
           "versionNumber",
+          "updatedAt",
+          "createdAt",
           "status"
         ],
         "type": "object",

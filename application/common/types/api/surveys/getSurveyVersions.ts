@@ -4,6 +4,8 @@ interface SurveyVersionBasic {
   id?: number
   versionNumber: number
   publishedAt?: string
+  updatedAt: string
+  createdAt: string
   status: SurveyVersionStatus
 }
 

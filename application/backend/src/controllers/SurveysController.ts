@@ -75,6 +75,8 @@ export class SurveysController extends Controller {
       versionNumber: survey.versionNumber,
       publishedAt: survey.publishedAt ? survey.publishedAt.toISOString() : undefined,
       status: survey.status,
+      updatedAt: survey.updatedAt.toISOString(),
+      createdAt: survey.createdAt.toISOString(),
     }))
 
     const responseData: GetSurveyVersionsResponse = { data: formattedSurveys }

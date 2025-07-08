@@ -179,6 +179,8 @@ const models: TsoaRoute.Models = {
             "id": {"dataType":"double"},
             "versionNumber": {"dataType":"double","required":true},
             "publishedAt": {"dataType":"string"},
+            "updatedAt": {"dataType":"string","required":true},
+            "createdAt": {"dataType":"string","required":true},
             "status": {"ref":"SurveyVersionStatus","required":true},
         },
         "additionalProperties": false,
