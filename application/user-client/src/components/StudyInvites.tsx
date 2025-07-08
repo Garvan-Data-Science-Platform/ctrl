@@ -10,7 +10,6 @@ import {
   ListItemText,
   Typography,
   Stack,
-  Box,
 } from '@mui/material'
 import { useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '../apiClient'
@@ -58,9 +57,8 @@ export const StudyInvitesDialog: React.FC<StudyInvitesDialogProps> = ({
         <List>
           {invites.map((invite) => (
             <ListItem key={invite.id} alignItems="flex-start" disableGutters>
-              <Box>
-                <ListItemText primary={invite.studyName} secondary={invite.description} />
-              </Box>
+              <ListItemText primary={invite.studyName} secondary={invite.description} />
+
               {invitesStatus[invite.id] ? (
                 <Typography>{invitesStatus[invite.id]}</Typography>
               ) : (

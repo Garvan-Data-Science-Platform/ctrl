@@ -105,7 +105,7 @@ const StudyCard = ({ study }: { study: StudyEntry }) => {
           >
             Cancel
           </Button>
-          <Button color="error" onClick={handleDelete} autoFocus>
+          <Button data-cy="confirm-delete" color="error" onClick={handleDelete} autoFocus>
             Delete
           </Button>
         </DialogActions>
@@ -143,6 +143,7 @@ const StudyCard = ({ study }: { study: StudyEntry }) => {
               onChange={(e) => {
                 setNewName(e.target.value)
               }}
+              data-cy="edit-name-field"
             ></TextField>
             <Button
               onClick={() => {
@@ -161,6 +162,7 @@ const StudyCard = ({ study }: { study: StudyEntry }) => {
               onClick={() => {
                 setEditingName(true)
               }}
+              data-cy="edit-name"
             >
               <Edit />
             </IconButton>
@@ -176,6 +178,7 @@ const StudyCard = ({ study }: { study: StudyEntry }) => {
               onChange={(e) => {
                 setNewDesc(e.target.value)
               }}
+              data-cy="edit-description-field"
             ></TextField>
             <Button
               onClick={() => {
@@ -192,6 +195,7 @@ const StudyCard = ({ study }: { study: StudyEntry }) => {
               disabled={editingName}
               size="small"
               onClick={() => setEditingDescription(true)}
+              data-cy="edit-description"
             >
               <Edit />
             </IconButton>
@@ -209,6 +213,7 @@ const StudyCard = ({ study }: { study: StudyEntry }) => {
         onClick={() => {
           setDeleteDialogOpen(true)
         }}
+        data-cy="delete-study"
       >
         <Delete />
       </IconButton>
@@ -280,6 +285,7 @@ const StudiesPage = () => {
         onClick={() => {
           setNewStudyDialogOpen(true)
         }}
+        data-cy="new-study-button"
       >
         New study
       </Button>

@@ -1,13 +1,4 @@
-import {
-  Menu,
-  MenuItem,
-  Button,
-  Dialog,
-  TextField,
-  DialogTitle,
-  DialogContent,
-  Divider,
-} from '@mui/material'
+import { Menu, MenuItem, Button, Divider } from '@mui/material'
 import AppBar from '@mui/material/AppBar'
 import Stack from '@mui/material/Stack'
 import Toolbar from '@mui/material/Toolbar'
@@ -59,6 +50,7 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({ sticky = tru
             onClose={handleCloseStudyMenu}
             anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
             sx={{ p: 3 }}
+            data-cy="study-menu"
           >
             {studies.map((study, idx) => {
               return (
@@ -75,11 +67,13 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({ sticky = tru
               )
             })}
             <Divider />
+            {/* 
+            // @ts-ignore */}
             <MenuItem
               component={Link}
               onClick={handleCloseStudyMenu}
               to="/studies"
-              data-cy="new-study-button"
+              data-cy="manage-studies"
             >
               Manage Studies
             </MenuItem>

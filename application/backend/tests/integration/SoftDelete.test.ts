@@ -12,6 +12,7 @@ const app = api.app
 let participantToken: string
 let orgAdminToken: string
 const STUDY_NAME = 'Soft Deletable Study'
+let studyId
 
 describe('Soft Deletion', () => {
   beforeAll(async () => {
@@ -72,8 +73,10 @@ describe('Soft Deletion', () => {
       .set({ authorization: `Bearer ${orgAdminToken}` })
       .send(reqBody)
 
-    await prisma.study.delete({ where: { name: STUDY_NAME } })
-    const study = await prisma.study.findFirst({ where: { name: STUDY_NAME } })
+    studyId = (await prisma.study.findFirstOrThrow({ where: { name: STUDY_NAME } })).id
+
+    await prisma.study.delete({ where: { id: studyId } })
+    const study = await prisma.study.findFirst({ where: { id: studyId } })
     expect(study).toBeNull()
   })
 
@@ -86,7 +89,7 @@ describe('Soft Deletion', () => {
 
   it('Study can be restored', async () => {
     await prisma.study.update({
-      where: { deleted: true, name: STUDY_NAME },
+      where: { deleted: true, id: studyId },
       data: { deleted: false },
     })
     const study = await prisma.study.findFirst({ where: { name: STUDY_NAME } })

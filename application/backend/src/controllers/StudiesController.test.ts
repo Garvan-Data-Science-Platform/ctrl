@@ -210,7 +210,7 @@ describe('StudiesController', () => {
 
       expect(response.status).toBe(404)
 
-      expect(response.body.message).toBe(`Study with ID: ${notExistingStudyId} not found`)
+      expect(response.body.message).toBe(`Record not found`)
     })
   })
 
