@@ -20,6 +20,7 @@
     "@typescript-eslint/eslint-plugin": "^8.31.1",
     "@typescript-eslint/parser": "^8.31.1",
     "eslint": "^8.56.0",
+    "json-schema-to-ts": "^3.1.1",
     "prettier": "^3.2.4",
     "start-server-and-test": "^2.0.9",
     "typescript": "^5.8.3"

@@ -22,11 +22,13 @@
   "dependencies": {
     "@prisma/client": "^5.20.0",
     "@tsoa/runtime": "^6.6.0",
+    "ajv": "^8.17.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "dotenv-cli": "^8.0.0",
     "express": "^5.1.0",
     "fast-csv": "^5.0.2",
+    "json5": "^2.2.3",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.1",
     "nodemailer": "^6.9.16",

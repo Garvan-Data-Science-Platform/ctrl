@@ -113,7 +113,8 @@ export function ErrorHandler(
   ) {
     const errorResponse: UnauthorizedErrorResponse = {
       message: err.message,
-      details: err,
+      //@ts-ignore
+      details: err.details || '',
     }
     logger.error({ ...errorResponse })
     return res.status(401).json(errorResponse)
