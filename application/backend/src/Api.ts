@@ -1,4 +1,5 @@
 import cors from 'cors'
+import JSON5 from 'json5'
 import express, { Response, Request, Application, ErrorRequestHandler } from 'express'
 import { type Server } from 'http'
 import swaggerUi from 'swagger-ui-express'
