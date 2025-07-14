@@ -261,13 +261,13 @@ export class AuthController extends Controller {
       throw new Error('OIDC Not Configured')
     }
 
-    const idx = config.oidc.findIndex((val) => val.name === bodyRequest.provider)
+    const oidc = config.oidc.find((val) => val.name === bodyRequest.provider)
 
-    if (idx == -1) {
+    if (!oidc) {
       throw new Error('OIDC Provider not found')
     }
 
-    const { client_id, client_secret, provider } = config.oidc[idx]
+    const { client_id, client_secret, provider } = oidc
 
     const body = new URLSearchParams({
       grant_type: 'authorization_code',
@@ -286,6 +286,8 @@ export class AuthController extends Controller {
       })
 
       const { access_token } = await token_res.json()
+
+      console.log('TOKEN', access_token)
 
       const userinfo_res = await fetch(`${provider}/oauth2/userinfo`, {
         body: new URLSearchParams({ access_token }),

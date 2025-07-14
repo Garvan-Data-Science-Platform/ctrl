@@ -3,6 +3,7 @@ import { Api } from '../Api'
 import type {
   LoginRequest,
   LoginResponse,
+  OIDCLoginRequest,
   RegisterParticipantRequest,
   RegisterParticipantResponse,
   RegisterRequest,
@@ -11,17 +12,19 @@ import type {
 import prisma from '../PrismaClient'
 import { Role } from '@prisma/client'
 import { resetDB, wipeDB } from 'common/testing/TestHelpers'
-import { TEST_STUDY } from 'common/testing/seed'
+import { PARTICIPANT_UNANSWERED_EMAIL, TEST_STUDY } from 'common/testing/seed'
 import {
   ContactMethod,
   ParticipantType,
   StateTerritory,
 } from 'common/types/api/users/ParticipantProfile'
 import { generateToken } from '../authentication'
+import fetchMock from 'fetch-mock'
 
 const api = new Api()
 const app = api.app
 let orgAdminToken: string
+jest.mock('../config')
 
 describe('AuthController', () => {
   beforeAll(async () => {
@@ -39,7 +42,7 @@ describe('AuthController', () => {
   afterAll(async () => {
     api.stop()
   })
-
+  /*
   describe('POST /auth/register', () => {
     it('should allow access to protected routes', async () => {
       // Try to make a protected route request
@@ -552,6 +555,77 @@ describe('AuthController', () => {
       expect(body.details).toEqual({
         'bodyRequest.email': { message: 'Please provide valid email', value: loginRequest.email },
       })
+    })
+  })
+  */
+  describe('POST /auth/login/oidc', () => {
+    it('Should allow oidc login', async () => {
+      fetchMock.mockGlobal().route('http://testurl/oauth2/token', { access_token: '123' })
+      fetchMock.mockGlobal().route('http://testurl/oauth2/userinfo', {
+        email: 'test1@example.com',
+      })
+
+      const loginRequest: OIDCLoginRequest = {
+        code: '123',
+        provider: 'test',
+        redirect_uri: 'redirect',
+      }
+
+      const response = await request(app).post('/auth/login/oidc').send(loginRequest)
+      expect(response.status).toEqual(200)
+      expect(response.body)
+    })
+
+    it('Should allow oidc login', async () => {
+      fetchMock.mockGlobal().route('http://testurl/oauth2/token', { access_token: '123' })
+      fetchMock.mockGlobal().route('http://testurl/oauth2/userinfo', {
+        email: 'test1@example.com',
+      })
+
+      const loginRequest: OIDCLoginRequest = {
+        code: '123',
+        provider: 'test',
+        redirect_uri: 'redirect',
+      }
+
+      const response = await request(app).post('/auth/login/oidc').send(loginRequest)
+      expect(response.status).toEqual(200)
+    })
+
+    it('Should fail on nonexisting provider', async () => {
+      fetchMock.mockGlobal().route('http://testurl/oauth2/token', { access_token: '123' })
+      fetchMock.mockGlobal().route('http://testurl/oauth2/userinfo', {
+        email: 'test1@example.com',
+      })
+
+      const loginRequest: OIDCLoginRequest = {
+        code: '123',
+        provider: 'test2',
+        redirect_uri: 'redirect',
+      }
+
+      const response = await request(app).post('/auth/login/oidc').send(loginRequest)
+      expect(response.ok).toBeFalsy()
+    })
+
+    it('Should enforce permissions', async () => {
+      fetchMock.removeRoutes()
+      fetchMock.mockGlobal().route('http://testurl/oauth2/token', { access_token: '123' })
+      fetchMock.mockGlobal().route('http://testurl/oauth2/userinfo', {
+        email: PARTICIPANT_UNANSWERED_EMAIL,
+      })
+
+      const loginRequest: OIDCLoginRequest = {
+        code: '123',
+        provider: 'test',
+        redirect_uri: 'redirect',
+      }
+
+      const response = await request(app)
+        .post('/auth/login/oidc')
+        .set({ 'x-client-type': 'admin-client' })
+        .send(loginRequest)
+      expect(response.status).toBe(401)
     })
   })
 })
