@@ -287,6 +287,8 @@ export class AuthController extends Controller {
 
       const { access_token } = await token_res.json()
 
+      console.log('TOKEN', access_token)
+
       const userinfo_res = await fetch(`${provider}/oauth2/userinfo`, {
         body: new URLSearchParams({ access_token }),
         method: 'POST',
