@@ -109,8 +109,8 @@ export class AuthController extends Controller {
       isSetup,
       oidc: (config.oidc || []).map((val) => ({
         name: val.name,
-        host: val.provider,
-        clientId: val.client_id,
+        host: val.providerUrl,
+        clientId: val.clientId,
         icon: val.icon,
       })),
     }
