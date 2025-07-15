@@ -16,16 +16,16 @@ const schema = {
           name: {
             type: 'string',
           },
-          provider: {
+          providerUrl: {
             type: 'string',
           },
-          client_id: {
+          clientId: {
             type: 'string',
           },
-          client_secret: { type: 'string' },
+          clientSecret: { type: 'string' },
           icon: { type: 'string' },
         },
-        required: ['name', 'provider', 'icon', 'client_id', 'client_secret'],
+        required: ['name', 'providerUrl', 'icon', 'clientId', 'clientSecret'],
         additionalProperties: false,
       },
     },
@@ -40,7 +40,7 @@ let config: Config = {}
 if (dir) {
   fs.readdirSync(dir).map((file) => {
     if (['json', 'json5'].includes(file.toLowerCase().split('.').at(-1) || '')) {
-      config = { ...config, ...JSON5.parse(fs.readFileSync(path.join(dir, file), 'utf8')) }
+      config = { ...config, ...JSON5.parse(fs.readFileSync(path.join(dir, file), 'ascii')) }
     }
   })
 }

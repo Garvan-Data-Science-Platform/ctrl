@@ -267,12 +267,12 @@ export class AuthController extends Controller {
       throw new Error('OIDC Provider not found')
     }
 
-    const { client_id, client_secret, provider } = oidc
+    const { clientId, clientSecret, providerUrl } = oidc
 
     const body = new URLSearchParams({
       grant_type: 'authorization_code',
-      client_id,
-      client_secret,
+      client_id: clientId,
+      client_secret: clientSecret,
       redirect_uri: bodyRequest.redirect_uri,
       code: bodyRequest.code,
     })
@@ -280,7 +280,7 @@ export class AuthController extends Controller {
     let user
 
     try {
-      const token_res = await fetch(`${provider}/oauth2/token`, {
+      const token_res = await fetch(`${providerUrl}/oauth2/token`, {
         body,
         method: 'POST',
       })
@@ -289,7 +289,7 @@ export class AuthController extends Controller {
 
       console.log('TOKEN', access_token)
 
-      const userinfo_res = await fetch(`${provider}/oauth2/userinfo`, {
+      const userinfo_res = await fetch(`${providerUrl}/oauth2/userinfo`, {
         body: new URLSearchParams({ access_token }),
         method: 'POST',
       })
