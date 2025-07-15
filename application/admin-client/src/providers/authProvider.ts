@@ -1,5 +1,4 @@
 import type { AuthProvider } from '@refinedev/core'
-import { redirect } from 'react-router-dom'
 import { useOIDCProviderStore } from '../oidcProvidersStore'
 
 export const TOKEN_KEY = 'refine-auth'

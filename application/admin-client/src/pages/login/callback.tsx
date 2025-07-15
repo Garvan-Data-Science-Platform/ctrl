@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, Stack, Tooltip, Typography } from '@mui/material'
+import { Button, CircularProgress, Stack, Typography } from '@mui/material'
 import { useLogin, useParsed } from '@refinedev/core'
 import { Link } from 'react-router-dom'
 
@@ -15,7 +15,7 @@ export const Callback = () => {
   useEffect(() => {
     //Promise needed to fix annoying bug caused by React StrictMode (dev only)
     if (!handleCallbackPromise) {
-      const { code, state } = params!!
+      const { code, state } = params!
       const redirectUri = `${window.location.href.split('/login').at(0)}/login/callback`
       handleCallbackPromise = axiosInstance
         .post(import.meta.env.VITE_BACKEND_URL + '/auth/login/oidc', {

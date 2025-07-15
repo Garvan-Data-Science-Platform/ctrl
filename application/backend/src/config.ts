@@ -36,7 +36,7 @@ const schema = {
 export type Config = FromSchema<typeof schema>
 
 const dir = process.env['CONFIG_DIR']
-var config: Config = {}
+const config: Config = {}
 if (dir) {
   fs.readdirSync(dir).map((file) => {
     if (['json', 'json5'].includes(file.toLowerCase().split('.').at(-1) || '')) {

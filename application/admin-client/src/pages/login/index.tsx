@@ -36,7 +36,7 @@ export const Login = () => {
       }
       providers={oidcProviderStore.providers.map((provider) => ({
         name: provider.name,
-        icon: <img src={provider.icon} height="70px" />,
+        icon: <img data-cy="oidc-img" src={provider.icon} height="70px" />,
       }))}
     ></AuthPage>
   )

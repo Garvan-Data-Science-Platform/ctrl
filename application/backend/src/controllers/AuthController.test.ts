@@ -42,7 +42,7 @@ describe('AuthController', () => {
   afterAll(async () => {
     api.stop()
   })
-  /*
+
   describe('POST /auth/register', () => {
     it('should allow access to protected routes', async () => {
       // Try to make a protected route request
@@ -557,7 +557,7 @@ describe('AuthController', () => {
       })
     })
   })
-  */
+
   describe('POST /auth/login/oidc', () => {
     it('Should allow oidc login', async () => {
       fetchMock.mockGlobal().route('http://testurl/oauth2/token', { access_token: '123' })
