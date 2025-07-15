@@ -705,6 +705,15 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "SetupResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "isSetup": {"dataType":"boolean","required":true},
+            "oidc": {"dataType":"array","array":{"dataType":"nestedObjectLiteral","nestedProperties":{"icon":{"dataType":"string","required":true},"clientId":{"dataType":"string","required":true},"host":{"dataType":"string","required":true},"name":{"dataType":"string","required":true}}},"required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "RegisterSetupRequest": {
         "dataType": "refObject",
         "properties": {
