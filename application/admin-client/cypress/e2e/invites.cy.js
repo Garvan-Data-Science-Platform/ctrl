@@ -67,7 +67,6 @@ describe('', () => {
   })
   it('Can resend an invite', () => {
     cy.visit('/participants')
-    cy.intercept('**/resend', {})
     cy.get('[data-cy="pending-list"]').get('[data-rowindex="0"]').should('contain.text', 'Pending')
     cy.get('[data-cy="invite-actions"]').first().click()
     cy.get('[data-cy="resend-button"]').click()
