@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ctrl-config
+data:
+  valuesconfig.json5: |-
+{{ .Values.config | toPrettyJson | indent 4}}

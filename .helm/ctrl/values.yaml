@@ -7,6 +7,15 @@ replicaCount: 1
 demoMode:
   enabled: false
 
+config:
+  oidc:
+    []
+    #- name:
+    #  providerUrl:
+    #  clientId:
+    #  clientSecret:
+    #  icon: #A link to png for login button
+
 userClient:
   image:
     repository: australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-user-client

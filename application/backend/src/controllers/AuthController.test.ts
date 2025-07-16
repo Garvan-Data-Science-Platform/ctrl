@@ -557,7 +557,6 @@ describe('AuthController', () => {
       })
     })
   })
-
   describe('POST /auth/login/oidc', () => {
     it('Should allow oidc login', async () => {
       fetchMock.mockGlobal().route('http://testurl/oauth2/token', { access_token: '123' })

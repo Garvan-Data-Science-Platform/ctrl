@@ -54,6 +54,8 @@ spec:
                 secretKeyRef:
                   name: jwt
                   key: jwt
+            - name: CONFIG_DIR
+              value: '/config'
             
           ports:
             - name: http
@@ -67,12 +69,23 @@ spec:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- with .Values.volumeMounts }}
+
           volumeMounts:
+          - name: config
+            mountPath: "/config"
+            readOnly: false
+          {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
-      {{- with .Values.volumes }}
+      
       volumes:
+      - name: config
+        configMap:
+          name: ctrl-config
+          items:
+          - key: "valuesconfig.json5"
+            path: "values.json5"
+      {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.nodeSelector }}
