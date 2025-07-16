@@ -4,6 +4,12 @@ import prisma from '../PrismaClient'
 export const fromAddress = `CTRL <noreply@${process.env.HOSTNAME}>`
 
 export async function createMailerTransporter() {
+  if (process.env.STUB_MAILER == 'true') {
+    return {
+      sendMail: async (props: any) => ({}),
+      verify: async () => ({}),
+    }
+  }
   const mailSettings = await prisma.organisation.findFirstOrThrow({
     where: { id: 1 },
     select: { mailerHost: true, mailerPassword: true, mailerPort: true, mailerUser: true },
