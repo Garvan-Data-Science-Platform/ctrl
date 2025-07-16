@@ -1,14 +1,14 @@
-name: Build and push
+name: Build and Push
 
 on:
   workflow_run:
     workflows: ['Build checks']
-    branches: [main]
+    branches: [main, dev]
     types: [completed]
 
 jobs:
-  release:
-    name: build and push ${{ matrix.name }}
+  build_push:
+    name: Build and Push ${{ matrix.name }}
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     permissions:
@@ -22,13 +22,13 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4
 
-      - name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v2'
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: 'projects/43338454952/locations/global/workloadIdentityPools/ctrl-id-pool/providers/github-provider'
           service_account: 'ctrl-ci-sa@ctrl-358804.iam.gserviceaccount.com'
 
-      - name: 'Docker auth'
+      - name: Docker auth
         run: gcloud auth configure-docker australia-southeast1-docker.pkg.dev
 
       - name: Set up Docker Buildx
@@ -38,18 +38,15 @@ jobs:
         id: nvm
         uses: ./.github/actions/parse-node-version
 
-      - name: Check node version
-        run: echo "node_version=${{ steps.nvm.outputs.node_version }}"
-
-      - name: Build and push ${{ matrix.name }}
+      - name: Build and Push ${{ matrix.name }} Image
         uses: docker/build-push-action@v3
         with:
           context: .
           file: application/${{ matrix.name }}/Dockerfile
-          platforms: linux/amd64
+          platforms: 'linux/amd64,linux/arm64'
           push: true
           tags: |
-            australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-${{ matrix.name }}:latest
+            australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-${{ matrix.name }}:${{ github.ref_name == 'main' && 'latest' || 'dev' }}
             australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-${{ matrix.name }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
