@@ -22,4 +22,3 @@ application/*/coverage/
 application/user-client/cypress/downloads
 application/backend/prisma/generated
 testvalues.yaml
-config
