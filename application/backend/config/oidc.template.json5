@@ -1,0 +1,11 @@
+{
+  oidc: [
+    {
+      name: '',
+      provider: '',
+      icon: '',
+      clientId: '',
+      clientSecret: '',
+    },
+  ],
+}

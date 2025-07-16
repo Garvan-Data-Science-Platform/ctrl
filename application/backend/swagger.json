@@ -1992,6 +1992,45 @@
           "role": "OrganisationAdmin"
         }
       },
+      "SetupResponse": {
+        "properties": {
+          "isSetup": {
+            "type": "boolean"
+          },
+          "oidc": {
+            "items": {
+              "properties": {
+                "icon": {
+                  "type": "string"
+                },
+                "clientId": {
+                  "type": "string"
+                },
+                "host": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "icon",
+                "clientId",
+                "host",
+                "name"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "isSetup",
+          "oidc"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
       "RegisterSetupRequest": {
         "properties": {
           "email": {
@@ -2141,6 +2180,26 @@
         },
         "required": [
           "token"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "OIDCLoginRequest": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "redirect_uri": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "provider",
+          "redirect_uri"
         ],
         "type": "object",
         "additionalProperties": false
@@ -5655,15 +5714,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "properties": {
-                    "isSetup": {
-                      "type": "boolean"
-                    }
-                  },
-                  "required": [
-                    "isSetup"
-                  ],
-                  "type": "object"
+                  "$ref": "#/components/schemas/SetupResponse"
                 }
               }
             }
@@ -5809,6 +5860,79 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/RegisterParticipantRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login/oidc": {
+      "post": {
+        "operationId": "LoginOIDC",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "OIDC login",
+        "summary": "Login using OIDC",
+        "tags": [
+          "Auth"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-client-type",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OIDCLoginRequest"
               }
             }
           }

@@ -37,6 +37,7 @@ import { AllResponsesView } from './pages/responses/all'
 import { FamilyEdit } from './pages/family/edit'
 import SettingsPage from './pages/settings'
 import { StudyLoader } from './components/StudyLoader'
+import { Callback } from './pages/login/callback'
 
 function App() {
   return (
@@ -204,6 +205,7 @@ function App() {
                       </Authenticated>
                     }
                   >
+                    <Route path="/login/callback" element={<Callback />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/setup" element={<SetupPage />} />
                     <Route path="/forgot-password" element={<ForgotPassword />} />
