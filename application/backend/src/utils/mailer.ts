@@ -6,7 +6,7 @@ export const fromAddress = `CTRL <noreply@${process.env.HOSTNAME}>`
 export async function createMailerTransporter() {
   if (process.env.STUB_MAILER == 'true') {
     return {
-      sendMail: async (props: any) => ({}),
+      sendMail: async () => ({}),
       verify: async () => ({}),
     }
   }
