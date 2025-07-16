@@ -1,6 +1,6 @@
 import { Link, Tooltip } from '@mui/material'
 import { AuthPage } from '@refinedev/mui'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../authStore'
 import { SetupResponse } from '@common/types/api/auth'

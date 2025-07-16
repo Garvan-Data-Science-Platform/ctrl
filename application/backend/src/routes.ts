@@ -710,6 +710,7 @@ const models: TsoaRoute.Models = {
         "properties": {
             "isSetup": {"dataType":"boolean","required":true},
             "oidc": {"dataType":"array","array":{"dataType":"nestedObjectLiteral","nestedProperties":{"icon":{"dataType":"string","required":true},"clientId":{"dataType":"string","required":true},"host":{"dataType":"string","required":true},"name":{"dataType":"string","required":true}}},"required":true},
+            "disableAdminPasswordLogin": {"dataType":"boolean","required":true},
         },
         "additionalProperties": false,
     },

@@ -2022,11 +2022,15 @@
               "type": "object"
             },
             "type": "array"
+          },
+          "disableAdminPasswordLogin": {
+            "type": "boolean"
           }
         },
         "required": [
           "isSetup",
-          "oidc"
+          "oidc",
+          "disableAdminPasswordLogin"
         ],
         "type": "object",
         "additionalProperties": false
