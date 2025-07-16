@@ -114,7 +114,6 @@ describe('UsersController', () => {
         firstName: 'Jane',
         lastName: 'Doe',
         email: 'jane@example.com',
-        password: 'password123',
         role: Role.OperatorAdmin,
       }
 
@@ -126,9 +125,7 @@ describe('UsersController', () => {
       expect(response.status).toBe(201)
 
       const createdUser = await prisma.user.findFirst({ where: { email: newUser.email } })
-      if (!createdUser) {
-        throw new Error('User with email already exists')
-      }
+
       expect(createdUser?.email).toBe(newUser.email)
     })
   })
@@ -286,7 +283,7 @@ describe('UsersController', () => {
 
   describe('POST /users/password/generate-reset-link', () => {
     const userEmail: string = 'test2@example.com'
-    afterEach(async () => {
+    beforeEach(async () => {
       mockNodeMailer.mock.reset()
     })
 
