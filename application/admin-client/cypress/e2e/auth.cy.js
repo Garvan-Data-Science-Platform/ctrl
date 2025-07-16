@@ -32,7 +32,7 @@ describe('auth', () => {
     cy.contains('Error Logging In: "Incorrect Permissions"').should('exist')
   })
 
-  it('can use oidc login', () => {
+  it('can use oidc login and disable password login', () => {
     cy.intercept('*/setup', {
       isSetup: true,
       oidc: [
@@ -43,12 +43,14 @@ describe('auth', () => {
           icon: 'https://aaf.edu.au/wp-content/uploads/AAF_LGO_small-website.png',
         },
       ],
+      disableAdminPasswordLogin: true,
     })
     cy.intercept('**/oidc', {
       token: 'dummy_token',
     })
     cy.intercept('**/studies').as('studyReq')
     cy.visit('/')
+    cy.get('input[name="email"]').should('not.exist')
     cy.get('[data-cy="oidc-img"]').should('exist')
     cy.visit('/login/callback?code=123&state=aaf')
     cy.wait('@studyReq').then((int) => {
