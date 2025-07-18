@@ -2,8 +2,7 @@ import { PrismaClient } from '@prisma/client'
 import { hashPassword } from '../../src/authentication'
 import { SurveyStep } from '../../../common/types/survey'
 import { createDefaultAnswers } from '../../src/utils/answers'
-
-const prisma = new PrismaClient()
+import prisma from '../../src/PrismaClient'
 
 const main = async () => {
   await prisma.organisation.upsert({

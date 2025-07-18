@@ -5,6 +5,34 @@ __metadata:
   version: 8
   cacheKey: 10c0
 
+"@47ng/cloak@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "@47ng/cloak@npm:1.2.0"
+  dependencies:
+    "@47ng/codec": "npm:^1.0.1"
+    "@stablelib/base64": "npm:^1.0.1"
+    "@stablelib/hex": "npm:^1.0.1"
+    "@stablelib/utf8": "npm:^1.0.1"
+    chalk: "npm:^4.1.2"
+    commander: "npm:^8.3.0"
+    dotenv: "npm:^10.0.0"
+    s-ago: "npm:^2.2.0"
+  bin:
+    cloak: dist/cli.js
+  checksum: 10c0/0fa33b2f83ab7de463a6c748e3b6379959e9c72b3f05a945d74345d26aa2a5651e2b8982e8e9b694182bf1b938640f0baaaeae0b17385df84ffd875929924425
+  languageName: node
+  linkType: hard
+
+"@47ng/codec@npm:^1.0.1":
+  version: 1.1.0
+  resolution: "@47ng/codec@npm:1.1.0"
+  dependencies:
+    "@stablelib/base64": "npm:^1.0.1"
+    "@stablelib/hex": "npm:^1.0.1"
+  checksum: 10c0/a0b94b003547146e30739c02bcaa46e7e0d8c6e3986ac1539549c47f7fdc597889149eb5ad6dd7590346a0ce32534bedcac094300298e46969cdd73465c44fc4
+  languageName: node
+  linkType: hard
+
 "@aliemir/dom-to-fiber-utils@npm:^0.4.0":
   version: 0.4.1
   resolution: "@aliemir/dom-to-fiber-utils@npm:0.4.1"
@@ -3076,6 +3104,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@prisma/generator-helper@npm:^5.9.1":
+  version: 5.22.0
+  resolution: "@prisma/generator-helper@npm:5.22.0"
+  dependencies:
+    "@prisma/debug": "npm:5.22.0"
+  checksum: 10c0/d7a6a6f66330b38aea76cd148b1bbdf43e373f6401e8edabaebc12db81abc35712386c97f1178d97d1655905a4ff822000b902c407ead986565984555b9893d0
+  languageName: node
+  linkType: hard
+
 "@prisma/generator-helper@npm:^6.6.0":
   version: 6.7.0
   resolution: "@prisma/generator-helper@npm:6.7.0"
@@ -3864,6 +3901,27 @@ __metadata:
   dependencies:
     "@sinonjs/commons": "npm:^3.0.0"
   checksum: 10c0/2e2fb6cc57f227912814085b7b01fede050cd4746ea8d49a1e44d5a0e56a804663b0340ae2f11af7559ea9bf4d087a11f2f646197a660ea3cb04e19efc04aa63
+  languageName: node
+  linkType: hard
+
+"@stablelib/base64@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "@stablelib/base64@npm:1.0.1"
+  checksum: 10c0/6330720f021819d19cecfe274111b79a256caa81df478d6b0ae7effc8842b96915b6aeed85926ff05b4d48ec1fc78ad043d928b730ee4e6cc6e8cba6aa097bed
+  languageName: node
+  linkType: hard
+
+"@stablelib/hex@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "@stablelib/hex@npm:1.0.1"
+  checksum: 10c0/57e6b0e0dbce12b8a7b9fef38d92af2adfab45b6824bde80a2c82c8c4e83bccac8d94bfe1ec921896b6a6b114b46eb21632bb2611adf1dd7a79ac8a766d6956d
+  languageName: node
+  linkType: hard
+
+"@stablelib/utf8@npm:^1.0.1":
+  version: 1.0.2
+  resolution: "@stablelib/utf8@npm:1.0.2"
+  checksum: 10c0/285e20102db831b75fbac3482219287f7c500a9b77f9276148dd7473c4dfcb7e0345c19e5297c95582b2fa556c2c3b133d07ea89c381f9394997bd834bb34ba9
   languageName: node
   linkType: hard
 
@@ -5634,6 +5692,7 @@ __metadata:
     nodemailer-mock: "npm:^2.0.6"
     pg: "npm:^8.12.0"
     prisma: "npm:^5.20.0"
+    prisma-field-encryption: "npm:^1.6.0"
     prisma-json-types-generator: "npm:^3.1.1"
     sharp: "npm:^0.34.1"
     supertest: "npm:^7.0.0"
@@ -6435,6 +6494,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"commander@npm:^8.3.0":
+  version: 8.3.0
+  resolution: "commander@npm:8.3.0"
+  checksum: 10c0/8b043bb8322ea1c39664a1598a95e0495bfe4ca2fad0d84a92d7d1d8d213e2a155b441d2470c8e08de7c4a28cf2bc6e169211c49e1b21d9f7edc6ae4d9356060
+  languageName: node
+  linkType: hard
+
 "common-tags@npm:^1.8.0":
   version: 1.8.2
   resolution: "common-tags@npm:1.8.2"
@@ -7066,6 +7132,13 @@ __metadata:
   version: 10.0.0
   resolution: "dotenv-expand@npm:10.0.0"
   checksum: 10c0/298f5018e29cfdcb0b5f463ba8e8627749103fbcf6cf81c561119115754ed582deee37b49dfc7253028aaba875ab7aea5fa90e5dac88e511d009ab0e6677924e
+  languageName: node
+  linkType: hard
+
+"dotenv@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "dotenv@npm:10.0.0"
+  checksum: 10c0/2d8d4ba64bfaff7931402aa5e8cbb8eba0acbc99fe9ae442300199af021079eafa7171ce90e150821a5cb3d74f0057721fbe7ec201a6044b68c8a7615f8c123f
   languageName: node
   linkType: hard
 
@@ -9134,7 +9207,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"immer@npm:^10.1.1":
+"immer@npm:^10.0.3, immer@npm:^10.1.1":
   version: 10.1.1
   resolution: "immer@npm:10.1.1"
   checksum: 10c0/b749e10d137ccae91788f41bd57e9387f32ea6d6ea8fd7eb47b23fd7766681575efc7f86ceef7fe24c3bc9d61e38ff5d2f49c2663b2b0c056e280a4510923653
@@ -12000,6 +12073,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"object-path@npm:^0.11.8":
+  version: 0.11.8
+  resolution: "object-path@npm:0.11.8"
+  checksum: 10c0/73b1f33bb30a7032d8cce2e3dcffd82b80a83d8304e80b4f83b4f456165625de9907f1ca7f7441d4dfb5e73429ace1e5bf9d9315636ac0aacc76392cc21d1672
+  languageName: node
+  linkType: hard
+
 "obuf@npm:~1.1.2":
   version: 1.1.2
   resolution: "obuf@npm:1.1.2"
@@ -12691,6 +12771,24 @@ __metadata:
     ansi-styles: "npm:^5.0.0"
     react-is: "npm:^18.0.0"
   checksum: 10c0/edc5ff89f51916f036c62ed433506b55446ff739358de77207e63e88a28ca2894caac6e73dcb68166a606e51c8087d32d400473e6a9fdd2dbe743f46c9c0276f
+  languageName: node
+  linkType: hard
+
+"prisma-field-encryption@npm:^1.6.0":
+  version: 1.6.0
+  resolution: "prisma-field-encryption@npm:1.6.0"
+  dependencies:
+    "@47ng/cloak": "npm:^1.2.0"
+    "@prisma/generator-helper": "npm:^5.9.1"
+    debug: "npm:^4.3.4"
+    immer: "npm:^10.0.3"
+    object-path: "npm:^0.11.8"
+    zod: "npm:^3.22.4"
+  peerDependencies:
+    "@prisma/client": ">= 4.7"
+  bin:
+    prisma-field-encryption: dist/generator/main.js
+  checksum: 10c0/6148bb459a3d7f1a582008f96f641e37f1328d98daf1f556e0068af8d4e2b664b98d34c32ec20e584d50b90b04b89d4cf26069c7768749aa77c54fd98aafe6e6
   languageName: node
   linkType: hard
 
@@ -13570,6 +13668,13 @@ __metadata:
   dependencies:
     tslib: "npm:^2.1.0"
   checksum: 10c0/1fcd33d2066ada98ba8f21fcbbcaee9f0b271de1d38dc7f4e256bfbc6ffcdde68c8bfb69093de7eeb46f24b1fb820620bf0223706cff26b4ab99a7ff7b2e2c45
+  languageName: node
+  linkType: hard
+
+"s-ago@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "s-ago@npm:2.2.0"
+  checksum: 10c0/946bacd0b13ac9a03efb82b6f0d2e480213b6c7deb3ab20e887b1fc7b48a8028f4e2eed383b9a1e1bccc8cd123990427dfc5c2297220b7d17906f17b1df91403
   languageName: node
   linkType: hard
 
@@ -15772,6 +15877,13 @@ __metadata:
   version: 3.2.1
   resolution: "yoga-layout@npm:3.2.1"
   checksum: 10c0/9001e51be993c85e03757e5a04a2b61b8b30c9e5a7865d0156ca87a6431a3b717d51eb4990bfe588189fcfeac688dd9c3de707bbd50d1c344a84e63974cc54a8
+  languageName: node
+  linkType: hard
+
+"zod@npm:^3.22.4":
+  version: 3.25.76
+  resolution: "zod@npm:3.25.76"
+  checksum: 10c0/5718ec35e3c40b600316c5b4c5e4976f7fee68151bc8f8d90ec18a469be9571f072e1bbaace10f1e85cf8892ea12d90821b200e980ab46916a6166a4260a983c
   languageName: node
   linkType: hard
 
