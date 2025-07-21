@@ -329,7 +329,13 @@
             "type": "number",
             "format": "double"
           },
-          "published_date": {
+          "publishedAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "createdAt": {
             "type": "string"
           },
           "status": {
@@ -338,6 +344,8 @@
         },
         "required": [
           "versionNumber",
+          "updatedAt",
+          "createdAt",
           "status"
         ],
         "type": "object",

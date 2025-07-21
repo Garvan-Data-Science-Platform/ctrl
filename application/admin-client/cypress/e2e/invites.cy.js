@@ -16,6 +16,21 @@ describe('', () => {
     cy.get('[data-cy="invite-modal-cancel"]').click()
     cy.get('[data-cy="invite-modal"]').should('not.exist')
   })
+
+  it('Should not allow inviting users when there is no published survey in the study', () => {
+    cy.visit('/participants')
+    cy.get('[data-cy="study-dropdown"]').click()
+    cy.contains('Empty Study').click()
+    cy.get('[data-cy="invite-modal"]').should('not.exist')
+    cy.get('[data-cy="invite-button"]').click()
+    cy.get('[data-cy="invite-modal"]').should('not.exist')
+    cy.get('[data-cy="no-published-survey-modal"]')
+      .should('exist')
+      .should('contain.text', 'You need to publish a survey before inviting participants')
+    cy.contains('Go to surveys').click()
+    cy.url().should('contain', '/surveys')
+  })
+
   it('Can type invites manually and remove', () => {
     cy.visit('/participants')
     cy.get('[data-cy="invite-button"]').click()

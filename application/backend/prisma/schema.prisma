@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearch"]
 }
 
@@ -101,31 +101,31 @@ enum ContactMethod {
 }
 
 model Organisation {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  mailerHost String?
-  mailerPort Int?
-  mailerUser String?
-  mailerPassword String?
-  primaryColour String?
+  id              Int      @id @default(autoincrement())
+  name            String   @unique
+  mailerHost      String?
+  mailerPort      Int?
+  mailerUser      String?
+  mailerPassword  String?
+  primaryColour   String?
   secondaryColour String?
-  redcapURL String?
-  redcapToken String?
-  logo Bytes?
-  users     User[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  redcapURL       String?
+  redcapToken     String?
+  logo            Bytes?
+  users           User[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model Study {
-  id                 Int                  @id @default(autoincrement())
-  name               String               @unique
-  inviteEmailSubject String               @default("Invitation to CTRL - Dynamic Consent Platform")
-  inviteEmailText    String               @default("You have been invited to register with CTRL dynamic consent platform.")
+  id                 Int                @id @default(autoincrement())
+  name               String             @unique
+  inviteEmailSubject String             @default("Invitation to CTRL - Dynamic Consent Platform")
+  inviteEmailText    String             @default("You have been invited to register with CTRL dynamic consent platform.")
   surveys            SurveyVersion[]
   profiles           StudyParticipant[]
   invites            Invite[]
-  deleted             Boolean              @default(false)
+  deleted            Boolean            @default(false)
 }
 
 enum SurveyVersionStatus {
@@ -144,6 +144,7 @@ model SurveyVersion {
   studyId              Int
   createdAt            DateTime               @default(now())
   updatedAt            DateTime               @updatedAt
+  publishedAt          DateTime?
 
   @@unique([studyId, versionNumber])
 }
