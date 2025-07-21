@@ -172,7 +172,7 @@ model Invite {
   createdAt DateTime     @default(now())
   sentAt    DateTime?
 
-  @@unique([studyId, email])
+  @@unique([studyId, emailHash])
 }
 
 enum InviteStatus {

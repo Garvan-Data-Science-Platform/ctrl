@@ -99,7 +99,7 @@ describe('Participant Invites', () => {
     // Check invites were created
     const createdInvite = await prisma.invite.findUnique({
       where: {
-        studyId_email: {
+        studyId_emailHash: {
           email: participantRegisterRequestBody.email,
           studyId: 1,
         },
@@ -186,7 +186,7 @@ describe('Participant Invites', () => {
     // Check the invite exists
     const invite = await prisma.invite.findUnique({
       where: {
-        studyId_email: {
+        studyId_emailHash: {
           email: participantRegisterRequestBody.email,
           studyId: 1,
         },
@@ -206,7 +206,7 @@ describe('Participant Invites', () => {
     // Check invite was revoked
     const revokedInvite = await prisma.invite.findUnique({
       where: {
-        studyId_email: {
+        studyId_emailHash: {
           email: participantRegisterRequestBody.email,
           studyId: 1,
         },
@@ -234,7 +234,7 @@ describe('Participant Invites', () => {
     // Check the invite exists
     const invite = await prisma.invite.findUnique({
       where: {
-        studyId_email: {
+        studyId_emailHash: {
           email: participantRegisterRequestBody.email,
           studyId: 1,
         },
@@ -254,7 +254,7 @@ describe('Participant Invites', () => {
     // Confirm it is revoked
     const inviteRevoked = await prisma.invite.findUnique({
       where: {
-        studyId_email: {
+        studyId_emailHash: {
           email: participantRegisterRequestBody.email,
           studyId: 1,
         },
@@ -293,7 +293,7 @@ describe('Participant Invites', () => {
     // Check the invite exists
     const invite = await prisma.invite.findUnique({
       where: {
-        studyId_email: {
+        studyId_emailHash: {
           email: participantRegisterRequestBody.email,
           studyId: 1,
         },
@@ -314,7 +314,7 @@ describe('Participant Invites', () => {
     // Confirm it is expired
     const inviteExpired = await prisma.invite.findUnique({
       where: {
-        studyId_email: {
+        studyId_emailHash: {
           email: participantRegisterRequestBody.email,
           studyId: 1,
         },
@@ -352,7 +352,7 @@ describe('Participant Invites', () => {
     // Check the invite exists
     const invite = await prisma.invite.findUnique({
       where: {
-        studyId_email: {
+        studyId_emailHash: {
           email: participantRegisterRequestBody.email,
           studyId: 1,
         },

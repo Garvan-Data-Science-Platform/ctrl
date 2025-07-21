@@ -424,12 +424,14 @@ export class InvitesController extends Controller {
     const expiresAt = new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000) // TODO: MAKE EXPIRY CONFIGURABLE
 
     // Fetch existing invites
-    const existingInvites = await this.invitesRepo.findMany({
+    let existingInvites = await this.invitesRepo.findMany({
       where: {
-        email: { in: emails },
         studyId: studyId,
       },
     })
+
+    //Has to be done by backend server due to
+    existingInvites = existingInvites.filter((invite) => emails.includes(invite.email))
 
     const newEmails = emails.filter(
       (email) => !existingInvites.map((invite) => invite.email).includes(email),
@@ -446,6 +448,8 @@ export class InvitesController extends Controller {
 
     const emailsResent: string[] = []
     const failedEmails: string[] = []
+
+    console.log('EXISTINGE', existingInvites)
 
     // Resend invites for existing emails
     if (existingInvites.length > 0) {
