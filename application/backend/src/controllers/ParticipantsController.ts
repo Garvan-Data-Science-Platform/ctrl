@@ -28,6 +28,7 @@ import {
   Post,
   Middlewares,
   Request,
+  Delete,
 } from 'tsoa'
 import { Participant } from 'common/types/api/participants/participant'
 import { createMailerTransporter, fromAddress } from '../utils/mailer'
@@ -35,7 +36,12 @@ import nodemailer from 'nodemailer'
 import { generateInviteEmail } from 'common/src/generateInviteTemplate'
 import { InviteStatus } from 'common/types/api/participants/invite'
 import { BadGatewayError, NotFoundError } from '../middlewares/ErrorHandler'
-import { createDefaultAnswers, determineLastUpdated, determineStatus } from '../utils/answers'
+import {
+  createDefaultAnswers,
+  determineLastUpdated,
+  determineStatus,
+  recalculateAnswers,
+} from '../utils/answers'
 import { ProfilesController } from './ProfilesController'
 import { auditLog } from '../middlewares/AuditLog'
 import { Role } from '@prisma/client'
@@ -51,6 +57,8 @@ import { genId } from '../utils/genId'
 export class ParticipantsController extends Controller {
   svaRepo = prisma.surveyVersionAnswers
   profileRepo = prisma.participantProfile
+  surveyRepo = prisma.surveyVersion
+  participantRepo = prisma.studyParticipant
 
   /**
    * List participants
@@ -59,9 +67,10 @@ export class ParticipantsController extends Controller {
    */
   @Get('/participants')
   public async getParticipants(@Path() studyId: number): Promise<GetParticipantsResponse> {
+    const participant_list = await prisma.studyParticipant.findMany({ where: { studyId } })
+
     const unique_participants = await this.svaRepo.findMany({
-      distinct: ['profileId'],
-      where: { version: { studyId } },
+      where: { profileId: { in: participant_list.map((val) => val.participantProfileId) } },
       select: {
         id: true,
         answers: true,
@@ -175,6 +184,102 @@ export class ParticipantsController extends Controller {
         })),
       },
     }
+  }
+
+  /**
+   * Remove a participant from the study
+   *
+   * @summary Remove a participant from the study
+   */
+  @Delete('/participants/{profileId}')
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
+  public async deleteParticipantById(
+    @Path() studyId: number,
+    @Path() profileId: number,
+  ): Promise<void> {
+    await prisma.studyParticipant.delete({
+      where: {
+        participantProfileId_studyId: {
+          participantProfileId: profileId,
+          studyId: studyId,
+        },
+      },
+    })
+  }
+
+  /**
+   * Add a participant to the study
+   *
+   * @summary Add a participant to the study, if they were formerly removed, or they don't have an account.
+   * Throws error if user has an account and should be added via the study invite process
+   */
+  @Post('/participants/{profileId}')
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
+  public async addParticipantById(
+    @Path() studyId: number,
+    @Path() profileId: number,
+  ): Promise<void> {
+    const currentSurvey = await this.surveyRepo.findFirst({
+      where: {
+        status: 'PUBLISHED',
+        studyId,
+      },
+      orderBy: { id: 'desc' },
+    })
+
+    if (!currentSurvey) {
+      throw new Error('You need to publish a survey before adding participants')
+    }
+
+    const deletedP = await prisma.studyParticipant.findFirst({
+      where: {
+        participantProfileId: profileId,
+        studyId: studyId,
+        deleted: true,
+      },
+    })
+
+    const profile = await this.profileRepo.findUniqueOrThrow({ where: { id: profileId } })
+
+    if (deletedP) {
+      await this.participantRepo.update({
+        where: {
+          participantProfileId_studyId: {
+            participantProfileId: deletedP.participantProfileId,
+            studyId: deletedP.studyId,
+          },
+          deleted: true,
+        },
+        data: { deleted: false },
+      })
+    } else if (!profile.userId) {
+      //TODO: Should prevent adding dependent when no guardian is a member of the study
+      const guardian = await this.participantRepo.findFirst({
+        where: {
+          studyId,
+          participantProfile: { familyId: profile.familyId, participantType: 'GUARDIAN' },
+        },
+      })
+      if (!guardian) {
+        throw new Error("Can't add a dependent to a study if no guardian is a member of the study")
+      }
+
+      await this.participantRepo.create({
+        data: { studyId: studyId, participantProfileId: profileId },
+      })
+      await prisma.surveyVersionAnswers.create({
+        data: {
+          profileId: profile.id,
+          versionId: currentSurvey.id,
+          answers: createDefaultAnswers(currentSurvey.data),
+        },
+      })
+    } else {
+      throw new Error(
+        'The participant must be invited to join the study via email (via the Participants page)',
+      )
+    }
+    await recalculateAnswers(profile.familyId, studyId)
   }
 }
 
@@ -332,9 +437,6 @@ export class InvitesController extends Controller {
       },
       orderBy: { id: 'desc' },
     })
-    if (!currentSurvey) {
-      throw new NotFoundError(`No published survey found for study ${invite.studyId}`)
-    }
 
     await this.profileRepo.update({
       where: {

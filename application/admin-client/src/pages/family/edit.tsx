@@ -10,6 +10,11 @@ import {
   Radio,
   RadioGroup,
   Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   TextField,
   Typography,
 } from '@mui/material'
@@ -17,11 +22,11 @@ import { useInvalidate, useNotification, useOne, useParsed } from '@refinedev/co
 import { Show } from '@refinedev/mui'
 import { useForm } from '@refinedev/react-hook-form'
 import { OnBehalf, ParticipantType } from '@common/types/api/users/ParticipantProfile'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ParticipantSearch } from '../../components/ParticipantSearch'
 import { ArrowBack, Delete } from '@mui/icons-material'
-import { Link } from 'react-router-dom'
-import { FamilyMember } from '@common/types/api/users/getParticipantProfile'
+import { Link, useNavigate } from 'react-router-dom'
+import { GetFamilyResponse } from '@common/types/api/families'
 import { axiosInstance } from '../../providers/dataProvider'
 import { useCurrentStudyId } from '../../studyStore'
 
@@ -31,8 +36,9 @@ export const FamilyEdit = () => {
   const { id } = useParsed()
 
   const invalidate = useInvalidate()
+  const nav = useNavigate()
 
-  const { data } = useOne<FamilyMember[]>({ resource: 'families', id })
+  const { data, remove } = useOne<GetFamilyResponse['data']>({ resource: 'families', id })
 
   const [action, setAction] = useState<'ADD' | 'REMOVE' | null>(null)
   const [loading, setLoading] = useState(false)
@@ -40,6 +46,15 @@ export const FamilyEdit = () => {
   const [newMemberType, setNewMemberType] = useState<'DEPENDENT' | 'GUARDIAN' | 'OTHER' | null>(
     null,
   )
+
+  useEffect(() => {
+    if (data) {
+      if (data.data.every((val) => !val.inStudy)) {
+        remove()
+        nav('/participants')
+      }
+    }
+  }, [data])
 
   //Dependents add form
   const { register, handleSubmit, reset } = useForm<OnBehalf>()
@@ -52,6 +67,28 @@ export const FamilyEdit = () => {
   }
 
   const { open } = useNotification()
+
+  const removeFromStudy = async (profileId: number) => {
+    try {
+      await axiosInstance.delete(`/studies/${studyId}/participants/${profileId}`)
+      open?.({ type: 'success', message: 'Removed member from study' })
+      invalidate({ resource: 'families', invalidates: ['all'] })
+      resetForm()
+    } catch (e: any) {
+      open?.({ type: 'error', message: `Failed to remove dependent: ${e.response.data.details}` })
+    }
+  }
+
+  const addToStudy = async (profileId: number) => {
+    try {
+      await axiosInstance.post(`/studies/${studyId}/participants/${profileId}`)
+      open?.({ type: 'success', message: 'Added member to study' })
+      invalidate({ resource: 'families', invalidates: ['all'] })
+      resetForm()
+    } catch (e: any) {
+      open?.({ type: 'error', message: `Failed: ${e.response.data.details}` })
+    }
+  }
 
   const handleRemove = async (profileId: number) => {
     try {
@@ -113,50 +150,60 @@ export const FamilyEdit = () => {
       }
     >
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <Typography>Current Family Members:</Typography>
-        <Box data-cy="current-family-members">
-          {data?.data.map((val) => (
-            <Box
-              key={val.id}
-              sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                minHeight: 40,
-                width: 400,
-                mt: 1,
-                mb: 1,
-                p: 1,
-                borderRadius: 2,
-                border: '1px solid',
-                borderColor: action == 'REMOVE' ? 'red' : 'lightgrey',
-              }}
-            >
-              <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', ml: 1 }}>
-                {action == 'REMOVE' && (
-                  <IconButton onClick={() => handleRemove(val.id)} data-cy="remove-icon-button">
-                    <Delete />
-                  </IconButton>
-                )}
-                <Typography>{`${val.firstName} ${val.lastName}`}</Typography>
-              </Box>
-              <Select
-                size="small"
-                sx={{ width: 200 }}
-                value={val.participantType}
-                disabled={loading}
-                onChange={(e) => handleChangeType(val.id, e.target.value as ParticipantType)}
-                data-cy="type-select"
-              >
-                <MenuItem value={ParticipantType.DEPENDENT_AGE}>Dependent (age based)</MenuItem>
-                <MenuItem value={ParticipantType.DEPENDENT_OTHER}>Dependent (other)</MenuItem>
-                <MenuItem value={ParticipantType.GUARDIAN}>Guardian</MenuItem>
-                <MenuItem value={ParticipantType.STANDARD}>Non-Guardian</MenuItem>
-              </Select>
-            </Box>
-          ))}
-        </Box>
+        <Table sx={{ width: 800 }}>
+          <TableHead>
+            <TableRow>
+              <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>Role</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>Is a participant in this study?</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {data?.data.map((val) => (
+              <TableRow key={`row_${val.id}`}>
+                <TableCell>
+                  <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', ml: 1 }}>
+                    {action == 'REMOVE' && (
+                      <IconButton onClick={() => handleRemove(val.id)} data-cy="remove-icon-button">
+                        <Delete />
+                      </IconButton>
+                    )}
+                    <Typography>{`${val.firstName} ${val.lastName}`}</Typography>
+                  </Box>
+                </TableCell>
+                <TableCell>
+                  <Select
+                    size="small"
+                    sx={{ width: 200 }}
+                    value={val.participantType}
+                    disabled={loading}
+                    onChange={(e) => handleChangeType(val.id, e.target.value as ParticipantType)}
+                    data-cy="type-select"
+                  >
+                    <MenuItem value={ParticipantType.DEPENDENT_AGE}>Dependent (age based)</MenuItem>
+                    <MenuItem value={ParticipantType.DEPENDENT_OTHER}>Dependent (other)</MenuItem>
+                    <MenuItem value={ParticipantType.GUARDIAN}>Guardian</MenuItem>
+                    <MenuItem value={ParticipantType.STANDARD}>Non-Guardian</MenuItem>
+                  </Select>
+                </TableCell>
+                <TableCell>
+                  <Checkbox
+                    checked={val.inStudy}
+                    onClick={() => {
+                      if (val.inStudy) {
+                        removeFromStudy(val.id)
+                      } else {
+                        addToStudy(val.id)
+                      }
+                    }}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+
+        <Box data-cy="current-family-members"></Box>
 
         <Box>
           <Button
@@ -164,15 +211,17 @@ export const FamilyEdit = () => {
             onClick={() => setAction('ADD')}
             data-cy="add-member-button"
           >
-            Add family member to this study
+            Add member to this family
           </Button>
           <Button
             sx={{ ml: 1 }}
             variant={action == 'REMOVE' ? 'contained' : 'outlined'}
-            onClick={() => setAction('REMOVE')}
+            onClick={() => {
+              action == 'REMOVE' ? setAction(null) : setAction('REMOVE')
+            }}
             data-cy="remove-member-button"
           >
-            Remove family member from this study
+            Remove member from this family
           </Button>
         </Box>
 
@@ -316,7 +365,9 @@ export const FamilyEdit = () => {
                 <ParticipantSearch
                   buttonText="Add to family"
                   onConfirm={handleAdd}
-                  exclude={data?.data.map((val) => val.id) || []}
+                  exclude={[...(data?.data.inStudy || []), ...(data?.data.notInStudy || [])].map(
+                    (val) => val.id,
+                  )}
                 />
               </>
             )}

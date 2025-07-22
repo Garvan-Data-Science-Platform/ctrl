@@ -843,7 +843,7 @@ const models: TsoaRoute.Models = {
     "GetFamilyResponse": {
         "dataType": "refObject",
         "properties": {
-            "data": {"dataType":"array","array":{"dataType":"refObject","ref":"FamilyMember"},"required":true},
+            "data": {"dataType":"array","array":{"dataType":"intersection","subSchemas":[{"ref":"FamilyMember"},{"dataType":"nestedObjectLiteral","nestedProperties":{"inStudy":{"dataType":"boolean","required":true}}}]},"required":true},
         },
         "additionalProperties": false,
     },
@@ -2089,6 +2089,70 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
 
               await templateService.apiHandler({
                 methodName: 'getParticipantById',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsParticipantsController_deleteParticipantById: Record<string, TsoaRoute.ParameterSchema> = {
+                studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
+                profileId: {"in":"path","name":"profileId","required":true,"dataType":"double"},
+        };
+        app.delete('/studies/:studyId/participants/:profileId',
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(ParticipantsController)),
+            ...(fetchMiddlewares<RequestHandler>(ParticipantsController.prototype.deleteParticipantById)),
+
+            async function ParticipantsController_deleteParticipantById(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsParticipantsController_deleteParticipantById, request, response });
+
+                const controller = new ParticipantsController();
+
+              await templateService.apiHandler({
+                methodName: 'deleteParticipantById',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsParticipantsController_addParticipantById: Record<string, TsoaRoute.ParameterSchema> = {
+                studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
+                profileId: {"in":"path","name":"profileId","required":true,"dataType":"double"},
+        };
+        app.post('/studies/:studyId/participants/:profileId',
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(ParticipantsController)),
+            ...(fetchMiddlewares<RequestHandler>(ParticipantsController.prototype.addParticipantById)),
+
+            async function ParticipantsController_addParticipantById(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsParticipantsController_addParticipantById, request, response });
+
+                const controller = new ParticipantsController();
+
+              await templateService.apiHandler({
+                methodName: 'addParticipantById',
                 controller,
                 response,
                 next,
