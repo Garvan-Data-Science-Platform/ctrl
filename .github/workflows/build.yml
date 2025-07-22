@@ -11,7 +11,7 @@ jobs:
   build_push:
     name: Build and Push ${{ matrix.name }}
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    # if: ${{ github.event.workflow_run.conclusion == 'success' }}
     permissions:
       contents: 'read'
       id-token: 'write'
