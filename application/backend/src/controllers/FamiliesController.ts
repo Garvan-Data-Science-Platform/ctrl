@@ -39,19 +39,40 @@ export class FamiliesController extends Controller {
     @Path() studyId: number,
     @Path() familyId: number,
   ): Promise<GetFamilyResponse> {
-    const members = (await prisma.participantProfile.findMany({
+    const inStudy = (await prisma.participantProfile.findMany({
       where: {
         familyId,
         studies: {
           some: {
             studyId: studyId,
+            deleted: false,
           },
         },
       },
       select: { firstName: true, lastName: true, id: true, participantType: true },
       orderBy: { dob: 'asc' },
     })) as FamilyMember[]
-    return { data: members }
+
+    const notInStudy = (await prisma.participantProfile.findMany({
+      where: {
+        familyId,
+        studies: {
+          none: {
+            studyId: studyId,
+            deleted: false,
+          },
+        },
+      },
+      select: { firstName: true, lastName: true, id: true, participantType: true },
+      orderBy: { dob: 'asc' },
+    })) as FamilyMember[]
+
+    return {
+      data: [
+        ...inStudy.map((val) => ({ ...val, inStudy: true })),
+        ...notInStudy.map((val) => ({ ...val, inStudy: false })),
+      ],
+    }
   }
 
   /**

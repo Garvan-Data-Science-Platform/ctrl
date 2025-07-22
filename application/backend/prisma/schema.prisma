@@ -68,6 +68,7 @@ model StudyParticipant {
   participantProfileId Int
   study                Study              @relation(fields: [studyId], references: [id], onDelete: Cascade)
   studyId              Int
+  deleted              Boolean            @default(false)
 
   @@id([participantProfileId, studyId])
 }
