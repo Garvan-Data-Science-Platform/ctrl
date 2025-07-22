@@ -5876,7 +5876,7 @@ __metadata:
     jest-mock-extended: "npm:^3.0.7"
     json5: "npm:^2.2.3"
     jsonwebtoken: "npm:^9.0.2"
-    multer: "npm:^2.0.1"
+    multer: "npm:^2.0.2"
     nodemailer: "npm:^6.9.16"
     nodemailer-mock: "npm:^2.0.6"
     pg: "npm:^8.12.0"
@@ -11973,6 +11973,7 @@ __metadata:
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 "mui-one-time-password-input@npm:^5.0.0":
   version: 5.0.0
   resolution: "mui-one-time-password-input@npm:5.0.0"
@@ -12000,6 +12001,11 @@ __metadata:
 "multer@npm:^2.0.1":
   version: 2.0.1
   resolution: "multer@npm:2.0.1"
+=======
+"multer@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "multer@npm:2.0.2"
+>>>>>>> 094c0d0 (update multer)
   dependencies:
     append-field: "npm:^1.0.0"
     busboy: "npm:^1.6.0"
@@ -12008,7 +12014,7 @@ __metadata:
     object-assign: "npm:^4.1.1"
     type-is: "npm:^1.6.18"
     xtend: "npm:^4.0.2"
-  checksum: 10c0/2b5ab16a2bc6070690cff1f30589bb0d1218ed62051d65fdb1a8d9c65c63238c07af81ae8921de449f921ff10c849f3f6830fd07ef5640c46aaaca5c94044d25
+  checksum: 10c0/d3b99dd0512169bbabf15440e1bbb3ecdc000b761e5a3e4aaca40b5e5e213c6cdcc9b7dffebaa601b7691a84f6876aa87e0173ffcc47139253793cf5657819eb
   languageName: node
   linkType: hard
 
