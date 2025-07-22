@@ -1,10 +1,10 @@
 name: Build and Push
 
 on:
-  workflow_run:
-    workflows: ['Build checks']
-    branches: [main, dev]
-    types: [completed]
+  # workflow_run:
+  #   workflows: ['Build checks']
+  #   branches: [main, dev]
+  #   types: [completed]
   workflow_dispatch:
 
 jobs:
