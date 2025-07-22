@@ -5,7 +5,7 @@ on:
   #   workflows: ['Build checks']
   #   branches: [main, dev]
   #   types: [completed]
-  workflow_dispatch:
+  push:
 
 jobs:
   build_push:
