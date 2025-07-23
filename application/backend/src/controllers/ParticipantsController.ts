@@ -430,7 +430,7 @@ export class InvitesController extends Controller {
       },
     })
 
-    //Has to be done by backend server due to
+    //Has to be done by backend server due to encryption
     existingInvites = existingInvites.filter((invite) => emails.includes(invite.email))
 
     const newEmails = emails.filter(
@@ -448,8 +448,6 @@ export class InvitesController extends Controller {
 
     const emailsResent: string[] = []
     const failedEmails: string[] = []
-
-    console.log('EXISTINGE', existingInvites)
 
     // Resend invites for existing emails
     if (existingInvites.length > 0) {
