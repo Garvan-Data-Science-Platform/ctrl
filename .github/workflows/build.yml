@@ -60,3 +60,4 @@ jobs:
     secrets: inherit
     with:
       environment: dev
+      ctrl-version: '1.0.0'
