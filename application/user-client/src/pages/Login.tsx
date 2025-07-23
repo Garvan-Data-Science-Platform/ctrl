@@ -95,7 +95,6 @@ export default function Login() {
             <Button data-cy="forgot-password" component={Link} to="/forgot">
               Forgot Password
             </Button>
-            <Box>(DEV TEST)</Box>
           </Box>
         </Card>
       </Container>
