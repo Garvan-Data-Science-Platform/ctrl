@@ -99,8 +99,15 @@ nameOverride: ''
 fullnameOverride: ''
 
 postgresql:
-  auth:
-    database: ctrl
+  image:
+    repository: postgres
+    tag: 17.5
+  primary:
+    containerSecurityContext:
+      readOnlyRootFilesystem: false
+  global:
+    security:
+      allowInsecureImages: true
 
 serviceAccount:
   # Specifies whether a service account should be created

@@ -121,9 +121,12 @@ describe('Studies tests', () => {
 
     const correctStudyParticipants = await prisma.participantProfile.findMany({
       where: {
-        firstName: {
-          search: 'J | X | Child1 | Child2',
-        },
+        OR: [
+          { firstName: 'J' },
+          { firstName: 'X' },
+          { firstName: 'Child1' },
+          { firstName: 'Child2' },
+        ],
         studies: {
           some: {
             study: {
@@ -137,9 +140,12 @@ describe('Studies tests', () => {
 
     const wrongStudyParticipants = await prisma.participantProfile.findMany({
       where: {
-        firstName: {
-          search: 'J | X | Child1 | Child2',
-        },
+        OR: [
+          { firstName: 'J' },
+          { firstName: 'X' },
+          { firstName: 'Child1' },
+          { firstName: 'Child2' },
+        ],
         studies: {
           some: {
             study: {
@@ -210,9 +216,12 @@ describe('Studies tests', () => {
 
     const correctStudyParticipants = await prisma.participantProfile.findMany({
       where: {
-        firstName: {
-          search: 'J | X | Child1 | Child2',
-        },
+        OR: [
+          { firstName: 'J' },
+          { firstName: 'X' },
+          { firstName: 'Child1' },
+          { firstName: 'Child2' },
+        ],
         studies: {
           some: {
             study: {

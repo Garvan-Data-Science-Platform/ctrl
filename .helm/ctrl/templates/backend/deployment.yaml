@@ -54,6 +54,11 @@ spec:
                 secretKeyRef:
                   name: jwt
                   key: jwt
+            - name: PRISMA_FIELD_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aeskey
+                  key: aeskey
             - name: CONFIG_DIR
               value: '/config'
             
