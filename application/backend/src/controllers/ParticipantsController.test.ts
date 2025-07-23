@@ -63,6 +63,98 @@ describe('ParticipantsController', () => {
       expect(body.data[1].answers[0].status).toBe('complete')
     })
   })
+
+  describe('POST /participants/{profileId}', () => {
+    it('Can add an existing dependent to a study, if their guardian is in the study', async () => {
+      const profileData = await prisma.participantProfile.findFirstOrThrow({})
+      await prisma.participantProfile.create({
+        data: {
+          ...profileData,
+          id: 500,
+          familyId: 100,
+          participantType: 'DEPENDENT_AGE',
+          userId: null,
+        },
+      })
+      const response = await request(app)
+        .post('/studies/1/participants/500')
+        .set({ Authorization: `Bearer ${organisationAdminToken}` })
+
+      expect(response.ok).toBeTruthy()
+
+      const p = await prisma.studyParticipant.findFirst({
+        where: { participantProfileId: 500, studyId: 1 },
+      })
+      expect(p).not.toBeNull()
+    })
+
+    it('Fails to add dependent if guardian is not in the study', async () => {
+      const profileData = await prisma.participantProfile.findFirstOrThrow({})
+      await prisma.participantProfile.create({
+        data: { ...profileData, id: 500, familyId: 100, participantType: 'DEPENDENT_AGE' },
+      })
+      const response = await request(app)
+        .post('/studies/3/participants/500')
+        .set({ Authorization: `Bearer ${organisationAdminToken}` })
+
+      expect(response.ok).toBeFalsy()
+
+      const p = await prisma.studyParticipant.findFirst({
+        where: { participantProfileId: 500, studyId: 1 },
+      })
+      expect(p).toBeNull()
+    })
+
+    it('Can add a deleted participant back to a study', async () => {
+      await prisma.studyParticipant.update({
+        where: {
+          participantProfileId_studyId: {
+            participantProfileId: PARTICIPANT_UNANSWERED_ID,
+            studyId: 1,
+          },
+        },
+        data: { deleted: true },
+      })
+
+      const response = await request(app)
+        .post(`/studies/1/participants/${PARTICIPANT_UNANSWERED_ID}`)
+        .set({ Authorization: `Bearer ${organisationAdminToken}` })
+
+      expect(response.ok).toBeTruthy()
+
+      const p = await prisma.studyParticipant.findFirstOrThrow({
+        where: { participantProfileId: PARTICIPANT_UNANSWERED_ID, studyId: 1 },
+      })
+      expect(p.deleted).toBeFalsy()
+    })
+
+    it('Cannot add a participant who is part of another study (they must be invited)', async () => {
+      const response = await request(app)
+        .post(`/studies/4/participants/${PARTICIPANT_UNANSWERED_ID}`)
+        .set({ Authorization: `Bearer ${organisationAdminToken}` })
+
+      expect(response.ok).toBeFalsy()
+
+      const p = await prisma.studyParticipant.findFirst({
+        where: { participantProfileId: PARTICIPANT_UNANSWERED_ID, studyId: 4 },
+      })
+      expect(p).toBeNull()
+    })
+  })
+
+  describe('DELETE /participants/{profileId}', () => {
+    it('Can remove a participant from a study', async () => {
+      const response = await request(app)
+        .delete(`/studies/1/participants/${PARTICIPANT_UNANSWERED_ID}`)
+        .set({ Authorization: `Bearer ${organisationAdminToken}` })
+
+      expect(response.ok).toBeTruthy()
+      const p = await prisma.studyParticipant.findFirstOrThrow({
+        where: { participantProfileId: PARTICIPANT_UNANSWERED_ID, studyId: 1, deleted: true },
+      })
+      expect(p.deleted).toBeTruthy()
+    })
+  })
 })
 
 describe('InvitesController', () => {

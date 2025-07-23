@@ -28,14 +28,16 @@ import {
   InternalErrorResponse,
   NotFoundErrorResponse,
   UnauthorizedErrorResponse,
+  UnprocessableErrorResponse,
   ValidateErrorResponse,
 } from 'common/types/api/errors'
-import { NotFoundError } from '../middlewares/ErrorHandler'
+import { NotFoundError, UnprocessableError } from '../middlewares/ErrorHandler'
 import { auditLog } from '../middlewares/AuditLog'
 
 @Route('organisations')
 @Tags('Organisations')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
+@Response<UnprocessableErrorResponse>('422', 'Unprocessable Content')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 @Security('jwt', ['OrganisationAdmin'])
 @Middlewares(auditLog)
@@ -212,7 +214,7 @@ export class OrganisationsController extends Controller {
     if (userInOrganisation) {
       const errorMessage: string = `User with ID: ${userId} already in organisation with ID: ${orgID}`
       logger.error({ errorMessage })
-      throw new Error(errorMessage)
+      throw new UnprocessableError(errorMessage)
     }
 
     // Add user to organisation
@@ -259,7 +261,7 @@ export class OrganisationsController extends Controller {
     if (!userInOrganisation) {
       const errorMessage: string = `User with ID: ${userId} not in organisation with ID: ${orgID}`
       logger.error({ errorMessage })
-      throw new Error(errorMessage)
+      throw new UnprocessableError(errorMessage)
     }
 
     // Remove user from organisation
