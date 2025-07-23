@@ -23,7 +23,7 @@ import { FamilyMember } from 'common/types/api/users/getParticipantProfile'
 import { auditLog } from '../middlewares/AuditLog'
 import { ParticipantType } from '@prisma/client'
 import { createDefaultAnswers, recalculateAnswers } from '../utils/answers'
-import { UnprocessableError } from 'middlewares/ErrorHandler'
+import { UnprocessableError } from '../middlewares/ErrorHandler'
 
 @Route('studies/{studyId}/families')
 @Tags('Families')

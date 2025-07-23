@@ -49,6 +49,29 @@
           }
         }
       },
+      "UnprocessableErrorResponse": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "enum": [
+              "Unprocessable Content"
+            ],
+            "nullable": false
+          },
+          "details": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "message": "Unprocessable Content",
+          "details": "There was a problem"
+        }
+      },
       "ValidateErrorResponse": {
         "properties": {
           "message": {
@@ -77,6 +100,25 @@
             "value": ""
           }
         }
+      },
+      "UnprocessableError": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "stack": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "message"
+        ],
+        "type": "object",
+        "additionalProperties": false
       },
       "User": {
         "description": "Model User",
@@ -2310,7 +2352,22 @@
         "properties": {
           "data": {
             "items": {
-              "$ref": "#/components/schemas/FamilyMember"
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/FamilyMember"
+                },
+                {
+                  "properties": {
+                    "inStudy": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "inStudy"
+                  ],
+                  "type": "object"
+                }
+              ]
             },
             "type": "array"
           }
@@ -4402,6 +4459,16 @@
               }
             }
           },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal Server Error",
             "content": {
@@ -4472,6 +4539,16 @@
               }
             }
           },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal Server Error",
             "content": {
@@ -4496,6 +4573,166 @@
           }
         ],
         "parameters": [
+          {
+            "in": "path",
+            "name": "profileId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "DeleteParticipantById",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Remove a participant from the study",
+        "summary": "Remove a participant from the study",
+        "tags": [
+          "Participants"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "profileId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "AddParticipantById",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Add a participant to the study",
+        "summary": "Add a participant to the study, if they were formerly removed, or they don't have an account.\nThrows error if user has an account and should be added via the study invite process",
+        "tags": [
+          "Participants"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
           {
             "in": "path",
             "name": "profileId",
@@ -5082,6 +5319,16 @@
               }
             }
           },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal Server Error",
             "content": {
@@ -5126,6 +5373,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
                 }
               }
             }
@@ -5196,6 +5453,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
                 }
               }
             }
@@ -5342,6 +5609,16 @@
               }
             }
           },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal Server Error",
             "content": {
@@ -5412,6 +5689,16 @@
               }
             }
           },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal Server Error",
             "content": {
@@ -5471,6 +5758,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
                 }
               }
             }
@@ -5541,6 +5838,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
                 }
               }
             }
@@ -5668,11 +5975,11 @@
             }
           },
           "422": {
-            "description": "Validation Failed",
+            "description": "Unprocessable Content",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                  "$ref": "#/components/schemas/UnprocessableError"
                 }
               }
             }
@@ -5728,11 +6035,11 @@
             }
           },
           "422": {
-            "description": "Validation Failed",
+            "description": "Unprocessable Content",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                  "$ref": "#/components/schemas/UnprocessableError"
                 }
               }
             }
@@ -5772,11 +6079,11 @@
             }
           },
           "422": {
-            "description": "Validation Failed",
+            "description": "Unprocessable Content",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                  "$ref": "#/components/schemas/UnprocessableError"
                 }
               }
             }
@@ -5826,11 +6133,11 @@
             }
           },
           "422": {
-            "description": "Validation Failed",
+            "description": "Unprocessable Content",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                  "$ref": "#/components/schemas/UnprocessableError"
                 }
               }
             }
@@ -5899,11 +6206,11 @@
             }
           },
           "422": {
-            "description": "Validation Failed",
+            "description": "Unprocessable Content",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                  "$ref": "#/components/schemas/UnprocessableError"
                 }
               }
             }
@@ -5972,11 +6279,11 @@
             }
           },
           "422": {
-            "description": "Validation Failed",
+            "description": "Unprocessable Content",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                  "$ref": "#/components/schemas/UnprocessableError"
                 }
               }
             }
@@ -6040,6 +6347,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
                 }
               }
             }
@@ -6121,6 +6438,16 @@
               }
             }
           },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal Server Error",
             "content": {
@@ -6185,6 +6512,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
                 }
               }
             }
@@ -6262,6 +6599,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
                 }
               }
             }
@@ -6368,6 +6715,16 @@
               }
             }
           },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal Server Error",
             "content": {
@@ -6434,6 +6791,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
                 }
               }
             }
@@ -6506,6 +6873,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
                 }
               }
             }

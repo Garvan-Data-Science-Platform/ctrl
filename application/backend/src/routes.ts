@@ -59,11 +59,30 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "UnprocessableErrorResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "message": {"dataType":"enum","enums":["Unprocessable Content"],"required":true},
+            "details": {"dataType":"string"},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "ValidateErrorResponse": {
         "dataType": "refObject",
         "properties": {
             "message": {"dataType":"enum","enums":["Validation Failed"],"required":true},
             "details": {"dataType":"nestedObjectLiteral","nestedProperties":{},"additionalProperties":{"dataType":"any"},"required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "UnprocessableError": {
+        "dataType": "refObject",
+        "properties": {
+            "name": {"dataType":"string","required":true},
+            "message": {"dataType":"string","required":true},
+            "stack": {"dataType":"string"},
         },
         "additionalProperties": false,
     },
