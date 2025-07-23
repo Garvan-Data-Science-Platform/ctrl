@@ -52,3 +52,9 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: NODE_VERSION=${{ steps.nvm.outputs.node_version }}
+  restart-dev-deployments:
+    needs: build_push
+    if: github.ref == 'refs/heads/dev' # Only restart if on dev branch
+    uses: Garvan-Data-Science-Platform/helm-deploy-config/.github/workflows/restart-deployments.yml@main
+    with:
+      environment: dev
