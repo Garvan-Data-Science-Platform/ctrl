@@ -41,6 +41,7 @@ import {
   IncorrectPermissionsError,
   InvalidCredentialsError,
   NotFoundError,
+  UnprocessableError,
 } from '../middlewares/ErrorHandler'
 import { ParticipantType } from 'common/types/api/users/ParticipantProfile'
 import { createDefaultAnswers } from '../utils/answers'
@@ -51,6 +52,7 @@ import config from '../config'
 @Tags('Auth')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 @Response<ValidateErrorResponse>('422', 'Validation Failed')
+@Response<UnprocessableError>('422', 'Unprocessable Content')
 @Middlewares(auditLog)
 export class AuthController extends Controller {
   userRepo = prisma.user
@@ -137,7 +139,7 @@ export class AuthController extends Controller {
 
     const existingUsers = await this.userRepo.count()
     if (existingUsers > 0) {
-      throw new Error('CTRL is already set up')
+      throw new UnprocessableError('CTRL is already set up')
     }
 
     const hashedPassword = await hashPassword(password)
@@ -394,7 +396,7 @@ export class AuthController extends Controller {
           value: `${firstName}, ${lastName} and ${dob}`,
         },
       })
-      throw new Error('Participant already exists')
+      throw new UnprocessableError('Participant already exists')
     }
 
     // Create Profile

@@ -11,6 +11,17 @@ export interface InternalErrorResponse {
 
 /**
  * @example {
+ *  "message": "Unprocessable Content",
+ *  "details": "There was a problem"
+ * }
+ */
+export interface UnprocessableErrorResponse {
+  message: 'Unprocessable Content'
+  details?: string
+}
+
+/**
+ * @example {
  *  "message": "Unauthorized",
  *  "details": { "message": "Token not in headers" }
  * }

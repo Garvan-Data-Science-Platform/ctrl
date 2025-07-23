@@ -4,6 +4,7 @@ import {
   InternalErrorResponse,
   NotFoundErrorResponse,
   ValidateErrorResponse,
+  UnprocessableErrorResponse,
 } from 'common/types/api/errors'
 import {
   Route,
@@ -22,11 +23,13 @@ import { FamilyMember } from 'common/types/api/users/getParticipantProfile'
 import { auditLog } from '../middlewares/AuditLog'
 import { ParticipantType } from '@prisma/client'
 import { createDefaultAnswers, recalculateAnswers } from '../utils/answers'
+import { UnprocessableError } from 'middlewares/ErrorHandler'
 
 @Route('studies/{studyId}/families')
 @Tags('Families')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
+@Response<UnprocessableErrorResponse>('422', 'Unprocessable Content')
 @Security('jwt', ['OrganisationAdmin'])
 @Middlewares(auditLog)
 export class FamiliesController extends Controller {
@@ -195,7 +198,7 @@ export class FamiliesController extends Controller {
     })
 
     if (depCheck) {
-      throw new Error('Dependent already registered in CTRL')
+      throw new UnprocessableError('Dependent already registered in CTRL')
     }
 
     const currentSurvey = await prisma.surveyVersion.findFirstOrThrow({
@@ -218,7 +221,7 @@ export class FamiliesController extends Controller {
     })
 
     if (!existingProfile) {
-      throw new Error('This family has no existing members in this study')
+      throw new UnprocessableError('This family has no existing members in this study')
     }
 
     const participantType = bodyRequest.permanent

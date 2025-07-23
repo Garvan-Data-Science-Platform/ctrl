@@ -150,7 +150,7 @@ export const FamilyEdit = () => {
       }
     >
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <Table sx={{ width: 800 }}>
+        <Table sx={{ width: 800 }} data-cy="current-family-members">
           <TableHead>
             <TableRow>
               <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
@@ -188,6 +188,7 @@ export const FamilyEdit = () => {
                 </TableCell>
                 <TableCell>
                   <Checkbox
+                    data-cy="in-study-checkbox"
                     checked={val.inStudy}
                     onClick={() => {
                       if (val.inStudy) {
@@ -203,8 +204,6 @@ export const FamilyEdit = () => {
           </TableBody>
         </Table>
 
-        <Box data-cy="current-family-members"></Box>
-
         <Box>
           <Button
             variant={action == 'ADD' ? 'contained' : 'outlined'}
@@ -216,9 +215,7 @@ export const FamilyEdit = () => {
           <Button
             sx={{ ml: 1 }}
             variant={action == 'REMOVE' ? 'contained' : 'outlined'}
-            onClick={() => {
-              action == 'REMOVE' ? setAction(null) : setAction('REMOVE')
-            }}
+            onClick={() => (action == 'REMOVE' ? setAction(null) : setAction('REMOVE'))}
             data-cy="remove-member-button"
           >
             Remove member from this family
@@ -365,9 +362,7 @@ export const FamilyEdit = () => {
                 <ParticipantSearch
                   buttonText="Add to family"
                   onConfirm={handleAdd}
-                  exclude={[...(data?.data.inStudy || []), ...(data?.data.notInStudy || [])].map(
-                    (val) => val.id,
-                  )}
+                  exclude={(data?.data || []).map((val) => val.id)}
                 />
               </>
             )}

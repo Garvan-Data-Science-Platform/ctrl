@@ -35,7 +35,7 @@ import { createMailerTransporter, fromAddress } from '../utils/mailer'
 import nodemailer from 'nodemailer'
 import { generateInviteEmail } from 'common/src/generateInviteTemplate'
 import { InviteStatus } from 'common/types/api/participants/invite'
-import { BadGatewayError, NotFoundError } from '../middlewares/ErrorHandler'
+import { BadGatewayError, NotFoundError, UnprocessableError } from '../middlewares/ErrorHandler'
 import {
   createDefaultAnswers,
   determineLastUpdated,
@@ -52,6 +52,7 @@ import { v4 as uuidv4 } from 'uuid'
 @Security('jwt', ['OrganisationAdmin'])
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
+@Response<InternalErrorResponse>('422', 'Unprocessable Content')
 @Middlewares(auditLog)
 export class ParticipantsController extends Controller {
   svaRepo = prisma.surveyVersionAnswers
@@ -69,7 +70,10 @@ export class ParticipantsController extends Controller {
     const participant_list = await prisma.studyParticipant.findMany({ where: { studyId } })
 
     const unique_participants = await this.svaRepo.findMany({
-      where: { profileId: { in: participant_list.map((val) => val.participantProfileId) } },
+      where: {
+        profileId: { in: participant_list.map((val) => val.participantProfileId) },
+        version: { studyId },
+      },
       select: {
         id: true,
         answers: true,
@@ -210,7 +214,7 @@ export class ParticipantsController extends Controller {
     })
 
     if (!currentSurvey) {
-      throw new Error('You need to publish a survey before adding participants')
+      throw new UnprocessableError('You need to publish a survey before adding participants')
     }
 
     const deletedP = await prisma.studyParticipant.findFirst({
@@ -243,7 +247,9 @@ export class ParticipantsController extends Controller {
         },
       })
       if (!guardian) {
-        throw new Error("Can't add a dependent to a study if no guardian is a member of the study")
+        throw new UnprocessableError(
+          "Can't add a dependent to a study if no guardian is a member of the study",
+        )
       }
 
       await this.participantRepo.create({
@@ -257,7 +263,7 @@ export class ParticipantsController extends Controller {
         },
       })
     } else {
-      throw new Error(
+      throw new UnprocessableError(
         'The participant must be invited to join the study via email (via the Participants page)',
       )
     }

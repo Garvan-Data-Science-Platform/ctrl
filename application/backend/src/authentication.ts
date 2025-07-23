@@ -3,7 +3,11 @@ import * as express from 'express'
 import * as jwt from 'jsonwebtoken'
 import logger from 'common/src/logger'
 import * as crypto from 'crypto'
-import { NoTokenError, IncorrectPermissionsError } from './middlewares/ErrorHandler'
+import {
+  NoTokenError,
+  IncorrectPermissionsError,
+  UnprocessableError,
+} from './middlewares/ErrorHandler'
 
 export function expressAuthentication(
   request: express.Request,
@@ -22,7 +26,7 @@ export function expressAuthentication(
 
       if (!process.env.JWT_SECRET) {
         logger.error({ message: 'JWT_SECRET environment variable not set' })
-        throw new Error('JWT_SECRET environment variable not set')
+        throw new UnprocessableError('JWT_SECRET environment variable not set')
       }
 
       jwt.verify(token, process.env.JWT_SECRET, function (err: any, decoded: any) {
@@ -72,7 +76,7 @@ export async function verifyPassword(hashedPassword: string, password: string): 
 export function generateToken(user: { userId: number; roles: string[] }): string {
   if (!process.env.JWT_SECRET) {
     logger.error({ message: 'JWT_SECRET environment variable not set' })
-    throw new Error('JWT_SECRET environment variable not set')
+    throw new UnprocessableError('JWT_SECRET environment variable not set')
   }
 
   const expiryValue = process.env.JWT_EXPIRY || '1hr'
