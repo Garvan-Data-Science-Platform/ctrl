@@ -38,6 +38,9 @@ jobs:
         id: nvm
         uses: ./.github/actions/parse-node-version
 
+      - name: Check node version
+        run: echo "node_version=${{ steps.nvm.outputs.node_version }}"
+
       - name: Build and Push ${{ matrix.name }} Image
         uses: docker/build-push-action@v3
         with:
