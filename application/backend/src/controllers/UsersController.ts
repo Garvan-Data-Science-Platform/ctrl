@@ -125,7 +125,7 @@ export class UsersController extends Controller {
       const responseData = {
         id: insertedUser.id,
       }
-      this.generatePasswordResetLink({ email: bodyRequest.email })
+      await this.generatePasswordResetLink({ email: bodyRequest.email })
       logger.info({ ...responseData })
       return responseData
     } catch (err) {

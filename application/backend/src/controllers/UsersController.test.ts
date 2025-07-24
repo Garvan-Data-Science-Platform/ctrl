@@ -33,6 +33,7 @@ describe('UsersController', () => {
 
   beforeEach(async () => {
     await resetDB()
+    mockNodeMailer.mock.reset()
   })
 
   afterAll(async () => {
@@ -283,9 +284,6 @@ describe('UsersController', () => {
 
   describe('POST /users/password/generate-reset-link', () => {
     const userEmail: string = 'test2@example.com'
-    beforeEach(async () => {
-      mockNodeMailer.mock.reset()
-    })
 
     it('should generate and send a password reset link to the users email', async () => {
       const generatePasswordResetLinkResponse = await request(app)
@@ -327,8 +325,6 @@ describe('UsersController', () => {
       }
 
       const response = await request(app).post('/users/password/reset').send(requestBody)
-
-      console.log(response)
 
       expect(response.status).toBe(200)
 
