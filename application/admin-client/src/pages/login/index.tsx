@@ -32,7 +32,7 @@ export const Login = () => {
     <AuthPage
       type="login"
       registerLink={false}
-      title="CTRL Admin Portal TEST THE DEV DEPLOYMENT PIPELINE"
+      title="CTRL Admin Portal"
       forgotPasswordLink={
         <Tooltip title="You need to use the CTRL User Portal to reset your password.">
           <Link href="#"> Forgot Password </Link>
