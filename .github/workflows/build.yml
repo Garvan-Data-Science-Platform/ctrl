@@ -1,17 +1,17 @@
 name: Build and Push
 
 on:
-  workflow_run:
-    workflows: ['Build checks']
-    branches: [main, dev]
-    types: [completed]
+  # workflow_run:
+  #   workflows: ['Build checks']
+  #   branches: [main, dev]
+  #   types: [completed]
   push:
 
 jobs:
   build_push:
     name: Build and Push ${{ matrix.name }}
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    # if: ${{ github.event.workflow_run.conclusion == 'success' }}
     permissions:
       contents: 'read'
       id-token: 'write'
