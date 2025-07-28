@@ -5,6 +5,7 @@ on:
     workflows: ['Build checks']
     branches: [main, dev]
     types: [completed]
+  push:
 
 jobs:
   build_push:
@@ -57,7 +58,7 @@ jobs:
 
   restart-dev-deployments:
     needs: build_push
-    if: github.ref == 'refs/heads/dev' # Only restart if on dev branch
+    # if: github.ref == 'refs/heads/dev' # Only restart if on dev branch
     uses: Garvan-Data-Science-Platform/helm-deploy-config/.github/workflows/restart-deployments.yml@main
     secrets: inherit
     with:
