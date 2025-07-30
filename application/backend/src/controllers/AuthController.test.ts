@@ -568,7 +568,6 @@ describe('AuthController', () => {
         password: 'password',
       }
       const loginResponse = await request(app).post('/auth/login').send(loginRequest)
-      console.log(loginResponse.body)
       expect(loginResponse.ok).toBe(true)
       expect(loginResponse.body.otp_token).toBeDefined()
     })
@@ -602,10 +601,20 @@ describe('AuthController', () => {
       expect(user.retriesRemaining).toBe(10)
     })
     it('Should refresh retries after successful login', async () => {
+      jest.replaceProperty(config, 'otp', false)
+
       await prisma.user.update({
         where: { id: PARTICIPANT_UNANSWERED_ID },
         data: { retriesRemaining: 1 },
       })
+      const loginRequest: LoginRequest = {
+        email: PARTICIPANT_UNANSWERED_EMAIL,
+        password: 'password',
+      }
+      const loginResponse = await request(app).post('/auth/login').send(loginRequest)
+      expect(loginResponse.ok).toBe(true)
+      const user = await prisma.user.findFirstOrThrow({ where: { id: PARTICIPANT_UNANSWERED_ID } })
+      expect(user.retriesRemaining).toBe(10)
     })
   })
   describe('POST /auth/login/otp', () => {
