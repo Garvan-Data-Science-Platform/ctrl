@@ -26,14 +26,18 @@ export default function Login() {
       .then((res) => {
         if (res.ok) {
           res.json().then((data: LoginResponse) => {
-            if (!data.token) throw new Error('No token provided')
-            login(data.token)
-            nav('/')
+            if (data.otp_token) {
+              nav('/login/otp', { state: data.otp_token })
+            } else if (!data.token) throw new Error('No token provided')
+            else {
+              login(data.token)
+              nav('/')
+            }
           })
         } else {
           res.json().then((data) => {
             setError('root.serverError', {
-              message: `Error Logging In: ${JSON.stringify(data.message)}`,
+              message: `Error Logging In: ${JSON.stringify(data.details)}`,
             })
           })
         }
