@@ -72,7 +72,11 @@ export const dataProvider = (): DataProvider => {
       }
     },
     deleteOne: async ({ resource, id }) => {
-      const response = await axiosInstance.delete(`${resource}/${id}`)
+      const { studies, activeStudyIndex } = useStudyStore.getState()
+      const studyId = studies[activeStudyIndex].id
+      let url = `${resource}/${id}`
+      if (studyResources.includes(resource)) url = `/studies/${studyId}/${url}`
+      const response = await axiosInstance.delete(url)
       const data = response.data
       return {
         data,

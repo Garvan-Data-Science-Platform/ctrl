@@ -124,9 +124,9 @@ export class ParticipantsController extends Controller {
   }
 
   /**
-   * Get participant by ID
+   * Get participant by profile ID
    *
-   * @summary Get a  Participant by ID
+   * @summary Get a  Participant by profile ID
    */
   @Get('/participants/{profileId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
