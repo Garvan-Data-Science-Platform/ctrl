@@ -161,6 +161,11 @@ export const ParticipantList = () => {
   const columns = React.useMemo<GridColDef[]>(
     () => [
       {
+        field: 'participantId',
+        flex: 1,
+        headerName: 'ID',
+      },
+      {
         field: 'firstName',
         flex: 1,
         headerName: 'First Name',

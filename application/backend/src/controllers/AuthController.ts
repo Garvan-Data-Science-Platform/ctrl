@@ -46,6 +46,7 @@ import { ParticipantType } from 'common/types/api/users/ParticipantProfile'
 import { createDefaultAnswers } from '../utils/answers'
 import { auditLog } from '../middlewares/AuditLog'
 import config from '../config'
+import { genId } from 'utils/genId'
 
 @Route('auth')
 @Tags('Auth')
@@ -420,6 +421,9 @@ export class AuthController extends Controller {
           dependents.length > 0 ? ParticipantType.GUARDIAN : ParticipantType.STANDARD,
       },
     })
+
+    //Generate unique Ids
+    await genId(studyId, profile.id)
 
     // Fetch current survey
     const currentSurvey = await this.surveyRepo.findFirstOrThrow({

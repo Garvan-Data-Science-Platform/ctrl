@@ -70,6 +70,8 @@ model StudyParticipant {
   participantProfileId Int
   study                Study              @relation(fields: [studyId], references: [id], onDelete: Cascade)
   studyId              Int
+  participantNumber    Int                @default(0)
+  participantId        String?
 
   @@id([participantProfileId, studyId])
 }
