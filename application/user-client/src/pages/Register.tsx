@@ -6,6 +6,8 @@ import {
   Checkbox,
   Container,
   FormControl,
+  FormControlLabel,
+  FormHelperText,
   IconButton,
   InputLabel,
   MenuItem,
@@ -44,6 +46,7 @@ interface FormValues {
   nok_surname: string
   nok_email: string
   dependents: OnBehalf[]
+  terms: boolean
 }
 
 export default function Register() {
@@ -421,6 +424,35 @@ export default function Register() {
                   Add Dependent
                 </Button>
               </>
+            </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexGrow: 1,
+                ml: 1,
+              }}
+            >
+              <FormControl error={Boolean(errors.terms)}>
+                <FormControlLabel
+                  control={
+                    <Checkbox defaultChecked={false} {...register('terms', { required: true })} />
+                  }
+                  label={
+                    <Typography>
+                      I agree to the{' '}
+                      <a target="_blank" href={import.meta.env.VITE_BACKEND_URL + '/auth/tcs'}>
+                        CTRL Terms and Conditions
+                      </a>
+                    </Typography>
+                  }
+                />
+                {errors.terms && (
+                  <FormHelperText>You must check this box to register</FormHelperText>
+                )}
+              </FormControl>
             </Box>
             {errors.root ? (
               <Alert sx={{ flexGrow: 1, m: 1 }} severity="error">

@@ -16,6 +16,7 @@ const SettingsPage = () => {
     secondaryColour: string | null
     redcapURL: string | null
     redcapToken: string | null
+    tcLink: string | null
   }
 
   const {
@@ -160,6 +161,23 @@ const SettingsPage = () => {
             />
           </Box>
         </Box>
+        <TextField
+          {...register('tcLink', {
+            pattern: {
+              value:
+                /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/, //eslint-disable-line
+              message: 'Invalid url, must include http(s)://...',
+            },
+          })}
+          error={!!(errors as any)?.tcLink}
+          helperText={(errors as any)?.tcLink?.message}
+          margin="normal"
+          InputLabelProps={{ shrink: true }}
+          type="text"
+          label={'Terms and Conditions URL'}
+          name="tcLink"
+          data-cy="tcLink"
+        />
         <Typography sx={{ mt: 2 }}>Colour Scheme (User Portal)</Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <TextField
