@@ -38,6 +38,7 @@ describe('SettingsController', () => {
     redcapURL: 'http://redcaptest.com',
     primaryColour: null,
     secondaryColour: null,
+    tcLink: 'https://garvan-data-science-platform.github.io/ctrl-docs/terms',
   }
 
   describe('GET /settings', () => {

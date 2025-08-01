@@ -438,7 +438,11 @@ export default function Register() {
               <FormControl error={Boolean(errors.terms)}>
                 <FormControlLabel
                   control={
-                    <Checkbox defaultChecked={false} {...register('terms', { required: true })} />
+                    <Checkbox
+                      data-cy="terms"
+                      defaultChecked={false}
+                      {...register('terms', { required: true })}
+                    />
                   }
                   label={
                     <Typography>
