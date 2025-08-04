@@ -90,7 +90,7 @@ jobs:
           project_id: ctrl-358804
 
       - name: Copy Helm charts to VM
-        if: steps.helm-changes.outputs.changed == 'true'
+        if: ${{ steps.helm-changes.outputs.changed == 'true' }}
         run: |
           gcloud --quiet beta compute scp --recurse .helm/ctrl/ \
             ctrl-dev:~/ \
