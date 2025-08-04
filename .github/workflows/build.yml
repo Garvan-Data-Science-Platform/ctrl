@@ -88,7 +88,7 @@ jobs:
         if: steps.helm-changes.outputs.changed == 'true'
         run: |
           gcloud --quiet beta compute scp --recurse .helm/ctrl/ \
-            ctrl-dev:~/helm-charts/ \
+            ctrl-dev:~/ \
             --zone=australia-southeast1-a \
             --project=ctrl-358804
 
