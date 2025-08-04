@@ -87,7 +87,7 @@ jobs:
       - name: Copy Helm charts to VM
         if: steps.helm-changes.outputs.changed == 'true'
         run: |
-          gcloud beta compute scp --recurse .helm/ctrl/ \
+          gcloud --quiet beta compute scp --recurse .helm/ctrl/ \
             ctrl-dev:~/helm-charts/ \
             --zone=australia-southeast1-a \
             --project=ctrl-358804
