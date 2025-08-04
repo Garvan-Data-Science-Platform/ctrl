@@ -84,6 +84,11 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Set up Google Cloud SDK
+        uses: 'google-github-actions/setup-gcloud@v2'
+        with:
+          project_id: ctrl-358804
+
       - name: Copy Helm charts to VM
         if: steps.helm-changes.outputs.changed == 'true'
         run: |
