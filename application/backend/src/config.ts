@@ -29,6 +29,7 @@ const schema = {
         additionalProperties: false,
       },
     },
+    disableAdminPasswordLogin: { type: 'boolean' },
   },
   additionalProperties: false,
 } as const

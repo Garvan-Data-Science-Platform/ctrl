@@ -1,0 +1,12 @@
+{
+  oidc: [
+    {
+      name: '',
+      providerUrl: '',
+      icon: '',
+      clientId: '',
+      clientSecret: '',
+    },
+  ],
+  disablePasswordLogin: true,
+}

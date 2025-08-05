@@ -1,5 +1,5 @@
 import type { AuthProvider } from '@refinedev/core'
-import { useOIDCProviderStore } from '../oidcProvidersStore'
+import { useAuthStore } from '../authStore'
 
 export const TOKEN_KEY = 'refine-auth'
 
@@ -40,7 +40,7 @@ export const authProvider: AuthProvider = {
       }
     }
 
-    const providers = useOIDCProviderStore.getState().providers
+    const providers = useAuthStore.getState().providers
     const match = providers.find((val) => val.name == providerName)
 
     if (match) {

@@ -16,6 +16,8 @@ config:
     #  clientSecret:
     #  icon: #A link to png for login button
 
+  disableAdminPasswordLogin: false
+
 userClient:
   image:
     repository: australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-user-client

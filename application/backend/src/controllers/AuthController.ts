@@ -113,6 +113,7 @@ export class AuthController extends Controller {
         clientId: val.clientId,
         icon: val.icon,
       })),
+      disableAdminPasswordLogin: config.disableAdminPasswordLogin || false,
     }
   }
 
