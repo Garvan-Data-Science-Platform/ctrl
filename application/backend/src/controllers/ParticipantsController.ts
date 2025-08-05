@@ -40,7 +40,7 @@ import { ProfilesController } from './ProfilesController'
 import { auditLog } from '../middlewares/AuditLog'
 import { Role } from '@prisma/client'
 import { v4 as uuidv4 } from 'uuid'
-import { genId } from 'utils/genId'
+import { genId } from '../utils/genId'
 
 @Route('studies/{studyId}')
 @Tags('Participants')
@@ -92,12 +92,17 @@ export class ParticipantsController extends Controller {
       const lastUpdated = Math.max(
         ...(p_answers.map((val) => determineLastUpdated(val.answers)) as unknown as number[]),
       )
-      const study_part = await prisma.studyParticipant.findFirstOrThrow({
-        where: { studyId, participantProfileId: p.profile.id },
+      const study_part = await prisma.studyParticipant.findUnique({
+        where: {
+          participantProfileId_studyId: {
+            studyId,
+            participantProfileId: p.profile.id,
+          },
+        },
       })
       const p_data: Participant = {
         id: p.profile.id,
-        participantId: study_part.participantId || '',
+        participantId: study_part?.participantId || '',
         email: p.profile.user?.email,
         firstName: p.profile.firstName,
         lastName: p.profile.lastName,

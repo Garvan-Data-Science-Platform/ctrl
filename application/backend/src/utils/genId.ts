@@ -1,4 +1,4 @@
-import prisma from 'PrismaClient'
+import prisma from '../PrismaClient'
 
 import { createHmac } from 'crypto'
 

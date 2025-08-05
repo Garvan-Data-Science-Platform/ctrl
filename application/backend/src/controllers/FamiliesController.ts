@@ -22,7 +22,7 @@ import { FamilyMember } from 'common/types/api/users/getParticipantProfile'
 import { auditLog } from '../middlewares/AuditLog'
 import { ParticipantType } from '@prisma/client'
 import { createDefaultAnswers, recalculateAnswers } from '../utils/answers'
-import { genId } from 'utils/genId'
+import { genId } from '../utils/genId'
 
 @Route('studies/{studyId}/families')
 @Tags('Families')

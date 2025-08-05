@@ -46,7 +46,7 @@ import { ParticipantType } from 'common/types/api/users/ParticipantProfile'
 import { createDefaultAnswers } from '../utils/answers'
 import { auditLog } from '../middlewares/AuditLog'
 import config from '../config'
-import { genId } from 'utils/genId'
+import { genId } from '../utils/genId'
 
 @Route('auth')
 @Tags('Auth')
