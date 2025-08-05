@@ -80,8 +80,10 @@ jobs:
         id: helm-changes
         run: |
           if git diff --quiet HEAD~1 HEAD -- .helm/; then
+            echo "No changes in Helm charts."
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
+            echo "Changes detected in Helm charts."
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
