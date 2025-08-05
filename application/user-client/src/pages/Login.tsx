@@ -57,7 +57,6 @@ export default function Login() {
         <Card sx={{ maxWidth: 400, mr: 'auto', ml: 'auto', mt: 10, p: 2 }}>
           <form onSubmit={handleSubmit(onSubmit)}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              DEV DEPLOYMENT TEST
               <Box sx={{ mt: 5, mb: 2 }}>
                 <img
                   src={import.meta.env.VITE_BACKEND_URL + '/settings/logo'}
