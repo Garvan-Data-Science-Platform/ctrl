@@ -43,7 +43,7 @@ jobs:
         run: echo "node_version=${{ steps.nvm.outputs.node_version }}"
 
       - name: Build and Push ${{ matrix.name }} Image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: application/${{ matrix.name }}/Dockerfile
@@ -69,6 +69,8 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
@@ -108,4 +110,4 @@ jobs:
     secrets: inherit
     with:
       environment: dev
-      helm-changed: ${{ needs.push_helm_charts.outputs.helm-changed }}
+      helm-changed: ${{ needs.push_helm_charts.outputs.helm-changed == 'true' }}
