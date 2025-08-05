@@ -38,7 +38,7 @@ import { NotFoundError, PasswordResetTokenInvalidError } from '../middlewares/Er
 import { hashPassword } from '../authentication'
 import { checkPasswordStrength } from 'common/src/PasswordStrength'
 import { generatePasswordResetEmail } from '../utils/passwordResetTemplate'
-import crypto from 'crypto'
+import crypto, { randomBytes } from 'crypto'
 import nodemailer from 'nodemailer'
 import { createMailerTransporter, fromAddress } from '../utils/mailer'
 import { auditLog } from '../middlewares/AuditLog'
@@ -118,12 +118,14 @@ export class UsersController extends Controller {
   @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
   public async createUser(@Body() bodyRequest: CreateUserRequest): Promise<CreateUserResponse> {
     try {
+      const password = hashPassword(randomBytes(8).toString('hex'))
       const insertedUser = await this.userRepo.create({
-        data: { ...bodyRequest, password: hashPassword(bodyRequest.password) },
+        data: { ...bodyRequest, password },
       })
       const responseData = {
         id: insertedUser.id,
       }
+      await this.generatePasswordResetLink({ email: bodyRequest.email })
       logger.info({ ...responseData })
       return responseData
     } catch (err) {
