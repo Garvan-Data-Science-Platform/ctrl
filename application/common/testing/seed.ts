@@ -36,6 +36,7 @@ export async function seedTests(prisma: PrismaClient) {
     },
   })
 
+  //Sets auto-increment counter
   await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"Organisation"', 'id'), 2, false) FROM "Organisation";`
 
   // Create three studies
@@ -62,7 +63,8 @@ export async function seedTests(prisma: PrismaClient) {
       id: 3,
     },
   })
-
+  
+  //Sets auto-increment counter
   await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"Study"', 'id'), 4, false) FROM "Study";`
 
   // OperatorAdminUser
