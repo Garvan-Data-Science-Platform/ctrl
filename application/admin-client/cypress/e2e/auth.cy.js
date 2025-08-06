@@ -29,7 +29,7 @@ describe('auth', () => {
 
     // Expect to stay on the login page & error message popup
     cy.url().should('not.include', '/users')
-    cy.contains('Error Logging In: "Incorrect Permissions"').should('exist')
+    cy.contains('admin privileges').should('exist')
   })
 
   it('can use oidc login and disable password login', () => {

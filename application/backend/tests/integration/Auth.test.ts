@@ -1,12 +1,13 @@
 import request from 'supertest'
 import { Api } from '../../src/Api'
 import {
+  LoginRequest,
   RegisterParticipantRequest,
   RegisterRequest,
   RegisterResponse,
 } from 'common/types/api/auth'
 import { resetDB } from 'common/testing/TestHelpers'
-import { TEST_STUDY } from 'common/testing/seed'
+import { PARTICIPANT_UNANSWERED_EMAIL, TEST_STUDY } from 'common/testing/seed'
 import {
   ContactMethod,
   ParticipantType,
@@ -15,6 +16,14 @@ import {
 import prisma from '../../src/PrismaClient'
 import { Role } from '@prisma/client'
 import { generateToken } from '../../src/authentication'
+import { NodemailerMock } from 'nodemailer-mock'
+import * as nodemailer from 'nodemailer'
+
+jest.mock('../../src/config')
+import config from '../../src/config'
+import { OTPLoginRequest } from 'common/types/api/auth/login'
+
+const mockNodeMailer = nodemailer as unknown as NodemailerMock
 
 const api = new Api()
 const app = api.app
@@ -87,18 +96,6 @@ describe('Auth', () => {
 
     expect(loginResponse.status).toBe(200)
     const token = loginResponse.body.token
-    /*
-    const protectedRouteBeforeExpiryResponse = await request(app)
-      .get('/users')
-      .set({ Authorization: `Bearer ${token}` })
-
-    expect(protectedRouteBeforeExpiryResponse.status).toBe(200)
-    expect(protectedRouteBeforeExpiryResponse.body.message).toBe('Got all users')
-    expect(protectedRouteBeforeExpiryResponse.body.users).not.toBeNull()
-
-    // Wait for 1 second to ensure the token expires
-    //await new Promise((resolve) => setTimeout(resolve, 1000))
-    */
 
     const protectedRouteResponse = await request(app)
       .get('/users')
@@ -203,5 +200,25 @@ describe('Auth', () => {
 
     expect(adminLoginResponse.status).toBe(401) // Should not allow login
     expect(adminLoginResponse.body.message).toBe('Incorrect Permissions')
+  })
+  it('Should enforce limited password retries', () => {})
+
+  it('Should support OTP based login', async () => {
+    jest.replaceProperty(config, 'otp', true)
+    const loginRequest: LoginRequest = {
+      email: PARTICIPANT_UNANSWERED_EMAIL,
+      password: 'password',
+    }
+    const res = await request(app).post('/auth/login').send(loginRequest)
+    const sentEmails = mockNodeMailer.mock.getSentMail()
+    const code = sentEmails[0].text?.toString().slice(-4) || ''
+
+    const otpRequest: OTPLoginRequest = {
+      otp_code: code,
+      otp_token: res.body.otp_token,
+    }
+    const res2 = await request(app).post('/auth/login/otp').send(otpRequest)
+    expect(res2.ok).toBe(true)
+    expect(res2.body.token).toBeDefined()
   })
 })

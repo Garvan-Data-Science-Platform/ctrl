@@ -1,16 +1,19 @@
 import { Link, Tooltip } from '@mui/material'
 import { AuthPage } from '@refinedev/mui'
 import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../authStore'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { SetupResponse } from '@common/types/api/auth'
 
 export const Login = () => {
   const nav = useNavigate()
 
   const authStore = useAuthStore()
+  // eslint-disable-next-line
+  const [_, setSearchParams] = useSearchParams()
 
   useEffect(() => {
+    setSearchParams({})
     fetch(import.meta.env.VITE_BACKEND_URL + '/auth/setup', {
       method: 'GET',
     }).then((res) => {

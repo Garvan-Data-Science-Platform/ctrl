@@ -8,6 +8,7 @@ const config = {
       clientSecret: 'testsecret',
     },
   ],
+  otp: false,
 }
 
 export default config

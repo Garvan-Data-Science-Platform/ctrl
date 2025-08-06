@@ -12,7 +12,11 @@ import type {
 import prisma from '../PrismaClient'
 import { Role } from '@prisma/client'
 import { resetDB, wipeDB } from 'common/testing/TestHelpers'
-import { PARTICIPANT_UNANSWERED_EMAIL, TEST_STUDY } from 'common/testing/seed'
+import {
+  PARTICIPANT_UNANSWERED_EMAIL,
+  PARTICIPANT_UNANSWERED_ID,
+  TEST_STUDY,
+} from 'common/testing/seed'
 import {
   ContactMethod,
   ParticipantType,
@@ -20,11 +24,13 @@ import {
 } from 'common/types/api/users/ParticipantProfile'
 import { generateToken } from '../authentication'
 import fetchMock from 'fetch-mock'
+jest.mock('../config')
+import config from '../config'
+import { OTPLoginRequest } from 'common/types/api/auth/login'
 
 const api = new Api()
 const app = api.app
 let orgAdminToken: string
-jest.mock('../config')
 
 describe('AuthController', () => {
   beforeAll(async () => {
@@ -537,7 +543,6 @@ describe('AuthController', () => {
       expect(body.message).toBe('Validation Failed')
       expect(body.details).toEqual({
         'bodyRequest.email': { message: 'Please provide valid email', value: '' },
-        'bodyRequest.password': { message: 'Password must be at least 8 characters', value: '' },
       })
     })
 
@@ -556,8 +561,133 @@ describe('AuthController', () => {
         'bodyRequest.email': { message: 'Please provide valid email', value: loginRequest.email },
       })
     })
+    it('Should return an otp token if otp is enabled', async () => {
+      jest.replaceProperty(config, 'otp', true)
+      const loginRequest: LoginRequest = {
+        email: PARTICIPANT_UNANSWERED_EMAIL,
+        password: 'password',
+      }
+      const loginResponse = await request(app).post('/auth/login').send(loginRequest)
+      expect(loginResponse.ok).toBe(true)
+      expect(loginResponse.body.otp_token).toBeDefined()
+    })
+    it('Should lock access for 10 mins if retries exceeded', async () => {
+      await prisma.user.update({
+        where: { id: PARTICIPANT_UNANSWERED_ID },
+        data: { retriesRemaining: 1 },
+      })
+      const loginRequest: LoginRequest = {
+        email: PARTICIPANT_UNANSWERED_EMAIL,
+        password: 'wrong',
+      }
+      await request(app).post('/auth/login').send(loginRequest)
+      const user = await prisma.user.findFirstOrThrow({ where: { id: PARTICIPANT_UNANSWERED_ID } })
+      expect(user.retriesRemaining).toBe(0)
+      const loginResponse = await request(app).post('/auth/login').send(loginRequest)
+      expect(loginResponse.body.details).toBe('Retries exceeded, account locked for 10 minutes')
+    })
+    it('Should lock access for 24 hours if retries exceeded again in 24 hours', async () => {
+      await prisma.user.update({
+        where: { id: PARTICIPANT_UNANSWERED_ID },
+        data: { retriesRemaining: 0, lockedUntil: new Date(new Date().getTime() - 1000) },
+      })
+      const loginRequest: LoginRequest = {
+        email: PARTICIPANT_UNANSWERED_EMAIL,
+        password: 'wrong',
+      }
+      const loginResponse = await request(app).post('/auth/login').send(loginRequest)
+      expect(loginResponse.body.details).toBe('Retries exceeded, account locked for 24 hours')
+      const user = await prisma.user.findFirstOrThrow({ where: { id: PARTICIPANT_UNANSWERED_ID } })
+      expect(user.retriesRemaining).toBe(10)
+    })
+    it('Should refresh retries after successful login', async () => {
+      jest.replaceProperty(config, 'otp', false)
+
+      await prisma.user.update({
+        where: { id: PARTICIPANT_UNANSWERED_ID },
+        data: { retriesRemaining: 1 },
+      })
+      const loginRequest: LoginRequest = {
+        email: PARTICIPANT_UNANSWERED_EMAIL,
+        password: 'password',
+      }
+      const loginResponse = await request(app).post('/auth/login').send(loginRequest)
+      expect(loginResponse.ok).toBe(true)
+      const user = await prisma.user.findFirstOrThrow({ where: { id: PARTICIPANT_UNANSWERED_ID } })
+      expect(user.retriesRemaining).toBe(10)
+    })
   })
+  describe('POST /auth/login/otp', () => {
+    beforeEach(async () => {
+      await prisma.oTPToken.create({
+        data: {
+          code: '1223',
+          expiresAt: new Date(new Date().getTime() + 1000 * 60),
+          id: 'abc123',
+          userId: PARTICIPANT_UNANSWERED_ID,
+        },
+      })
+    })
+    it('Should allow login if otp is valid', async () => {
+      const loginRequest: OTPLoginRequest = {
+        otp_code: '1223',
+        otp_token: 'abc123',
+      }
+      const loginResponse = await request(app).post('/auth/login/otp').send(loginRequest)
+      expect(loginResponse.ok).toBe(true)
+      expect(loginResponse.body.token).toBeDefined()
+    })
+    it('Should decrement available retries if code is invalid', async () => {
+      const loginRequest: OTPLoginRequest = {
+        otp_code: '1220',
+        otp_token: 'abc123',
+      }
+      const loginResponse = await request(app).post('/auth/login/otp').send(loginRequest)
+      expect(loginResponse.ok).toBe(false)
+      expect(loginResponse.body.token).toBeUndefined()
+      const user = await prisma.user.findFirstOrThrow({ where: { id: PARTICIPANT_UNANSWERED_ID } })
+      expect(user.retriesRemaining).toBe(9)
+    })
+    it('Should prevent login if otp is expired', async () => {
+      await prisma.oTPToken.update({
+        where: { id: 'abc123' },
+        data: { expiresAt: new Date(new Date().getTime() - 1000) },
+      })
+      const loginRequest: OTPLoginRequest = {
+        otp_code: '1223',
+        otp_token: 'abc123',
+      }
+      const loginResponse = await request(app).post('/auth/login/otp').send(loginRequest)
+      expect(loginResponse.body.details).toBe('Code expired')
+    })
+    it('Should not allow login if user is locked out', async () => {
+      await prisma.user.update({
+        where: { id: PARTICIPANT_UNANSWERED_ID },
+        data: { lockedUntil: new Date(new Date().getTime() + 1000 * 60) },
+      })
+      const loginRequest: OTPLoginRequest = {
+        otp_code: '1223',
+        otp_token: 'abc123',
+      }
+      const loginResponse = await request(app).post('/auth/login/otp').send(loginRequest)
+      expect(loginResponse.body.details.includes('locked')).toBe(true)
+    })
+  })
+
   describe('POST /auth/login/oidc', () => {
+    beforeEach(() => {
+      jest.setMock('../config', {
+        oidc: [
+          {
+            name: 'test',
+            providerUrl: 'http://testurl',
+            icon: 'https://aaf.edu.au/wp-content/uploads/AAF_LGO_small-website.png',
+            clientId: 'testid',
+            clientSecret: 'testsecret',
+          },
+        ],
+      })
+    })
     it('Should allow oidc login', async () => {
       fetchMock.mockGlobal().route('http://testurl/oauth2/token', { access_token: '123' })
       fetchMock.mockGlobal().route('http://testurl/oauth2/userinfo', {

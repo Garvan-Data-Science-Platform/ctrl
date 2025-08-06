@@ -75,7 +75,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "DefaultSelection_Prisma._36_UserPayload_": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"deleted":{"dataType":"boolean","required":true},"agreedTermsAt":{"dataType":"union","subSchemas":[{"dataType":"datetime"},{"dataType":"enum","enums":[null]}],"required":true},"updatedAt":{"dataType":"datetime","required":true},"createdAt":{"dataType":"datetime","required":true},"role":{"ref":"_36_Enums.Role","required":true},"password":{"dataType":"string","required":true},"emailHash":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"email":{"dataType":"string","required":true},"lastName":{"dataType":"string","required":true},"middleName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"firstName":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"deleted":{"dataType":"boolean","required":true},"retriesRemaining":{"dataType":"double","required":true},"lockedUntil":{"dataType":"union","subSchemas":[{"dataType":"datetime"},{"dataType":"enum","enums":[null]}],"required":true},"updatedAt":{"dataType":"datetime","required":true},"createdAt":{"dataType":"datetime","required":true},"role":{"ref":"_36_Enums.Role","required":true},"password":{"dataType":"string","required":true},"emailHash":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"email":{"dataType":"string","required":true},"lastName":{"dataType":"string","required":true},"middleName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"firstName":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "User": {
@@ -771,7 +771,8 @@ const models: TsoaRoute.Models = {
     "LoginResponse": {
         "dataType": "refObject",
         "properties": {
-            "token": {"dataType":"string","required":true},
+            "token": {"dataType":"string"},
+            "otp_token": {"dataType":"string"},
         },
         "additionalProperties": false,
     },
@@ -790,7 +791,16 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "email": {"dataType":"string","required":true,"validators":{"pattern":{"errorMsg":"Please provide valid email","value":"^(.+)@(.+)$"}}},
-            "password": {"dataType":"string","required":true,"validators":{"minLength":{"errorMsg":"Password must be at least 8 characters","value":8}}},
+            "password": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "OTPLoginRequest": {
+        "dataType": "refObject",
+        "properties": {
+            "otp_token": {"dataType":"string","required":true},
+            "otp_code": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },
@@ -2807,30 +2817,31 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsAuthController_tcs: Record<string, TsoaRoute.ParameterSchema> = {
-                request: {"in":"request","name":"request","required":true,"dataType":"object"},
+        const argsAuthController_loginOtp: Record<string, TsoaRoute.ParameterSchema> = {
+                bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"OTPLoginRequest"},
+                clientType: {"in":"header","name":"x-client-type","dataType":"string"},
         };
-        app.get('/auth/tcs',
+        app.post('/auth/login/otp',
             ...(fetchMiddlewares<RequestHandler>(AuthController)),
-            ...(fetchMiddlewares<RequestHandler>(AuthController.prototype.tcs)),
+            ...(fetchMiddlewares<RequestHandler>(AuthController.prototype.loginOtp)),
 
-            async function AuthController_tcs(request: ExRequest, response: ExResponse, next: any) {
+            async function AuthController_loginOtp(request: ExRequest, response: ExResponse, next: any) {
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsAuthController_tcs, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args: argsAuthController_loginOtp, request, response });
 
                 const controller = new AuthController();
 
               await templateService.apiHandler({
-                methodName: 'tcs',
+                methodName: 'loginOtp',
                 controller,
                 response,
                 next,
                 validatedArgs,
-                successStatus: 302,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);

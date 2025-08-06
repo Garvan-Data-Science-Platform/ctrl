@@ -23,11 +23,20 @@ export const authProvider: AuthProvider = {
         headers: { 'Content-Type': 'application/json', 'x-client-type': clientType },
       })
       const data = await res.json()
+
       if (res.ok) {
-        localStorage.setItem(TOKEN_KEY, data.token)
-        return {
-          success: true,
-          redirectTo: '/',
+        if (data.otp_token) {
+          return {
+            success: true,
+            redirectTo: `/login/otp?token=${data.otp_token}`,
+          }
+        } else if (!data.token) throw new Error('No token provided')
+        else {
+          localStorage.setItem(TOKEN_KEY, data.token)
+          return {
+            success: true,
+            redirectTo: '/',
+          }
         }
       }
       // Handle invalid credentials
@@ -35,7 +44,7 @@ export const authProvider: AuthProvider = {
         success: false,
         error: {
           name: 'LoginError',
-          message: `Error Logging In: ${JSON.stringify(data.message)}`,
+          message: `Error Logging In: ${JSON.stringify(data.details)}`,
         },
       }
     }
