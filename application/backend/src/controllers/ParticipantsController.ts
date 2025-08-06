@@ -40,6 +40,7 @@ import { ProfilesController } from './ProfilesController'
 import { auditLog } from '../middlewares/AuditLog'
 import { Role } from '@prisma/client'
 import { v4 as uuidv4 } from 'uuid'
+import { genId } from '../utils/genId'
 
 @Route('studies/{studyId}')
 @Tags('Participants')
@@ -91,8 +92,17 @@ export class ParticipantsController extends Controller {
       const lastUpdated = Math.max(
         ...(p_answers.map((val) => determineLastUpdated(val.answers)) as unknown as number[]),
       )
+      const study_part = await prisma.studyParticipant.findUnique({
+        where: {
+          participantProfileId_studyId: {
+            studyId,
+            participantProfileId: p.profile.id,
+          },
+        },
+      })
       const p_data: Participant = {
         id: p.profile.id,
+        participantId: study_part?.participantId || '',
         email: p.profile.user?.email,
         firstName: p.profile.firstName,
         lastName: p.profile.lastName,
@@ -117,7 +127,10 @@ export class ParticipantsController extends Controller {
    */
   @Get('/participants/{profileId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  public async getParticipantById(@Path() profileId: number): Promise<GetParticipantResponse> {
+  public async getParticipantById(
+    @Path() studyId: number,
+    @Path() profileId: number,
+  ): Promise<GetParticipantResponse> {
     const profile = await this.profileRepo.findFirstOrThrow({
       where: { id: profileId },
       select: {
@@ -142,9 +155,14 @@ export class ParticipantsController extends Controller {
       orderBy: { versionId: 'asc' },
     })
 
+    const sp = await prisma.studyParticipant.findFirstOrThrow({
+      where: { participantProfileId: profileId, studyId: studyId },
+    })
+
     return {
       data: {
         id: profileId,
+        participantId: sp.participantId || '',
         profile: profileData,
         firstName: profile.firstName,
         lastName: profile.lastName,
@@ -334,6 +352,8 @@ export class InvitesController extends Controller {
         },
       },
     })
+
+    await genId(invite.studyId, existingProfile.id)
 
     await prisma.surveyVersionAnswers.create({
       data: {

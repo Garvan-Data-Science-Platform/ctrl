@@ -32,6 +32,10 @@ export const ParticipantShow = () => {
     >
       <Stack gap={1}>
         <Typography variant="body1" fontWeight="bold">
+          {'Participant ID'}
+        </Typography>
+        <TextField value={record?.participantId} />
+        <Typography variant="body1" fontWeight="bold">
           {'First Name'}
         </Typography>
         <TextField value={record?.firstName} />

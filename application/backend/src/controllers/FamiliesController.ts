@@ -22,6 +22,7 @@ import { FamilyMember } from 'common/types/api/users/getParticipantProfile'
 import { auditLog } from '../middlewares/AuditLog'
 import { ParticipantType } from '@prisma/client'
 import { createDefaultAnswers, recalculateAnswers } from '../utils/answers'
+import { genId } from '../utils/genId'
 
 @Route('studies/{studyId}/families')
 @Tags('Families')
@@ -224,6 +225,8 @@ export class FamiliesController extends Controller {
         },
       },
     })
+
+    await genId(studyId, depProfile.id)
 
     await prisma.surveyVersionAnswers.create({
       data: {
