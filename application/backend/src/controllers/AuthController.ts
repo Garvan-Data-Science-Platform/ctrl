@@ -48,6 +48,10 @@ import { ParticipantType } from 'common/types/api/users/ParticipantProfile'
 import { createDefaultAnswers } from '../utils/answers'
 import { auditLog } from '../middlewares/AuditLog'
 import config from '../config'
+import type { OTPLoginRequest } from 'common/types/api/auth/login'
+import { randomInt } from 'node:crypto'
+import nodemailer from 'nodemailer'
+import { createMailerTransporter, fromAddress } from '../utils/mailer'
 import { genId } from '../utils/genId'
 
 @Route('auth')
@@ -292,8 +296,6 @@ export class AuthController extends Controller {
 
       const { access_token } = await token_res.json()
 
-      console.log('TOKEN', access_token)
-
       const userinfo_res = await fetch(`${providerUrl}/oauth2/userinfo`, {
         body: new URLSearchParams({ access_token }),
         method: 'POST',
@@ -336,6 +338,18 @@ export class AuthController extends Controller {
       throw new InvalidCredentialsError('User not found')
     }
 
+    if (user.lockedUntil && user.lockedUntil > new Date()) {
+      throw new InvalidCredentialsError(
+        `Account locked until ${user.lockedUntil.toLocaleString('en-AU', { timeZone: 'Australia/Sydney' })}`,
+      )
+    }
+
+    if (user.retriesRemaining < 1) {
+      const lockDuration = await this.lockUser(user.id)
+      await this.userRepo.update({ where: { id: user.id }, data: { retriesRemaining: 10 } })
+      throw new InvalidCredentialsError(`Retries exceeded, account locked for ${lockDuration}`)
+    }
+
     // Check client type and roles
     if (clientType === 'admin-client' && user.role !== 'OrganisationAdmin') {
       throw new IncorrectPermissionsError('User does not have admin privileges')
@@ -345,15 +359,114 @@ export class AuthController extends Controller {
     }
 
     if (!(await verifyPassword(user.password, bodyRequest.password))) {
+      await this.userRepo.update({
+        where: { id: user.id },
+        data: { retriesRemaining: user.retriesRemaining - 1 },
+      })
       throw new InvalidCredentialsError('Invalid credentials provided')
+    }
+    let responseData
+
+    const smtp = await prisma.organisation.findFirstOrThrow({})
+
+    if (config.otp && smtp.mailerHost && smtp.mailerUser) {
+      const zeroPad = (num: number, places: number) => String(num).padStart(places, '0')
+      const code = zeroPad(randomInt(9999), 4)
+      const otp = await prisma.oTPToken.create({
+        data: {
+          code,
+          userId: user.id,
+          expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 mins in future
+        },
+      })
+      responseData = {
+        otp_token: otp.id,
+      }
+      const mailToUserOptions: nodemailer.SendMailOptions = {
+        from: fromAddress,
+        to: user.email,
+        subject: 'CTRL - One Time Password',
+        text: `Your CTRL login code is: ${code}`,
+      }
+
+      const mailerTransporter = await createMailerTransporter()
+
+      mailerTransporter.sendMail(mailToUserOptions)
+    } else {
+      await this.userRepo.update({ where: { id: user.id }, data: { retriesRemaining: 10 } })
+      const token = await generateToken({ userId: user.id, roles: [user.role] })
+      responseData = {
+        token,
+      }
+      logger.info({ ...responseData })
+    }
+
+    return responseData
+  }
+
+  /**
+   * login
+   *
+   * @summary Login a User
+   */
+  @Post('/login/otp')
+  @NoSecurity()
+  @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
+  public async loginOtp(
+    @Body() bodyRequest: OTPLoginRequest,
+    @Header('x-client-type') clientType?: string,
+  ): Promise<LoginResponse> {
+    console.log('OTP', bodyRequest)
+    const otp = await prisma.oTPToken.findUnique({
+      where: { id: bodyRequest.otp_token },
+    })
+
+    if (!otp) {
+      throw new Error('Bad request')
+    }
+
+    const user = await this.userRepo.findFirstOrThrow({ where: { id: otp.userId } })
+
+    if (user.lockedUntil && user.lockedUntil > new Date()) {
+      throw new InvalidCredentialsError(
+        `Account locked until ${user.lockedUntil.toLocaleString('en-AU', { timeZone: 'Australia/Sydney' })}`,
+      )
+    }
+
+    if (user.retriesRemaining < 1) {
+      await this.userRepo.update({ where: { id: user.id }, data: { retriesRemaining: 10 } })
+      const lockDuration = await this.lockUser(user.id)
+      throw new InvalidCredentialsError(`Retries exceeded, account locked for ${lockDuration}`)
+    }
+
+    if (otp?.code !== bodyRequest.otp_code) {
+      await this.userRepo.update({
+        where: { id: user.id },
+        data: { retriesRemaining: user.retriesRemaining - 1 },
+      })
+      throw new InvalidCredentialsError('Invalid code')
+    }
+
+    if (otp.expiresAt < new Date()) {
+      throw new InvalidCredentialsError('Code expired')
+    }
+
+    // Check client type and roles
+    if (clientType === 'admin-client' && user.role !== 'OrganisationAdmin') {
+      throw new IncorrectPermissionsError('User does not have admin privileges')
+    }
+    if (clientType === 'user-client' && user.role !== 'Participant') {
+      throw new IncorrectPermissionsError('User is not a participant')
     }
 
     const token = await generateToken({ userId: user.id, roles: [user.role] })
+    await this.userRepo.update({ where: { id: user.id }, data: { retriesRemaining: 10 } })
+
     const responseData = {
       token,
     }
 
-    logger.info({ ...responseData })
+    await prisma.oTPToken.delete({ where: { id: otp.id } })
 
     return responseData
   }
@@ -370,6 +483,25 @@ export class AuthController extends Controller {
     const response = (<any>request).res as express.Response
     const tcLink = (await prisma.organisation.findFirstOrThrow({})).tcLink
     response.redirect(tcLink)
+  }
+
+  private async lockUser(userId: number) {
+    const user = await this.userRepo.findFirstOrThrow({ where: { id: userId } })
+    let lockTimeMS = 10 * 60 * 1000
+    let lockDurationString = '10 minutes'
+    if (
+      user.lockedUntil &&
+      // Has been locked within last 24 hours
+      user.lockedUntil > new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+    ) {
+      lockTimeMS = 24 * 60 * 60 * 1000 // 24 hours
+      lockDurationString = '24 hours'
+    }
+    await this.userRepo.update({
+      where: { id: userId },
+      data: { lockedUntil: new Date(new Date().getTime() + lockTimeMS) },
+    })
+    return lockDurationString
   }
 
   public async createParticipant(

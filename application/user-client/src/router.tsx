@@ -14,6 +14,7 @@ import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import ErrorPage from './pages/Error'
 import RegisterErrorPage from './pages/RegisterError'
+import OTP from './pages/OTP'
 
 const router = createBrowserRouter([
   {
@@ -57,6 +58,10 @@ const router = createBrowserRouter([
   {
     path: '/login',
     element: <Login />,
+  },
+  {
+    path: '/login/otp',
+    element: <OTP />,
   },
   {
     errorElement: <RegisterErrorPage />,

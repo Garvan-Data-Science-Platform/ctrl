@@ -9,10 +9,12 @@ export interface LoginRequest {
    * @pattern ^(.+)@(.+)$ Please provide valid email
    */
   email: string
-  /**
-   * @minLength 8 Password must be at least 8 characters
-   */
   password: string
+}
+
+export interface OTPLoginRequest {
+  otp_token: string
+  otp_code: string
 }
 
 export interface OIDCLoginRequest {
@@ -22,5 +24,6 @@ export interface OIDCLoginRequest {
 }
 
 export interface LoginResponse {
-  token: string
+  token?: string
+  otp_token?: string
 }

@@ -26,7 +26,10 @@ model User {
   agreedTermsAt       DateTime?
   profiles            ParticipantProfile[]
   auditLogs           AuditLog[]
+  otpTokens           OTPToken[]
   passwordResetTokens PasswordResetToken[]
+  lockedUntil         DateTime?
+  retriesRemaining    Int                  @default(10)
   deleted             Boolean              @default(false)
 }
 
@@ -214,4 +217,12 @@ model AuditLog {
   userId    Int?
   user      User?             @relation(fields: [userId], references: [id], onDelete: Restrict)
   meta      Json
+}
+
+model OTPToken {
+ id        String      @id @default(uuid())
+ userId    Int
+ user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+ code      String
+ expiresAt DateTime
 }
