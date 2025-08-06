@@ -105,12 +105,10 @@ export class ParticipantsController extends Controller {
       const lastUpdated = Math.max(
         ...(p_answers.map((val) => determineLastUpdated(val.answers)) as unknown as number[]),
       )
-      const study_part = await prisma.studyParticipant.findUnique({
+      const study_part = await prisma.studyParticipant.findFirstOrThrow({
         where: {
-          participantProfileId_studyId: {
-            studyId,
-            participantProfileId: p.profile.id,
-          },
+          studyId,
+          participantProfileId: p.profile.id,
         },
       })
       const p_data: Participant = {

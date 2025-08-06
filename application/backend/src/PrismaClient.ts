@@ -27,6 +27,8 @@ baseClient.$use(async (params, next) => {
           // Exclude deleted records if they have not been explicitly requested
           params.args.where['deleted'] = false
         }
+      } else {
+        params.args.where = { deleted: false }
       }
     }
     if (params.action === 'findMany') {
@@ -35,6 +37,8 @@ baseClient.$use(async (params, next) => {
         if (params.args.where.deleted == undefined) {
           params.args.where['deleted'] = false
         }
+      } else {
+        params.args.where = { deleted: false }
       }
     }
     if (params.action == 'update') {
