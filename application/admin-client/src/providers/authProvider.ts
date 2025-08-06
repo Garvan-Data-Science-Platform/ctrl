@@ -1,4 +1,5 @@
 import type { AuthProvider } from '@refinedev/core'
+import { useAuthStore } from '../authStore'
 
 export const TOKEN_KEY = 'refine-auth'
 
@@ -7,7 +8,14 @@ export const clientType = 'admin-client'
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
 export const authProvider: AuthProvider = {
-  login: async ({ email, password }) => {
+  login: async ({ providerName, email, password, token }) => {
+    if (token) {
+      localStorage.setItem(TOKEN_KEY, token)
+      return {
+        success: true,
+        redirectTo: '/',
+      }
+    }
     if (email && password) {
       const res = await fetch(BACKEND_URL + '/auth/login', {
         method: 'POST',
@@ -32,12 +40,18 @@ export const authProvider: AuthProvider = {
       }
     }
 
+    const providers = useAuthStore.getState().providers
+    const match = providers.find((val) => val.name == providerName)
+
+    if (match) {
+      const { host, clientId } = match
+      const redirectUri = `${window.location.href.split('/login').at(0)}/login/callback`
+      window.location.replace(
+        `${host}/authorize?state=${providerName}&client_id=${clientId}&scope=openid%20email%20profile&response_type=code&redirect_uri=${redirectUri}`,
+      )
+    }
     return {
-      success: false,
-      error: {
-        name: 'LoginError',
-        message: 'Invalid username or password',
-      },
+      success: true,
     }
   },
   logout: async () => {

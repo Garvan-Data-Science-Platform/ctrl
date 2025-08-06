@@ -8,6 +8,8 @@ import type {
   CreateParticipantResponse,
   CreateParticipantRequest,
   RegisterSetupRequest,
+  OIDCLoginRequest,
+  SetupResponse,
 } from 'common/types/api/auth'
 import {
   Route,
@@ -43,6 +45,7 @@ import {
 import { ParticipantType } from 'common/types/api/users/ParticipantProfile'
 import { createDefaultAnswers } from '../utils/answers'
 import { auditLog } from '../middlewares/AuditLog'
+import config from '../config'
 
 @Route('auth')
 @Tags('Auth')
@@ -99,10 +102,19 @@ export class AuthController extends Controller {
    */
   @Get('/setup')
   @NoSecurity()
-  public async checkSetup(): Promise<{ isSetup: boolean }> {
+  public async checkSetup(): Promise<SetupResponse> {
     const existingUsers = await this.userRepo.count()
     const isSetup = existingUsers != 0
-    return { isSetup }
+    return {
+      isSetup,
+      oidc: (config.oidc || []).map((val) => ({
+        name: val.name,
+        host: val.providerUrl,
+        clientId: val.clientId,
+        icon: val.icon,
+      })),
+      disableAdminPasswordLogin: config.disableAdminPasswordLogin || false,
+    }
   }
 
   /**
@@ -232,6 +244,73 @@ export class AuthController extends Controller {
     }
 
     return responseData
+  }
+
+  /**
+   * OIDC login
+   *
+   * @summary Login using OIDC
+   */
+  @Post('/login/oidc')
+  @NoSecurity()
+  @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
+  public async loginOIDC(
+    @Body() bodyRequest: OIDCLoginRequest,
+    @Header('x-client-type') clientType?: string,
+  ): Promise<LoginResponse> {
+    if (!config.oidc) {
+      throw new Error('OIDC Not Configured')
+    }
+
+    const oidc = config.oidc.find((val) => val.name === bodyRequest.provider)
+
+    if (!oidc) {
+      throw new Error('OIDC Provider not found')
+    }
+
+    const { clientId, clientSecret, providerUrl } = oidc
+
+    const body = new URLSearchParams({
+      grant_type: 'authorization_code',
+      client_id: clientId,
+      client_secret: clientSecret,
+      redirect_uri: bodyRequest.redirect_uri,
+      code: bodyRequest.code,
+    })
+
+    let user
+
+    try {
+      const token_res = await fetch(`${providerUrl}/oauth2/token`, {
+        body,
+        method: 'POST',
+      })
+
+      const { access_token } = await token_res.json()
+
+      console.log('TOKEN', access_token)
+
+      const userinfo_res = await fetch(`${providerUrl}/oauth2/userinfo`, {
+        body: new URLSearchParams({ access_token }),
+        method: 'POST',
+      })
+
+      const { email } = await userinfo_res.json()
+      user = await this.userRepo.findFirst({ where: { email } })
+    } catch {
+      throw new Error('Error authenticating with OIDC')
+    }
+
+    if (!user) {
+      throw new IncorrectPermissionsError('User does not have admin privileges')
+    }
+
+    if (!user || (clientType === 'admin-client' && user.role !== 'OrganisationAdmin')) {
+      throw new IncorrectPermissionsError('User does not have admin privileges')
+    }
+
+    const token = await generateToken({ userId: user.id, roles: [user.role] })
+    return { token }
   }
 
   /**

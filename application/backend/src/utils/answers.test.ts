@@ -32,6 +32,7 @@ describe('Answer functions', () => {
     studyId: 1, // From `application/common/testing` seed data
     versionNumber: 1, // From `application/commont/testing` seed data
     updatedAt: new Date(),
+    publishedAt: new Date(),
     status: 'PUBLISHED',
     data: [prevStep1, prevStep2],
   }

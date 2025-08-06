@@ -1,13 +1,14 @@
 import './jsontypes'
 import { PrismaClient } from '@prisma/client'
+import { fieldEncryptionExtension } from 'prisma-field-encryption'
 
-const prisma = new PrismaClient()
+const baseClient = new PrismaClient()
 
 /***********************************/
 /* SOFT DELETE MIDDLEWARE */
 /***********************************/
 
-prisma.$use(async (params, next) => {
+baseClient.$use(async (params, next) => {
   if (params.model == 'User' || params.model == 'Study') {
     if (params.action === 'findUnique' || params.action === 'findFirst') {
       // Change to findFirst - you cannot filter
@@ -67,5 +68,7 @@ prisma.$use(async (params, next) => {
   }
   return next(params)
 })
+
+const prisma = baseClient.$extends(fieldEncryptionExtension())
 
 export default prisma

@@ -72,3 +72,15 @@ jwt: {{ $secret.data.jwt }}
 jwt: {{ randAlphaNum 10 | b64enc }}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Create or generate 256bit encryption key
+*/}}
+{{- define "secret.aeskey" -}}
+{{- $secret := lookup "v1" "Secret" .Release.Namespace "aeskey" -}}
+{{- if $secret.data.aeskey -}}
+aeskey: {{ $secret.data.aeskey }}
+{{- else -}}
+aeskey: {{ (print "k1.aesgcm256." (randAlphaNum 43) "=") | b64enc }}
+{{- end -}}
+{{- end -}}

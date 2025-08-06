@@ -7,6 +7,7 @@ import { PARTICIPANT_UNANSWERED_ID, seedTests } from './seed'
 export async function resetDB(): Promise<null> {
   try {
     await wipeDB()
+    // @ts-ignore
     await seedTests(prisma)
     return null
   } catch (error) {

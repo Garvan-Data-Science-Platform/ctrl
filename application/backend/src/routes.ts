@@ -127,8 +127,7 @@ const models: TsoaRoute.Models = {
             "firstName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
             "lastName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
             "email": {"dataType":"string","required":true,"validators":{"pattern":{"errorMsg":"please provide valid email","value":"^(.+)@(.+)$"}}},
-            "password": {"dataType":"string","required":true,"validators":{"minLength":{"value":8}}},
-            "role": {"ref":"Role","required":true},
+            "role": {"ref":"Role","required":true,"validators":{"minLength":{"value":8}}},
         },
         "additionalProperties": false,
     },
@@ -178,7 +177,9 @@ const models: TsoaRoute.Models = {
         "properties": {
             "id": {"dataType":"double"},
             "versionNumber": {"dataType":"double","required":true},
-            "published_date": {"dataType":"string"},
+            "publishedAt": {"dataType":"string"},
+            "updatedAt": {"dataType":"string","required":true},
+            "createdAt": {"dataType":"string","required":true},
             "status": {"ref":"SurveyVersionStatus","required":true},
         },
         "additionalProperties": false,
@@ -705,6 +706,16 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "SetupResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "isSetup": {"dataType":"boolean","required":true},
+            "oidc": {"dataType":"array","array":{"dataType":"nestedObjectLiteral","nestedProperties":{"icon":{"dataType":"string","required":true},"clientId":{"dataType":"string","required":true},"host":{"dataType":"string","required":true},"name":{"dataType":"string","required":true}}},"required":true},
+            "disableAdminPasswordLogin": {"dataType":"boolean","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "RegisterSetupRequest": {
         "dataType": "refObject",
         "properties": {
@@ -749,6 +760,16 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "token": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "OIDCLoginRequest": {
+        "dataType": "refObject",
+        "properties": {
+            "code": {"dataType":"string","required":true},
+            "provider": {"dataType":"string","required":true},
+            "redirect_uri": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },
@@ -2637,6 +2658,37 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 next,
                 validatedArgs,
                 successStatus: 201,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsAuthController_loginOIDC: Record<string, TsoaRoute.ParameterSchema> = {
+                bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"OIDCLoginRequest"},
+                clientType: {"in":"header","name":"x-client-type","dataType":"string"},
+        };
+        app.post('/auth/login/oidc',
+            ...(fetchMiddlewares<RequestHandler>(AuthController)),
+            ...(fetchMiddlewares<RequestHandler>(AuthController.prototype.loginOIDC)),
+
+            async function AuthController_loginOIDC(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsAuthController_loginOIDC, request, response });
+
+                const controller = new AuthController();
+
+              await templateService.apiHandler({
+                methodName: 'loginOIDC',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);

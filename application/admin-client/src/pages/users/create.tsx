@@ -55,20 +55,6 @@ export const UserCreate = () => {
           label={'Email'}
           name="email"
         />
-
-        <TextField
-          {...register('password', {
-            required: 'This field is required',
-          })}
-          error={!!(errors as any)?.title}
-          helperText={(errors as any)?.title?.message}
-          margin="normal"
-          fullWidth
-          InputLabelProps={{ shrink: true }}
-          type="text"
-          label={'Password'}
-          name="password"
-        />
         {
           <Controller
             name="role"

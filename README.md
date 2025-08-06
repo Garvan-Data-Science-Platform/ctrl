@@ -21,7 +21,6 @@
 
 </div>
 
-
 CTRL, developed by [Garvan Institute of Medical Research](https://www.garvan.org.au/), is a secure, web-based dynamic consent platform that empowers research participants to manage their consent preferences, update personal details, and make informed decisions about the use of their genomic and health data. For research organizations, CTRL streamlines consent management by replacing paper records with electronic ones, offering interoperability with databases like [REDCap](https://projectredcap.org/), and managing permissions.
 
 **Demo Login Information**
@@ -29,14 +28,38 @@ CTRL, developed by [Garvan Institute of Medical Research](https://www.garvan.org
 **User Portal**  
 URL: [http://ctrldemo.dsp.garvan.org.au/](http://ctrldemo.dsp.garvan.org.au/)  
 Login: `user@example.com`  
-Password: `Testpassword2`  
+Password: `Testpassword2`
 
 **Admin Portal**  
 URL: [http://admin.ctrldemo.dsp.garvan.org.au/](http://admin.ctrldemo.dsp.garvan.org.au/)  
 Login: `admin@example.com`  
 Password: `Testpassword1`
 
-## Installation 
+## Installation
+
+### Prod installation: Helm
+
+We have created a helm chart for quick and easy installation of CTRL and its dependencies. If you have a kubernetes cluster and helm CLI installed, you can use this command to install the latest stable version of CTRL:
+
+`helm install <release-name> oci://australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl`
+
+Refer to `.helm/ctrl/values.yaml` for full list of configuration options. The most important ones are:
+
+**ingress.hosts.userClient.hostname** and **ingress.hosts.adminClient.hostname**: These should correspond to dns hostnames when using nginx ingress (enabled by default).
+
+**cert-manager.enabled** and **letsencryptEmail**: Set these to enable automatic configuration of TLS using letsencrypt.
+
+All other values should be left as default in most cases.
+
+#### Upgrading
+
+To upgrade to the latest version, use:
+
+`helm upgrade <release-name> oci://australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl`
+
+We take special care to ensure upgrading this way is always safe. If you are using the backend API directly, it is recommended to check release notes for potential changes to the API spec before upgrading.
+
+### Local Installation
 
 #### Install required software and packages
 
@@ -60,7 +83,6 @@ corepack enable
 yarn install
 ```
 
-## Running CTRL Locally (Node)
 ### Run the Database
 
 ```bash
@@ -86,6 +108,7 @@ Run the backend and frontend servers in development mode (with hot reload):
 `yarn dev`
 
 In your browser open:
+
 - http://localhost:5173 to see application frontend
 - http://localhost:5000/docs to see Swagger UI for the API
 - http://localhost:5174 to see admin portal
@@ -95,6 +118,7 @@ In your browser open:
 
 Seed data is intended for development only, NOT PRODUCTION.
 Seed data contains infomation to support tests, and also two users to made development easy:
+
 1. an example admin account
 2. an example user account
 
@@ -132,6 +156,7 @@ yarn build-docs
 ```
 
 ## About CTRL
+
 CTRL, initially funded by [Australian Genomics](https://www.australiangenomics.org.au/), has recently undergone a major upgrade, featuring a modern interface, scalable backend, and new capabilities for both participants and research teams. The platform supports automated consent capture, secure audit logging, and flexible integration options.
 
 [Newsletter update &rarr;](https://www.australiangenomics.org.au/streamlined-consent-management-inside-the-new-ctrl-platform/)
@@ -151,8 +176,7 @@ CTRL is also partially funded through [GUARDIANS](https://www.biocommons.org.au/
 </div>
 
 ## Want to contribute?
+
 Have a look through existing [issues](https://github.com/Garvan-Data-Science-Platform/ctrl-next/issues) for anything that you could help with. If you'd like to request a feature or report a bug, please create a GitHub Issue using one of the templates provided.
 
 [See contribution guide &rarr;](https://github.com/Garvan-Data-Science-Platform/ctrl-next/blob/main/docs/CONTRIBUTING.md)
-
-
