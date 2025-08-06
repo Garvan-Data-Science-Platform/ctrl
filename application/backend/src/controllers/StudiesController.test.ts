@@ -44,7 +44,7 @@ describe('StudiesController', () => {
       const body: GetAllStudiesResponse = response.body
       expect(Array.isArray(body.data)).toBeTruthy()
       console.log(body.data)
-      expect(body.data.length).toEqual(3)
+      expect(body.data.length).toEqual(4)
     })
 
     it('should return a 500 error if a database error occurs', async () => {

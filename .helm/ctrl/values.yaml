@@ -7,6 +7,17 @@ replicaCount: 1
 demoMode:
   enabled: false
 
+config:
+  oidc:
+    []
+    #- name:
+    #  providerUrl:
+    #  clientId:
+    #  clientSecret:
+    #  icon: #A link to png for login button
+
+  disableAdminPasswordLogin: false
+
 userClient:
   image:
     repository: australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-user-client
@@ -90,8 +101,15 @@ nameOverride: ''
 fullnameOverride: ''
 
 postgresql:
-  auth:
-    database: ctrl
+  image:
+    repository: postgres
+    tag: 17.5
+  primary:
+    containerSecurityContext:
+      readOnlyRootFilesystem: false
+  global:
+    security:
+      allowInsecureImages: true
 
 serviceAccount:
   # Specifies whether a service account should be created

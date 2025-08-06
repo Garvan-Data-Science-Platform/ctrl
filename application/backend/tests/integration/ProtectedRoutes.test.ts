@@ -207,6 +207,11 @@ describe('Protected Routes', () => {
       rolesWhitelisted: [Role.OrganisationAdmin],
     },
     {
+      method: HttpMethod.GET,
+      url: '/studies/1/surveys/published',
+      rolesWhitelisted: [Role.OrganisationAdmin],
+    },
+    {
       method: HttpMethod.PATCH,
       url: '/studies/1/surveys/1',
       rolesWhitelisted: [Role.OrganisationAdmin],

@@ -15,6 +15,12 @@ export interface LoginRequest {
   password: string
 }
 
+export interface OIDCLoginRequest {
+  code: string
+  provider: string
+  redirect_uri: string
+}
+
 export interface LoginResponse {
   token: string
 }

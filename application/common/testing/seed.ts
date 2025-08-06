@@ -18,6 +18,7 @@ export const TEST_STUDY = 'Test Study'
 export const SECOND_TEST_STUDY = 'Study 2'
 export const SECOND_TEST_STUDY_ID = 2
 export const FE_TEST_STUDY = 'Study FE'
+export const EMPTY_TEST_STUDY = 'Empty Study'
 
 export async function seedTests(prisma: PrismaClient) {
   const ExampleSurveyStepData = await import('../src/surveys/exampleSurveyStepData.json', {
@@ -39,7 +40,7 @@ export async function seedTests(prisma: PrismaClient) {
   //Sets auto-increment counter
   await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"Organisation"', 'id'), 2, false) FROM "Organisation";`
 
-  // Create three studies
+  // Create four studies
   const testStudy = await prisma.study.create({
     data: {
       name: TEST_STUDY,
@@ -66,6 +67,13 @@ export async function seedTests(prisma: PrismaClient) {
   
   //Sets auto-increment counter
   await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"Study"', 'id'), 4, false) FROM "Study";`
+
+  // This study will be empty
+  await prisma.study.create({
+    data: {
+      name: EMPTY_TEST_STUDY,
+    },
+  })
 
   // OperatorAdminUser
   await prisma.user.create({
@@ -152,6 +160,7 @@ export async function seedTests(prisma: PrismaClient) {
       role: Role.Participant,
     },
   })
+
   const participantUnansweredProfile = await prisma.participantProfile.create({
     data: {
       id: PARTICIPANT_UNANSWERED_ID,

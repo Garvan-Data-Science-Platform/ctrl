@@ -169,7 +169,8 @@ describe('InvitesController', () => {
       for (const email of emails) {
         const createdInvite = await prisma.invite.findUnique({
           where: {
-            studyId_email: {
+            studyId_emailHash: {
+              //@ts-ignore
               email,
               studyId: 1,
             },
@@ -190,7 +191,8 @@ describe('InvitesController', () => {
       // Check the status REVOKED invite
       const invite = await prisma.invite.findUnique({
         where: {
-          studyId_email: {
+          studyId_emailHash: {
+            //@ts-ignore
             email: 'invite3@revoked.com',
             studyId: 1,
           },
@@ -209,6 +211,7 @@ describe('InvitesController', () => {
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       const body: InviteParticipantsResponse = response.body
+
       expect(response.status).toBe(200)
       expect(body.emailsResentCount).toBe(1)
       expect(body.alreadyAcceptedCount).toBe(0)
@@ -224,7 +227,8 @@ describe('InvitesController', () => {
       // Check invite status was changed to PENDING
       const updatedInvite = await prisma.invite.findUnique({
         where: {
-          studyId_email: {
+          studyId_emailHash: {
+            //@ts-ignore
             email: 'invite3@revoked.com',
             studyId: 1,
           },
@@ -244,7 +248,8 @@ describe('InvitesController', () => {
       // Check the status REVOKED invite
       const invite = await prisma.invite.findUnique({
         where: {
-          studyId_email: {
+          studyId_emailHash: {
+            //@ts-ignore
             email: emailPendingInvite,
             studyId: 1,
           },
@@ -277,7 +282,8 @@ describe('InvitesController', () => {
       // Check invite status was is still PENDING
       const updatedInvite = await prisma.invite.findUnique({
         where: {
-          studyId_email: {
+          studyId_emailHash: {
+            //@ts-ignore
             email: emailPendingInvite,
             studyId: 1,
           },
@@ -315,7 +321,8 @@ describe('InvitesController', () => {
       // Check invite status was is still ACCEPTED
       const updatedInvite = await prisma.invite.findUnique({
         where: {
-          studyId_email: {
+          studyId_emailHash: {
+            //@ts-ignore
             email: emailAcceptedInvite,
             studyId: 1,
           },
@@ -365,7 +372,8 @@ describe('InvitesController', () => {
       for (const e of emails) {
         const createdInvite = await prisma.invite.findUnique({
           where: {
-            studyId_email: {
+            studyId_emailHash: {
+              //@ts-ignore
               email: e.email,
               studyId: 1,
             },
@@ -413,7 +421,8 @@ describe('InvitesController', () => {
 
       const invite = await prisma.invite.findUnique({
         where: {
-          studyId_email: {
+          studyId_emailHash: {
+            //@ts-ignore
             email: emailPendingInvite,
             studyId: 1,
           },
@@ -432,7 +441,8 @@ describe('InvitesController', () => {
       // Check invite status was changed to REVOKED
       const updatedInvite = await prisma.invite.findUniqueOrThrow({
         where: {
-          studyId_email: {
+          studyId_emailHash: {
+            //@ts-ignore
             email: emailPendingInvite,
             studyId: 1,
           },
@@ -620,7 +630,8 @@ describe('InvitesController', () => {
       // change invite to accepted.
       await prisma.invite.update({
         where: {
-          studyId_email: {
+          studyId_emailHash: {
+            //@ts-ignore
             email: PARTICIPANT_UNANSWERED_EMAIL,
             studyId: 2,
           },
