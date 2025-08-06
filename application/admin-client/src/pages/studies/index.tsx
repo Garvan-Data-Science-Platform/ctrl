@@ -58,6 +58,7 @@ const StudyCard = ({ study }: { study: StudyEntry }) => {
       .catch((e) => {
         open?.({ type: 'error', message: `Error deleting study: ${e}` })
       })
+    setDeleteDialogOpen(false)
   }
 
   const uploadLogo = async (file: File) => {

@@ -61,12 +61,12 @@ describe('Study management page', () => {
     //Change to last study to test behaviour when last study in list is active and deleted
     cy.get('[data-cy="study-dropdown"]').click()
     cy.get('[data-cy="study-menu"]').contains('Study FE').click()
-    cy.get('[data-cy="delete-study"]').should('have.length', 3).eq(2).click()
+    cy.get('[data-cy="delete-study"]').should('have.length', 4).eq(2).click()
     cy.get('[data-cy="confirm-delete"]').click()
-    cy.get('[data-cy="delete-study"]').should('have.length', 2)
+    cy.get('[data-cy="delete-study"]').should('have.length', 3)
     cy.reload()
-    cy.get('[data-cy="delete-study"]').should('have.length', 2)
-    cy.get('[data-cy="study-dropdown"]').should('have.text', 'Test Study')
+    cy.get('[data-cy="delete-study"]').should('have.length', 3)
+    cy.get('[data-cy="study-dropdown"]').should('have.text', 'Empty Study')
   })
 
   it('Can upload a study logo', () => {
