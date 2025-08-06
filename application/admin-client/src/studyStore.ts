@@ -1,9 +1,11 @@
 import { create } from 'zustand'
 import { produce } from 'immer'
 
-interface StudyEntry {
+export interface StudyEntry {
   id: number
   name: string
+  description?: string
+  logo?: SourceBuffer
 }
 
 interface StudyState {

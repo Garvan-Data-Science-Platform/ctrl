@@ -11,8 +11,8 @@ import {
   ORG_ADMIN_ID,
   PARTICIPANT_UNANSWERED_ID,
   PARTICIPANT_UNANSWERED_EMAIL,
-  SECOND_TEST_STUDY,
   PASSWORD_RESET_USER_ID,
+  SECOND_TEST_STUDY_ID,
 } from 'common/testing/seed'
 import { InviteStatus, Role } from '@prisma/client'
 import prisma from '../PrismaClient'
@@ -569,7 +569,7 @@ describe('InvitesController', () => {
           status: InviteStatus.PENDING,
           study: {
             connect: {
-              name: SECOND_TEST_STUDY,
+              id: SECOND_TEST_STUDY_ID,
             },
           },
           expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
@@ -607,7 +607,6 @@ describe('InvitesController', () => {
       expect(response.status).toEqual(201)
     })
   })
-
   describe('GET /invites/pending', () => {
     beforeEach(async () => {
       await inviteUser(PARTICIPANT_UNANSWERED_EMAIL, 2)

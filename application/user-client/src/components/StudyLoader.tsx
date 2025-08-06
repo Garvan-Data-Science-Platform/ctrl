@@ -28,6 +28,9 @@ export const StudyLoader: React.FC<PropsWithChildren> = ({ children }) => {
       if (studyId) {
         setActiveStudyIndex(data.data.findIndex((val) => val.id == Number(studyId)))
       }
+      if (activeStudyIndex >= data.data.length) {
+        setActiveStudyIndex(0)
+      }
     }
   }, [data])
 
