@@ -67,6 +67,7 @@ CREATE TABLE "StudyParticipant" (
     "studyId" INTEGER NOT NULL,
     "participantNumber" INTEGER NOT NULL DEFAULT 0,
     "participantId" TEXT,
+    "deleted" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "StudyParticipant_pkey" PRIMARY KEY ("participantProfileId","studyId")
 );
