@@ -10,6 +10,7 @@ import {
   UnauthorizedErrorResponse,
   ValidateErrorResponse,
   BadRequestErrorResponse,
+  UnprocessableErrorResponse,
 } from 'common/types/api/errors'
 
 export class NoTokenError extends Error {
@@ -74,6 +75,13 @@ export class BadGatewayError extends Error {
     super(message)
     this.name = 'BadGatewayError'
     this.details = details
+  }
+}
+
+export class UnprocessableError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'UnprocessableError'
   }
 }
 
@@ -166,6 +174,17 @@ export function ErrorHandler(
     }
     logger.error({ ...errorResponse })
     return res.status(502).json(errorResponse)
+  }
+
+  // Default error handling for any other type of error
+  if (err instanceof UnprocessableError) {
+    const error: UnprocessableErrorResponse = {
+      message: 'Unprocessable Content',
+      details: err.message,
+    }
+
+    logger.error({ ...error })
+    return res.status(422).json(error)
   }
 
   // Default error handling for any other type of error

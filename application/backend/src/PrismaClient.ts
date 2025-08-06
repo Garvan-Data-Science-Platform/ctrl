@@ -9,14 +9,17 @@ const baseClient = new PrismaClient()
 /***********************************/
 
 baseClient.$use(async (params, next) => {
-  if (params.model == 'User' || params.model == 'Study') {
+  if (params.model == 'User' || params.model == 'Study' || params.model == 'StudyParticipant') {
     if (params.action === 'findUnique' || params.action === 'findFirst') {
       // Change to findFirst - you cannot filter
       // by anything except ID / unique with findUnique()
       params.action = 'findFirst'
       // Add 'deleted' filter
       // ID filter maintained
-      params.args.where['deleted'] = false
+      if (params.args.where.deleted == undefined) {
+        // Exclude deleted records if they have not been explicitly requested
+        params.args.where['deleted'] = false
+      }
     }
     if (params.action === 'findFirstOrThrow' || params.action === 'findUniqueOrThrow') {
       if (params.args.where) {
@@ -24,8 +27,6 @@ baseClient.$use(async (params, next) => {
           // Exclude deleted records if they have not been explicitly requested
           params.args.where['deleted'] = false
         }
-      } else {
-        params.args['where'] = { deleted: false }
       }
     }
     if (params.action === 'findMany') {
@@ -34,8 +35,6 @@ baseClient.$use(async (params, next) => {
         if (params.args.where.deleted == undefined) {
           params.args.where['deleted'] = false
         }
-      } else {
-        params.args['where'] = { deleted: false }
       }
     }
     if (params.action == 'update') {
@@ -46,8 +45,6 @@ baseClient.$use(async (params, next) => {
     if (params.action == 'updateMany') {
       if (params.args.where != undefined) {
         params.args.where['deleted'] = false
-      } else {
-        params.args['where'] = { deleted: false }
       }
     }
     if (params.action == 'delete') {
