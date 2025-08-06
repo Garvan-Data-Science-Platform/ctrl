@@ -23,6 +23,7 @@ model User {
   organisations       Organisation[]
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
+  agreedTermsAt       DateTime?
   profiles            ParticipantProfile[]
   auditLogs           AuditLog[]
   passwordResetTokens PasswordResetToken[]
@@ -116,6 +117,7 @@ model Organisation {
   redcapURL       String?
   redcapToken     String?
   logo            Bytes?
+  tcLink          String  @default("https://garvan-data-science-platform.github.io/ctrl-docs/terms")
   users           User[]
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

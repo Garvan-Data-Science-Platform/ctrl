@@ -52,6 +52,7 @@ export class SettingsController extends Controller {
         secondaryColour: true,
         redcapToken: true,
         redcapURL: true,
+        tcLink: true,
       },
     })
     return { data: orgdata }
