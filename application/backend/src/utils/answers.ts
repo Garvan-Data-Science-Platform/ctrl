@@ -179,5 +179,19 @@ export async function recalculateAnswers(familyId: number, studyId: number) {
         derived: guardians.map((val) => `${val.firstName} ${val.lastName}`).join(', '),
       },
     })
+    await prisma.auditLog.create({
+      data: {
+        resource: 'SurveyVersionAnswers',
+        operation: 'UPDATE',
+        meta: {
+          reource: 'SurveyVersionAnswers',
+          id: sva.id,
+          message: 'Recalculated answers of dependent based on guardians answers',
+          derivedFrom: guardians.map((val) => `${val.firstName} ${val.lastName}`).join(', '),
+          previousAnswers: sva.answers,
+          newAnsers: answers,
+        },
+      },
+    })
   }
 }
