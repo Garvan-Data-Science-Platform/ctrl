@@ -2,6 +2,7 @@ import { GetParticipantProfileResponse } from '../users'
 
 export interface Participant {
   id: number
+  participantId: string
   email?: string
   firstName: string
   lastName: string
