@@ -21,8 +21,12 @@ import type {
   UploadRedcapParticipantResponse,
   UploadRedcapParticipantAPIRequest,
 } from 'common/types/api/integrations/redcap'
-import { BadGatewayError } from '../middlewares/ErrorHandler'
-import { UnauthorizedErrorResponse, InternalErrorResponse } from 'common/types/api/errors'
+import { BadGatewayError, UnprocessableError } from '../middlewares/ErrorHandler'
+import {
+  UnauthorizedErrorResponse,
+  InternalErrorResponse,
+  UnprocessableErrorResponse,
+} from 'common/types/api/errors'
 import { SurveyStep } from 'common/types/survey'
 import REDCapMapping from '../../../integrations/src/REDCapMapping.json'
 import { parseCSV, validateFile } from '../utils/parseCsv'
@@ -34,6 +38,7 @@ import { auditLog } from '../middlewares/AuditLog'
 @Route('studies/{studyId}/integrations')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
+@Response<UnprocessableErrorResponse>('422', 'Unprocessable Content')
 @Tags('Integrations')
 @Security('jwt', ['OrganisationAdmin'])
 @Middlewares(auditLog)
@@ -74,7 +79,7 @@ export class IntegrationsController extends Controller {
     })
 
     if (!redcapSettings.redcapToken || !redcapSettings.redcapURL) {
-      throw new Error('Redcap API not configured')
+      throw new UnprocessableError('Redcap API not configured')
     }
 
     params.append('token', redcapSettings.redcapToken)
@@ -302,7 +307,7 @@ export class IntegrationsController extends Controller {
     })
 
     if (!redcapSettings.redcapToken || !redcapSettings.redcapURL) {
-      throw new Error('Redcap API not configured')
+      throw new UnprocessableError('Redcap API not configured')
     }
     return redcapSettings as any
   }

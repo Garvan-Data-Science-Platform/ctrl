@@ -34,6 +34,7 @@ describe('Family Editing', () => {
     cy.get('[data-cy="dep-dob"]').type('2020-01-01')
     cy.get('[data-cy="add-dep-button"]').click()
     cy.get('[data-cy="current-family-members"]').contains('Jonny Tester').should('exist')
+    cy.get('[data-cy="in-study-checkbox"] input').last().should('be.checked')
   })
 
   it('Remove member from family', () => {
@@ -49,5 +50,20 @@ describe('Family Editing', () => {
     cy.contains('Non-Guardian').click()
     cy.visit('/participants/family/edit/100')
     cy.contains('Non-Guardian').should('be.visible')
+  })
+
+  it('Remove family member from study, add them back in', () => {
+    cy.visit('/participants/family/edit/100')
+    cy.get('[data-cy="in-study-checkbox"]').first().click()
+    cy.contains('Removed').should('exist')
+    cy.get('[data-cy="in-study-checkbox"]').last().click()
+    cy.contains('Added').should('exist')
+  })
+
+  it('If changing study and no family members are in current study, redirect to participants page', () => {
+    cy.visit('/participants/family/edit/100')
+    cy.get('[data-cy="study-dropdown"]').click()
+    cy.contains('Study 2').click()
+    cy.url().should('not.contain', 'family')
   })
 })
