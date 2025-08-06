@@ -200,8 +200,7 @@ export class InvitesController extends Controller {
         study: {
           select: {
             name: true,
-            // In the future other details could be pulled through here too,
-            // e.g. blurb about study
+            description: true,
           },
         },
       },
@@ -249,6 +248,7 @@ export class InvitesController extends Controller {
       expiresAt: invite.expiresAt.toISOString(),
       sentAt: invite.sentAt ? invite.sentAt.toISOString() : undefined,
       studyName: invite.study.name,
+      description: invite.study.description || undefined,
     }))
 
     // const formattedDependents = dependents.map((dependent) => ({

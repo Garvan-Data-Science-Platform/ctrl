@@ -8,4 +8,5 @@ export interface UpdateStudyRequest {
    * @minLength 1
    */
   name?: string
+  description?: string
 }

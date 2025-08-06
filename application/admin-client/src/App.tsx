@@ -37,6 +37,7 @@ import { AllResponsesView } from './pages/responses/all'
 import { FamilyEdit } from './pages/family/edit'
 import SettingsPage from './pages/settings'
 import { StudyLoader } from './components/StudyLoader'
+import StudiesPage from './pages/studies'
 import { Callback } from './pages/login/callback'
 
 function App() {
@@ -195,6 +196,7 @@ function App() {
                     <Route path="/responses/all/:id" index element={<AllResponsesView />} />
                     <Route path="/responses/:id" index element={<ResponsesView />} />
                     <Route path="/settings" index element={<SettingsPage />} />
+                    <Route path="/studies" index element={<StudiesPage />} />
                     <Route path="*" element={<ErrorComponent />} />
                   </Route>
 

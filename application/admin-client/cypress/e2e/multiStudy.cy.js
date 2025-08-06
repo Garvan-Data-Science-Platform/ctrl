@@ -12,24 +12,13 @@ describe('Multi-study features', () => {
     cy.get('[data-cy="study-dropdown"]').click()
     cy.contains(name).click()
   }
-
-  it('Can create a new study', () => {
-    cy.visit('/')
-    cy.get('[data-cy="study-dropdown"]').click()
-    cy.get('[data-cy="new-study-button"]').click()
-    cy.get('[data-cy="study-create"]').click()
-    cy.get('[data-cy="study-name"] input').should('be.focused').type('TEST')
-    cy.get('[data-cy="study-create"]').click()
-    cy.get('[data-cy="study-create"]').should('not.exist')
-    cy.get('[data-cy="study-dropdown"]').should('have.text', 'TEST')
-  })
   it('Can changes studies, all data is updated accordingly', () => {
-    cy.visit('/')
-    cy.get('[data-cy="study-dropdown"]').click()
+    cy.visit('/studies')
     cy.get('[data-cy="new-study-button"]').click()
     cy.get('[data-cy="study-create"]').click()
     cy.get('[data-cy="study-name"] input').should('be.focused').type('TEST')
     cy.get('[data-cy="study-create"]').click()
+    cy.visit('/')
     //List of surveys
     changeStudy('Test Study')
     cy.visit('/surveys')

@@ -57,7 +57,8 @@ export const StudyInvitesDialog: React.FC<StudyInvitesDialogProps> = ({
         <List>
           {invites.map((invite) => (
             <ListItem key={invite.id} alignItems="flex-start" disableGutters>
-              <ListItemText primary={invite.studyName} />
+              <ListItemText primary={invite.studyName} secondary={invite.description} />
+
               {invitesStatus[invite.id] ? (
                 <Typography>{invitesStatus[invite.id]}</Typography>
               ) : (
