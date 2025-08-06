@@ -4807,8 +4807,8 @@
             }
           }
         },
-        "description": "Get participant by ID",
-        "summary": "Get a  Participant by ID",
+        "description": "Get participant by profile ID",
+        "summary": "Get a  Participant by profile ID",
         "tags": [
           "Participants"
         ],
@@ -6608,11 +6608,11 @@
             }
           },
           "422": {
-            "description": "Validation Failed",
+            "description": "Unprocessable Content",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                  "$ref": "#/components/schemas/UnprocessableError"
                 }
               }
             }
@@ -6664,11 +6664,11 @@
             "description": "Redirect"
           },
           "422": {
-            "description": "Validation Failed",
+            "description": "Unprocessable Content",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                  "$ref": "#/components/schemas/UnprocessableError"
                 }
               }
             }
