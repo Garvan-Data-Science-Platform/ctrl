@@ -26,7 +26,9 @@ import {
   Middlewares,
   NoSecurity,
   Security,
+  Request,
 } from 'tsoa'
+import * as express from 'express'
 import prisma from '../PrismaClient'
 import logger from 'common/src/logger'
 import { checkPasswordStrength } from 'common/src/PasswordStrength'
@@ -214,6 +216,7 @@ export class AuthController extends Controller {
       email: email,
       role: Role.Participant,
       password: hashedPassword,
+      agreedTermsAt: new Date(),
     }
 
     const insertedUser = await this.userRepo.create({ data })
@@ -353,6 +356,20 @@ export class AuthController extends Controller {
     logger.info({ ...responseData })
 
     return responseData
+  }
+
+  /**
+   * login
+   *
+   * @summary Login a User
+   */
+  @Get('/tcs')
+  @NoSecurity()
+  @SuccessResponse(302, 'Redirect')
+  public async tcs(@Request() request: express.Request) {
+    const response = (<any>request).res as express.Response
+    const tcLink = (await prisma.organisation.findFirstOrThrow({})).tcLink
+    response.redirect(tcLink)
   }
 
   public async createParticipant(

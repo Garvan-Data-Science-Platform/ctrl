@@ -8,5 +8,6 @@ export interface GetSettingsResponse {
     secondaryColour: string | null
     redcapToken: string | null
     redcapURL: string | null
+    tcLink: string
   }
 }

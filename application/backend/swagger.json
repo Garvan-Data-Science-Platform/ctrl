@@ -84,6 +84,11 @@
           "deleted": {
             "type": "boolean"
           },
+          "agreedTermsAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
           "updatedAt": {
             "type": "string",
             "format": "date-time"
@@ -97,6 +102,10 @@
           },
           "password": {
             "type": "string"
+          },
+          "emailHash": {
+            "type": "string",
+            "nullable": true
           },
           "email": {
             "type": "string"
@@ -118,10 +127,12 @@
         },
         "required": [
           "deleted",
+          "agreedTermsAt",
           "updatedAt",
           "createdAt",
           "role",
           "password",
+          "emailHash",
           "email",
           "lastName",
           "middleName",
@@ -992,6 +1003,9 @@
         "properties": {
           "data": {
             "properties": {
+              "tcLink": {
+                "type": "string"
+              },
               "redcapURL": {
                 "type": "string",
                 "nullable": true
@@ -1027,6 +1041,7 @@
               }
             },
             "required": [
+              "tcLink",
               "redcapURL",
               "redcapToken",
               "secondaryColour",
@@ -1079,6 +1094,9 @@
           "redcapURL": {
             "type": "string",
             "nullable": true
+          },
+          "tcLink": {
+            "type": "string"
           }
         },
         "type": "object",
@@ -1781,6 +1799,9 @@
             "format": "byte",
             "nullable": true
           },
+          "tcLink": {
+            "type": "string"
+          },
           "redcapURL": {
             "type": "string",
             "nullable": true
@@ -1832,6 +1853,7 @@
         },
         "required": [
           "logo",
+          "tcLink",
           "redcapURL",
           "redcapToken",
           "secondaryColour",
@@ -6022,6 +6044,43 @@
             }
           }
         }
+      }
+    },
+    "/auth/tcs": {
+      "get": {
+        "operationId": "Tcs",
+        "responses": {
+          "302": {
+            "description": "Redirect"
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "login",
+        "summary": "Login a User",
+        "tags": [
+          "Auth"
+        ],
+        "security": [],
+        "parameters": []
       }
     },
     "/studies/{studyId}/integrations/redcap/participant/upload/csv": {
