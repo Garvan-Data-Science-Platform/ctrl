@@ -39,15 +39,15 @@ backend:
     # Overrides the image tag whose default is the chart appVersion.
     tag: #
 
-nginx-ingress:
-  enabled: true
+#nginx-ingress:
+#  enabled: true
 
-cert-manager: #Use to enable https
-  enabled: false
-  crds:
-    enabled: true
+#cert-manager: #Use to enable https
+#  enabled: false
+#  crds:
+#    enabled: true
 
-letsencryptEmail: #Required if using cert-manager
+#letsencryptEmail: #Required if using cert-manager
 
 ingress:
   enabled: true
@@ -55,8 +55,6 @@ ingress:
   annotations:
     nginx.org/rewrites: 'serviceName=backend rewrite=/'
     #ingress.kubernetes.io/ssl-redirect: 'false'
-    acme.cert-manager.io/http01-edit-in-place: 'true'
-    cert-manager.io/issuer: 'letsencrypt-prod'
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
@@ -110,6 +108,7 @@ postgresql:
   global:
     security:
       allowInsecureImages: true
+  fullnameOverride: ctrl-postgres
 
 serviceAccount:
   # Specifies whether a service account should be created
