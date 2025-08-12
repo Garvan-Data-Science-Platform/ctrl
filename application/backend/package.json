@@ -30,7 +30,7 @@
     "fast-csv": "^5.0.2",
     "json5": "^2.2.3",
     "jsonwebtoken": "^9.0.2",
-    "multer": "^2.0.1",
+    "multer": "^2.0.2",
     "nodemailer": "^6.9.16",
     "pg": "^8.12.0",
     "prisma-field-encryption": "^1.6.0",

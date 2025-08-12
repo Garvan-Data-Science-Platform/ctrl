@@ -35,6 +35,11 @@ spec:
                   secretKeyRef:
                     name: ctrl-postgresql
                     key: postgres-password
+              - name: PRISMA_FIELD_ENCRYPTION_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: aeskey
+                    key: aeskey
             command:
             - /bin/sh
             - -c
