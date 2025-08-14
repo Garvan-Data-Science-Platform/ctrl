@@ -21,9 +21,11 @@ terraform {
 # Configure provider.
 provider "google" {
   project = var.project
+  zone = "australia-southeast1-a"
 }
 
 # Configure beta provider.
 provider "google-beta" {
   project = var.project
+  zone = "australia-southeast1-a"
 }
