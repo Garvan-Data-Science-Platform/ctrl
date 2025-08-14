@@ -18,6 +18,7 @@ export interface StudyInvite {
   id: string
   studyId: number
   studyName: string
+  description?: string
 }
 
 interface StudyInvitesDialogProps {
