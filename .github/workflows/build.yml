@@ -85,7 +85,7 @@ jobs:
 
       - name: Copy Helm charts to VM
         run: |
-          gcloud --quiet beta comput ssh ctrl-dev \
+          gcloud --quiet beta compute ssh ctrl-dev \
             --zone=australia-southeast1-a \
             --project=ctrl-358804 \
             --command="mkdir -p /opt/ctrl/chart && rm -rf /opt/ctrl/chart/{*,.*} 2>/dev/null || true" && \
