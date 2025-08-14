@@ -1,12 +1,6 @@
 dependencies:
-- name: nginx-ingress
-  repository: oci://ghcr.io/nginx/charts
-  version: 2.0.0
 - name: postgresql
   repository: oci://registry-1.docker.io/bitnamicharts
   version: 16.3.0
-- name: cert-manager
-  repository: https://charts.jetstack.io
-  version: v1.17.2
-digest: sha256:31b0c01ad9df2c5e880169dc31159c63585608b3feb66b49f1dc1d0ad62a48e9
-generated: "2025-08-05T11:15:19.161777+10:00"
+digest: sha256:45d149cf5b3302f8dd44d3666f55e47bdfd58a6a75027591a420fb2a2da27b0b
+generated: "2025-08-14T10:05:37.925403+10:00"

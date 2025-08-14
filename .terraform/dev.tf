@@ -9,7 +9,7 @@ resource "google_compute_address" "dev" {
 
 resource "google_dns_record_set" "user_client" {
 
-  name = "ctrltest.dsp.garvan.org.au."
+  name = "ctrldev.dsp.garvan.org.au."
   type = "A"
   ttl  = 300
 
@@ -21,7 +21,7 @@ resource "google_dns_record_set" "user_client" {
 
 resource "google_dns_record_set" "admin_client" {
 
-  name = "admin.ctrltest.dsp.garvan.org.au."
+  name = "admin.ctrldev.dsp.garvan.org.au."
   type = "A"
   ttl  = 300
 
@@ -32,7 +32,7 @@ resource "google_dns_record_set" "admin_client" {
 }
 
 resource "google_compute_instance" "dev" {
-  name         = "test-instance"
+  name         = "ctrl-dev"
   machine_type = "e2-standard-2"
   zone         = "australia-southeast1-a"
 
@@ -68,7 +68,9 @@ resource "null_resource" "install_chart" {
     command = <<EOT
 gcloud --quiet beta compute scp ./dev.yaml ${google_compute_instance.dev.name}:/opt/ctrl/values.yaml  --zone=australia-southeast1-a --project=ctrl-358804 && \
 gcloud --quiet beta compute scp --recurse ../.helm/ctrl/ ${google_compute_instance.dev.name}:/opt/ctrl/chart/  --zone=australia-southeast1-a --project=ctrl-358804 && \
-gcloud compute ssh --zone australia-southeast1-a ${google_compute_instance.dev.name} --project ctrl-358804 --command "sudo helm install ctrl /opt/ctrl/chart/ctrl -f /opt/ctrl/values.yaml"
+gcloud compute ssh --zone australia-southeast1-a ${google_compute_instance.dev.name} --project ctrl-358804 --command "sudo helm upgrade --install cert-manager oci://quay.io/jetstack/charts/cert-manager --version v1.18.2 --namespace cert-manager --create-namespace --set crds.enabled=true --kubeconfig /etc/rancher/k3s/k3s.yaml" && \
+gcloud compute ssh --zone australia-southeast1-a ${google_compute_instance.dev.name} --project ctrl-358804 --command "sudo helm upgrade --install nginx-ingress oci://ghcr.io/nginx/charts/nginx-ingress --version 2.2.1 --kubeconfig /etc/rancher/k3s/k3s.yaml" && \
+gcloud compute ssh --zone australia-southeast1-a ${google_compute_instance.dev.name} --project ctrl-358804 --command "sudo helm upgrade --install ctrl /opt/ctrl/chart/ctrl --kubeconfig /etc/rancher/k3s/k3s.yaml -f /opt/ctrl/values.yaml"
 EOT
   }
 }

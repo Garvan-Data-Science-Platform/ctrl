@@ -17,7 +17,7 @@ spec:
             imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
             env:
               - name: POSTGRES_HOST
-                value: ctrl-postgresql
+                value: ctrl-postgres
               - name: HOSTNAME
               {{ with .Values.ingress.hosts.userClient }}
                 value: {{ .hostname | quote }}
@@ -33,7 +33,7 @@ spec:
               - name: POSTGRES_PASSWORD
                 valueFrom:
                   secretKeyRef:
-                    name: ctrl-postgresql
+                    name: ctrl-postgres
                     key: postgres-password
               - name: PRISMA_FIELD_ENCRYPTION_KEY
                 valueFrom:

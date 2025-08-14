@@ -14,7 +14,10 @@ terraform {
       source  = "hashicorp/google-beta"
       version = "~> 5.3.0"
     }
-
+  }
+  backend "gcs" {
+    bucket = "ctrl-tf-remote-state"
+    prefix = "ctrl-dev"
   }
 }
 
