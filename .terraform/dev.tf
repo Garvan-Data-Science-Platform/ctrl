@@ -65,7 +65,7 @@ resource "google_compute_instance" "dev" {
     scopes = ["cloud-platform"]
   }
   
-  metadata_startup_script =  "curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC='server' sh -s - --disable=traefik && curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash && mkdir -p '/opt/ctrl/chart' && chmod -R 777 /opt/ctrl"
+  metadata_startup_script =  "curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC='server' sh -s - --disable=traefik && mkdir -p '/opt/ctrl/chart' && chmod -R 777 /opt/ctrl"
 }
 
 resource "null_resource" "install_chart" {
@@ -74,11 +74,11 @@ resource "null_resource" "install_chart" {
   provisioner "local-exec" {
     command = <<EOT
 gcloud secrets versions access latest --secret="ctrl-dev-config" --project ctrl-358804 > dev.yaml && \
+gcloud compute ssh --zone australia-southeast1-a ${google_compute_instance.dev.name} --project ctrl-358804 --command "sudo chmod -R 777 /opt/ctrl && sudo chown sa_${google_service_account.ci_sa.unique_id}: /etc/rancher/k3s/k3s.yaml" && \
 gcloud --quiet beta compute scp ./dev.yaml ${google_compute_instance.dev.name}:/opt/ctrl/values.yaml  --zone=australia-southeast1-a --project=ctrl-358804 && \
 gcloud --quiet beta compute scp --recurse ../.helm/ctrl/ ${google_compute_instance.dev.name}:/opt/ctrl/chart/  --zone=australia-southeast1-a --project=ctrl-358804 && \
-gcloud compute ssh --zone australia-southeast1-a ${google_compute_instance.dev.name} --project ctrl-358804 --command "sudo chmod -R 777 /opt/ctrl" && \
+gcloud compute ssh --zone australia-southeast1-a ${google_compute_instance.dev.name} --project ctrl-358804 --command "sudo curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash && sudo helm upgrade --install nginx-ingress oci://ghcr.io/nginx/charts/nginx-ingress --version 2.2.1 --kubeconfig /etc/rancher/k3s/k3s.yaml" && \
 gcloud compute ssh --zone australia-southeast1-a ${google_compute_instance.dev.name} --project ctrl-358804 --command "sudo helm upgrade --install cert-manager oci://quay.io/jetstack/charts/cert-manager --version v1.18.2 --namespace cert-manager --create-namespace --set crds.enabled=true --kubeconfig /etc/rancher/k3s/k3s.yaml" && \
-gcloud compute ssh --zone australia-southeast1-a ${google_compute_instance.dev.name} --project ctrl-358804 --command "sudo helm upgrade --install nginx-ingress oci://ghcr.io/nginx/charts/nginx-ingress --version 2.2.1 --kubeconfig /etc/rancher/k3s/k3s.yaml" && \
 gcloud compute ssh --zone australia-southeast1-a ${google_compute_instance.dev.name} --project ctrl-358804 --command "sudo helm upgrade --install ctrl /opt/ctrl/chart/ctrl --kubeconfig /etc/rancher/k3s/k3s.yaml -f /opt/ctrl/values.yaml"
 EOT
   }
