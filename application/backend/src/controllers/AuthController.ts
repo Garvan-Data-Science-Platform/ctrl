@@ -342,7 +342,7 @@ export class AuthController extends Controller {
 
     if (user.lockedUntil && user.lockedUntil > new Date()) {
       throw new InvalidCredentialsError(
-        `Account locked until ${user.lockedUntil.toLocaleString('en-AU', { timeZone: 'Australia/Sydney' })}`,
+        `Account locked until ${user.lockedUntil.toLocaleString('en-AU', { timeZone: 'Australia/Sydney' })} (AEST)`,
       )
     }
 
@@ -407,9 +407,9 @@ export class AuthController extends Controller {
   }
 
   /**
-   * login
+   * One time password
    *
-   * @summary Login a User
+   * @summary Log in with a OTP code
    */
   @Post('/login/otp')
   @NoSecurity()
@@ -418,7 +418,6 @@ export class AuthController extends Controller {
     @Body() bodyRequest: OTPLoginRequest,
     @Header('x-client-type') clientType?: string,
   ): Promise<LoginResponse> {
-    console.log('OTP', bodyRequest)
     const otp = await prisma.oTPToken.findUnique({
       where: { id: bodyRequest.otp_token },
     })
@@ -474,10 +473,11 @@ export class AuthController extends Controller {
   }
 
   /**
-   * login
+   * Terms and conditions link
    *
-   * @summary Login a User
+   * @summary Redirects to configured terms and conditions url
    */
+
   @Get('/tcs')
   @NoSecurity()
   @SuccessResponse(302, 'Redirect')

@@ -190,7 +190,7 @@ const StudyCard = ({ study }: { study: StudyEntry }) => {
             </Button>
           </Box>
         ) : (
-          <Typography>
+          <Typography whiteSpace="pre-wrap">
             {study.description || 'No description'}
             <IconButton
               disabled={editingName}

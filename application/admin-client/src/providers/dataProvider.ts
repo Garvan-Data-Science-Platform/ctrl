@@ -28,6 +28,17 @@ axiosInstance.interceptors.request.use(
   },
 )
 
+// Add response interceptor for 401 redirect
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      window.location.href = '/login'
+    }
+    return Promise.reject(error)
+  },
+)
+
 export const dataProvider = (): DataProvider => {
   return {
     getOne: async ({ resource, id }) => {

@@ -67,6 +67,11 @@ describe('Study management page', () => {
     cy.reload()
     cy.get('[data-cy="delete-study"]').should('have.length', 3)
     cy.get('[data-cy="study-dropdown"]').should('have.text', 'Empty Study')
+    cy.get('[data-cy="delete-study"]').should('have.length', 3).eq(0).click()
+    cy.get('[data-cy="confirm-delete"]').click()
+    cy.get('[data-cy="delete-study"]').should('have.length', 2).eq(0).click()
+    cy.get('[data-cy="confirm-delete"]').click()
+    cy.get('[data-cy="delete-study"]').should('have.length', 1).eq(0).should('be.disabled')
   })
 
   it('Can upload a study logo', () => {

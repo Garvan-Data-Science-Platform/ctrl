@@ -9,4 +9,5 @@
     },
   ],
   disablePasswordLogin: true,
+  otp: false,
 }

@@ -1,5 +1,5 @@
 import { Box, Button, Card, Container, Stack, Typography } from '@mui/material'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { LoginResponse } from '@common/types/api/auth'
 import { FormEvent, useEffect, useState } from 'react'
 import { MuiOtpInput } from 'mui-one-time-password-input'
@@ -75,6 +75,11 @@ export default function OTP() {
                 <Button data-cy="login" variant="contained" sx={{ mt: 3 }} type="submit">
                   Log In
                 </Button>
+                {error && (
+                  <Button variant="contained" sx={{ mt: 3, ml: 1 }} component={Link} to="/login">
+                    Go back
+                  </Button>
+                )}
               </Box>
             </Box>
           </Stack>

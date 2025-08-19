@@ -75,7 +75,10 @@ export const FamilyEdit = () => {
       invalidate({ resource: 'families', invalidates: ['all'] })
       resetForm()
     } catch (e: any) {
-      open?.({ type: 'error', message: `Failed to remove dependent: ${e.response.data.details}` })
+      open?.({
+        type: 'error',
+        message: `Failed to remove study participant: ${e.response.data.details}`,
+      })
     }
   }
 

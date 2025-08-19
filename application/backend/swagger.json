@@ -6628,8 +6628,8 @@
             }
           }
         },
-        "description": "login",
-        "summary": "Login a User",
+        "description": "One time password",
+        "summary": "Log in with a OTP code",
         "tags": [
           "Auth"
         ],
@@ -6684,8 +6684,8 @@
             }
           }
         },
-        "description": "login",
-        "summary": "Login a User",
+        "description": "Terms and conditions link",
+        "summary": "Redirects to configured terms and conditions url",
         "tags": [
           "Auth"
         ],

@@ -117,7 +117,7 @@ export class ParticipantsController extends Controller {
         email: p.profile.user?.email,
         firstName: p.profile.firstName,
         lastName: p.profile.lastName,
-        lastUpdated: lastUpdated ? new Date(lastUpdated).toLocaleDateString() : undefined,
+        lastUpdated: lastUpdated ? new Date(lastUpdated).toISOString() : undefined,
         familyId: p.profile.familyId,
         answers: p_answers.map((val) => ({
           surveyVersionNumber: val.version.versionNumber,
@@ -199,6 +199,25 @@ export class ParticipantsController extends Controller {
     @Path() studyId: number,
     @Path() profileId: number,
   ): Promise<void> {
+    const profile = await prisma.participantProfile.findUniqueOrThrow({ where: { id: profileId } })
+
+    const familyGuardiansCount = await prisma.participantProfile.count({
+      where: { familyId: profile.familyId, participantType: 'GUARDIAN' },
+    })
+    const familyDepsCount = await prisma.studyParticipant.count({
+      where: {
+        participantProfile: { familyId: profile.familyId },
+        studyId,
+        OR: [
+          { participantProfile: { participantType: 'DEPENDENT_AGE' } },
+          { participantProfile: { participantType: 'DEPENDENT_OTHER' } },
+        ],
+      },
+    })
+    if (profile.participantType == 'GUARDIAN' && familyGuardiansCount == 1 && familyDepsCount > 0) {
+      throw new UnprocessableError('Cannot leave a dependent with no guardian')
+    }
+
     await prisma.studyParticipant.delete({
       where: {
         participantProfileId_studyId: {

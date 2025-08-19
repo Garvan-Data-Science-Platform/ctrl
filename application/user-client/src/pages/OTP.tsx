@@ -4,6 +4,7 @@ import { useAuth } from '../auth'
 import { LoginResponse } from '@common/types/api/auth'
 import { FormEvent, useEffect, useState } from 'react'
 import { MuiOtpInput } from 'mui-one-time-password-input'
+import { Link } from 'react-router-dom'
 
 export default function OTP() {
   const { login } = useAuth()
@@ -71,6 +72,11 @@ export default function OTP() {
               <Button data-cy="login" variant="contained" sx={{ mt: 3 }} type="submit">
                 Log In
               </Button>
+              {error && (
+                <Button variant="contained" sx={{ mt: 3, ml: 1 }} component={Link} to="/login">
+                  Go back
+                </Button>
+              )}
             </form>
           </Stack>
         </Card>

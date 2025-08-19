@@ -98,6 +98,30 @@ export class FamiliesController extends Controller {
       },
     })
 
+    if (profile.participantType == 'GUARDIAN') {
+      const familyGuardiansCount = await prisma.studyParticipant.count({
+        where: {
+          studyId,
+          participantProfile: { familyId: profile.familyId, participantType: 'GUARDIAN' },
+        },
+      })
+
+      const familyDepsCount = await prisma.studyParticipant.count({
+        where: {
+          participantProfile: { familyId: profile.familyId },
+          studyId,
+          OR: [
+            { participantProfile: { participantType: 'DEPENDENT_AGE' } },
+            { participantProfile: { participantType: 'DEPENDENT_OTHER' } },
+          ],
+        },
+      })
+
+      if (familyGuardiansCount == 1 && familyDepsCount > 0) {
+        throw new UnprocessableError('Cannot leave a dependent with no guardian')
+      }
+    }
+
     const lastFam = await prisma.participantProfile.findFirstOrThrow({
       orderBy: { familyId: 'desc' },
       select: { familyId: true },
@@ -200,6 +224,15 @@ export class FamiliesController extends Controller {
 
     if (depCheck) {
       throw new UnprocessableError('Dependent already registered in CTRL')
+    }
+
+    const familyProfilesCount = await prisma.studyParticipant.count({
+      where: { studyId, participantProfile: { familyId, participantType: 'GUARDIAN' } },
+    })
+    if (familyProfilesCount == 0) {
+      throw new UnprocessableError(
+        'At least one family member must have the role of Guardian and be participating in the study to add a dependent',
+      )
     }
 
     const currentSurvey = await prisma.surveyVersion.findFirstOrThrow({
