@@ -149,6 +149,11 @@ describe('Survey tests', () => {
   })
 
   it('Another dependent is registered and inherits the latest answers', async () => {
+    await prisma.participantProfile.update({
+      where: { id: 98 },
+      data: { participantType: 'GUARDIAN' },
+    })
+
     await request(app)
       .post(`/studies/1/families/2/add-dependent`)
       .set({ Authorization: `Bearer ${adminToken}` })

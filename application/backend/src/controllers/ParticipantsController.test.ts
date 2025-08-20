@@ -56,7 +56,7 @@ describe('ParticipantsController', () => {
 
       expect(body.data).toHaveLength(4)
       expect(body.data[0]).not.toHaveProperty('lastUpdated')
-      expect(body.data[1].lastUpdated).toBe(
+      expect(new Date(body.data[1].lastUpdated || 0).toLocaleDateString()).toBe(
         new Date('2024-12-02T02:38:01.195Z').toLocaleDateString(),
       )
       expect(body.data[1].answers).toHaveLength(1)
