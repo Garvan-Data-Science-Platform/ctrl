@@ -82,6 +82,7 @@ describe('REDCap Survey Upload', () => {
       }).as('uploadFile')
 
       cy.url().should('include', '/surveys/edit/')
+      cy.url().should('not.include', ':versionNumber')
 
       // Check updated draft metadata
       cy.request({
@@ -145,6 +146,7 @@ describe('REDCap Survey Upload', () => {
       cy.contains('button', 'Yes, Overwrite').click()
 
       cy.url().should('include', '/surveys/edit/')
+      cy.url().should('not.include', ':versionNumber')
 
       // Check updated draft metadata
       cy.request({
