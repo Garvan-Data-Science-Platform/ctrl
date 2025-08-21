@@ -174,6 +174,39 @@ export class FamiliesController extends Controller {
         },
       },
     })
+
+    if (profile.participantType == 'GUARDIAN') {
+      const oldFamGuardianCount = await prisma.participantProfile.count({
+        where: { familyId: profile.familyId, participantType: 'GUARDIAN' },
+      })
+      const oldFamDepCount = await prisma.participantProfile.count({
+        where: {
+          familyId: profile.familyId,
+          OR: [{ participantType: 'DEPENDENT_AGE' }, { participantType: 'DEPENDENT_OTHER' }],
+        },
+      })
+
+      if (oldFamDepCount > 0 && oldFamGuardianCount == 1) {
+        throw new UnprocessableError(
+          'Cannot add this person because they are currently in a family where they are the only guardian. Move dependents out of their family first.',
+        )
+      }
+    }
+
+    if (
+      profile.participantType == 'DEPENDENT_AGE' ||
+      profile.participantType == 'DEPENDENT_OTHER'
+    ) {
+      const newFamGuardianCount = await prisma.participantProfile.count({
+        where: { familyId, participantType: 'GUARDIAN', studies: { every: { studyId } } },
+      })
+      if (newFamGuardianCount == 0) {
+        throw new UnprocessableError(
+          'Cannot add this person because they are a dependent and there must be at least one guardian study participant in this family first.',
+        )
+      }
+    }
+
     const oldId = profile.familyId
 
     await prisma.participantProfile.update({

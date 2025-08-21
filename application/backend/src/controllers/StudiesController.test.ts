@@ -238,5 +238,14 @@ describe('StudiesController', () => {
 
       expect(response.body.message).toBe(`Study with ID: ${notExistingStudyId} not found`)
     })
+
+    it('should not allow deleting last study', async () => {
+      await prisma.study.deleteMany({ where: { id: { not: testStudyId } } })
+
+      const response = await request(app)
+        .delete(`/studies/${testStudyId}`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(response.status).toBe(422)
+    })
   })
 })

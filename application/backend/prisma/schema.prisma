@@ -121,7 +121,7 @@ model Organisation {
   redcapURL       String?
   redcapToken     String?
   logo            Bytes?
-  tcLink          String  @default("https://garvan-data-science-platform.github.io/ctrl-docs/terms")
+  tcLink          String  @default("https://garvan-data-science-platform.github.io/ctrl-docs/docs/terms-and-conditions")
   users           User[]
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

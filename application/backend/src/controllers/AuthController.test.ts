@@ -762,7 +762,7 @@ describe('AuthController', () => {
       const response = await request(app).get('/auth/tcs')
       expect(response.redirect).toBe(true)
       expect(response.headers['location']).toBe(
-        'https://garvan-data-science-platform.github.io/ctrl-docs/terms',
+        'https://garvan-data-science-platform.github.io/ctrl-docs/docs/terms-and-conditions',
       )
     })
   })

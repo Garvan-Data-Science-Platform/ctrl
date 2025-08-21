@@ -259,7 +259,10 @@ export class SurveysController extends Controller {
     @Path() studyId: number,
   ): Promise<GetAllResponsesResponse> {
     const study_participants = (
-      await prisma.studyParticipant.findMany({ select: { participantProfileId: true } })
+      await prisma.studyParticipant.findMany({
+        where: { studyId },
+        select: { participantProfileId: true },
+      })
     ).map((val) => val.participantProfileId)
 
     const participants = await this.svaRepo.findMany({

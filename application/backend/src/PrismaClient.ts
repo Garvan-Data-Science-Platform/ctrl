@@ -44,9 +44,9 @@ baseClient.$use(async (params, next) => {
     if (params.action === 'count') {
       if (!params.args) {
         params.args = { where: { deleted: false } }
-      }
-      // Find many queries
-      if (params.args?.where && params.args.where.deleted == undefined) {
+      } else if (!params.args.where) {
+        params.args.where = { deleted: false }
+      } else if (params.args.where.deleted == undefined) {
         params.args.where['deleted'] = false
       }
     }

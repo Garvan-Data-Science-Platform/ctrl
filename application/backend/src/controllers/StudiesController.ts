@@ -26,7 +26,7 @@ import type {
 } from 'common/types/api/studies'
 import prisma from '../PrismaClient'
 import { Study } from '@prisma/client'
-import { NotFoundError } from '../middlewares/ErrorHandler'
+import { NotFoundError, UnprocessableError } from '../middlewares/ErrorHandler'
 import {
   ValidateErrorResponse,
   NotFoundErrorResponse,
@@ -74,17 +74,14 @@ export class StudiesController extends Controller {
       where: { userId: request.user.userId },
     })
 
-    const studies: Study[] = await this.studyRepo.findMany({
-      where: {
-        profiles: {
-          some: {
-            participantProfileId: participantProfile.id,
-          },
-        },
-      },
+    const studies = await this.studyParticipantRepo.findMany({
+      where: { participantProfileId: participantProfile.id },
+      select: { study: true },
     })
 
-    const responseData = { data: studies.map((val) => ({ ...val, logo: Boolean(val.logo) })) }
+    const responseData = {
+      data: studies.map((val) => ({ ...val.study, logo: Boolean(val.study.logo) })),
+    }
     logger.info({ ...responseData })
     return responseData
   }
@@ -183,6 +180,11 @@ export class StudiesController extends Controller {
   @Delete('/{studyId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async deleteStudy(@Path() studyId: number) {
+    const studyCount = await this.studyRepo.count({})
+    if (studyCount == 1) {
+      throw new UnprocessableError('Must have at least one study')
+    }
+
     try {
       await this.studyRepo.delete({
         where: { id: studyId },

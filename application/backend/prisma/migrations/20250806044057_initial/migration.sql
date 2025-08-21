@@ -98,7 +98,7 @@ CREATE TABLE "Organisation" (
     "redcapURL" TEXT,
     "redcapToken" TEXT,
     "logo" BYTEA,
-    "tcLink" TEXT NOT NULL DEFAULT 'https://garvan-data-science-platform.github.io/ctrl-docs/terms',
+    "tcLink" TEXT NOT NULL DEFAULT 'https://garvan-data-science-platform.github.io/ctrl-docs/docs/terms-and-conditions',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 

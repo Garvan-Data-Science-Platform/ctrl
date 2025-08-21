@@ -57,6 +57,15 @@ describe('Family Editing', () => {
   })
 
   it('Remove family member from study, add them back in', () => {
+    //Removing a family member who is part of multiple studies properly removes them from the answers list
+    cy.visit('/participants/family/edit/1')
+    cy.contains('Unanswered').should('exist')
+    cy.get('[data-cy="in-study-checkbox"]').first().click()
+    cy.visit('/responses/all/1')
+    cy.contains('Survey Version 1').should('exist')
+    cy.contains('Test Dependent').should('exist')
+    cy.contains('Unanswered').should('not.exist')
+
     cy.visit('/participants/family/edit/100')
     cy.get('[data-cy="in-study-checkbox"]').first().click()
     cy.contains('Removed').should('exist')
@@ -75,6 +84,7 @@ describe('Family Editing', () => {
   })
 
   it('Cannot make changes that would leave orphan dependent', () => {
+    //Can't change participant type
     cy.visit('/participants/family/edit/100')
     cy.get('[data-cy="type-select"]').first().click()
     cy.contains('Non-Guardian').click()
@@ -82,18 +92,36 @@ describe('Family Editing', () => {
     cy.get('[data-value="STANDARD"]').click()
     cy.contains('no guardian').should('exist')
     cy.contains('no guardian').should('not.exist')
+    //Can't remove from study
     cy.get('[data-cy="in-study-checkbox"]').last().click()
     cy.contains('no guardian').should('exist')
     cy.contains('no guardian').should('not.exist')
+    //Can't remove from family
     cy.get('[data-cy="remove-member-button"]').click()
     cy.get('[data-cy="remove-icon-button"]').last().click()
     cy.contains('no guardian').should('exist')
+    //Can't add a dependent to a family with no guardian
     cy.visit('/participants/family/edit/1')
     addDep()
     cy.contains('At least one').should('exist')
+    //Can't change type to dependent if there is no guardian
     cy.visit('/participants/family/edit/1')
     cy.get('[data-cy="type-select"]').click()
     cy.contains('Dependent (other)').click()
     cy.contains('no guardian').should('exist')
+    cy.contains('no guardian').should('not.exist')
+    //Can't bring in a dependent to a family with no guardian
+    cy.get('[data-cy="add-member-button"]').click()
+    cy.get('[data-cy="registered-yes"]').click()
+    cy.get('[data-cy="search-first"]').type('Test')
+    cy.get('[data-cy="participant-list"]').get('li').should('have.length', 1).click()
+    cy.get('[data-cy="search-confirm-button"]').click()
+    cy.contains('Cannot add').should('exist')
+    cy.contains('Cannot add').should('not.exist')
+    //Can't bring in a guardian from a family with a dependent and no other guardian
+    cy.get('[data-cy="search-first"]').clear().type('Second')
+    cy.get('[data-cy="participant-list"]').get('li').should('have.length', 1).click()
+    cy.get('[data-cy="search-confirm-button"]').click()
+    cy.contains('only guardian').should('exist')
   })
 })
