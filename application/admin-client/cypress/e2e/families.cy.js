@@ -68,7 +68,6 @@ describe('Family Editing', () => {
     cy.contains('Unanswered').should('not.exist')
 
     cy.visit('/participants/family/edit/100')
-    cy.get('[data-cy="display-sensitive"]').click()
     cy.get('[data-cy="in-study-checkbox"]').first().click()
     cy.contains('Removed').should('exist')
     cy.visit('/responses/all/1')
