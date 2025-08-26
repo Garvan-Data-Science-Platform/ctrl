@@ -53,7 +53,7 @@ import type { OTPLoginRequest } from 'common/types/api/auth/login'
 import { randomInt } from 'node:crypto'
 import nodemailer from 'nodemailer'
 import { createMailerTransporter, fromAddress } from '../utils/mailer'
-import { genId } from '../utils/genId'
+import { genId, genIndId } from '../utils/genId'
 
 @Route('auth')
 @Tags('Auth')
@@ -573,6 +573,7 @@ export class AuthController extends Controller {
           dependents.length > 0 ? ParticipantType.GUARDIAN : ParticipantType.STANDARD,
       },
     })
+    await genIndId(profile.id)
 
     //Generate unique Ids
     await genId(studyId, profile.id)
@@ -611,6 +612,8 @@ export class AuthController extends Controller {
               : ParticipantType.DEPENDENT_AGE,
           },
         })
+        await genId(studyId, depProfile.id)
+        await genIndId(depProfile.id)
         if (currentSurvey) {
           await this.svaRepo.create({
             data: {

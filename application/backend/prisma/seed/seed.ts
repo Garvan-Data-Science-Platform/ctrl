@@ -157,6 +157,7 @@ const main = async () => {
       profiles: {
         create: [
           {
+            individualId: 'IND-ABC-123',
             firstName: 'Judith',
             middleName: 'Arundell',
             lastName: 'Wright',

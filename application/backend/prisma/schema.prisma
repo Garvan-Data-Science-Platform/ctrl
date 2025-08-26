@@ -48,6 +48,7 @@ enum Role {
 
 model ParticipantProfile {
   id               Int                    @id @default(autoincrement())
+  individualId     String                 @unique @default(uuid())
   firstName        String                  /// @encrypted
   firstNameHash    String?                 /// @encryption:hash(firstName)
   middleName       String?                 /// @encrypted
