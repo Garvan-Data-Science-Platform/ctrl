@@ -87,6 +87,34 @@ export class StudiesController extends Controller {
   }
 
   /**
+   * Get deleted Studies
+   *
+   * @summary Get deleted Studies
+   */
+  @Get('/deleted')
+  public async getDeletedStudies(): Promise<GetAllStudiesResponse> {
+    const studies: Study[] = await this.studyRepo.findMany({
+      where: { deleted: true },
+      orderBy: { id: 'asc' },
+    })
+    const responseData = { data: studies.map((val) => ({ ...val, logo: Boolean(val.logo) })) }
+    return responseData
+  }
+
+  /**
+   * Restores a Deleted Study by ID
+   *
+   * @summary Restore Deleted Study by Id
+   */
+  @Patch('{studyId}/restore')
+  public async restoreStudyById(@Path() studyId: number) {
+    const study: Study | null = await this.studyRepo.update({
+      where: { id: studyId, deleted: true },
+      data: { deleted: false },
+    })
+  }
+
+  /**
    * Gets a Specific Study by ID
    *
    * @summary Get Specific Study by Id

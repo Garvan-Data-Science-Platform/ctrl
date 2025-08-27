@@ -84,6 +84,35 @@ export class UsersController extends Controller {
   }
 
   /**
+   * Get all deleted Admin Users
+   *
+   * @summary Get all deleted Admin Users
+   */
+  @Get('/admin/deleted')
+  @Security('jwt', ['OrganisationAdmin'])
+  @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
+  public async getDeletedAdminUsers(): Promise<GetAllUsersResponse> {
+    const users: User[] = await this.userRepo.findMany({
+      where: { role: { in: ['OperatorAdmin', 'OrganisationAdmin'] }, deleted: true },
+    })
+    const responseData = { data: users }
+    return responseData
+  }
+
+  /**
+   * Restore deleted user
+   *
+   * @summary Restore deleted user by Id
+   */
+  @Patch('/{userId}/restore')
+  @Security('jwt', ['OrganisationAdmin'])
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
+  @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
+  public async restoreUserById(@Path() userId: number) {
+    await this.userRepo.update({ where: { id: userId, deleted: true }, data: { deleted: false } })
+  }
+
+  /**
    * Gets a Specific User using their ID
    *
    * @summary Get Specific User

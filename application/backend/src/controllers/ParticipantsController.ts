@@ -13,6 +13,7 @@ import type {
   GetParticipantsResponse,
   InviteParticipantsRequest,
   InviteParticipantsResponse,
+  GetDeletedParticipantsResponse,
 } from 'common/types/api/participants'
 import logger from 'common/src/logger'
 import {
@@ -29,6 +30,7 @@ import {
   Middlewares,
   Request,
   Delete,
+  Patch,
 } from 'tsoa'
 import { Participant } from 'common/types/api/participants/participant'
 import { createMailerTransporter, fromAddress } from '../utils/mailer'
@@ -125,11 +127,54 @@ export class ParticipantsController extends Controller {
   }
 
   /**
+   * List deleted participants
+   *
+   * @summary List deleted participants
+   */
+  @Get('/participants/deleted')
+  public async getDeletedParticipants(
+    @Path() studyId: number,
+  ): Promise<GetDeletedParticipantsResponse> {
+    const participants = await this.participantRepo.findMany({
+      where: { deleted: true, studyId },
+      select: {
+        participantId: true,
+        participantProfile: { select: { firstName: true, lastName: true, dob: true, id: true } },
+      },
+    })
+
+    return {
+      data: participants.map((val) => ({
+        ...val.participantProfile,
+        id: val.participantId || '',
+        profileId: val.participantProfile.id,
+      })),
+    }
+  }
+
+  /**
+   * Restore a deleted participant by Profile ID
+   *
+   * @summary Restore deleted participant by ProfileId
+   */
+  @Patch('/participants/{profileId}/restore')
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
+  public async restoreParticipantById(@Path() studyId: number, @Path() profileId: number) {
+    await this.participantRepo.update({
+      where: {
+        deleted: true,
+        participantProfileId_studyId: { studyId, participantProfileId: profileId },
+      },
+      data: { deleted: false },
+    })
+  }
+
+  /**
    * Get participant by profile ID
    *
    * @summary Get a  Participant by profile ID
    */
-  @Get('/participants/{profileId}')
+  @Get('/participants/{profileId}/')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async getParticipantById(
     @Path() studyId: number,

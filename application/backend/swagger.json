@@ -11,16 +11,12 @@
         "properties": {
           "message": {
             "type": "string",
-            "enum": [
-              "Internal Server Error"
-            ],
+            "enum": ["Internal Server Error"],
             "nullable": false
           },
           "details": {}
         },
-        "required": [
-          "message"
-        ],
+        "required": ["message"],
         "type": "object",
         "additionalProperties": false,
         "example": {
@@ -37,9 +33,7 @@
           },
           "details": {}
         },
-        "required": [
-          "message"
-        ],
+        "required": ["message"],
         "type": "object",
         "additionalProperties": false,
         "example": {
@@ -53,18 +47,14 @@
         "properties": {
           "message": {
             "type": "string",
-            "enum": [
-              "Unprocessable Content"
-            ],
+            "enum": ["Unprocessable Content"],
             "nullable": false
           },
           "details": {
             "type": "string"
           }
         },
-        "required": [
-          "message"
-        ],
+        "required": ["message"],
         "type": "object",
         "additionalProperties": false,
         "example": {
@@ -76,9 +66,7 @@
         "properties": {
           "message": {
             "type": "string",
-            "enum": [
-              "Validation Failed"
-            ],
+            "enum": ["Validation Failed"],
             "nullable": false
           },
           "details": {
@@ -87,10 +75,7 @@
             "type": "object"
           }
         },
-        "required": [
-          "message",
-          "details"
-        ],
+        "required": ["message", "details"],
         "type": "object",
         "additionalProperties": false,
         "example": {
@@ -113,10 +98,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "name",
-          "message"
-        ],
+        "required": ["name", "message"],
         "type": "object",
         "additionalProperties": false
       },
@@ -203,9 +185,7 @@
             "type": "array"
           }
         },
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "type": "object",
         "additionalProperties": false
       },
@@ -215,9 +195,7 @@
             "$ref": "#/components/schemas/User"
           }
         },
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "type": "object",
         "additionalProperties": false
       },
@@ -228,9 +206,7 @@
           },
           "details": {}
         },
-        "required": [
-          "message"
-        ],
+        "required": ["message"],
         "type": "object",
         "additionalProperties": false,
         "example": {
@@ -247,19 +223,13 @@
             "format": "double"
           }
         },
-        "required": [
-          "id"
-        ],
+        "required": ["id"],
         "type": "object",
         "additionalProperties": false
       },
       "Role": {
         "type": "string",
-        "enum": [
-          "OperatorAdmin",
-          "Participant",
-          "OrganisationAdmin"
-        ]
+        "enum": ["OperatorAdmin", "Participant", "OrganisationAdmin"]
       },
       "CreateUserRequest": {
         "properties": {
@@ -279,12 +249,7 @@
             "$ref": "#/components/schemas/Role"
           }
         },
-        "required": [
-          "firstName",
-          "lastName",
-          "email",
-          "role"
-        ],
+        "required": ["firstName", "lastName", "email", "role"],
         "type": "object",
         "additionalProperties": false,
         "example": {
@@ -324,9 +289,7 @@
             "$ref": "#/components/schemas/Role"
           }
         },
-        "required": [
-          "newRole"
-        ],
+        "required": ["newRole"],
         "type": "object",
         "additionalProperties": false,
         "example": {
@@ -340,9 +303,7 @@
             "pattern": "^(.+)@(.+)$"
           }
         },
-        "required": [
-          "email"
-        ],
+        "required": ["email"],
         "type": "object",
         "additionalProperties": false,
         "example": {
@@ -359,10 +320,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "newPassword",
-          "token"
-        ],
+        "required": ["newPassword", "token"],
         "type": "object",
         "additionalProperties": false,
         "example": {
@@ -372,10 +330,7 @@
       },
       "SurveyVersionStatus": {
         "type": "string",
-        "enum": [
-          "PUBLISHED",
-          "DRAFT"
-        ]
+        "enum": ["PUBLISHED", "DRAFT"]
       },
       "SurveyVersionBasic": {
         "properties": {
@@ -400,12 +355,7 @@
             "$ref": "#/components/schemas/SurveyVersionStatus"
           }
         },
-        "required": [
-          "versionNumber",
-          "updatedAt",
-          "createdAt",
-          "status"
-        ],
+        "required": ["versionNumber", "updatedAt", "createdAt", "status"],
         "type": "object",
         "additionalProperties": false
       },
@@ -418,9 +368,7 @@
             "type": "array"
           }
         },
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "type": "object",
         "additionalProperties": false
       },
@@ -440,10 +388,7 @@
             ]
           }
         },
-        "required": [
-          "code",
-          "relatedAnswer"
-        ],
+        "required": ["code", "relatedAnswer"],
         "type": "object",
         "additionalProperties": false
       },
@@ -471,11 +416,7 @@
             "type": "array"
           }
         },
-        "required": [
-          "text",
-          "required",
-          "choices"
-        ],
+        "required": ["text", "required", "choices"],
         "type": "object",
         "additionalProperties": false
       },
@@ -497,10 +438,7 @@
             "type": "array"
           }
         },
-        "required": [
-          "text",
-          "required"
-        ],
+        "required": ["text", "required"],
         "type": "object",
         "additionalProperties": false
       },
@@ -510,9 +448,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "link"
-        ],
+        "required": ["link"],
         "type": "object",
         "additionalProperties": false
       },
@@ -522,20 +458,13 @@
             "type": "string"
           }
         },
-        "required": [
-          "text"
-        ],
+        "required": ["text"],
         "type": "object",
         "additionalProperties": false
       },
       "SurveyElementType": {
         "type": "string",
-        "enum": [
-          "question-choices",
-          "question-checkbox",
-          "subheading",
-          "video"
-        ]
+        "enum": ["question-choices", "question-checkbox", "subheading", "video"]
       },
       "SurveyElement": {
         "anyOf": [
@@ -546,16 +475,11 @@
               },
               "type": {
                 "type": "string",
-                "enum": [
-                  "question-choices"
-                ],
+                "enum": ["question-choices"],
                 "nullable": false
               }
             },
-            "required": [
-              "data",
-              "type"
-            ],
+            "required": ["data", "type"],
             "type": "object"
           },
           {
@@ -565,16 +489,11 @@
               },
               "type": {
                 "type": "string",
-                "enum": [
-                  "question-checkbox"
-                ],
+                "enum": ["question-checkbox"],
                 "nullable": false
               }
             },
-            "required": [
-              "data",
-              "type"
-            ],
+            "required": ["data", "type"],
             "type": "object"
           },
           {
@@ -584,16 +503,11 @@
               },
               "type": {
                 "type": "string",
-                "enum": [
-                  "video"
-                ],
+                "enum": ["video"],
                 "nullable": false
               }
             },
-            "required": [
-              "data",
-              "type"
-            ],
+            "required": ["data", "type"],
             "type": "object"
           },
           {
@@ -603,16 +517,11 @@
               },
               "type": {
                 "type": "string",
-                "enum": [
-                  "subheading"
-                ],
+                "enum": ["subheading"],
                 "nullable": false
               }
             },
-            "required": [
-              "data",
-              "type"
-            ],
+            "required": ["data", "type"],
             "type": "object"
           },
           {
@@ -622,10 +531,7 @@
                 "$ref": "#/components/schemas/SurveyElementType"
               }
             },
-            "required": [
-              "data",
-              "type"
-            ],
+            "required": ["data", "type"],
             "type": "object"
           }
         ]
@@ -648,11 +554,7 @@
             "type": "array"
           }
         },
-        "required": [
-          "title",
-          "text",
-          "elements"
-        ],
+        "required": ["title", "text", "elements"],
         "type": "object",
         "additionalProperties": false
       },
@@ -679,10 +581,7 @@
             "type": "array"
           }
         },
-        "required": [
-          "status",
-          "data"
-        ],
+        "required": ["status", "data"],
         "type": "object",
         "additionalProperties": false
       },
@@ -692,19 +591,13 @@
             "$ref": "#/components/schemas/SurveyVersion"
           }
         },
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "type": "object",
         "additionalProperties": false
       },
       "SurveyStepStatus": {
         "type": "string",
-        "enum": [
-          "completed",
-          "review_required",
-          "viewed"
-        ]
+        "enum": ["completed", "review_required", "viewed"]
       },
       "GetUserSurveyStepsResponse": {
         "properties": {
@@ -724,19 +617,13 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "status",
-                "tooltip",
-                "title"
-              ],
+              "required": ["status", "tooltip", "title"],
               "type": "object"
             },
             "type": "array"
           }
         },
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "type": "object",
         "additionalProperties": false
       },
@@ -751,10 +638,7 @@
             "format": "double"
           }
         },
-        "required": [
-          "current_step",
-          "total_steps"
-        ],
+        "required": ["current_step", "total_steps"],
         "type": "object",
         "additionalProperties": false
       },
@@ -771,9 +655,7 @@
             ]
           }
         },
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "type": "object",
         "additionalProperties": false
       },
@@ -791,15 +673,11 @@
                 "type": "array"
               }
             },
-            "required": [
-              "steps"
-            ],
+            "required": ["steps"],
             "type": "object"
           }
         },
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "type": "object",
         "additionalProperties": false
       },
@@ -829,10 +707,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "status",
-          "answers"
-        ],
+        "required": ["status", "answers"],
         "type": "object",
         "additionalProperties": false
       },
@@ -855,12 +730,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "familyId",
-              "dob",
-              "lastName",
-              "firstName"
-            ],
+            "required": ["familyId", "dob", "lastName", "firstName"],
             "type": "object"
           },
           "answers": {
@@ -877,12 +747,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "profile",
-          "answers",
-          "versionId",
-          "participantId"
-        ],
+        "required": ["profile", "answers", "versionId", "participantId"],
         "type": "object",
         "additionalProperties": false
       },
@@ -903,16 +768,11 @@
                 "type": "array"
               }
             },
-            "required": [
-              "participants",
-              "surveyData"
-            ],
+            "required": ["participants", "surveyData"],
             "type": "object"
           }
         },
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "type": "object",
         "additionalProperties": false
       },
@@ -936,10 +796,7 @@
             "type": "array"
           }
         },
-        "required": [
-          "step",
-          "data"
-        ],
+        "required": ["step", "data"],
         "type": "object",
         "additionalProperties": false
       },
@@ -952,9 +809,7 @@
             "type": "array"
           }
         },
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "type": "object",
         "additionalProperties": false
       },
@@ -1013,9 +868,7 @@
             "type": "object"
           }
         },
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "type": "object",
         "additionalProperties": false
       },
@@ -1077,16 +930,11 @@
                 "nullable": true
               }
             },
-            "required": [
-              "secondaryColour",
-              "primaryColour"
-            ],
+            "required": ["secondaryColour", "primaryColour"],
             "type": "object"
           }
         },
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "type": "object",
         "additionalProperties": false
       },
@@ -1142,9 +990,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "logo"
-                  ],
+                  "required": ["logo"],
                   "type": "object"
                 }
               ]
@@ -1152,9 +998,7 @@
             "type": "array"
           }
         },
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "type": "object",
         "additionalProperties": false
       },
@@ -1204,9 +1048,7 @@
             "$ref": "#/components/schemas/Study"
           }
         },
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "type": "object",
         "additionalProperties": false
       },
@@ -1217,9 +1059,7 @@
             "format": "double"
           }
         },
-        "required": [
-          "id"
-        ],
+        "required": ["id"],
         "type": "object",
         "additionalProperties": false
       },
@@ -1230,9 +1070,7 @@
             "minLength": 1
           }
         },
-        "required": [
-          "name"
-        ],
+        "required": ["name"],
         "type": "object",
         "additionalProperties": false
       },
@@ -1250,33 +1088,15 @@
         "additionalProperties": false
       },
       "StateTerritory": {
-        "enum": [
-          "ACT",
-          "NSW",
-          "NT",
-          "QLD",
-          "SA",
-          "TAS",
-          "VIC",
-          "WA"
-        ],
+        "enum": ["ACT", "NSW", "NT", "QLD", "SA", "TAS", "VIC", "WA"],
         "type": "string"
       },
       "ContactMethod": {
-        "enum": [
-          "EMAIL",
-          "MOBILE",
-          "MAIL"
-        ],
+        "enum": ["EMAIL", "MOBILE", "MAIL"],
         "type": "string"
       },
       "ParticipantType": {
-        "enum": [
-          "STANDARD",
-          "GUARDIAN",
-          "DEPENDENT_AGE",
-          "DEPENDENT_OTHER"
-        ],
+        "enum": ["STANDARD", "GUARDIAN", "DEPENDENT_AGE", "DEPENDENT_OTHER"],
         "type": "string"
       },
       "AlternativeContact": {
@@ -1298,11 +1118,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "firstName",
-          "lastName",
-          "email"
-        ],
+        "required": ["firstName", "lastName", "email"],
         "type": "object",
         "additionalProperties": false
       },
@@ -1328,13 +1144,7 @@
             "$ref": "#/components/schemas/ParticipantType"
           }
         },
-        "required": [
-          "firstName",
-          "lastName",
-          "dob",
-          "id",
-          "participantType"
-        ],
+        "required": ["firstName", "lastName", "dob", "id", "participantType"],
         "type": "object",
         "additionalProperties": false
       },
@@ -1410,9 +1220,7 @@
             "type": "object"
           }
         },
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "type": "object",
         "additionalProperties": false
       },
@@ -1431,12 +1239,7 @@
             "type": "boolean"
           }
         },
-        "required": [
-          "firstName",
-          "lastName",
-          "dob",
-          "permanent"
-        ],
+        "required": ["firstName", "lastName", "dob", "permanent"],
         "type": "object",
         "additionalProperties": false
       },
@@ -1541,18 +1344,10 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "complete",
-              "partially_complete",
-              "incomplete"
-            ]
+            "enum": ["complete", "partially_complete", "incomplete"]
           }
         },
-        "required": [
-          "surveyVersionNumber",
-          "participantId",
-          "status"
-        ],
+        "required": ["surveyVersionNumber", "participantId", "status"],
         "type": "object",
         "additionalProperties": false
       },
@@ -1588,14 +1383,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id",
-          "participantId",
-          "firstName",
-          "lastName",
-          "familyId",
-          "answers"
-        ],
+        "required": ["id", "participantId", "firstName", "lastName", "familyId", "answers"],
         "type": "object",
         "additionalProperties": false
       },
@@ -1608,9 +1396,7 @@
             "type": "array"
           }
         },
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "type": "object",
         "additionalProperties": false
       },
@@ -1691,9 +1477,7 @@
                 "type": "object"
               }
             },
-            "required": [
-              "profile"
-            ],
+            "required": ["profile"],
             "type": "object"
           }
         ]
@@ -1704,9 +1488,7 @@
             "$ref": "#/components/schemas/ParticipantWithProfile"
           }
         },
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "type": "object",
         "additionalProperties": false
       },
@@ -1743,39 +1525,22 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "studyName",
-                    "expiresAt",
-                    "createdAt",
-                    "studyId",
-                    "email",
-                    "id"
-                  ],
+                  "required": ["studyName", "expiresAt", "createdAt", "studyId", "email", "id"],
                   "type": "object"
                 },
                 "type": "array"
               }
             },
-            "required": [
-              "invites"
-            ],
+            "required": ["invites"],
             "type": "object"
           }
         },
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "type": "object",
         "additionalProperties": false
       },
       "InviteStatus": {
-        "enum": [
-          "PENDING",
-          "ACCEPTED",
-          "EXPIRED",
-          "REVOKED",
-          "FAILED_TO_SEND"
-        ],
+        "enum": ["PENDING", "ACCEPTED", "EXPIRED", "REVOKED", "FAILED_TO_SEND"],
         "type": "string"
       },
       "GetInvitesResponse": {
@@ -1806,22 +1571,13 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "inviteStatus",
-                "expiresAt",
-                "createdAt",
-                "studyId",
-                "email",
-                "id"
-              ],
+              "required": ["inviteStatus", "expiresAt", "createdAt", "studyId", "email", "id"],
               "type": "object"
             },
             "type": "array"
           }
         },
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "type": "object",
         "additionalProperties": false
       },
@@ -1884,18 +1640,11 @@
             "type": "string"
           }
         },
-        "required": [
-          "emails",
-          "subjectText",
-          "explanatoryText"
-        ],
+        "required": ["emails", "subjectText", "explanatoryText"],
         "type": "object",
         "additionalProperties": false,
         "example": {
-          "emails": [
-            "john.doe@email.com",
-            "jane@email.com"
-          ],
+          "emails": ["john.doe@email.com", "jane@email.com"],
           "subjectText": "Invitation to Study",
           "explanatoryText": "You have been invited to participate in this Study. Please click this link to provide consent."
         }
@@ -1909,10 +1658,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "inviteEmailSubject",
-          "inviteEmailText"
-        ],
+        "required": ["inviteEmailSubject", "inviteEmailText"],
         "type": "object",
         "additionalProperties": false
       },
@@ -2008,9 +1754,7 @@
             "type": "array"
           }
         },
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "type": "object",
         "additionalProperties": false
       },
@@ -2020,9 +1764,7 @@
             "$ref": "#/components/schemas/Organisation"
           }
         },
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "type": "object",
         "additionalProperties": false
       },
@@ -2033,9 +1775,7 @@
             "format": "double"
           }
         },
-        "required": [
-          "id"
-        ],
+        "required": ["id"],
         "type": "object",
         "additionalProperties": false
       },
@@ -2046,9 +1786,7 @@
             "minLength": 1
           }
         },
-        "required": [
-          "name"
-        ],
+        "required": ["name"],
         "type": "object",
         "additionalProperties": false
       },
@@ -2071,9 +1809,7 @@
             "type": "array"
           }
         },
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "type": "object",
         "additionalProperties": false
       },
@@ -2086,10 +1822,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "subject",
-          "content"
-        ],
+        "required": ["subject", "content"],
         "type": "object",
         "additionalProperties": false,
         "example": {
@@ -2103,9 +1836,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "token"
-        ],
+        "required": ["token"],
         "type": "object",
         "additionalProperties": false
       },
@@ -2135,13 +1866,7 @@
             "$ref": "#/components/schemas/Role"
           }
         },
-        "required": [
-          "firstName",
-          "lastName",
-          "email",
-          "password",
-          "role"
-        ],
+        "required": ["firstName", "lastName", "email", "password", "role"],
         "type": "object",
         "additionalProperties": false,
         "example": {
@@ -2173,12 +1898,7 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "icon",
-                "clientId",
-                "host",
-                "name"
-              ],
+              "required": ["icon", "clientId", "host", "name"],
               "type": "object"
             },
             "type": "array"
@@ -2187,11 +1907,7 @@
             "type": "boolean"
           }
         },
-        "required": [
-          "isSetup",
-          "oidc",
-          "disableAdminPasswordLogin"
-        ],
+        "required": ["isSetup", "oidc", "disableAdminPasswordLogin"],
         "type": "object",
         "additionalProperties": false
       },
@@ -2206,10 +1922,7 @@
             "minLength": 8
           }
         },
-        "required": [
-          "email",
-          "password"
-        ],
+        "required": ["email", "password"],
         "type": "object",
         "additionalProperties": false,
         "example": {
@@ -2227,10 +1940,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id",
-          "token"
-        ],
+        "required": ["id", "token"],
         "type": "object",
         "additionalProperties": false
       },
@@ -2360,11 +2070,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "code",
-          "provider",
-          "redirect_uri"
-        ],
+        "required": ["code", "provider", "redirect_uri"],
         "type": "object",
         "additionalProperties": false
       },
@@ -2378,10 +2084,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "email",
-          "password"
-        ],
+        "required": ["email", "password"],
         "type": "object",
         "additionalProperties": false,
         "example": {
@@ -2398,10 +2101,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "otp_token",
-          "otp_code"
-        ],
+        "required": ["otp_token", "otp_code"],
         "type": "object",
         "additionalProperties": false
       },
@@ -2423,11 +2123,7 @@
             "type": "array"
           }
         },
-        "required": [
-          "profilesCreatedCount",
-          "profilesAlreadyExistedCount",
-          "ids"
-        ],
+        "required": ["profilesCreatedCount", "profilesAlreadyExistedCount", "ids"],
         "type": "object",
         "additionalProperties": false
       },
@@ -2439,9 +2135,7 @@
             "minLength": 1
           }
         },
-        "required": [
-          "formName"
-        ],
+        "required": ["formName"],
         "type": "object",
         "additionalProperties": false
       },
@@ -2456,10 +2150,7 @@
             "format": "double"
           }
         },
-        "required": [
-          "id",
-          "versionNumber"
-        ],
+        "required": ["id", "versionNumber"],
         "type": "object",
         "additionalProperties": false
       },
@@ -2471,9 +2162,7 @@
             "minLength": 1
           }
         },
-        "required": [
-          "formName"
-        ],
+        "required": ["formName"],
         "type": "object",
         "additionalProperties": false
       },
@@ -2492,10 +2181,7 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "duos",
-                "participantId"
-              ],
+              "required": ["duos", "participantId"],
               "type": "object"
             },
             "type": "array"
@@ -2507,10 +2193,7 @@
             "type": "array"
           }
         },
-        "required": [
-          "data",
-          "notFoundIds"
-        ],
+        "required": ["data", "notFoundIds"],
         "type": "object",
         "additionalProperties": false
       },
@@ -2521,9 +2204,7 @@
             "nullable": true
           }
         },
-        "required": [
-          "token"
-        ],
+        "required": ["token"],
         "type": "object",
         "additionalProperties": false
       },
@@ -2541,9 +2222,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "inStudy"
-                  ],
+                  "required": ["inStudy"],
                   "type": "object"
                 }
               ]
@@ -2551,9 +2230,7 @@
             "type": "array"
           }
         },
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "type": "object",
         "additionalProperties": false
       },
@@ -2616,14 +2293,10 @@
         },
         "description": "Get all Users",
         "summary": "Get all Users",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": []
@@ -2674,14 +2347,10 @@
         },
         "description": "Create and persist a new user.",
         "summary": "Create a new User",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [],
@@ -2734,14 +2403,10 @@
         },
         "description": "Get all Admin Users",
         "summary": "Get all Admin Users",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": []
@@ -2794,14 +2459,10 @@
         },
         "description": "Gets a Specific User using their ID",
         "summary": "Get Specific User",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -2865,14 +2526,10 @@
         },
         "description": "Update an existing user.",
         "summary": "Update a User",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -2936,14 +2593,10 @@
         },
         "description": "Delete a user.",
         "summary": "Delete a User",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -2999,14 +2652,10 @@
         },
         "description": "Update a users role.",
         "summary": "Update a Users Role",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "security": [
           {
-            "jwt": [
-              "OperatorAdmin"
-            ]
+            "jwt": ["OperatorAdmin"]
           }
         ],
         "parameters": [
@@ -3062,9 +2711,7 @@
         },
         "description": "Generate Password Reset Link",
         "summary": "Generate and send a password reset link to the user",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "security": [],
         "parameters": [],
         "requestBody": {
@@ -3117,9 +2764,7 @@
             }
           }
         },
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "security": [],
         "parameters": [],
         "requestBody": {
@@ -3157,14 +2802,10 @@
         },
         "description": "Get all Survey versions",
         "summary": "Get all Survey versions",
-        "tags": [
-          "Surveys"
-        ],
+        "tags": ["Surveys"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -3206,14 +2847,10 @@
         },
         "description": "Gets a specific survey version for a study using their VersionNumber",
         "summary": "Get Specific Survey",
-        "tags": [
-          "Surveys"
-        ],
+        "tags": ["Surveys"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -3264,14 +2901,10 @@
           }
         },
         "summary": "Update draft survey by versionNumber",
-        "tags": [
-          "Surveys"
-        ],
+        "tags": ["Surveys"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -3332,14 +2965,10 @@
         },
         "description": "Get user survey steps",
         "summary": "Get survey steps for current user",
-        "tags": [
-          "Surveys"
-        ],
+        "tags": ["Surveys"],
         "security": [
           {
-            "jwt": [
-              "Participant"
-            ]
+            "jwt": ["Participant"]
           }
         ],
         "parameters": [
@@ -3381,14 +3010,10 @@
         },
         "description": "Get user survey step",
         "summary": "Get questions and current answers for step of a survey",
-        "tags": [
-          "Surveys"
-        ],
+        "tags": ["Surveys"],
         "security": [
           {
-            "jwt": [
-              "Participant"
-            ]
+            "jwt": ["Participant"]
           }
         ],
         "parameters": [
@@ -3439,14 +3064,10 @@
         },
         "description": "Get responses for current user",
         "summary": "Get current answers for current user by token",
-        "tags": [
-          "Surveys"
-        ],
+        "tags": ["Surveys"],
         "security": [
           {
-            "jwt": [
-              "Participant"
-            ]
+            "jwt": ["Participant"]
           }
         ],
         "parameters": [
@@ -3489,14 +3110,10 @@
         },
         "description": "Update survey answers",
         "summary": "Update survey answers for current user by token",
-        "tags": [
-          "Surveys"
-        ],
+        "tags": ["Surveys"],
         "security": [
           {
-            "jwt": [
-              "Participant"
-            ]
+            "jwt": ["Participant"]
           }
         ],
         "parameters": [
@@ -3548,14 +3165,10 @@
         },
         "description": "Get all responses for a survey version number",
         "summary": "Get all participants answers for a survey version",
-        "tags": [
-          "Surveys"
-        ],
+        "tags": ["Surveys"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -3606,14 +3219,10 @@
         },
         "description": "Get responses",
         "summary": "Get answers for a survey participant by version number",
-        "tags": [
-          "Surveys"
-        ],
+        "tags": ["Surveys"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -3675,14 +3284,10 @@
           }
         },
         "summary": "Publish a draft survey",
-        "tags": [
-          "Surveys"
-        ],
+        "tags": ["Surveys"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -3744,14 +3349,10 @@
         },
         "description": "Get the current organisation",
         "summary": "Get the current organisation settings",
-        "tags": [
-          "Settings"
-        ],
+        "tags": ["Settings"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": []
@@ -3793,14 +3394,10 @@
             }
           }
         },
-        "tags": [
-          "Settings"
-        ],
+        "tags": ["Settings"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [],
@@ -3851,9 +3448,7 @@
             }
           }
         },
-        "tags": [
-          "Settings"
-        ],
+        "tags": ["Settings"],
         "security": [],
         "parameters": []
       }
@@ -3896,14 +3491,10 @@
             }
           }
         },
-        "tags": [
-          "Settings"
-        ],
+        "tags": ["Settings"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [],
@@ -3919,9 +3510,7 @@
                     "format": "binary"
                   }
                 },
-                "required": [
-                  "file"
-                ]
+                "required": ["file"]
               }
             }
           }
@@ -3972,9 +3561,7 @@
             }
           }
         },
-        "tags": [
-          "Settings"
-        ],
+        "tags": ["Settings"],
         "security": [],
         "parameters": []
       }
@@ -4009,14 +3596,10 @@
         },
         "description": "Get all Studies",
         "summary": "Get all Studies",
-        "tags": [
-          "Studies"
-        ],
+        "tags": ["Studies"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": []
@@ -4060,14 +3643,10 @@
         },
         "description": "Create a new study.",
         "summary": "Create a new Study",
-        "tags": [
-          "Studies"
-        ],
+        "tags": ["Studies"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [],
@@ -4113,14 +3692,10 @@
         },
         "description": "List users Studies",
         "summary": "List all Studies that a user is participating in, by token (doesn't include pending invitations)",
-        "tags": [
-          "Studies"
-        ],
+        "tags": ["Studies"],
         "security": [
           {
-            "jwt": [
-              "Participant"
-            ]
+            "jwt": ["Participant"]
           }
         ],
         "parameters": []
@@ -4156,14 +3731,10 @@
         },
         "description": "Gets a Specific Study by ID",
         "summary": "Get Specific Study by Id",
-        "tags": [
-          "Studies"
-        ],
+        "tags": ["Studies"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -4220,14 +3791,10 @@
         },
         "description": "Update an existing study.",
         "summary": "Update an existing Study",
-        "tags": [
-          "Studies"
-        ],
+        "tags": ["Studies"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -4284,14 +3851,10 @@
         },
         "description": "Delete a study",
         "summary": "Delete a study",
-        "tags": [
-          "Studies"
-        ],
+        "tags": ["Studies"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -4338,14 +3901,10 @@
             "description": "Internal Server Error"
           }
         },
-        "tags": [
-          "Studies"
-        ],
+        "tags": ["Studies"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -4371,9 +3930,7 @@
                     "format": "binary"
                   }
                 },
-                "required": [
-                  "file"
-                ]
+                "required": ["file"]
               }
             }
           }
@@ -4417,9 +3974,7 @@
             "description": "Internal Server Error"
           }
         },
-        "tags": [
-          "Studies"
-        ],
+        "tags": ["Studies"],
         "security": [],
         "parameters": [
           {
@@ -4471,14 +4026,10 @@
         },
         "description": "Get the current Participants Profile",
         "summary": "Get the current Participants Profile",
-        "tags": [
-          "Profiles"
-        ],
+        "tags": ["Profiles"],
         "security": [
           {
-            "jwt": [
-              "Participant"
-            ]
+            "jwt": ["Participant"]
           }
         ],
         "parameters": []
@@ -4520,14 +4071,10 @@
             }
           }
         },
-        "tags": [
-          "Profiles"
-        ],
+        "tags": ["Profiles"],
         "security": [
           {
-            "jwt": [
-              "Participant"
-            ]
+            "jwt": ["Participant"]
           }
         ],
         "parameters": [],
@@ -4590,14 +4137,10 @@
         },
         "description": "Get a Participants Profile by ID",
         "summary": "Get a Participants Profile by ID",
-        "tags": [
-          "Profiles"
-        ],
+        "tags": ["Profiles"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -4658,14 +4201,10 @@
             }
           }
         },
-        "tags": [
-          "Profiles"
-        ],
+        "tags": ["Profiles"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -4717,14 +4256,10 @@
             }
           }
         },
-        "tags": [
-          "Profiles"
-        ],
+        "tags": ["Profiles"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -4797,14 +4332,10 @@
         },
         "description": "List participants",
         "summary": "List participants",
-        "tags": [
-          "Participants"
-        ],
+        "tags": ["Participants"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -4877,14 +4408,10 @@
         },
         "description": "Get participant by profile ID",
         "summary": "Get a  Participant by profile ID",
-        "tags": [
-          "Participants"
-        ],
+        "tags": ["Participants"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -4957,14 +4484,10 @@
         },
         "description": "Remove a participant from the study",
         "summary": "Remove a participant from the study",
-        "tags": [
-          "Participants"
-        ],
+        "tags": ["Participants"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -5037,14 +4560,10 @@
         },
         "description": "Add a participant to the study",
         "summary": "Add a participant to the study, if they were formerly removed, or they don't have an account.\nThrows error if user has an account and should be added via the study invite process",
-        "tags": [
-          "Participants"
-        ],
+        "tags": ["Participants"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -5126,14 +4645,10 @@
         },
         "description": "List all pending invites for a user",
         "summary": "List all pending invites for a logged in user",
-        "tags": [
-          "Invites"
-        ],
+        "tags": ["Invites"],
         "security": [
           {
-            "jwt": [
-              "Participant"
-            ]
+            "jwt": ["Participant"]
           }
         ],
         "parameters": []
@@ -5153,9 +4668,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "acceptedInvite"
-                  ],
+                  "required": ["acceptedInvite"],
                   "type": "object"
                 }
               }
@@ -5184,14 +4697,10 @@
         },
         "description": "Accept an invitation",
         "summary": "Accept an invite for an existing participant to join a new study",
-        "tags": [
-          "Invites"
-        ],
+        "tags": ["Invites"],
         "security": [
           {
-            "jwt": [
-              "Participant"
-            ]
+            "jwt": ["Participant"]
           }
         ],
         "parameters": [
@@ -5263,14 +4772,10 @@
         },
         "description": "List all non-accepted invites",
         "summary": "List all non-accepted invites for a study",
-        "tags": [
-          "Invites"
-        ],
+        "tags": ["Invites"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -5331,14 +4836,10 @@
         },
         "description": "Create invites",
         "summary": "Creates invites for a list of participant emails and sends it to them",
-        "tags": [
-          "Invites"
-        ],
+        "tags": ["Invites"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -5394,14 +4895,10 @@
         },
         "description": "Resend invite by ID and StudyID",
         "summary": "Resend invite by ID and StudyID",
-        "tags": [
-          "Invites"
-        ],
+        "tags": ["Invites"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -5455,14 +4952,10 @@
         },
         "description": "Resend all pending invites for a study",
         "summary": "Resend invites that are currently pending for a study",
-        "tags": [
-          "Invites"
-        ],
+        "tags": ["Invites"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -5518,14 +5011,10 @@
         },
         "description": "Revoke invite",
         "summary": "Revoke an invite by inviteId and studyId",
-        "tags": [
-          "Invites"
-        ],
+        "tags": ["Invites"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -5596,14 +5085,10 @@
         },
         "description": "Get invite email subject and text",
         "summary": "Get invite email subject and text",
-        "tags": [
-          "Invites"
-        ],
+        "tags": ["Invites"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -5666,14 +5151,10 @@
         },
         "description": "getAllOrganisations",
         "summary": "Get all Organisations",
-        "tags": [
-          "Organisations"
-        ],
+        "tags": ["Organisations"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": []
@@ -5724,14 +5205,10 @@
         },
         "description": "createOrganisation",
         "summary": "Create a new Organisation",
-        "tags": [
-          "Organisations"
-        ],
+        "tags": ["Organisations"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [],
@@ -5804,14 +5281,10 @@
         },
         "description": "getOrganisationById",
         "summary": "Get a specific Organisation",
-        "tags": [
-          "Organisations"
-        ],
+        "tags": ["Organisations"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -5875,14 +5348,10 @@
         },
         "description": "updateOrganisation",
         "summary": "Update an existing Organisation",
-        "tags": [
-          "Organisations"
-        ],
+        "tags": ["Organisations"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -5956,14 +5425,10 @@
         },
         "description": "deleteOrganisation",
         "summary": "Delete an existing Organisation",
-        "tags": [
-          "Organisations"
-        ],
+        "tags": ["Organisations"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -6036,14 +5501,10 @@
         },
         "description": "getOrganisationUsers",
         "summary": "Get all Users within a specific Organisation",
-        "tags": [
-          "Organisations"
-        ],
+        "tags": ["Organisations"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -6109,14 +5570,10 @@
         },
         "description": "addUserToOrganisation",
         "summary": "Add specific User to specific Organisation",
-        "tags": [
-          "Organisations"
-        ],
+        "tags": ["Organisations"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -6189,14 +5646,10 @@
         },
         "description": "removeUserFromOrganisation",
         "summary": "Removes a specific User from a specific Organisation",
-        "tags": [
-          "Organisations"
-        ],
+        "tags": ["Organisations"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -6261,14 +5714,10 @@
         },
         "description": "Sends a contact us email to the admin and user's account.",
         "summary": "ContactUs",
-        "tags": [
-          "Mailer"
-        ],
+        "tags": ["Mailer"],
         "security": [
           {
-            "jwt": [
-              "Participant"
-            ]
+            "jwt": ["Participant"]
           }
         ],
         "parameters": [],
@@ -6321,14 +5770,10 @@
         },
         "description": "register",
         "summary": "Register a new user",
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [],
@@ -6381,9 +5826,7 @@
         },
         "description": "Check setup",
         "summary": "Check if CTRL is setup",
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "security": [],
         "parameters": []
       }
@@ -6425,9 +5868,7 @@
         },
         "description": "register admin",
         "summary": "Register initial admin user",
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "security": [],
         "parameters": [],
         "requestBody": {
@@ -6479,9 +5920,7 @@
         },
         "description": "registerParticipant",
         "summary": "Register a participant",
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "security": [],
         "parameters": [
           {
@@ -6552,9 +5991,7 @@
         },
         "description": "OIDC login",
         "summary": "Login using OIDC",
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "security": [],
         "parameters": [
           {
@@ -6625,9 +6062,7 @@
         },
         "description": "login",
         "summary": "Login a User",
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "security": [],
         "parameters": [
           {
@@ -6698,9 +6133,7 @@
         },
         "description": "One time password",
         "summary": "Log in with a OTP code",
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "security": [],
         "parameters": [
           {
@@ -6754,9 +6187,7 @@
         },
         "description": "Terms and conditions link",
         "summary": "Redirects to configured terms and conditions url",
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "security": [],
         "parameters": []
       }
@@ -6806,14 +6237,10 @@
             }
           }
         },
-        "tags": [
-          "Integrations"
-        ],
+        "tags": ["Integrations"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -6839,9 +6266,7 @@
                     "format": "binary"
                   }
                 },
-                "required": [
-                  "file"
-                ]
+                "required": ["file"]
               }
             }
           }
@@ -6893,14 +6318,10 @@
             }
           }
         },
-        "tags": [
-          "Integrations"
-        ],
+        "tags": ["Integrations"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -6971,14 +6392,10 @@
             }
           }
         },
-        "tags": [
-          "Integrations"
-        ],
+        "tags": ["Integrations"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -7004,9 +6421,7 @@
                     "format": "binary"
                   }
                 },
-                "required": [
-                  "file"
-                ]
+                "required": ["file"]
               }
             }
           }
@@ -7058,14 +6473,10 @@
             }
           }
         },
-        "tags": [
-          "Integrations"
-        ],
+        "tags": ["Integrations"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -7108,15 +6519,10 @@
                       "data": [
                         {
                           "participantId": "PID-TYT-00000",
-                          "duos": [
-                            "DUO:0000004",
-                            "DUO:0000018"
-                          ]
+                          "duos": ["DUO:0000004", "DUO:0000018"]
                         }
                       ],
-                      "notFoundIds": [
-                        "PID-TYT-ABC12"
-                      ]
+                      "notFoundIds": ["PID-TYT-ABC12"]
                     }
                   }
                 }
@@ -7156,9 +6562,7 @@
         },
         "description": "Provide a list of ParticipantIds and get back corresponding DUO codes\nRequires an Elsa API key, and header \"Authorization: Apikey <api-key>\"",
         "summary": "Get DUO codes for a list of ParticipantIds",
-        "tags": [
-          "Integrations"
-        ],
+        "tags": ["Integrations"],
         "security": [],
         "parameters": [
           {
@@ -7183,16 +6587,11 @@
                     "type": "array"
                   }
                 },
-                "required": [
-                  "participantIds"
-                ],
+                "required": ["participantIds"],
                 "type": "object"
               },
               "example": {
-                "participantIds": [
-                  "PID-TYT-00000",
-                  "PID-TYT-ABC12"
-                ]
+                "participantIds": ["PID-TYT-00000", "PID-TYT-ABC12"]
               }
             }
           }
@@ -7239,14 +6638,10 @@
         },
         "description": "Enable Elsa Integration",
         "summary": "Generates a new Elsa API Key, retrieve using /elsa/token",
-        "tags": [
-          "Integrations"
-        ],
+        "tags": ["Integrations"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": []
@@ -7292,14 +6687,10 @@
         },
         "description": "Disable Elsa Integration",
         "summary": "Disables Elsa integration and deletes API key",
-        "tags": [
-          "Integrations"
-        ],
+        "tags": ["Integrations"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": []
@@ -7352,14 +6743,10 @@
         },
         "description": "Get Elsa API Key",
         "summary": "Returns Elsa API key if integration is enabled",
-        "tags": [
-          "Integrations"
-        ],
+        "tags": ["Integrations"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": []
@@ -7382,9 +6769,7 @@
         },
         "description": "Health check to ensure server is up and running",
         "summary": "Health Check",
-        "tags": [
-          "Healthcheck"
-        ],
+        "tags": ["Healthcheck"],
         "security": [],
         "parameters": []
       }
@@ -7444,14 +6829,10 @@
             }
           }
         },
-        "tags": [
-          "Families"
-        ],
+        "tags": ["Families"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -7526,14 +6907,10 @@
         },
         "description": "removeMember",
         "summary": "Remove a member from their family, put into a new family.",
-        "tags": [
-          "Families"
-        ],
+        "tags": ["Families"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -7608,14 +6985,10 @@
         },
         "description": "addExistingMember",
         "summary": "Add an existing CTRL profile as a member of a family.\nNote: this endpoint assumes that initial family composition is valid. When adding non-guardians to a family there are no checks that the new family state will be valid.",
-        "tags": [
-          "Families"
-        ],
+        "tags": ["Families"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [
@@ -7699,14 +7072,10 @@
         },
         "description": "addNewDependent",
         "summary": "Add a new dependent to the family.",
-        "tags": [
-          "Families"
-        ],
+        "tags": ["Families"],
         "security": [
           {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
+            "jwt": ["OrganisationAdmin"]
           }
         ],
         "parameters": [

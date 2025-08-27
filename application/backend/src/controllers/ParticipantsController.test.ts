@@ -162,6 +162,65 @@ describe('ParticipantsController', () => {
       expect(p.deleted).toBeTruthy()
     })
   })
+
+  describe('GET /participants/deleted', () => {
+    it('Lists deleted participants', async () => {
+      const res1 = await request(app)
+        .get('/studies/1/participants/deleted')
+        .set({ Authorization: `Bearer ${organisationAdminToken}` })
+      expect(res1.ok).toBe(true)
+      expect(res1.body.data).toHaveLength(0)
+      await prisma.studyParticipant.delete({
+        where: {
+          participantProfileId_studyId: {
+            participantProfileId: PARTICIPANT_UNANSWERED_ID,
+            studyId: 1,
+          },
+        },
+      })
+      const res2 = await request(app)
+        .get('/studies/1/participants/deleted')
+        .set({ Authorization: `Bearer ${organisationAdminToken}` })
+      expect(res2.ok).toBe(true)
+      expect(res2.body.data).toHaveLength(1)
+      expect(res2.body.data[0].profileId).toBe(PARTICIPANT_UNANSWERED_ID)
+    })
+  })
+
+  describe('PATCH /participants/{profileId}/restore', () => {
+    it('Fails if participant is not deleted', async () => {
+      const res = await request(app)
+        .patch(`/studies/1/participants/${PARTICIPANT_UNANSWERED_ID}/restore`)
+        .set({ Authorization: `Bearer ${organisationAdminToken}` })
+
+      expect(res.ok).toBe(false)
+      expect(res.status).toBe(404)
+    })
+    it('Restores a deleted participant', async () => {
+      await prisma.studyParticipant.delete({
+        where: {
+          participantProfileId_studyId: {
+            participantProfileId: PARTICIPANT_UNANSWERED_ID,
+            studyId: 1,
+          },
+        },
+      })
+
+      const res = await request(app)
+        .patch(`/studies/1/participants/${PARTICIPANT_UNANSWERED_ID}/restore`)
+        .set({ Authorization: `Bearer ${organisationAdminToken}` })
+
+      expect(res.ok).toBe(true)
+
+      const participant = await prisma.studyParticipant.findFirst({
+        where: {
+          participantProfileId: PARTICIPANT_UNANSWERED_ID,
+          studyId: 1,
+        },
+      })
+      expect(participant).not.toBeNull()
+    })
+  })
 })
 
 describe('InvitesController', () => {

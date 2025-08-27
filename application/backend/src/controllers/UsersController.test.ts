@@ -400,4 +400,55 @@ describe('UsersController', () => {
       expect(response.body.message).toBe('Validation Failed')
     })
   })
+  describe('GET /users/admin/deleted', () => {
+    it('Lists deleted studies', async () => {
+      const res1 = await request(app)
+        .get('/users/admin/deleted')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(res1.ok).toBe(true)
+      expect(res1.body.data).toHaveLength(0)
+      await prisma.user.delete({
+        where: {
+          id: ORG_ADMIN_ID,
+        },
+      })
+      const res2 = await request(app)
+        .get('/users/admin/deleted')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(res2.ok).toBe(true)
+      expect(res2.body.data).toHaveLength(1)
+      expect(res2.body.data[0].id).toBe(ORG_ADMIN_ID)
+    })
+  })
+
+  describe('PATCH /users/{userId}/restore', () => {
+    it('Fails if user is not deleted', async () => {
+      const res = await request(app)
+        .patch(`/users/${ORG_ADMIN_ID}/restore`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+
+      expect(res.ok).toBe(false)
+      expect(res.status).toBe(404)
+    })
+    it('Restores a deleted user', async () => {
+      await prisma.user.delete({
+        where: {
+          id: ORG_ADMIN_ID,
+        },
+      })
+
+      const res = await request(app)
+        .patch(`/users/${ORG_ADMIN_ID}/restore`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+
+      expect(res.ok).toBe(true)
+
+      const user = await prisma.user.findFirst({
+        where: {
+          id: ORG_ADMIN_ID,
+        },
+      })
+      expect(user).not.toBeNull()
+    })
+  })
 })
