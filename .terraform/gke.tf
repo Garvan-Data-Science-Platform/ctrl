@@ -71,3 +71,31 @@ resource "helm_release" "ctrl" {
     data.google_secret_manager_secret_version_access.ctrl_prod_config.secret_data
   ]
 }
+
+resource "google_compute_managed_ssl_certificate" "ctrl_ssl" {
+  name = "ctrl-ssl-cert"
+  managed {
+    domains = [
+      "ctrl.dsp.garvan.org.au",
+      "admin.ctrl.dsp.garvan.org.au"
+    ]
+  }
+}
+
+resource "kubernetes_manifest" "ctrl_managed_cert" {
+
+  manifest = {
+    "apiVersion" = "networking.gke.io/v1"
+    "kind"       = "ManagedCertificate"
+    "metadata" = {
+      "name"      = "ctrl-managed-cert"
+      "namespace" = "default"
+    }
+    "spec" = {
+      "domains" = [
+        "ctrl.dsp.garvan.org.au",
+        "admin.ctrl.dsp.garvan.org.au"
+      ]
+    }
+  }
+}
