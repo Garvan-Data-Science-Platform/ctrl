@@ -44,7 +44,7 @@ describe('Family Editing', () => {
   it('Remove member from family', () => {
     cy.visit('/participants/family/edit/100')
     cy.get('[data-cy="remove-member-button"]').click()
-    cy.get('[data-cy="remove-icon-button"]').should('have.length', 3).first().click()
+    cy.get('[data-cy="remove-icon-button"]').should('have.length', 2).first().click()
     cy.get('[data-cy="current-family-members"]').contains('Test User').should('not.exist')
   })
 
@@ -61,6 +61,7 @@ describe('Family Editing', () => {
     cy.visit('/participants/family/edit/1')
     cy.contains('Unanswered').should('exist')
     cy.get('[data-cy="in-study-checkbox"]').first().click()
+    cy.get('[data-cy="confirm-remove"]').click()
     cy.visit('/responses/all/1')
     cy.contains('Survey Version 1').should('exist')
     cy.contains('Test Dependent').should('exist')
@@ -68,6 +69,7 @@ describe('Family Editing', () => {
 
     cy.visit('/participants/family/edit/100')
     cy.get('[data-cy="in-study-checkbox"]').first().click()
+    cy.get('[data-cy="confirm-remove"]').click()
     cy.contains('Removed').should('exist')
     cy.visit('/responses/all/1')
     cy.contains('Completed User').should('not.exist')
@@ -94,6 +96,7 @@ describe('Family Editing', () => {
     cy.contains('no guardian').should('not.exist')
     //Can't remove from study
     cy.get('[data-cy="in-study-checkbox"]').last().click()
+    cy.get('[data-cy="confirm-remove"]').click()
     cy.contains('no guardian').should('exist')
     cy.contains('no guardian').should('not.exist')
     //Can't remove from family

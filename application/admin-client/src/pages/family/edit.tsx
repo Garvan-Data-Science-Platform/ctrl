@@ -2,6 +2,10 @@ import {
   Box,
   Button,
   Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControl,
   FormControlLabel,
   FormLabel,
@@ -46,6 +50,8 @@ export const FamilyEdit = () => {
   const [newMemberType, setNewMemberType] = useState<'DEPENDENT' | 'GUARDIAN' | 'OTHER' | null>(
     null,
   )
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [pendingRemoveId, setPendingRemoveId] = useState<number | null>(null)
 
   useEffect(() => {
     if (data) {
@@ -100,7 +106,10 @@ export const FamilyEdit = () => {
       invalidate({ resource: 'families', invalidates: ['all'] })
       resetForm()
     } catch (e: any) {
-      open?.({ type: 'error', message: `Failed to remove dependent: ${e.response.data.details}` })
+      open?.({
+        type: 'error',
+        message: `Failed to remove family member: ${e.response.data.details}`,
+      })
     }
   }
 
@@ -142,9 +151,32 @@ export const FamilyEdit = () => {
     }
   }
 
+  const handleCheckboxClick = (val: GetFamilyResponse['data'][0]) => {
+    if (val.inStudy) {
+      setPendingRemoveId(val.id)
+      setDialogOpen(true)
+    } else {
+      addToStudy(val.id)
+    }
+  }
+
+  const handleDialogConfirm = async () => {
+    if (pendingRemoveId !== null) {
+      await removeFromStudy(pendingRemoveId)
+      setPendingRemoveId(null)
+      setDialogOpen(false)
+    }
+  }
+
+  const handleDialogCancel = () => {
+    setPendingRemoveId(null)
+    setDialogOpen(false)
+  }
+
   return (
     <Show
       resource="family"
+      headerButtons={[]}
       title={<Typography variant="h5">Edit Family</Typography>}
       goBack={
         <IconButton component={Link} to="/participants">
@@ -166,11 +198,17 @@ export const FamilyEdit = () => {
               <TableRow key={`row_${val.id}`}>
                 <TableCell>
                   <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', ml: 1 }}>
-                    {action == 'REMOVE' && (
-                      <IconButton onClick={() => handleRemove(val.id)} data-cy="remove-icon-button">
-                        <Delete />
-                      </IconButton>
-                    )}
+                    {action == 'REMOVE' &&
+                      val.inStudy &&
+                      val.participantType != 'DEPENDENT_OTHER' &&
+                      val.participantType != 'DEPENDENT_AGE' && (
+                        <IconButton
+                          onClick={() => handleRemove(val.id)}
+                          data-cy="remove-icon-button"
+                        >
+                          <Delete />
+                        </IconButton>
+                      )}
                     <Typography>{`${val.firstName} ${val.lastName}`}</Typography>
                   </Box>
                 </TableCell>
@@ -193,13 +231,7 @@ export const FamilyEdit = () => {
                   <Checkbox
                     data-cy="in-study-checkbox"
                     checked={val.inStudy}
-                    onClick={() => {
-                      if (val.inStudy) {
-                        removeFromStudy(val.id)
-                      } else {
-                        addToStudy(val.id)
-                      }
-                    }}
+                    onClick={() => handleCheckboxClick(val)}
                   />
                 </TableCell>
               </TableRow>
@@ -215,20 +247,22 @@ export const FamilyEdit = () => {
           >
             Add member to this family
           </Button>
-          <Button
-            sx={{ ml: 1 }}
-            variant={action == 'REMOVE' ? 'contained' : 'outlined'}
-            onClick={() => (action == 'REMOVE' ? setAction(null) : setAction('REMOVE'))}
-            data-cy="remove-member-button"
-          >
-            Remove member from this family
-          </Button>
+          {(data?.data.length || 0) > 1 && (
+            <Button
+              sx={{ ml: 1 }}
+              variant={action == 'REMOVE' ? 'contained' : 'outlined'}
+              onClick={() => (action == 'REMOVE' ? setAction(null) : setAction('REMOVE'))}
+              data-cy="remove-member-button"
+            >
+              Remove member from this family
+            </Button>
+          )}
         </Box>
 
         {action == 'ADD' && (
           <>
             <FormControl>
-              <FormLabel>Is this person registered as a participant in CTRL?</FormLabel>
+              <FormLabel>Is this person registered as a participant in this study?</FormLabel>
               <RadioGroup
                 row
                 onChange={(e) => {
@@ -372,6 +406,24 @@ export const FamilyEdit = () => {
           </>
         )}
       </Box>
+      <Dialog open={dialogOpen} onClose={handleDialogCancel}>
+        <DialogTitle>Are you sure</DialogTitle>
+        <DialogContent>
+          This person will no longer be able to access the consent form for this study. Any existing
+          consent they have provided will be hidden. This action can be undone if required.
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogCancel}>Cancel</Button>
+          <Button
+            onClick={handleDialogConfirm}
+            color="error"
+            variant="contained"
+            data-cy="confirm-remove"
+          >
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Show>
   )
 }

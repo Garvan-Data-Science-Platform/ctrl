@@ -70,31 +70,24 @@ export class ParticipantsController extends Controller {
   public async getParticipants(@Path() studyId: number): Promise<GetParticipantsResponse> {
     const participant_list = await prisma.studyParticipant.findMany({ where: { studyId } })
 
-    const unique_participants = await this.svaRepo.findMany({
+    const profiles = await this.profileRepo.findMany({
       where: {
-        profileId: { in: participant_list.map((val) => val.participantProfileId) },
-        version: { studyId },
+        id: { in: participant_list.map((val) => val.participantProfileId) },
       },
       select: {
         id: true,
-        answers: true,
-        profile: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            familyId: true,
-            user: { select: { email: true } },
-          },
-        },
+        firstName: true,
+        lastName: true,
+        familyId: true,
+        user: { select: { email: true } },
       },
     })
 
     const participants: GetParticipantsResponse['data'] = []
 
-    for (const p of unique_participants) {
+    for (const p of profiles) {
       const p_answers = await this.svaRepo.findMany({
-        where: { profileId: p.profile.id, version: { studyId } },
+        where: { profileId: p.id, version: { studyId } },
         select: {
           answers: true,
           version: { select: { versionNumber: true, updatedAt: true } },
@@ -108,17 +101,17 @@ export class ParticipantsController extends Controller {
       const study_part = await prisma.studyParticipant.findFirstOrThrow({
         where: {
           studyId,
-          participantProfileId: p.profile.id,
+          participantProfileId: p.id,
         },
       })
       const p_data: Participant = {
-        id: p.profile.id,
+        id: p.id,
         participantId: study_part?.participantId || '',
-        email: p.profile.user?.email,
-        firstName: p.profile.firstName,
-        lastName: p.profile.lastName,
+        email: p.user?.email,
+        firstName: p.firstName,
+        lastName: p.lastName,
         lastUpdated: lastUpdated ? new Date(lastUpdated).toISOString() : undefined,
-        familyId: p.profile.familyId,
+        familyId: p.familyId,
         answers: p_answers.map((val) => ({
           surveyVersionNumber: val.version.versionNumber,
           participantId: val.id,
@@ -274,7 +267,6 @@ export class ParticipantsController extends Controller {
         data: { deleted: false },
       })
     } else if (!profile.userId) {
-      //TODO: Should prevent adding dependent when no guardian is a member of the study
       const guardian = await this.participantRepo.findFirst({
         where: {
           studyId,
