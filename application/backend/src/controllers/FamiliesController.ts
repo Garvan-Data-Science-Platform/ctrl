@@ -103,9 +103,10 @@ export class FamiliesController extends Controller {
     }
 
     if (profile.participantType == 'GUARDIAN') {
-      const familyGuardiansCount = await prisma.studyParticipant.count({
+      const familyGuardiansCount = await prisma.participantProfile.count({
         where: {
-          participantProfile: { familyId: profile.familyId, participantType: 'GUARDIAN' },
+          familyId: profile.familyId,
+          participantType: 'GUARDIAN',
         },
       })
 
