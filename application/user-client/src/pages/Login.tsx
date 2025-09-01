@@ -16,7 +16,7 @@ export default function Login() {
   } = useForm()
   const { login } = useAuth()
   const nav = useNavigate()
-  const { reset, studies } = useAppStore()
+  const { reset } = useAppStore()
 
   const clientType = 'user-client'
 
