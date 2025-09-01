@@ -207,7 +207,6 @@ export class FamiliesController extends Controller {
       profile.participantType == 'DEPENDENT_OTHER'
     ) {
       for (const study of profile.studies) {
-        console.log('STUDY', study.studyId)
         const newFamGuardianCount = await prisma.participantProfile.count({
           where: {
             familyId,
@@ -215,7 +214,6 @@ export class FamiliesController extends Controller {
             studies: { some: { studyId: study.studyId, deleted: false } },
           },
         })
-        console.log('GCOUNT', newFamGuardianCount)
         if (newFamGuardianCount == 0) {
           throw new UnprocessableError(
             'Cannot add this person because they are a dependent and there must be at least one guardian in this family first. The guardian must be a participant in every study the dependent is.',
