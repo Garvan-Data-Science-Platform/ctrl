@@ -27,7 +27,7 @@ import type {
   UpdateSurveyRequest,
 } from 'common/types/api/surveys'
 import { SurveyVersion as SurveyVersionPrisma } from '@prisma/client'
-import { SurveyElementType, SurveyStep, SurveyStepStatus } from 'common/types/survey'
+import { SurveyStep } from 'common/types/survey'
 import prisma from '../PrismaClient'
 import '../jsontypes'
 import { validateAnswers } from 'common/src/surveys/validateSurveyAnswers'
@@ -383,7 +383,6 @@ export class SurveysController extends Controller {
 
     const answers = participantAnswers.answers
 
-    //Maps the type of the last element to the updated status
     const status =
       surveySteps[step].elements.filter((val) =>
         ['question-checkbox', 'question-choices'].includes(val.type),
