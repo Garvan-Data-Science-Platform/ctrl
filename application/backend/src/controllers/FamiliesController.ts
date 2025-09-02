@@ -236,9 +236,19 @@ export class FamiliesController extends Controller {
       data: { familyId },
     })
 
+    const studies = await prisma.study.findMany({
+      where: {
+        profiles: {
+          some: { deleted: false, participantProfile: { familyId: { in: [familyId, oldId] } } },
+        },
+      },
+    })
+
     //Recalculate answers for any dependents in the new or old families
-    await recalculateAnswers(familyId, studyId)
-    await recalculateAnswers(oldId, studyId)
+    for (const study of studies) {
+      await recalculateAnswers(familyId, study.id)
+      await recalculateAnswers(oldId, study.id)
+    }
 
     return
   }

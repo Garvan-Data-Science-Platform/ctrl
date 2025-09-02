@@ -147,7 +147,7 @@ export async function recalculateAnswers(familyId: number, studyId: number) {
   let answers: PrismaJson.SurveyAnswerData
 
   const latestSurveyVersionAnswers = await prisma.surveyVersionAnswers.findFirstOrThrow({
-    where: { profileId: guardians[0].id },
+    where: { profileId: guardians[0].id, version: { studyId } },
     orderBy: { versionId: 'desc' },
   })
 
