@@ -4,6 +4,7 @@ import {
   InternalErrorResponse,
   NotFoundErrorResponse,
   ValidateErrorResponse,
+  UnprocessableErrorResponse,
 } from 'common/types/api/errors'
 import {
   Route,
@@ -22,11 +23,14 @@ import { FamilyMember } from 'common/types/api/users/getParticipantProfile'
 import { auditLog } from '../middlewares/AuditLog'
 import { ParticipantType } from '@prisma/client'
 import { createDefaultAnswers, recalculateAnswers } from '../utils/answers'
+import { genId } from '../utils/genId'
+import { UnprocessableError } from '../middlewares/ErrorHandler'
 
 @Route('studies/{studyId}/families')
 @Tags('Families')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
+@Response<UnprocessableErrorResponse>('422', 'Unprocessable Content')
 @Security('jwt', ['OrganisationAdmin'])
 @Middlewares(auditLog)
 export class FamiliesController extends Controller {
@@ -39,19 +43,40 @@ export class FamiliesController extends Controller {
     @Path() studyId: number,
     @Path() familyId: number,
   ): Promise<GetFamilyResponse> {
-    const members = (await prisma.participantProfile.findMany({
+    const inStudy = (await prisma.participantProfile.findMany({
       where: {
         familyId,
         studies: {
           some: {
             studyId: studyId,
+            deleted: false,
           },
         },
       },
       select: { firstName: true, lastName: true, id: true, participantType: true },
       orderBy: { dob: 'asc' },
     })) as FamilyMember[]
-    return { data: members }
+
+    const notInStudy = (await prisma.participantProfile.findMany({
+      where: {
+        familyId,
+        studies: {
+          none: {
+            studyId: studyId,
+            deleted: false,
+          },
+        },
+      },
+      select: { firstName: true, lastName: true, id: true, participantType: true },
+      orderBy: { dob: 'asc' },
+    })) as FamilyMember[]
+
+    return {
+      data: [
+        ...inStudy.map((val) => ({ ...val, inStudy: true })),
+        ...notInStudy.map((val) => ({ ...val, inStudy: false })),
+      ],
+    }
   }
 
   /**
@@ -72,6 +97,30 @@ export class FamiliesController extends Controller {
         },
       },
     })
+
+    if (['DEPENDENT_AGE', 'DEPENDENT_OTHER'].includes(profile.participantType)) {
+      throw new UnprocessableError('Cannot remove a dependant')
+    }
+
+    if (profile.participantType == 'GUARDIAN') {
+      const familyGuardiansCount = await prisma.participantProfile.count({
+        where: {
+          familyId: profile.familyId,
+          participantType: 'GUARDIAN',
+        },
+      })
+
+      const familyDepsCount = await prisma.participantProfile.count({
+        where: {
+          familyId: profile.familyId,
+          OR: [{ participantType: 'DEPENDENT_AGE' }, { participantType: 'DEPENDENT_OTHER' }],
+        },
+      })
+
+      if (familyGuardiansCount == 1 && familyDepsCount > 0) {
+        throw new UnprocessableError('Cannot leave a dependent with no guardian')
+      }
+    }
 
     const lastFam = await prisma.participantProfile.findFirstOrThrow({
       orderBy: { familyId: 'desc' },
@@ -107,6 +156,7 @@ export class FamiliesController extends Controller {
    * addExistingMember
    *
    * @summary Add an existing CTRL profile as a member of a family.
+   * Note: this endpoint assumes that initial family composition is valid. When adding non-guardians to a family there are no checks that the new family state will be valid.
    */
   @Post('/{familyId}/add/{profileId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
@@ -124,7 +174,54 @@ export class FamiliesController extends Controller {
           },
         },
       },
+      select: { participantType: true, familyId: true, studies: { select: { studyId: true } } },
     })
+
+    if (profile.participantType == 'GUARDIAN') {
+      for (const study of profile.studies) {
+        const oldFamGuardianCount = await prisma.participantProfile.count({
+          where: {
+            familyId: profile.familyId,
+            participantType: 'GUARDIAN',
+            studies: { some: { studyId: study.studyId, deleted: false } },
+          },
+        })
+        const oldFamDepCount = await prisma.participantProfile.count({
+          where: {
+            familyId: profile.familyId,
+            OR: [{ participantType: 'DEPENDENT_AGE' }, { participantType: 'DEPENDENT_OTHER' }],
+            studies: { some: { studyId: study.studyId, deleted: false } },
+          },
+        })
+
+        if (oldFamDepCount > 0 && oldFamGuardianCount == 1) {
+          throw new UnprocessableError(
+            'Cannot add this person because they are currently in a family where they are the only guardian in a study. Move dependents out of their family first.',
+          )
+        }
+      }
+    }
+
+    if (
+      profile.participantType == 'DEPENDENT_AGE' ||
+      profile.participantType == 'DEPENDENT_OTHER'
+    ) {
+      for (const study of profile.studies) {
+        const newFamGuardianCount = await prisma.participantProfile.count({
+          where: {
+            familyId,
+            participantType: 'GUARDIAN',
+            studies: { some: { studyId: study.studyId, deleted: false } },
+          },
+        })
+        if (newFamGuardianCount == 0) {
+          throw new UnprocessableError(
+            'Cannot add this person because they are a dependent and there must be at least one guardian in this family first. The guardian must be a participant in every study the dependent is.',
+          )
+        }
+      }
+    }
+
     const oldId = profile.familyId
 
     await prisma.participantProfile.update({
@@ -139,9 +236,19 @@ export class FamiliesController extends Controller {
       data: { familyId },
     })
 
+    const studies = await prisma.study.findMany({
+      where: {
+        profiles: {
+          some: { deleted: false, participantProfile: { familyId: { in: [familyId, oldId] } } },
+        },
+      },
+    })
+
     //Recalculate answers for any dependents in the new or old families
-    await recalculateAnswers(familyId, studyId)
-    await recalculateAnswers(oldId, studyId)
+    for (const study of studies) {
+      await recalculateAnswers(familyId, study.id)
+      await recalculateAnswers(oldId, study.id)
+    }
 
     return
   }
@@ -165,16 +272,20 @@ export class FamiliesController extends Controller {
         firstName: bodyRequest.firstName,
         lastName: bodyRequest.lastName,
         dob: new Date(bodyRequest.dob),
-        studies: {
-          some: {
-            studyId: studyId,
-          },
-        },
       },
     })
 
     if (depCheck) {
-      throw new Error('Dependent already registered in CTRL')
+      throw new UnprocessableError('Dependent already registered in CTRL')
+    }
+
+    const familyProfilesCount = await prisma.studyParticipant.count({
+      where: { studyId, participantProfile: { familyId, participantType: 'GUARDIAN' } },
+    })
+    if (familyProfilesCount == 0) {
+      throw new UnprocessableError(
+        'At least one family member must have the role of Guardian and be participating in the study to add a dependent',
+      )
     }
 
     const currentSurvey = await prisma.surveyVersion.findFirstOrThrow({
@@ -197,7 +308,7 @@ export class FamiliesController extends Controller {
     })
 
     if (!existingProfile) {
-      throw new Error('This family has no existing members in this study')
+      throw new UnprocessableError('This family has no existing members in this study')
     }
 
     const participantType = bodyRequest.permanent
@@ -224,6 +335,8 @@ export class FamiliesController extends Controller {
         },
       },
     })
+
+    await genId(studyId, depProfile.id)
 
     await prisma.surveyVersionAnswers.create({
       data: {

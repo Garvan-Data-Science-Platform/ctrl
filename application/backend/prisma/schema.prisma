@@ -23,9 +23,13 @@ model User {
   organisations       Organisation[]
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
+  agreedTermsAt       DateTime?
   profiles            ParticipantProfile[]
   auditLogs           AuditLog[]
+  otpTokens           OTPToken[]
   passwordResetTokens PasswordResetToken[]
+  lockedUntil         DateTime?
+  retriesRemaining    Int                  @default(10)
   deleted             Boolean              @default(false)
 }
 
@@ -70,6 +74,9 @@ model StudyParticipant {
   participantProfileId Int
   study                Study              @relation(fields: [studyId], references: [id], onDelete: Cascade)
   studyId              Int
+  participantNumber    Int                @default(0)
+  participantId        String?
+  deleted              Boolean            @default(false)
 
   @@id([participantProfileId, studyId])
 }
@@ -114,16 +121,19 @@ model Organisation {
   redcapURL       String?
   redcapToken     String?
   logo            Bytes?
+  tcLink          String  @default("https://garvan-data-science-platform.github.io/ctrl-docs/docs/terms-and-conditions")
   users           User[]
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
 
 model Study {
-  id                 Int                @id @default(autoincrement())
-  name               String             @unique
-  inviteEmailSubject String             @default("Invitation to CTRL - Dynamic Consent Platform")
-  inviteEmailText    String             @default("You have been invited to register with CTRL dynamic consent platform.")
+  id                 Int                  @id @default(autoincrement())
+  name               String               
+  description        String?
+  logo               Bytes?
+  inviteEmailSubject String               @default("Invitation to CTRL - Dynamic Consent Platform")
+  inviteEmailText    String               @default("You have been invited to register with CTRL dynamic consent platform.")
   surveys            SurveyVersion[]
   profiles           StudyParticipant[]
   invites            Invite[]
@@ -208,4 +218,12 @@ model AuditLog {
   userId    Int?
   user      User?             @relation(fields: [userId], references: [id], onDelete: Restrict)
   meta      Json
+}
+
+model OTPToken {
+ id        String      @id @default(uuid())
+ userId    Int
+ user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+ code      String
+ expiresAt DateTime
 }

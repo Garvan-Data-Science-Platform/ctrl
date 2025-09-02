@@ -23,6 +23,7 @@ describe('registration', () => {
     cy.get('[data-cy="nok-first"]').type('ALT')
     cy.get('[data-cy="nok-surname"]').type('LAST')
     cy.get('[data-cy="nok-email"]').type('alt@email.com')
+    cy.get('[data-cy="terms"] input').click()
   }
 
   it('open registration page and register a user', () => {

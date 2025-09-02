@@ -19,6 +19,7 @@ config:
   disableAdminPasswordLogin: false
 
 userClient:
+  hostname: ctrlhost
   image:
     repository: australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-user-client
     pullPolicy: Always
@@ -26,6 +27,7 @@ userClient:
     tag: #
 
 adminClient:
+  hostname: ctrladmin
   image:
     repository: australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-admin-client
     pullPolicy: Always
@@ -39,29 +41,18 @@ backend:
     # Overrides the image tag whose default is the chart appVersion.
     tag: #
 
-nginx-ingress:
-  enabled: true
-
-cert-manager: #Use to enable https
-  enabled: false
-  crds:
-    enabled: true
-
-letsencryptEmail: #Required if using cert-manager
-
 ingress:
-  enabled: true
+  enabled: false
   className: 'nginx'
   annotations:
     nginx.org/rewrites: 'serviceName=backend rewrite=/'
     #ingress.kubernetes.io/ssl-redirect: 'false'
-    acme.cert-manager.io/http01-edit-in-place: 'true'
-    cert-manager.io/issuer: 'letsencrypt-prod'
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
+  tls: []
   hosts:
     userClient:
-      hostname: ctrlhost
+      host: ctrlhost
       paths:
         - path: /api/
           pathType: Prefix
@@ -79,7 +70,7 @@ ingress:
                 number: 80
 
     adminClient:
-      hostname: ctrladmin
+      host: ctrladmin
       paths:
         - path: /
           pathType: Prefix
@@ -110,6 +101,7 @@ postgresql:
   global:
     security:
       allowInsecureImages: true
+  fullnameOverride: ctrl-postgres
 
 serviceAccount:
   # Specifies whether a service account should be created

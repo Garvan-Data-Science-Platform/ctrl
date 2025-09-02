@@ -189,6 +189,11 @@ export default function Dashboard() {
             </Button>
           )}
         </Stack>
+        {studies[activeStudyIndex]?.description && (
+          <Typography textAlign="left" whiteSpace="pre-wrap">
+            {studies[activeStudyIndex].description}
+          </Typography>
+        )}
         <Menu
           anchorEl={anchorEl}
           open={studyMenuOpen}

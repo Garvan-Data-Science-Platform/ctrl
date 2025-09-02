@@ -12,6 +12,7 @@ interface AppState {
   activeStudyIndex: number
   setActiveStudyIndex: (index: number) => void
   setStudies: (studies: Study[]) => void
+  reset: () => void
 }
 
 function standardize_color(str: string) {
@@ -20,7 +21,7 @@ function standardize_color(str: string) {
   return ctx.fillStyle
 }
 
-export const useAppStore = create<AppState>((set) => ({
+export const useAppStore = create<AppState>((set, get, store) => ({
   primaryColour: null,
   secondaryColour: null,
   contactMessageText: '',
@@ -46,9 +47,12 @@ export const useAppStore = create<AppState>((set) => ({
         state.studies = studies
       }),
     ),
+  reset: () => {
+    set(store.getInitialState())
+  },
 }))
 
 export const useCurrentStudyId = () => {
   const { activeStudyIndex, studies } = useAppStore()
-  return studies && studies[activeStudyIndex].id
+  return studies[activeStudyIndex]?.id
 }

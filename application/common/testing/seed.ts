@@ -16,6 +16,7 @@ export const PASSWORD_RESET_USER_ID = 105
 export const PASSWORD_RESET_USER_EMAIL = 'test-reset-password@example.com'
 export const TEST_STUDY = 'Test Study'
 export const SECOND_TEST_STUDY = 'Study 2'
+export const SECOND_TEST_STUDY_ID = 2
 export const FE_TEST_STUDY = 'Study FE'
 export const EMPTY_TEST_STUDY = 'Empty Study'
 
@@ -36,12 +37,14 @@ export async function seedTests(prisma: PrismaClient) {
     },
   })
 
+  //Sets auto-increment counter
   await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"Organisation"', 'id'), 2, false) FROM "Organisation";`
 
   // Create four studies
   const testStudy = await prisma.study.create({
     data: {
       name: TEST_STUDY,
+      id: 1,
     },
   })
 
@@ -50,6 +53,7 @@ export async function seedTests(prisma: PrismaClient) {
   const secondTestStudy = await prisma.study.create({
     data: {
       name: SECOND_TEST_STUDY,
+      id: SECOND_TEST_STUDY_ID,
     },
   })
 
@@ -57,8 +61,12 @@ export async function seedTests(prisma: PrismaClient) {
   const frontendTestStudy = await prisma.study.create({
     data: {
       name: FE_TEST_STUDY,
+      id: 3,
     },
   })
+  
+  //Sets auto-increment counter
+  await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"Study"', 'id'), 4, false) FROM "Study";`
 
   // This study will be empty
   await prisma.study.create({
@@ -169,7 +177,7 @@ export async function seedTests(prisma: PrismaClient) {
         create: {
           study: {
             connect: {
-              name: testStudy.name,
+              id: testStudy.id,
             },
           },
         },
@@ -204,7 +212,7 @@ export async function seedTests(prisma: PrismaClient) {
         create: {
           study: {
             connect: {
-              name: testStudy.name,
+              id: testStudy.id,
             },
           },
         },
@@ -232,7 +240,7 @@ export async function seedTests(prisma: PrismaClient) {
         create: {
           study: {
             connect: {
-              name: testStudy.name,
+              id: testStudy.id,
             },
           },
         },
@@ -260,7 +268,7 @@ export async function seedTests(prisma: PrismaClient) {
         create: {
           study: {
             connect: {
-              name: testStudy.name,
+              id: testStudy.id,
             },
           },
         },
@@ -469,7 +477,7 @@ export async function seedTests(prisma: PrismaClient) {
         create: {
           study: {
             connect: {
-              name: frontendTestStudy.name,
+              id: frontendTestStudy.id,
             },
           },
         },

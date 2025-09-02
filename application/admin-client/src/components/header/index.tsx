@@ -1,13 +1,4 @@
-import {
-  Menu,
-  MenuItem,
-  Button,
-  Dialog,
-  TextField,
-  DialogTitle,
-  DialogContent,
-  Divider,
-} from '@mui/material'
+import { Menu, MenuItem, Button, Divider } from '@mui/material'
 import AppBar from '@mui/material/AppBar'
 import Stack from '@mui/material/Stack'
 import Toolbar from '@mui/material/Toolbar'
@@ -15,16 +6,11 @@ import { HamburgerMenu, RefineThemedLayoutV2HeaderProps } from '@refinedev/mui'
 import React, { useState } from 'react'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import { useStudyStore } from '../../studyStore'
-import { useParsed } from '@refinedev/core'
-import { axiosInstance } from '../../providers/dataProvider'
-import { useQueryClient } from '@tanstack/react-query'
+import { Link, useParsed } from '@refinedev/core'
 
 export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({ sticky = true }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const studyMenuOpen = Boolean(anchorEl)
-  const [newStudyDialogOpen, setNewStudyDialogOpen] = useState(false)
-  const [newStudyName, setNewStudyName] = useState('')
-  const queryClient = useQueryClient()
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
@@ -33,44 +19,12 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({ sticky = tru
     setAnchorEl(null)
   }
 
-  const handleCloseNewStudyDialog = () => {
-    setNewStudyDialogOpen(false)
-  }
-
-  const handleCreateNewStudy = (e: React.FormEvent) => {
-    e.preventDefault()
-    axiosInstance.post('studies', { name: newStudyName }).then(() => {
-      handleCloseNewStudyDialog()
-      queryClient.invalidateQueries(['studies'])
-    })
-  }
-
   const { resource, action } = useParsed()
 
   const { studies, activeStudyIndex, setActiveStudyIndex } = useStudyStore()
 
   return (
     <AppBar position={sticky ? 'sticky' : 'relative'}>
-      <Dialog open={newStudyDialogOpen} onClose={handleCloseNewStudyDialog}>
-        <DialogTitle>Create New Study</DialogTitle>
-        <DialogContent>
-          <Stack spacing={2} p={1} component="form" onSubmit={handleCreateNewStudy}>
-            <TextField
-              required
-              label="Study Name"
-              value={newStudyName}
-              onChange={(e) => setNewStudyName(e.target.value)}
-              data-cy="study-name"
-            />
-            <Stack direction="row" justifyContent="space-between">
-              <Button variant="contained" type="submit" data-cy="study-create">
-                Create
-              </Button>
-              <Button onClick={handleCloseNewStudyDialog}>Cancel</Button>
-            </Stack>
-          </Stack>
-        </DialogContent>
-      </Dialog>
       <Toolbar>
         <Stack
           direction="row"
@@ -96,6 +50,7 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({ sticky = tru
             onClose={handleCloseStudyMenu}
             anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
             sx={{ p: 3 }}
+            data-cy="study-menu"
           >
             {studies.map((study, idx) => {
               return (
@@ -112,15 +67,15 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({ sticky = tru
               )
             })}
             <Divider />
-
+            {/* 
+            // @ts-ignore */}
             <MenuItem
-              onClick={() => {
-                handleCloseStudyMenu()
-                setNewStudyDialogOpen(true)
-              }}
-              data-cy="new-study-button"
+              component={Link}
+              onClick={handleCloseStudyMenu}
+              to="/studies"
+              data-cy="manage-studies"
             >
-              Add new study
+              Manage Studies
             </MenuItem>
           </Menu>
         </Stack>

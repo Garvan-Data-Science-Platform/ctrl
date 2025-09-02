@@ -258,12 +258,20 @@ export class SurveysController extends Controller {
     @Path() versionNumber: number,
     @Path() studyId: number,
   ): Promise<GetAllResponsesResponse> {
+    const study_participants = (
+      await prisma.studyParticipant.findMany({
+        where: { studyId },
+        select: { participantProfileId: true },
+      })
+    ).map((val) => val.participantProfileId)
+
     const participants = await this.svaRepo.findMany({
       where: {
         version: {
           studyId: studyId,
           versionNumber: versionNumber,
         },
+        profileId: { in: study_participants },
       },
       select: {
         answers: true,
@@ -463,6 +471,11 @@ export class SurveysController extends Controller {
             },
           },
         })
+
+        const derived = [profile, ...coGuardians]
+          .map((val) => `${val.firstName} ${val.lastName}`)
+          .join(',')
+
         await this.svaRepo.update({
           where: {
             id: sva.id,
@@ -472,9 +485,22 @@ export class SurveysController extends Controller {
           },
           data: {
             answers,
-            derived: [profile, ...coGuardians]
-              .map((val) => `${val.firstName} ${val.lastName}`)
-              .join(','),
+            derived,
+          },
+        })
+
+        await prisma.auditLog.create({
+          data: {
+            resource: 'SurveyVersionAnswers',
+            operation: 'UPDATE',
+            meta: {
+              reource: 'SurveyVersionAnswers',
+              id: sva.id,
+              message: 'Recalculated answers of dependent based on guardians answers',
+              derivedFrom: derived,
+              previousAnswers: sva.answers,
+              newAnsers: answers,
+            },
           },
         })
       }

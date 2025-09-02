@@ -28,28 +28,38 @@ import {
   Post,
   Middlewares,
   Request,
+  Delete,
 } from 'tsoa'
 import { Participant } from 'common/types/api/participants/participant'
 import { createMailerTransporter, fromAddress } from '../utils/mailer'
 import nodemailer from 'nodemailer'
 import { generateInviteEmail } from 'common/src/generateInviteTemplate'
 import { InviteStatus } from 'common/types/api/participants/invite'
-import { BadGatewayError, NotFoundError } from '../middlewares/ErrorHandler'
-import { createDefaultAnswers, determineLastUpdated, determineStatus } from '../utils/answers'
+import { BadGatewayError, NotFoundError, UnprocessableError } from '../middlewares/ErrorHandler'
+import {
+  createDefaultAnswers,
+  determineLastUpdated,
+  determineStatus,
+  recalculateAnswers,
+} from '../utils/answers'
 import { ProfilesController } from './ProfilesController'
 import { auditLog } from '../middlewares/AuditLog'
 import { Role } from '@prisma/client'
 import { v4 as uuidv4 } from 'uuid'
+import { genId } from '../utils/genId'
 
 @Route('studies/{studyId}')
 @Tags('Participants')
 @Security('jwt', ['OrganisationAdmin'])
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
+@Response<InternalErrorResponse>('422', 'Unprocessable Content')
 @Middlewares(auditLog)
 export class ParticipantsController extends Controller {
   svaRepo = prisma.surveyVersionAnswers
   profileRepo = prisma.participantProfile
+  surveyRepo = prisma.surveyVersion
+  participantRepo = prisma.studyParticipant
 
   /**
    * List participants
@@ -58,29 +68,26 @@ export class ParticipantsController extends Controller {
    */
   @Get('/participants')
   public async getParticipants(@Path() studyId: number): Promise<GetParticipantsResponse> {
-    const unique_participants = await this.svaRepo.findMany({
-      distinct: ['profileId'],
-      where: { version: { studyId } },
+    const participant_list = await prisma.studyParticipant.findMany({ where: { studyId } })
+
+    const profiles = await this.profileRepo.findMany({
+      where: {
+        id: { in: participant_list.map((val) => val.participantProfileId) },
+      },
       select: {
         id: true,
-        answers: true,
-        profile: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            familyId: true,
-            user: { select: { email: true } },
-          },
-        },
+        firstName: true,
+        lastName: true,
+        familyId: true,
+        user: { select: { email: true } },
       },
     })
 
     const participants: GetParticipantsResponse['data'] = []
 
-    for (const p of unique_participants) {
+    for (const p of profiles) {
       const p_answers = await this.svaRepo.findMany({
-        where: { profileId: p.profile.id, version: { studyId } },
+        where: { profileId: p.id, version: { studyId } },
         select: {
           answers: true,
           version: { select: { versionNumber: true, updatedAt: true } },
@@ -91,13 +98,20 @@ export class ParticipantsController extends Controller {
       const lastUpdated = Math.max(
         ...(p_answers.map((val) => determineLastUpdated(val.answers)) as unknown as number[]),
       )
+      const study_part = await prisma.studyParticipant.findFirstOrThrow({
+        where: {
+          studyId,
+          participantProfileId: p.id,
+        },
+      })
       const p_data: Participant = {
-        id: p.profile.id,
-        email: p.profile.user?.email,
-        firstName: p.profile.firstName,
-        lastName: p.profile.lastName,
-        lastUpdated: lastUpdated ? new Date(lastUpdated).toLocaleDateString() : undefined,
-        familyId: p.profile.familyId,
+        id: p.id,
+        participantId: study_part?.participantId || '',
+        email: p.user?.email,
+        firstName: p.firstName,
+        lastName: p.lastName,
+        lastUpdated: lastUpdated ? new Date(lastUpdated).toISOString() : undefined,
+        familyId: p.familyId,
         answers: p_answers.map((val) => ({
           surveyVersionNumber: val.version.versionNumber,
           participantId: val.id,
@@ -111,13 +125,16 @@ export class ParticipantsController extends Controller {
   }
 
   /**
-   * Get participant by ID
+   * Get participant by profile ID
    *
-   * @summary Get a  Participant by ID
+   * @summary Get a  Participant by profile ID
    */
   @Get('/participants/{profileId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  public async getParticipantById(@Path() profileId: number): Promise<GetParticipantResponse> {
+  public async getParticipantById(
+    @Path() studyId: number,
+    @Path() profileId: number,
+  ): Promise<GetParticipantResponse> {
     const profile = await this.profileRepo.findFirstOrThrow({
       where: { id: profileId },
       select: {
@@ -142,9 +159,14 @@ export class ParticipantsController extends Controller {
       orderBy: { versionId: 'asc' },
     })
 
+    const sp = await prisma.studyParticipant.findFirstOrThrow({
+      where: { participantProfileId: profileId, studyId: studyId },
+    })
+
     return {
       data: {
         id: profileId,
+        participantId: sp.participantId || '',
         profile: profileData,
         firstName: profile.firstName,
         lastName: profile.lastName,
@@ -157,6 +179,122 @@ export class ParticipantsController extends Controller {
         })),
       },
     }
+  }
+
+  /**
+   * Remove a participant from the study
+   *
+   * @summary Remove a participant from the study
+   */
+  @Delete('/participants/{profileId}')
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
+  public async deleteParticipantById(
+    @Path() studyId: number,
+    @Path() profileId: number,
+  ): Promise<void> {
+    const profile = await prisma.participantProfile.findUniqueOrThrow({ where: { id: profileId } })
+
+    const familyGuardiansCount = await prisma.participantProfile.count({
+      where: { familyId: profile.familyId, participantType: 'GUARDIAN' },
+    })
+    const familyDepsCount = await prisma.studyParticipant.count({
+      where: {
+        participantProfile: { familyId: profile.familyId },
+        studyId,
+        OR: [
+          { participantProfile: { participantType: 'DEPENDENT_AGE' } },
+          { participantProfile: { participantType: 'DEPENDENT_OTHER' } },
+        ],
+      },
+    })
+    if (profile.participantType == 'GUARDIAN' && familyGuardiansCount == 1 && familyDepsCount > 0) {
+      throw new UnprocessableError('Cannot leave a dependent with no guardian')
+    }
+
+    await prisma.studyParticipant.delete({
+      where: {
+        participantProfileId_studyId: {
+          participantProfileId: profileId,
+          studyId: studyId,
+        },
+      },
+    })
+  }
+
+  /**
+   * Add a participant to the study
+   *
+   * @summary Add a participant to the study, if they were formerly removed, or they don't have an account.
+   * Throws error if user has an account and should be added via the study invite process
+   */
+  @Post('/participants/{profileId}')
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
+  public async addParticipantById(
+    @Path() studyId: number,
+    @Path() profileId: number,
+  ): Promise<void> {
+    const currentSurvey = await this.surveyRepo.findFirst({
+      where: {
+        status: 'PUBLISHED',
+        studyId,
+      },
+      orderBy: { id: 'desc' },
+    })
+
+    if (!currentSurvey) {
+      throw new UnprocessableError('You need to publish a survey before adding participants')
+    }
+
+    const deletedP = await prisma.studyParticipant.findFirst({
+      where: {
+        participantProfileId: profileId,
+        studyId: studyId,
+        deleted: true,
+      },
+    })
+
+    const profile = await this.profileRepo.findUniqueOrThrow({ where: { id: profileId } })
+
+    if (deletedP) {
+      await this.participantRepo.update({
+        where: {
+          participantProfileId_studyId: {
+            participantProfileId: deletedP.participantProfileId,
+            studyId: deletedP.studyId,
+          },
+          deleted: true,
+        },
+        data: { deleted: false },
+      })
+    } else if (!profile.userId) {
+      const guardian = await this.participantRepo.findFirst({
+        where: {
+          studyId,
+          participantProfile: { familyId: profile.familyId, participantType: 'GUARDIAN' },
+        },
+      })
+      if (!guardian) {
+        throw new UnprocessableError(
+          "Can't add a dependent to a study if no guardian is a member of the study",
+        )
+      }
+
+      await this.participantRepo.create({
+        data: { studyId: studyId, participantProfileId: profileId },
+      })
+      await prisma.surveyVersionAnswers.create({
+        data: {
+          profileId: profile.id,
+          versionId: currentSurvey.id,
+          answers: createDefaultAnswers(currentSurvey.data),
+        },
+      })
+    } else {
+      throw new UnprocessableError(
+        'The participant must be invited to join the study via email (via the Participants page)',
+      )
+    }
+    await recalculateAnswers(profile.familyId, studyId)
   }
 }
 
@@ -200,8 +338,7 @@ export class InvitesController extends Controller {
         study: {
           select: {
             name: true,
-            // In the future other details could be pulled through here too,
-            // e.g. blurb about study
+            description: true,
           },
         },
       },
@@ -249,6 +386,7 @@ export class InvitesController extends Controller {
       expiresAt: invite.expiresAt.toISOString(),
       sentAt: invite.sentAt ? invite.sentAt.toISOString() : undefined,
       studyName: invite.study.name,
+      description: invite.study.description || undefined,
     }))
 
     // const formattedDependents = dependents.map((dependent) => ({
@@ -314,9 +452,6 @@ export class InvitesController extends Controller {
       },
       orderBy: { id: 'desc' },
     })
-    if (!currentSurvey) {
-      throw new NotFoundError(`No published survey found for study ${invite.studyId}`)
-    }
 
     await this.profileRepo.update({
       where: {
@@ -334,6 +469,8 @@ export class InvitesController extends Controller {
         },
       },
     })
+
+    await genId(invite.studyId, existingProfile.id)
 
     await prisma.surveyVersionAnswers.create({
       data: {

@@ -7,7 +7,7 @@ import {
   ValidateErrorResponse,
 } from 'common/types/api/errors'
 import type { GetParticipantProfileResponse, UpdateProfileRequest } from 'common/types/api/users'
-import { NotFoundError } from '../middlewares/ErrorHandler'
+import { NotFoundError, UnprocessableError } from '../middlewares/ErrorHandler'
 import {
   Route,
   Tags,
@@ -177,6 +177,29 @@ export class ProfilesController extends Controller {
 
     const hasNok = Boolean(nextOfKin)
 
+    const familyGuardiansCount = await this.participantProfileRepo.count({
+      where: { familyId: profile.familyId, participantType: 'GUARDIAN' },
+    })
+
+    if (bodyRequest.participantType && profile.participantType == 'GUARDIAN') {
+      const familyDepsCount = await this.participantProfileRepo.count({
+        where: {
+          familyId: profile.familyId,
+          OR: [{ participantType: 'DEPENDENT_AGE' }, { participantType: 'DEPENDENT_OTHER' }],
+        },
+      })
+      if (familyGuardiansCount == 1 && familyDepsCount > 0) {
+        throw new UnprocessableError('Cannot leave a dependent with no guardian')
+      }
+    }
+
+    if (
+      (bodyRequest.participantType == 'DEPENDENT_AGE' ||
+        bodyRequest.participantType == 'DEPENDENT_OTHER') &&
+      familyGuardiansCount == 0
+    ) {
+      throw new UnprocessableError('Cannot add a dependent to a family with no guardian')
+    }
     await this.participantProfileRepo.update({
       where: { id: profile.id },
       data: { ...updateData, nextOfKin: hasNok ? { update: nextOfKin } : undefined },

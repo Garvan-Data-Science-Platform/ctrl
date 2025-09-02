@@ -14,16 +14,21 @@ terraform {
       source  = "hashicorp/google-beta"
       version = "~> 5.3.0"
     }
-
+  }
+  backend "gcs" {
+    bucket = "ctrl-tf-remote-state"
+    prefix = "ctrl-dev"
   }
 }
 
 # Configure provider.
 provider "google" {
   project = var.project
+  zone = "australia-southeast1-a"
 }
 
 # Configure beta provider.
 provider "google-beta" {
   project = var.project
+  zone = "australia-southeast1-a"
 }

@@ -4,6 +4,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth'
 import { LoginRequest, LoginResponse } from '@common/types/api/auth'
 import { useEffect } from 'react'
+import { useAppStore } from '../store'
+import { useQueryClient } from '@tanstack/react-query'
 
 export default function Login() {
   const {
@@ -14,8 +16,11 @@ export default function Login() {
   } = useForm()
   const { login } = useAuth()
   const nav = useNavigate()
+  const { reset } = useAppStore()
 
   const clientType = 'user-client'
+
+  const queryClient = useQueryClient()
 
   const onSubmit = (data: unknown) => {
     fetch(import.meta.env.VITE_BACKEND_URL + '/auth/login', {
@@ -26,14 +31,18 @@ export default function Login() {
       .then((res) => {
         if (res.ok) {
           res.json().then((data: LoginResponse) => {
-            if (!data.token) throw new Error('No token provided')
-            login(data.token)
-            nav('/')
+            if (data.otp_token) {
+              nav('/login/otp', { state: data.otp_token })
+            } else if (!data.token) throw new Error('No token provided')
+            else {
+              login(data.token)
+              nav('/')
+            }
           })
         } else {
           res.json().then((data) => {
             setError('root.serverError', {
-              message: `Error Logging In: ${JSON.stringify(data.message)}`,
+              message: `Error Logging In: ${JSON.stringify(data.details)}`,
             })
           })
         }
@@ -45,6 +54,8 @@ export default function Login() {
 
   useEffect(() => {
     document.title = 'Login | CTRL'
+    queryClient.clear()
+    reset()
   }, [])
 
   return (

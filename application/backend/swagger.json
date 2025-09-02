@@ -49,6 +49,29 @@
           }
         }
       },
+      "UnprocessableErrorResponse": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "enum": [
+              "Unprocessable Content"
+            ],
+            "nullable": false
+          },
+          "details": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "message": "Unprocessable Content",
+          "details": "There was a problem"
+        }
+      },
       "ValidateErrorResponse": {
         "properties": {
           "message": {
@@ -78,11 +101,44 @@
           }
         }
       },
+      "UnprocessableError": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "stack": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "message"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
       "User": {
         "description": "Model User",
         "properties": {
           "deleted": {
             "type": "boolean"
+          },
+          "retriesRemaining": {
+            "type": "number",
+            "format": "double"
+          },
+          "lockedUntil": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "agreedTermsAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
           },
           "updatedAt": {
             "type": "string",
@@ -97,6 +153,10 @@
           },
           "password": {
             "type": "string"
+          },
+          "emailHash": {
+            "type": "string",
+            "nullable": true
           },
           "email": {
             "type": "string"
@@ -118,10 +178,14 @@
         },
         "required": [
           "deleted",
+          "retriesRemaining",
+          "lockedUntil",
+          "agreedTermsAt",
           "updatedAt",
           "createdAt",
           "role",
           "password",
+          "emailHash",
           "email",
           "lastName",
           "middleName",
@@ -211,10 +275,6 @@
             "type": "string",
             "pattern": "^(.+)@(.+)$"
           },
-          "password": {
-            "type": "string",
-            "minLength": 8
-          },
           "role": {
             "$ref": "#/components/schemas/Role"
           }
@@ -223,7 +283,6 @@
           "firstName",
           "lastName",
           "email",
-          "password",
           "role"
         ],
         "type": "object",
@@ -232,7 +291,6 @@
           "firstName": "John",
           "lastName": "Doe",
           "email": "john.doe@email.com",
-          "password": "Password123",
           "role": "Participant"
         }
       },
@@ -896,102 +954,13 @@
         "type": "object",
         "additionalProperties": false
       },
-      "Study": {
-        "description": "Model Study",
-        "properties": {
-          "inviteEmailText": {
-            "type": "string"
-          },
-          "inviteEmailSubject": {
-            "type": "string"
-          },
-          "deleted": {
-            "type": "boolean"
-          },
-          "id": {
-            "type": "number",
-            "format": "double"
-          },
-          "name": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "inviteEmailText",
-          "inviteEmailSubject",
-          "deleted",
-          "id",
-          "name"
-        ],
-        "type": "object"
-      },
-      "GetAllStudiesResponse": {
-        "properties": {
-          "data": {
-            "items": {
-              "$ref": "#/components/schemas/Study"
-            },
-            "type": "array"
-          }
-        },
-        "required": [
-          "data"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "GetStudyByIdResponse": {
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/Study"
-          }
-        },
-        "required": [
-          "data"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "CreateStudyResponse": {
-        "properties": {
-          "id": {
-            "type": "number",
-            "format": "double"
-          }
-        },
-        "required": [
-          "id"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "CreateStudyRequest": {
-        "properties": {
-          "name": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "required": [
-          "name"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "UpdateStudyRequest": {
-        "properties": {
-          "name": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "type": "object",
-        "additionalProperties": false
-      },
       "GetSettingsResponse": {
         "properties": {
           "data": {
             "properties": {
+              "tcLink": {
+                "type": "string"
+              },
               "redcapURL": {
                 "type": "string",
                 "nullable": true
@@ -1027,6 +996,7 @@
               }
             },
             "required": [
+              "tcLink",
               "redcapURL",
               "redcapToken",
               "secondaryColour",
@@ -1079,6 +1049,9 @@
           "redcapURL": {
             "type": "string",
             "nullable": true
+          },
+          "tcLink": {
+            "type": "string"
           }
         },
         "type": "object",
@@ -1110,6 +1083,165 @@
         "required": [
           "data"
         ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "Pick_Study.Exclude_keyofStudy.logo__": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "number",
+            "format": "double"
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "inviteEmailSubject": {
+            "type": "string"
+          },
+          "inviteEmailText": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "id",
+          "deleted",
+          "description",
+          "inviteEmailSubject",
+          "inviteEmailText"
+        ],
+        "type": "object",
+        "description": "From T, pick a set of properties whose keys are in the union K"
+      },
+      "Omit_Study.logo_": {
+        "$ref": "#/components/schemas/Pick_Study.Exclude_keyofStudy.logo__",
+        "description": "Construct a type with the properties of T except for those in type K."
+      },
+      "GetAllStudiesResponse": {
+        "properties": {
+          "data": {
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Omit_Study.logo_"
+                },
+                {
+                  "properties": {
+                    "logo": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "logo"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "Study": {
+        "description": "Model Study",
+        "properties": {
+          "inviteEmailText": {
+            "type": "string"
+          },
+          "inviteEmailSubject": {
+            "type": "string"
+          },
+          "logo": {
+            "type": "string",
+            "format": "byte",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "number",
+            "format": "double"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "inviteEmailText",
+          "inviteEmailSubject",
+          "logo",
+          "description",
+          "deleted",
+          "id",
+          "name"
+        ],
+        "type": "object"
+      },
+      "GetStudyByIdResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Study"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "CreateStudyResponse": {
+        "properties": {
+          "id": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "CreateStudyRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UpdateStudyRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          }
+        },
         "type": "object",
         "additionalProperties": false
       },
@@ -1426,6 +1558,9 @@
             "type": "number",
             "format": "double"
           },
+          "participantId": {
+            "type": "string"
+          },
           "email": {
             "type": "string"
           },
@@ -1451,6 +1586,7 @@
         },
         "required": [
           "id",
+          "participantId",
           "firstName",
           "lastName",
           "familyId",
@@ -1577,6 +1713,9 @@
               "invites": {
                 "items": {
                   "properties": {
+                    "description": {
+                      "type": "string"
+                    },
                     "studyName": {
                       "type": "string"
                     },
@@ -1781,6 +1920,9 @@
             "format": "byte",
             "nullable": true
           },
+          "tcLink": {
+            "type": "string"
+          },
           "redcapURL": {
             "type": "string",
             "nullable": true
@@ -1832,6 +1974,7 @@
         },
         "required": [
           "logo",
+          "tcLink",
           "redcapURL",
           "redcapToken",
           "secondaryColour",
@@ -2188,11 +2331,11 @@
         "properties": {
           "token": {
             "type": "string"
+          },
+          "otp_token": {
+            "type": "string"
           }
         },
-        "required": [
-          "token"
-        ],
         "type": "object",
         "additionalProperties": false
       },
@@ -2223,8 +2366,7 @@
             "pattern": "^(.+)@(.+)$"
           },
           "password": {
-            "type": "string",
-            "minLength": 8
+            "type": "string"
           }
         },
         "required": [
@@ -2237,6 +2379,22 @@
           "email": "john.doe@email.com",
           "password": "Password123"
         }
+      },
+      "OTPLoginRequest": {
+        "properties": {
+          "otp_token": {
+            "type": "string"
+          },
+          "otp_code": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "otp_token",
+          "otp_code"
+        ],
+        "type": "object",
+        "additionalProperties": false
       },
       "UploadRedcapParticipantResponse": {
         "properties": {
@@ -2314,7 +2472,22 @@
         "properties": {
           "data": {
             "items": {
-              "$ref": "#/components/schemas/FamilyMember"
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/FamilyMember"
+                },
+                {
+                  "properties": {
+                    "inStudy": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "inStudy"
+                  ],
+                  "type": "object"
+                }
+              ]
             },
             "type": "array"
           }
@@ -3466,6 +3639,278 @@
         ]
       }
     },
+    "/settings": {
+      "get": {
+        "operationId": "GetSettings",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetSettingsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Get the current organisation",
+        "summary": "Get the current organisation settings",
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": []
+      },
+      "patch": {
+        "operationId": "UpdateSettings",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSettingsRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/theme": {
+      "get": {
+        "operationId": "GetTheme",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetThemeResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Settings"
+        ],
+        "security": [],
+        "parameters": []
+      }
+    },
+    "/settings/logo": {
+      "post": {
+        "operationId": "UploadLogo",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "GetLogo",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Settings"
+        ],
+        "security": [],
+        "parameters": []
+      }
+    },
     "/studies": {
       "get": {
         "operationId": "GetAllStudies",
@@ -3794,158 +4239,7 @@
         ]
       }
     },
-    "/settings": {
-      "get": {
-        "operationId": "GetSettings",
-        "responses": {
-          "200": {
-            "description": "Ok",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetSettingsResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "description": "Get the current organisation",
-        "summary": "Get the current organisation settings",
-        "tags": [
-          "Settings"
-        ],
-        "security": [
-          {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
-          }
-        ],
-        "parameters": []
-      },
-      "patch": {
-        "operationId": "UpdateSettings",
-        "responses": {
-          "204": {
-            "description": "No content"
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Failed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Settings"
-        ],
-        "security": [
-          {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
-          }
-        ],
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateSettingsRequest"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/settings/theme": {
-      "get": {
-        "operationId": "GetTheme",
-        "responses": {
-          "200": {
-            "description": "Ok",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetThemeResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Settings"
-        ],
-        "security": [],
-        "parameters": []
-      }
-    },
-    "/settings/logo": {
+    "/studies/{studyId}/logo": {
       "post": {
         "operationId": "UploadLogo",
         "responses": {
@@ -3973,18 +4267,11 @@
             }
           },
           "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
+            "description": "Internal Server Error"
           }
         },
         "tags": [
-          "Settings"
+          "Studies"
         ],
         "security": [
           {
@@ -3993,7 +4280,17 @@
             ]
           }
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -4049,21 +4346,24 @@
             }
           },
           "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
+            "description": "Internal Server Error"
           }
         },
         "tags": [
-          "Settings"
+          "Studies"
         ],
         "security": [],
-        "parameters": []
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
       }
     },
     "/profiles/current": {
@@ -4406,6 +4706,16 @@
               }
             }
           },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal Server Error",
             "content": {
@@ -4476,6 +4786,16 @@
               }
             }
           },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal Server Error",
             "content": {
@@ -4487,8 +4807,8 @@
             }
           }
         },
-        "description": "Get participant by ID",
-        "summary": "Get a  Participant by ID",
+        "description": "Get participant by profile ID",
+        "summary": "Get a  Participant by profile ID",
         "tags": [
           "Participants"
         ],
@@ -4500,6 +4820,175 @@
           }
         ],
         "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "profileId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "DeleteParticipantById",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Remove a participant from the study",
+        "summary": "Remove a participant from the study",
+        "tags": [
+          "Participants"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "profileId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "AddParticipantById",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Add a participant to the study",
+        "summary": "Add a participant to the study, if they were formerly removed, or they don't have an account.\nThrows error if user has an account and should be added via the study invite process",
+        "tags": [
+          "Participants"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
           {
             "in": "path",
             "name": "profileId",
@@ -5086,6 +5575,16 @@
               }
             }
           },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal Server Error",
             "content": {
@@ -5130,6 +5629,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
                 }
               }
             }
@@ -5200,6 +5709,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
                 }
               }
             }
@@ -5346,6 +5865,16 @@
               }
             }
           },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal Server Error",
             "content": {
@@ -5416,6 +5945,16 @@
               }
             }
           },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal Server Error",
             "content": {
@@ -5475,6 +6014,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
                 }
               }
             }
@@ -5545,6 +6094,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
                 }
               }
             }
@@ -5672,11 +6231,11 @@
             }
           },
           "422": {
-            "description": "Validation Failed",
+            "description": "Unprocessable Content",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                  "$ref": "#/components/schemas/UnprocessableError"
                 }
               }
             }
@@ -5732,11 +6291,11 @@
             }
           },
           "422": {
-            "description": "Validation Failed",
+            "description": "Unprocessable Content",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                  "$ref": "#/components/schemas/UnprocessableError"
                 }
               }
             }
@@ -5776,11 +6335,11 @@
             }
           },
           "422": {
-            "description": "Validation Failed",
+            "description": "Unprocessable Content",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                  "$ref": "#/components/schemas/UnprocessableError"
                 }
               }
             }
@@ -5830,11 +6389,11 @@
             }
           },
           "422": {
-            "description": "Validation Failed",
+            "description": "Unprocessable Content",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                  "$ref": "#/components/schemas/UnprocessableError"
                 }
               }
             }
@@ -5903,11 +6462,11 @@
             }
           },
           "422": {
-            "description": "Validation Failed",
+            "description": "Unprocessable Content",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                  "$ref": "#/components/schemas/UnprocessableError"
                 }
               }
             }
@@ -5976,11 +6535,11 @@
             }
           },
           "422": {
-            "description": "Validation Failed",
+            "description": "Unprocessable Content",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                  "$ref": "#/components/schemas/UnprocessableError"
                 }
               }
             }
@@ -6024,6 +6583,116 @@
         }
       }
     },
+    "/auth/login/otp": {
+      "post": {
+        "operationId": "LoginOtp",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "One time password",
+        "summary": "Log in with a OTP code",
+        "tags": [
+          "Auth"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-client-type",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OTPLoginRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/tcs": {
+      "get": {
+        "operationId": "Tcs",
+        "responses": {
+          "302": {
+            "description": "Redirect"
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Terms and conditions link",
+        "summary": "Redirects to configured terms and conditions url",
+        "tags": [
+          "Auth"
+        ],
+        "security": [],
+        "parameters": []
+      }
+    },
     "/studies/{studyId}/integrations/redcap/participant/upload/csv": {
       "post": {
         "operationId": "UploadRedcapParticipantCSV",
@@ -6044,6 +6713,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
                 }
               }
             }
@@ -6125,6 +6804,16 @@
               }
             }
           },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal Server Error",
             "content": {
@@ -6189,6 +6878,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
                 }
               }
             }
@@ -6266,6 +6965,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
                 }
               }
             }
@@ -6372,6 +7081,16 @@
               }
             }
           },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal Server Error",
             "content": {
@@ -6438,6 +7157,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
                 }
               }
             }
@@ -6510,6 +7239,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
                 }
               }
             }

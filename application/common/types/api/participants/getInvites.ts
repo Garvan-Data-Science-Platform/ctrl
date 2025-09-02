@@ -23,6 +23,7 @@ export interface GetUserInvitesResponse {
       expiresAt: string
       sentAt?: string
       studyName: string // may be other fields here in future
+      description?: string
     }[]
     //    dependents: FamilyMember[]
   }

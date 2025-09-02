@@ -103,7 +103,6 @@ export const useSurveyStore = create<SurveyState>((set) => ({
   deleteChoice: (step: number, element: number, choice: number) =>
     set(
       produce((state: SurveyState) => {
-        console.log('DELETING', choice)
         state.data[step].elements[element].data.choices.splice(choice, 1)
       }),
     ),

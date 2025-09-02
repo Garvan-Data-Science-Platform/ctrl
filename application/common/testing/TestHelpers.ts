@@ -149,3 +149,11 @@ export async function inviteUser(email: string, studyId: number) {
   })
   return null
 }
+
+export async function removeUserFromStudy(email: string, studyId: number) {
+  const prof = await prisma.participantProfile.findFirstOrThrow({ where: { user: { email } } })
+  await prisma.studyParticipant.delete({
+    where: { participantProfileId_studyId: { participantProfileId: prof.id, studyId } },
+  })
+  return null
+}

@@ -37,7 +37,9 @@ import { AllResponsesView } from './pages/responses/all'
 import { FamilyEdit } from './pages/family/edit'
 import SettingsPage from './pages/settings'
 import { StudyLoader } from './components/StudyLoader'
+import StudiesPage from './pages/studies'
 import { Callback } from './pages/login/callback'
+import OTP from './pages/login/OTP'
 
 function App() {
   return (
@@ -195,6 +197,7 @@ function App() {
                     <Route path="/responses/all/:id" index element={<AllResponsesView />} />
                     <Route path="/responses/:id" index element={<ResponsesView />} />
                     <Route path="/settings" index element={<SettingsPage />} />
+                    <Route path="/studies" index element={<StudiesPage />} />
                     <Route path="*" element={<ErrorComponent />} />
                   </Route>
 
@@ -205,6 +208,7 @@ function App() {
                       </Authenticated>
                     }
                   >
+                    <Route path="/login/otp" element={<OTP />} />
                     <Route path="/login/callback" element={<Callback />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/setup" element={<SetupPage />} />

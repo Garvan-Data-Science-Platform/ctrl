@@ -147,7 +147,7 @@ describe('FamiliesController', () => {
           dob: '1990-01-23',
           permanent: false,
         })
-      expect(res.status).toBe(500)
+      expect(res.status).toBe(422)
       expect(res.body.details).toEqual('Dependent already registered in CTRL')
     })
     it('Invalid form should return error', async () => {

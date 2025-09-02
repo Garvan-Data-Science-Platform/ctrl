@@ -26,10 +26,14 @@ CREATE TABLE "User" (
     "middleName" TEXT,
     "lastName" TEXT NOT NULL,
     "email" TEXT NOT NULL,
+    "emailHash" TEXT,
     "password" TEXT NOT NULL,
     "role" "Role" NOT NULL DEFAULT 'Participant',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "agreedTermsAt" TIMESTAMP(3),
+    "lockedUntil" TIMESTAMP(3),
+    "retriesRemaining" INTEGER NOT NULL DEFAULT 10,
     "deleted" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
@@ -39,8 +43,10 @@ CREATE TABLE "User" (
 CREATE TABLE "ParticipantProfile" (
     "id" SERIAL NOT NULL,
     "firstName" TEXT NOT NULL,
+    "firstNameHash" TEXT,
     "middleName" TEXT,
     "lastName" TEXT NOT NULL,
+    "lastNameHash" TEXT,
     "dob" DATE NOT NULL,
     "mobile" TEXT NOT NULL,
     "addressLine" TEXT NOT NULL,
@@ -59,6 +65,9 @@ CREATE TABLE "ParticipantProfile" (
 CREATE TABLE "StudyParticipant" (
     "participantProfileId" INTEGER NOT NULL,
     "studyId" INTEGER NOT NULL,
+    "participantNumber" INTEGER NOT NULL DEFAULT 0,
+    "participantId" TEXT,
+    "deleted" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "StudyParticipant_pkey" PRIMARY KEY ("participantProfileId","studyId")
 );
@@ -89,6 +98,7 @@ CREATE TABLE "Organisation" (
     "redcapURL" TEXT,
     "redcapToken" TEXT,
     "logo" BYTEA,
+    "tcLink" TEXT NOT NULL DEFAULT 'https://garvan-data-science-platform.github.io/ctrl-docs/docs/terms-and-conditions',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -99,6 +109,8 @@ CREATE TABLE "Organisation" (
 CREATE TABLE "Study" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
+    "description" TEXT,
+    "logo" BYTEA,
     "inviteEmailSubject" TEXT NOT NULL DEFAULT 'Invitation to CTRL - Dynamic Consent Platform',
     "inviteEmailText" TEXT NOT NULL DEFAULT 'You have been invited to register with CTRL dynamic consent platform.',
     "deleted" BOOLEAN NOT NULL DEFAULT false,
@@ -115,6 +127,7 @@ CREATE TABLE "SurveyVersion" (
     "studyId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "publishedAt" TIMESTAMP(3),
 
     CONSTRAINT "SurveyVersion_pkey" PRIMARY KEY ("id")
 );
@@ -134,6 +147,7 @@ CREATE TABLE "SurveyVersionAnswers" (
 CREATE TABLE "Invite" (
     "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
+    "emailHash" TEXT,
     "status" "InviteStatus" NOT NULL DEFAULT 'PENDING',
     "studyId" INTEGER NOT NULL,
     "expiresAt" TIMESTAMP(3) NOT NULL,
@@ -168,6 +182,16 @@ CREATE TABLE "AuditLog" (
 );
 
 -- CreateTable
+CREATE TABLE "OTPToken" (
+    "id" TEXT NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "code" TEXT NOT NULL,
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "OTPToken_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "_OrganisationToUser" (
     "A" INTEGER NOT NULL,
     "B" INTEGER NOT NULL
@@ -177,19 +201,19 @@ CREATE TABLE "_OrganisationToUser" (
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "User_emailHash_key" ON "User"("emailHash");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "AlternativeContact_participantProfileId_key" ON "AlternativeContact"("participantProfileId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Organisation_name_key" ON "Organisation"("name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Study_name_key" ON "Study"("name");
-
--- CreateIndex
 CREATE UNIQUE INDEX "SurveyVersion_studyId_versionNumber_key" ON "SurveyVersion"("studyId", "versionNumber");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Invite_studyId_email_key" ON "Invite"("studyId", "email");
+CREATE UNIQUE INDEX "Invite_studyId_emailHash_key" ON "Invite"("studyId", "emailHash");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "PasswordResetToken_token_key" ON "PasswordResetToken"("token");
@@ -229,6 +253,9 @@ ALTER TABLE "PasswordResetToken" ADD CONSTRAINT "PasswordResetToken_userId_fkey"
 
 -- AddForeignKey
 ALTER TABLE "AuditLog" ADD CONSTRAINT "AuditLog_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OTPToken" ADD CONSTRAINT "OTPToken_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_OrganisationToUser" ADD CONSTRAINT "_OrganisationToUser_A_fkey" FOREIGN KEY ("A") REFERENCES "Organisation"("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -28,6 +28,17 @@ axiosInstance.interceptors.request.use(
   },
 )
 
+// Add response interceptor for 401 redirect
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      window.location.href = '/login'
+    }
+    return Promise.reject(error)
+  },
+)
+
 export const dataProvider = (): DataProvider => {
   return {
     getOne: async ({ resource, id }) => {
@@ -72,7 +83,11 @@ export const dataProvider = (): DataProvider => {
       }
     },
     deleteOne: async ({ resource, id }) => {
-      const response = await axiosInstance.delete(`${resource}/${id}`)
+      const { studies, activeStudyIndex } = useStudyStore.getState()
+      const studyId = studies[activeStudyIndex].id
+      let url = `${resource}/${id}`
+      if (studyResources.includes(resource)) url = `/studies/${studyId}/${url}`
+      const response = await axiosInstance.delete(url)
       const data = response.data
       return {
         data,
