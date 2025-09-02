@@ -127,6 +127,15 @@ export const RedcapImport = ({
         component="form"
         sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}
         autoComplete="off"
+        onSubmit={(e) => {
+          e.preventDefault()
+          if (confirmDialog) {
+            setDialogType('API')
+            openDialog()
+          } else {
+            handleApiSubmission()
+          }
+        }}
       >
         <img
           src="/redcap.png"
@@ -218,7 +227,7 @@ export const RedcapImport = ({
               Import from REDCap API
             </Typography>
             {redcapIsSetup ? (
-              <>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 {formNameInput && (
                   <TextField
                     label="Form Name"
@@ -245,7 +254,7 @@ export const RedcapImport = ({
                 >
                   Import from API
                 </Button>
-              </>
+              </Box>
             ) : (
               <>
                 <Typography>Redcap API is not set up</Typography>

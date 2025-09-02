@@ -40,7 +40,7 @@ export const SurveyImport = () => {
       })
       .then((response) => {
         invalidate({ resource: 'surveys', invalidates: ['resourceAll'] })
-        navigate(successRedirect.replace(':surveyId', response.data.versionNumber))
+        navigate(successRedirect.replace(':versionNumber', response.data.versionNumber))
       })
       .catch((response) => {
         open?.({
