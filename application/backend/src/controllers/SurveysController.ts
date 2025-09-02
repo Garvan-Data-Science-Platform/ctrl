@@ -27,7 +27,7 @@ import type {
   UpdateSurveyRequest,
 } from 'common/types/api/surveys'
 import { SurveyVersion as SurveyVersionPrisma } from '@prisma/client'
-import { SurveyElementType, SurveyStep, SurveyStepStatus } from 'common/types/survey'
+import { SurveyStep } from 'common/types/survey'
 import prisma from '../PrismaClient'
 import '../jsontypes'
 import { validateAnswers } from 'common/src/surveys/validateSurveyAnswers'
@@ -383,19 +383,12 @@ export class SurveysController extends Controller {
 
     const answers = participantAnswers.answers
 
-    type StatusMap = {
-      [key in SurveyElementType]: SurveyStepStatus
-    }
-
-    const statusMap: StatusMap = {
-      video: 'viewed',
-      subheading: 'viewed',
-      'question-checkbox': 'completed',
-      'question-choices': 'completed',
-    }
-
-    //Maps the type of the first element to the updated status
-    const status = statusMap[surveySteps[step].elements[0]?.type || 'subheading']
+    const status =
+      surveySteps[step].elements.filter((val) =>
+        ['question-checkbox', 'question-choices'].includes(val.type),
+      ).length > 0
+        ? 'completed'
+        : 'viewed'
 
     if (!validateAnswers(surveySteps[step], data)) {
       throw new ValidateError({}, 'Answers did not match survey question structure')
