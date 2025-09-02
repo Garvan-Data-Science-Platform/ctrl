@@ -383,19 +383,13 @@ export class SurveysController extends Controller {
 
     const answers = participantAnswers.answers
 
-    type StatusMap = {
-      [key in SurveyElementType]: SurveyStepStatus
-    }
-
-    const statusMap: StatusMap = {
-      video: 'viewed',
-      subheading: 'viewed',
-      'question-checkbox': 'completed',
-      'question-choices': 'completed',
-    }
-
     //Maps the type of the last element to the updated status
-    const status = statusMap[surveySteps[step].elements.at(-1)?.type || 'subheading']
+    const status =
+      surveySteps[step].elements.filter((val) =>
+        ['question-checkbox', 'question-choices'].includes(val.type),
+      ).length > 0
+        ? 'completed'
+        : 'viewed'
 
     if (!validateAnswers(surveySteps[step], data)) {
       throw new ValidateError({}, 'Answers did not match survey question structure')
