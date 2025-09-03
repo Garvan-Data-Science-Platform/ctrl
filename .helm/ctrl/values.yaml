@@ -8,8 +8,7 @@ demoMode:
   enabled: false
 
 config:
-  oidc:
-    []
+  oidc: []
     #- name:
     #  providerUrl:
     #  clientId:
@@ -17,6 +16,7 @@ config:
     #  icon: #A link to png for login button
 
   disableAdminPasswordLogin: false
+  otp: true
 
 userClient:
   hostname: ctrlhost
@@ -117,12 +117,10 @@ serviceAccount:
 podAnnotations: {}
 podLabels: {}
 
-podSecurityContext:
-  {}
+podSecurityContext: {}
   # fsGroup: 2000
 
-securityContext:
-  {}
+securityContext: {}
   # capabilities:
   #   drop:
   #   - ALL
