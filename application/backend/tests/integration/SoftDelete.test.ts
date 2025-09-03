@@ -84,7 +84,7 @@ describe('Soft Deletion', () => {
     const aLog = await prisma.auditLog.findFirstOrThrow({ where: { userId: ORG_ADMIN_ID } })
     expect(aLog.resource).toBe('studies')
     expect(aLog.operation).toBe('UPDATE')
-    expect((aLog.meta as any).bodyData.name).toBe(`${STUDY_NAME}`)
+    expect(JSON.parse(aLog.requestBody as any).name).toBe(`${STUDY_NAME}`)
   })
 
   it('Study can be restored', async () => {
