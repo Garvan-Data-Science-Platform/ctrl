@@ -1,4 +1,4 @@
-import { Button, Card, Container, Typography } from '@mui/material'
+import { Button, Card, Container, Typography, Link as MLink } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import NavBar from '../components/NavBar'
 import { useQuery } from '@tanstack/react-query'
@@ -209,6 +209,21 @@ export default function Profile() {
                     </>
                   </tbody>
                 </table>
+                <Typography variant="body2" sx={{ mt: 3 }}>
+                  Note: dependant consent is based on the consent of all guardians in the family.{' '}
+                  <MLink
+                    target="_blank"
+                    href="https://garvan-data-science-platform.github.io/ctrl-docs/docs/families"
+                  >
+                    Click here to learn more.
+                  </MLink>
+                  <br />
+                  If this section does not look right,{' '}
+                  <MLink component={Link} to="/contact">
+                    contact the study administrator
+                  </MLink>
+                  .
+                </Typography>
               </Card>
             </Grid>
           )}

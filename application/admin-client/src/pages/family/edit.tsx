@@ -21,6 +21,7 @@ import {
   TableRow,
   TextField,
   Typography,
+  Link as MLink,
 } from '@mui/material'
 import { useInvalidate, useNotification, useOne, useParsed } from '@refinedev/core'
 import { Show } from '@refinedev/mui'
@@ -405,6 +406,15 @@ export const FamilyEdit = () => {
             )}
           </>
         )}
+        <Typography variant="body2">
+          Dependants in a family will inherit their answers from Guardians. {` `}
+          <MLink
+            target="_blank"
+            href="https://garvan-data-science-platform.github.io/ctrl-docs/docs/families"
+          >
+            Click here for more info.
+          </MLink>
+        </Typography>
       </Box>
       <Dialog open={dialogOpen} onClose={handleDialogCancel}>
         <DialogTitle>Are you sure</DialogTitle>
