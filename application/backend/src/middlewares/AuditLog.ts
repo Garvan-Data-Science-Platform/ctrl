@@ -41,7 +41,7 @@ export async function auditLog(req: Request, res: Response, next: NextFunction) 
       .join('/')
     const success = 200 <= res.statusCode && res.statusCode <= 299
     const bodyData = req.body
-    if (bodyData.password) {
+    if (bodyData?.password) {
       bodyData.password = '***'
     }
     const meta = { resourceId: id, url: req.url, method: req.method }
@@ -53,7 +53,7 @@ export async function auditLog(req: Request, res: Response, next: NextFunction) 
           operation,
           resource,
           meta,
-          requestBody: JSON.stringify(bodyData),
+          requestBody: bodyData ? JSON.stringify(bodyData) : undefined,
           success,
         },
       })
