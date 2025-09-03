@@ -79,6 +79,10 @@ export default function Dashboard() {
     }
   }, [invitesData])
 
+  // This function doesn't have named parameters, but it uses the following data from the environment:
+  //   - studies[activeStudyIndex].name
+  //   - profileData
+  //   - responseData
   const generatePdf = async () => {
     setIsLoading(true)
     try {
@@ -92,7 +96,13 @@ export default function Dashboard() {
       })
 
       // Generate PDF with the data
-      const pdfDoc = <ResponsesPdf profile={profileData} responses={responseData} />
+      const pdfDoc = (
+        <ResponsesPdf
+          studyName={studies[activeStudyIndex].name}
+          profile={profileData}
+          responses={responseData}
+        />
+      )
 
       // Create a blob from the PDF document
       const blob = await pdf(pdfDoc).toBlob()
