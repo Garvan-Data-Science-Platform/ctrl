@@ -217,7 +217,8 @@ model AuditLog {
   timestamp DateTime          @default(now())
   userId    Int?
   user      User?             @relation(fields: [userId], references: [id], onDelete: Restrict)
-  meta      Json
+  meta      Json              
+  requestBody String?          /// @encrypted
 }
 
 model OTPToken {
