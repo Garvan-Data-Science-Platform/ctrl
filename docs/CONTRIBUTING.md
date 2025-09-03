@@ -116,3 +116,9 @@ yarn console
 This command will opens a [REPL](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop) with the Prisma ORM client loaded.
 You can run Prisma queries from the application in the REPL.
 This makes it easy to interactively explore the results of Prisma queries.
+
+For example:
+
+```javascript
+await prisma.participantProfile.findUniqueOrThrow({ where: { id: 1 } })
+```
