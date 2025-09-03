@@ -13,7 +13,8 @@
     "prisma:generate": "yarn prisma generate",
     "prisma:seed": "yarn prisma db seed",
     "prisma:wipe": "yarn ts-node -T scripts/runWipeDB.ts",
-    "prisma:migrate": "yarn prisma migrate dev"
+    "prisma:migrate": "yarn prisma migrate dev",
+    "console": "tsx -r ./prisma/console.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed/seed.ts"
@@ -59,6 +60,7 @@
     "nodemailer-mock": "^2.0.6",
     "prisma": "^5.20.0",
     "prisma-json-types-generator": "^3.1.1",
+    "prisma-repl": "^1.4.0",
     "supertest": "^7.0.0",
     "ts-jest": "^29.1.5",
     "ts-node": "^10.9.2",
