@@ -13,6 +13,7 @@ import { Link } from 'react-router-dom'
 import { apiClient } from '../apiClient'
 import { useEffect, useState } from 'react'
 import { GeneratePasswordResetLinkRequest } from '@common/types/api/users'
+import { AxiosError, AxiosResponse } from 'axios'
 
 export default function ForgotPassword() {
   const logoPath = import.meta.env.VITE_BACKEND_URL + '/settings/logo'
@@ -36,7 +37,7 @@ export default function ForgotPassword() {
 
     apiClient
       .post('/users/password/generate-reset-link', data)
-      .then((res) => {
+      .then((res: AxiosResponse | AxiosError) => {
         if (res.status == 200) {
           // Set to sent on successful response
           setStatus('sent')
@@ -44,7 +45,7 @@ export default function ForgotPassword() {
           // Back to unsent if there is an error
           setStatus('unsent')
           setError('root.serverError', {
-            message: `Error: ${JSON.stringify((res as any).message)}`,
+            message: `Error: ${JSON.stringify((res as AxiosError).message)}`,
           })
         }
       })

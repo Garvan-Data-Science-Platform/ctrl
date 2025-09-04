@@ -14,6 +14,7 @@ import { ResetPasswordRequest } from '@common/types/api/users'
 import { checkPasswordStrength } from '@common/src/PasswordStrength'
 import { apiClient } from '../apiClient'
 import { useEffect, useState } from 'react'
+import { AxiosError, AxiosResponse } from 'axios'
 
 interface FormValues {
   newPassword: string
@@ -77,7 +78,7 @@ export default function ResetPassword() {
 
     apiClient
       .post('/users/password/reset', reqData)
-      .then((res) => {
+      .then((res: AxiosResponse | AxiosError) => {
         if (res.status == 200) {
           // Set to sent on successful response
           setStatus('sent')
@@ -85,7 +86,7 @@ export default function ResetPassword() {
           // Set to error
           setStatus('error')
           setError('root.serverError', {
-            message: `Error: ${JSON.stringify((res as any).message)}`,
+            message: `Error: ${JSON.stringify((res as AxiosError).message)}`,
           })
         }
       })

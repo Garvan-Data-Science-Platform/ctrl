@@ -15,7 +15,7 @@ function App() {
   const [theme, setTheme] = useState<Theme | null>(null)
 
   function standardize_color(str: string) {
-    const ctx = document.createElement('canvas').getContext('2d') as any
+    const ctx = document.createElement('canvas').getContext('2d')!
     ctx.fillStyle = str
     return ctx.fillStyle
   }
@@ -26,7 +26,7 @@ function App() {
       setTheme(
         customTheme({
           primary: primary ? standardize_color(primary) : '#2196f3',
-          secondary: secondary ? res.data.data.secondaryColour(secondary) : '#2196f3',
+          secondary: secondary ? standardize_color(secondary) : '#2196f3',
         }),
       )
     })

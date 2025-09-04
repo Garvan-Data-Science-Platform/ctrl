@@ -164,9 +164,11 @@ export default function ConsentForm() {
           },
         })}
       >
-        {/* 
-          // @ts-ignore */}
-        <Typography component="label" for={`input_${idx}`} sx={{ flexGrow: 1, textAlign: 'left' }}>
+        <Typography
+          component="label"
+          htmlFor={`input_${idx}`}
+          sx={{ flexGrow: 1, textAlign: 'left' }}
+        >
           {data.text}
         </Typography>
         {data.tooltip ? (

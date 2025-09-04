@@ -30,7 +30,7 @@ import { useEffect, useState } from 'react'
 import { ParticipantSearch } from '../../components/ParticipantSearch'
 import { ArrowBack, Delete } from '@mui/icons-material'
 import { Link, useNavigate } from 'react-router-dom'
-import { GetFamilyResponse } from '@common/types/api/families'
+import { AddDependentRequest, GetFamilyResponse } from '@common/types/api/families'
 import { axiosInstance } from '../../providers/dataProvider'
 import { useCurrentStudyId } from '../../studyStore'
 
@@ -128,7 +128,7 @@ export const FamilyEdit = () => {
     }
   }
 
-  const onSubmitNewDependent = async (data: any) => {
+  const onSubmitNewDependent = async (data: AddDependentRequest) => {
     try {
       await axiosInstance.post(`/studies/${studyId}/families/${id}/add-dependent`, data)
       open?.({ type: 'success', message: 'Added dependent to family' })
@@ -266,7 +266,7 @@ export const FamilyEdit = () => {
               <RadioGroup
                 row
                 onChange={(e) => {
-                  setNewMemberStatus(e.target.value as any)
+                  setNewMemberStatus(e.target.value as 'NEW' | 'EXISTING' | null)
                 }}
                 value={newMemberStatus}
               >

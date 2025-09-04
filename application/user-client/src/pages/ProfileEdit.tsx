@@ -20,6 +20,7 @@ import { GetParticipantProfileResponse, UpdateProfileRequest } from '@common/typ
 import NavBar from '../components/NavBar'
 import { apiClient } from '../apiClient'
 import { ContactMethod, StateTerritory } from '@common/types/api/users/ParticipantProfile'
+import { AxiosError, AxiosResponse } from 'axios'
 
 interface FormValues {
   firstName: string
@@ -94,12 +95,12 @@ export default function ProfileEdit() {
 
     apiClient
       .patch('/profiles/current', reqData)
-      .then((res) => {
+      .then((res: AxiosResponse | AxiosError) => {
         if (res.status == 204) {
           nav('/profile')
         } else {
           setError('root.serverError', {
-            message: `Error Updating Profile: ${JSON.stringify((res as any).response.data.message)}`,
+            message: `Error Updating Profile: ${JSON.stringify((res as AxiosError).message)}`,
           })
         }
       })
