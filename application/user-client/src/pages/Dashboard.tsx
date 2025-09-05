@@ -31,6 +31,7 @@ import ResponsesPdf from '../components/PdfExport'
 import { pdf } from '@react-pdf/renderer'
 import { useAppStore, useCurrentStudyId } from '../store'
 import { StudyInvitesDialog } from '../components/StudyInvites'
+import { formatStudyFileName } from '@common/src/pdfHelpers'
 
 export default function Dashboard() {
   const studyId = useCurrentStudyId()
@@ -95,13 +96,11 @@ export default function Dashboard() {
             .then((res) => res.data) as Promise<GetResponsesByIdResponse>,
       })
 
+      const studyName = studies[activeStudyIndex].name
+
       // Generate PDF with the data
       const pdfDoc = (
-        <ResponsesPdf
-          studyName={studies[activeStudyIndex].name}
-          profile={profileData}
-          responses={responseData}
-        />
+        <ResponsesPdf studyName={studyName} profile={profileData} responses={responseData} />
       )
 
       // Create a blob from the PDF document
@@ -111,10 +110,12 @@ export default function Dashboard() {
       const now = new Date()
       const formattedDatetime = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}`
 
+      const formattedStudyName = formatStudyFileName(studyName)
+
       // Trigger download
       const link = document.createElement('a')
       link.href = URL.createObjectURL(blob)
-      link.download = `CTRL-responses-${profileData!.data.firstName}_${profileData!.data.lastName}_${formattedDatetime}.pdf`
+      link.download = `CTRL-responses-${formattedStudyName}-${profileData!.data.firstName}_${profileData!.data.lastName}_${formattedDatetime}.pdf`
       link.click()
     } catch {
       setShowPdfError(true)

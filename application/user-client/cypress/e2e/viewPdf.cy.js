@@ -22,7 +22,6 @@ describe('viewPdf', () => {
     // Function to:
     //  - click 'View responses' button,
     //  - access latest downloaded PDF that matches specific Regex
-    //    - (note 'Test User' and date format assumptions)
     //  - parse PDF
     //  - check contents include specific text_string parameter.
     //  - deletes downloaded file
@@ -54,9 +53,7 @@ describe('viewPdf', () => {
     // Function to:
     //  - click 'View responses' button,
     //  - access latest downloaded PDF that matches specific Regex
-    //    - (note 'Test User' and date format assumptions)
     //  - check filename includes specific filename_string parameter.
-    //  - TODO: make sure studyname gets the same transformation as filename (i.e. removing spaces etc)
     //  - deletes downloaded file
     cy.intercept('GET', `/studies/${studyId}/survey-answers`).as('requestPdf')
     cy.get('[data-cy="view-pdf"]').click()
@@ -72,11 +69,8 @@ describe('viewPdf', () => {
       .then((latestFile) => {
         cy.wrap(`cypress/downloads/${latestFile}`).as('pdfFile')
       })
-
     cy.get('@pdfFile').then((pdfFile) => {
-      cy.readFile(pdfFile).should('exist')
-      // Parse PDF and check contents
-      cy.task('readPdf', pdfFile).should('contain', text_string)
+      expect(pdfFile).to.include(filename_string)
       // Delete PDF
       cy.task('deleteFile', pdfFile)
     })
@@ -160,7 +154,9 @@ describe('viewPdf', () => {
     cy.contains('Intro').should('exist')
     // Check UI to ensure it matches expectations
     cy.get('[data-cy="step-card-0"]').contains('Reviewed').should('exist')
-    assertPdfFilenameContains(studyId, studyName)
+    cy.task('formatStudyFileName', studyName).then((formattedStudyName) => {
+      assertPdfFilenameContains(studyId, formattedStudyName)
+    })
     // changing study results in different study file name
   })
 
