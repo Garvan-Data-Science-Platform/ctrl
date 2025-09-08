@@ -19,6 +19,7 @@ export const TEST_STUDY_ID = 1
 export const SECOND_TEST_STUDY = 'Study 2'
 export const SECOND_TEST_STUDY_ID = 2
 export const FE_TEST_STUDY = 'Study FE'
+export const FE_TEST_STUDY_ID = 3
 export const EMPTY_TEST_STUDY = 'Empty Study'
 
 export async function seedTests(prisma: PrismaClient) {
@@ -62,7 +63,7 @@ export async function seedTests(prisma: PrismaClient) {
   const frontendTestStudy = await prisma.study.create({
     data: {
       name: FE_TEST_STUDY,
-      id: 3,
+      id: FE_TEST_STUDY_ID,
     },
   })
 

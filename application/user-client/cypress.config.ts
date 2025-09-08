@@ -16,8 +16,8 @@ import {
   PASSWORD_RESET_USER_EMAIL,
   TEST_STUDY,
   TEST_STUDY_ID,
-  SECOND_TEST_STUDY,
-  SECOND_TEST_STUDY_ID,
+  FE_TEST_STUDY,
+  FE_TEST_STUDY_ID,
 } from 'common/testing/seed'
 import { defineConfig } from 'cypress'
 
@@ -27,8 +27,8 @@ export default defineConfig({
     PASSWORD_RESET_USER_EMAIL: PASSWORD_RESET_USER_EMAIL,
     TEST_STUDY: TEST_STUDY,
     TEST_STUDY_ID: TEST_STUDY_ID,
-    SECOND_TEST_STUDY: SECOND_TEST_STUDY,
-    SECOND_TEST_STUDY_ID: SECOND_TEST_STUDY_ID,
+    FE_TEST_STUDY: FE_TEST_STUDY,
+    FE_TEST_STUDY_ID: FE_TEST_STUDY_ID,
   },
   e2e: {
     defaultCommandTimeout: 8000,

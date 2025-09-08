@@ -7,7 +7,6 @@ beforeEach(() => {
 const { UserType } = require('../support/commands')
 const downloadsPath = 'cypress/downloads/'
 
-// TODO: Add multistudy pdf tests
 // TODO: Add logo tests
 
 // Note: the tests below make heavy use of environment variables
@@ -16,6 +15,8 @@ const downloadsPath = 'cypress/downloads/'
 //   (`application/common/testing/seed.ts`)
 const studyName = Cypress.env('TEST_STUDY')
 const studyId = Cypress.env('TEST_STUDY_ID')
+const feStudyName = Cypress.env('FE_TEST_STUDY')
+const feStudyId = Cypress.env('FE_TEST_STUDY_ID')
 
 describe('viewPdf', () => {
   function assertPdfContains(studyId, text_string) {
@@ -145,7 +146,14 @@ describe('viewPdf', () => {
     // Check UI to ensure it matches expectations
     cy.get('[data-cy="step-card-0"]').contains('Reviewed').should('exist')
     assertPdfContains(studyId, studyName)
+
     // changing study results in different study name
+    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.visit('/')
+    cy.get('[data-cy="change-study"]').click()
+    cy.contains('Study FE').click()
+    cy.contains('Frontend study step').should('exist')
+    assertPdfContains(feStudyId, feStudyName)
   })
 
   it('PDF file name contains study name', () => {
@@ -157,8 +165,17 @@ describe('viewPdf', () => {
     cy.task('formatStudyFileName', studyName).then((formattedStudyName) => {
       assertPdfFilenameContains(studyId, formattedStudyName)
     })
+
     // changing study results in different study file name
+    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.visit('/')
+    cy.get('[data-cy="change-study"]').click()
+    cy.contains('Study FE').click()
+    cy.contains('Frontend study step').should('exist')
+    cy.task('formatStudyFileName', feStudyName).then((formattedStudyName) => {
+      assertPdfFilenameContains(feStudyId, formattedStudyName)
+    })
   })
 
-  // PDF contains logo, doesn't contain logo, and contains correct logo when changed
+  // PDF contains logo, doesn't contain logo, and contains correct logo when study is changed
 })
