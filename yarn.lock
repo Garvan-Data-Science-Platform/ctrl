@@ -5869,7 +5869,6 @@ __metadata:
     prisma: "npm:^5.20.0"
     prisma-field-encryption: "npm:^1.6.0"
     prisma-json-types-generator: "npm:^3.1.1"
-    prisma-repl: "npm:^1.4.0"
     sharp: "npm:^0.34.1"
     supertest: "npm:^7.0.0"
     swagger-ui-express: "npm:^5.0.1"
@@ -12859,15 +12858,6 @@ __metadata:
   bin:
     prisma-json-types-generator: index.js
   checksum: 10c0/bb97ef60c86b2b18ed07a2abde2282c1b6a16e0a5dffe8e1a1d0685850fa6a6d3dcb36fe80626f82e1cf1c5c10df82d95a20e536fc62b0eed45e5e74675af0d2
-  languageName: node
-  linkType: hard
-
-"prisma-repl@npm:^1.4.0":
-  version: 1.4.0
-  resolution: "prisma-repl@npm:1.4.0"
-  bin:
-    prisma-repl: dist/cli-wrapper.js
-  checksum: 10c0/f16a8d7001b962cd576e87a3d7ea9dc75e22a4c63702fdab5ecbd770e3fb2f2a5040a41c5952e8dd4df3c554ba695971434fb1399ab8391861f5f1be42be94a4
   languageName: node
   linkType: hard
 
