@@ -1,4 +1,4 @@
-export function formatStudyFileName(studyName: string) {
+export function formatStudyName(studyName: string) {
   // Format studyName to make it appropriate for inclusion in a file name:
   //   - no whitespace
   //   - no characters in this list: `/\<>|:&`

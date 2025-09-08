@@ -162,7 +162,7 @@ describe('viewPdf', () => {
     cy.contains('Intro').should('exist')
     // Check UI to ensure it matches expectations
     cy.get('[data-cy="step-card-0"]').contains('Reviewed').should('exist')
-    cy.task('formatStudyFileName', studyName).then((formattedStudyName) => {
+    cy.task('formatStudyName', studyName).then((formattedStudyName) => {
       assertPdfFilenameContains(studyId, formattedStudyName)
     })
 
@@ -172,7 +172,7 @@ describe('viewPdf', () => {
     cy.get('[data-cy="change-study"]').click()
     cy.contains('Study FE').click()
     cy.contains('Frontend study step').should('exist')
-    cy.task('formatStudyFileName', feStudyName).then((formattedStudyName) => {
+    cy.task('formatStudyName', feStudyName).then((formattedStudyName) => {
       assertPdfFilenameContains(feStudyId, formattedStudyName)
     })
   })

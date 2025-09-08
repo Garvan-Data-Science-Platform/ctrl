@@ -10,7 +10,7 @@ import {
   inviteUser,
   removeUserFromStudy,
 } from 'common/testing/TestHelpers'
-import { formatStudyFileName } from 'common/src/pdfHelpers'
+import { formatStudyName } from 'common/src/pdfHelpers'
 
 import {
   PASSWORD_RESET_USER_EMAIL,
@@ -66,8 +66,8 @@ export default defineConfig({
         removeUserFromStudy({ email, studyId }) {
           return removeUserFromStudy(email, studyId)
         },
-        formatStudyFileName(studyName: string) {
-          return formatStudyFileName(studyName)
+        formatStudyName(studyName: string) {
+          return formatStudyName(studyName)
         },
       })
     },

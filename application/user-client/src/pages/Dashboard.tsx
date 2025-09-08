@@ -31,7 +31,7 @@ import ResponsesPdf from '../components/PdfExport'
 import { pdf } from '@react-pdf/renderer'
 import { useAppStore, useCurrentStudyId } from '../store'
 import { StudyInvitesDialog } from '../components/StudyInvites'
-import { formatStudyFileName } from '@common/src/pdfHelpers'
+import { formatStudyName } from '@common/src/pdfHelpers'
 
 export default function Dashboard() {
   const studyId = useCurrentStudyId()
@@ -110,7 +110,7 @@ export default function Dashboard() {
       const now = new Date()
       const formattedDatetime = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}`
 
-      const formattedStudyName = formatStudyFileName(studyName)
+      const formattedStudyName = formatStudyName(studyName)
 
       // Trigger download
       const link = document.createElement('a')
