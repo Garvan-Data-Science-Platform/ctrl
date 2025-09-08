@@ -107,10 +107,8 @@ The database is also accessible using `psql` ([a terminal-based frontend to Post
 
 Another tool to help with development and debugging is inspired by the `rails c` command from ruby on rails.
 
-In the `application/backend` directory, run:
-
 ```bash
-yarn console
+yarn workspace backend console
 ```
 
 This command will opens a [REPL](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop) with the Prisma ORM client loaded.
