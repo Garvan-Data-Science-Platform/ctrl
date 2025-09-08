@@ -108,14 +108,16 @@ const FormatResponseElement = (element: SurveyElement) => {
 }
 
 interface ResponsesPdfProps {
+  studyName: string
   profile: GetParticipantProfileResponse
   responses: GetResponsesByIdResponse
 }
 
 // Create a PDF document component
-const ResponsesPdf = ({ profile, responses }: ResponsesPdfProps) => (
+const ResponsesPdf = ({ studyName, profile, responses }: ResponsesPdfProps) => (
   <Document>
     <Page size="A4" style={styles.page}>
+      <Text style={styles.title}>{studyName}</Text>
       <Text style={styles.title}>
         Responses for {profile.data.firstName} {profile.data.lastName}
       </Text>
