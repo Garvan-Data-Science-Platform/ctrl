@@ -23,7 +23,6 @@ import type {
   UploadRedcapInstrumentResponse,
   UploadRedcapInstrumentAPIRequest,
   UploadRedcapParticipantResponse,
-  UploadRedcapParticipantAPIRequest,
 } from 'common/types/api/integrations/redcap'
 import { BadGatewayError, UnauthorizedError, UnprocessableError } from '../middlewares/ErrorHandler'
 import {
