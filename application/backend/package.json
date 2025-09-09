@@ -13,7 +13,8 @@
     "prisma:generate": "yarn prisma generate",
     "prisma:seed": "yarn prisma db seed",
     "prisma:wipe": "yarn ts-node -T scripts/runWipeDB.ts",
-    "prisma:migrate": "yarn prisma migrate dev"
+    "prisma:migrate": "yarn prisma migrate dev",
+    "console": "ts-node -T -r ./prisma/console.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed/seed.ts"
