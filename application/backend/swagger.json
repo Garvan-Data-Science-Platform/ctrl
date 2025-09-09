@@ -2599,20 +2599,6 @@
         "type": "object",
         "additionalProperties": false
       },
-      "UploadRedcapParticipantAPIRequest": {
-        "description": "This is the name of the redcap instrument you are importing from.\nNOTE: These 'forms' are not the form label values that are seen on the webpages,\nbut instead they are the unique form names seen in Column B of the data dictionary.",
-        "properties": {
-          "formName": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "required": [
-          "formName"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
       "UploadRedcapInstrumentResponse": {
         "properties": {
           "id": {
@@ -7503,17 +7489,7 @@
               "type": "number"
             }
           }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UploadRedcapParticipantAPIRequest"
-              }
-            }
-          }
-        }
+        ]
       }
     },
     "/studies/{studyId}/integrations/redcap/instrument/upload/csv": {

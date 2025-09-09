@@ -82,9 +82,7 @@ export class IntegrationsController extends Controller {
   @SuccessResponse('201', 'Created Participants from REDCap API')
   public async uploadRedcapParticipantAPI(
     @Path() studyId: number,
-    @Body() bodyRequest: UploadRedcapParticipantAPIRequest,
   ): Promise<UploadRedcapParticipantResponse> {
-    const { formName } = bodyRequest
     const params = new URLSearchParams()
 
     const redcapSettings = await prisma.organisation.findFirstOrThrow({
@@ -99,18 +97,11 @@ export class IntegrationsController extends Controller {
     params.append('token', redcapSettings.redcapToken)
     params.append('content', 'record')
     params.append('format', 'json')
+
     /**
      * flat - output as one record per row [default]
      */
     params.append('type', 'flat')
-
-    /**
-     * an array of form names you wish to pull records for.
-     * If the form name has a space in it, replace the space
-     * with an underscore
-     * (by default, all records from all data collection instruments is pulled)
-     */
-    params.append('form[0]', formName)
 
     const participantData = await fetch(redcapSettings.redcapURL, {
       method: 'POST',
