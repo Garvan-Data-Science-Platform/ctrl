@@ -134,7 +134,7 @@ describe('SurveysController', () => {
         where: { userId: PARTICIPANT_COMPLETED_ID },
       })
       expect(aLog.resource).toBe('studies/survey-answers')
-      expect(aLog.operation).toBe('UPDATE')
+      expect(aLog.operation).toBe('CREATE')
       expect(JSON.parse(aLog.requestBody as string)).toStrictEqual(reqBody)
     })
 
