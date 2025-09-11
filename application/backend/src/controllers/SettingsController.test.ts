@@ -36,8 +36,8 @@ describe('SettingsController', () => {
     mailerUser: 'eduardo.boyer@ethereal.email',
     redcapToken: 'ABC',
     redcapURL: 'http://redcaptest.com',
-    primaryColour: null,
-    secondaryColour: null,
+    primaryColour: 'red',
+    secondaryColour: 'red',
     tcLink: 'https://garvan-data-science-platform.github.io/ctrl-docs/docs/terms-and-conditions',
   }
 
@@ -86,7 +86,7 @@ describe('SettingsController', () => {
       const response = await request(app).get(`/settings/theme`)
 
       expect(response.status).toBe(200)
-      expect(response.body.data).toEqual({ primaryColour: null, secondaryColour: null })
+      expect(response.body.data).toEqual({ primaryColour: 'red', secondaryColour: 'red' })
     })
   })
 
