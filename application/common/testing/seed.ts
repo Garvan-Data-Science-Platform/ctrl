@@ -34,6 +34,8 @@ export async function seedTests(prisma: PrismaClient) {
       mailerUser: 'eduardo.boyer@ethereal.email',
       redcapToken: 'ABC',
       redcapURL: 'http://redcaptest.com',
+      primaryColour: 'red',
+      secondaryColour: 'red',
     },
   })
 
@@ -64,7 +66,7 @@ export async function seedTests(prisma: PrismaClient) {
       id: 3,
     },
   })
-  
+
   //Sets auto-increment counter
   await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"Study"', 'id'), 4, false) FROM "Study";`
 
