@@ -20,10 +20,19 @@ import {
   gridFilterActiveItemsSelector,
   gridColumnVisibilityModelSelector,
 } from '@mui/x-data-grid'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { List } from '@refinedev/mui'
 import { styled } from '@mui/material/styles'
-import { Badge, Divider, InputAdornment, TextField, Tooltip } from '@mui/material'
+import {
+  Badge,
+  Box,
+  Checkbox,
+  Divider,
+  FormControlLabel,
+  InputAdornment,
+  TextField,
+  Tooltip,
+} from '@mui/material'
 import { Cancel, FileDownload } from '@mui/icons-material'
 import { ParticipantData } from '@common/types/api/surveys/getAllResponses'
 import { useCurrentStudyId } from '../../studyStore'
@@ -34,6 +43,8 @@ export const AllResponsesView = () => {
   const { id } = useParsed()
 
   const studyId = useCurrentStudyId()
+
+  const [showSensitive, setShowSensitive] = useState(false)
 
   const { data } = useCustom<GetAllResponsesResponse>({
     url: `studies/${studyId}/surveys/${id}/participants/answers`,
@@ -62,35 +73,46 @@ export const AllResponsesView = () => {
   }
 
   const inviteCols: GridColDef[] = useMemo(
-    () => [
-      {
-        field: 'profile',
-        headerName: 'Participant',
-        minWidth: 200,
-        valueGetter: (val: ParticipantData['profile']) =>
-          `${val.firstName} ${val.lastName} (${new Date(val.dob).toLocaleDateString()})`,
-      },
-      {
-        field: 'family',
-        headerName: 'Family Id',
-        minWidth: 100,
-        valueGetter: (val, row) => `${row.profile.familyId}`,
-      },
-      {
-        field: 'versionId',
-        headerName: 'Survey Version',
-        minWidth: 100,
-      },
-      ...(questions || []).map((val, idx) => {
-        return {
-          field: `answers[${idx}]`,
-          headerName: val,
-          minWidth: 200,
-          valueGetter: (val, row) => formatAnswer(row.answers.flatMap((v: any) => v.answers)[idx]),
-          //formatAnswer(val.flatMap((v: any) => v.answers)[idx]),
-        } as GridColDef
-      }),
-    ],
+    () =>
+      (showSensitive
+        ? [
+            {
+              field: 'profile',
+              headerName: 'Participant',
+              minWidth: 200,
+              valueGetter: (val: ParticipantData['profile']) =>
+                `${val.firstName} ${val.lastName} (${new Date(val.dob).toLocaleDateString()})`,
+            } as GridColDef,
+          ]
+        : []
+      ).concat([
+        {
+          field: 'participantId',
+          headerName: 'ParticipantId',
+          minWidth: 120,
+        },
+        {
+          field: 'family',
+          headerName: 'Family Id',
+          minWidth: 100,
+          valueGetter: (val: any, row: any) => `${row.profile.familyId}`,
+        },
+        {
+          field: 'versionId',
+          headerName: 'Survey Version',
+          minWidth: 100,
+        },
+        ...(questions || []).map((val, idx) => {
+          return {
+            field: `answers[${idx}]`,
+            headerName: val,
+            minWidth: 200,
+            valueGetter: (val, row) =>
+              formatAnswer(row.answers.flatMap((v: any) => v.answers)[idx]),
+            //formatAnswer(val.flatMap((v: any) => v.answers)[idx]),
+          } as GridColDef
+        }),
+      ]),
     [questions],
   )
 
@@ -226,16 +248,26 @@ export const AllResponsesView = () => {
   return (
     <List title={`Responses: Survey Version ${id}`} breadcrumb={false}>
       {questions && (
-        <DataGrid
-          getRowId={(row) => `${row.profile.firstName}${row.profile.lastName}${row.profile.dob}`}
-          sortingMode="client"
-          initialState={{ sorting: { sortModel: [{ field: 'family', sort: 'asc' }] } }}
-          rows={rows}
-          columns={inviteCols}
-          showToolbar
-          slots={{ toolbar: CustomToolbar }}
-          autoHeight
-        />
+        <Box>
+          <FormControlLabel
+            sx={{ mt: -2, mb: 1 }}
+            control={
+              <Checkbox checked={showSensitive} onChange={() => setShowSensitive(!showSensitive)} />
+            }
+            label="Display sensitive data"
+            data-cy="display-sensitive"
+          />
+          <DataGrid
+            getRowId={(row) => `${row.profile.firstName}${row.profile.lastName}${row.profile.dob}`}
+            sortingMode="client"
+            initialState={{ sorting: { sortModel: [{ field: 'family', sort: 'asc' }] } }}
+            rows={rows}
+            columns={inviteCols}
+            showToolbar
+            slots={{ toolbar: CustomToolbar }}
+            autoHeight
+          />
+        </Box>
       )}
     </List>
   )

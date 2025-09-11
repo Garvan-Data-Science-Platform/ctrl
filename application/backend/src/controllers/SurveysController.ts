@@ -258,12 +258,12 @@ export class SurveysController extends Controller {
     @Path() versionNumber: number,
     @Path() studyId: number,
   ): Promise<GetAllResponsesResponse> {
-    const study_participants = (
-      await prisma.studyParticipant.findMany({
-        where: { studyId },
-        select: { participantProfileId: true },
-      })
-    ).map((val) => val.participantProfileId)
+    const participant_list = await prisma.studyParticipant.findMany({
+      where: { studyId },
+      select: { participantProfileId: true, participantId: true },
+    })
+
+    const participant_profiles = participant_list.map((val) => val.participantProfileId)
 
     const participants = await this.svaRepo.findMany({
       where: {
@@ -271,14 +271,23 @@ export class SurveysController extends Controller {
           studyId: studyId,
           versionNumber: versionNumber,
         },
-        profileId: { in: study_participants },
+        profileId: { in: participant_profiles },
       },
       select: {
         answers: true,
         versionId: true,
-        profile: { select: { firstName: true, lastName: true, dob: true, familyId: true } },
+        profile: {
+          select: { firstName: true, lastName: true, dob: true, familyId: true, id: true },
+        },
       },
     })
+
+    const participantsCombined = participants.map((p) => ({
+      ...p,
+      participantId:
+        participant_list.find((val) => val.participantProfileId == p.profile.id)?.participantId ||
+        'ERROR',
+    }))
 
     const survey = await this.surveyRepo.findUniqueOrThrow({
       where: {
@@ -290,7 +299,7 @@ export class SurveysController extends Controller {
       select: { data: true },
     })
 
-    return { data: { surveyData: survey.data, participants } }
+    return { data: { surveyData: survey.data, participants: participantsCombined } }
   }
 
   /**

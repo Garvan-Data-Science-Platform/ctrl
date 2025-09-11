@@ -360,6 +360,7 @@ const models: TsoaRoute.Models = {
             "profile": {"dataType":"nestedObjectLiteral","nestedProperties":{"familyId":{"dataType":"double","required":true},"dob":{"dataType":"datetime","required":true},"lastName":{"dataType":"string","required":true},"firstName":{"dataType":"string","required":true}},"required":true},
             "answers": {"dataType":"array","array":{"dataType":"refObject","ref":"UserSurveyStepState"},"required":true},
             "versionId": {"dataType":"double","required":true},
+            "participantId": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },

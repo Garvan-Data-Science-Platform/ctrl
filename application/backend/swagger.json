@@ -872,12 +872,16 @@
           "versionId": {
             "type": "number",
             "format": "double"
+          },
+          "participantId": {
+            "type": "string"
           }
         },
         "required": [
           "profile",
           "answers",
-          "versionId"
+          "versionId",
+          "participantId"
         ],
         "type": "object",
         "additionalProperties": false

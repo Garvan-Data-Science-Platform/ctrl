@@ -4,6 +4,7 @@ export interface ParticipantData {
   profile: { firstName: string; lastName: string; dob: Date; familyId: number }
   answers: UserSurveyStepState[]
   versionId: number
+  participantId: string
 }
 
 export interface GetAllResponsesResponse {
