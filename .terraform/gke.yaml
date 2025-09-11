@@ -1,0 +1,30 @@
+demoMode:
+  enabled: true
+
+ingress:
+  enabled: true
+  className: 'gce'
+  annotations:
+    kubernetes.io/ingress.class: 'gce'
+    kubernetes.io/ingress.global-static-ip-name: gke-ingress-ip
+    networking.gke.io/managed-certificates: ctrl-managed-cert
+    networking.gke.io/ssl-redirect: 'true'
+  hosts:
+    userClient:
+      host: ctrl.dsp.garvan.org.au
+    adminClient:
+      host: admin.ctrl.dsp.garvan.org.au
+
+userClient:
+  hostname: ctrl.dsp.garvan.org.au
+  image:
+    tag: 'dev'
+
+adminClient:
+  hostname: admin.ctrl.dsp.garvan.org.au
+  image:
+    tag: 'dev'
+
+backend:
+  image:
+    tag: 'dev'
