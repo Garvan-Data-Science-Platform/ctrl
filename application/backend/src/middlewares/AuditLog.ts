@@ -21,7 +21,7 @@ export async function auditLog(req: Request, res: Response, next: NextFunction) 
         operation = 'DELETE'
         break
       case 'POST':
-        operation = 'UPDATE'
+        operation = 'CREATE'
         break
       case 'PUT':
         operation = 'CREATE'
