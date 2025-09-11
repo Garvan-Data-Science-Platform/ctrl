@@ -4,12 +4,12 @@ import { Box, Table, TableBody, TableCell, TableRow, Typography } from '@mui/mat
 import { useCurrentStudyId } from '../../studyStore'
 
 export const ResponsesView = () => {
-  const { id } = useParsed()
+  const { params } = useParsed()
 
   const studyId = useCurrentStudyId()
 
   const { data } = useCustom<GetResponsesByIdResponse>({
-    url: `studies/${studyId}/surveys/current/participants/${id}/answers`,
+    url: `studies/${studyId}/surveys/${params?.versionNumber}/participants/${params?.id}/answers`,
     method: 'get',
   })
 

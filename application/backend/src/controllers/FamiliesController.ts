@@ -293,7 +293,7 @@ export class FamiliesController extends Controller {
         status: 'PUBLISHED',
         studyId: studyId,
       },
-      orderBy: { id: 'desc' },
+      orderBy: { versionNumber: 'desc' },
     })
 
     const existingProfile = await prisma.participantProfile.findFirst({

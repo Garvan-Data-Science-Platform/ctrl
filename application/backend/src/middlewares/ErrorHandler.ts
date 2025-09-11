@@ -20,6 +20,14 @@ export class NoTokenError extends Error {
   }
 }
 
+export class UnauthorizedError extends Error {
+  constructor(message: string) {
+    super('Unauthorized')
+    this.name = 'Unauthorized'
+    this.message = message
+  }
+}
+
 export class NotFoundError extends Error {
   message: string
   details: unknown
@@ -117,7 +125,8 @@ export function ErrorHandler(
     err instanceof TokenExpiredError ||
     err instanceof JsonWebTokenError ||
     err instanceof InvalidCredentialsError ||
-    err instanceof IncorrectPermissionsError
+    err instanceof IncorrectPermissionsError ||
+    err instanceof UnauthorizedError
   ) {
     const errorResponse: UnauthorizedErrorResponse = {
       message: err.message,
