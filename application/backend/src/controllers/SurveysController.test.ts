@@ -134,8 +134,8 @@ describe('SurveysController', () => {
         where: { userId: PARTICIPANT_COMPLETED_ID },
       })
       expect(aLog.resource).toBe('studies/survey-answers')
-      expect(aLog.operation).toBe('UPDATE')
-      expect((aLog.meta as any).bodyData).toStrictEqual(reqBody)
+      expect(aLog.operation).toBe('CREATE')
+      expect(JSON.parse(aLog.requestBody as string)).toStrictEqual(reqBody)
     })
 
     it('should change status from requires_review after submission', async () => {
@@ -243,7 +243,7 @@ describe('SurveysController', () => {
       })
       expect(aLog.resource).toBe('studies/surveys')
       expect(aLog.operation).toBe('UPDATE')
-      expect((aLog.meta as any).bodyData).toStrictEqual(reqBody)
+      expect(JSON.parse(aLog.requestBody as string)).toStrictEqual(reqBody)
       expect((aLog.meta as any).resourceId).toBe('1,2')
     })
 

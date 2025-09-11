@@ -52,7 +52,7 @@ describe('Soft Deletion', () => {
       where: { userId: PARTICIPANT_UNANSWERED_ID },
     })
     expect(aLog.resource).toBe('studies/survey-answers')
-    expect(aLog.operation).toBe('UPDATE')
+    expect(aLog.operation).toBe('CREATE')
   })
 
   it('User can be restored', async () => {
@@ -83,8 +83,8 @@ describe('Soft Deletion', () => {
   it('Audit log of associated draft survey remains', async () => {
     const aLog = await prisma.auditLog.findFirstOrThrow({ where: { userId: ORG_ADMIN_ID } })
     expect(aLog.resource).toBe('studies')
-    expect(aLog.operation).toBe('UPDATE')
-    expect((aLog.meta as any).bodyData.name).toBe(`${STUDY_NAME}`)
+    expect(aLog.operation).toBe('CREATE')
+    expect(JSON.parse(aLog.requestBody as any).name).toBe(`${STUDY_NAME}`)
   })
 
   it('Study can be restored', async () => {
