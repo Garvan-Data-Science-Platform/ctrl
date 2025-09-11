@@ -62,7 +62,7 @@ describe('FamiliesController', () => {
 
       //No conflict when another family is added
       const newProf = await prisma.participantProfile.create({
-        data: { ...profile, id: undefined, familyId: undefined },
+        data: { ...profile, individualId: undefined, id: undefined, familyId: undefined },
       })
       expect(newProf.familyId).toBe(102)
     })

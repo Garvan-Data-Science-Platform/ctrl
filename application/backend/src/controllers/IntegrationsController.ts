@@ -34,6 +34,7 @@ import { FileUploadError } from '../middlewares/ErrorHandler'
 import logger from 'common/src/logger'
 import { AuthController } from './AuthController'
 import { auditLog } from '../middlewares/AuditLog'
+import { genId, genIndId } from '../utils/genId'
 
 @Route('studies/{studyId}/integrations')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
@@ -251,6 +252,8 @@ export class IntegrationsController extends Controller {
                 : undefined,
             },
           })
+          await genIndId(participantProfile.id)
+          await genId(studyId, participantProfile.id)
           ids.push(participantProfile.id)
           profilesCreatedCount++
         } else {
