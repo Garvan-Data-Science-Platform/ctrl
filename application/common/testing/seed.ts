@@ -36,6 +36,8 @@ export async function seedTests(prisma: PrismaClient) {
       mailerUser: 'eduardo.boyer@ethereal.email',
       redcapToken: 'ABC',
       redcapURL: 'http://redcaptest.com',
+      primaryColour: 'red',
+      secondaryColour: 'red',
     },
   })
 

@@ -26,7 +26,7 @@ function App() {
       setTheme(
         customTheme({
           primary: primary ? standardize_color(primary) : '#2196f3',
-          secondary: secondary ? res.data.data.secondaryColour(secondary) : '#2196f3',
+          secondary: secondary ? standardize_color(secondary) : '#2196f3',
         }),
       )
     })
