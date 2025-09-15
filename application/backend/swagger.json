@@ -2516,15 +2516,13 @@
       },
       "GetElsaTokenResponse": {
         "properties": {
-          "enabled": {
-            "type": "boolean"
-          },
           "token": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           }
         },
         "required": [
-          "enabled"
+          "token"
         ],
         "type": "object",
         "additionalProperties": false

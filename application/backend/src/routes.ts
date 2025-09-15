@@ -872,8 +872,7 @@ const models: TsoaRoute.Models = {
     "GetElsaTokenResponse": {
         "dataType": "refObject",
         "properties": {
-            "enabled": {"dataType":"boolean","required":true},
-            "token": {"dataType":"string"},
+            "token": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},
         },
         "additionalProperties": false,
     },

@@ -1,4 +1,3 @@
 export interface GetElsaTokenResponse {
-  enabled: boolean
-  token?: string
+  token: string | null
 }

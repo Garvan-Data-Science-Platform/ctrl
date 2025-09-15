@@ -30,7 +30,7 @@ export const IntegrationsHome = () => {
     method: 'get',
   })
 
-  const enabled = data?.data.enabled || false
+  const enabled = Boolean(data?.data.token)
 
   const handleCheckboxChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const checked = event.target.checked

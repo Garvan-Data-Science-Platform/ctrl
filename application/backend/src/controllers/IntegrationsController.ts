@@ -289,11 +289,7 @@ export class IntegrationsController extends Controller {
   @Security('jwt', ['OrganisationAdmin'])
   public async elsa(): Promise<GetElsaTokenResponse> {
     const token = (await prisma.organisation.findFirstOrThrow({})).elsaToken
-    const res = { enabled: Boolean(token) } as GetElsaTokenResponse
-    if (token) {
-      res['token'] = token
-    }
-    return res
+    return { token }
   }
 
   private async calcDuos(ans: SurveyVersionAnswers) {
