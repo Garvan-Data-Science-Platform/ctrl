@@ -1,4 +1,0 @@
-.terraform
-*.tfstate*
-dev.yaml
-gke.yaml
