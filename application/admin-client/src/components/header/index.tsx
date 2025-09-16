@@ -34,11 +34,11 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({ sticky = tru
           spacing={2}
         >
           <HamburgerMenu />
-          {['settings', 'users', 'studies'].includes(resource?.name) ? (
+          {['settings', 'users', 'studies'].includes(resource?.name || '') ? (
             <Button
               color="inherit"
               sx={{ ml: 2, textTransform: 'none' }}
-              component={Link}
+              component={Link as any}
               to="/studies"
               data-cy="manage-studies"
             >
