@@ -82,7 +82,7 @@ export function SurveyElementCard({
       <Box>
         <DUOModal
           open={duoOpen}
-          answers={'choices' in data ? data.choices : ['True', 'False']}
+          answers={'choices' in data ? data.choices : [true, false]}
           questionText={data.text}
           onClose={() => {
             setDuoOpen(false)

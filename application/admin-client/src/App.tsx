@@ -195,7 +195,7 @@ function App() {
                       <Route path="redcap/participant/import" element={<ParticipantImport />} />
                     </Route>
                     <Route path="/responses/all/:id" index element={<AllResponsesView />} />
-                    <Route path="/responses/:id" index element={<ResponsesView />} />
+                    <Route path="/responses/:versionNumber/:id" index element={<ResponsesView />} />
                     <Route path="/settings" index element={<SettingsPage />} />
                     <Route path="/studies" index element={<StudiesPage />} />
                     <Route path="*" element={<ErrorComponent />} />

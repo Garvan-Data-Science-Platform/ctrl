@@ -17,7 +17,10 @@ export const ParticipantShow = () => {
 
   const renderAnswers = (answers: ParticipantAnswerStatus[]) => {
     return answers.map((val) => (
-      <Link key={val.participantId} to={`/responses/${val.participantId}`}>
+      <Link
+        key={val.participantId}
+        to={`/responses/${val.participantId}/${val.surveyVersionNumber}`}
+      >
         <Tooltip title={statusMap[val.status].tooltip}>
           <Button sx={{ color: statusMap[val.status].color }}>V{val.surveyVersionNumber}</Button>
         </Tooltip>

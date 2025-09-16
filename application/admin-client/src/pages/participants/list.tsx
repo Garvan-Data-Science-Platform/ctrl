@@ -146,9 +146,9 @@ export const ParticipantList = () => {
     closeInviteActionMenu()
   }
 
-  const renderAnswer = (answer: ParticipantAnswerStatus) => {
+  const renderAnswer = (profileId: number, answer: ParticipantAnswerStatus) => {
     return (
-      <Link key={answer.participantId} to={`/responses/${answer.participantId}`}>
+      <Link key={answer.participantId} to={`/responses/${profileId}/${answer.surveyVersionNumber}`}>
         <Tooltip title={statusMap[answer.status].tooltip}>
           <Button sx={{ color: statusMap[answer.status].color }}>
             V{answer.surveyVersionNumber}
@@ -187,7 +187,7 @@ export const ParticipantList = () => {
         field: 'answers',
         headerName: 'Latest Answers',
         minWidth: 250,
-        renderCell: ({ value }) => renderAnswer(value.at(-1)),
+        renderCell: ({ value, row }) => renderAnswer(row.id, value.at(-1)),
         sortable: false,
         disableColumnMenu: true,
       },

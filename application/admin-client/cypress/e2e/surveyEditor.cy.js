@@ -101,26 +101,26 @@ describe('Survey Editor', () => {
     cy.get('[data-cy="duo-results"] li').should('have.length', 4).first().click()
     cy.get('[data-cy="confirm-duo"]').should('be.disabled')
     cy.get('[data-cy="duo-answer"]').click()
-    cy.contains('False').click()
+    cy.contains('false').click()
     cy.get('[data-cy="confirm-duo"]').should('be.enabled').click()
     cy.contains('no restriction').should('exist')
 
     //Remove DUO Code
 
-    cy.get('[data-cy="duo-chip"] svg').click()
     cy.contains('no restriction').should('not.exist')
     cy.get('[data-cy="advanced-toggle"]').eq(0).click()
-
     cy.get('[data-cy="advanced-toggle"]').eq(1).click()
+    cy.get('[data-cy="duo-chip"] svg').eq(3).click()
+    cy.get('[data-cy="duo-chip"] svg').eq(3).click()
     cy.get('[data-cy="add-duo"]').eq(1).click()
     cy.get('[data-cy="duo-results"] li').first().click()
     cy.get('[data-cy="confirm-duo"]').should('be.disabled')
     cy.get('[data-cy="duo-answer"]').click()
     cy.contains('Choice 1').click()
     cy.get('[data-cy="confirm-duo"]').should('be.enabled').click()
-    cy.contains('population origins').should('exist')
+    cy.contains('no restriction').should('exist')
     //Editing choice will remove the duo code
     cy.get('[data-cy="choice-text"]').first().type('B')
-    cy.contains('population origins').should('not.exist')
+    cy.contains('no restriction').should('not.exist')
   })
 })

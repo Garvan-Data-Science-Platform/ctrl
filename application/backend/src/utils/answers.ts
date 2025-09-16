@@ -148,7 +148,7 @@ export async function recalculateAnswers(familyId: number, studyId: number) {
 
   const latestSurveyVersionAnswers = await prisma.surveyVersionAnswers.findFirstOrThrow({
     where: { profileId: guardians[0].id, version: { studyId } },
-    orderBy: { versionId: 'desc' },
+    orderBy: { version: { versionNumber: 'desc' } },
   })
 
   if (guardians.length == 1) {

@@ -105,7 +105,7 @@ describe('Survey tests', () => {
     expect(data.data[1].last_updated).toBeUndefined()
 
     const res3 = await request(app)
-      .get('/studies/1/surveys/current/participants/1/answers') //All the seed ParticipantProfiles have ids like 98,99
+      .get('/studies/1/surveys/1/participants/1/answers') //All the seed ParticipantProfiles have ids like 98,99
       .set({ authorization: `Bearer ${adminToken}` })
     expect(res3.statusCode).toBe(200)
 
@@ -174,7 +174,7 @@ describe('Survey tests', () => {
     expect(data.data[1].last_updated).toBeUndefined()
 
     const res3 = await request(app)
-      .get('/studies/1/surveys/current/participants/99/answers')
+      .get('/studies/1/surveys/2/participants/99/answers')
       .set({ authorization: `Bearer ${adminToken}` })
     expect(res3.statusCode).toBe(200)
 

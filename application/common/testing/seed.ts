@@ -38,6 +38,7 @@ export async function seedTests(prisma: PrismaClient) {
       redcapURL: 'http://redcaptest.com',
       primaryColour: 'red',
       secondaryColour: 'red',
+      elsaToken: 'abc123',
     },
   })
 
@@ -179,6 +180,7 @@ export async function seedTests(prisma: PrismaClient) {
       suburb: 'M',
       studies: {
         create: {
+          participantId: `PID-TEST1-${PARTICIPANT_UNANSWERED_ID}`,
           study: {
             connect: {
               id: testStudy.id,
@@ -214,6 +216,7 @@ export async function seedTests(prisma: PrismaClient) {
       suburb: 'Melbourne',
       studies: {
         create: {
+          participantId: `PID-TEST1-${PARTICIPANT_COMPLETED_ID}`,
           study: {
             connect: {
               id: testStudy.id,
@@ -242,6 +245,7 @@ export async function seedTests(prisma: PrismaClient) {
       suburb: 'Melbourne',
       studies: {
         create: {
+          participantId: `PID-TEST1-${DEPENDENT_ID}`,
           study: {
             connect: {
               id: testStudy.id,
@@ -270,6 +274,7 @@ export async function seedTests(prisma: PrismaClient) {
       suburb: 'Melbourne',
       studies: {
         create: {
+          participantId: `PID-TEST1-${SECOND_GUARDIAN_ID}`,
           study: {
             connect: {
               id: testStudy.id,
@@ -465,7 +470,15 @@ export async function seedTests(prisma: PrismaClient) {
         {
           title: 'Frontend study step',
           text: '',
-          elements: [{ type: 'question-checkbox', data: { text: 'Hello' } }],
+          elements: [
+            {
+              type: 'question-checkbox',
+              data: {
+                text: 'Hello',
+                duoCodes: [{ code: 'DUO:0000004', relatedAnswer: true }],
+              },
+            },
+          ],
         },
       ] as SurveyStep[],
       studyId: frontendTestStudy.id,
@@ -479,6 +492,7 @@ export async function seedTests(prisma: PrismaClient) {
     data: {
       studies: {
         create: {
+          participantId: `PID-TEST2-${PARTICIPANT_UNANSWERED_ID}`,
           study: {
             connect: {
               id: frontendTestStudy.id,

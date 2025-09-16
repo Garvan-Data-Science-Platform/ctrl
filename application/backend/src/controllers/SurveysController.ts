@@ -140,7 +140,7 @@ export class SurveysController extends Controller {
           studyId: studyId,
         },
       },
-      orderBy: { versionId: 'desc' },
+      orderBy: { version: { versionNumber: 'desc' } },
     })
 
     const surveyVersionId = surveyVersionAnswers.versionId
@@ -183,7 +183,7 @@ export class SurveysController extends Controller {
           studyId: studyId,
         },
       },
-      orderBy: { versionId: 'desc' },
+      orderBy: { version: { versionNumber: 'desc' } },
     })
 
     const surveyVersionId = surveyVersionAnswers.versionId
@@ -227,7 +227,7 @@ export class SurveysController extends Controller {
           studyId: studyId,
         },
       },
-      orderBy: { versionId: 'desc' },
+      orderBy: { version: { versionNumber: 'desc' } },
     })
 
     const survey = await this.surveyRepo.findUniqueOrThrow({
@@ -305,23 +305,24 @@ export class SurveysController extends Controller {
   /**
    * Get responses
    *
-   * @summary Get current answers for a survey participant
+   * @summary Get answers for a survey participant by version number
    */
-  @Get('/surveys/current/participants/{participantId}/answers')
+  @Get('/surveys/{versionNumber}/participants/{profileId}/answers')
   @Response('404', 'Not Found')
   @Security('jwt', ['OrganisationAdmin'])
   public async getResponsesById(
-    @Path() participantId: number,
     @Path() studyId: number,
+    @Path() versionNumber: number,
+    @Path() profileId: number,
   ): Promise<GetResponsesByIdResponse> {
     const surveyVersionAnswers = await this.svaRepo.findFirstOrThrow({
       where: {
-        profileId: participantId,
+        profileId,
         version: {
-          studyId: studyId,
+          studyId,
+          versionNumber,
         },
       },
-      orderBy: { versionId: 'desc' },
     })
 
     const survey = await this.surveyRepo.findUniqueOrThrow({
@@ -377,7 +378,7 @@ export class SurveysController extends Controller {
           studyId: studyId,
         },
       },
-      orderBy: { versionId: 'desc' },
+      orderBy: { version: { versionNumber: 'desc' } },
     })
 
     const survey = await this.surveyRepo.findUniqueOrThrow({
@@ -631,7 +632,7 @@ export class SurveysController extends Controller {
             studyId: studyId,
           },
         },
-        orderBy: { versionId: 'desc' },
+        orderBy: { version: { versionNumber: 'desc' } },
         select: { answers: true, version: { select: { createdAt: true, id: true } } },
       })
 

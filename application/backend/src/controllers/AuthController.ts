@@ -584,7 +584,7 @@ export class AuthController extends Controller {
         status: 'PUBLISHED',
         studyId: studyId,
       },
-      orderBy: { id: 'desc' },
+      orderBy: { versionNumber: 'desc' },
     })
 
     // Create profiles for dependents if no existing family ID

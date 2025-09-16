@@ -121,6 +121,7 @@ model Organisation {
   secondaryColour String?
   redcapURL       String?
   redcapToken     String?
+  elsaToken       String?
   logo            Bytes?
   tcLink          String  @default("https://garvan-data-science-platform.github.io/ctrl-docs/docs/terms-and-conditions")
   users           User[]
