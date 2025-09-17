@@ -64,6 +64,17 @@ export const StudyLoader: React.FC<PropsWithChildren> = ({ children }) => {
     activeStudyIndex < studies.length &&
     studies[activeStudyIndex]
 
+  if (studies && studies.length < 1) {
+    return (
+      <>
+        <NavBar disabled />
+        <Container>
+          <Typography sx={{ mt: 5 }}>You are no longer participating in any studies.</Typography>
+        </Container>
+      </>
+    )
+  }
+
   return hasValidActiveStudy ? (
     children
   ) : (
