@@ -1,5 +1,5 @@
 import './App.css'
-import { Theme, ThemeProvider } from '@mui/material'
+import { Box, Theme, ThemeProvider, Typography } from '@mui/material'
 import customTheme from './theme'
 
 import { RouterProvider } from 'react-router-dom'
@@ -34,13 +34,29 @@ function App() {
 
   return (
     theme && (
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <ThemeProvider theme={theme}>
-            <RouterProvider router={router} />
-          </ThemeProvider>
-        </AuthProvider>
-      </QueryClientProvider>
+      <Box sx={{ minHeight: '98vh', display: 'flex', flexDirection: 'column' }}>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <ThemeProvider theme={theme}>
+              <RouterProvider router={router} />
+            </ThemeProvider>
+          </AuthProvider>
+        </QueryClientProvider>
+        <Box sx={{ flex: '1 0 auto' }} />
+        <footer
+          style={{
+            bottom: 0,
+            left: 0,
+            padding: 24,
+            width: '100%',
+            textAlign: 'center',
+          }}
+        >
+          <Typography variant="body2">
+            {import.meta.env['VITE_APP_VERSION']} © 2025 Garvan Institute of Medical Research
+          </Typography>
+        </footer>
+      </Box>
     )
   )
 }

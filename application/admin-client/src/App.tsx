@@ -40,197 +40,217 @@ import { StudyLoader } from './components/StudyLoader'
 import StudiesPage from './pages/studies'
 import { Callback } from './pages/login/callback'
 import OTP from './pages/login/OTP'
+import { Box, Typography } from '@mui/material'
 
 function App() {
   return (
-    <BrowserRouter>
-      <RefineKbarProvider>
-        <ColorModeContextProvider>
-          <CssBaseline />
-          <GlobalStyles styles={{ html: { WebkitFontSmoothing: 'auto' } }} />
-          <RefineSnackbarProvider>
-            <DevtoolsProvider>
-              <Refine
-                dataProvider={dataProvider()}
-                notificationProvider={notificationProvider}
-                routerProvider={routerBindings}
-                authProvider={authProvider}
-                resources={[
-                  {
-                    name: 'users',
-                    list: '/users',
-                    create: '/users/create',
-                    edit: '/users/update/:id',
-                    show: '/users/:id',
-                    meta: {
-                      label: 'Admin Users',
-                      canDelete: true,
-                      icon: <Person />,
+    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <BrowserRouter>
+        <RefineKbarProvider>
+          <ColorModeContextProvider>
+            <CssBaseline />
+            <GlobalStyles styles={{ html: { WebkitFontSmoothing: 'auto' } }} />
+            <RefineSnackbarProvider>
+              <DevtoolsProvider>
+                <Refine
+                  dataProvider={dataProvider()}
+                  notificationProvider={notificationProvider}
+                  routerProvider={routerBindings}
+                  authProvider={authProvider}
+                  resources={[
+                    {
+                      name: 'users',
+                      list: '/users',
+                      create: '/users/create',
+                      edit: '/users/update/:id',
+                      show: '/users/:id',
+                      meta: {
+                        label: 'Admin Users',
+                        canDelete: true,
+                        icon: <Person />,
+                      },
                     },
-                  },
-                  {
-                    name: 'users/admin',
-                  },
-                  {
-                    name: 'surveys',
-                    list: '/surveys',
-                    edit: '/surveys/edit/:id',
-                    show: '/surveys/:id',
-                    meta: {
-                      canDelete: true,
-                      icon: <ListAlt />,
+                    {
+                      name: 'users/admin',
                     },
-                  },
-                  {
-                    name: 'participants',
-                    list: '/participants',
-                    edit: '/participants/edit/:id',
-                    show: '/participants/:id',
-                    meta: {
-                      canDelete: true,
-                      icon: <RecentActors />,
+                    {
+                      name: 'surveys',
+                      list: '/surveys',
+                      edit: '/surveys/edit/:id',
+                      show: '/surveys/:id',
+                      meta: {
+                        canDelete: true,
+                        icon: <ListAlt />,
+                      },
                     },
-                  },
-                  {
-                    name: 'integrations',
-                    list: '/integrations',
-                    meta: {
-                      label: 'Integrations',
-                      icon: <DatasetLinked />,
-                      canDelete: true,
+                    {
+                      name: 'participants',
+                      list: '/participants',
+                      edit: '/participants/edit/:id',
+                      show: '/participants/:id',
+                      meta: {
+                        canDelete: true,
+                        icon: <RecentActors />,
+                      },
                     },
-                  },
-                  {
-                    name: 'surveys/responses',
-                    show: '/responses/:id',
-                    meta: {
-                      canDelete: true,
+                    {
+                      name: 'integrations',
+                      list: '/integrations',
+                      meta: {
+                        label: 'Integrations',
+                        icon: <DatasetLinked />,
+                        canDelete: true,
+                      },
                     },
-                  },
-                  {
-                    name: 'surveys/responses/all',
-                    show: '/responses/all/:id',
-                    meta: {
-                      canDelete: true,
+                    {
+                      name: 'surveys/responses',
+                      show: '/responses/:id',
+                      meta: {
+                        canDelete: true,
+                      },
                     },
-                  },
-                  {
-                    name: 'invites',
-                  },
-                  {
-                    name: 'families',
-                  },
-                  { name: 'studies', edit: '/studies' },
-                  {
-                    name: 'settings',
-                    list: '/settings',
-                    edit: '/settings',
-                    meta: {
-                      icon: <Settings />,
+                    {
+                      name: 'surveys/responses/all',
+                      show: '/responses/all/:id',
+                      meta: {
+                        canDelete: true,
+                      },
                     },
-                  },
-                ]}
-                options={{
-                  syncWithLocation: true,
-                  warnWhenUnsavedChanges: false,
-                  useNewQueryKeys: true,
-                  projectId: 'UqrerM-EBDoyv-UEni4Y',
-                  reactQuery: {
-                    clientConfig: {
-                      defaultOptions: {
-                        queries: {
-                          retry: (failureCount: number, error: any) => {
-                            if (error.status == 401) {
-                              return false
-                            }
-                            return failureCount < 3
+                    {
+                      name: 'invites',
+                    },
+                    {
+                      name: 'families',
+                    },
+                    {
+                      name: 'settings',
+                      list: '/settings',
+                      edit: '/settings',
+                      meta: {
+                        icon: <Settings />,
+                      },
+                    },
+                  ]}
+                  options={{
+                    syncWithLocation: true,
+                    warnWhenUnsavedChanges: false,
+                    useNewQueryKeys: true,
+                    projectId: 'UqrerM-EBDoyv-UEni4Y',
+                    reactQuery: {
+                      clientConfig: {
+                        defaultOptions: {
+                          queries: {
+                            retry: (failureCount: number, error: any) => {
+                              if (error.status == 401) {
+                                return false
+                              }
+                              return failureCount < 3
+                            },
                           },
                         },
                       },
                     },
-                  },
-                }}
-              >
-                <Routes>
-                  <Route
-                    element={
-                      <Authenticated
-                        key="authenticated-inner"
-                        fallback={<CatchAllNavigate to="/login" />}
-                      >
-                        <StudyLoader>
-                          <ThemedLayoutV2
-                            Header={Header}
-                            Title={({ collapsed }) => (
-                              <ThemedTitleV2 collapsed={collapsed} text="CTRL Admin Portal" />
-                            )}
-                          >
-                            <Outlet />
-                          </ThemedLayoutV2>
-                        </StudyLoader>
-                      </Authenticated>
+                  }}
+                >
+                  <Routes>
+                    <Route
+                      element={
+                        <Authenticated
+                          key="authenticated-inner"
+                          fallback={<CatchAllNavigate to="/login" />}
+                        >
+                          <StudyLoader>
+                            <ThemedLayoutV2
+                              Header={Header}
+                              Title={({ collapsed }) => (
+                                <ThemedTitleV2 collapsed={collapsed} text="CTRL Admin Portal" />
+                              )}
+                            >
+                              <Outlet />
+                            </ThemedLayoutV2>
+                          </StudyLoader>
+                        </Authenticated>
+                      }
+                    >
+                      <Route index element={<NavigateToResource resource="users" />} />
+
+                      <Route path="/users">
+                        <Route index element={<UserList />} />
+                        <Route path="create" element={<UserCreate />} />
+                        <Route path="update/:id" element={<UserEdit />} />
+                        <Route path=":id" element={<UserShow />} />
+                      </Route>
+                      <Route path="/surveys">
+                        <Route index element={<SurveyList />} />
+                        <Route path="edit/:id" element={<SurveyEditor />} />
+                        <Route path=":id" element={<SurveyEditor />} />
+                      </Route>
+                      <Route path="/participants">
+                        <Route index element={<ParticipantList />} />
+                        <Route path="edit/:id" element={<ParticipantEdit />} />
+                        <Route path="family/edit/:id" element={<FamilyEdit />} />
+                        <Route path=":id" element={<ParticipantShow />} />
+                      </Route>
+                      <Route path="/integrations">
+                        <Route index element={<IntegrationsHome />} />
+                        <Route path="redcap/survey/import" element={<SurveyImport />} />
+                        <Route path="redcap/participant/import" element={<ParticipantImport />} />
+                      </Route>
+                      <Route path="/responses/all/:id" index element={<AllResponsesView />} />
+                      <Route
+                        path="/responses/:versionNumber/:id"
+                        index
+                        element={<ResponsesView />}
+                      />
+                      <Route path="/settings" index element={<SettingsPage />} />
+                      <Route path="/studies" index element={<StudiesPage />} />
+                      <Route path="*" element={<ErrorComponent />} />
+                    </Route>
+
+                    <Route
+                      element={
+                        <Authenticated key="authenticated-outer" fallback={<Outlet />}>
+                          <NavigateToResource />
+                        </Authenticated>
+                      }
+                    >
+                      <Route path="/login/otp" element={<OTP />} />
+                      <Route path="/login/callback" element={<Callback />} />
+                      <Route path="/login" element={<Login />} />
+                      <Route path="/setup" element={<SetupPage />} />
+                      <Route path="/forgot-password" element={<ForgotPassword />} />
+                    </Route>
+                  </Routes>
+
+                  <RefineKbar />
+                  <UnsavedChangesNotifier />
+                  <DocumentTitleHandler
+                    handler={({ resource }) =>
+                      resource ? `${resource.meta?.label} | CTRL Admin Portal` : 'CTRL Admin Portal'
                     }
-                  >
-                    <Route index element={<NavigateToResource resource="users" />} />
-
-                    <Route path="/users">
-                      <Route index element={<UserList />} />
-                      <Route path="create" element={<UserCreate />} />
-                      <Route path="update/:id" element={<UserEdit />} />
-                      <Route path=":id" element={<UserShow />} />
-                    </Route>
-                    <Route path="/surveys">
-                      <Route index element={<SurveyList />} />
-                      <Route path="edit/:id" element={<SurveyEditor />} />
-                      <Route path=":id" element={<SurveyEditor />} />
-                    </Route>
-                    <Route path="/participants">
-                      <Route index element={<ParticipantList />} />
-                      <Route path="edit/:id" element={<ParticipantEdit />} />
-                      <Route path="family/edit/:id" element={<FamilyEdit />} />
-                      <Route path=":id" element={<ParticipantShow />} />
-                    </Route>
-                    <Route path="/integrations">
-                      <Route index element={<IntegrationsHome />} />
-                      <Route path="redcap/survey/import" element={<SurveyImport />} />
-                      <Route path="redcap/participant/import" element={<ParticipantImport />} />
-                    </Route>
-                    <Route path="/responses/all/:id" index element={<AllResponsesView />} />
-                    <Route path="/responses/:versionNumber/:id" index element={<ResponsesView />} />
-                    <Route path="/settings" index element={<SettingsPage />} />
-                    <Route path="/studies" index element={<StudiesPage />} />
-                    <Route path="*" element={<ErrorComponent />} />
-                  </Route>
-
-                  <Route
-                    element={
-                      <Authenticated key="authenticated-outer" fallback={<Outlet />}>
-                        <NavigateToResource />
-                      </Authenticated>
-                    }
-                  >
-                    <Route path="/login/otp" element={<OTP />} />
-                    <Route path="/login/callback" element={<Callback />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/setup" element={<SetupPage />} />
-                    <Route path="/forgot-password" element={<ForgotPassword />} />
-                  </Route>
-                </Routes>
-
-                <RefineKbar />
-                <UnsavedChangesNotifier />
-                <DocumentTitleHandler
-                  handler={({ resource }) =>
-                    resource ? `${resource.meta?.label} | CTRL Admin Portal` : 'CTRL Admin Portal'
-                  }
-                />
-              </Refine>
-              <DevtoolsPanel />
-            </DevtoolsProvider>
-          </RefineSnackbarProvider>
-        </ColorModeContextProvider>
-      </RefineKbarProvider>
-    </BrowserRouter>
+                  />
+                </Refine>
+                <DevtoolsPanel />
+              </DevtoolsProvider>
+            </RefineSnackbarProvider>
+          </ColorModeContextProvider>
+        </RefineKbarProvider>
+      </BrowserRouter>
+      <Box sx={{ flex: '1 0 auto' }} />
+      <footer
+        style={{
+          bottom: 0,
+          left: 0,
+          padding: 24,
+          width: '100%',
+          textAlign: 'center',
+        }}
+      >
+        <Typography variant="body2">
+          {import.meta.env['VITE_APP_VERSION']} © 2025 Garvan Institute of Medical Research
+        </Typography>
+      </footer>
+    </Box>
   )
 }
 
