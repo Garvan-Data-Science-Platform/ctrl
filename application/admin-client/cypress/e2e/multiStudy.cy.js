@@ -18,10 +18,9 @@ describe('Multi-study features', () => {
     cy.get('[data-cy="study-create"]').click()
     cy.get('[data-cy="study-name"] input').should('be.focused').type('TEST')
     cy.get('[data-cy="study-create"]').click()
-    cy.visit('/')
+    cy.visit('/surveys')
     //List of surveys
     changeStudy('Test Study')
-    cy.visit('/surveys')
     cy.get('[role="rowgroup"]').children().should('have.length', 2)
     changeStudy('Study 2')
     cy.get('[role="rowgroup"]').children().should('have.length', 1)
@@ -47,10 +46,10 @@ describe('Multi-study features', () => {
   })
 
   it('Maintains active study between browsing sessions', () => {
-    cy.visit('/')
+    cy.visit('/surveys')
     cy.get('[data-cy="study-dropdown"]').should('have.text', 'Test Study')
     changeStudy('Study 2')
-    cy.visit('/')
+    cy.visit('/surveys')
     cy.get('[data-cy="study-dropdown"]').should('have.text', 'Study 2')
   })
 })
