@@ -21,7 +21,7 @@ function standardize_color(str: string) {
   return ctx.fillStyle
 }
 
-export const useAppStore = create<AppState>((set, get, store) => ({
+export const useAppStore = create<AppState>((set, _, store) => ({
   primaryColour: null,
   secondaryColour: null,
   contactMessageText: '',

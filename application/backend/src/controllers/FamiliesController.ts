@@ -23,7 +23,7 @@ import { FamilyMember } from 'common/types/api/users/getParticipantProfile'
 import { auditLog } from '../middlewares/AuditLog'
 import { ParticipantType } from '@prisma/client'
 import { createDefaultAnswers, recalculateAnswers } from '../utils/answers'
-import { genId } from '../utils/genId'
+import { genId, genIndId } from '../utils/genId'
 import { UnprocessableError } from '../middlewares/ErrorHandler'
 
 @Route('studies/{studyId}/families')
@@ -293,7 +293,7 @@ export class FamiliesController extends Controller {
         status: 'PUBLISHED',
         studyId: studyId,
       },
-      orderBy: { id: 'desc' },
+      orderBy: { versionNumber: 'desc' },
     })
 
     const existingProfile = await prisma.participantProfile.findFirst({
@@ -318,6 +318,7 @@ export class FamiliesController extends Controller {
     const depProfile = await prisma.participantProfile.create({
       data: {
         ...existingProfile,
+        individualId: undefined,
         userId: null, // Null userId for dependents
         firstName: bodyRequest.firstName,
         lastName: bodyRequest.lastName,
@@ -336,6 +337,7 @@ export class FamiliesController extends Controller {
       },
     })
 
+    await genIndId(depProfile.id)
     await genId(studyId, depProfile.id)
 
     await prisma.surveyVersionAnswers.create({

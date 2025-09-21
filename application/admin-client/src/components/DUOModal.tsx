@@ -28,9 +28,9 @@ export interface DUOEntry {
 interface DUOModalProps {
   open: boolean
   onClose: () => void
-  onConfirm: (duo: DUOEntry, relatedAnswer: string) => void
+  onConfirm: (duo: DUOEntry, relatedAnswer: string | boolean) => void
   questionText: string
-  answers: string[]
+  answers: (string | boolean)[]
 }
 
 const duoEntries = duoJson as DUOEntry[]
@@ -38,7 +38,7 @@ const duoEntries = duoJson as DUOEntry[]
 export function DUOModal({ open, onClose, onConfirm, answers, questionText }: DUOModalProps) {
   const [search, setSearch] = useState('')
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null)
-  const [selectedAnswer, setSelectedAnswer] = useState<string>('')
+  const [selectedAnswer, setSelectedAnswer] = useState<string | boolean>('')
 
   // Filtered results
   const filtered = useMemo(() => {
@@ -146,8 +146,8 @@ export function DUOModal({ open, onClose, onConfirm, answers, questionText }: DU
               Select answer
             </MenuItem>
             {answers.map((ans) => (
-              <MenuItem key={ans} value={ans}>
-                {ans}
+              <MenuItem key={`item_${ans}`} value={ans as any}>
+                {String(ans)}
               </MenuItem>
             ))}
           </Select>
@@ -158,9 +158,9 @@ export function DUOModal({ open, onClose, onConfirm, answers, questionText }: DU
           </Button>
           <Button
             variant="contained"
-            disabled={selectedIdx === null || !selectedAnswer}
+            disabled={selectedIdx === null || selectedAnswer === ''}
             onClick={() => {
-              if (selectedIdx !== null && selectedAnswer) {
+              if (selectedIdx !== null && selectedAnswer !== '') {
                 onConfirm(filtered[selectedIdx], selectedAnswer)
               }
             }}

@@ -8,6 +8,9 @@
   - [API Documentation](#api-documentation)
     - [Swagger](#swagger)
     - [Editing Swagger Documentation](#editing-swagger-documentation)
+  - [Tools to help with development](#dev-tools)
+    - [Adminer](#adminer)
+    - [Node REPL](#repl)
 
 ## Welcome
 
@@ -53,9 +56,12 @@ To access the Swagger UI documentation, follow these steps:
 1. Start the Server: Ensure your development server is running.
 
 ```bash
-yarn run dev
-# or
-make docker-run
+yarn dev
+```
+To seed the database with data for development and demonstrations, run the following in a new terminal window:
+
+```bash
+make seed
 ```
 
 _**NOTE**: If you want to run the server using Yarn, you should also setup the postgres database container using, `make db`._
@@ -86,3 +92,31 @@ This project uses [tsoa](https://tsoa-community.github.io/docs/) to automaticall
    ```
 
 3. **Test the Documentation:** Restart your server and check the Swagger UI to ensure the documentation displays correctly and the new endpoints are accessible.
+
+## Tools to help with development
+
+### Adminer
+
+Running `yarn dev` also spins up a docker container with a browser-based user interface to the database.
+This tool is called [Adminer](https://www.adminer.org/) and is served at `localhost:8080`.
+Credentials for logging in are found in the `application/backend/.env` file.
+
+The database is also accessible using `psql` ([a terminal-based frontend to PostgreSQL](https://www.postgresql.org/docs/current/app-psql.html)).
+
+### Yarn console
+
+Another tool to help with development and debugging is inspired by the `rails c` command from ruby on rails.
+
+```bash
+yarn workspace backend console
+```
+
+This command will opens a [REPL](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop) with the Prisma ORM client loaded.
+You can run Prisma queries from the application in the REPL.
+This makes it easy to interactively explore the results of Prisma queries.
+
+For example:
+
+```javascript
+await prisma.participantProfile.findUniqueOrThrow({ where: { id: 1 } })
+```

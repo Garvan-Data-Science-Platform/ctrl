@@ -7,17 +7,25 @@ beforeEach(() => {
 const { UserType } = require('../support/commands')
 const downloadsPath = 'cypress/downloads/'
 
-// TODO: Add multistudy pdf tests
-const studyId = 1
+// TODO: Add logo tests
+
+// Note: the tests below make heavy use of environment variables
+//   specified in `application/user-client/cypress.config.ts`.
+//   These env vars pull in variables specified in the test seed data
+//   (`application/common/testing/seed.ts`)
+const studyName = Cypress.env('TEST_STUDY')
+const studyId = Cypress.env('TEST_STUDY_ID')
+const feStudyName = Cypress.env('FE_TEST_STUDY')
+const feStudyId = Cypress.env('FE_TEST_STUDY_ID')
 
 describe('viewPdf', () => {
-  // Function to:
-  //  - click 'View responses' button,
-  //  - access latest downloaded PDF that matches specific Regex
-  //    - (note 'Test User' and date format assumptions)
-  //  - parse PDF
-  //  - check contents include specific text_string parameter.
-  function assertPdfContains(text_string) {
+  function assertPdfContains(studyId, text_string) {
+    // Function to:
+    //  - click 'View responses' button,
+    //  - access latest downloaded PDF that matches specific Regex
+    //  - parse PDF
+    //  - check contents include specific text_string parameter.
+    //  - deletes downloaded file
     cy.intercept('GET', `/studies/${studyId}/survey-answers`).as('requestPdf')
     cy.get('[data-cy="view-pdf"]').click()
     cy.wait('@requestPdf')
@@ -42,13 +50,40 @@ describe('viewPdf', () => {
     })
   }
 
+  function assertPdfFilenameContains(studyId, filename_string) {
+    // Function to:
+    //  - click 'View responses' button,
+    //  - access latest downloaded PDF that matches specific Regex
+    //  - check filename includes specific filename_string parameter.
+    //  - deletes downloaded file
+    cy.intercept('GET', `/studies/${studyId}/survey-answers`).as('requestPdf')
+    cy.get('[data-cy="view-pdf"]').click()
+    cy.wait('@requestPdf')
+    cy.wait(500)
+    cy.task('readDir', 'cypress/downloads')
+      .then((files) => {
+        const regex = /^CTRL-responses-.*_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}\.pdf$/
+        const pdfFiles = files.filter((file) => regex.test(file))
+
+        return cy.task('getLatestFile', pdfFiles)
+      })
+      .then((latestFile) => {
+        cy.wrap(`cypress/downloads/${latestFile}`).as('pdfFile')
+      })
+    cy.get('@pdfFile').then((pdfFile) => {
+      expect(pdfFile).to.include(filename_string)
+      // Delete PDF
+      cy.task('deleteFile', pdfFile)
+    })
+  }
+
   it('If unanswered, PDF shows "not answered"', () => {
     cy.login(UserType.PARTICIPANT_UNANSWERED)
     cy.visit('/')
     cy.contains('Intro').should('exist')
     // Check UI to ensure it matches expectations
     cy.get('[data-cy="step-card-0"]').contains('Requires Review').should('exist')
-    assertPdfContains('Question 1 Not answered')
+    assertPdfContains(studyId, 'Question 1 Not answered')
   })
 
   it('If answered, PDF shows correct answer', () => {
@@ -57,7 +92,7 @@ describe('viewPdf', () => {
     cy.contains('Intro').should('exist')
     // Check UI to ensure it matches expectations
     cy.get('[data-cy="step-card-0"]').contains('Reviewed').should('exist')
-    assertPdfContains('Question 1 No')
+    assertPdfContains(studyId, 'Question 1 No')
   })
 
   it('checks answers, changes them and checks updated answers are updated in PDF', () => {
@@ -66,7 +101,7 @@ describe('viewPdf', () => {
     cy.contains('Intro').should('exist')
     // Check UI to ensure it matches expectations
     cy.get('[data-cy="step-card-0"]').contains('Reviewed').should('exist')
-    assertPdfContains('Question 2 Choice 2')
+    assertPdfContains(studyId, 'Question 2 Choice 2')
 
     // Change response from above test
     cy.get('[data-cy="step-button-1"]').click()
@@ -75,7 +110,7 @@ describe('viewPdf', () => {
     cy.get('input[type="radio"]').eq(0).should('be.checked')
     cy.contains('Save').click()
     cy.get('[data-cy="proceed-button"]').click()
-    assertPdfContains('Question 2 Choice 1')
+    assertPdfContains(studyId, 'Question 2 Choice 1')
 
     // Change response back to original
     // This updates the reviewed date to be later that in the seed data
@@ -103,4 +138,44 @@ describe('viewPdf', () => {
     // Assert that the error message is displayed
     cy.contains('Error Creating PDF').should('be.visible')
   })
+
+  it('PDF text contains study name', () => {
+    cy.login(UserType.PARTICIPANT_COMPLETED)
+    cy.visit('/')
+    cy.contains('Intro').should('exist')
+    // Check UI to ensure it matches expectations
+    cy.get('[data-cy="step-card-0"]').contains('Reviewed').should('exist')
+    assertPdfContains(studyId, studyName)
+
+    // changing study results in different study name
+    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.visit('/')
+    cy.get('[data-cy="change-study"]').click()
+    cy.contains('Study FE').click()
+    cy.contains('Frontend study step').should('exist')
+    assertPdfContains(feStudyId, feStudyName)
+  })
+
+  it('PDF file name contains study name', () => {
+    cy.login(UserType.PARTICIPANT_COMPLETED)
+    cy.visit('/')
+    cy.contains('Intro').should('exist')
+    // Check UI to ensure it matches expectations
+    cy.get('[data-cy="step-card-0"]').contains('Reviewed').should('exist')
+    cy.task('formatStudyName', studyName).then((formattedStudyName) => {
+      assertPdfFilenameContains(studyId, formattedStudyName)
+    })
+
+    // changing study results in different study file name
+    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.visit('/')
+    cy.get('[data-cy="change-study"]').click()
+    cy.contains('Study FE').click()
+    cy.contains('Frontend study step').should('exist')
+    cy.task('formatStudyName', feStudyName).then((formattedStudyName) => {
+      assertPdfFilenameContains(feStudyId, formattedStudyName)
+    })
+  })
+
+  // PDF contains logo, doesn't contain logo, and contains correct logo when study is changed
 })

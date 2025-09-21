@@ -93,7 +93,7 @@ export class ParticipantsController extends Controller {
           version: { select: { versionNumber: true, updatedAt: true } },
           id: true,
         },
-        orderBy: { versionId: 'asc' },
+        orderBy: { version: { versionNumber: 'asc' } },
       })
       const lastUpdated = Math.max(
         ...(p_answers.map((val) => determineLastUpdated(val.answers)) as unknown as number[]),
@@ -156,7 +156,7 @@ export class ParticipantsController extends Controller {
         version: { select: { versionNumber: true, updatedAt: true } },
         id: true,
       },
-      orderBy: { versionId: 'asc' },
+      orderBy: { version: { versionNumber: 'asc' } },
     })
 
     const sp = await prisma.studyParticipant.findFirstOrThrow({
@@ -174,7 +174,7 @@ export class ParticipantsController extends Controller {
         familyId: profile.familyId,
         answers: p_answers.map((val) => ({
           surveyVersionNumber: val.version.versionNumber,
-          participantId: val.id,
+          participantId: profileData.id,
           status: determineStatus(val.answers, new Date(val.version.updatedAt)),
         })),
       },
@@ -238,7 +238,7 @@ export class ParticipantsController extends Controller {
         status: 'PUBLISHED',
         studyId,
       },
-      orderBy: { id: 'desc' },
+      orderBy: { versionNumber: 'desc' },
     })
 
     if (!currentSurvey) {
@@ -450,7 +450,7 @@ export class InvitesController extends Controller {
         status: 'PUBLISHED',
         studyId: invite.studyId,
       },
-      orderBy: { id: 'desc' },
+      orderBy: { versionNumber: 'desc' },
     })
 
     await this.profileRepo.update({
@@ -543,7 +543,7 @@ export class InvitesController extends Controller {
         status: 'PUBLISHED',
         studyId: studyId,
       },
-      orderBy: { id: 'desc' },
+      orderBy: { versionNumber: 'desc' },
     })
 
     if (!currentSurvey) {

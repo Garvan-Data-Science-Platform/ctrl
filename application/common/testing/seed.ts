@@ -15,9 +15,11 @@ export const SECOND_GUARDIAN_ID = 102
 export const PASSWORD_RESET_USER_ID = 105
 export const PASSWORD_RESET_USER_EMAIL = 'test-reset-password@example.com'
 export const TEST_STUDY = 'Test Study'
+export const TEST_STUDY_ID = 1
 export const SECOND_TEST_STUDY = 'Study 2'
 export const SECOND_TEST_STUDY_ID = 2
 export const FE_TEST_STUDY = 'Study FE'
+export const FE_TEST_STUDY_ID = 3
 export const EMPTY_TEST_STUDY = 'Empty Study'
 
 export async function seedTests(prisma: PrismaClient) {
@@ -34,6 +36,9 @@ export async function seedTests(prisma: PrismaClient) {
       mailerUser: 'eduardo.boyer@ethereal.email',
       redcapToken: 'ABC',
       redcapURL: 'http://redcaptest.com',
+      primaryColour: 'red',
+      secondaryColour: 'red',
+      elsaToken: 'abc123',
     },
   })
 
@@ -44,7 +49,7 @@ export async function seedTests(prisma: PrismaClient) {
   const testStudy = await prisma.study.create({
     data: {
       name: TEST_STUDY,
-      id: 1,
+      id: TEST_STUDY_ID,
     },
   })
 
@@ -61,10 +66,10 @@ export async function seedTests(prisma: PrismaClient) {
   const frontendTestStudy = await prisma.study.create({
     data: {
       name: FE_TEST_STUDY,
-      id: 3,
+      id: FE_TEST_STUDY_ID,
     },
   })
-  
+
   //Sets auto-increment counter
   await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"Study"', 'id'), 4, false) FROM "Study";`
 
@@ -175,6 +180,7 @@ export async function seedTests(prisma: PrismaClient) {
       suburb: 'M',
       studies: {
         create: {
+          participantId: `PID-TEST1-${PARTICIPANT_UNANSWERED_ID}`,
           study: {
             connect: {
               id: testStudy.id,
@@ -210,6 +216,7 @@ export async function seedTests(prisma: PrismaClient) {
       suburb: 'Melbourne',
       studies: {
         create: {
+          participantId: `PID-TEST1-${PARTICIPANT_COMPLETED_ID}`,
           study: {
             connect: {
               id: testStudy.id,
@@ -238,6 +245,7 @@ export async function seedTests(prisma: PrismaClient) {
       suburb: 'Melbourne',
       studies: {
         create: {
+          participantId: `PID-TEST1-${DEPENDENT_ID}`,
           study: {
             connect: {
               id: testStudy.id,
@@ -266,6 +274,7 @@ export async function seedTests(prisma: PrismaClient) {
       suburb: 'Melbourne',
       studies: {
         create: {
+          participantId: `PID-TEST1-${SECOND_GUARDIAN_ID}`,
           study: {
             connect: {
               id: testStudy.id,
@@ -461,7 +470,15 @@ export async function seedTests(prisma: PrismaClient) {
         {
           title: 'Frontend study step',
           text: '',
-          elements: [{ type: 'question-checkbox', data: { text: 'Hello' } }],
+          elements: [
+            {
+              type: 'question-checkbox',
+              data: {
+                text: 'Hello',
+                duoCodes: [{ code: 'DUO:0000004', relatedAnswer: true }],
+              },
+            },
+          ],
         },
       ] as SurveyStep[],
       studyId: frontendTestStudy.id,
@@ -475,6 +492,7 @@ export async function seedTests(prisma: PrismaClient) {
     data: {
       studies: {
         create: {
+          participantId: `PID-TEST2-${PARTICIPANT_UNANSWERED_ID}`,
           study: {
             connect: {
               id: frontendTestStudy.id,

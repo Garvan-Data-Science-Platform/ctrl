@@ -3,9 +3,14 @@ import { resetDB } from 'common/testing/TestHelpers'
 import { Api } from '../Api'
 import { generateToken } from '../authentication'
 import prisma from '../PrismaClient'
-import { PARTICIPANT_COMPLETED_ID } from 'common/testing/seed'
+import {
+  FE_TEST_STUDY_ID,
+  PARTICIPANT_COMPLETED_ID,
+  PARTICIPANT_UNANSWERED_ID,
+} from 'common/testing/seed'
 import { redcapFetch } from '../../tests/__mocks__/RedcapFetch'
 import path from 'path'
+import { SurveysController } from './SurveysController'
 
 const api = new Api()
 const app = api.app
@@ -334,6 +339,98 @@ describe('IntegrationsController', () => {
         .set({ Authorization: `Bearer ${token}` })
 
       expect(response.status).toBe(502)
+    })
+  })
+
+  describe('POST /elsa/duos', () => {
+    /*
+    Relevant seed data
+    Study 1 survey
+    Q1
+      { "code": "DUO:0000001", "relatedAnswer": true },
+      { "code": "DUO:0000002", "relatedAnswer": false }
+
+    Q2
+      { "code": "DUO:0000003", "relatedAnswer": "Choice 1" }
+
+    PARTICIPANT_COMPLETED
+      answers: [false, 'Choice 2'],
+    
+    PARTICIPANT_UNANSWERED
+      answers: [null, null]
+    */
+
+    it('Returns 401 for missing or incorrect API Key', async () => {
+      const res1 = await request(app).post('/elsa/duos')
+      expect(res1.status).toBe(422)
+      const res2 = await request(app)
+        .post('/elsa/duos')
+        .send({ participantIds: [] })
+        .set({ Authorization: 'Apikey 123' })
+      expect(res2.status).toBe(401)
+    })
+
+    it('Returns list of Not Found ParticipantIds', async () => {
+      const res = await request(app)
+        .post('/elsa/duos')
+        .set({ Authorization: 'Apikey abc123' })
+        .send({ participantIds: [`PID-TEST1-${PARTICIPANT_COMPLETED_ID}`, 'dummy'] })
+      expect(res.body.notFoundIds).toEqual(['dummy'])
+    })
+
+    it('Returns correct DUO code for participant who has answered', async () => {
+      const res = await request(app)
+        .post('/elsa/duos')
+        .set({ Authorization: 'Apikey abc123' })
+        .send({
+          participantIds: [
+            `PID-TEST1-${PARTICIPANT_COMPLETED_ID}`,
+            `PID-TEST1-${PARTICIPANT_UNANSWERED_ID}`,
+          ],
+        })
+
+      //Correct when two duos apply to same question
+      //Does not return code for question with wrong answer (Choice 2)
+      expect(res.body.data[0].duos).toEqual(['DUO:0000002'])
+      expect(res.body.data).toHaveLength(2)
+    })
+
+    it('null does not count as false', async () => {
+      const res = await request(app)
+        .post('/elsa/duos')
+        .set({ Authorization: 'Apikey abc123' })
+        .send({ participantIds: [`PID-TEST1-${PARTICIPANT_UNANSWERED_ID}`] })
+      expect(res.body.data[0].duos).toEqual([])
+    })
+
+    it('DUO codes work with multi studies', async () => {
+      const sva = await prisma.surveyVersionAnswers.findFirstOrThrow({
+        where: {
+          version: { studyId: FE_TEST_STUDY_ID },
+          profileId: PARTICIPANT_UNANSWERED_ID,
+        },
+        orderBy: { version: { versionNumber: 'desc' } },
+      })
+      await prisma.surveyVersionAnswers.update({
+        where: { id: sva.id },
+        data: { answers: [{ status: 'review_required', answers: [true] }] },
+      })
+
+      const res = await request(app)
+        .post('/elsa/duos')
+        .set({ Authorization: 'Apikey abc123' })
+        .send({ participantIds: [`PID-TEST2-${PARTICIPANT_UNANSWERED_ID}`] })
+      expect(res.body.data[0].duos).toEqual(['DUO:0000004'])
+    })
+
+    it('DUO code is maintained when a new version is published and answer is carried over', async () => {
+      await new SurveysController().publishSurvey(1, 2)
+
+      const res = await request(app)
+        .post('/elsa/duos')
+        .set({ Authorization: 'Apikey abc123' })
+        .send({ participantIds: [`PID-TEST1-${PARTICIPANT_COMPLETED_ID}`] })
+      expect(res.body.data[0].duos).toEqual(['DUO:0000002'])
     })
   })
 })

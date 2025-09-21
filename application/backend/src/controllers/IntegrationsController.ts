@@ -10,6 +10,10 @@ import {
   Body,
   UploadedFile,
   Middlewares,
+  Header,
+  NoSecurity,
+  Get,
+  Example,
 } from 'tsoa'
 import { Integrations } from '../../../integrations/src/Integrations'
 import prisma from '../PrismaClient'
@@ -21,26 +25,34 @@ import type {
   UploadRedcapParticipantResponse,
   UploadRedcapParticipantAPIRequest,
 } from 'common/types/api/integrations/redcap'
-import { BadGatewayError, UnprocessableError } from '../middlewares/ErrorHandler'
+import { BadGatewayError, UnauthorizedError, UnprocessableError } from '../middlewares/ErrorHandler'
 import {
   UnauthorizedErrorResponse,
   InternalErrorResponse,
   UnprocessableErrorResponse,
 } from 'common/types/api/errors'
-import { SurveyStep } from 'common/types/survey'
+import { GetElsaTokenResponse } from 'common/types/api/integrations/getElsaToken'
+import { SurveyQuestionCheckbox, SurveyQuestionChoices, SurveyStep } from 'common/types/survey'
 import REDCapMapping from '../../../integrations/src/REDCapMapping.json'
 import { parseCSV, validateFile } from '../utils/parseCsv'
 import { FileUploadError } from '../middlewares/ErrorHandler'
 import logger from 'common/src/logger'
 import { AuthController } from './AuthController'
 import { auditLog } from '../middlewares/AuditLog'
+import { genId, genIndId } from '../utils/genId'
+import { SurveyVersionAnswers } from '@prisma/client'
+import { randomBytes } from 'crypto'
 
-@Route('studies/{studyId}/integrations')
+interface ElsaDuosResponse {
+  data: { participantId: string; duos: string[] }[]
+  notFoundIds: string[]
+}
+
+@Route('/')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 @Response<UnprocessableErrorResponse>('422', 'Unprocessable Content')
 @Tags('Integrations')
-@Security('jwt', ['OrganisationAdmin'])
 @Middlewares(auditLog)
 export class IntegrationsController extends Controller {
   userRepo = prisma.user
@@ -49,7 +61,8 @@ export class IntegrationsController extends Controller {
   svaRepo = prisma.surveyVersionAnswers
   integrationService = new Integrations(REDCapMapping)
 
-  @Post('/redcap/participant/upload/csv')
+  @Post('studies/{studyId}/integrations/redcap/participant/upload/csv')
+  @Security('jwt', ['OrganisationAdmin'])
   @SuccessResponse('201', 'Created Participants from CSV')
   public async uploadRedcapParticipantCSV(
     @Path() studyId: number,
@@ -64,7 +77,8 @@ export class IntegrationsController extends Controller {
     return await this.processParticipantData(studyId, csvData)
   }
 
-  @Post('/redcap/participant/upload/api')
+  @Post('studies/{studyId}/integrations/redcap/participant/upload/api')
+  @Security('jwt', ['OrganisationAdmin'])
   @SuccessResponse('201', 'Created Participants from REDCap API')
   public async uploadRedcapParticipantAPI(
     @Path() studyId: number,
@@ -119,7 +133,8 @@ export class IntegrationsController extends Controller {
     return await this.processParticipantData(studyId, participantData)
   }
 
-  @Post('/redcap/instrument/upload/csv')
+  @Post('studies/{studyId}/integrations/redcap/instrument/upload/csv')
+  @Security('jwt', ['OrganisationAdmin'])
   @SuccessResponse('201', 'Upserted Survey from Instrument CSV')
   public async uploadRedcapInstrumentCSV(
     @Path() studyId: number,
@@ -139,7 +154,8 @@ export class IntegrationsController extends Controller {
     return await this.processInstrumentData(studyId, csvData, false)
   }
 
-  @Post('/redcap/instrument/upload/api')
+  @Post('studies/{studyId}/integrations/redcap/instrument/upload/api')
+  @Security('jwt', ['OrganisationAdmin'])
   @SuccessResponse('201', 'Created Survey from Redcap API')
   public async uploadRedcapInstrumentAPI(
     @Path() studyId: number,
@@ -186,6 +202,112 @@ export class IntegrationsController extends Controller {
         throw new BadGatewayError(error.message, error)
       })
     return await this.processInstrumentData(studyId, surveyData, true)
+  }
+
+  /**
+   * Provide a list of ParticipantIds and get back corresponding DUO codes
+   * Requires an Elsa API key, and header "Authorization: Apikey <api-key>"
+   *
+   * @summary Get DUO codes for a list of ParticipantIds
+   *
+   * @example body {
+   * "participantIds": ["PID-TYT-00000", "PID-TYT-ABC12"]
+   * }
+   *
+   */
+  @Example<ElsaDuosResponse>({
+    data: [{ participantId: 'PID-TYT-00000', duos: ['DUO:0000004', 'DUO:0000018'] }],
+    notFoundIds: ['PID-TYT-ABC12'],
+  })
+  @Post('elsa/duos')
+  @NoSecurity()
+  public async elsaDuos(
+    @Header('Authorization') authorizationHeader: string,
+    @Body() body: { participantIds: string[] },
+  ): Promise<ElsaDuosResponse> {
+    const headerKey = authorizationHeader.split(' ').at(1)
+    const elsaKey = (await prisma.organisation.findFirstOrThrow({})).elsaToken
+    if (!elsaKey || elsaKey !== headerKey) {
+      throw new UnauthorizedError('Elsa API key is invalid or missing')
+    }
+
+    const res: ElsaDuosResponse = { data: [], notFoundIds: [] }
+
+    for (const participantId of body.participantIds) {
+      const p = await prisma.studyParticipant.findFirst({ where: { participantId } })
+      if (!p) {
+        res.notFoundIds.push(participantId)
+      } else {
+        const ans = await prisma.surveyVersionAnswers.findFirst({
+          where: { version: { studyId: p.studyId }, profileId: p.participantProfileId },
+          orderBy: { version: { versionNumber: 'desc' } },
+        })
+        if (!ans) {
+          res.data.push({ participantId, duos: [] })
+        } else {
+          const duos = await this.calcDuos(ans)
+          res.data.push({ participantId, duos })
+        }
+      }
+    }
+
+    return res
+  }
+
+  /**
+   * Enable Elsa Integration
+   *
+   * @summary Generates a new Elsa API Key, retrieve using /elsa/token
+   */
+  @Post('elsa/enable')
+  @Security('jwt', ['OrganisationAdmin'])
+  public async elsaEnable() {
+    await prisma.organisation.updateMany({
+      data: { elsaToken: `ctrl-elsa-${randomBytes(32).toString('base64')}` },
+    })
+  }
+
+  /**
+   * Disable Elsa Integration
+   *
+   * @summary Disables Elsa integration and deletes API key
+   */
+  @Post('elsa/disable')
+  @Security('jwt', ['OrganisationAdmin'])
+  public async elsaDisable() {
+    await prisma.organisation.updateMany({
+      data: { elsaToken: null },
+    })
+  }
+
+  /**
+   * Get Elsa API Key
+   *
+   * @summary Returns Elsa API key if integration is enabled
+   */
+  @Get('elsa/token')
+  @Security('jwt', ['OrganisationAdmin'])
+  public async elsa(): Promise<GetElsaTokenResponse> {
+    const token = (await prisma.organisation.findFirstOrThrow({})).elsaToken
+    return { token }
+  }
+
+  private async calcDuos(ans: SurveyVersionAnswers) {
+    const duos = []
+    const survey = await prisma.surveyVersion.findFirstOrThrow({ where: { id: ans.versionId } })
+    for (const stepIdx in survey.data) {
+      const questionData = survey.data[stepIdx].elements
+        .filter((val) => val.type == 'question-checkbox' || val.type == 'question-choices')
+        .map((val) => val.data) as (SurveyQuestionCheckbox | SurveyQuestionChoices)[]
+      for (const i in questionData) {
+        for (const duo of questionData[i].duoCodes || []) {
+          if (ans.answers[stepIdx].answers[i] === duo.relatedAnswer) {
+            duos.push(duo.code)
+          }
+        }
+      }
+    }
+    return duos
   }
 
   private async processParticipantData(studyId: number, rawData: Record<string, string>[]) {
@@ -251,6 +373,8 @@ export class IntegrationsController extends Controller {
                 : undefined,
             },
           })
+          await genIndId(participantProfile.id)
+          await genId(studyId, participantProfile.id)
           ids.push(participantProfile.id)
           profilesCreatedCount++
         } else {

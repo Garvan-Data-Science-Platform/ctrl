@@ -27,7 +27,7 @@ import type {
   UpdateSurveyRequest,
 } from 'common/types/api/surveys'
 import { SurveyVersion as SurveyVersionPrisma } from '@prisma/client'
-import { SurveyElementType, SurveyStep, SurveyStepStatus } from 'common/types/survey'
+import { SurveyStep } from 'common/types/survey'
 import prisma from '../PrismaClient'
 import '../jsontypes'
 import { validateAnswers } from 'common/src/surveys/validateSurveyAnswers'
@@ -140,7 +140,7 @@ export class SurveysController extends Controller {
           studyId: studyId,
         },
       },
-      orderBy: { versionId: 'desc' },
+      orderBy: { version: { versionNumber: 'desc' } },
     })
 
     const surveyVersionId = surveyVersionAnswers.versionId
@@ -183,7 +183,7 @@ export class SurveysController extends Controller {
           studyId: studyId,
         },
       },
-      orderBy: { versionId: 'desc' },
+      orderBy: { version: { versionNumber: 'desc' } },
     })
 
     const surveyVersionId = surveyVersionAnswers.versionId
@@ -227,7 +227,7 @@ export class SurveysController extends Controller {
           studyId: studyId,
         },
       },
-      orderBy: { versionId: 'desc' },
+      orderBy: { version: { versionNumber: 'desc' } },
     })
 
     const survey = await this.surveyRepo.findUniqueOrThrow({
@@ -258,12 +258,12 @@ export class SurveysController extends Controller {
     @Path() versionNumber: number,
     @Path() studyId: number,
   ): Promise<GetAllResponsesResponse> {
-    const study_participants = (
-      await prisma.studyParticipant.findMany({
-        where: { studyId },
-        select: { participantProfileId: true },
-      })
-    ).map((val) => val.participantProfileId)
+    const participant_list = await prisma.studyParticipant.findMany({
+      where: { studyId },
+      select: { participantProfileId: true, participantId: true },
+    })
+
+    const participant_profiles = participant_list.map((val) => val.participantProfileId)
 
     const participants = await this.svaRepo.findMany({
       where: {
@@ -271,14 +271,23 @@ export class SurveysController extends Controller {
           studyId: studyId,
           versionNumber: versionNumber,
         },
-        profileId: { in: study_participants },
+        profileId: { in: participant_profiles },
       },
       select: {
         answers: true,
         versionId: true,
-        profile: { select: { firstName: true, lastName: true, dob: true, familyId: true } },
+        profile: {
+          select: { firstName: true, lastName: true, dob: true, familyId: true, id: true },
+        },
       },
     })
+
+    const participantsCombined = participants.map((p) => ({
+      ...p,
+      participantId:
+        participant_list.find((val) => val.participantProfileId == p.profile.id)?.participantId ||
+        'ERROR',
+    }))
 
     const survey = await this.surveyRepo.findUniqueOrThrow({
       where: {
@@ -290,29 +299,30 @@ export class SurveysController extends Controller {
       select: { data: true },
     })
 
-    return { data: { surveyData: survey.data, participants } }
+    return { data: { surveyData: survey.data, participants: participantsCombined } }
   }
 
   /**
    * Get responses
    *
-   * @summary Get current answers for a survey participant
+   * @summary Get answers for a survey participant by version number
    */
-  @Get('/surveys/current/participants/{participantId}/answers')
+  @Get('/surveys/{versionNumber}/participants/{profileId}/answers')
   @Response('404', 'Not Found')
   @Security('jwt', ['OrganisationAdmin'])
   public async getResponsesById(
-    @Path() participantId: number,
     @Path() studyId: number,
+    @Path() versionNumber: number,
+    @Path() profileId: number,
   ): Promise<GetResponsesByIdResponse> {
     const surveyVersionAnswers = await this.svaRepo.findFirstOrThrow({
       where: {
-        profileId: participantId,
+        profileId,
         version: {
-          studyId: studyId,
+          studyId,
+          versionNumber,
         },
       },
-      orderBy: { versionId: 'desc' },
     })
 
     const survey = await this.surveyRepo.findUniqueOrThrow({
@@ -368,7 +378,7 @@ export class SurveysController extends Controller {
           studyId: studyId,
         },
       },
-      orderBy: { versionId: 'desc' },
+      orderBy: { version: { versionNumber: 'desc' } },
     })
 
     const survey = await this.surveyRepo.findUniqueOrThrow({
@@ -383,19 +393,12 @@ export class SurveysController extends Controller {
 
     const answers = participantAnswers.answers
 
-    type StatusMap = {
-      [key in SurveyElementType]: SurveyStepStatus
-    }
-
-    const statusMap: StatusMap = {
-      video: 'viewed',
-      subheading: 'viewed',
-      'question-checkbox': 'completed',
-      'question-choices': 'completed',
-    }
-
-    //Maps the type of the first element to the updated status
-    const status = statusMap[surveySteps[step].elements[0]?.type || 'subheading']
+    const status =
+      surveySteps[step].elements.filter((val) =>
+        ['question-checkbox', 'question-choices'].includes(val.type),
+      ).length > 0
+        ? 'completed'
+        : 'viewed'
 
     if (!validateAnswers(surveySteps[step], data)) {
       throw new ValidateError({}, 'Answers did not match survey question structure')
@@ -629,7 +632,7 @@ export class SurveysController extends Controller {
             studyId: studyId,
           },
         },
-        orderBy: { versionId: 'desc' },
+        orderBy: { version: { versionNumber: 'desc' } },
         select: { answers: true, version: { select: { createdAt: true, id: true } } },
       })
 

@@ -14,6 +14,7 @@ import {
   Select,
   TextField,
   Typography,
+  Link as MLink,
 } from '@mui/material'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { Link, useNavigate, useParams } from 'react-router-dom'
@@ -414,6 +415,18 @@ export default function Register() {
                     </Box>
                   </Box>
                 ))}
+
+                {fields.length > 0 && (
+                  <Typography variant="body2" sx={{ mt: 3 }}>
+                    Note: dependent consent is based on the consent of all guardians in the family.{' '}
+                    <MLink
+                      target="_blank"
+                      href="https://garvan-data-science-platform.github.io/ctrl-docs/docs/families"
+                    >
+                      Click here to learn more.
+                    </MLink>
+                  </Typography>
+                )}
 
                 <Button
                   sx={{ ml: 'auto', mr: 'auto', mt: 2, mb: 2 }}

@@ -872,12 +872,16 @@
           "versionId": {
             "type": "number",
             "format": "double"
+          },
+          "participantId": {
+            "type": "string"
           }
         },
         "required": [
           "profile",
           "answers",
-          "versionId"
+          "versionId",
+          "participantId"
         ],
         "type": "object",
         "additionalProperties": false
@@ -1915,6 +1919,10 @@
       "Organisation": {
         "description": "Model Organisation",
         "properties": {
+          "elsaToken": {
+            "type": "string",
+            "nullable": true
+          },
           "logo": {
             "type": "string",
             "format": "byte",
@@ -1973,6 +1981,7 @@
           }
         },
         "required": [
+          "elsaToken",
           "logo",
           "tcLink",
           "redcapURL",
@@ -2464,6 +2473,56 @@
         },
         "required": [
           "formName"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "ElsaDuosResponse": {
+        "properties": {
+          "data": {
+            "items": {
+              "properties": {
+                "duos": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "participantId": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "duos",
+                "participantId"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "notFoundIds": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data",
+          "notFoundIds"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "GetElsaTokenResponse": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "token"
         ],
         "type": "object",
         "additionalProperties": false
@@ -3521,7 +3580,7 @@
         ]
       }
     },
-    "/studies/{studyId}/surveys/current/participants/{participantId}/answers": {
+    "/studies/{studyId}/surveys/{versionNumber}/participants/{profileId}/answers": {
       "get": {
         "operationId": "GetResponsesById",
         "responses": {
@@ -3546,7 +3605,7 @@
           }
         },
         "description": "Get responses",
-        "summary": "Get current answers for a survey participant",
+        "summary": "Get answers for a survey participant by version number",
         "tags": [
           "Surveys"
         ],
@@ -3560,7 +3619,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "participantId",
+            "name": "studyId",
             "required": true,
             "schema": {
               "format": "double",
@@ -3569,7 +3628,16 @@
           },
           {
             "in": "path",
-            "name": "studyId",
+            "name": "versionNumber",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "profileId",
             "required": true,
             "schema": {
               "format": "double",
@@ -7023,6 +7091,280 @@
         }
       }
     },
+    "/elsa/duos": {
+      "post": {
+        "operationId": "ElsaDuos",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ElsaDuosResponse"
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {
+                      "data": [
+                        {
+                          "participantId": "PID-TYT-00000",
+                          "duos": [
+                            "DUO:0000004",
+                            "DUO:0000018"
+                          ]
+                        }
+                      ],
+                      "notFoundIds": [
+                        "PID-TYT-ABC12"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Provide a list of ParticipantIds and get back corresponding DUO codes\nRequires an Elsa API key, and header \"Authorization: Apikey <api-key>\"",
+        "summary": "Get DUO codes for a list of ParticipantIds",
+        "tags": [
+          "Integrations"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "participantIds": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "participantIds"
+                ],
+                "type": "object"
+              },
+              "example": {
+                "participantIds": [
+                  "PID-TYT-00000",
+                  "PID-TYT-ABC12"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/elsa/enable": {
+      "post": {
+        "operationId": "ElsaEnable",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Enable Elsa Integration",
+        "summary": "Generates a new Elsa API Key, retrieve using /elsa/token",
+        "tags": [
+          "Integrations"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": []
+      }
+    },
+    "/elsa/disable": {
+      "post": {
+        "operationId": "ElsaDisable",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Disable Elsa Integration",
+        "summary": "Disables Elsa integration and deletes API key",
+        "tags": [
+          "Integrations"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": []
+      }
+    },
+    "/elsa/token": {
+      "get": {
+        "operationId": "Elsa",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetElsaTokenResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Get Elsa API Key",
+        "summary": "Returns Elsa API key if integration is enabled",
+        "tags": [
+          "Integrations"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": []
+      }
+    },
     "/": {
       "get": {
         "operationId": "HealthCheck",
@@ -7265,7 +7607,7 @@
           }
         },
         "description": "addExistingMember",
-        "summary": "Add an existing CTRL profile as a member of a family.",
+        "summary": "Add an existing CTRL profile as a member of a family.\nNote: this endpoint assumes that initial family composition is valid. When adding non-guardians to a family there are no checks that the new family state will be valid.",
         "tags": [
           "Families"
         ],

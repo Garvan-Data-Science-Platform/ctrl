@@ -42,6 +42,7 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "ParticipantProfile" (
     "id" SERIAL NOT NULL,
+    "individualId" TEXT NOT NULL,
     "firstName" TEXT NOT NULL,
     "firstNameHash" TEXT,
     "middleName" TEXT,
@@ -97,6 +98,7 @@ CREATE TABLE "Organisation" (
     "secondaryColour" TEXT,
     "redcapURL" TEXT,
     "redcapToken" TEXT,
+    "elsaToken" TEXT,
     "logo" BYTEA,
     "tcLink" TEXT NOT NULL DEFAULT 'https://garvan-data-science-platform.github.io/ctrl-docs/docs/terms-and-conditions',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -177,6 +179,7 @@ CREATE TABLE "AuditLog" (
     "timestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "userId" INTEGER,
     "meta" JSONB NOT NULL,
+    "requestBody" TEXT,
 
     CONSTRAINT "AuditLog_pkey" PRIMARY KEY ("id")
 );
@@ -204,6 +207,12 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX "User_emailHash_key" ON "User"("emailHash");
 
 -- CreateIndex
+<<<<<<<< HEAD:application/backend/prisma/migrations/20250806044057_initial/migration.sql
+========
+CREATE UNIQUE INDEX "ParticipantProfile_individualId_key" ON "ParticipantProfile"("individualId");
+
+-- CreateIndex
+>>>>>>>> dev:application/backend/prisma/migrations/20250921234219_initial/migration.sql
 CREATE UNIQUE INDEX "AlternativeContact_participantProfileId_key" ON "AlternativeContact"("participantProfileId");
 
 -- CreateIndex

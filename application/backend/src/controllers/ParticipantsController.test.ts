@@ -70,6 +70,7 @@ describe('ParticipantsController', () => {
       await prisma.participantProfile.create({
         data: {
           ...profileData,
+          individualId: undefined,
           id: 500,
           familyId: 100,
           participantType: 'DEPENDENT_AGE',
@@ -91,7 +92,13 @@ describe('ParticipantsController', () => {
     it('Fails to add dependent if guardian is not in the study', async () => {
       const profileData = await prisma.participantProfile.findFirstOrThrow({})
       await prisma.participantProfile.create({
-        data: { ...profileData, id: 500, familyId: 100, participantType: 'DEPENDENT_AGE' },
+        data: {
+          ...profileData,
+          individualId: undefined,
+          id: 500,
+          familyId: 100,
+          participantType: 'DEPENDENT_AGE',
+        },
       })
       const response = await request(app)
         .post('/studies/3/participants/500')

@@ -16,6 +16,7 @@ const main = async () => {
       mailerPassword: process.env.MAILER_PASSWORD,
       redcapURL: process.env.REDCAP_API_URL,
       redcapToken: process.env.REDCAP_API_TOKEN,
+      elsaToken: 'ctrl-elsa-abc123',
     },
   })
 
@@ -144,6 +145,8 @@ const main = async () => {
   })
   console.log('Added the following users:', exampleAdmin)
 
+  const exampleAnswers = createDefaultAnswers(SeedSurveyStepData)
+  exampleAnswers[1].answers[0] = false //For DUO testing
   const exampleUser = await prisma.user.upsert({
     where: { email: String(process.env.EXAMPLE_PARTICIPANT_EMAIL) },
     update: {},
@@ -157,6 +160,7 @@ const main = async () => {
       profiles: {
         create: [
           {
+            individualId: 'IND-ABC-123',
             firstName: 'Judith',
             middleName: 'Arundell',
             lastName: 'Wright',
@@ -179,12 +183,13 @@ const main = async () => {
             studies: {
               create: {
                 studyId: defaultStudy.id,
+                participantId: 'PID-TYT-00000',
               },
             },
             surveys: {
               create: {
                 versionId: 1000,
-                answers: createDefaultAnswers(SeedSurveyStepData),
+                answers: exampleAnswers,
               },
             },
           },

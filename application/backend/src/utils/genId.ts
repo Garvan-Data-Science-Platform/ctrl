@@ -33,3 +33,16 @@ export const genId = async (studyId: number, profileId: number) => {
     data: { participantNumber: num, participantId: PID },
   })
 }
+
+export const genIndId = async (profileId: number) => {
+  const participantCode = profileId.toString(16).padStart(5, '0').toUpperCase()
+  const hostname = process.env.HOSTNAME!
+  const instanceString = createHmac('sha256', 'key')
+    .update(hostname)
+    .digest('base64')
+    .replace(/o|O|0|[^\w\s]+/g, '')
+    .toUpperCase()
+    .slice(0, 3)
+  const ID = `IND-${instanceString}-${participantCode}`
+  await prisma.participantProfile.update({ where: { id: profileId }, data: { individualId: ID } })
+}
