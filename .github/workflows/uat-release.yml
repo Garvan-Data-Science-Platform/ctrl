@@ -36,11 +36,7 @@ jobs:
       - name: Rename Helm chart
         run: mv ctrl-*.tgz ctrl-${GITHUB_REF_NAME}.tgz
 
-      - name: Install oras
-        run: |
-          curl -LO https://github.com/oras-project/oras/releases/latest/download/oras_$(uname -s | tr '[:upper:]' '[:lower:]')_amd64.tar.gz
-          tar -xzf oras_*.tar.gz oras
-          sudo mv oras /usr/local/bin/
+      - uses: oras-project/setup-oras@v1
 
       - name: Push Helm chart to OCI with oras
         run: |
