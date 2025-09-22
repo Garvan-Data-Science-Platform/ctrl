@@ -36,8 +36,16 @@ jobs:
       - name: Rename Helm chart
         run: mv ctrl-*.tgz ctrl-${GITHUB_REF_NAME}.tgz
 
-      - name: Push Helm chart to OCI
-        run: helm push ctrl-${GITHUB_REF_NAME}.tgz oci://australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public
+      - name: Install oras
+        run: |
+          curl -LO https://github.com/oras-project/oras/releases/latest/download/oras_$(uname -s | tr '[:upper:]' '[:lower:]')_amd64.tar.gz
+          tar -xzf oras_*.tar.gz oras
+          sudo mv oras /usr/local/bin/
+
+      - name: Push Helm chart to OCI with oras
+        run: |
+          oras push australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl:${GITHUB_REF_NAME} \
+            ctrl-${GITHUB_REF_NAME}.tgz
 
   docker_retag_push:
     name: Retag Docker images and push
