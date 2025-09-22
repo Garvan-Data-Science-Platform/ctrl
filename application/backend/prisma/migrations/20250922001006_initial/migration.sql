@@ -207,12 +207,9 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX "User_emailHash_key" ON "User"("emailHash");
 
 -- CreateIndex
-<<<<<<<< HEAD:application/backend/prisma/migrations/20250806044057_initial/migration.sql
-========
 CREATE UNIQUE INDEX "ParticipantProfile_individualId_key" ON "ParticipantProfile"("individualId");
 
 -- CreateIndex
->>>>>>>> dev:application/backend/prisma/migrations/20250921234219_initial/migration.sql
 CREATE UNIQUE INDEX "AlternativeContact_participantProfileId_key" ON "AlternativeContact"("participantProfileId");
 
 -- CreateIndex
