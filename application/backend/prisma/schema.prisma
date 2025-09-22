@@ -230,11 +230,3 @@ model OTPToken {
  code      String
  expiresAt DateTime
 }
-
-model OTPToken {
- id        String      @id @default(uuid())
- userId    Int
- user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
- code      String
- expiresAt DateTime
-}
