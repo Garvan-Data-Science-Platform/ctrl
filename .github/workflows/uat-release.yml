@@ -11,6 +11,9 @@ jobs:
   helm_release:
     name: Build, rename, and push Helm chart
     runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -41,6 +44,9 @@ jobs:
   docker_retag_push:
     name: Retag Docker images and push
     runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     needs: helm_release
     steps:
       - name: Checkout code
