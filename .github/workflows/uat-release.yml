@@ -38,8 +38,7 @@ jobs:
 
       - name: Push Helm chart to OCI repo
         run: |
-          helm push oci://australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl \
-            ctrl-${GITHUB_REF_NAME}.tgz
+          helm push ctrl-${GITHUB_REF_NAME}.tgz oci://australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl
 
       - name: Get Chart version
         id: chart_version
