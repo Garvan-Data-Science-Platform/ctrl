@@ -30,16 +30,6 @@ jobs:
       - name: Build Helm dependencies
         run: helm repo add jetstack https://charts.jetstack.io --force-update && helm dependency build .helm/ctrl
 
-      - name: Package Helm chart
-        run: helm package .helm/ctrl
-
-      - name: Rename Helm chart
-        run: mv ctrl-*.tgz ctrl-${GITHUB_REF_NAME}.tgz
-
-      - name: Push Helm chart to OCI repo
-        run: |
-          helm push ctrl-${GITHUB_REF_NAME}.tgz oci://australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl
-
       - name: Get Chart version
         id: chart_version
         run: |
@@ -54,6 +44,16 @@ jobs:
             echo "Tag base ($TAG_BASE) does not match chart version ($CHART_VERSION)"
             exit 1
           fi
+
+      - name: Package Helm chart
+        run: helm package .helm/ctrl
+
+      - name: Rename Helm chart
+        run: mv ctrl-*.tgz ctrl-${GITHUB_REF_NAME}.tgz
+
+      - name: Push Helm chart to OCI repo
+        run: |
+          helm push ctrl-${GITHUB_REF_NAME}.tgz oci://australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public
 
       - name: Retag Helm chart in Artifact Registry
         env:
