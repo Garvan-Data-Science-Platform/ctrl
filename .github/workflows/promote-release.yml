@@ -26,6 +26,13 @@ jobs:
         run: |
           git fetch --all --tags
 
+      - name: Check prerelease tag exists
+        run: |
+          if ! git rev-parse "${{ github.event.inputs.prerelease_tag }}" >/dev/null 2>&1; then
+            echo "Pre-release tag '${{ github.event.inputs.prerelease_tag }}' does not exist."
+            exit 1
+          fi
+
       - name: Get commit for prerelease tag
         id: get_commit
         run: |
