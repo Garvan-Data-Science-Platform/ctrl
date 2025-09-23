@@ -36,12 +36,32 @@ jobs:
       - name: Rename Helm chart
         run: mv ctrl-*.tgz ctrl-${GITHUB_REF_NAME}.tgz
 
-      - uses: oras-project/setup-oras@v1
-
-      - name: Push Helm chart to OCI with oras
+      - name: Push Helm chart to OCI repo
         run: |
-          oras push australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl:${GITHUB_REF_NAME} \
+          helm push australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl \
             ctrl-${GITHUB_REF_NAME}.tgz
+
+      - name: Get Chart version
+        id: chart_version
+        run: |
+          version=$(grep '^version:' .helm/ctrl/Chart.yaml | awk '{print $2}')
+          echo "chart_version=$version" >> $GITHUB_OUTPUT
+
+      - name: Check tag matches chart version
+        run: |
+          TAG_BASE=$(echo "${GITHUB_REF_NAME}" | sed -E 's/-rc\.[0-9]+$//')
+          CHART_VERSION="${{ steps.chart_version.outputs.chart_version }}"
+          if [ "$TAG_BASE" != "$CHART_VERSION" ]; then
+            echo "Tag base ($TAG_BASE) does not match chart version ($CHART_VERSION)"
+            exit 1
+          fi
+
+      - name: Retag Helm chart in Artifact Registry
+        env:
+          CHART_VERSION: ${{ steps.chart_version.outputs.chart_version }}
+        run: |
+          gcloud artifacts docker tags add australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl:${CHART_VERSION} australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl:${GITHUB_REF_NAME}
+          gcloud artifacts docker tags delete australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl:${CHART_VERSION} --quiet
 
   docker_retag_push:
     name: Retag Docker images and push
@@ -64,14 +84,14 @@ jobs:
         run: gcloud auth configure-docker australia-southeast1-docker.pkg.dev
 
       - name: Get Chart version
-        id: chart
+        id: chart_version
         run: |
           version=$(grep '^version:' .helm/ctrl/Chart.yaml | awk '{print $2}')
           echo "chart_version=$version" >> $GITHUB_OUTPUT
 
       - name: Retag and push images
         env:
-          CHART_VERSION: ${{ steps.chart.outputs.chart_version }}
+          CHART_VERSION: ${{ steps.chart_version.outputs.chart_version }}
           SHA: ${{ github.sha }}
         run: |
           for img in backend user-client admin-client; do
