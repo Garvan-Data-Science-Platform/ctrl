@@ -96,7 +96,5 @@ jobs:
           for img in backend user-client admin-client; do
             src="australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-${img}:${SHA}"
             dst="australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-${img}:${CHART_VERSION}"
-            docker pull $src
-            docker tag $src $dst
-            docker push $dst
+            gcloud artifacts docker tags add $src $dst
           done
