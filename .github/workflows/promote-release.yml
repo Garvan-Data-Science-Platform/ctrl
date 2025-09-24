@@ -42,10 +42,7 @@ jobs:
       - name: Merge commit to main (if not present)
         run: |
           git checkout main
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
           git merge --ff-only ${{ steps.get_commit.outputs.commit_sha }} || echo "Already up to date"
-          git remote set-url origin https://x-access-token:${{ secrets.PAT }}}@github.com/${{ github.repository }}.git
           git push origin main
 
       - name: Create and push release tag
