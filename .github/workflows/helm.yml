@@ -2,13 +2,13 @@ name: Test helm install
 
 on:
   workflow_run:
-    workflows: ['Build checks']
-    branches: [main]
+    workflows: ['Build and Push']
     types: [completed]
 
 jobs:
   helm-install:
     name: test helm install
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-22.04
     steps:
       - name: Check out repository code
