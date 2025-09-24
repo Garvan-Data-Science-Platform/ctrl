@@ -37,7 +37,7 @@ Password: `Testpassword1`
 
 ## Installation
 
-### Prod installation: Helm
+### Prod installation: Helm (CTRL Standalone)
 
 We have created a helm chart for quick and easy installation of CTRL and its dependencies. If you have a kubernetes cluster and helm CLI installed, you can use this command to install the latest stable version of CTRL:
 
@@ -45,11 +45,16 @@ We have created a helm chart for quick and easy installation of CTRL and its dep
 
 Refer to `.helm/ctrl/values.yaml` for full list of configuration options. The most important ones are:
 
-**ingress.hosts.userClient.hostname** and **ingress.hosts.adminClient.hostname**: These should correspond to dns hostnames when using nginx ingress (enabled by default).
+**ingress.hosts.userClient.hostname** and **ingress.hosts.adminClient.hostname**: These should correspond to dns hostnames you've set up.
 
-**cert-manager.enabled** and **letsencryptEmail**: Set these to enable automatic configuration of TLS using letsencrypt.
+**config**: CTRL Config: Refer [application/backend/config/config.json5.template](application/backend/config/config.json5.template) for config spec.
 
 All other values should be left as default in most cases.
+
+### Prod installation: Helm (CTRL + extras)
+
+We have also created a helm chart intended to get fully production-ready, cloud/on-prem agnostic deployment running (e.g. on K3S). It includes CTRL, nginx-ingress for ingress, letsencrypt for https and optionally other complementary apps (e.g. Elsa).
+Refer to [https://github.com/Garvan-Data-Science-Platform/guardians-charts?tab=readme-ov-file](https://github.com/Garvan-Data-Science-Platform/guardians-charts?tab=readme-ov-file)
 
 #### Upgrading
 
