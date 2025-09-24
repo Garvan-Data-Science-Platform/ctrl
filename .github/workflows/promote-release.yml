@@ -1,0 +1,72 @@
+name: Promote Pre-release to Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      prerelease_tag:
+        description: 'Pre-release tag (e.g. 1.0.0-rc.1)'
+        required: true
+      release_tag:
+        description: 'Release tag (e.g. 1.0.0)'
+        required: true
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'write'
+      id-token: 'write'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch all tags and branches
+        run: |
+          git fetch --all --tags
+
+      - name: Check prerelease tag exists
+        run: |
+          if ! git rev-parse "${{ github.event.inputs.prerelease_tag }}" >/dev/null 2>&1; then
+            echo "Pre-release tag '${{ github.event.inputs.prerelease_tag }}' does not exist."
+            exit 1
+          fi
+
+      - name: Get commit for prerelease tag
+        id: get_commit
+        run: |
+          COMMIT=$(git rev-list -n 1 ${{ github.event.inputs.prerelease_tag }})
+          echo "commit_sha=$COMMIT" >> $GITHUB_OUTPUT
+
+      - name: Merge commit to main (if not present)
+        run: |
+          git checkout main
+          git merge --ff-only ${{ steps.get_commit.outputs.commit_sha }} || echo "Already up to date"
+          git push origin main
+
+      - name: Create and push release tag
+        run: |
+          git tag ${{ github.event.inputs.release_tag }} ${{ steps.get_commit.outputs.commit_sha }}
+          git push origin ${{ github.event.inputs.release_tag }}
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: 'projects/43338454952/locations/global/workloadIdentityPools/ctrl-id-pool/providers/github-provider'
+          service_account: 'ctrl-ci-sa@ctrl-358804.iam.gserviceaccount.com'
+
+      - name: Retag OCI artifact
+        run: |
+          gcloud auth configure-docker australia-southeast1-docker.pkg.dev
+          gcloud artifacts docker tags add \
+            australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl:${{ github.event.inputs.prerelease_tag }} \
+            australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl:${{ github.event.inputs.release_tag }}
+
+      - name: Mark release as latest on GitHub
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BODY=$(gh release view "${{ github.event.inputs.prerelease_tag }}" --json body -q .body || echo "Release ${{ github.event.inputs.release_tag }}")
+          gh release create "${{ github.event.inputs.release_tag }}" --target "${{ steps.get_commit.outputs.commit_sha }}" --latest --title "${{ github.event.inputs.release_tag }}" --notes "$BODY" || \
+          gh release edit "${{ github.event.inputs.release_tag }}" --latest --notes "$BODY"

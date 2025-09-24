@@ -3,7 +3,7 @@ name: Build and Push
 on:
   workflow_run:
     workflows: ['Build checks']
-    branches: [main, dev]
+    branches: ['dev', 'rel*']
     types: [completed]
 
 jobs:
@@ -23,6 +23,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Get latest branch SHA
+        id: branch_sha
+        run: |
+          git fetch origin ${{ github.event.workflow_run.head_branch }}
+          echo "sha=$(git rev-parse origin/${{ github.event.workflow_run.head_branch }})" >> $GITHUB_OUTPUT
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
@@ -52,7 +58,7 @@ jobs:
           push: true
           tags: |
             australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-${{ matrix.name }}:${{ github.event.workflow_run.head_branch == 'main' && 'latest' || 'dev' }}
-            australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-${{ matrix.name }}:${{ github.sha }}
+            australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-${{ matrix.name }}:${{ steps.branch_sha.outputs.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: NODE_VERSION=${{ steps.nvm.outputs.node_version }}
