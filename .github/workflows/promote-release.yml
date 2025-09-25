@@ -41,6 +41,8 @@ jobs:
 
       - name: Merge commit to main (if not present)
         run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
           git checkout main
           git merge ${{ steps.get_commit.outputs.commit_sha }} || echo "Already up to date"
           git push origin main
