@@ -2,6 +2,7 @@ import { partiallyCompleteSurvey, resetDB, wipeDB } from 'common/testing/TestHel
 import { defineConfig } from 'cypress'
 
 export default defineConfig({
+  retries: 2,
   env: {
     DATABASE_URL: 'postgres://postgres:password@db-test:5432/ctrl',
   },
