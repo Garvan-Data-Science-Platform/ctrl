@@ -18,7 +18,7 @@ describe('auth', () => {
     cy.get('input[name="email"]').type(UserType.ADMIN)
     cy.get('input[name="password"]').type('Testpassword1')
     cy.get('button[type="submit"]').click()
-    cy.url().should('include', '/users') // Redirects to /users after login
+    cy.url().should('include', '/surveys') // Redirects to /surveys after login
   })
 
   it('cannot login as a participant to the admin portal', () => {
@@ -28,7 +28,7 @@ describe('auth', () => {
     cy.get('button[type="submit"]').click()
 
     // Expect to stay on the login page & error message popup
-    cy.url().should('not.include', '/users')
+    cy.url().should('not.include', '/surveys')
     cy.contains('admin privileges').should('exist')
   })
 
