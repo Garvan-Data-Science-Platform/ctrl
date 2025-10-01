@@ -16,7 +16,7 @@ describe('auth', () => {
   it('can login as admin to the admin portal', () => {
     cy.visit('/')
     cy.get('input[name="email"]').type(UserType.ADMIN)
-    cy.get('input[name="password"]').type('password')
+    cy.get('input[name="password"]').type('Testpassword1')
     cy.get('button[type="submit"]').click()
     cy.url().should('include', '/users') // Redirects to /users after login
   })
@@ -24,7 +24,7 @@ describe('auth', () => {
   it('cannot login as a participant to the admin portal', () => {
     cy.visit('/')
     cy.get('input[name="email"]').type(UserType.PARTICIPANT_COMPLETED)
-    cy.get('input[name="password"]').type('password')
+    cy.get('input[name="password"]').type('Testpassword1')
     cy.get('button[type="submit"]').click()
 
     // Expect to stay on the login page & error message popup

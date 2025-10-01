@@ -22,7 +22,7 @@ Cypress.Commands.add('login', (type: UserType) => {
   cy.request({
     method: 'POST',
     url: `localhost:5001/auth/login`,
-    body: { email: type, password: 'password' },
+    body: { email: type, password: 'Testpassword1' },
   }).then((res) => {
     window.localStorage.setItem('access_token', res.body.token)
   })

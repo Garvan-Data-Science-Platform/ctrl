@@ -716,7 +716,7 @@ describe('InvitesController', () => {
           email: 'usernoprofile@example.com',
           firstName: 'User',
           lastName: 'NoProfile',
-          password: hashPassword('password'),
+          password: hashPassword('Testpassword1'),
           role: Role.Participant,
         },
       })

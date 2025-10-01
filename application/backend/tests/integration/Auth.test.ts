@@ -207,7 +207,7 @@ describe('Auth', () => {
     jest.replaceProperty(config, 'otp', true)
     const loginRequest: LoginRequest = {
       email: PARTICIPANT_UNANSWERED_EMAIL,
-      password: 'password',
+      password: 'Testpassword1',
     }
     const res = await request(app).post('/auth/login').send(loginRequest)
     const sentEmails = mockNodeMailer.mock.getSentMail()

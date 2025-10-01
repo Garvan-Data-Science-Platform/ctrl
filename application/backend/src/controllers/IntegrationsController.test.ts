@@ -100,7 +100,7 @@ describe('IntegrationsController', () => {
           firstName: 'John',
           lastName: 'Smith',
           email: 'example@example.com',
-          password: 'password',
+          password: 'Testpassword1',
         },
       })
 

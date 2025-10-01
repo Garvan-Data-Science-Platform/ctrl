@@ -108,7 +108,7 @@ export class StudiesController extends Controller {
    */
   @Patch('{studyId}/restore')
   public async restoreStudyById(@Path() studyId: number) {
-    const study: Study | null = await this.studyRepo.update({
+    await this.studyRepo.update({
       where: { id: studyId, deleted: true },
       data: { deleted: false },
     })

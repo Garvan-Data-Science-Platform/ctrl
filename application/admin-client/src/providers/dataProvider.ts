@@ -13,6 +13,7 @@ const studyResources = [
   'invites',
   'participants',
   'families',
+  'participants/deleted',
 ]
 
 axiosInstance.interceptors.request.use(
