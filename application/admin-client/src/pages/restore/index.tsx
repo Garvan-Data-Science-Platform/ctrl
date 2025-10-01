@@ -70,12 +70,6 @@ const RestorePage = () => {
         minWidth: 100,
       },
       {
-        field: 'email',
-        flex: 1,
-        headerName: 'Email',
-        minWidth: 100,
-      },
-      {
         field: 'actions',
         headerName: 'Restore',
         sortable: false,
