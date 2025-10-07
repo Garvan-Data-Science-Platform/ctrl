@@ -98,7 +98,11 @@ export const ParticipantImport = () => {
         prefill: { studyParticipant: { externalId: columns[0] } },
         email: columns[5], // ctrl_email index
       }
-      if (!recipients.includes(recipient) && recipient.email && recipient.email !== 'ctrl_email') {
+      if (
+        !recipients.map((r) => r.email).includes(recipient.email) &&
+        recipient.email &&
+        recipient.email !== 'ctrl_email'
+      ) {
         recipients.push(recipient)
       }
     })
