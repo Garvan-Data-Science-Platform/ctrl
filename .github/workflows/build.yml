@@ -63,7 +63,7 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             NODE_VERSION=${{ steps.nvm.outputs.node_version }}
-            APP_VERSION="Development ${{github.sha}}"
+            APP_VERSION="V${{github.sha}}"
 
   push_helm_charts:
     name: Push Helm Charts
