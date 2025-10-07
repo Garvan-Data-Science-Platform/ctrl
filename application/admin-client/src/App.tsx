@@ -38,6 +38,7 @@ import {
   Settings,
   AdminPanelSettings,
   RestoreFromTrash,
+  LibraryBooks,
 } from '@mui/icons-material'
 import { ParticipantEdit } from './pages/participants/edit'
 import { SetupPage } from './pages/setup'
@@ -146,6 +147,14 @@ function App() {
                       edit: '/settings',
                       meta: {
                         icon: <Settings />,
+                        parent: 'admin',
+                      },
+                    },
+                    {
+                      name: 'manage studies',
+                      list: '/studies',
+                      meta: {
+                        icon: <LibraryBooks />,
                         parent: 'admin',
                       },
                     },
