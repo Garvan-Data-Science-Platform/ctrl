@@ -34,50 +34,64 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({ sticky = tru
           spacing={2}
         >
           <HamburgerMenu />
-          <Button
-            color="inherit"
-            onClick={handleClick}
-            sx={{ ml: 2, textTransform: 'none' }}
-            endIcon={<ArrowDropDownIcon />}
-            disabled={resource?.name == 'surveys' && action == 'edit'}
-            data-cy="study-dropdown"
-          >
-            {studies[activeStudyIndex].name}
-          </Button>
-          <Menu
-            anchorEl={anchorEl}
-            open={studyMenuOpen}
-            onClose={handleCloseStudyMenu}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-            sx={{ p: 3 }}
-            data-cy="study-menu"
-          >
-            {studies.map((study, idx) => {
-              return (
-                <MenuItem
-                  key={study.id}
-                  onClick={() => {
-                    setActiveStudyIndex(idx)
-                    handleCloseStudyMenu()
-                  }}
-                  sx={{ fontWeight: activeStudyIndex == idx ? 'bold' : 'normal' }}
-                >
-                  {study.name}
-                </MenuItem>
-              )
-            })}
-            <Divider />
-            {/* 
-            // @ts-ignore */}
-            <MenuItem
-              component={Link}
-              onClick={handleCloseStudyMenu}
+          {['settings', 'users', 'studies'].includes(resource?.name || '') ? (
+            <Button
+              color="inherit"
+              sx={{ ml: 2, textTransform: 'none' }}
+              component={Link as any}
               to="/studies"
               data-cy="manage-studies"
             >
               Manage Studies
-            </MenuItem>
-          </Menu>
+            </Button>
+          ) : (
+            <>
+              <Button
+                color="inherit"
+                onClick={handleClick}
+                sx={{ ml: 2, textTransform: 'none' }}
+                endIcon={<ArrowDropDownIcon />}
+                disabled={resource?.name == 'surveys' && action == 'edit'}
+                data-cy="study-dropdown"
+              >
+                {studies[activeStudyIndex].name}
+              </Button>
+              <Menu
+                anchorEl={anchorEl}
+                open={studyMenuOpen}
+                onClose={handleCloseStudyMenu}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                sx={{ p: 3 }}
+                data-cy="study-menu"
+              >
+                {studies.map((study, idx) => {
+                  return (
+                    <MenuItem
+                      key={study.id}
+                      onClick={() => {
+                        setActiveStudyIndex(idx)
+                        handleCloseStudyMenu()
+                      }}
+                      sx={{ fontWeight: activeStudyIndex == idx ? 'bold' : 'normal' }}
+                    >
+                      {study.name}
+                    </MenuItem>
+                  )
+                })}
+                <Divider />
+                {/* 
+                // @ts-ignore */}
+                <MenuItem
+                  component={Link}
+                  onClick={handleCloseStudyMenu}
+                  to="/studies"
+                  data-cy="manage-studies"
+                >
+                  Manage Studies
+                </MenuItem>
+              </Menu>
+            </>
+          )}
         </Stack>
       </Toolbar>
     </AppBar>

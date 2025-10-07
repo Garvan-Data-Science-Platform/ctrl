@@ -120,6 +120,7 @@ function App() {
                   {
                     name: 'families',
                   },
+                  { name: 'studies', edit: '/studies' },
                   {
                     name: 'settings',
                     list: '/settings',

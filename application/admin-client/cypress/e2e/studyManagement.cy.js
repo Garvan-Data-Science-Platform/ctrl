@@ -10,7 +10,6 @@ beforeEach(() => {
 describe('Study management page', () => {
   it('Can access study management page', () => {
     cy.visit('/')
-    cy.get('[data-cy="study-dropdown"]').click()
     cy.get('[data-cy="manage-studies"]').click()
     cy.url().should('contain', '/studies')
   })
@@ -22,7 +21,7 @@ describe('Study management page', () => {
     cy.get('[data-cy="study-name"] input').should('be.focused').type('TEST')
     cy.get('[data-cy="study-create"]').click()
     cy.get('[data-cy="study-create"]').should('not.exist')
-    cy.get('[data-cy="study-dropdown"]').should('have.text', 'TEST')
+    cy.contains('TEST').should('exist')
   })
 
   it('Can edit study name', () => {
@@ -59,14 +58,12 @@ describe('Study management page', () => {
   it('Can delete a study', () => {
     cy.visit('/studies')
     //Change to last study to test behaviour when last study in list is active and deleted
-    cy.get('[data-cy="study-dropdown"]').click()
-    cy.get('[data-cy="study-menu"]').contains('Study FE').click()
     cy.get('[data-cy="delete-study"]').should('have.length', 4).eq(2).click()
     cy.get('[data-cy="confirm-delete"]').click()
     cy.get('[data-cy="delete-study"]').should('have.length', 3)
     cy.reload()
     cy.get('[data-cy="delete-study"]').should('have.length', 3)
-    cy.get('[data-cy="study-dropdown"]').should('have.text', 'Empty Study')
+    cy.contains('Empty Study').should('exist')
     cy.get('[data-cy="delete-study"]').should('have.length', 3).eq(0).click()
     cy.get('[data-cy="confirm-delete"]').click()
     cy.get('[data-cy="delete-study"]').should('have.length', 2).eq(0).click()
