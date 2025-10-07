@@ -153,17 +153,17 @@ export const SurveyEditor = () => {
         <Divider />
         <List>
           <ListItem disablePadding>
-            <ListItemButton disabled={disabled}>
+            <ListItemButton
+              disabled={disabled}
+              onClick={() => {
+                addStep()
+                setActiveStep(surveyData.length)
+              }}
+            >
               <ListItemIcon>
                 <Add />
               </ListItemIcon>
-              <ListItemText
-                primary={'New Step'}
-                onClick={() => {
-                  addStep()
-                  setActiveStep(surveyData.length)
-                }}
-              />
+              <ListItemText primary={'New Step'} />
             </ListItemButton>
           </ListItem>
         </List>
