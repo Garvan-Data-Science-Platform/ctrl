@@ -255,7 +255,7 @@ export class ParticipantsController extends Controller {
       data: {
         id: profileId,
         participantId: sp.participantId || '',
-        externalId: sp.externalId || '',
+        externalId: sp.externalId ?? undefined,
         profile: profileData,
         firstName: profile.firstName,
         lastName: profile.lastName,

@@ -25,7 +25,6 @@ import { UpdateProfileRequest } from '../users/updateProfile'
  *    "email": "jeremydoe@email.com"
  *  }
  * }
- * }
  */
 export type UpdateParticipantRequest = {
   externalId: string
