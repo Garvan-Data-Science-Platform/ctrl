@@ -4,6 +4,7 @@ import { axiosInstance } from '../../providers/dataProvider'
 import { participantUploadCSVDocumentation } from './helpPageRedcap'
 import { useNavigate } from 'react-router-dom'
 import { useCurrentStudyId } from '../../studyStore'
+import { Recipient } from '@common/types/invite'
 
 export const ParticipantImport = () => {
   const studyId = useCurrentStudyId()
@@ -39,7 +40,7 @@ export const ParticipantImport = () => {
         navigate(SUCCESS_REDIRECT, {
           state: {
             openInviteModal: true,
-            initialEmails: await getInitialEmailsFromFile(file),
+            initialRecipients: await getInitialRecipientsFromFile(file),
           },
         })
       })
@@ -71,7 +72,10 @@ export const ParticipantImport = () => {
         navigate(SUCCESS_REDIRECT, {
           state: {
             openInviteModal: true,
-            initialEmails: await getInitialEmailsFromApi(data.newInvites),
+            initialRecipients: (await getInitialEmailsFromApi(data.newInvites)).map((email) => ({
+              email,
+              prefill: {},
+            })),
           },
         })
       })
@@ -83,21 +87,23 @@ export const ParticipantImport = () => {
       })
   }
 
-  const getInitialEmailsFromFile = async (file: File): Promise<string[]> => {
+  const getInitialRecipientsFromFile = async (file: File): Promise<Recipient[]> => {
     const content = await file.text()
     const rows = content.split('\n').slice(1) // Skip header row
-    const uniqueEmails = new Set<string>()
+    const recipients: Recipient[] = []
 
     rows.forEach((row: string) => {
       const columns = row.split(',')
-      const participantEmail = columns[5] // ctrl_email index
-
-      if (participantEmail && participantEmail !== 'ctrl_email') {
-        uniqueEmails.add(participantEmail)
+      const recipient: Recipient = {
+        prefill: { studyParticipant: { externalId: columns[0] } },
+        email: columns[5], // ctrl_email index
+      }
+      if (!recipients.includes(recipient) && recipient.email && recipient.email !== 'ctrl_email') {
+        recipients.push(recipient)
       }
     })
 
-    return Array.from(uniqueEmails)
+    return recipients
   }
 
   const getInitialEmailsFromApi = async (newInvites: string[]): Promise<string[]> => {

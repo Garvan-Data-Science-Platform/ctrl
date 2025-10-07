@@ -228,7 +228,12 @@ export class AuthController extends Controller {
     const insertedUser = await this.userRepo.create({ data })
 
     // Extract info for participant creation
-    const participantData: CreateParticipantRequest = { firstName, lastName, ...participantInfo }
+    const participantData: CreateParticipantRequest = {
+      firstName,
+      lastName,
+      ...participantInfo,
+      ...invite.prefill.studyParticipant,
+    }
     const study = await this.studyRepo.findFirstOrThrow({ where: { id: invite.studyId } })
     await this.createParticipant(participantData, study.id, insertedUser)
     logger.info(`Participant ${insertedUser.id} created`)
@@ -512,7 +517,7 @@ export class AuthController extends Controller {
     user?: User,
   ): Promise<CreateParticipantResponse> {
     // Extract user and profile data
-    const { firstName, lastName, dob, ...profileData } = participantData
+    const { firstName, lastName, dob, externalId, ...profileData } = participantData
     const { nextOfKin, dependents, ...noNextOfKinProfileData } = profileData
     const nextOfKinCreateData = { nextOfKin: { create: { ...nextOfKin } } }
 
@@ -573,6 +578,14 @@ export class AuthController extends Controller {
           dependents.length > 0 ? ParticipantType.GUARDIAN : ParticipantType.STANDARD,
       },
     })
+
+    if (externalId) {
+      await prisma.studyParticipant.update({
+        where: { participantProfileId_studyId: { participantProfileId: profile.id, studyId } },
+        data: { externalId },
+      })
+    }
+
     await genIndId(profile.id)
 
     //Generate unique Ids

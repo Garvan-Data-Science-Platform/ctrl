@@ -1498,6 +1498,9 @@
               "$ref": "#/components/schemas/OnBehalf"
             },
             "type": "array"
+          },
+          "externalId": {
+            "type": "string"
           }
         },
         "type": "object",
@@ -1525,8 +1528,7 @@
             "lastName": "Doe",
             "mobile": "0412341432",
             "email": "jeremydoe@email.com"
-          },
-          "dependents": []
+          }
         }
       },
       "ParticipantAnswerStatus": {
@@ -1563,6 +1565,9 @@
             "format": "double"
           },
           "participantId": {
+            "type": "string"
+          },
+          "externalId": {
             "type": "string"
           },
           "email": {
@@ -1765,6 +1770,21 @@
         "type": "object",
         "additionalProperties": false
       },
+      "UpdateParticipantRequest": {
+        "properties": {
+          "profile": {
+            "$ref": "#/components/schemas/UpdateProfileRequest"
+          },
+          "externalId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "profile",
+          "externalId"
+        ],
+        "type": "object"
+      },
       "GetUserInvitesResponse": {
         "properties": {
           "data": {
@@ -1924,11 +1944,103 @@
         "type": "string",
         "pattern": "^(.+)@(.+)$"
       },
+      "Partial_GetParticipantProfileResponse-at-data_": {
+        "properties": {
+          "id": {
+            "type": "number",
+            "format": "double"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "middleName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "dob": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "mobile": {
+            "type": "string"
+          },
+          "addressLine": {
+            "type": "string"
+          },
+          "suburb": {
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/StateTerritory"
+          },
+          "postcode": {
+            "type": "string"
+          },
+          "preferredContact": {
+            "$ref": "#/components/schemas/ContactMethod"
+          },
+          "participantType": {
+            "$ref": "#/components/schemas/ParticipantType"
+          },
+          "nextOfKin": {
+            "$ref": "#/components/schemas/AlternativeContact"
+          },
+          "familyMembers": {
+            "items": {
+              "$ref": "#/components/schemas/FamilyMember"
+            },
+            "type": "array"
+          },
+          "familyId": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "type": "object",
+        "description": "Make all properties in T optional"
+      },
+      "Prefill": {
+        "properties": {
+          "profile": {
+            "$ref": "#/components/schemas/Partial_GetParticipantProfileResponse-at-data_"
+          },
+          "studyParticipant": {
+            "properties": {
+              "externalId": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object",
+        "additionalProperties": false
+      },
+      "Recipient": {
+        "properties": {
+          "email": {
+            "$ref": "#/components/schemas/Email"
+          },
+          "prefill": {
+            "$ref": "#/components/schemas/Prefill"
+          }
+        },
+        "required": [
+          "email",
+          "prefill"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
       "InviteParticipantsRequest": {
         "properties": {
-          "emails": {
+          "recipients": {
             "items": {
-              "$ref": "#/components/schemas/Email"
+              "$ref": "#/components/schemas/Recipient"
             },
             "type": "array"
           },
@@ -1940,7 +2052,7 @@
           }
         },
         "required": [
-          "emails",
+          "recipients",
           "subjectText",
           "explanatoryText"
         ],
@@ -2347,6 +2459,9 @@
               "$ref": "#/components/schemas/OnBehalf"
             },
             "type": "array"
+          },
+          "externalId": {
+            "type": "string"
           }
         },
         "required": [
@@ -5306,6 +5421,84 @@
             }
           }
         ]
+      },
+      "patch": {
+        "operationId": "UpdateProfileById",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Participants"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "profileId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateParticipantRequest"
+              }
+            }
+          }
+        }
       },
       "delete": {
         "operationId": "DeleteParticipantById",

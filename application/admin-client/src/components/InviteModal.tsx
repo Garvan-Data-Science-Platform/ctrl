@@ -1,34 +1,31 @@
 import { Add, Delete } from '@mui/icons-material'
-import {
-  Box,
-  Button,
-  IconButton,
-  InputAdornment,
-  List,
-  ListItem,
-  TextField,
-  Typography,
-} from '@mui/material'
+import { Box, Button, IconButton, List, ListItem, TextField, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { generateInviteEmail } from '@common/src/generateInviteTemplate'
+import { Recipient } from '@common/types/invite'
 import { axiosInstance } from '../providers/dataProvider'
 import { GetInviteTextResponse } from '@common/types/api/participants'
 import { useCurrentStudyId } from '../studyStore'
 
 interface InviteModalProps {
-  onSend: (emails: string[], subjectText: string, explanatoryText: string) => void
+  onSend: (recipients: Recipient[], subjectText: string, explanatoryText: string) => void
   onCancel: () => void
-  initialEmails?: string[]
+  initialRecipients?: Recipient[]
 }
 
-export function InviteModal({ onSend, onCancel, initialEmails = [] }: InviteModalProps) {
+export function InviteModal({ onSend, onCancel, initialRecipients = [] }: InviteModalProps) {
   const validateEmail = (email: string) => {
     const r = new RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) //eslint-disable-line
     return r.test(email)
   }
 
-  const [emails, setEmails] = useState<string[]>(initialEmails.filter(validateEmail))
+  const [recipients, setRecipients] = useState<Recipient[]>(
+    initialRecipients.filter((r) => validateEmail(r.email)),
+  )
+  const emails = recipients.map((val) => val.email)
+  //const [emails, setEmails] = useState<string[]>()
   const [fieldValue, setFieldValue] = useState<string>('')
+  const [idFieldValue, setIdFieldValue] = useState<string>('')
   const [invalid, setInvalid] = useState(false)
   const [emailText, setEmailText] = useState('')
   const [emailTitle, setEmailTitle] = useState('')
@@ -38,12 +35,13 @@ export function InviteModal({ onSend, onCancel, initialEmails = [] }: InviteModa
     if (!validateEmail(fieldValue)) {
       setInvalid(true)
     } else if (!emails.includes(fieldValue)) {
-      setEmails((current) => {
+      setRecipients((current) => {
         const c = structuredClone(current)
-        c.push(fieldValue)
+        c.push({ email: fieldValue, prefill: { studyParticipant: { externalId: idFieldValue } } })
         return c
       })
       setFieldValue('')
+      setIdFieldValue('')
     }
   }
 
@@ -64,11 +62,20 @@ export function InviteModal({ onSend, onCancel, initialEmails = [] }: InviteModa
   const handlePaste = (event: React.ClipboardEvent) => {
     event.preventDefault()
     const pasted = event.clipboardData.getData('Text').split('\n')
-    setEmails((current) => {
+    setRecipients((current) => {
       const c = structuredClone(current)
       for (const p of pasted) {
-        if (!c.includes(p) && validateEmail(p)) {
-          c.push(p)
+        let split = p.split(',')
+        if (split.length == 1) {
+          split = split[0].split('\t')
+        }
+        const email = split[0]
+        let id
+        if (split.length > 1) {
+          id = split[1]
+        }
+        if (!emails.includes(email) && validateEmail(email)) {
+          c.push({ email, prefill: { studyParticipant: { externalId: id } } })
         }
       }
       return c
@@ -82,37 +89,47 @@ export function InviteModal({ onSend, onCancel, initialEmails = [] }: InviteModa
   )
 
   return (
-    <Box sx={{ width: 800, display: 'flex', flexDirection: 'row' }} data-cy="invite-modal">
-      <Box sx={{ flex: 1 }}>
+    <Box sx={{ width: 1000, display: 'flex', flexDirection: 'row' }} data-cy="invite-modal">
+      <Box sx={{ flex: 1.3 }}>
         <Typography variant="h4">Invite Participants</Typography>
 
-        <TextField
-          fullWidth
-          placeholder="tom@example.com"
-          helperText={invalid ? 'Invalid email' : 'Enter manually or paste from spreadsheet'}
-          error={invalid}
-          sx={{ mt: 2, mb: 2 }}
-          slotProps={{
-            input: {
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton data-cy="add-button" onClick={handleAdd}>
-                    <Add />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            },
-          }}
-          onKeyUp={(event) => {
-            if (event.key == 'Enter') {
-              handleAdd()
-            }
-          }}
-          value={fieldValue}
-          onChange={(e) => setFieldValue(e.target.value)}
-          data-cy="email-field"
-          onPasteCapture={handlePaste}
-        />
+        <Box sx={{ display: 'flex', flexDirection: 'row', mt: 2, alignItems: 'center' }}>
+          <TextField
+            fullWidth
+            placeholder="tom@example.com"
+            helperText={invalid && 'Invalid email'}
+            error={invalid}
+            onKeyUp={(event) => {
+              if (event.key == 'Enter') {
+                handleAdd()
+              }
+            }}
+            value={fieldValue}
+            onChange={(e) => setFieldValue(e.target.value)}
+            data-cy="email-field"
+            onPasteCapture={handlePaste}
+            sx={{ minWidth: 240 }}
+            label="Email"
+          />
+          <TextField
+            label="ID (optional)"
+            value={idFieldValue}
+            onChange={(e) => setIdFieldValue(e.target.value)}
+            onKeyUp={(event) => {
+              if (event.key == 'Enter') {
+                handleAdd()
+              }
+            }}
+            sx={{ minWidth: 120 }}
+            data-cy="id-field"
+          />
+          <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+            <IconButton data-cy="add-button" onClick={handleAdd}>
+              <Add />
+            </IconButton>
+          </Box>
+        </Box>
+        <Typography variant="caption">Enter manually or paste from spreadsheet</Typography>
         <Typography sx={{ mt: 1 }}>
           Recipients{emails.length > 0 && ` (${emails.length})`}:
         </Typography>
@@ -121,13 +138,13 @@ export function InviteModal({ onSend, onCancel, initialEmails = [] }: InviteModa
           sx={{ height: 180, overflow: 'auto', bgcolor: 'rgba(0,0,0,0.05)', borderRadius: 2 }}
           data-cy="recipients-list"
         >
-          {emails.map((email, idx) => {
+          {recipients.map((recipient, idx) => {
             return (
               <ListItem
                 secondaryAction={
                   <IconButton
                     onClick={() => {
-                      setEmails(emails.filter((e) => e != email))
+                      setRecipients(recipients.filter((r) => r.email != recipient.email))
                     }}
                     data-cy="remove-button"
                   >
@@ -137,7 +154,11 @@ export function InviteModal({ onSend, onCancel, initialEmails = [] }: InviteModa
                 key={`email_${idx}`}
                 sx={{ display: 'flex', flexDirection: 'row' }}
               >
-                <Typography>{email}</Typography>
+                <Typography>
+                  {recipient.email}{' '}
+                  {recipient.prefill.studyParticipant?.externalId &&
+                    `(${recipient.prefill.studyParticipant.externalId})`}
+                </Typography>
               </ListItem>
             )
           })}
@@ -171,10 +192,20 @@ export function InviteModal({ onSend, onCancel, initialEmails = [] }: InviteModa
                 if (!validateEmail(fieldValue)) {
                   setInvalid(true)
                 } else {
-                  onSend([...emails, fieldValue], emailTitle, emailText)
+                  onSend(
+                    [
+                      ...recipients,
+                      {
+                        email: fieldValue,
+                        prefill: { studyParticipant: { externalId: idFieldValue } },
+                      },
+                    ],
+                    emailTitle,
+                    emailText,
+                  )
                 }
               } else {
-                onSend(emails, emailTitle, emailText)
+                onSend(recipients, emailTitle, emailText)
               }
             }}
             data-cy="send-button"

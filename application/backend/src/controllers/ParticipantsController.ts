@@ -13,6 +13,7 @@ import type {
   GetParticipantsResponse,
   InviteParticipantsRequest,
   InviteParticipantsResponse,
+  UpdateParticipantRequest,
   GetDeletedParticipantsResponse,
 } from 'common/types/api/participants'
 import logger from 'common/src/logger'
@@ -92,6 +93,7 @@ export class ParticipantsController extends Controller {
           },
         },
         participantId: true,
+        externalId: true,
       },
       orderBy: extractOrderBy(queryParams),
       skip: queryParams._start ? Number(queryParams._start) : undefined,
@@ -127,6 +129,7 @@ export class ParticipantsController extends Controller {
         email: profile.user?.email,
         firstName: profile.firstName,
         lastName: profile.lastName,
+        externalId: p.externalId || undefined,
         lastUpdated: lastUpdated ? new Date(lastUpdated).toISOString() : undefined,
         familyId: profile.familyId,
         answers: p_answers.map((val) => ({
@@ -252,6 +255,7 @@ export class ParticipantsController extends Controller {
       data: {
         id: profileId,
         participantId: sp.participantId || '',
+        externalId: sp.externalId || '',
         profile: profileData,
         firstName: profile.firstName,
         lastName: profile.lastName,
@@ -263,6 +267,24 @@ export class ParticipantsController extends Controller {
           status: determineStatus(val.answers, new Date(val.version.updatedAt)),
         })),
       },
+    }
+  }
+
+  @Patch('/participants/{profileId}')
+  @Response<ValidateErrorResponse>('422', 'Validation Failed')
+  @Security('jwt', ['OrganisationAdmin'])
+  public async updateProfileById(
+    @Path() studyId: number,
+    @Path() profileId: number,
+    @Body() bodyRequest: UpdateParticipantRequest,
+  ) {
+    const { profile, ...participant } = bodyRequest
+    await new ProfilesController().updateProfileById(profileId, profile)
+    if (participant) {
+      await this.participantRepo.update({
+        where: { participantProfileId_studyId: { participantProfileId: profileId, studyId } },
+        data: participant,
+      })
     }
   }
 
@@ -651,7 +673,9 @@ export class InvitesController extends Controller {
       data: { inviteEmailSubject: subjectText, inviteEmailText: explanatoryText },
     })
 
-    const emails = [...new Set(bodyRequest.emails)]
+    const recipients = [...new Set(bodyRequest.recipients)]
+    const emails = recipients.map((val) => val.email)
+
     const expiresAt = new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000) // TODO: MAKE EXPIRY CONFIGURABLE
 
     // Fetch existing invites
@@ -664,13 +688,13 @@ export class InvitesController extends Controller {
     //Has to be done by backend server due to encryption
     existingInvites = existingInvites.filter((invite) => emails.includes(invite.email))
 
-    const newEmails = emails.filter(
-      (email) => !existingInvites.map((invite) => invite.email).includes(email),
+    const newRecipients = recipients.filter(
+      (r) => !existingInvites.map((invite) => invite.email).includes(r.email),
     )
 
     const responseData = {
       resendEmailRequestCount: emails.length,
-      newInvitesCount: newEmails.length,
+      newInvitesCount: newRecipients.length,
       emailsResentCount: 0, // this gets assigned below
       alreadyAcceptedCount: 0, // this gets assigned below
       failedEmailsCount: 0, // this gets assigned below
@@ -732,33 +756,30 @@ export class InvitesController extends Controller {
     }
 
     // Create new invites
-    if (newEmails.length > 0) {
+    if (newRecipients.length > 0) {
       const inviteResults = await Promise.all(
-        newEmails.map(async (email) => {
+        newRecipients.map(async (r) => {
           const inviteId: string = uuidv4()
-          const success = await this.sendInvite(email, studyId, inviteId)
+          const success = await this.sendInvite(r.email, studyId, inviteId)
           if (!success) {
-            logger.error(`Failed to send email to ${email}`)
-            failedEmails.push(email)
+            logger.error(`Failed to send email to ${r.email}`)
+            failedEmails.push(r.email)
           }
-          return { email, id: inviteId, success }
+          return { recipient: r, id: inviteId, success }
         }),
       )
 
-      const successfulInvites = inviteResults
-        .filter((invite) => invite.success)
-        .map((invite) => ({ emailString: invite.email, id: invite.id }))
+      const successfulInvites = inviteResults.filter((invite) => invite.success)
 
-      const newFailedInvites = inviteResults
-        .filter((invite) => !invite.success)
-        .map((invite) => ({ emailString: invite.email, id: invite.id }))
+      const newFailedInvites = inviteResults.filter((invite) => !invite.success)
 
       // Create invites with appropriate status
       await this.invitesRepo.createMany({
         data: [
           ...successfulInvites.map((invite) => ({
             id: invite.id,
-            email: invite.emailString,
+            email: invite.recipient.email,
+            prefill: invite.recipient.prefill,
             studyId,
             expiresAt,
             sentAt: new Date(),
@@ -766,7 +787,8 @@ export class InvitesController extends Controller {
           })),
           ...newFailedInvites.map((invite) => ({
             id: invite.id,
-            email: invite.emailString,
+            email: invite.recipient.email,
+            prefill: invite.recipient.prefill,
             studyId,
             expiresAt,
             status: InviteStatus.FAILED_TO_SEND,

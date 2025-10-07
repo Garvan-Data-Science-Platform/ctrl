@@ -288,7 +288,10 @@ describe('InvitesController', () => {
 
   describe('POST /studies/{studyId}/invites', () => {
     it('should not create invites if a study does not yet have a published survey', async () => {
-      const emails = ['invite5@new.com', 'invite6@new.com']
+      const recipients = [
+        { email: 'invite5@new.com', prefill: {} },
+        { email: 'invite6@new.com', prefill: {} },
+      ]
       const studyId = 2
 
       await prisma.surveyVersion.update({
@@ -305,7 +308,7 @@ describe('InvitesController', () => {
 
       const response = await request(app)
         .post(`/studies/${studyId}/invites`)
-        .send({ emails, subjectText: 'Subject Text', explanatoryText: 'Explanatory Text' })
+        .send({ recipients, subjectText: 'Subject Text', explanatoryText: 'Explanatory Text' })
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       expect(response.status).toBe(404)
@@ -316,11 +319,14 @@ describe('InvitesController', () => {
     })
 
     it('should create new study invites from a list of emails, return data about how many new invites were created, and send the invites to their emails', async () => {
-      const emails = ['invite5@new.com', 'invite6@new.com']
+      const recipients = [
+        { email: 'invite5@new.com', prefill: {} },
+        { email: 'invite6@new.com', prefill: {} },
+      ]
 
       const response = await request(app)
         .post('/studies/1/invites')
-        .send({ emails, subjectText: 'Subject Text', explanatoryText: 'Explanatory Text' })
+        .send({ recipients, subjectText: 'Subject Text', explanatoryText: 'Explanatory Text' })
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       const body: InviteParticipantsResponse = response.body
@@ -333,7 +339,7 @@ describe('InvitesController', () => {
       expect(sentEmails.length).toBe(2)
       sentEmails.forEach((email) => {
         expect(email.from).toBe(`CTRL <noreply@${process.env.HOSTNAME}>`)
-        expect(emails).toContain(email.to)
+        expect(recipients.map((r) => r.email)).toContain(email.to)
         expect(email.subject).toBe('Subject Text')
         expect(email.html).toContain('Explanatory Text')
       })
@@ -345,12 +351,12 @@ describe('InvitesController', () => {
       expect(study.inviteEmailText).toBe('Explanatory Text')
 
       // Check invites were created
-      for (const email of emails) {
+      for (const r of recipients) {
         const createdInvite = await prisma.invite.findUnique({
           where: {
             studyId_emailHash: {
               //@ts-ignore
-              email,
+              email: r.email,
               studyId: 1,
             },
           },
@@ -386,7 +392,11 @@ describe('InvitesController', () => {
       // Create invite for revoked
       const response = await request(app)
         .post('/studies/1/invites')
-        .send({ emails: ['invite3@revoked.com'], subjectText: 'ABC', explanatoryText: '123' })
+        .send({
+          recipients: [{ email: 'invite3@revoked.com', prefill: {} }],
+          subjectText: 'ABC',
+          explanatoryText: '123',
+        })
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       const body: InviteParticipantsResponse = response.body
@@ -442,7 +452,11 @@ describe('InvitesController', () => {
 
       const response = await request(app)
         .post('/studies/1/invites')
-        .send({ emails: [emailPendingInvite], subjectText: 'ABC', explanatoryText: '123' })
+        .send({
+          recipients: [{ email: emailPendingInvite, prefill: {} }],
+          subjectText: 'ABC',
+          explanatoryText: '123',
+        })
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       const body: InviteParticipantsResponse = response.body
@@ -486,7 +500,11 @@ describe('InvitesController', () => {
 
       const response = await request(app)
         .post('/studies/1/invites')
-        .send({ emails: [emailAcceptedInvite], subjectText: 'ABC', explanatoryText: '123' })
+        .send({
+          recipients: [{ email: emailAcceptedInvite, prefill: {} }],
+          subjectText: 'ABC',
+          explanatoryText: '123',
+        })
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       const body: InviteParticipantsResponse = response.body
@@ -527,7 +545,7 @@ describe('InvitesController', () => {
       const response = await request(app)
         .post('/studies/1/invites')
         .send({
-          emails: emails.map((e) => e.email),
+          recipients: emails.map((e) => ({ email: e.email, prefill: {} })),
           subjectText: 'Subject Text',
           explanatoryText: 'Explanatory Text',
         })

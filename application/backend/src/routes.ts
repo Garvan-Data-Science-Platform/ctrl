@@ -538,7 +538,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Partial_RegisterParticipantRequest_": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"firstName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"middleName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"lastName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"email":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"pattern":{"errorMsg":"please provide valid email","value":"^(.+)@(.+)$"}}},"mobile":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"pattern":{"errorMsg":"please provide valid phone number","value":"^(\\+\\d{1,2}\\s?)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$"}}},"preferredContact":{"dataType":"union","subSchemas":[{"ref":"ContactMethod"},{"dataType":"undefined"}]},"addressLine":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"suburb":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"postcode":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"state":{"dataType":"union","subSchemas":[{"ref":"StateTerritory"},{"dataType":"undefined"}]},"password":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"errorMsg":"Password must be at least 8 characters","value":8}}},"dob":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"isDate":{"errorMsg":"Date of birth must be of date format"}}},"participantType":{"dataType":"union","subSchemas":[{"ref":"ParticipantType"},{"dataType":"undefined"}]},"nextOfKin":{"dataType":"union","subSchemas":[{"ref":"AlternativeContact"},{"dataType":"undefined"}]},"dependents":{"dataType":"union","subSchemas":[{"dataType":"array","array":{"dataType":"refObject","ref":"OnBehalf"}},{"dataType":"undefined"}]}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"firstName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"middleName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"lastName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"email":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"pattern":{"errorMsg":"please provide valid email","value":"^(.+)@(.+)$"}}},"mobile":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"pattern":{"errorMsg":"please provide valid phone number","value":"^(\\+\\d{1,2}\\s?)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$"}}},"preferredContact":{"dataType":"union","subSchemas":[{"ref":"ContactMethod"},{"dataType":"undefined"}]},"addressLine":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"suburb":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"postcode":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"state":{"dataType":"union","subSchemas":[{"ref":"StateTerritory"},{"dataType":"undefined"}]},"password":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"errorMsg":"Password must be at least 8 characters","value":8}}},"dob":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"isDate":{"errorMsg":"Date of birth must be of date format"}}},"participantType":{"dataType":"union","subSchemas":[{"ref":"ParticipantType"},{"dataType":"undefined"}]},"nextOfKin":{"dataType":"union","subSchemas":[{"ref":"AlternativeContact"},{"dataType":"undefined"}]},"dependents":{"dataType":"union","subSchemas":[{"dataType":"array","array":{"dataType":"refObject","ref":"OnBehalf"}},{"dataType":"undefined"}]},"externalId":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "UpdateProfileRequest": {
@@ -561,6 +561,7 @@ const models: TsoaRoute.Models = {
         "properties": {
             "id": {"dataType":"double","required":true},
             "participantId": {"dataType":"string","required":true},
+            "externalId": {"dataType":"string"},
             "email": {"dataType":"string"},
             "firstName": {"dataType":"string","required":true},
             "lastName": {"dataType":"string","required":true},
@@ -599,6 +600,11 @@ const models: TsoaRoute.Models = {
             "data": {"ref":"ParticipantWithProfile","required":true},
         },
         "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "UpdateParticipantRequest": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"profile":{"ref":"UpdateProfileRequest","required":true},"externalId":{"dataType":"string","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "GetUserInvitesResponse": {
@@ -640,10 +646,33 @@ const models: TsoaRoute.Models = {
         "type": {"dataType":"string","validators":{"pattern":{"errorMsg":"Please provide valid email","value":"^(.+)@(.+)$"}}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Partial_GetParticipantProfileResponse-at-data_": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"id":{"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"undefined"}]},"firstName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"middleName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"lastName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"dob":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"email":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"mobile":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"addressLine":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"suburb":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"state":{"dataType":"union","subSchemas":[{"ref":"StateTerritory"},{"dataType":"undefined"}]},"postcode":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"preferredContact":{"dataType":"union","subSchemas":[{"ref":"ContactMethod"},{"dataType":"undefined"}]},"participantType":{"dataType":"union","subSchemas":[{"ref":"ParticipantType"},{"dataType":"undefined"}]},"nextOfKin":{"dataType":"union","subSchemas":[{"ref":"AlternativeContact"},{"dataType":"undefined"}]},"familyMembers":{"dataType":"union","subSchemas":[{"dataType":"array","array":{"dataType":"refObject","ref":"FamilyMember"}},{"dataType":"undefined"}]},"familyId":{"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"undefined"}]}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Prefill": {
+        "dataType": "refObject",
+        "properties": {
+            "profile": {"ref":"Partial_GetParticipantProfileResponse-at-data_"},
+            "studyParticipant": {"dataType":"nestedObjectLiteral","nestedProperties":{"externalId":{"dataType":"string"}}},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Recipient": {
+        "dataType": "refObject",
+        "properties": {
+            "email": {"ref":"Email","required":true},
+            "prefill": {"ref":"Prefill","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "InviteParticipantsRequest": {
         "dataType": "refObject",
         "properties": {
-            "emails": {"dataType":"array","array":{"dataType":"refAlias","ref":"Email"},"required":true},
+            "recipients": {"dataType":"array","array":{"dataType":"refObject","ref":"Recipient"},"required":true},
             "subjectText": {"dataType":"string","required":true},
             "explanatoryText": {"dataType":"string","required":true},
         },
@@ -793,6 +822,7 @@ const models: TsoaRoute.Models = {
             "participantType": {"ref":"ParticipantType","required":true},
             "nextOfKin": {"ref":"AlternativeContact","required":true},
             "dependents": {"dataType":"array","array":{"dataType":"refObject","ref":"OnBehalf"},"required":true},
+            "externalId": {"dataType":"string"},
         },
         "additionalProperties": false,
     },
@@ -2321,6 +2351,39 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
 
               await templateService.apiHandler({
                 methodName: 'getParticipantById',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsParticipantsController_updateProfileById: Record<string, TsoaRoute.ParameterSchema> = {
+                studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
+                profileId: {"in":"path","name":"profileId","required":true,"dataType":"double"},
+                bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"UpdateParticipantRequest"},
+        };
+        app.patch('/studies/:studyId/participants/:profileId',
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(ParticipantsController)),
+            ...(fetchMiddlewares<RequestHandler>(ParticipantsController.prototype.updateProfileById)),
+
+            async function ParticipantsController_updateProfileById(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsParticipantsController_updateProfileById, request, response });
+
+                const controller = new ParticipantsController();
+
+              await templateService.apiHandler({
+                methodName: 'updateProfileById',
                 controller,
                 response,
                 next,

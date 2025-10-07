@@ -18,6 +18,7 @@ import { DateField, EditButton, List, ShowButton, useDataGrid } from '@refinedev
 import React, { useEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { InviteModal } from '../../components/InviteModal'
+import { Recipient } from '@common/types/invite'
 import { axiosInstance } from '../../providers/dataProvider'
 import { useInvalidate, useNotification } from '@refinedev/core'
 import { InviteStatus } from '@common/types/api/participants/invite'
@@ -54,7 +55,7 @@ export const ParticipantList = () => {
   const location = useLocation()
   const invalidate = useInvalidate()
 
-  const [initialEmails, setInitialEmails] = useState<string[]>([])
+  const [initialRecipients, setInitialRecipients] = useState<Recipient[]>([])
   const [modalOpen, setModalOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
@@ -94,16 +95,16 @@ export const ParticipantList = () => {
 
     if (location.state?.openInviteModal) {
       setModalOpen(true)
-      setInitialEmails(location.state.initialEmails || [])
+      setInitialRecipients(location.state.initialRecipients || [])
       // Clear the navigation state
       window.history.replaceState({}, document.title)
     }
   }, [location, studyId])
 
-  const sendInvites = (emails: string[], subjectText: string, explanatoryText: string) => {
+  const sendInvites = (recipients: Recipient[], subjectText: string, explanatoryText: string) => {
     setLoading(true)
     axiosInstance
-      .post(`/studies/${studyId}/invites`, { emails, subjectText, explanatoryText })
+      .post(`/studies/${studyId}/invites`, { recipients, subjectText, explanatoryText })
       .then(() => {
         setModalOpen(false)
         open?.({ type: 'success', message: `Invites sent` })
@@ -218,6 +219,8 @@ export const ParticipantList = () => {
         field: 'participantId',
         flex: 1,
         headerName: 'ID',
+        renderCell: ({ value, row }) => (row.externalId ? `${value} (${row.externalId})` : value),
+        minWidth: 180,
         filterOperators: allowedOperators,
       },
       {
@@ -247,7 +250,7 @@ export const ParticipantList = () => {
       {
         field: 'answers',
         headerName: 'Latest Answers',
-        minWidth: 250,
+        minWidth: 120,
         renderCell: ({ value, row }) => renderAnswer(row.id, value.at(-1)),
         sortable: false,
         disableColumnMenu: true,
@@ -398,7 +401,7 @@ export const ParticipantList = () => {
                 setModalOpen(false)
               }}
               onSend={sendInvites}
-              initialEmails={initialEmails}
+              initialRecipients={initialRecipients}
             />
           ) : (
             <Box>
