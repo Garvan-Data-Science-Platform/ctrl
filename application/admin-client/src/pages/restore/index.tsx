@@ -1,5 +1,4 @@
 import { useInvalidate, useNotification } from '@refinedev/core'
-import { useCurrentStudyId } from '../../studyStore'
 import { List, useDataGrid } from '@refinedev/mui'
 import { Box, IconButton, Tooltip } from '@mui/material'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
