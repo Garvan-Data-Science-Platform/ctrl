@@ -32,22 +32,16 @@ const RestorePage = () => {
   const { dataGridProps } = useDataGrid({
     syncWithLocation: false,
     resource: 'participants/deleted',
-    filters: { mode: 'off' },
-    sorters: { mode: 'off' },
   })
 
   const { dataGridProps: studiesDataGridProps } = useDataGrid({
     syncWithLocation: false,
     resource: 'studies/deleted',
-    filters: { mode: 'off' },
-    sorters: { mode: 'off' },
   })
 
   const { dataGridProps: usersDataGridProps } = useDataGrid({
     syncWithLocation: false,
     resource: 'users/admin/deleted',
-    filters: { mode: 'off' },
-    sorters: { mode: 'off' },
   })
 
   const columns = React.useMemo<GridColDef[]>(
@@ -65,6 +59,12 @@ const RestorePage = () => {
       },
       {
         field: 'lastName',
+        flex: 1,
+        headerName: 'Last Name',
+        minWidth: 100,
+      },
+      {
+        field: 'study',
         flex: 1,
         headerName: 'Last Name',
         minWidth: 100,

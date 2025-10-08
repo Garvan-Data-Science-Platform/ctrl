@@ -5,5 +5,6 @@ export interface GetDeletedParticipantsResponse {
     firstName: string
     lastName: string
     dob: Date
+    study: string
   }[]
 }

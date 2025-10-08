@@ -50,7 +50,7 @@ import { Role } from '@prisma/client'
 import { v4 as uuidv4 } from 'uuid'
 import { genId } from '../utils/genId'
 
-@Route('studies/{studyId}')
+@Route('/')
 @Tags('Participants')
 @Security('jwt', ['OrganisationAdmin'])
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
@@ -68,7 +68,7 @@ export class ParticipantsController extends Controller {
    *
    * @summary List participants
    */
-  @Get('/participants')
+  @Get('studies/{studyId}/participants')
   public async getParticipants(@Path() studyId: number): Promise<GetParticipantsResponse> {
     const participant_list = await prisma.studyParticipant.findMany({ where: { studyId } })
 
@@ -131,15 +131,14 @@ export class ParticipantsController extends Controller {
    *
    * @summary List deleted participants
    */
-  @Get('/participants/deleted')
-  public async getDeletedParticipants(
-    @Path() studyId: number,
-  ): Promise<GetDeletedParticipantsResponse> {
+  @Get('participants/deleted')
+  public async getDeletedParticipants(): Promise<GetDeletedParticipantsResponse> {
     const participants = await this.participantRepo.findMany({
-      where: { deleted: true, studyId },
+      where: { deleted: true },
       select: {
         participantId: true,
         participantProfile: { select: { firstName: true, lastName: true, dob: true, id: true } },
+        study: { select: { name: true } },
       },
     })
 
@@ -148,6 +147,7 @@ export class ParticipantsController extends Controller {
         ...val.participantProfile,
         id: val.participantId || '',
         profileId: val.participantProfile.id,
+        study: val.study.name,
       })),
     }
   }
@@ -157,7 +157,7 @@ export class ParticipantsController extends Controller {
    *
    * @summary Restore deleted participant by ProfileId
    */
-  @Patch('/participants/{profileId}/restore')
+  @Patch('studies/{studyId}/participants/{profileId}/restore')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async restoreParticipantById(@Path() studyId: number, @Path() profileId: number) {
     await this.participantRepo.update({
@@ -174,7 +174,7 @@ export class ParticipantsController extends Controller {
    *
    * @summary Get a  Participant by profile ID
    */
-  @Get('/participants/{profileId}/')
+  @Get('studies/{studyId}/participants/{profileId}/')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async getParticipantById(
     @Path() studyId: number,
@@ -231,7 +231,7 @@ export class ParticipantsController extends Controller {
    *
    * @summary Remove a participant from the study
    */
-  @Delete('/participants/{profileId}')
+  @Delete('studies/{studyId}/participants/{profileId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async deleteParticipantById(
     @Path() studyId: number,
@@ -272,7 +272,7 @@ export class ParticipantsController extends Controller {
    * @summary Add a participant to the study, if they were formerly removed, or they don't have an account.
    * Throws error if user has an account and should be added via the study invite process
    */
-  @Post('/participants/{profileId}')
+  @Post('studies/{studyId}/participants/{profileId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async addParticipantById(
     @Path() studyId: number,
