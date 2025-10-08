@@ -209,7 +209,7 @@ function App() {
                         </Authenticated>
                       }
                     >
-                      <Route index element={<NavigateToResource resource="users" />} />
+                      <Route index element={<NavigateToResource resource="surveys" />} />
 
                       <Route path="/users">
                         <Route index element={<UserList />} />

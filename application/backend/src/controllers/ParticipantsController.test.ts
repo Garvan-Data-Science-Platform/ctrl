@@ -166,7 +166,7 @@ describe('ParticipantsController', () => {
   describe('GET /participants/deleted', () => {
     it('Lists deleted participants', async () => {
       const res1 = await request(app)
-        .get('/studies/1/participants/deleted')
+        .get('/participants/deleted')
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
       expect(res1.ok).toBe(true)
       expect(res1.body.data).toHaveLength(0)
@@ -179,7 +179,7 @@ describe('ParticipantsController', () => {
         },
       })
       const res2 = await request(app)
-        .get('/studies/1/participants/deleted')
+        .get('/participants/deleted')
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
       expect(res2.ok).toBe(true)
       expect(res2.body.data).toHaveLength(1)

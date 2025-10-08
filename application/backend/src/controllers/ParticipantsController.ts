@@ -138,7 +138,7 @@ export class ParticipantsController extends Controller {
       select: {
         participantId: true,
         participantProfile: { select: { firstName: true, lastName: true, dob: true, id: true } },
-        study: { select: { name: true } },
+        study: { select: { name: true, id: true } },
       },
     })
 
@@ -148,6 +148,7 @@ export class ParticipantsController extends Controller {
         id: val.participantId || '',
         profileId: val.participantProfile.id,
         study: val.study.name,
+        studyId: val.study.id,
       })),
     }
   }

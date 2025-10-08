@@ -582,7 +582,7 @@ const models: TsoaRoute.Models = {
     "GetDeletedParticipantsResponse": {
         "dataType": "refObject",
         "properties": {
-            "data": {"dataType":"array","array":{"dataType":"nestedObjectLiteral","nestedProperties":{"study":{"dataType":"string","required":true},"dob":{"dataType":"datetime","required":true},"lastName":{"dataType":"string","required":true},"firstName":{"dataType":"string","required":true},"profileId":{"dataType":"double","required":true},"id":{"dataType":"string","required":true}}},"required":true},
+            "data": {"dataType":"array","array":{"dataType":"nestedObjectLiteral","nestedProperties":{"studyId":{"dataType":"double","required":true},"study":{"dataType":"string","required":true},"dob":{"dataType":"datetime","required":true},"lastName":{"dataType":"string","required":true},"firstName":{"dataType":"string","required":true},"profileId":{"dataType":"double","required":true},"id":{"dataType":"string","required":true}}},"required":true},
         },
         "additionalProperties": false,
     },

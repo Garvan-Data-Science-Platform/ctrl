@@ -83,7 +83,7 @@ const RestorePage = () => {
                   onClick={() =>
                     restore(
                       'participants/deleted',
-                      `studies/${studyId}/participants/${row.profileId}/restore`,
+                      `studies/${row.studyId}/participants/${row.profileId}/restore`,
                     )
                   }
                   data-cy="restore-participant"
