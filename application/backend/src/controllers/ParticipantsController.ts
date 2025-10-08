@@ -264,8 +264,11 @@ export class ParticipantsController extends Controller {
   ): Promise<void> {
     const profile = await prisma.participantProfile.findUniqueOrThrow({ where: { id: profileId } })
 
-    const familyGuardiansCount = await prisma.participantProfile.count({
-      where: { familyId: profile.familyId, participantType: 'GUARDIAN' },
+    const familyGuardiansCount = await prisma.studyParticipant.count({
+      where: {
+        studyId,
+        participantProfile: { familyId: profile.familyId, participantType: 'GUARDIAN' },
+      },
     })
     const familyDepsCount = await prisma.studyParticipant.count({
       where: {
