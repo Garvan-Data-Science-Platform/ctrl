@@ -75,7 +75,7 @@ export class StudiesController extends Controller {
     })
 
     const studies = await this.studyParticipantRepo.findMany({
-      where: { participantProfileId: participantProfile.id },
+      where: { participantProfileId: participantProfile.id, study: { deleted: false } },
       select: { study: true },
     })
 
