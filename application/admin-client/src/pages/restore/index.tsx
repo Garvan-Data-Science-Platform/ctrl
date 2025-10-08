@@ -11,7 +11,6 @@ import { useQueryClient } from '@tanstack/react-query'
 const RestorePage = () => {
   const invalidate = useInvalidate()
   const { open } = useNotification()
-  const studyId = useCurrentStudyId()
   const queryClient = useQueryClient()
 
   const restore = async (resource: string, endpoint: string) => {
