@@ -161,6 +161,30 @@ export class ParticipantsController extends Controller {
   @Patch('studies/{studyId}/participants/{profileId}/restore')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async restoreParticipantById(@Path() studyId: number, @Path() profileId: number) {
+    const participant = await this.participantRepo.findUniqueOrThrow({
+      where: {
+        deleted: true,
+        participantProfileId_studyId: { studyId, participantProfileId: profileId },
+      },
+      select: { participantProfile: { select: { participantType: true, familyId: true } } },
+    })
+    const ptype = participant.participantProfile.participantType
+    const gcount = await this.participantRepo.count({
+      where: {
+        studyId,
+        participantProfile: {
+          familyId: participant.participantProfile.familyId,
+          participantType: 'GUARDIAN',
+        },
+      },
+    })
+
+    if ((ptype == 'DEPENDENT_AGE' || ptype == 'DEPENDENT_OTHER') && gcount < 1) {
+      throw new UnprocessableError(
+        'Cannot restore a dependant if their guardian is not a participant of the study',
+      )
+    }
+
     await this.participantRepo.update({
       where: {
         deleted: true,
@@ -301,6 +325,22 @@ export class ParticipantsController extends Controller {
 
     const profile = await this.profileRepo.findUniqueOrThrow({ where: { id: profileId } })
 
+    if (
+      profile.participantType == 'DEPENDENT_AGE' ||
+      profile.participantType == 'DEPENDENT_OTHER'
+    ) {
+      const guardian = await this.participantRepo.findFirst({
+        where: {
+          studyId,
+          participantProfile: { familyId: profile.familyId, participantType: 'GUARDIAN' },
+        },
+      })
+      if (!guardian) {
+        throw new UnprocessableError(
+          "Can't add a dependent to a study if no guardian is a member of the study",
+        )
+      }
+    }
     if (deletedP) {
       await this.participantRepo.update({
         where: {
@@ -313,18 +353,6 @@ export class ParticipantsController extends Controller {
         data: { deleted: false },
       })
     } else if (!profile.userId) {
-      const guardian = await this.participantRepo.findFirst({
-        where: {
-          studyId,
-          participantProfile: { familyId: profile.familyId, participantType: 'GUARDIAN' },
-        },
-      })
-      if (!guardian) {
-        throw new UnprocessableError(
-          "Can't add a dependent to a study if no guardian is a member of the study",
-        )
-      }
-
       await this.participantRepo.create({
         data: { studyId: studyId, participantProfileId: profileId },
       })

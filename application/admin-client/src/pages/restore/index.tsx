@@ -64,7 +64,7 @@ const RestorePage = () => {
       {
         field: 'study',
         flex: 1,
-        headerName: 'Last Name',
+        headerName: 'Study Name',
         minWidth: 100,
       },
       {

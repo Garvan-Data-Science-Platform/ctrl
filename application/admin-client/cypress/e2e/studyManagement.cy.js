@@ -9,7 +9,7 @@ beforeEach(() => {
 
 describe('Study management page', () => {
   it('Can access study management page', () => {
-    cy.visit('/')
+    cy.visit('/users')
     cy.get('[data-cy="manage-studies"]').click()
     cy.url().should('contain', '/studies')
   })
