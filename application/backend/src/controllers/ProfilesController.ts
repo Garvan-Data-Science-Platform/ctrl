@@ -171,35 +171,50 @@ export class ProfilesController extends Controller {
   ) {
     const profile = await this.participantProfileRepo.findUniqueOrThrow({
       where: { id: profileId },
+      select: {
+        participantType: true,
+        familyId: true,
+        userId: true,
+        id: true,
+        studies: { select: { studyId: true } },
+      },
     })
     const { nextOfKin, email, ...updateData } = { ...bodyRequest }
     if (bodyRequest.dob) updateData.dob = new Date(bodyRequest.dob) as any
 
     const hasNok = Boolean(nextOfKin)
 
-    const familyGuardiansCount = await this.participantProfileRepo.count({
-      where: { familyId: profile.familyId, participantType: 'GUARDIAN' },
-    })
-
-    if (bodyRequest.participantType && profile.participantType == 'GUARDIAN') {
-      const familyDepsCount = await this.participantProfileRepo.count({
+    for (const study of profile.studies) {
+      const familyGuardiansCount = await prisma.studyParticipant.count({
         where: {
-          familyId: profile.familyId,
-          OR: [{ participantType: 'DEPENDENT_AGE' }, { participantType: 'DEPENDENT_OTHER' }],
+          studyId: study.studyId,
+          participantProfile: { familyId: profile.familyId, participantType: 'GUARDIAN' },
         },
       })
-      if (familyGuardiansCount == 1 && familyDepsCount > 0) {
-        throw new UnprocessableError('Cannot leave a dependent with no guardian')
+
+      if (bodyRequest.participantType && profile.participantType == 'GUARDIAN') {
+        const familyDepsCount = await prisma.studyParticipant.count({
+          where: {
+            studyId: study.studyId,
+            participantProfile: {
+              familyId: profile.familyId,
+              OR: [{ participantType: 'DEPENDENT_AGE' }, { participantType: 'DEPENDENT_OTHER' }],
+            },
+          },
+        })
+        if (familyGuardiansCount == 1 && familyDepsCount > 0) {
+          throw new UnprocessableError('Cannot leave a dependent with no guardian')
+        }
+      }
+      if (
+        (bodyRequest.participantType == 'DEPENDENT_AGE' ||
+          bodyRequest.participantType == 'DEPENDENT_OTHER') &&
+        familyGuardiansCount == 0
+      ) {
+        throw new UnprocessableError('Cannot add a dependent to a family with no guardian')
       }
     }
 
-    if (
-      (bodyRequest.participantType == 'DEPENDENT_AGE' ||
-        bodyRequest.participantType == 'DEPENDENT_OTHER') &&
-      familyGuardiansCount == 0
-    ) {
-      throw new UnprocessableError('Cannot add a dependent to a family with no guardian')
-    }
     await this.participantProfileRepo.update({
       where: { id: profile.id },
       data: { ...updateData, nextOfKin: hasNok ? { update: nextOfKin } : undefined },
