@@ -9,7 +9,7 @@ beforeEach(() => {
 describe('Users', () => {
   it('List users', () => {
     cy.login(UserType.ADMIN)
-    cy.visit('/')
+    cy.visit('/users')
     cy.contains('Users').should('exist')
   })
 

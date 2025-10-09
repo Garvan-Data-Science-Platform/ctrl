@@ -567,7 +567,7 @@ describe('AuthController', () => {
       jest.replaceProperty(config, 'otp', true)
       const loginRequest: LoginRequest = {
         email: PARTICIPANT_UNANSWERED_EMAIL,
-        password: 'password',
+        password: 'Testpassword1',
       }
       const loginResponse = await request(app).post('/auth/login').send(loginRequest)
       expect(loginResponse.ok).toBe(true)
@@ -611,7 +611,7 @@ describe('AuthController', () => {
       })
       const loginRequest: LoginRequest = {
         email: PARTICIPANT_UNANSWERED_EMAIL,
-        password: 'password',
+        password: 'Testpassword1',
       }
       const loginResponse = await request(app).post('/auth/login').send(loginRequest)
       expect(loginResponse.ok).toBe(true)
@@ -693,7 +693,7 @@ describe('AuthController', () => {
     it('Should allow oidc login', async () => {
       fetchMock.mockGlobal().route('http://testurl/oauth2/token', { access_token: '123' })
       fetchMock.mockGlobal().route('http://testurl/oauth2/userinfo', {
-        email: 'test1@example.com',
+        email: 'admin@example.com',
       })
 
       const loginRequest: OIDCLoginRequest = {
@@ -710,7 +710,7 @@ describe('AuthController', () => {
     it('Should allow oidc login', async () => {
       fetchMock.mockGlobal().route('http://testurl/oauth2/token', { access_token: '123' })
       fetchMock.mockGlobal().route('http://testurl/oauth2/userinfo', {
-        email: 'test1@example.com',
+        email: 'admin@example.com',
       })
 
       const loginRequest: OIDCLoginRequest = {
@@ -726,7 +726,7 @@ describe('AuthController', () => {
     it('Should fail on nonexisting provider', async () => {
       fetchMock.mockGlobal().route('http://testurl/oauth2/token', { access_token: '123' })
       fetchMock.mockGlobal().route('http://testurl/oauth2/userinfo', {
-        email: 'test1@example.com',
+        email: 'admin@example.com',
       })
 
       const loginRequest: OIDCLoginRequest = {

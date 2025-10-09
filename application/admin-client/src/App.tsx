@@ -30,7 +30,16 @@ import { authProvider } from './providers/authProvider'
 import { ParticipantList, ParticipantShow } from './pages/participants'
 import { SurveyImport, IntegrationsHome, ParticipantImport } from './pages/integrations'
 import { ResponsesView } from './pages/responses'
-import { ListAlt, Person, RecentActors, DatasetLinked, Settings } from '@mui/icons-material'
+import {
+  ListAlt,
+  Person,
+  RecentActors,
+  DatasetLinked,
+  Settings,
+  AdminPanelSettings,
+  RestoreFromTrash,
+  LibraryBooks,
+} from '@mui/icons-material'
 import { ParticipantEdit } from './pages/participants/edit'
 import { SetupPage } from './pages/setup'
 import { AllResponsesView } from './pages/responses/all'
@@ -41,6 +50,7 @@ import StudiesPage from './pages/studies'
 import { Callback } from './pages/login/callback'
 import OTP from './pages/login/OTP'
 import { Box, Typography } from '@mui/material'
+import RestorePage from './pages/restore'
 
 function App() {
   return (
@@ -58,21 +68,6 @@ function App() {
                   routerProvider={routerBindings}
                   authProvider={authProvider}
                   resources={[
-                    {
-                      name: 'users',
-                      list: '/users',
-                      create: '/users/create',
-                      edit: '/users/update/:id',
-                      show: '/users/:id',
-                      meta: {
-                        label: 'Admin Users',
-                        canDelete: true,
-                        icon: <Person />,
-                      },
-                    },
-                    {
-                      name: 'users/admin',
-                    },
                     {
                       name: 'surveys',
                       list: '/surveys',
@@ -122,12 +117,54 @@ function App() {
                     {
                       name: 'families',
                     },
+
+                    {
+                      name: 'admin',
+                      meta: {
+                        icon: <AdminPanelSettings />,
+                        label: 'Admin Panel',
+                      },
+                    },
+                    {
+                      name: 'users',
+                      list: '/users',
+                      create: '/users/create',
+                      edit: '/users/update/:id',
+                      show: '/users/:id',
+                      meta: {
+                        label: 'Admin Users',
+                        canDelete: true,
+                        icon: <Person />,
+                        parent: 'admin',
+                      },
+                    },
+                    {
+                      name: 'users/admin',
+                    },
                     {
                       name: 'settings',
                       list: '/settings',
                       edit: '/settings',
                       meta: {
                         icon: <Settings />,
+                        parent: 'admin',
+                      },
+                    },
+                    {
+                      name: 'manage studies',
+                      list: '/studies',
+                      meta: {
+                        icon: <LibraryBooks />,
+                        parent: 'admin',
+                      },
+                    },
+                    {
+                      name: 'restore',
+                      list: '/restore',
+                      meta: {
+                        icon: <RestoreFromTrash />,
+                        parent: 'admin',
+                        label: 'Restore',
                       },
                     },
                   ]}
@@ -172,7 +209,7 @@ function App() {
                         </Authenticated>
                       }
                     >
-                      <Route index element={<NavigateToResource resource="users" />} />
+                      <Route index element={<NavigateToResource resource="surveys" />} />
 
                       <Route path="/users">
                         <Route index element={<UserList />} />
@@ -203,6 +240,7 @@ function App() {
                         element={<ResponsesView />}
                       />
                       <Route path="/settings" index element={<SettingsPage />} />
+                      <Route path="/restore" index element={<RestorePage />} />
                       <Route path="/studies" index element={<StudiesPage />} />
                       <Route path="*" element={<ErrorComponent />} />
                     </Route>

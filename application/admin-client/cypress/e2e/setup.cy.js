@@ -8,7 +8,7 @@ describe('Setup', () => {
     cy.get('[data-cy="setup-email"]').type('abc@d.com')
     cy.get('[data-cy="setup-password"]').type('asdfSDFSDIF12343@$#@')
     cy.get('[data-cy="setup-submit"]').click()
-    cy.url().should('contain', '/users')
+    cy.url().should('contain', '/surveys')
     cy.visit('/surveys')
     cy.contains('Current Draft').should('exist')
   })

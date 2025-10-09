@@ -35,6 +35,7 @@ axiosInstance.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       window.location.href = '/login'
     }
+    error.message = error?.response?.data?.details || error.message
     return Promise.reject(error)
   },
 )

@@ -8,7 +8,7 @@ describe('Login', () => {
   it('Can log in', () => {
     cy.visit('/')
     cy.get('[data-cy="login-email"]').type('test2@example.com')
-    cy.get('[data-cy="login-password"]').type('password')
+    cy.get('[data-cy="login-password"]').type('Testpassword1')
     cy.contains('Log In').click()
     cy.contains('Welcome').should('exist')
   })

@@ -128,7 +128,7 @@ describe('MailerController', () => {
           headers: {},
           subject: 'New Contact Us Request RE: Test Subject',
           text: 'Test Content',
-          to: ['test1@example.com', 'testOrgAdmin2@example.com'],
+          to: ['admin@example.com', 'testOrgAdmin2@example.com'],
         },
         {
           from: 'CTRL <noreply@ctrl.garvan.org.au>',
