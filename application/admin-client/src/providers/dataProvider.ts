@@ -33,6 +33,7 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
+      localStorage.removeItem(TOKEN_KEY)
       window.location.href = '/login'
     }
     error.message = error?.response?.data?.details || error.message
@@ -64,16 +65,34 @@ export const dataProvider = (): DataProvider => {
         data,
       }
     },
-    getList: async ({ resource }) => {
+    getList: async ({ resource, pagination, filters, sorters }: any) => {
       const { studies, activeStudyIndex } = useStudyStore.getState()
       const studyId = studies[activeStudyIndex].id
       let url = resource
-      if (studyResources.includes(resource)) url = `/studies/${studyId}/${url}`
+      const params = new URLSearchParams()
+      if (pagination) {
+        params.append(
+          '_start',
+          String(((pagination.current || 1) - 1) * (pagination.pageSize || 1)),
+        )
+        params.append('_end', String((pagination.current || 1) * (pagination.pageSize || 1)))
+      }
+
+      if (filters?.at(0)) {
+        params.append(`filter[${filters[0].field}][${filters[0].operator}]`, filters[0].value)
+      }
+
+      if (sorters?.at(0)) {
+        params.append(`orderBy[${sorters[0].field}]`, sorters[0].order)
+      }
+
+      if (studyResources.includes(resource)) url = `/studies/${studyId}/${url}?${params.toString()}`
       const response = await axiosInstance.get(url)
       const data = response.data.data
+
       return {
         data,
-        total: data.length,
+        total: response.data.total || data.length,
       }
     },
     create: async ({ resource, variables }) => {

@@ -30,6 +30,7 @@ import {
   Middlewares,
   Request,
   Delete,
+  Queries,
   Patch,
 } from 'tsoa'
 import { Participant } from 'common/types/api/participants/participant'
@@ -49,6 +50,7 @@ import { auditLog } from '../middlewares/AuditLog'
 import { Role } from '@prisma/client'
 import { v4 as uuidv4 } from 'uuid'
 import { genId } from '../utils/genId'
+import { extractOrderBy, extractWhere } from 'utils/filtering'
 
 @Route('/')
 @Tags('Participants')
@@ -68,9 +70,21 @@ export class ParticipantsController extends Controller {
    *
    * @summary List participants
    */
-  @Get('studies/{studyId}/participants')
-  public async getParticipants(@Path() studyId: number): Promise<GetParticipantsResponse> {
-    const participant_list = await prisma.studyParticipant.findMany({ where: { studyId } })
+  @Get('/participants')
+  public async getParticipants(
+    @Path() studyId: number,
+    @Queries() queryParams: { [key: string]: any },
+  ): Promise<GetParticipantsResponse> {
+    const total = await prisma.studyParticipant.count({
+      where: { studyId, participantProfile: extractWhere(queryParams) },
+    })
+
+    const participant_list = await prisma.studyParticipant.findMany({
+      where: { studyId, participantProfile: extractWhere(queryParams) },
+      orderBy: extractOrderBy(queryParams),
+      skip: queryParams._start ? Number(queryParams._start) : undefined,
+      take: queryParams._end ? Number(queryParams._end) - Number(queryParams._start) : undefined,
+    })
 
     const profiles = await this.profileRepo.findMany({
       where: {
@@ -87,7 +101,9 @@ export class ParticipantsController extends Controller {
 
     const participants: GetParticipantsResponse['data'] = []
 
-    for (const p of profiles) {
+    for (const study_part of participant_list) {
+      const p = profiles.filter((val) => val.id == study_part.participantProfileId)[0]
+
       const p_answers = await this.svaRepo.findMany({
         where: { profileId: p.id, version: { studyId } },
         select: {
@@ -100,12 +116,6 @@ export class ParticipantsController extends Controller {
       const lastUpdated = Math.max(
         ...(p_answers.map((val) => determineLastUpdated(val.answers)) as unknown as number[]),
       )
-      const study_part = await prisma.studyParticipant.findFirstOrThrow({
-        where: {
-          studyId,
-          participantProfileId: p.id,
-        },
-      })
       const p_data: Participant = {
         id: p.id,
         participantId: study_part?.participantId || '',
@@ -123,7 +133,7 @@ export class ParticipantsController extends Controller {
       participants.push(p_data)
     }
 
-    return { data: participants }
+    return { data: participants, total }
   }
 
   /**

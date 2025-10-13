@@ -8,7 +8,7 @@
     "@mui/icons-material": "^5.8.3",
     "@mui/lab": "^5.0.0-alpha.85",
     "@mui/material": "^6.1.5",
-    "@mui/x-data-grid": "^8.0.0",
+    "@mui/x-data-grid": "latest-v7",
     "@refinedev/cli": "^2.16.46",
     "@refinedev/core": "^4.57.9",
     "@refinedev/devtools": "^1.2.16",
@@ -28,6 +28,7 @@
     "react-markdown": "^10.0.1",
     "react-router-dom": "^6.8.1",
     "react-router-hash-link": "^2.4.3",
+    "x-data-grid-8": "npm:@mui/x-data-grid@8.14",
     "zustand": "^5.0.0"
   },
   "devDependencies": {
