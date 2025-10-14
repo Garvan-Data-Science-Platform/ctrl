@@ -24,7 +24,6 @@ import { ContactMethod, StateTerritory } from '@common/types/api/users/Participa
 interface FormValues {
   firstName: string
   lastName: string
-  email: string
   dob: string
   addressLine: string
   suburb: string
@@ -135,23 +134,6 @@ export default function ProfileEdit() {
                   error={Boolean(errors.lastName)}
                   helperText={errors.lastName?.message}
                   {...register('lastName', { required: true, value: data?.lastName })}
-                />
-                <TextField
-                  type="email"
-                  fullWidth
-                  sx={{ m: 1 }}
-                  label="Email"
-                  defaultValue="."
-                  error={Boolean(errors.email)}
-                  helperText={errors.email?.message}
-                  {...register('email', {
-                    required: true,
-                    value: data?.email,
-                    pattern: {
-                      value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, //eslint-disable-line
-                      message: 'Enter a valid email',
-                    },
-                  })}
                 />
 
                 <TextField
