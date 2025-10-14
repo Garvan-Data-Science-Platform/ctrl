@@ -175,6 +175,14 @@ export const ParticipantList = () => {
       }, 500) // 500ms debounce
     }
 
+    useEffect(() => {
+      return () => {
+        if (debounceRef.current) {
+          window.clearTimeout(debounceRef.current)
+        }
+      }
+    }, [])
+
     return (
       <div style={{ display: 'flex', alignItems: 'flex-end', height: '100%' }}>
         <TextField
@@ -377,14 +385,6 @@ export const ParticipantList = () => {
             position: 'absolute',
             top: '50%',
             left: '50%',
-            transform: 'translate(-50%, -50%)',
-            bgcolor: 'background.paper',
-            boxShadow: 24,
-            p: 2,
-            borderRadius: 2,
-          }}
-        >
-          {emailIsSetup && publishedSurvey ? (
             <InviteModal
               onCancel={() => {
                 setModalOpen(false)
