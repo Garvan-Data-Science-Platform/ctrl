@@ -70,7 +70,7 @@ export class ParticipantsController extends Controller {
    *
    * @summary List participants
    */
-  @Get('/participants')
+  @Get('studies/{studyId}/participants')
   public async getParticipants(
     @Path() studyId: number,
     @Queries() queryParams: { [key: string]: any },
