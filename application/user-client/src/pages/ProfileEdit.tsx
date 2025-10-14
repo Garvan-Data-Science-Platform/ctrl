@@ -11,6 +11,7 @@ import {
   Select,
   TextField,
   Typography,
+  Link as MLink,
 } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
@@ -278,6 +279,18 @@ export default function ProfileEdit() {
                     value: data?.nextOfKin?.email,
                   })}
                 />
+
+                <Typography variant="body2" sx={{ mt: 3 }}>
+                  Note: If you need to change your email address, please contact a study
+                  administrator via the{' '}
+                  <MLink
+                    onClick={() => {
+                      nav('/contact')
+                    }}
+                  >
+                    Contact Us page.
+                  </MLink>
+                </Typography>
 
                 {errors.root ? (
                   <Alert sx={{ flexGrow: 1, m: 1 }} severity="error">
