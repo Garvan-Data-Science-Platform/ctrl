@@ -148,7 +148,7 @@ export const ParticipantList = () => {
 
   const renderAnswer = (profileId: number, answer: ParticipantAnswerStatus) => {
     return (
-      <Link key={answer.participantId} to={`/responses/${profileId}/${answer.surveyVersionNumber}`}>
+      <Link key={answer.participantId} to={`/responses/${answer.surveyVersionNumber}/${profileId}`}>
         <Tooltip title={statusMap[answer.status].tooltip}>
           <Button sx={{ color: statusMap[answer.status].color }}>
             V{answer.surveyVersionNumber}
