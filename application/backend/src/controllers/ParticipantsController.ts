@@ -50,7 +50,7 @@ import { auditLog } from '../middlewares/AuditLog'
 import { Role } from '@prisma/client'
 import { v4 as uuidv4 } from 'uuid'
 import { genId } from '../utils/genId'
-import { extractOrderBy, extractWhere } from 'utils/filtering'
+import { extractOrderBy, extractWhere } from '../utils/filtering'
 
 @Route('/')
 @Tags('Participants')
@@ -81,31 +81,28 @@ export class ParticipantsController extends Controller {
 
     const participant_list = await prisma.studyParticipant.findMany({
       where: { studyId, participantProfile: extractWhere(queryParams) },
+      select: {
+        participantProfile: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            familyId: true,
+            user: { select: { email: true } },
+          },
+        },
+        participantId: true,
+      },
       orderBy: extractOrderBy(queryParams),
       skip: queryParams._start ? Number(queryParams._start) : undefined,
       take: queryParams._end ? Number(queryParams._end) - Number(queryParams._start) : undefined,
     })
 
-    const profiles = await this.profileRepo.findMany({
-      where: {
-        id: { in: participant_list.map((val) => val.participantProfileId) },
-      },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        familyId: true,
-        user: { select: { email: true } },
-      },
-    })
-
     const participants: GetParticipantsResponse['data'] = []
 
-    for (const study_part of participant_list) {
-      const p = profiles.filter((val) => val.id == study_part.participantProfileId)[0]
-
+    for (const p of participant_list) {
       const p_answers = await this.svaRepo.findMany({
-        where: { profileId: p.id, version: { studyId } },
+        where: { profileId: p.participantProfile.id, version: { studyId } },
         select: {
           answers: true,
           version: { select: { versionNumber: true, updatedAt: true } },
@@ -116,14 +113,15 @@ export class ParticipantsController extends Controller {
       const lastUpdated = Math.max(
         ...(p_answers.map((val) => determineLastUpdated(val.answers)) as unknown as number[]),
       )
+      const profile = p.participantProfile
       const p_data: Participant = {
-        id: p.id,
-        participantId: study_part?.participantId || '',
-        email: p.user?.email,
-        firstName: p.firstName,
-        lastName: p.lastName,
+        id: profile.id,
+        participantId: p.participantId || '',
+        email: profile.user?.email,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
         lastUpdated: lastUpdated ? new Date(lastUpdated).toISOString() : undefined,
-        familyId: p.familyId,
+        familyId: profile.familyId,
         answers: p_answers.map((val) => ({
           surveyVersionNumber: val.version.versionNumber,
           participantId: val.id,

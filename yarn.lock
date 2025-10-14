@@ -6275,6 +6275,7 @@ __metadata:
     tsx: "npm:^4.19.4"
     typescript: "npm:^5.8.3"
     uuid: "npm:^11.1.0"
+    vite-node: "npm:^3.2.4"
   languageName: unknown
   linkType: soft
 
