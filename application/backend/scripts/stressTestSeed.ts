@@ -4,7 +4,12 @@ import prisma from '../src/PrismaClient'
 import { faker } from '@faker-js/faker'
 
 const main = async () => {
-  //Create 1000 survey participants
+  // Get number of records from command line argument, fallback to 1000
+  const numRecords = process.argv[2] ? parseInt(process.argv[2], 10) : 1000
+  if (isNaN(numRecords) || numRecords <= 0) {
+    console.error('Please provide a valid positive integer for the number of records.')
+    process.exit(1)
+  }
 
   //eslint-disable-next-line
   const SeedSurveyStepData = require('../prisma/seed/seedSurveyStepData.json')
@@ -13,7 +18,7 @@ const main = async () => {
   const participants: Partial<StudyParticipant>[] = []
   const profiles: Partial<ParticipantProfile>[] = []
   const answers: Partial<SurveyVersionAnswers>[] = []
-  for (let i = 0; i < 1000; i++) {
+  for (let i = 0; i < numRecords; i++) {
     const pData: Partial<ParticipantProfile> = {
       id: 1000 + i,
       addressLine: faker.string.alphanumeric(),
