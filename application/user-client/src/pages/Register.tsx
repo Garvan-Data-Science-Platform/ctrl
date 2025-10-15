@@ -132,6 +132,11 @@ export default function Register() {
                 alt="logo"
               />
             </Box>
+            <Box sx={{ mt: 3 }}>
+              <Button component={Link} to="/login">
+                Already registered? Log In
+              </Button>
+            </Box>
             {Object.keys(errors) && <Typography>{}</Typography>}
             <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
               <TextField
@@ -480,11 +485,6 @@ export default function Register() {
               Register
             </Button>
           </form>
-          <Box sx={{ mt: 3 }}>
-            <Button component={Link} to="/login">
-              Already registered? Log In
-            </Button>
-          </Box>
         </Card>
       </Container>
     </>
