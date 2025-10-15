@@ -53,6 +53,7 @@ describe('Participants', () => {
     cy.get('[data-rowindex="1"]').contains('V1').trigger('mouseover', { force: true })
     cy.contains('Complete').should('be.visible')
     cy.get('[data-rowindex="1"]').contains('V1').click({ force: true })
+    cy.contains('false').should('exist')
   })
 
   it('Shows completed and partially completed surveys', () => {
@@ -64,9 +65,5 @@ describe('Participants', () => {
     cy.visit('/participants')
     cy.get('[data-rowindex="2"]').contains('V1').trigger('mouseover', { force: true })
     cy.contains('Incomplete').should('be.visible')
-  })
-
-  it('Can view responses', () => {
-    //Note yet implemented
   })
 })
