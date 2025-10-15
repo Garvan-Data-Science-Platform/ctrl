@@ -11,9 +11,10 @@ import {
   Select,
   TextField,
   Typography,
+  Link as MLink,
 } from '@mui/material'
 import { useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { GetParticipantProfileResponse, UpdateProfileRequest } from '@common/types/api/users'
@@ -24,7 +25,6 @@ import { ContactMethod, StateTerritory } from '@common/types/api/users/Participa
 interface FormValues {
   firstName: string
   lastName: string
-  email: string
   dob: string
   addressLine: string
   suburb: string
@@ -135,23 +135,6 @@ export default function ProfileEdit() {
                   error={Boolean(errors.lastName)}
                   helperText={errors.lastName?.message}
                   {...register('lastName', { required: true, value: data?.lastName })}
-                />
-                <TextField
-                  type="email"
-                  fullWidth
-                  sx={{ m: 1 }}
-                  label="Email"
-                  defaultValue="."
-                  error={Boolean(errors.email)}
-                  helperText={errors.email?.message}
-                  {...register('email', {
-                    required: true,
-                    value: data?.email,
-                    pattern: {
-                      value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, //eslint-disable-line
-                      message: 'Enter a valid email',
-                    },
-                  })}
                 />
 
                 <TextField
@@ -296,6 +279,14 @@ export default function ProfileEdit() {
                     value: data?.nextOfKin?.email,
                   })}
                 />
+
+                <Typography variant="body2" sx={{ mt: 3 }}>
+                  Note: If you need to change your email address, please contact a study
+                  administrator via the{' '}
+                  <MLink component={Link} to="/contact">
+                    Contact Us page.
+                  </MLink>
+                </Typography>
 
                 {errors.root ? (
                   <Alert sx={{ flexGrow: 1, m: 1 }} severity="error">

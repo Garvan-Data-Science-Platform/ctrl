@@ -87,7 +87,7 @@ export async function seedTests(prisma: PrismaClient) {
       email: 'operatoradmin@example.com',
       firstName: 'Operator',
       lastName: 'Admin',
-      password: hashPassword('password'),
+      password: hashPassword('Testpassword1'),
       role: Role.OperatorAdmin,
     },
   })
@@ -96,10 +96,10 @@ export async function seedTests(prisma: PrismaClient) {
   await prisma.user.create({
     data: {
       id: ORG_ADMIN_ID,
-      email: 'test1@example.com',
+      email: 'admin@example.com',
       firstName: 'Organisation',
       lastName: 'Admin',
-      password: hashPassword('password'),
+      password: hashPassword('Testpassword1'),
       role: Role.OrganisationAdmin,
       organisations: {
         connect: {
@@ -116,7 +116,7 @@ export async function seedTests(prisma: PrismaClient) {
       email: 'testOrgAdmin2@example.com',
       firstName: 'Organisation2',
       lastName: 'Admin2',
-      password: hashPassword('password'),
+      password: hashPassword('Testpassword1'),
       role: Role.OrganisationAdmin,
       organisations: {
         connect: {
@@ -133,7 +133,7 @@ export async function seedTests(prisma: PrismaClient) {
       email: PARTICIPANT_UNANSWERED_EMAIL,
       firstName: 'Test',
       lastName: 'User',
-      password: hashPassword('password'),
+      password: hashPassword('Testpassword1'),
       role: Role.Participant,
       organisations: {
         connect: {
@@ -150,7 +150,7 @@ export async function seedTests(prisma: PrismaClient) {
       email: 'g2@example.com',
       firstName: 'Second',
       lastName: 'Guardian',
-      password: hashPassword('password'),
+      password: hashPassword('Testpassword1'),
       role: Role.Participant,
     },
   })
@@ -161,7 +161,7 @@ export async function seedTests(prisma: PrismaClient) {
       email: PARTICIPANT_COMPLETED_EMAIL,
       firstName: 'Test',
       lastName: 'User',
-      password: hashPassword('password'),
+      password: hashPassword('Testpassword1'),
       role: Role.Participant,
     },
   })

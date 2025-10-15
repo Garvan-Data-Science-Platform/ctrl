@@ -13,6 +13,7 @@ import type {
   GetParticipantsResponse,
   InviteParticipantsRequest,
   InviteParticipantsResponse,
+  GetDeletedParticipantsResponse,
 } from 'common/types/api/participants'
 import logger from 'common/src/logger'
 import {
@@ -29,6 +30,8 @@ import {
   Middlewares,
   Request,
   Delete,
+  Queries,
+  Patch,
 } from 'tsoa'
 import { Participant } from 'common/types/api/participants/participant'
 import { createMailerTransporter, fromAddress } from '../utils/mailer'
@@ -47,8 +50,9 @@ import { auditLog } from '../middlewares/AuditLog'
 import { Role } from '@prisma/client'
 import { v4 as uuidv4 } from 'uuid'
 import { genId } from '../utils/genId'
+import { extractOrderBy, extractWhere } from '../utils/filtering'
 
-@Route('studies/{studyId}')
+@Route('/')
 @Tags('Participants')
 @Security('jwt', ['OrganisationAdmin'])
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
@@ -66,52 +70,65 @@ export class ParticipantsController extends Controller {
    *
    * @summary List participants
    */
-  @Get('/participants')
-  public async getParticipants(@Path() studyId: number): Promise<GetParticipantsResponse> {
-    const participant_list = await prisma.studyParticipant.findMany({ where: { studyId } })
+  @Get('studies/{studyId}/participants')
+  public async getParticipants(
+    @Path() studyId: number,
+    @Queries() queryParams: { [key: string]: any },
+  ): Promise<GetParticipantsResponse> {
+    const total = await prisma.studyParticipant.count({
+      where: { studyId, participantProfile: extractWhere(queryParams) },
+    })
 
-    const profiles = await this.profileRepo.findMany({
-      where: {
-        id: { in: participant_list.map((val) => val.participantProfileId) },
-      },
+    const participant_list = await prisma.studyParticipant.findMany({
+      where: { studyId, participantProfile: extractWhere(queryParams) },
       select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        familyId: true,
-        user: { select: { email: true } },
+        participantProfile: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            familyId: true,
+            user: { select: { email: true } },
+          },
+        },
+        participantId: true,
       },
+      orderBy: extractOrderBy(queryParams),
+      skip: queryParams._start ? Number(queryParams._start) : undefined,
+      take: queryParams._end ? Number(queryParams._end) - Number(queryParams._start) : undefined,
     })
 
     const participants: GetParticipantsResponse['data'] = []
 
-    for (const p of profiles) {
-      const p_answers = await this.svaRepo.findMany({
-        where: { profileId: p.id, version: { studyId } },
-        select: {
-          answers: true,
-          version: { select: { versionNumber: true, updatedAt: true } },
-          id: true,
-        },
-        orderBy: { version: { versionNumber: 'asc' } },
-      })
+    const all_answers = await this.svaRepo.findMany({
+      where: {
+        profileId: { in: participant_list.map((val) => val.participantProfile.id) },
+        version: { studyId },
+      },
+      select: {
+        answers: true,
+        profileId: true,
+        version: { select: { versionNumber: true, updatedAt: true } },
+        id: true,
+      },
+      orderBy: { version: { versionNumber: 'asc' } },
+    })
+
+    for (const p of participant_list) {
+      const p_answers = all_answers.filter((val) => val.profileId == p.participantProfile.id)
+
       const lastUpdated = Math.max(
         ...(p_answers.map((val) => determineLastUpdated(val.answers)) as unknown as number[]),
       )
-      const study_part = await prisma.studyParticipant.findFirstOrThrow({
-        where: {
-          studyId,
-          participantProfileId: p.id,
-        },
-      })
+      const profile = p.participantProfile
       const p_data: Participant = {
-        id: p.id,
-        participantId: study_part?.participantId || '',
-        email: p.user?.email,
-        firstName: p.firstName,
-        lastName: p.lastName,
+        id: profile.id,
+        participantId: p.participantId || '',
+        email: profile.user?.email,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
         lastUpdated: lastUpdated ? new Date(lastUpdated).toISOString() : undefined,
-        familyId: p.familyId,
+        familyId: profile.familyId,
         answers: p_answers.map((val) => ({
           surveyVersionNumber: val.version.versionNumber,
           participantId: val.id,
@@ -121,7 +138,75 @@ export class ParticipantsController extends Controller {
       participants.push(p_data)
     }
 
-    return { data: participants }
+    return { data: participants, total }
+  }
+
+  /**
+   * List deleted participants
+   *
+   * @summary List deleted participants
+   */
+  @Get('participants/deleted')
+  public async getDeletedParticipants(): Promise<GetDeletedParticipantsResponse> {
+    const participants = await this.participantRepo.findMany({
+      where: { deleted: true },
+      select: {
+        participantId: true,
+        participantProfile: { select: { firstName: true, lastName: true, dob: true, id: true } },
+        study: { select: { name: true, id: true } },
+      },
+    })
+
+    return {
+      data: participants.map((val) => ({
+        ...val.participantProfile,
+        id: val.participantId || '',
+        profileId: val.participantProfile.id,
+        study: val.study.name,
+        studyId: val.study.id,
+      })),
+    }
+  }
+
+  /**
+   * Restore a deleted participant by Profile ID
+   *
+   * @summary Restore deleted participant by ProfileId
+   */
+  @Patch('studies/{studyId}/participants/{profileId}/restore')
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
+  public async restoreParticipantById(@Path() studyId: number, @Path() profileId: number) {
+    const participant = await this.participantRepo.findUniqueOrThrow({
+      where: {
+        deleted: true,
+        participantProfileId_studyId: { studyId, participantProfileId: profileId },
+      },
+      select: { participantProfile: { select: { participantType: true, familyId: true } } },
+    })
+    const ptype = participant.participantProfile.participantType
+    const gcount = await this.participantRepo.count({
+      where: {
+        studyId,
+        participantProfile: {
+          familyId: participant.participantProfile.familyId,
+          participantType: 'GUARDIAN',
+        },
+      },
+    })
+
+    if ((ptype == 'DEPENDENT_AGE' || ptype == 'DEPENDENT_OTHER') && gcount < 1) {
+      throw new UnprocessableError(
+        'Cannot restore a dependant if their guardian is not a participant of the study',
+      )
+    }
+
+    await this.participantRepo.update({
+      where: {
+        deleted: true,
+        participantProfileId_studyId: { studyId, participantProfileId: profileId },
+      },
+      data: { deleted: false },
+    })
   }
 
   /**
@@ -129,7 +214,7 @@ export class ParticipantsController extends Controller {
    *
    * @summary Get a  Participant by profile ID
    */
-  @Get('/participants/{profileId}')
+  @Get('studies/{studyId}/participants/{profileId}/')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async getParticipantById(
     @Path() studyId: number,
@@ -150,7 +235,7 @@ export class ParticipantsController extends Controller {
     const profileData = profileDataResponse.data
 
     const p_answers = await this.svaRepo.findMany({
-      where: { profileId: profileId },
+      where: { profileId: profileId, version: { studyId } },
       select: {
         answers: true,
         version: { select: { versionNumber: true, updatedAt: true } },
@@ -186,7 +271,7 @@ export class ParticipantsController extends Controller {
    *
    * @summary Remove a participant from the study
    */
-  @Delete('/participants/{profileId}')
+  @Delete('studies/{studyId}/participants/{profileId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async deleteParticipantById(
     @Path() studyId: number,
@@ -194,8 +279,11 @@ export class ParticipantsController extends Controller {
   ): Promise<void> {
     const profile = await prisma.participantProfile.findUniqueOrThrow({ where: { id: profileId } })
 
-    const familyGuardiansCount = await prisma.participantProfile.count({
-      where: { familyId: profile.familyId, participantType: 'GUARDIAN' },
+    const familyGuardiansCount = await prisma.studyParticipant.count({
+      where: {
+        studyId,
+        participantProfile: { familyId: profile.familyId, participantType: 'GUARDIAN' },
+      },
     })
     const familyDepsCount = await prisma.studyParticipant.count({
       where: {
@@ -227,7 +315,7 @@ export class ParticipantsController extends Controller {
    * @summary Add a participant to the study, if they were formerly removed, or they don't have an account.
    * Throws error if user has an account and should be added via the study invite process
    */
-  @Post('/participants/{profileId}')
+  @Post('studies/{studyId}/participants/{profileId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async addParticipantById(
     @Path() studyId: number,
@@ -255,6 +343,22 @@ export class ParticipantsController extends Controller {
 
     const profile = await this.profileRepo.findUniqueOrThrow({ where: { id: profileId } })
 
+    if (
+      profile.participantType == 'DEPENDENT_AGE' ||
+      profile.participantType == 'DEPENDENT_OTHER'
+    ) {
+      const guardian = await this.participantRepo.findFirst({
+        where: {
+          studyId,
+          participantProfile: { familyId: profile.familyId, participantType: 'GUARDIAN' },
+        },
+      })
+      if (!guardian) {
+        throw new UnprocessableError(
+          "Can't add a dependent to a study if no guardian is a member of the study",
+        )
+      }
+    }
     if (deletedP) {
       await this.participantRepo.update({
         where: {
@@ -267,18 +371,6 @@ export class ParticipantsController extends Controller {
         data: { deleted: false },
       })
     } else if (!profile.userId) {
-      const guardian = await this.participantRepo.findFirst({
-        where: {
-          studyId,
-          participantProfile: { familyId: profile.familyId, participantType: 'GUARDIAN' },
-        },
-      })
-      if (!guardian) {
-        throw new UnprocessableError(
-          "Can't add a dependent to a study if no guardian is a member of the study",
-        )
-      }
-
       await this.participantRepo.create({
         data: { studyId: studyId, participantProfileId: profileId },
       })

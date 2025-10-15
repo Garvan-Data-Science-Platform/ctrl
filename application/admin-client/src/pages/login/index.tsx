@@ -1,4 +1,4 @@
-import { Link, Tooltip } from '@mui/material'
+import { Box, Link, Tooltip } from '@mui/material'
 import { AuthPage } from '@refinedev/mui'
 import { useEffect } from 'react'
 import { useAuthStore } from '../../authStore'
@@ -29,20 +29,22 @@ export const Login = () => {
   }, [])
 
   return (
-    <AuthPage
-      type="login"
-      registerLink={false}
-      title="CTRL Admin Portal"
-      forgotPasswordLink={
-        <Tooltip title="You need to use the CTRL User Portal to reset your password.">
-          <Link href="#"> Forgot Password </Link>
-        </Tooltip>
-      }
-      hideForm={authStore.passwordLoginDisabled}
-      providers={authStore.providers.map((provider) => ({
-        name: provider.name,
-        icon: <img data-cy="oidc-img" src={provider.icon} height="70px" />,
-      }))}
-    ></AuthPage>
+    <Box sx={{ height: '90vh' }}>
+      <AuthPage
+        type="login"
+        registerLink={false}
+        title="CTRL Admin Portal"
+        forgotPasswordLink={
+          <Tooltip title="You need to use the CTRL User Portal to reset your password.">
+            <Link href="#"> Forgot Password </Link>
+          </Tooltip>
+        }
+        hideForm={authStore.passwordLoginDisabled}
+        providers={authStore.providers.map((provider) => ({
+          name: provider.name,
+          icon: <img data-cy="oidc-img" src={provider.icon} height="70px" />,
+        }))}
+      ></AuthPage>
+    </Box>
   )
 }

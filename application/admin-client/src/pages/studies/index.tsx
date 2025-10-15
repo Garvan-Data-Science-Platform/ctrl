@@ -97,7 +97,14 @@ const StudyCard = ({ study }: { study: StudyEntry }) => {
         }}
       >
         <DialogTitle>Delete Study</DialogTitle>
-        <DialogContent>Are you sure you want to delete study: {study.name}</DialogContent>
+        <DialogContent>
+          Are you sure you want to delete {study.name}? <br />
+          <Typography variant="caption">
+            All participants will lose access to the survey, and you will no longer be able to view
+            survey responses and participant information associated with this study. This action is
+            reversible.
+          </Typography>
+        </DialogContent>
         <DialogActions>
           <Button
             onClick={() => {

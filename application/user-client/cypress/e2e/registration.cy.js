@@ -69,7 +69,7 @@ describe('registration', () => {
   it('Attempt to register existing email (i.e. no invite) and get correct error message', () => {
     cy.visit('/register/not-a-real-inviteId')
     fillValid()
-    const testEmail = 'test1@example.com'
+    const testEmail = 'admin@example.com'
     cy.get('[data-cy="reg-email"]').clear()
     cy.get('[data-cy="reg-email"]').type(testEmail)
     cy.get('[data-cy="reg-button"]').click()

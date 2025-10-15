@@ -4,6 +4,7 @@ import type { GetInvitesResponse, GetUserInvitesResponse } from './getInvites'
 import type { InviteParticipantsRequest, InviteParticipantsResponse } from './inviteParticipant'
 import type { RevokeInviteRequest } from './revokeInvite'
 import type { GetInviteTextResponse } from './getInviteText'
+import type { GetDeletedParticipantsResponse } from './getDeletedParticipants'
 
 export {
   GetParticipantResponse,
@@ -14,4 +15,5 @@ export {
   InviteParticipantsRequest,
   InviteParticipantsResponse,
   RevokeInviteRequest,
+  GetDeletedParticipantsResponse,
 }

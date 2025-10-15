@@ -39,7 +39,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/contact',
-        element: <Contact />,
+        element: <Contact disableHeader={false} />,
       },
       {
         path: '/message_sent',

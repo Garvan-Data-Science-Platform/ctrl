@@ -4,7 +4,7 @@
     "dev": "tsx watch src/index.ts",
     "build": "yarn prisma generate && esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --external:express --external:cors",
     "start": "node dist/index.js",
-    "type-check": "tsc",
+    "type-check": "tsc -b",
     "lint": "eslint .",
     "test": "bash scripts/run_tests.sh",
     "tsoa:spec": "tsoa spec",
@@ -12,7 +12,9 @@
     "build-docs": "yarn run tsoa:routes && yarn run tsoa:spec && tsx scripts/replace-refs.ts",
     "prisma:generate": "yarn prisma generate",
     "prisma:seed": "yarn prisma db seed",
+    "prisma:test": "yarn ts-node -T scripts/runTestSeed.ts",
     "prisma:wipe": "yarn ts-node -T scripts/runWipeDB.ts",
+    "prisma:stresstest": "yarn prisma:wipe && yarn prisma:seed && vite-node scripts/stressTestSeed.ts",
     "prisma:migrate": "yarn prisma migrate dev",
     "console": "ts-node -T -r ./prisma/console.ts"
   },
@@ -38,7 +40,8 @@
     "sharp": "^0.34.1",
     "swagger-ui-express": "^5.0.1",
     "tsoa": "^6.6.0",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "vite-node": "^3.2.4"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

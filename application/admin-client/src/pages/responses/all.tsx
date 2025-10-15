@@ -19,7 +19,7 @@ import {
   useGridSelector,
   gridFilterActiveItemsSelector,
   gridColumnVisibilityModelSelector,
-} from '@mui/x-data-grid'
+} from 'x-data-grid-8'
 import { useMemo, useState } from 'react'
 import { List } from '@refinedev/mui'
 import { styled } from '@mui/material/styles'

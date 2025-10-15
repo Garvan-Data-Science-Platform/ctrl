@@ -209,18 +209,6 @@
         "type": "object",
         "additionalProperties": false
       },
-      "GetUserByIdResponse": {
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/User"
-          }
-        },
-        "required": [
-          "data"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
       "NotFoundErrorResponse": {
         "properties": {
           "message": {
@@ -239,6 +227,18 @@
             "message": "User not found"
           }
         }
+      },
+      "GetUserByIdResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/User"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "additionalProperties": false
       },
       "CreateUserResponse": {
         "properties": {
@@ -1606,6 +1606,61 @@
               "$ref": "#/components/schemas/Participant"
             },
             "type": "array"
+          },
+          "total": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": [
+          "data",
+          "total"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "GetDeletedParticipantsResponse": {
+        "properties": {
+          "data": {
+            "items": {
+              "properties": {
+                "studyId": {
+                  "type": "number",
+                  "format": "double"
+                },
+                "study": {
+                  "type": "string"
+                },
+                "dob": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "lastName": {
+                  "type": "string"
+                },
+                "firstName": {
+                  "type": "string"
+                },
+                "profileId": {
+                  "type": "number",
+                  "format": "double"
+                },
+                "id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "studyId",
+                "study",
+                "dob",
+                "lastName",
+                "firstName",
+                "profileId",
+                "id"
+              ],
+              "type": "object"
+            },
+            "type": "array"
           }
         },
         "required": [
@@ -2745,6 +2800,119 @@
           }
         ],
         "parameters": []
+      }
+    },
+    "/users/admin/deleted": {
+      "get": {
+        "operationId": "GetDeletedAdminUsers",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllUsersResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Get all deleted Admin Users",
+        "summary": "Get all deleted Admin Users",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": []
+      }
+    },
+    "/users/{userId}/restore": {
+      "patch": {
+        "operationId": "RestoreUserById",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Restore deleted user",
+        "summary": "Restore deleted user by Id",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
       }
     },
     "/users/{userId}": {
@@ -4126,6 +4294,95 @@
         "parameters": []
       }
     },
+    "/studies/deleted": {
+      "get": {
+        "operationId": "GetDeletedStudies",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllStudiesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Get deleted Studies",
+        "summary": "Get deleted Studies",
+        "tags": [
+          "Studies"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": []
+      }
+    },
+    "/studies/{studyId}/restore": {
+      "patch": {
+        "operationId": "RestoreStudyById",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Restores a Deleted Study by ID",
+        "summary": "Restore Deleted Study by Id",
+        "tags": [
+          "Studies"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
     "/studies/{studyId}": {
       "get": {
         "operationId": "GetStudyById",
@@ -4811,6 +5068,148 @@
           {
             "in": "path",
             "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/participants/deleted": {
+      "get": {
+        "operationId": "GetDeletedParticipants",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetDeletedParticipantsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "List deleted participants",
+        "summary": "List deleted participants",
+        "tags": [
+          "Participants"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": []
+      }
+    },
+    "/studies/{studyId}/participants/{profileId}/restore": {
+      "patch": {
+        "operationId": "RestoreParticipantById",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Restore a deleted participant by Profile ID",
+        "summary": "Restore deleted participant by ProfileId",
+        "tags": [
+          "Participants"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "profileId",
             "required": true,
             "schema": {
               "format": "double",

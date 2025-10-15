@@ -22,7 +22,7 @@ const pages = [
   { name: 'Glossary', route: '/glossary' },
 ]
 
-export default function NavBar() {
+export default function NavBar({ disabled }: { disabled?: boolean }) {
   const location = useLocation()
   const nav = useNavigate()
   const { logout } = useAuth()
@@ -103,6 +103,7 @@ export default function NavBar() {
                     key={page.name}
                     label={page.name}
                     onClick={() => nav(page.route)}
+                    disabled={disabled}
                   />
                 ))}
               </Tabs>

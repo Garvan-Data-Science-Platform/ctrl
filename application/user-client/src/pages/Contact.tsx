@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAppStore } from '../store'
 import { useEffect } from 'react'
 
-export default function Contact() {
+export default function Contact({ disableHeader }: { disableHeader: boolean }) {
   const store = useAppStore()
   const nav = useNavigate()
   const handleSend = () => {
@@ -18,7 +18,7 @@ export default function Contact() {
   }, [])
   return (
     <>
-      <NavBar />
+      {!disableHeader && <NavBar />}
 
       <Container>
         <Card

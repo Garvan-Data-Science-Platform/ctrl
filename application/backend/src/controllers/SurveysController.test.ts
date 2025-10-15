@@ -335,4 +335,55 @@ describe('SurveysController', () => {
       expect(data.data.participants[1].answers[1].answers).toEqual([false, 'Choice 2'])
     })
   })
+  describe('GET /studies/deleted', () => {
+    it('Lists deleted studies', async () => {
+      const res1 = await request(app)
+        .get('/studies/deleted')
+        .set({ Authorization: `Bearer ${tokenAdmin}` })
+      expect(res1.ok).toBe(true)
+      expect(res1.body.data).toHaveLength(0)
+      await prisma.study.delete({
+        where: {
+          id: 1,
+        },
+      })
+      const res2 = await request(app)
+        .get('/studies/deleted')
+        .set({ Authorization: `Bearer ${tokenAdmin}` })
+      expect(res2.ok).toBe(true)
+      expect(res2.body.data).toHaveLength(1)
+      expect(res2.body.data[0].id).toBe(1)
+    })
+  })
+
+  describe('PATCH /studies/{studyId}/restore', () => {
+    it('Fails if study is not deleted', async () => {
+      const res = await request(app)
+        .patch(`/studies/1/restore`)
+        .set({ Authorization: `Bearer ${tokenAdmin}` })
+
+      expect(res.ok).toBe(false)
+      expect(res.status).toBe(404)
+    })
+    it('Restores a deleted study', async () => {
+      await prisma.study.delete({
+        where: {
+          id: 1,
+        },
+      })
+
+      const res = await request(app)
+        .patch(`/studies/1/restore`)
+        .set({ Authorization: `Bearer ${tokenAdmin}` })
+
+      expect(res.ok).toBe(true)
+
+      const study = await prisma.study.findFirst({
+        where: {
+          id: 1,
+        },
+      })
+      expect(study).not.toBeNull()
+    })
+  })
 })

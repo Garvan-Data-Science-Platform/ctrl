@@ -19,13 +19,13 @@ import 'cypress-file-upload'
 export enum UserType {
   PARTICIPANT_COMPLETED = 'test3@example.com',
   PARTICIPANT_UNANSWERED = 'test2@example.com',
-  ADMIN = 'test1@example.com',
+  ADMIN = 'admin@example.com',
 }
 Cypress.Commands.add('login', (type: UserType) => {
   cy.request({
     method: 'POST',
     url: `localhost:5001/auth/login`,
-    body: { email: type, password: 'password' },
+    body: { email: type, password: 'Testpassword1' },
     headers: {
       'x-client-type': 'admin-client',
     },

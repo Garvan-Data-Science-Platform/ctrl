@@ -6,6 +6,7 @@ import { apiClient } from '../apiClient'
 import NavBar from '../components/NavBar'
 import { CircularProgress, Container, Typography } from '@mui/material'
 import type { GetAllStudiesResponse } from '@common/types/api/studies'
+import Contact from '../pages/Contact'
 
 export const StudyLoader: React.FC<PropsWithChildren> = ({ children }) => {
   const { data: data, error } = useQuery({
@@ -63,6 +64,27 @@ export const StudyLoader: React.FC<PropsWithChildren> = ({ children }) => {
     activeStudyIndex >= 0 &&
     activeStudyIndex < studies.length &&
     studies[activeStudyIndex]
+
+  if (studies && studies.length < 1) {
+    return (
+      <>
+        <NavBar disabled />
+        <Container>
+          {!window.location.href.includes('message_sent') ? (
+            <>
+              <Typography sx={{ mt: 5 }}>
+                You are no longer participating in any studies. If you think this is a mistake,
+                contact us using the form below:
+              </Typography>
+              <Contact disableHeader />
+            </>
+          ) : (
+            <Typography sx={{ mt: 5 }}>Message sent</Typography>
+          )}
+        </Container>
+      </>
+    )
+  }
 
   return hasValidActiveStudy ? (
     children
