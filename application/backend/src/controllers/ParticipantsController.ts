@@ -30,6 +30,7 @@ import {
   Middlewares,
   Request,
   Delete,
+  Queries,
   Patch,
 } from 'tsoa'
 import { Participant } from 'common/types/api/participants/participant'
@@ -49,6 +50,7 @@ import { auditLog } from '../middlewares/AuditLog'
 import { Role } from '@prisma/client'
 import { v4 as uuidv4 } from 'uuid'
 import { genId } from '../utils/genId'
+import { extractOrderBy, extractWhere } from '../utils/filtering'
 
 @Route('/')
 @Tags('Participants')
@@ -69,51 +71,64 @@ export class ParticipantsController extends Controller {
    * @summary List participants
    */
   @Get('studies/{studyId}/participants')
-  public async getParticipants(@Path() studyId: number): Promise<GetParticipantsResponse> {
-    const participant_list = await prisma.studyParticipant.findMany({ where: { studyId } })
+  public async getParticipants(
+    @Path() studyId: number,
+    @Queries() queryParams: { [key: string]: any },
+  ): Promise<GetParticipantsResponse> {
+    const total = await prisma.studyParticipant.count({
+      where: { studyId, participantProfile: extractWhere(queryParams) },
+    })
 
-    const profiles = await this.profileRepo.findMany({
-      where: {
-        id: { in: participant_list.map((val) => val.participantProfileId) },
-      },
+    const participant_list = await prisma.studyParticipant.findMany({
+      where: { studyId, participantProfile: extractWhere(queryParams) },
       select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        familyId: true,
-        user: { select: { email: true } },
+        participantProfile: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            familyId: true,
+            user: { select: { email: true } },
+          },
+        },
+        participantId: true,
       },
+      orderBy: extractOrderBy(queryParams),
+      skip: queryParams._start ? Number(queryParams._start) : undefined,
+      take: queryParams._end ? Number(queryParams._end) - Number(queryParams._start) : undefined,
     })
 
     const participants: GetParticipantsResponse['data'] = []
 
-    for (const p of profiles) {
-      const p_answers = await this.svaRepo.findMany({
-        where: { profileId: p.id, version: { studyId } },
-        select: {
-          answers: true,
-          version: { select: { versionNumber: true, updatedAt: true } },
-          id: true,
-        },
-        orderBy: { version: { versionNumber: 'asc' } },
-      })
+    const all_answers = await this.svaRepo.findMany({
+      where: {
+        profileId: { in: participant_list.map((val) => val.participantProfile.id) },
+        version: { studyId },
+      },
+      select: {
+        answers: true,
+        profileId: true,
+        version: { select: { versionNumber: true, updatedAt: true } },
+        id: true,
+      },
+      orderBy: { version: { versionNumber: 'asc' } },
+    })
+
+    for (const p of participant_list) {
+      const p_answers = all_answers.filter((val) => val.profileId == p.participantProfile.id)
+
       const lastUpdated = Math.max(
         ...(p_answers.map((val) => determineLastUpdated(val.answers)) as unknown as number[]),
       )
-      const study_part = await prisma.studyParticipant.findFirstOrThrow({
-        where: {
-          studyId,
-          participantProfileId: p.id,
-        },
-      })
+      const profile = p.participantProfile
       const p_data: Participant = {
-        id: p.id,
-        participantId: study_part?.participantId || '',
-        email: p.user?.email,
-        firstName: p.firstName,
-        lastName: p.lastName,
+        id: profile.id,
+        participantId: p.participantId || '',
+        email: profile.user?.email,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
         lastUpdated: lastUpdated ? new Date(lastUpdated).toISOString() : undefined,
-        familyId: p.familyId,
+        familyId: profile.familyId,
         answers: p_answers.map((val) => ({
           surveyVersionNumber: val.version.versionNumber,
           participantId: val.id,
@@ -123,7 +138,7 @@ export class ParticipantsController extends Controller {
       participants.push(p_data)
     }
 
-    return { data: participants }
+    return { data: participants, total }
   }
 
   /**
@@ -220,7 +235,7 @@ export class ParticipantsController extends Controller {
     const profileData = profileDataResponse.data
 
     const p_answers = await this.svaRepo.findMany({
-      where: { profileId: profileId },
+      where: { profileId: profileId, version: { studyId } },
       select: {
         answers: true,
         version: { select: { versionNumber: true, updatedAt: true } },

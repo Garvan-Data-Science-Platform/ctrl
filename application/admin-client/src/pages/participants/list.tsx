@@ -9,12 +9,13 @@ import {
   Menu,
   MenuItem,
   Modal,
+  TextField,
   Tooltip,
   Typography,
 } from '@mui/material'
-import { DataGrid, type GridColDef } from '@mui/x-data-grid'
+import { DataGrid, GridFilterOperator, type GridColDef } from '@mui/x-data-grid'
 import { DateField, EditButton, List, ShowButton, useDataGrid } from '@refinedev/mui'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { InviteModal } from '../../components/InviteModal'
 import { axiosInstance } from '../../providers/dataProvider'
@@ -40,15 +41,14 @@ export const statusMap = {
 
 export const ParticipantList = () => {
   const { dataGridProps } = useDataGrid({
-    syncWithLocation: true,
-    filters: { mode: 'off' },
-    sorters: { mode: 'off' },
+    syncWithLocation: false,
+    pagination: { pageSize: 10, mode: 'server' } as any,
+    filters: { mode: 'server' },
+    sorters: { mode: 'server' },
   })
   const { dataGridProps: inviteGridProps } = useDataGrid({
-    syncWithLocation: true,
+    syncWithLocation: false,
     resource: 'invites',
-    filters: { mode: 'off' },
-    sorters: { mode: 'off' },
   })
 
   const location = useLocation()
@@ -158,30 +158,91 @@ export const ParticipantList = () => {
     )
   }
 
+  // Debounced input component
+  function DebouncedInput(props: any) {
+    const { item, applyValue, InputProps } = props
+    const [value, setValue] = useState(item.value ?? '')
+    const debounceRef = useRef<number | undefined>()
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = event.target.value
+      setValue(newValue)
+      if (debounceRef.current) {
+        window.clearTimeout(debounceRef.current)
+      }
+      debounceRef.current = window.setTimeout(() => {
+        applyValue({ ...item, value: newValue })
+      }, 500) // 500ms debounce
+    }
+
+    useEffect(() => {
+      return () => {
+        if (debounceRef.current) {
+          window.clearTimeout(debounceRef.current)
+        }
+      }
+    }, [])
+
+    return (
+      <div style={{ display: 'flex', alignItems: 'flex-end', height: '100%' }}>
+        <TextField
+          variant="standard"
+          value={value}
+          onChange={handleChange}
+          fullWidth
+          {...InputProps}
+        />
+      </div>
+    )
+  }
+
+  const allowedOperators: GridFilterOperator[] = [
+    {
+      label: 'Equals',
+      value: 'equals',
+      requiresFilterValue: true,
+      getApplyFilterFn: (filterItem) => (value) => value === filterItem.value,
+      InputComponent: DebouncedInput,
+    },
+    {
+      label: 'Does not equal',
+      value: 'doesNotEqual',
+      getApplyFilterFn: (filterItem) => (value) => value !== filterItem.value,
+      InputComponent: DebouncedInput,
+    },
+  ]
+
   const columns = React.useMemo<GridColDef[]>(
     () => [
       {
         field: 'participantId',
         flex: 1,
         headerName: 'ID',
+        filterOperators: allowedOperators,
       },
       {
         field: 'firstName',
         flex: 1,
         headerName: 'First Name',
         minWidth: 100,
+        sortable: false,
+        filterOperators: allowedOperators,
       },
       {
         field: 'lastName',
         flex: 1,
         headerName: 'Last Name',
         minWidth: 100,
+        sortable: false,
+        filterOperators: allowedOperators,
       },
       {
         field: 'email',
         flex: 1,
         headerName: 'Email',
         minWidth: 100,
+        sortable: false,
+        filterOperators: allowedOperators,
       },
       {
         field: 'answers',
@@ -197,6 +258,8 @@ export const ParticipantList = () => {
         headerName: 'Latest Survey Response',
         minWidth: 100,
         type: 'date',
+        disableColumnMenu: true,
+        sortable: false,
         valueGetter: (value) => {
           if (!value) return null
           return new Date(value)

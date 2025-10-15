@@ -575,6 +575,7 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "data": {"dataType":"array","array":{"dataType":"refObject","ref":"Participant"},"required":true},
+            "total": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
     },
@@ -2207,6 +2208,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsParticipantsController_getParticipants: Record<string, TsoaRoute.ParameterSchema> = {
                 studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
+                queryParams: {"in":"queries","name":"queryParams","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{},"additionalProperties":{"dataType":"any"}},
         };
         app.get('/studies/:studyId/participants',
             authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
