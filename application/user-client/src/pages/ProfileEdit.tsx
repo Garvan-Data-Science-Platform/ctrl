@@ -14,7 +14,7 @@ import {
   Link as MLink,
 } from '@mui/material'
 import { useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { GetParticipantProfileResponse, UpdateProfileRequest } from '@common/types/api/users'
@@ -283,11 +283,7 @@ export default function ProfileEdit() {
                 <Typography variant="body2" sx={{ mt: 3 }}>
                   Note: If you need to change your email address, please contact a study
                   administrator via the{' '}
-                  <MLink
-                    onClick={() => {
-                      nav('/contact')
-                    }}
-                  >
+                  <MLink component={Link} to="/contact">
                     Contact Us page.
                   </MLink>
                 </Typography>
