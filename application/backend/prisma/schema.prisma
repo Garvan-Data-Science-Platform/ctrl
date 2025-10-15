@@ -113,15 +113,15 @@ enum ContactMethod {
 model Organisation {
   id              Int      @id @default(autoincrement())
   name            String   @unique
-  mailerHost      String?
+  mailerHost      String? /// @encrypted
   mailerPort      Int?
-  mailerUser      String?
-  mailerPassword  String?
+  mailerUser      String? /// @encrypted
+  mailerPassword  String? /// @encrypted
   primaryColour   String?
   secondaryColour String?
-  redcapURL       String?
-  redcapToken     String?
-  elsaToken       String?
+  redcapURL       String? /// @encrypted
+  redcapToken     String? /// @encrypted
+  elsaToken       String? /// @encrypted
   logo            Bytes?
   tcLink          String  @default("https://garvan-data-science-platform.github.io/ctrl-docs/docs/terms-and-conditions")
   users           User[]
