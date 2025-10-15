@@ -100,16 +100,23 @@ export class ParticipantsController extends Controller {
 
     const participants: GetParticipantsResponse['data'] = []
 
+    const all_answers = await this.svaRepo.findMany({
+      where: {
+        profileId: { in: participant_list.map((val) => val.participantProfile.id) },
+        version: { studyId },
+      },
+      select: {
+        answers: true,
+        profileId: true,
+        version: { select: { versionNumber: true, updatedAt: true } },
+        id: true,
+      },
+      orderBy: { version: { versionNumber: 'asc' } },
+    })
+
     for (const p of participant_list) {
-      const p_answers = await this.svaRepo.findMany({
-        where: { profileId: p.participantProfile.id, version: { studyId } },
-        select: {
-          answers: true,
-          version: { select: { versionNumber: true, updatedAt: true } },
-          id: true,
-        },
-        orderBy: { version: { versionNumber: 'asc' } },
-      })
+      const p_answers = all_answers.filter((val) => val.profileId == p.participantProfile.id)
+
       const lastUpdated = Math.max(
         ...(p_answers.map((val) => determineLastUpdated(val.answers)) as unknown as number[]),
       )
@@ -228,7 +235,7 @@ export class ParticipantsController extends Controller {
     const profileData = profileDataResponse.data
 
     const p_answers = await this.svaRepo.findMany({
-      where: { profileId: profileId },
+      where: { profileId: profileId, version: { studyId } },
       select: {
         answers: true,
         version: { select: { versionNumber: true, updatedAt: true } },
