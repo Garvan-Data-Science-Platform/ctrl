@@ -50,7 +50,7 @@
     "dev": "refine dev --port 5174",
     "build": "tsc && refine build",
     "start": "refine start",
-    "type-check": "tsc -b",
+    "type-check": "tsc",
     "lint": "eslint .",
     "refine": "refine",
     "cy:open": "cypress open",
