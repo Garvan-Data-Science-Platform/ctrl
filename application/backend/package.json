@@ -4,7 +4,7 @@
     "dev": "tsx watch src/index.ts",
     "build": "yarn prisma generate && esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --external:express --external:cors",
     "start": "node dist/index.js",
-    "type-check": "tsc",
+    "type-check": "tsc -b",
     "lint": "eslint .",
     "test": "bash scripts/run_tests.sh",
     "tsoa:spec": "tsoa spec",
