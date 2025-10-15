@@ -57,4 +57,14 @@ describe('Profile Edit', () => {
     cy.contains('Test Dependent').should('exist')
     cy.contains('Dependent child').should('exist')
   })
+
+  it('Does not allow participant to change their own email address', () => {
+    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.visit('/profile/update')
+    // Wait for data to load
+    cy.get('[data-cy="update-nok-first"]', { timeout: 500 }).should('be.visible')
+    cy.get('input, textarea, select').each(($el) => {
+      expect($el.val()).to.not.include(UserType.PARTICIPANT_UNANSWERED)
+    })
+  })
 })
