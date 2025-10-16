@@ -586,6 +586,18 @@ export class InvitesController extends Controller {
       },
     })
 
+    if (invite.prefill.studyParticipant) {
+      await prisma.studyParticipant.update({
+        where: {
+          participantProfileId_studyId: {
+            participantProfileId: existingProfile.id,
+            studyId: invite.studyId,
+          },
+        },
+        data: invite.prefill.studyParticipant,
+      })
+    }
+
     await genId(invite.studyId, existingProfile.id)
 
     await prisma.surveyVersionAnswers.create({

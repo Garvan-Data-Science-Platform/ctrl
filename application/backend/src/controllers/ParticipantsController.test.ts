@@ -13,6 +13,7 @@ import {
   PARTICIPANT_UNANSWERED_EMAIL,
   PASSWORD_RESET_USER_ID,
   SECOND_TEST_STUDY_ID,
+  PARTICIPANT_COMPLETED_EMAIL,
   PARTICIPANT_COMPLETED_ID,
 } from 'common/testing/seed'
 import { InviteStatus, Role } from '@prisma/client'
@@ -679,7 +680,10 @@ describe('InvitesController', () => {
 
   describe('POST /invites/{inviteId}/accept', () => {
     beforeEach(async () => {
-      await inviteUser(PARTICIPANT_UNANSWERED_EMAIL, 2)
+      await inviteUser(PARTICIPANT_UNANSWERED_EMAIL, 2, {})
+      await inviteUser(PARTICIPANT_COMPLETED_EMAIL, 2, {
+        studyParticipant: { externalId: 'external' },
+      })
     })
 
     it('should fail if inviteId does not exist', async () => {
@@ -802,11 +806,47 @@ describe('InvitesController', () => {
         .post(`/invites/${invite.id}/accept`)
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toEqual(201)
+
+      const p = await prisma.studyParticipant.findFirstOrThrow({
+        where: {
+          studyId: 2,
+          participantProfile: { user: { email: PARTICIPANT_UNANSWERED_EMAIL } },
+        },
+      })
+      expect(p.externalId).toBeNull()
+    })
+
+    it('should prefill with external id', async () => {
+      const invite = await prisma.invite.findFirstOrThrow({
+        where: {
+          email: PARTICIPANT_COMPLETED_EMAIL,
+          studyId: 2,
+        },
+      })
+
+      // need valid invite and token for user that does exist
+      const token = await generateToken({
+        userId: PARTICIPANT_COMPLETED_ID,
+        roles: ['Participant'],
+      })
+
+      const response = await request(app)
+        .post(`/invites/${invite.id}/accept`)
+        .set({ Authorization: `Bearer ${token}` })
+      expect(response.status).toEqual(201)
+
+      const p = await prisma.studyParticipant.findFirstOrThrow({
+        where: {
+          studyId: 2,
+          participantProfile: { user: { email: PARTICIPANT_COMPLETED_EMAIL } },
+        },
+      })
+      expect(p.externalId).toBe('external')
     })
   })
   describe('GET /invites/pending', () => {
     beforeEach(async () => {
-      await inviteUser(PARTICIPANT_UNANSWERED_EMAIL, 2)
+      await inviteUser(PARTICIPANT_UNANSWERED_EMAIL, 2, {})
     })
     it('should return correct number of invites', async () => {
       // One initial invite
