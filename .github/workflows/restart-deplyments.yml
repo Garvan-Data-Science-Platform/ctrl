@@ -1,0 +1,47 @@
+name: Restart Deployments
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: Which environment to restart deployments for
+        default: dev
+        required: true
+        options:
+        - dev
+        - demo 
+        - staging
+        - prod
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        description: Which environment to restart deployments for
+        default: dev
+        required: true
+
+jobs:
+  restart-deployments:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Restart deployments on VM
+        uses: Garvan-Data-Science-Platform/ctrl/.github/actions/run-vm-command@main
+        with:
+          project_id: 'ctrl-358804'
+          vm_instance: ctrl-${{ inputs.environment }}
+          workload_identity_provider: 'projects/43338454952/locations/global/workloadIdentityPools/ctrl-id-pool/providers/github-provider'
+          service_account: ctrl-ci-sa@ctrl-358804.iam.gserviceaccount.com
+          command: |
+            helm dependency build /opt/ctrl/chart/ctrl
+            helm upgrade --install ctrl /opt/ctrl/chart/ctrl --kubeconfig /etc/rancher/k3s/k3s.yaml -f /opt/ctrl/values.yaml && \
+            kubectl --kubeconfig "/etc/rancher/k3s/k3s.yaml" rollout restart deployment admin && \
+            kubectl --kubeconfig "/etc/rancher/k3s/k3s.yaml" rollout restart deployment backend && \
+            kubectl --kubeconfig "/etc/rancher/k3s/k3s.yaml" rollout restart deployment ctrl
