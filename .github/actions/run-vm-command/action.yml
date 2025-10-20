@@ -1,0 +1,53 @@
+name: 'Run Command on GCP VM'
+description: 'Execute commands on Google Cloud Platform virtual machines via SSH'
+
+inputs:
+  vm_instance:
+    description: 'GCP VM instance name'
+    required: true
+  vm_zone:
+    description: 'GCP VM zone'
+    required: false
+    default: 'australia-southeast1-a'
+  command:
+    description: 'Command to run on the VM'
+    required: true
+  project_id:
+    description: 'GCP Project ID'
+    required: false
+    default: 'ctrl-358804'
+  workload_identity_provider:
+    description: 'Workload Identity Provider'
+    required: true
+  service_account:
+    description: 'GCP Service Account'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Authenticate to Google Cloud
+      uses: 'google-github-actions/auth@v2'
+      with:
+        workload_identity_provider: ${{ inputs.workload_identity_provider }}
+        service_account: ${{ inputs.service_account }}
+
+    - name: Set up Google Cloud SDK
+      uses: 'google-github-actions/setup-gcloud@v2'
+      with:
+        project_id: ${{ inputs.project_id }}
+
+    - name: Run command on VM
+      shell: bash
+      run: |
+        echo "Running command on VM: ${{ inputs.vm_instance }}"
+        echo "Zone: ${{ inputs.vm_zone }}"
+        echo "Command: ${{ inputs.command }}"
+        
+        gcloud --quiet beta compute ssh "${{ inputs.vm_instance }}" \
+          --zone="${{ inputs.vm_zone }}" \
+          --command="${{ inputs.command }}"
+
+branding:
+  icon: 'server'
+  color: 'blue'
