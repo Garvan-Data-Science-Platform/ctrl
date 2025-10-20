@@ -121,6 +121,7 @@ export async function recalculateAnswers(familyId: number, studyId: number) {
       studies: {
         some: {
           studyId: studyId,
+          deleted: false,
         },
       },
       participantType: {
@@ -136,6 +137,7 @@ export async function recalculateAnswers(familyId: number, studyId: number) {
       studies: {
         some: {
           studyId: studyId,
+          deleted: false,
         },
       },
       participantType: 'GUARDIAN',

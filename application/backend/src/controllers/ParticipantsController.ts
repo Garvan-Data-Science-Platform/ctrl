@@ -307,6 +307,8 @@ export class ParticipantsController extends Controller {
         },
       },
     })
+
+    await recalculateAnswers(profile.familyId, studyId)
   }
 
   /**

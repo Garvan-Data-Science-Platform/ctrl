@@ -13,6 +13,7 @@ import {
   PARTICIPANT_UNANSWERED_EMAIL,
   PASSWORD_RESET_USER_ID,
   SECOND_TEST_STUDY_ID,
+  PARTICIPANT_COMPLETED_ID,
 } from 'common/testing/seed'
 import { InviteStatus, Role } from '@prisma/client'
 import prisma from '../PrismaClient'
@@ -168,14 +169,18 @@ describe('ParticipantsController', () => {
   describe('DELETE /participants/{profileId}', () => {
     it('Can remove a participant from a study', async () => {
       const response = await request(app)
-        .delete(`/studies/1/participants/${PARTICIPANT_UNANSWERED_ID}`)
+        .delete(`/studies/1/participants/${PARTICIPANT_COMPLETED_ID}`)
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       expect(response.ok).toBeTruthy()
       const p = await prisma.studyParticipant.findFirstOrThrow({
-        where: { participantProfileId: PARTICIPANT_UNANSWERED_ID, studyId: 1, deleted: true },
+        where: { participantProfileId: PARTICIPANT_COMPLETED_ID, studyId: 1, deleted: true },
       })
       expect(p.deleted).toBeTruthy()
+      const ans = await prisma.surveyVersionAnswers.findFirstOrThrow({
+        where: { profile: { firstName: 'Test', lastName: 'Dependent' } },
+      })
+      expect(ans.answers[1].answers[0]).toBeNull()
     })
   })
 
