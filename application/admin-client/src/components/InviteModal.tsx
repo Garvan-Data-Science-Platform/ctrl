@@ -1,5 +1,14 @@
 import { Add, Delete } from '@mui/icons-material'
-import { Box, Button, IconButton, List, ListItem, TextField, Typography } from '@mui/material'
+import {
+  Box,
+  Button,
+  IconButton,
+  List,
+  ListItem,
+  TextField,
+  Tooltip,
+  Typography,
+} from '@mui/material'
 import { useEffect, useState } from 'react'
 import { generateInviteEmail } from '@common/src/generateInviteTemplate'
 import { Recipient } from '@common/types/invite'
@@ -96,7 +105,6 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
           <TextField
             fullWidth
             placeholder="tom@example.com"
-            helperText={invalid && 'Invalid email'}
             error={invalid}
             onKeyUp={(event) => {
               if (event.key == 'Enter') {
@@ -122,13 +130,26 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
             sx={{ minWidth: 120 }}
             data-cy="id-field"
           />
+
           <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
             <IconButton data-cy="add-button" onClick={handleAdd}>
               <Add />
             </IconButton>
           </Box>
         </Box>
-        <Typography variant="caption">Enter manually or paste from spreadsheet</Typography>
+        {invalid && (
+          <Typography variant="caption" color="error">
+            Invalid email <br />
+          </Typography>
+        )}
+        <Typography variant="caption">
+          Enter manually or paste from spreadsheet.{' '}
+          <Tooltip title="ID is for providing an external participant ID (e.g. from Redcap) that will be stored alongside the CTRL generated Participant ID, for reference purposes only.">
+            <Typography variant="caption" color="primary">
+              About ID
+            </Typography>
+          </Tooltip>
+        </Typography>
         <Typography sx={{ mt: 1 }}>
           Recipients{emails.length > 0 && ` (${emails.length})`}:
         </Typography>
