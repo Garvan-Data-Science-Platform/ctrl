@@ -102,12 +102,11 @@ jobs:
             --zone=australia-southeast1-a \
             --project=ctrl-358804
 
-
- restart-dev-deployments:
-   name: Restart Dev Deployments
-   needs: push_helm_charts
-   if: ${{ github.event.workflow_run.head_branch == 'dev' }} # Only restart if on dev branch
-   uses: Garvan-Data-Science-Platform/ctrl/.github/workflows/restart-deployments.yml@main
-   secrets: inherit
-   with:
-     environment: dev
+  restart-dev-deployments:
+    name: Restart Dev Deployments
+    needs: push_helm_charts
+    if: ${{ github.event.workflow_run.head_branch == 'dev' }} # Only restart if on dev branch
+    uses: Garvan-Data-Science-Platform/ctrl/.github/workflows/restart-deployments.yml@main
+    secrets: inherit
+    with:
+      environment: dev
