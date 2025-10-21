@@ -144,7 +144,7 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
         )}
         <Typography variant="caption">
           Enter manually or paste from spreadsheet.{' '}
-          <Tooltip title="ID is for providing an external participant ID (e.g. from Redcap) that will be stored alongside the CTRL generated Participant ID, for reference purposes only.">
+          <Tooltip title="The ID field is for providing an external participant ID (e.g. from REDCap) that will be stored alongside the CTRL generated Participant ID, for reference purposes only.">
             <Typography variant="caption" color="primary">
               About ID
             </Typography>
