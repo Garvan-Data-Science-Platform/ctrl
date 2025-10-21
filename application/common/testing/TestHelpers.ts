@@ -2,6 +2,7 @@ import prisma from '../../backend/src/PrismaClient'
 import { SurveysController } from '../../backend/src/controllers/SurveysController'
 import logger from 'common/src/logger'
 import { PARTICIPANT_UNANSWERED_ID, seedTests } from './seed'
+import { Prefill } from 'common/types/invite'
 
 // Function to reset DB state
 export async function resetDB(): Promise<null> {
@@ -143,9 +144,9 @@ export async function getInviteId(email: string, studyId: number): Promise<strin
   }
 }
 
-export async function inviteUser(email: string, studyId: number) {
+export async function inviteUser(email: string, studyId: number, prefill: Prefill) {
   await prisma.invite.create({
-    data: { email, studyId, expiresAt: new Date('2100-01-01'), status: 'PENDING' },
+    data: { email, studyId, expiresAt: new Date('2100-01-01'), status: 'PENDING', prefill },
   })
   return null
 }

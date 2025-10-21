@@ -59,6 +59,21 @@ describe('', () => {
       .should('contain.text', 'email2@g.co')
   })
 
+  it('Can paste invites with external ID', () => {
+    cy.visit('/participants')
+    cy.get('[data-cy="invite-button"]').click()
+    cy.get('[data-cy="email-field"]').trigger('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: { getData: (type) => 'email1@g.co\tabc123\nemail2@g.co' },
+    })
+    cy.get('[data-cy="recipients-list"]')
+      .should('contain.text', 'email1@g.co')
+      .should('contain.text', 'email2@g.co')
+      .should('contain.text', 'abc123')
+    cy.contains('(2)').should('exist')
+  })
+
   it('Should load text from the backend correctly', () => {
     cy.visit('/participants')
     cy.get('[data-cy="invite-button"]').click()

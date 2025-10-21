@@ -81,7 +81,7 @@ describe('Participant Invites', () => {
     const response = await request(app)
       .post('/studies/1/invites')
       .send({
-        emails: [participantRegisterRequestBody.email],
+        recipients: [{ prefill: {}, email: participantRegisterRequestBody.email }],
         subjectText: 'Subject',
         explanatoryText: 'Text',
       })
@@ -116,7 +116,7 @@ describe('Participant Invites', () => {
     const response = await request(app)
       .post('/studies/1/invites')
       .send({
-        emails: [participantRegisterRequestBody.email],
+        recipients: [{ prefill: {}, email: participantRegisterRequestBody.email }],
         subjectText: 'Subject',
         explanatoryText: 'Text',
       })
@@ -173,7 +173,7 @@ describe('Participant Invites', () => {
     const response = await request(app)
       .post('/studies/1/invites')
       .send({
-        emails: [participantRegisterRequestBody.email],
+        recipients: [{ prefill: {}, email: participantRegisterRequestBody.email }],
         subjectText: 'Subject',
         explanatoryText: 'Text',
       })
@@ -221,7 +221,7 @@ describe('Participant Invites', () => {
     const responseToBeRevoked = await request(app)
       .post('/studies/1/invites')
       .send({
-        emails: [participantRegisterRequestBody.email],
+        recipients: [{ prefill: {}, email: participantRegisterRequestBody.email }],
         subjectText: 'Subject',
         explanatoryText: 'Text',
       })
@@ -280,7 +280,7 @@ describe('Participant Invites', () => {
     const responseToBeExpired = await request(app)
       .post('/studies/1/invites')
       .send({
-        emails: [participantRegisterRequestBody.email],
+        recipients: [{ prefill: {}, email: participantRegisterRequestBody.email }],
         subjectText: 'Subject',
         explanatoryText: 'Text',
       })
@@ -339,7 +339,12 @@ describe('Participant Invites', () => {
     const response = await request(app)
       .post('/studies/1/invites')
       .send({
-        emails: [participantRegisterRequestBody.email],
+        recipients: [
+          {
+            prefill: { studyParticipant: { externalId: 'abc123' } },
+            email: participantRegisterRequestBody.email,
+          },
+        ],
         subjectText: 'Subject',
         explanatoryText: 'Text',
       })
@@ -368,5 +373,8 @@ describe('Participant Invites', () => {
 
     expect(registerResponse.status).toBe(201)
     expect(registerResponse.body.token).not.toBe(undefined)
+
+    const count = await prisma.studyParticipant.count({ where: { externalId: 'abc123' } })
+    expect(count).toEqual(1)
   })
 })

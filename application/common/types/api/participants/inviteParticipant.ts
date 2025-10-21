@@ -1,7 +1,4 @@
-/**
- * @pattern ^(.+)@(.+)$ Please provide valid email
- */
-type Email = string
+import { Recipient } from '../../invite'
 
 /**
  *
@@ -12,7 +9,7 @@ type Email = string
  * }
  */
 export interface InviteParticipantsRequest {
-  emails: Email[]
+  recipients: Recipient[]
   subjectText: string
   explanatoryText: string
 }

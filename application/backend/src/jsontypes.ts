@@ -1,4 +1,5 @@
 import { SurveyStep, UserSurveyStepState } from 'common/types/survey'
+import { Prefill as P } from 'common/types/invite'
 
 export {}
 
@@ -7,5 +8,6 @@ declare global {
   namespace PrismaJson {
     type SurveyVersionData = SurveyStep[]
     type SurveyAnswerData = UserSurveyStepState[]
+    type Prefill = P
   }
 }

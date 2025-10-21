@@ -39,6 +39,10 @@ export const ParticipantShow = () => {
         </Typography>
         <TextField value={record?.participantId} />
         <Typography variant="body1" fontWeight="bold">
+          {'External ID'}
+        </Typography>
+        <TextField value={record?.externalId} />
+        <Typography variant="body1" fontWeight="bold">
           {'First Name'}
         </Typography>
         <TextField value={record?.firstName} />

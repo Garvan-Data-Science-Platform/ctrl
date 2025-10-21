@@ -77,6 +77,7 @@ model StudyParticipant {
   studyId              Int
   participantNumber    Int                @default(0)
   participantId        String?
+  externalId           String?
   deleted              Boolean            @default(false)
 
   @@id([participantProfileId, studyId])
@@ -184,6 +185,8 @@ model Invite {
   expiresAt DateTime
   createdAt DateTime     @default(now())
   sentAt    DateTime?
+  /// ![PrismaJson.Prefill]
+  prefill   Json         @default("{}")      
 
   @@unique([studyId, emailHash])
 }

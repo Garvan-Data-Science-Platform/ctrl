@@ -1,7 +1,9 @@
-import { RegisterParticipantRequest } from '../auth'
+import { UpdateProfileRequest } from '../users/updateProfile'
 
 /**
  * @example {
+ *  externalId: 123,
+ *  profile: {
  *  "firstName": "John",
  *  "middleName": "James",
  *  "lastName": "Doe",
@@ -24,4 +26,7 @@ import { RegisterParticipantRequest } from '../auth'
  *  }
  * }
  */
-export type UpdateProfileRequest = Partial<RegisterParticipantRequest>
+export type UpdateParticipantRequest = {
+  externalId: string
+  profile: UpdateProfileRequest
+}
