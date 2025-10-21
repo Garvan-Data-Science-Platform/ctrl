@@ -270,7 +270,7 @@ export class ParticipantsController extends Controller {
     }
   }
 
-  @Patch('/participants/{profileId}')
+  @Patch('studies/{studyId}/participants/{profileId}')
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
   @Security('jwt', ['OrganisationAdmin'])
   public async updateProfileById(
