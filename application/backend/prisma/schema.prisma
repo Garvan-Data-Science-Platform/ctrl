@@ -55,7 +55,7 @@ model ParticipantProfile {
   lastName         String                  /// @encrypted
   lastNameHash     String?                 /// @encryption:hash(lastName)
   dob              String                  /// @encrypted
-  dobHash          String                  /// @encryption:hash(dob)
+  dobHash          String?                 /// @encryption:hash(dob)
   mobile           String                  /// @encrypted
   addressLine      String                  /// @encrypted
   suburb           String                  /// @encrypted
