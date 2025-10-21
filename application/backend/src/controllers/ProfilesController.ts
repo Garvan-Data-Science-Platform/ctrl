@@ -102,8 +102,8 @@ export class ProfilesController extends Controller {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { user, ...profile } = data
-    const { mobile, addressLine, postcode, suburb, firstName, lastName, familyId, id } = profile
-    const dob = profile.dob.toISOString()
+    const { mobile, addressLine, postcode, suburb, firstName, lastName, familyId, id, dob } =
+      profile
     const state = profile.state as StateTerritory
     const participantType = profile.participantType as ParticipantType
     const preferredContact = profile.preferredContact as ContactMethod
@@ -147,7 +147,6 @@ export class ProfilesController extends Controller {
       where: { userId: request.user?.userId },
     })
     const { nextOfKin, ...updateData } = { ...bodyRequest }
-    if (bodyRequest.dob) updateData.dob = new Date(bodyRequest.dob) as any
 
     const hasNok = Boolean(nextOfKin)
 
@@ -180,7 +179,6 @@ export class ProfilesController extends Controller {
       },
     })
     const { nextOfKin, email, ...updateData } = { ...bodyRequest }
-    if (bodyRequest.dob) updateData.dob = new Date(bodyRequest.dob) as any
 
     const hasNok = Boolean(nextOfKin)
 

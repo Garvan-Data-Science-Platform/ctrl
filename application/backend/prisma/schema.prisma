@@ -54,7 +54,8 @@ model ParticipantProfile {
   middleName       String?                 /// @encrypted
   lastName         String                  /// @encrypted
   lastNameHash     String?                 /// @encryption:hash(lastName)
-  dob              DateTime               @db.Date
+  dob              String                  /// @encrypted
+  dobHash          String                  /// @encryption:hash(dob)
   mobile           String                  /// @encrypted
   addressLine      String                  /// @encrypted
   suburb           String                  /// @encrypted
