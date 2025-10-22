@@ -1,9 +1,9 @@
 <div align="center">
 
   <h1>CTRL</h1>
-  
+
   Dynamic Consent Management Platform
-  
+
   [![Build checks](https://github.com/Garvan-Data-Science-Platform/ctrl-next/actions/workflows/check.yml/badge.svg)](https://github.com/Garvan-Data-Science-Platform/ctrl-next/actions/workflows/check.yml)
   [![Release](https://github.com/Garvan-Data-Science-Platform/ctrl-next/actions/workflows/release.yml/badge.svg)](https://github.com/Garvan-Data-Science-Platform/ctrl-next/actions/workflows/release.yml)
 
@@ -17,7 +17,7 @@
     <a href="https://www.australiangenomics.org.au/tools-and-resources/dynamic-consent-and-ctrl/"><b>Website</b></a>
   </div>
   <br/>
-  <img src="docs/participant-portal.png" alt="GIF" width="100%" style="margin: 0 20px;"/>
+  <img src="docs/ctrl.gif" alt="GIF" width="100%" style="margin: 0 20px;"/>
 
 </div>
 
@@ -25,14 +25,14 @@ CTRL, developed by [Garvan Institute of Medical Research](https://www.garvan.org
 
 **Demo Login Information**
 
-**User Portal**  
-URL: [http://ctrldemo.dsp.garvan.org.au/](http://ctrldemo.dsp.garvan.org.au/)  
-Login: `user@example.com`  
+**User Portal**
+URL: [http://ctrldemo.dsp.garvan.org.au/](http://ctrldemo.dsp.garvan.org.au/)
+Login: `user@example.com`
 Password: `Testpassword2`
 
-**Admin Portal**  
-URL: [http://admin.ctrldemo.dsp.garvan.org.au/](http://admin.ctrldemo.dsp.garvan.org.au/)  
-Login: `admin@example.com`  
+**Admin Portal**
+URL: [http://admin.ctrldemo.dsp.garvan.org.au/](http://admin.ctrldemo.dsp.garvan.org.au/)
+Login: `admin@example.com`
 Password: `Testpassword1`
 
 ## Installation
