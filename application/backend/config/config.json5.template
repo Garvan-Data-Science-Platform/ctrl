@@ -10,4 +10,10 @@
   ],
   disablePasswordLogin: true,
   otp: false,
+  smtp: {
+    host: '',
+    port: 587,
+    username: '',
+    password: ''
+  }
 }

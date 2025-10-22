@@ -30,12 +30,6 @@ export async function seedTests(prisma: PrismaClient) {
     data: {
       id: 1,
       name: 'Test Organisation',
-      mailerHost: 'smtp.ethereal.email',
-      mailerPort: 587,
-      mailerPassword: 'b7nS4Ge8gCvHUzq6Rf',
-      mailerUser: 'eduardo.boyer@ethereal.email',
-      redcapToken: 'ABC',
-      redcapURL: 'http://redcaptest.com',
       primaryColour: 'red',
       secondaryColour: 'red',
       elsaToken: 'abc123',

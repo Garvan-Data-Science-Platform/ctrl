@@ -33,14 +33,34 @@ const schema = {
     otp: {
       type: 'boolean',
     },
+    smtp: {
+      type: 'object',
+      properties: {
+        host: {
+          type: 'string',
+        },
+        port: {
+          type: 'number',
+        },
+        username: {
+          type: 'string',
+        },
+        password: {
+          type: 'string',
+        },
+      },
+      required: ['host', 'port', 'username', 'password'],
+      additionalProperties: false,
+    },
   },
+  required: ['smtp'],
   additionalProperties: false,
 } as const
 
 export type Config = FromSchema<typeof schema>
 
 const dir = process.env['CONFIG_DIR']
-let config: Config = {}
+let config = {}
 if (dir) {
   fs.readdirSync(dir).map((file) => {
     if (['json', 'json5'].includes(file.toLowerCase().split('.').at(-1) || '')) {
@@ -60,4 +80,4 @@ if (process.env.NODE_ENV !== 'production') {
   console.log('CONFIG', config)
 }
 
-export default config
+export default config as Config

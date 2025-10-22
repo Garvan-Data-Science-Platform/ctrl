@@ -44,14 +44,8 @@ export class SettingsController extends Controller {
     const orgdata = await prisma.organisation.findFirstOrThrow({
       where: { id: 1 },
       select: {
-        mailerHost: true,
-        mailerPassword: true,
-        mailerPort: true,
-        mailerUser: true,
         primaryColour: true,
         secondaryColour: true,
-        redcapToken: true,
-        redcapURL: true,
         tcLink: true,
       },
     })

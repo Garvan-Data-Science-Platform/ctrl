@@ -10,12 +10,6 @@ const main = async () => {
     update: {},
     create: {
       name: 'OrgName',
-      mailerHost: process.env.MAILER_HOST,
-      mailerPort: process.env.MAILER_PORT ? Number(process.env.MAILER_PORT) : null,
-      mailerUser: process.env.MAILER_USER,
-      mailerPassword: process.env.MAILER_PASSWORD,
-      redcapURL: process.env.REDCAP_API_URL,
-      redcapToken: process.env.REDCAP_API_TOKEN,
       elsaToken: 'ctrl-elsa-abc123',
     },
   })
@@ -24,6 +18,8 @@ const main = async () => {
   const defaultStudy = await prisma.study.create({
     data: {
       name: 'Seed Study',
+      redcapURL: process.env.REDCAP_API_URL,
+      redcapToken: process.env.REDCAP_API_TOKEN,
     },
   })
 

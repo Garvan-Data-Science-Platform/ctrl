@@ -374,9 +374,7 @@ export class AuthController extends Controller {
     }
     let responseData
 
-    const smtp = await prisma.organisation.findFirstOrThrow({})
-
-    if (config.otp && smtp.mailerHost && smtp.mailerUser) {
+    if (config.otp) {
       const zeroPad = (num: number, places: number) => String(num).padStart(places, '0')
       const code = zeroPad(randomInt(9999), 4)
       const otp = await prisma.oTPToken.create({

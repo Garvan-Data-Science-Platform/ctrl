@@ -19,6 +19,8 @@ import { useNotification, useBack } from '@refinedev/core'
 import { GetSettingsResponse } from '@common/types/api/settings'
 import { HashLink } from 'react-router-hash-link'
 import { axiosInstance } from '../providers/dataProvider'
+import { Link } from 'react-router-dom'
+import { useCurrentStudyId, useStudyStore } from '../studyStore'
 
 interface RedcapImportProps {
   type: 'survey' | 'participant'
@@ -82,14 +84,17 @@ export const RedcapImport = ({
 
   const [redcapIsSetup, setRedcapIsSetup] = useState(true)
 
+  const { studies } = useStudyStore()
+  const studyId = useCurrentStudyId()
+
   useEffect(() => {
-    axiosInstance.get('/settings').then((res) => {
-      const settings = res.data.data as GetSettingsResponse['data']
-      if (!settings.redcapToken || !settings.redcapURL) {
-        setRedcapIsSetup(false)
-      }
-    })
-  }, [])
+    const currentStudy = studies.find((val) => val.id == studyId)
+    if (!currentStudy?.redcapToken || !currentStudy?.redcapURL) {
+      setRedcapIsSetup(false)
+    } else {
+      setRedcapIsSetup(true)
+    }
+  }, [studies, studyId])
 
   return (
     <Box>
@@ -260,7 +265,7 @@ export const RedcapImport = ({
                 <Typography>Redcap API is not set up</Typography>
                 {/* 
                 // @ts-ignore */}
-                <Button component={HashLink} to="/settings#redcap">
+                <Button component={Link} to={`/studies?advanced=${studyId}`}>
                   Redcap settings
                 </Button>
               </>

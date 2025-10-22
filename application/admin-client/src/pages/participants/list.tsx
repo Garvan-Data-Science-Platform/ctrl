@@ -60,7 +60,6 @@ export const ParticipantList = () => {
   const [loading, setLoading] = useState(false)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [inviteRowId, setInviteRowId] = useState('')
-  const [emailIsSetup, setEmailIsSetup] = useState(true)
   const [publishedSurvey, setPublishedSurvey] = useState(true)
 
   const { open } = useNotification()
@@ -68,21 +67,6 @@ export const ParticipantList = () => {
   const studyId = useCurrentStudyId()
 
   useEffect(() => {
-    // Check Mailer Settings
-    axiosInstance.get('/settings').then((res) => {
-      const settings = res.data.data as GetSettingsResponse['data']
-      if (
-        !(
-          settings.mailerHost &&
-          settings.mailerPassword &&
-          settings.mailerPort &&
-          settings.mailerUser
-        )
-      ) {
-        setEmailIsSetup(false)
-      }
-    })
-
     // Check Published Survey
     axiosInstance.get(`/studies/${studyId}/surveys`).then((response) => {
       const allSurveys = response.data.data as GetSurveyVersionsResponse['data']
@@ -395,7 +379,7 @@ export const ParticipantList = () => {
             borderRadius: 2,
           }}
         >
-          {emailIsSetup && publishedSurvey ? (
+          {publishedSurvey ? (
             <InviteModal
               onCancel={() => {
                 setModalOpen(false)
@@ -405,43 +389,20 @@ export const ParticipantList = () => {
             />
           ) : (
             <Box>
-              {!emailIsSetup && (
-                <Box sx={{ mb: !publishedSurvey ? 3 : 0 }}>
-                  <Typography sx={{ mb: 1 }}>
-                    You need to set up your email SMTP settings to invite participants
-                  </Typography>
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    component={Link}
-                    to="/settings"
-                    sx={{ textTransform: 'none' }}
-                  >
-                    Go to settings
-                  </Button>
-                </Box>
-              )}
-              {!emailIsSetup && !publishedSurvey && (
-                <Box sx={{ my: 2 }}>
-                  <hr style={{ border: 0, borderTop: '1px solid #eee' }} />
-                </Box>
-              )}
-              {!publishedSurvey && (
-                <Box data-cy="no-published-survey-modal">
-                  <Typography sx={{ mb: 1 }}>
-                    You need to publish a survey before inviting participants
-                  </Typography>
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    component={Link}
-                    to="/surveys/edit/1"
-                    sx={{ textTransform: 'none' }}
-                  >
-                    Go to surveys
-                  </Button>
-                </Box>
-              )}
+              <Box data-cy="no-published-survey-modal">
+                <Typography sx={{ mb: 1 }}>
+                  You need to publish a survey before inviting participants
+                </Typography>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  component={Link}
+                  to="/surveys/edit/1"
+                  sx={{ textTransform: 'none' }}
+                >
+                  Go to surveys
+                </Button>
+              </Box>
             </Box>
           )}
         </Box>
