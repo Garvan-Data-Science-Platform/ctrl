@@ -845,8 +845,7 @@
                 "format": "double"
               },
               "dob": {
-                "type": "string",
-                "format": "date-time"
+                "type": "string"
               },
               "lastName": {
                 "type": "string"
@@ -1637,8 +1636,7 @@
                   "type": "string"
                 },
                 "dob": {
-                  "type": "string",
-                  "format": "date-time"
+                  "type": "string"
                 },
                 "lastName": {
                   "type": "string"

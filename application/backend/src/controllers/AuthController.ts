@@ -528,7 +528,7 @@ export class AuthController extends Controller {
         where: {
           firstName: dependents[0].firstName,
           lastName: dependents[0].lastName,
-          dob: new Date(dependents[0].dob),
+          dob: dependents[0].dob,
         },
       })
       if (existingDep) {
@@ -541,7 +541,7 @@ export class AuthController extends Controller {
       where: {
         firstName: firstName,
         lastName: lastName,
-        dob: new Date(dob),
+        dob: dob,
       },
     })
 
@@ -563,7 +563,7 @@ export class AuthController extends Controller {
         ...nextOfKinCreateData,
         firstName: firstName,
         lastName: lastName,
-        dob: new Date(dob),
+        dob: dob,
         familyId,
         studies: {
           create: {
@@ -609,7 +609,7 @@ export class AuthController extends Controller {
             ...nextOfKinCreateData,
             firstName: dep.firstName,
             lastName: dep.lastName,
-            dob: new Date(dep.dob),
+            dob: dep.dob,
             familyId: profile.familyId,
             studies: {
               create: {

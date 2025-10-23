@@ -45,7 +45,7 @@ describe('ProfilesController', () => {
       const expectedProfileData = expect.objectContaining({
         addressLine: '123 smith st',
         nextOfKin: null,
-        dob: '1980-01-23T00:00:00.000Z',
+        dob: '1980-01-23',
         mobile: '0412345678',
         participantType: 'GUARDIAN',
         postcode: '1234',
@@ -87,7 +87,7 @@ describe('ProfilesController', () => {
 
       const expectedProfileData = expect.objectContaining({
         addressLine: '123 smith st',
-        dob: '1980-01-23T00:00:00.000Z',
+        dob: '1980-01-23',
         mobile: '0412345678',
         participantType: 'GUARDIAN',
         postcode: '1234',
@@ -147,7 +147,7 @@ describe('ProfilesController', () => {
       })
       expect(user.lastName).toBe('Brown')
       expect(profile.lastName).toBe('Brown')
-      expect(profile.dob).toEqual(new Date('2010-12-12'))
+      expect(profile.dob).toEqual('2010-12-12')
       expect(profile.state).toBe('QLD')
 
       const aLog = await prisma.auditLog.findFirstOrThrow({ where: { userId: user.id } })

@@ -90,20 +90,20 @@ describe('Family Editing', () => {
   it('Cannot make changes that would leave orphan dependent', () => {
     //Can't change participant type
     cy.visit('/participants/family/edit/100')
-    cy.get('[data-cy="type-select"]').first().click()
+    cy.contains('tr', 'Completed User').find('[data-cy="type-select"]').click()
     cy.contains('Non-Guardian').click()
-    cy.get('[data-cy="type-select"]').eq(2).click()
+    cy.contains('tr', 'Second Guardian').find('[data-cy="type-select"]').click()
     cy.get('[data-value="STANDARD"]').click()
     cy.contains('no guardian').should('exist')
     cy.contains('no guardian').should('not.exist')
     //Can't remove from study
-    cy.get('[data-cy="in-study-checkbox"]').last().click()
+    cy.contains('tr', 'Second Guardian').find('[data-cy="in-study-checkbox"]').click()
     cy.get('[data-cy="confirm-remove"]').click()
     cy.contains('no guardian').should('exist')
     cy.contains('no guardian').should('not.exist')
     //Can't remove from family
     cy.get('[data-cy="remove-member-button"]').click()
-    cy.get('[data-cy="remove-icon-button"]').last().click()
+    cy.contains('tr', 'Second Guardian').find('[data-cy="remove-icon-button"]').click()
     cy.contains('no guardian').should('exist')
     //Can't add a dependent to a family with no guardian
     cy.visit('/participants/family/edit/1')

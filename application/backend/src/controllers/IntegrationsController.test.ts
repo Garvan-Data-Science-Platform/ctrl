@@ -108,7 +108,7 @@ describe('IntegrationsController', () => {
         data: {
           firstName: 'John',
           lastName: 'Smith',
-          dob: new Date('1990-01-01'),
+          dob: '1990-01-01',
           mobile: '1234567890',
           addressLine: '123 Main St',
           suburb: 'Anytown',

@@ -271,7 +271,7 @@ export class FamiliesController extends Controller {
       where: {
         firstName: bodyRequest.firstName,
         lastName: bodyRequest.lastName,
-        dob: new Date(bodyRequest.dob),
+        dob: bodyRequest.dob,
       },
     })
 
@@ -322,7 +322,7 @@ export class FamiliesController extends Controller {
         userId: null, // Null userId for dependents
         firstName: bodyRequest.firstName,
         lastName: bodyRequest.lastName,
-        dob: new Date(bodyRequest.dob),
+        dob: bodyRequest.dob,
         id: undefined,
         participantType,
         studies: {

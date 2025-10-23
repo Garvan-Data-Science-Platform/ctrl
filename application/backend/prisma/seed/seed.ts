@@ -164,7 +164,7 @@ const main = async () => {
             firstName: 'Judith',
             middleName: 'Arundell',
             lastName: 'Wright',
-            dob: new Date('1915-05-31'),
+            dob: '1915-05-31',
             mobile: '0412345678',
             addressLine: '123 Main St',
             suburb: 'Armidale',
