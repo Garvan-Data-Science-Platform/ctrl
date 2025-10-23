@@ -1,5 +1,4 @@
 import { ParticipantAnswerStatus } from '@common/types/api/participants/participant'
-import { GetSettingsResponse } from '@common/types/api/settings'
 import { GetSurveyVersionsResponse } from '@common/types/api/surveys'
 import {
   Box,
