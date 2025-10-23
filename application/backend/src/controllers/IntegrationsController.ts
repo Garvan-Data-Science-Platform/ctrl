@@ -338,12 +338,13 @@ export class IntegrationsController extends Controller {
     const existingUsers: string[] = []
 
     for (const participant of data) {
-      const participantEmail = participant.email
+      /* eslint-disable @typescript-eslint/no-unused-vars */
+      const { email, ...participantData } = participant
 
       // Check if user has a participant profile associated with this study
       const user = await this.userRepo.findUnique({
         where: {
-          email: participantEmail,
+          email,
           profiles: {
             every: {
               studies: {
@@ -354,11 +355,13 @@ export class IntegrationsController extends Controller {
         },
       })
 
+      // TODO: Use participant data to prefill registration
+
       // If user is already part of that study add to existingUser
       if (user) {
-        existingUsers.push(participantEmail)
+        existingUsers.push(email)
       } else {
-        newInvites.push(participantEmail)
+        newInvites.push(email)
       }
     }
 

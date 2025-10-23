@@ -1,5 +1,6 @@
 [
   {
+    "ctrl_study_id": "1",
     "ctrl_pers_name": "Frank",
     "ctrl_pers_surname": "Brown",
     "ctrl_dob": "1980-01-01",
@@ -42,6 +43,7 @@
     "ctrl_test_1_complete": "1"
   },
   {
+    "ctrl_study_id": "2",
     "ctrl_pers_name": "Bob",
     "ctrl_pers_surname": "Miller",
     "ctrl_dob": "1980-01-02",
@@ -84,6 +86,7 @@
     "ctrl_test_1_complete": "1"
   },
   {
+    "ctrl_study_id": "3",
     "ctrl_pers_name": "David",
     "ctrl_pers_surname": "Rodriguez",
     "ctrl_dob": "1980-01-03",
@@ -126,6 +129,7 @@
     "ctrl_test_1_complete": "1"
   },
   {
+    "ctrl_study_id": "4",
     "ctrl_pers_name": "Grace",
     "ctrl_pers_surname": "Davis",
     "ctrl_dob": "1980-01-04",
@@ -168,6 +172,7 @@
     "ctrl_test_1_complete": "1"
   },
   {
+    "ctrl_study_id": "5",
     "ctrl_pers_name": "John",
     "ctrl_pers_surname": "Jones",
     "ctrl_dob": "1980-01-05",
@@ -210,6 +215,7 @@
     "ctrl_test_1_complete": "1"
   },
   {
+    "ctrl_study_id": "6",
     "ctrl_pers_name": "Peter",
     "ctrl_pers_surname": "Johnson",
     "ctrl_dob": "1980-01-06",
@@ -252,6 +258,7 @@
     "ctrl_test_1_complete": "1"
   },
   {
+    "ctrl_study_id": "7",
     "ctrl_pers_name": "Charlie",
     "ctrl_pers_surname": "Martinez",
     "ctrl_dob": "1980-01-07",
@@ -294,6 +301,7 @@
     "ctrl_test_1_complete": "1"
   },
   {
+    "ctrl_study_id": "8",
     "ctrl_pers_name": "Eve",
     "ctrl_pers_surname": "Smith",
     "ctrl_dob": "1980-01-08",
@@ -336,6 +344,7 @@
     "ctrl_test_1_complete": "1"
   },
   {
+    "ctrl_study_id": "9",
     "ctrl_pers_name": "Alice",
     "ctrl_pers_surname": "Garcia",
     "ctrl_dob": "1980-01-09",
@@ -378,6 +387,7 @@
     "ctrl_test_1_complete": "1"
   },
   {
+    "ctrl_study_id": "10",
     "ctrl_pers_name": "Test",
     "ctrl_pers_surname": "Williams",
     "ctrl_dob": "1980-01-10",
