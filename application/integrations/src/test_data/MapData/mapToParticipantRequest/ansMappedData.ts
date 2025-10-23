@@ -5,6 +5,7 @@ import {
 } from 'common/types/api/users/ParticipantProfile'
 
 export const expectedMappedData = {
+  externalId: 'external-123',
   firstName: 'John',
   lastName: 'Doe',
   email: 'john.doe@example.com',
