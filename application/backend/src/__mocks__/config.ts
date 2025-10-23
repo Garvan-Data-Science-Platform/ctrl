@@ -9,6 +9,12 @@ const config = {
     },
   ],
   otp: false,
+  smtp: {
+    host: 'smtp.ethereal.email',
+    port: 587,
+    username: 'piper.gorczany60@ethereal.email',
+    password: 'FK1DCrQYv2BzFYNf4k',
+  },
 }
 
 export default config

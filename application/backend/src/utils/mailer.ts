@@ -1,5 +1,4 @@
 import nodemailer from 'nodemailer'
-import prisma from '../PrismaClient'
 import config from '../config'
 
 export const fromAddress = `CTRL <noreply@${process.env.HOSTNAME}>`
@@ -11,8 +10,8 @@ export async function createMailerTransporter() {
       verify: async () => ({}),
     }
   }
-
-  if (!Object.values(config.smtp).every((val) => !!val)) {
+  console.log('CONFIG', config)
+  if (!config.smtp || !Object.values(config.smtp).every((val) => !!val)) {
     throw new Error('SMTP settings not configured')
   }
   // Check the mailer is available

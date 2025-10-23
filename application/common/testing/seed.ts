@@ -44,6 +44,8 @@ export async function seedTests(prisma: PrismaClient) {
     data: {
       name: TEST_STUDY,
       id: TEST_STUDY_ID,
+      redcapToken: 'ABC',
+      redcapURL: 'http://redcaptest.com',
     },
   })
 

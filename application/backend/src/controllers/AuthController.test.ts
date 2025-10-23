@@ -569,8 +569,10 @@ describe('AuthController', () => {
         email: PARTICIPANT_UNANSWERED_EMAIL,
         password: 'Testpassword1',
       }
+      console.log('X\nX\nX\nX\nX\nX\nX\nX\nX\nX\n')
       const loginResponse = await request(app).post('/auth/login').send(loginRequest)
       expect(loginResponse.ok).toBe(true)
+
       expect(loginResponse.body.otp_token).toBeDefined()
     })
     it('Should lock access for 10 mins if retries exceeded', async () => {
