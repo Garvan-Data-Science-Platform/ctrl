@@ -36,9 +36,7 @@ import REDCapMapping from '../../../integrations/src/REDCapMapping.json'
 import { parseCSV, validateFile } from '../utils/parseCsv'
 import { FileUploadError } from '../middlewares/ErrorHandler'
 import logger from 'common/src/logger'
-import { AuthController } from './AuthController'
 import { auditLog } from '../middlewares/AuditLog'
-import { genId, genIndId } from '../utils/genId'
 import { SurveyVersionAnswers } from '@prisma/client'
 import { randomBytes } from 'crypto'
 
@@ -301,6 +299,7 @@ export class IntegrationsController extends Controller {
   }
 
   private async processParticipantData(studyId: number, rawData: Record<string, string>[]) {
+    // Map REDCap data to CTRL data
     let data: RegisterParticipantRequest[] = []
     try {
       data = this.integrationService.mapRecordToParticipantRequests(rawData)
@@ -310,70 +309,36 @@ export class IntegrationsController extends Controller {
       )
     }
 
-    const authController = new AuthController()
-    const ids: number[] = []
-    let profilesCreatedCount = 0
-    let profilesAlreadyExistedCount = 0
+    // Process each participant - check if they exist already
     const newInvites: string[] = []
+    const existingUsersEmail: string[] = []
 
     for (const participant of data) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { email, password, middleName, ...participantData } = participant
-      newInvites.push(email)
-      const user = await this.userRepo.findFirst({
-        where: { email: email },
-        select: { id: true, profiles: true },
+      const participantEmail = participant.email
+
+      // Check if user has a participant profile associated with this study
+      const user = await this.userRepo.findUnique({
+        where: {
+          email: participantEmail,
+          profiles: {
+            every: {
+              studies: {
+                every: { studyId },
+              },
+            },
+          },
+        },
       })
 
-      // If user doesn't exist, create a participant using the authController and send an invitation, otherwise create a profile and attach it to the user.
-      if (!user) {
-        try {
-          const participantResponse = await authController.createParticipant(
-            participantData,
-            studyId,
-          )
-          ids.push(participantResponse.id)
-          profilesCreatedCount++
-        } catch (err) {
-          logger.error(err)
-          profilesAlreadyExistedCount++
-          continue
-        }
+      // If user is already part of that study add to existingUser
+      if (user) {
+        existingUsersEmail.push(participantEmail)
       } else {
-        if (user.profiles.length === 0) {
-          const participantProfile = await prisma.participantProfile.create({
-            data: {
-              ...participantData,
-              user: {
-                connect: { id: user.id },
-              },
-              studies: {
-                create: {
-                  study: {
-                    connect: {
-                      id: studyId,
-                    },
-                  },
-                },
-              },
-              nextOfKin: participantData.nextOfKin
-                ? {
-                    create: participantData.nextOfKin,
-                  }
-                : undefined,
-            },
-          })
-          await genIndId(participantProfile.id)
-          await genId(studyId, participantProfile.id)
-          ids.push(participantProfile.id)
-          profilesCreatedCount++
-        } else {
-          profilesAlreadyExistedCount++
-        }
+        newInvites.push(participantEmail)
       }
     }
 
-    return { profilesCreatedCount, profilesAlreadyExistedCount, ids, newInvites }
+    return { newInvites, existingUsersEmail }
   }
 
   private async processInstrumentData(
