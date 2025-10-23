@@ -2262,6 +2262,143 @@
           "content": "There was some problem with this thing that I was doing.\nBut I don't know why?\n\nCheers,\nJohn Doe"
         }
       },
+      "UploadRedcapParticipantResponse": {
+        "properties": {
+          "newInvites": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "existingUsersEmail": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "newInvites",
+          "existingUsersEmail"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UploadRedcapInstrumentResponse": {
+        "properties": {
+          "id": {
+            "type": "number",
+            "format": "double"
+          },
+          "versionNumber": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": [
+          "id",
+          "versionNumber"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UploadRedcapInstrumentAPIRequest": {
+        "description": "This is the name of the redcap instrument you are importing from.\nNOTE: These 'forms' are not the form label values that are seen on the webpages,\nbut instead they are the unique form names seen in Column B of the data dictionary.",
+        "properties": {
+          "formName": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "formName"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "ElsaDuosResponse": {
+        "properties": {
+          "data": {
+            "items": {
+              "properties": {
+                "duos": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "participantId": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "duos",
+                "participantId"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "notFoundIds": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data",
+          "notFoundIds"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "GetElsaTokenResponse": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "GetFamilyResponse": {
+        "properties": {
+          "data": {
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/FamilyMember"
+                },
+                {
+                  "properties": {
+                    "inStudy": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "inStudy"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "AddDependentRequest": {
+        "$ref": "#/components/schemas/OnBehalf"
+      },
       "RegisterResponse": {
         "properties": {
           "token": {
@@ -2572,147 +2709,6 @@
         ],
         "type": "object",
         "additionalProperties": false
-      },
-      "UploadRedcapParticipantResponse": {
-        "properties": {
-          "profilesCreatedCount": {
-            "type": "number",
-            "format": "double"
-          },
-          "profilesAlreadyExistedCount": {
-            "type": "number",
-            "format": "double"
-          },
-          "ids": {
-            "items": {
-              "type": "number",
-              "format": "double"
-            },
-            "type": "array"
-          }
-        },
-        "required": [
-          "profilesCreatedCount",
-          "profilesAlreadyExistedCount",
-          "ids"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "UploadRedcapInstrumentResponse": {
-        "properties": {
-          "id": {
-            "type": "number",
-            "format": "double"
-          },
-          "versionNumber": {
-            "type": "number",
-            "format": "double"
-          }
-        },
-        "required": [
-          "id",
-          "versionNumber"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "UploadRedcapInstrumentAPIRequest": {
-        "description": "This is the name of the redcap instrument you are importing from.\nNOTE: These 'forms' are not the form label values that are seen on the webpages,\nbut instead they are the unique form names seen in Column B of the data dictionary.",
-        "properties": {
-          "formName": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "required": [
-          "formName"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "ElsaDuosResponse": {
-        "properties": {
-          "data": {
-            "items": {
-              "properties": {
-                "duos": {
-                  "items": {
-                    "type": "string"
-                  },
-                  "type": "array"
-                },
-                "participantId": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "duos",
-                "participantId"
-              ],
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "notFoundIds": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          }
-        },
-        "required": [
-          "data",
-          "notFoundIds"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "GetElsaTokenResponse": {
-        "properties": {
-          "token": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "required": [
-          "token"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "GetFamilyResponse": {
-        "properties": {
-          "data": {
-            "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/FamilyMember"
-                },
-                {
-                  "properties": {
-                    "inStudy": {
-                      "type": "boolean"
-                    }
-                  },
-                  "required": [
-                    "inStudy"
-                  ],
-                  "type": "object"
-                }
-              ]
-            },
-            "type": "array"
-          }
-        },
-        "required": [
-          "data"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "AddDependentRequest": {
-        "$ref": "#/components/schemas/OnBehalf"
       }
     },
     "securitySchemes": {
@@ -6860,483 +6856,6 @@
         }
       }
     },
-    "/auth/register": {
-      "post": {
-        "operationId": "RegisterUser",
-        "responses": {
-          "201": {
-            "description": "User Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RegisterResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Content",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnprocessableError"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "description": "register",
-        "summary": "Register a new user",
-        "tags": [
-          "Auth"
-        ],
-        "security": [
-          {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
-          }
-        ],
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegisterRequest"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/auth/setup": {
-      "get": {
-        "operationId": "CheckSetup",
-        "responses": {
-          "200": {
-            "description": "Ok",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SetupResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Content",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnprocessableError"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "description": "Check setup",
-        "summary": "Check if CTRL is setup",
-        "tags": [
-          "Auth"
-        ],
-        "security": [],
-        "parameters": []
-      }
-    },
-    "/auth/register/setup": {
-      "post": {
-        "operationId": "RegisterInitialUser",
-        "responses": {
-          "201": {
-            "description": "User Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RegisterResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Content",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnprocessableError"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "description": "register admin",
-        "summary": "Register initial admin user",
-        "tags": [
-          "Auth"
-        ],
-        "security": [],
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegisterSetupRequest"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/auth/register/participants/{inviteId}": {
-      "post": {
-        "operationId": "RegisterParticipant",
-        "responses": {
-          "201": {
-            "description": "Participant Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RegisterParticipantResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Content",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnprocessableError"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "description": "registerParticipant",
-        "summary": "Register a participant",
-        "tags": [
-          "Auth"
-        ],
-        "security": [],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "inviteId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegisterParticipantRequest"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/auth/login/oidc": {
-      "post": {
-        "operationId": "LoginOIDC",
-        "responses": {
-          "200": {
-            "description": "Ok",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Content",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnprocessableError"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "description": "OIDC login",
-        "summary": "Login using OIDC",
-        "tags": [
-          "Auth"
-        ],
-        "security": [],
-        "parameters": [
-          {
-            "in": "header",
-            "name": "x-client-type",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/OIDCLoginRequest"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/auth/login": {
-      "post": {
-        "operationId": "Login",
-        "responses": {
-          "200": {
-            "description": "Ok",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Content",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnprocessableError"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "description": "login",
-        "summary": "Login a User",
-        "tags": [
-          "Auth"
-        ],
-        "security": [],
-        "parameters": [
-          {
-            "in": "header",
-            "name": "x-client-type",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginRequest"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/auth/login/otp": {
-      "post": {
-        "operationId": "LoginOtp",
-        "responses": {
-          "200": {
-            "description": "Ok",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Content",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnprocessableError"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "description": "One time password",
-        "summary": "Log in with a OTP code",
-        "tags": [
-          "Auth"
-        ],
-        "security": [],
-        "parameters": [
-          {
-            "in": "header",
-            "name": "x-client-type",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/OTPLoginRequest"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/auth/tcs": {
-      "get": {
-        "operationId": "Tcs",
-        "responses": {
-          "302": {
-            "description": "Redirect"
-          },
-          "422": {
-            "description": "Unprocessable Content",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnprocessableError"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "description": "Terms and conditions link",
-        "summary": "Redirects to configured terms and conditions url",
-        "tags": [
-          "Auth"
-        ],
-        "security": [],
-        "parameters": []
-      }
-    },
     "/studies/{studyId}/integrations/redcap/participant/upload/csv": {
       "post": {
         "operationId": "UploadRedcapParticipantCSV",
@@ -8305,6 +7824,483 @@
             }
           }
         }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "operationId": "RegisterUser",
+        "responses": {
+          "201": {
+            "description": "User Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "register",
+        "summary": "Register a new user",
+        "tags": [
+          "Auth"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/setup": {
+      "get": {
+        "operationId": "CheckSetup",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SetupResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Check setup",
+        "summary": "Check if CTRL is setup",
+        "tags": [
+          "Auth"
+        ],
+        "security": [],
+        "parameters": []
+      }
+    },
+    "/auth/register/setup": {
+      "post": {
+        "operationId": "RegisterInitialUser",
+        "responses": {
+          "201": {
+            "description": "User Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "register admin",
+        "summary": "Register initial admin user",
+        "tags": [
+          "Auth"
+        ],
+        "security": [],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterSetupRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/register/participants/{inviteId}": {
+      "post": {
+        "operationId": "RegisterParticipant",
+        "responses": {
+          "201": {
+            "description": "Participant Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterParticipantResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "registerParticipant",
+        "summary": "Register a participant",
+        "tags": [
+          "Auth"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "inviteId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterParticipantRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login/oidc": {
+      "post": {
+        "operationId": "LoginOIDC",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "OIDC login",
+        "summary": "Login using OIDC",
+        "tags": [
+          "Auth"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-client-type",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OIDCLoginRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "Login",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "login",
+        "summary": "Login a User",
+        "tags": [
+          "Auth"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-client-type",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login/otp": {
+      "post": {
+        "operationId": "LoginOtp",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "One time password",
+        "summary": "Log in with a OTP code",
+        "tags": [
+          "Auth"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-client-type",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OTPLoginRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/tcs": {
+      "get": {
+        "operationId": "Tcs",
+        "responses": {
+          "302": {
+            "description": "Redirect"
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Terms and conditions link",
+        "summary": "Redirects to configured terms and conditions url",
+        "tags": [
+          "Auth"
+        ],
+        "security": [],
+        "parameters": []
       }
     }
   },
