@@ -2270,7 +2270,7 @@
             },
             "type": "array"
           },
-          "existingUsersEmail": {
+          "existingUsers": {
             "items": {
               "type": "string"
             },
@@ -2279,7 +2279,7 @@
         },
         "required": [
           "newInvites",
-          "existingUsersEmail"
+          "existingUsers"
         ],
         "type": "object",
         "additionalProperties": false

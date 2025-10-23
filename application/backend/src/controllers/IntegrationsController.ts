@@ -24,7 +24,12 @@ import type {
   UploadRedcapInstrumentAPIRequest,
   UploadRedcapParticipantResponse,
 } from 'common/types/api/integrations/redcap'
-import { BadGatewayError, UnauthorizedError, UnprocessableError } from '../middlewares/ErrorHandler'
+import {
+  BadGatewayError,
+  NotFoundError,
+  UnauthorizedError,
+  UnprocessableError,
+} from '../middlewares/ErrorHandler'
 import {
   UnauthorizedErrorResponse,
   InternalErrorResponse,
@@ -65,9 +70,19 @@ export class IntegrationsController extends Controller {
     @Path() studyId: number,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<UploadRedcapParticipantResponse> {
+    // Check if study exists
+    const study = await prisma.study.findUnique({
+      where: { id: studyId },
+    })
+
+    if (!study) {
+      throw new NotFoundError(`Study with id ${studyId} not found`)
+    }
+
     logger.info({ message: 'This is the file that has been uploaded', file })
     await validateFile(file, []) // no required headers here so we pass none to the headers checker
     // Create a readable stream from the buffer
+
     const readableStream = Readable.from(file.buffer.toString())
     const csvData: Record<string, string>[] = await parseCSV(readableStream)
 
@@ -81,6 +96,15 @@ export class IntegrationsController extends Controller {
     @Path() studyId: number,
   ): Promise<UploadRedcapParticipantResponse> {
     const params = new URLSearchParams()
+
+    // Check if study exists
+    const study = await prisma.study.findUnique({
+      where: { id: studyId },
+    })
+
+    if (!study) {
+      throw new NotFoundError(`Study with id ${studyId} not found`)
+    }
 
     const redcapSettings = await prisma.organisation.findFirstOrThrow({
       where: { id: 1 },
@@ -311,7 +335,7 @@ export class IntegrationsController extends Controller {
 
     // Process each participant - check if they exist already
     const newInvites: string[] = []
-    const existingUsersEmail: string[] = []
+    const existingUsers: string[] = []
 
     for (const participant of data) {
       const participantEmail = participant.email
@@ -332,13 +356,13 @@ export class IntegrationsController extends Controller {
 
       // If user is already part of that study add to existingUser
       if (user) {
-        existingUsersEmail.push(participantEmail)
+        existingUsers.push(participantEmail)
       } else {
         newInvites.push(participantEmail)
       }
     }
 
-    return { newInvites, existingUsersEmail }
+    return { newInvites, existingUsers }
   }
 
   private async processInstrumentData(

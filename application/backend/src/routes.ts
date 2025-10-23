@@ -759,7 +759,7 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "newInvites": {"dataType":"array","array":{"dataType":"string"},"required":true},
-            "existingUsersEmail": {"dataType":"array","array":{"dataType":"string"},"required":true},
+            "existingUsers": {"dataType":"array","array":{"dataType":"string"},"required":true},
         },
         "additionalProperties": false,
     },
