@@ -59,6 +59,7 @@ export default function Register() {
     handleSubmit,
     setError,
     watch,
+    reset,
     formState: { errors },
   } = useForm<FormValues>()
 
@@ -72,7 +73,24 @@ export default function Register() {
 
   useEffect(() => {
     document.title = 'Register | CTRL'
-  }, [])
+
+    // Fetch Prefill Data
+    if (inviteId) {
+      fetch(import.meta.env.VITE_BACKEND_URL + `/invites/${inviteId}/prefill`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      }).then((res) => {
+        if (res.ok) {
+          res.json().then((data) => {
+            // Prefill form data
+            const prefill = { ...data.prefill }
+            delete prefill.password // Do not prefill password
+            reset(prefill)
+          })
+        }
+      })
+    }
+  }, [inviteId, reset])
 
   const onSubmit = (data: FormValues) => {
     const reqData: RegisterParticipantRequest = {
