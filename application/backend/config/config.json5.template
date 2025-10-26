@@ -10,4 +10,5 @@
   ],
   disablePasswordLogin: true,
   otp: false,
+  inviteExpiryDays: 7
 }

@@ -33,6 +33,7 @@ import {
   Delete,
   Queries,
   Patch,
+  NoSecurity,
 } from 'tsoa'
 import { Participant } from 'common/types/api/participants/participant'
 import { createMailerTransporter, fromAddress } from '../utils/mailer'
@@ -49,9 +50,9 @@ import {
 import { ProfilesController } from './ProfilesController'
 import { auditLog } from '../middlewares/AuditLog'
 import { Role } from '@prisma/client'
-import { v4 as uuidv4 } from 'uuid'
 import { genId } from '../utils/genId'
 import { extractOrderBy, extractWhere } from '../utils/filtering'
+import { generateInviteId, inviteExpiresAt } from 'utils/invite'
 
 @Route('/')
 @Tags('Participants')
@@ -688,7 +689,7 @@ export class InvitesController extends Controller {
     const recipients = [...new Set(bodyRequest.recipients)]
     const emails = recipients.map((val) => val.email)
 
-    const expiresAt = new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000) // TODO: MAKE EXPIRY CONFIGURABLE
+    const expiresAt = inviteExpiresAt()
 
     // Fetch existing invites
     let existingInvites = await this.invitesRepo.findMany({
@@ -771,7 +772,7 @@ export class InvitesController extends Controller {
     if (newRecipients.length > 0) {
       const inviteResults = await Promise.all(
         newRecipients.map(async (r) => {
-          const inviteId: string = uuidv4()
+          const inviteId: string = generateInviteId()
           const success = await this.sendInvite(r.email, studyId, inviteId)
           if (!success) {
             logger.error(`Failed to send email to ${r.email}`)
@@ -971,7 +972,6 @@ export class InvitesController extends Controller {
    *
    * @summary Get invite email subject and text
    */
-  //TODO: make invite register link include inviteId uuid string
   @Get('/studies/{studyId}/invites/text')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async getInviteText(@Path() studyId: number): Promise<GetInviteTextResponse> {
@@ -983,7 +983,22 @@ export class InvitesController extends Controller {
     return inviteText
   }
 
-  //TODO: make registerLink include inviteId uuid string
+  /**
+   * Get invite prefill data by ID
+   *
+   * @summary Get invite prefill data by ID
+   */
+  @NoSecurity()
+  @Get('/invites/{inviteId}/prefill')
+  public async getPrefillDataById(inviteId: string) {
+    const prefillData = await this.invitesRepo.findUniqueOrThrow({
+      where: { id: inviteId },
+      select: { prefill: true },
+    })
+    console.log('prefillData: ', prefillData)
+    return prefillData
+  }
+
   private async sendInvite(email: string, studyId: number, inviteId: string): Promise<boolean> {
     try {
       const registerLink = `${process.env.HOSTNAME}/register/${inviteId}`

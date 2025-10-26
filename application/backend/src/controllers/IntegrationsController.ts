@@ -44,6 +44,8 @@ import logger from 'common/src/logger'
 import { auditLog } from '../middlewares/AuditLog'
 import { SurveyVersionAnswers } from '@prisma/client'
 import { randomBytes } from 'crypto'
+import { generateInviteId, inviteExpiresAt } from 'utils/invite'
+import { Prefill } from 'common/types/invite'
 
 interface ElsaDuosResponse {
   data: { participantId: string; duos: string[] }[]
@@ -61,6 +63,7 @@ export class IntegrationsController extends Controller {
   profileRepo = prisma.participantProfile
   surveyRepo = prisma.surveyVersion
   svaRepo = prisma.surveyVersionAnswers
+  invitesRepo = prisma.invite
   integrationService = new Integrations(REDCapMapping)
 
   @Post('studies/{studyId}/integrations/redcap/participant/upload/csv')
@@ -355,7 +358,20 @@ export class IntegrationsController extends Controller {
         },
       })
 
-      // TODO: Use participant data to prefill registration
+      // Create an invite with prefilled REDCap data (is not sent until admin sends through the invite)
+      try {
+        await this.invitesRepo.create({
+          data: {
+            id: generateInviteId(),
+            email,
+            studyId,
+            expiresAt: inviteExpiresAt(),
+            prefill: participantData as Prefill,
+          },
+        })
+      } catch (error) {
+        logger.error({ message: 'Error creating invite', error, email, studyId })
+      }
 
       // If user is already part of that study add to existingUser
       if (user) {

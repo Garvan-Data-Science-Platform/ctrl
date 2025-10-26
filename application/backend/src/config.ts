@@ -33,6 +33,9 @@ const schema = {
     otp: {
       type: 'boolean',
     },
+    inviteExpiryDays: {
+      type: 'number',
+    },
   },
   additionalProperties: false,
 } as const

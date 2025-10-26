@@ -6191,6 +6191,67 @@
         ]
       }
     },
+    "/invites/{inviteId}/prefill": {
+      "get": {
+        "operationId": "GetPrefillDataById",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "prefill": {
+                      "$ref": "#/components/schemas/Prefill"
+                    }
+                  },
+                  "required": [
+                    "prefill"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Get invite prefill data by ID",
+        "summary": "Get invite prefill data by ID",
+        "tags": [
+          "Invites"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "inviteId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
     "/organisations": {
       "get": {
         "operationId": "GetAllOrganisations",
