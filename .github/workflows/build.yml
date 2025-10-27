@@ -49,6 +49,16 @@ jobs:
       - name: Check node version
         run: echo "node_version=${{ steps.nvm.outputs.node_version }}"
 
+      - name: Get Chart version
+        id: chart_version
+        run: |
+          version=$(grep '^version:' .helm/ctrl/Chart.yaml | awk '{print $2}')
+          echo "chart_version=$version" >> $GITHUB_OUTPUT
+
+      - name: Get short SHA
+        id: short_sha
+        run: echo "short_sha=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_OUTPUT
+
       - name: Build and Push ${{ matrix.name }} Image
         uses: docker/build-push-action@v6
         with:
@@ -63,7 +73,7 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             NODE_VERSION=${{ steps.nvm.outputs.node_version }}
-            APP_VERSION="V${{github.sha}}"
+            APP_VERSION=${{ steps.chart_version.outputs.chart_version }}_${{ steps.short_sha.outputs.short_sha }}
 
   push_helm_charts:
     name: Push Helm Charts
