@@ -1,9 +1,10 @@
 #Must be built from top directory
 
 ARG NODE_VERSION
-ARG APP_VERSION
 
 FROM node:${NODE_VERSION}-alpine AS build
+
+ARG APP_VERSION
 
 ARG NODE_ENV=production
 ENV NODE_ENV $NODE_ENV
