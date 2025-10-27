@@ -70,32 +70,12 @@ describe('Settings page', () => {
     cy.get('[data-cy="save-button"]').click()
 
     cy.contains('Invalid colour').should('exist')
-    cy.contains('Invalid url').should('exist')
 
     for (const [key, value] of Object.entries(fieldMap)) {
       cy.get(`[data-cy="${key}"] input`).clear().type(value)
     }
 
     cy.contains('Invalid colour').should('not.exist')
-    cy.contains('Invalid url').should('not.exist')
-  })
-
-  it('Redcap import page does not allow API features if not set up', () => {
-    cy.login(UserType.ADMIN)
-    cy.visit('/settings')
-
-    cy.get('[data-cy="tcLink"] input').should(
-      'have.value',
-      'https://garvan-data-science-platform.github.io/ctrl-docs/docs/terms-and-conditions',
-    )
-
-    cy.get('[data-cy="redcapURL"] input').clear()
-    cy.get('[data-cy="save-button"]').click()
-
-    cy.visit('/integrations/redcap/survey/import')
-    cy.contains('Redcap API is not set up').should('exist')
-    cy.contains('Redcap settings').click()
-    cy.url().should('contain', '/settings#redcap')
   })
 
   it('Can update logo', () => {

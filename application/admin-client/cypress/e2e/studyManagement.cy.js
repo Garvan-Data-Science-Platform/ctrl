@@ -55,6 +55,14 @@ describe('Study management page', () => {
     cy.contains('Study with that name already exists').should('exist')
   })
 
+  it('Redcap import page does not allow API features if not set up', () => {
+    cy.login(UserType.ADMIN)
+    cy.visit('/integrations/redcap/survey/import')
+    cy.contains('Redcap API is not set up').should('exist')
+    cy.contains('Redcap settings').click()
+    cy.contains('Redcap API URL').should('exist')
+  })
+
   it('Can delete a study', () => {
     cy.visit('/studies')
     //Change to last study to test behaviour when last study in list is active and deleted

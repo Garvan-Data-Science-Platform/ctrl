@@ -61,19 +61,23 @@ export type Config = FromSchema<typeof schema>
 
 const dir = process.env['CONFIG_DIR']
 let config = {}
-if (dir) {
-  fs.readdirSync(dir).map((file) => {
-    if (['json', 'json5'].includes(file.toLowerCase().split('.').at(-1) || '')) {
-      config = { ...config, ...JSON5.parse(fs.readFileSync(path.join(dir, file), 'ascii')) }
-    }
-  })
-}
+if (process.env.NODE_ENV !== 'test') {
+  if (dir) {
+    fs.readdirSync(dir).map((file) => {
+      if (['json', 'json5'].includes(file.toLowerCase().split('.').at(-1) || '')) {
+        config = { ...config, ...JSON5.parse(fs.readFileSync(path.join(dir, file), 'ascii')) }
+      }
+    })
+  }
 
-const ajv = new Ajv()
-const validate = ajv.compile(schema)
+  const ajv = new Ajv()
+  const validate = ajv.compile(schema)
 
-if (!validate(config)) {
-  throw new Error('Invalid config')
+  if (!validate(config)) {
+    throw new Error('Invalid config')
+  }
+} else {
+  config = { smtp: { host: '', port: 0, username: '', password: '' } }
 }
 
 if (process.env.NODE_ENV !== 'production') {

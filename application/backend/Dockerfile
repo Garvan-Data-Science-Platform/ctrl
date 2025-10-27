@@ -30,7 +30,5 @@ RUN yarn workspace backend build
 RUN yarn workspace backend tsoa:spec
 RUN yarn workspace backend prisma:generate
 
-RUN echo '{smtp:{username:"",password:"",host:"",port:0}}' > application/backend/config/config.json5
-
 #ENTRYPOINT ["tail", "-f", "/dev/null"]
 ENTRYPOINT [ "sh", "application/backend/scripts/entrypoint.sh" ]

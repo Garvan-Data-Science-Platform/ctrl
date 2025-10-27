@@ -10,7 +10,6 @@ export async function createMailerTransporter() {
       verify: async () => ({}),
     }
   }
-  console.log('CONFIG', config)
   if (!config.smtp || !Object.values(config.smtp).every((val) => !!val)) {
     throw new Error('SMTP settings not configured')
   }
