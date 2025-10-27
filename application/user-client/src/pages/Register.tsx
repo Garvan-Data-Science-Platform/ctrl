@@ -61,27 +61,7 @@ export default function Register() {
     watch,
     reset,
     formState: { errors },
-  } = useForm<FormValues>({
-    defaultValues: {
-      firstName: '',
-      lastName: '',
-      email: '',
-      password: '',
-      confirm_password: '',
-      dob: '',
-      addressLine: '',
-      suburb: '',
-      state: '' as StateTerritory,
-      postcode: '',
-      mobile: '',
-      preferredContact: '' as ContactMethod,
-      nok_first: '',
-      nok_surname: '',
-      nok_email: '',
-      dependents: [],
-      terms: false,
-    },
-  })
+  } = useForm<FormValues>()
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -106,9 +86,22 @@ export default function Register() {
             const prefill = { ...data.prefill }
             delete prefill.password // Do not prefill password
             reset({
-              ...prefill,
+              firstName: prefill.firstName ?? '',
+              lastName: prefill.lastName ?? '',
+              email: prefill.email ?? '',
               password: '',
               confirm_password: '',
+              dob: prefill.dob ?? '',
+              addressLine: prefill.addressLine ?? '',
+              suburb: prefill.suburb ?? '',
+              state: prefill.state ?? ('' as StateTerritory),
+              postcode: prefill.postcode ?? '',
+              mobile: prefill.mobile ?? '',
+              preferredContact: prefill.preferredContact ?? ('' as ContactMethod),
+              nok_first: prefill.nok_first ?? '',
+              nok_surname: prefill.nok_surname ?? '',
+              nok_email: prefill.nok_email ?? '',
+              dependents: prefill.dependents ?? [],
               terms: false,
             })
           })
