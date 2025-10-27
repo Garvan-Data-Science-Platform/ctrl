@@ -341,8 +341,10 @@ export class IntegrationsController extends Controller {
     const existingUsers: string[] = []
 
     for (const participant of data) {
-      /* eslint-disable @typescript-eslint/no-unused-vars */
       const { email, ...participantData } = participant
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      delete (participantData as any).password
 
       // Check if user has a participant profile associated with this study
       const user = await this.userRepo.findUnique({
