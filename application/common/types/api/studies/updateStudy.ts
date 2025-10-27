@@ -9,4 +9,6 @@ export interface UpdateStudyRequest {
    */
   name?: string
   description?: string
+  redcapToken?: string
+  redcapURL?: string
 }

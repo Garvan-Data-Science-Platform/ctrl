@@ -46,6 +46,18 @@ describe('Study management page', () => {
     cy.contains('STUDY DESCRIPTION').should('exist')
   })
 
+  it('Can edit redcap settings', () => {
+    cy.visit('/studies')
+    cy.get('[data-cy="advanced-toggle"]').eq(1).click()
+    cy.get('[data-cy="redcapURL"] input').eq(1).type('abc')
+    cy.get('[data-cy="redcapToken"] input').eq(1).type('abc123')
+    cy.get('[data-cy="redcap-apply"]').eq(1).click()
+    cy.contains('Invalid Redcap').should('exist')
+    cy.get('[data-cy="redcapURL"] input').eq(1).clear().type('https://abc.com')
+    cy.get('[data-cy="redcap-apply"]').eq(1).click()
+    cy.contains('Updated').should('exist')
+  })
+
   it('Cannot give study same name as existing study', () => {
     cy.visit('/studies')
     cy.get('[data-cy="edit-name-field"]').should('not.exist')
@@ -58,6 +70,8 @@ describe('Study management page', () => {
   it('Redcap import page does not allow API features if not set up', () => {
     cy.login(UserType.ADMIN)
     cy.visit('/integrations/redcap/survey/import')
+    cy.get('[data-cy="study-dropdown"]').click()
+    cy.contains('Study 2').click()
     cy.contains('Redcap API is not set up').should('exist')
     cy.contains('Redcap settings').click()
     cy.contains('Redcap API URL').should('exist')

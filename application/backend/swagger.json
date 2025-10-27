@@ -965,14 +965,6 @@
               "tcLink": {
                 "type": "string"
               },
-              "redcapURL": {
-                "type": "string",
-                "nullable": true
-              },
-              "redcapToken": {
-                "type": "string",
-                "nullable": true
-              },
               "secondaryColour": {
                 "type": "string",
                 "nullable": true
@@ -980,35 +972,12 @@
               "primaryColour": {
                 "type": "string",
                 "nullable": true
-              },
-              "mailerPassword": {
-                "type": "string",
-                "nullable": true
-              },
-              "mailerUser": {
-                "type": "string",
-                "nullable": true
-              },
-              "mailerPort": {
-                "type": "number",
-                "format": "double",
-                "nullable": true
-              },
-              "mailerHost": {
-                "type": "string",
-                "nullable": true
               }
             },
             "required": [
               "tcLink",
-              "redcapURL",
-              "redcapToken",
               "secondaryColour",
-              "primaryColour",
-              "mailerPassword",
-              "mailerUser",
-              "mailerPort",
-              "mailerHost"
+              "primaryColour"
             ],
             "type": "object"
           }
@@ -1021,36 +990,11 @@
       },
       "Partial_GetSettingsResponse-at-data_": {
         "properties": {
-          "mailerHost": {
-            "type": "string",
-            "nullable": true
-          },
-          "mailerPort": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "mailerUser": {
-            "type": "string",
-            "nullable": true
-          },
-          "mailerPassword": {
-            "type": "string",
-            "nullable": true
-          },
           "primaryColour": {
             "type": "string",
             "nullable": true
           },
           "secondaryColour": {
-            "type": "string",
-            "nullable": true
-          },
-          "redcapToken": {
-            "type": "string",
-            "nullable": true
-          },
-          "redcapURL": {
             "type": "string",
             "nullable": true
           },
@@ -1106,6 +1050,14 @@
             "type": "string",
             "nullable": true
           },
+          "redcapURL": {
+            "type": "string",
+            "nullable": true
+          },
+          "redcapToken": {
+            "type": "string",
+            "nullable": true
+          },
           "inviteEmailSubject": {
             "type": "string"
           },
@@ -1118,6 +1070,8 @@
           "id",
           "deleted",
           "description",
+          "redcapURL",
+          "redcapToken",
           "inviteEmailSubject",
           "inviteEmailText"
         ],
@@ -1167,6 +1121,14 @@
           "inviteEmailSubject": {
             "type": "string"
           },
+          "redcapToken": {
+            "type": "string",
+            "nullable": true
+          },
+          "redcapURL": {
+            "type": "string",
+            "nullable": true
+          },
           "logo": {
             "type": "string",
             "format": "byte",
@@ -1190,6 +1152,8 @@
         "required": [
           "inviteEmailText",
           "inviteEmailSubject",
+          "redcapToken",
+          "redcapURL",
           "logo",
           "description",
           "deleted",
@@ -1243,6 +1207,12 @@
             "minLength": 1
           },
           "description": {
+            "type": "string"
+          },
+          "redcapToken": {
+            "type": "string"
+          },
+          "redcapURL": {
             "type": "string"
           }
         },
@@ -2098,36 +2068,11 @@
           "tcLink": {
             "type": "string"
           },
-          "redcapURL": {
-            "type": "string",
-            "nullable": true
-          },
-          "redcapToken": {
-            "type": "string",
-            "nullable": true
-          },
           "secondaryColour": {
             "type": "string",
             "nullable": true
           },
           "primaryColour": {
-            "type": "string",
-            "nullable": true
-          },
-          "mailerPassword": {
-            "type": "string",
-            "nullable": true
-          },
-          "mailerUser": {
-            "type": "string",
-            "nullable": true
-          },
-          "mailerPort": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "mailerHost": {
             "type": "string",
             "nullable": true
           },
@@ -2151,14 +2096,8 @@
           "elsaToken",
           "logo",
           "tcLink",
-          "redcapURL",
-          "redcapToken",
           "secondaryColour",
           "primaryColour",
-          "mailerPassword",
-          "mailerUser",
-          "mailerPort",
-          "mailerHost",
           "updatedAt",
           "createdAt",
           "id",

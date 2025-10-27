@@ -473,6 +473,8 @@ const models: TsoaRoute.Models = {
         "properties": {
             "name": {"dataType":"string","validators":{"minLength":{"value":1}}},
             "description": {"dataType":"string"},
+            "redcapToken": {"dataType":"string"},
+            "redcapURL": {"dataType":"string"},
         },
         "additionalProperties": false,
     },

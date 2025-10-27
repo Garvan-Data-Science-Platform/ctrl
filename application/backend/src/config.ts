@@ -77,7 +77,7 @@ if (process.env.NODE_ENV !== 'test') {
     throw new Error('Invalid config')
   }
 } else {
-  config = { smtp: { host: '', port: 0, username: '', password: '' } }
+  config = { smtp: { host: 'x', port: 1, username: 'x', password: 'x' } }
 }
 
 if (process.env.NODE_ENV !== 'production') {
