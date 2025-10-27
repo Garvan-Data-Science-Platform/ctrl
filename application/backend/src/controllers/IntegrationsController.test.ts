@@ -49,7 +49,34 @@ describe('IntegrationsController', () => {
 
       expect(response.body).toStrictEqual({
         existingUsers: [],
-        newInvites: ['example@example.com'],
+        newParticipants: [
+          {
+            email: 'example@example.com',
+            prefill: {
+              profile: {
+                addressLine: '2 fake st',
+                dob: '01/10/1984',
+                firstName: 'John',
+                lastName: 'Smith',
+                mobile: '0448434946',
+                nextOfKin: {
+                  email: 'example2@example.com',
+                  firstName: 'fake',
+                  lastName: 'fakerson',
+                  mobile: '0448434946',
+                },
+                participantType: 'STANDARD',
+                postcode: '2010',
+                preferredContact: 'EMAIL',
+                state: 'ACT',
+                suburb: 'fakie',
+              },
+              studyParticipant: {
+                externalId: '1',
+              },
+            },
+          },
+        ],
       })
     })
 
@@ -64,7 +91,7 @@ describe('IntegrationsController', () => {
 
       expect(response.status).toBe(201)
 
-      expect(response.body.newInvites.length).toBe(90)
+      expect(response.body.newParticipants.length).toBe(90)
     }, 15000)
 
     it('should not return an email that already has a user in that study', async () => {
@@ -77,7 +104,7 @@ describe('IntegrationsController', () => {
         .attach('file', csvPath)
 
       expect(response0.status).toBe(201)
-      expect(response0.body.newInvites.length).toBe(1)
+      expect(response0.body.newParticipants.length).toBe(1)
 
       // Create the user and participant profile that matches the csv upload
       const user = await prisma.user.create({
@@ -120,7 +147,7 @@ describe('IntegrationsController', () => {
         .attach('file', csvPath)
 
       expect(response1.status).toBe(201)
-      expect(response1.body.newInvites.length).toBe(0)
+      expect(response1.body.newParticipants.length).toBe(0)
       expect(response1.body.existingUsers.length).toBe(1)
     }, 15000)
 
@@ -245,8 +272,10 @@ describe('IntegrationsController', () => {
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(201)
 
+      console.log('RESPONSE TEST', response.body)
+
       // check correct response message
-      expect(response.body.newInvites.length).toBe(10)
+      expect(response.body.newParticipants.length).toBe(10)
     })
 
     it('should return a BadGatewayError if the api is offline, or unavailable when adding participants', async () => {
