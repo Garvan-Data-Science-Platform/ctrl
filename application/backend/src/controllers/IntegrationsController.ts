@@ -44,7 +44,7 @@ import logger from 'common/src/logger'
 import { auditLog } from '../middlewares/AuditLog'
 import { SurveyVersionAnswers } from '@prisma/client'
 import { randomBytes } from 'crypto'
-import { generateInviteId, inviteExpiresAt } from 'utils/invite'
+import { generateInviteId, inviteExpiresAt } from '../utils/invite'
 import { Prefill } from 'common/types/invite'
 
 interface ElsaDuosResponse {
