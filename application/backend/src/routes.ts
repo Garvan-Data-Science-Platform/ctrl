@@ -758,7 +758,7 @@ const models: TsoaRoute.Models = {
     "UploadRedcapParticipantResponse": {
         "dataType": "refObject",
         "properties": {
-            "newInvites": {"dataType":"array","array":{"dataType":"string"},"required":true},
+            "newParticipants": {"dataType":"array","array":{"dataType":"refObject","ref":"Recipient"},"required":true},
             "existingUsers": {"dataType":"array","array":{"dataType":"string"},"required":true},
         },
         "additionalProperties": false,

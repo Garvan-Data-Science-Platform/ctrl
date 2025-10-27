@@ -995,7 +995,6 @@ export class InvitesController extends Controller {
       where: { id: inviteId },
       select: { prefill: true },
     })
-    console.log('prefillData: ', prefillData)
     return prefillData
   }
 

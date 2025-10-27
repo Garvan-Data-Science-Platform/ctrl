@@ -61,7 +61,27 @@ export default function Register() {
     watch,
     reset,
     formState: { errors },
-  } = useForm<FormValues>()
+  } = useForm<FormValues>({
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      confirm_password: '',
+      dob: '',
+      addressLine: '',
+      suburb: '',
+      state: '' as StateTerritory,
+      postcode: '',
+      mobile: '',
+      preferredContact: '' as ContactMethod,
+      nok_first: '',
+      nok_surname: '',
+      nok_email: '',
+      dependents: [],
+      terms: false,
+    },
+  })
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -85,7 +105,12 @@ export default function Register() {
             // Prefill form data
             const prefill = { ...data.prefill }
             delete prefill.password // Do not prefill password
-            reset(prefill)
+            reset({
+              ...prefill,
+              password: '',
+              confirm_password: '',
+              terms: false,
+            })
           })
         }
       })
@@ -164,6 +189,7 @@ export default function Register() {
                 error={Boolean(errors.firstName)}
                 helperText={errors.firstName?.message}
                 data-cy="reg-first"
+                slotProps={{ inputLabel: { shrink: Boolean(watch('firstName')) } }}
                 {...register('firstName', { required: 'This field is required' })}
               />
               <TextField
@@ -173,6 +199,7 @@ export default function Register() {
                 error={Boolean(errors.lastName)}
                 helperText={errors.lastName?.message}
                 data-cy="reg-last"
+                slotProps={{ inputLabel: { shrink: Boolean(watch('lastName')) } }}
                 {...register('lastName', { required: 'This field is required' })}
               />
               <TextField
@@ -184,6 +211,7 @@ export default function Register() {
                 error={Boolean(errors.email)}
                 helperText={errors.email?.message}
                 data-cy="reg-email"
+                slotProps={{ inputLabel: { shrink: Boolean(watch('email')) } }}
                 {...register('email', {
                   required: 'This field is required',
                   pattern: {
@@ -246,6 +274,7 @@ export default function Register() {
                 error={Boolean(errors.addressLine)}
                 helperText={errors.addressLine?.message}
                 data-cy="reg-address-line"
+                slotProps={{ inputLabel: { shrink: Boolean(watch('addressLine')) } }}
                 {...register('addressLine', { required: 'This field is required' })}
               />
               <TextField
@@ -255,6 +284,7 @@ export default function Register() {
                 autoComplete="address-level-2"
                 error={Boolean(errors.suburb)}
                 helperText={errors.suburb?.message}
+                slotProps={{ inputLabel: { shrink: Boolean(watch('suburb')) } }}
                 {...register('suburb', { required: 'This field is required' })}
               />
               <FormControl sx={{ m: 1, flexGrow: 1 }}>
@@ -283,6 +313,7 @@ export default function Register() {
                 error={Boolean(errors.postcode)}
                 helperText={errors.postcode?.message}
                 data-cy="reg-postcode"
+                slotProps={{ inputLabel: { shrink: Boolean(watch('postcode')) } }}
                 {...register('postcode', {
                   required: 'This field is required',
                   pattern: {
@@ -298,6 +329,7 @@ export default function Register() {
                 error={Boolean(errors.mobile)}
                 helperText={errors.mobile?.message}
                 data-cy="reg-mobile"
+                slotProps={{ inputLabel: { shrink: Boolean(watch('mobile')) } }}
                 {...register('mobile', {
                   required: 'This field is required',
                   pattern: {
@@ -335,6 +367,7 @@ export default function Register() {
                   error={Boolean(errors.nok_first)}
                   helperText={errors.nok_first?.message}
                   data-cy="nok-first"
+                  slotProps={{ inputLabel: { shrink: Boolean(watch('nok_first')) } }}
                   {...register('nok_first', { required: 'This field is required' })}
                 />
                 <TextField
@@ -343,6 +376,7 @@ export default function Register() {
                   error={Boolean(errors.nok_surname)}
                   helperText={errors.nok_surname?.message}
                   data-cy="nok-surname"
+                  slotProps={{ inputLabel: { shrink: Boolean(watch('nok_surname')) } }}
                   {...register('nok_surname', { required: 'This field is required' })}
                 />
                 <TextField
@@ -353,6 +387,7 @@ export default function Register() {
                   error={Boolean(errors.nok_email)}
                   helperText={errors.nok_email?.message}
                   data-cy="nok-email"
+                  slotProps={{ inputLabel: { shrink: Boolean(watch('nok_email')) } }}
                   {...register('nok_email', {
                     required: 'This field is required',
                   })}
@@ -393,6 +428,9 @@ export default function Register() {
                       data-cy="dep-first"
                       error={Boolean(errors.dependents && errors.dependents[idx]?.firstName)}
                       helperText={errors.dependents && errors.dependents[idx]?.firstName?.message}
+                      slotProps={{
+                        inputLabel: { shrink: Boolean(watch(`dependents.${idx}.firstName`)) },
+                      }}
                       {...register(`dependents.${idx}.firstName`, {
                         required: 'This field is required',
                       })}
@@ -403,6 +441,9 @@ export default function Register() {
                       error={Boolean(errors.dependents && errors.dependents[idx]?.lastName)}
                       helperText={errors.dependents && errors.dependents[idx]?.lastName?.message}
                       data-cy="dep-surname"
+                      slotProps={{
+                        inputLabel: { shrink: Boolean(watch(`dependents.${idx}.lastName`)) },
+                      }}
                       {...register(`dependents.${idx}.lastName`, {
                         required: 'This field is required',
                       })}

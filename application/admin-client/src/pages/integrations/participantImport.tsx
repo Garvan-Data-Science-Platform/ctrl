@@ -40,7 +40,7 @@ export const ParticipantImport = () => {
         navigate(SUCCESS_REDIRECT, {
           state: {
             openInviteModal: true,
-            initialRecipients: await getInitialRecipientsFromFile(file),
+            initialRecipients: data.newParticipants as Recipient[],
           },
         })
       })
@@ -72,10 +72,7 @@ export const ParticipantImport = () => {
         navigate(SUCCESS_REDIRECT, {
           state: {
             openInviteModal: true,
-            initialRecipients: (await getInitialEmailsFromApi(data.newInvites)).map((email) => ({
-              email,
-              prefill: {},
-            })),
+            initialRecipients: data.newParticipants as Recipient[],
           },
         })
       })
@@ -85,34 +82,6 @@ export const ParticipantImport = () => {
           message: `Internal Server Error: ${response.response.data.message}`,
         })
       })
-  }
-
-  const getInitialRecipientsFromFile = async (file: File): Promise<Recipient[]> => {
-    const content = await file.text()
-    const rows = content.split('\n').slice(1) // Skip header row
-    const recipients: Recipient[] = []
-
-    rows.forEach((row: string) => {
-      const columns = row.split(',')
-      const recipient: Recipient = {
-        prefill: { studyParticipant: { externalId: columns[0] } },
-        email: columns[5], // ctrl_email index
-      }
-      if (
-        !recipients.map((r) => r.email).includes(recipient.email) &&
-        recipient.email &&
-        recipient.email !== 'ctrl_email'
-      ) {
-        recipients.push(recipient)
-      }
-    })
-
-    return recipients
-  }
-
-  const getInitialEmailsFromApi = async (newInvites: string[]): Promise<string[]> => {
-    const uniqueEmails = new Set<string>(newInvites)
-    return Array.from(uniqueEmails)
   }
 
   return (

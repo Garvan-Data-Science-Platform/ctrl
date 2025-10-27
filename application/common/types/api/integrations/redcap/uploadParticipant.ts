@@ -1,4 +1,6 @@
+import { Recipient } from 'common/types/invite'
+
 export interface UploadRedcapParticipantResponse {
-  newInvites: string[]
+  newParticipants: Recipient[]
   existingUsers: string[]
 }

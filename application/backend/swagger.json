@@ -2264,9 +2264,9 @@
       },
       "UploadRedcapParticipantResponse": {
         "properties": {
-          "newInvites": {
+          "newParticipants": {
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/Recipient"
             },
             "type": "array"
           },
@@ -2278,7 +2278,7 @@
           }
         },
         "required": [
-          "newInvites",
+          "newParticipants",
           "existingUsers"
         ],
         "type": "object",

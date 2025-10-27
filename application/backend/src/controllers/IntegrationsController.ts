@@ -44,8 +44,7 @@ import logger from 'common/src/logger'
 import { auditLog } from '../middlewares/AuditLog'
 import { SurveyVersionAnswers } from '@prisma/client'
 import { randomBytes } from 'crypto'
-import { generateInviteId, inviteExpiresAt } from '../utils/invite'
-import { Prefill } from 'common/types/invite'
+import { Prefill, Recipient } from 'common/types/invite'
 
 interface ElsaDuosResponse {
   data: { participantId: string; duos: string[] }[]
@@ -337,7 +336,7 @@ export class IntegrationsController extends Controller {
     }
 
     // Process each participant - check if they exist already
-    const newInvites: string[] = []
+    const newParticipants: Recipient[] = []
     const existingUsers: string[] = []
 
     for (const participant of data) {
@@ -345,6 +344,11 @@ export class IntegrationsController extends Controller {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (participantData as any).password
+
+      // Exclude dependents and externalId from profile
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { dependents, externalId, ...profile } = participantData
 
       // Check if user has a participant profile associated with this study
       const user = await this.userRepo.findUnique({
@@ -360,30 +364,23 @@ export class IntegrationsController extends Controller {
         },
       })
 
-      // Create an invite with prefilled REDCap data (is not sent until admin sends through the invite)
-      try {
-        await this.invitesRepo.create({
-          data: {
-            id: generateInviteId(),
-            email,
-            studyId,
-            expiresAt: inviteExpiresAt(),
-            prefill: participantData as Prefill,
-          },
-        })
-      } catch (error) {
-        logger.error({ message: 'Error creating invite', error, email, studyId })
-      }
-
       // If user is already part of that study add to existingUser
       if (user) {
         existingUsers.push(email)
       } else {
-        newInvites.push(email)
+        const alreadyAdded = newParticipants.some((recipient) => recipient.email === email)
+
+        if (!alreadyAdded) {
+          const prefill: Prefill = {
+            profile,
+            studyParticipant: { externalId },
+          }
+          newParticipants.push({ email, prefill })
+        }
       }
     }
 
-    return { newInvites, existingUsers }
+    return { newParticipants, existingUsers }
   }
 
   private async processInstrumentData(
