@@ -61,7 +61,7 @@ const StudyCard = ({
           setActiveStudyIndex(0)
         }
         queryClient.invalidateQueries(['studies'])
-        open?.({ type: 'success', message: 'Updated succesfully' })
+        open?.({ type: 'success', message: 'Updated successfully' })
       })
       .catch((e) => {
         open?.({ type: 'error', message: `Error updating study: ${e.response.data.details}` })
