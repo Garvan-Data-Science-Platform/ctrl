@@ -52,7 +52,7 @@ import { auditLog } from '../middlewares/AuditLog'
 import { Role } from '@prisma/client'
 import { genId } from '../utils/genId'
 import { extractOrderBy, extractWhere } from '../utils/filtering'
-import { generateInviteId, inviteExpiresAt } from 'utils/invite'
+import { generateInviteId, inviteExpiresAt } from '../utils/invite'
 
 @Route('/')
 @Tags('Participants')
