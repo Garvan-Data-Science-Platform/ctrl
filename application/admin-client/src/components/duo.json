@@ -14,8 +14,8 @@
   {
     "ID": "DUO:0000046",
     "Label": "non-commercial use only",
-    "Description": "This data use modifier indicates that use of the data is limited to not-for-profit use.",
-    "Comment": "This indicates that data can be used by commercial organisations for research purposes, but not commercial purposes."
+    "Description": "This indicates that data can be used by commercial organisations for research purposes, but not commercial purposes.",
+    "Comment": ""
   },
   {
     "ID": "SNOMED:362991006",
