@@ -89,6 +89,7 @@ describe('Survey Editor', () => {
     cy.get('[data-cy="publish-confirm"]').click()
     cy.contains('2').should('exist')
   })
+
   it('DUO Code Lookup', () => {
     cy.login(UserType.ADMIN)
     cy.visit('/surveys/edit/2')
@@ -97,17 +98,18 @@ describe('Survey Editor', () => {
     //DUO for checkbox question
     cy.get('[data-cy="advanced-toggle"]').eq(0).click()
     cy.get('[data-cy="add-duo"]').eq(0).click()
-    cy.get('[data-cy="duo-filter"]').type('ancestry')
-    cy.get('[data-cy="duo-results"] li').should('have.length', 4).first().click()
+    cy.get('[data-cy="duo-filter"]').type('biomed')
+    cy.get('[data-cy="duo-results"] li').should('have.length', 2).first().click()
     cy.get('[data-cy="confirm-duo"]').should('be.disabled')
     cy.get('[data-cy="duo-answer"]').click()
     cy.contains('false').click()
     cy.get('[data-cy="confirm-duo"]').should('be.enabled').click()
-    cy.contains('no restriction').should('exist')
+    cy.contains('health or').should('exist')
+    cy.contains('non-commercial').should('exist')
 
     //Remove DUO Code
 
-    cy.contains('no restriction').should('not.exist')
+    cy.contains('non-biomed').should('not.exist')
     cy.get('[data-cy="advanced-toggle"]').eq(0).click()
     cy.get('[data-cy="advanced-toggle"]').eq(1).click()
     cy.get('[data-cy="duo-chip"] svg').eq(3).click()
@@ -118,9 +120,9 @@ describe('Survey Editor', () => {
     cy.get('[data-cy="duo-answer"]').click()
     cy.contains('Choice 1').click()
     cy.get('[data-cy="confirm-duo"]').should('be.enabled').click()
-    cy.contains('no restriction').should('exist')
+    cy.contains('non-bio').should('exist')
     //Editing choice will remove the duo code
     cy.get('[data-cy="choice-text"]').first().type('B')
-    cy.contains('no restriction').should('not.exist')
+    cy.contains('non-commercial').should('not.exist')
   })
 })
