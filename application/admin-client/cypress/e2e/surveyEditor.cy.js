@@ -89,7 +89,6 @@ describe('Survey Editor', () => {
     cy.get('[data-cy="publish-confirm"]').click()
     cy.contains('2').should('exist')
   })
-
   it('DUO Code Lookup', () => {
     cy.login(UserType.ADMIN)
     cy.visit('/surveys/edit/2')
