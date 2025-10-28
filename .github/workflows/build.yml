@@ -49,6 +49,16 @@ jobs:
       - name: Check node version
         run: echo "node_version=${{ steps.nvm.outputs.node_version }}"
 
+      - name: Get Chart version
+        id: chart_version
+        run: |
+          version=$(grep '^version:' .helm/ctrl/Chart.yaml | awk '{print $2}')
+          echo "chart_version=$version" >> $GITHUB_OUTPUT
+
+      - name: Get short SHA
+        id: short_sha
+        run: echo "short_sha=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_OUTPUT
+
       - name: Build and Push ${{ matrix.name }} Image
         uses: docker/build-push-action@v6
         with:
@@ -61,7 +71,9 @@ jobs:
             australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-${{ matrix.name }}:${{ steps.branch_sha.outputs.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          build-args: NODE_VERSION=${{ steps.nvm.outputs.node_version }}
+          build-args: |
+            NODE_VERSION=${{ steps.nvm.outputs.node_version }}
+            APP_VERSION=${{ steps.chart_version.outputs.chart_version }}_${{ steps.short_sha.outputs.short_sha }}
 
   push_helm_charts:
     name: Push Helm Charts
@@ -100,12 +112,11 @@ jobs:
             --zone=australia-southeast1-a \
             --project=ctrl-358804
 
-#
-#  restart-dev-deployments:
-#    name: Restart Dev Deployments
-#    needs: push_helm_charts
-#    if: ${{ github.event.workflow_run.head_branch == 'dev' }} # Only restart if on dev branch
-#    uses: Garvan-Data-Science-Platform/helm-deploy-config/.github/workflows/restart-deployments.yml@main
-#    secrets: inherit
-#    with:
-#      environment: dev
+  restart-dev-deployments:
+    name: Restart Dev Deployments
+    needs: push_helm_charts
+    if: ${{ github.event.workflow_run.head_branch == 'dev' }} # Only restart if on dev branch
+    uses: Garvan-Data-Science-Platform/ctrl/.github/workflows/restart-deployments.yml@main
+    secrets: inherit
+    with:
+      environment: dev
