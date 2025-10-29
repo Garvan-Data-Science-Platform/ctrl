@@ -1,12 +1,6 @@
 import { create } from 'zustand'
 import { produce } from 'immer'
-
-export interface OIDCProvider {
-  name: string
-  host: string
-  clientId: string
-  icon: string
-}
+import { OIDCProvider } from '@common/types/oidc'
 
 interface AuthState {
   providers: OIDCProvider[]

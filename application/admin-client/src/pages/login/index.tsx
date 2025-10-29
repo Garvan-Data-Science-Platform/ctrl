@@ -21,7 +21,7 @@ export const Login = () => {
         if (!data.isSetup) {
           nav('/setup')
         } else {
-          authStore.setProviders(data.oidc)
+          authStore.setProviders(data.oidc.filter((val) => val.displayInAdminPortal))
           authStore.setPasswordLoginDisabled(data.disableAdminPasswordLogin)
         }
       })

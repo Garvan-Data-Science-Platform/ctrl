@@ -1,11 +1,22 @@
-import { Alert, Box, Button, Card, Container, TextField } from '@mui/material'
+import {
+  Alert,
+  Box,
+  Button,
+  Card,
+  Container,
+  Divider,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth'
-import { LoginRequest, LoginResponse } from '@common/types/api/auth'
-import { useEffect } from 'react'
+import { LoginRequest, LoginResponse, SetupResponse } from '@common/types/api/auth'
+import { useEffect, useState } from 'react'
 import { useAppStore } from '../store'
 import { useQueryClient } from '@tanstack/react-query'
+import { OIDCProvider } from '@common/types/oidc'
 
 export default function Login() {
   const {
@@ -17,6 +28,22 @@ export default function Login() {
   const { login } = useAuth()
   const nav = useNavigate()
   const { reset } = useAppStore()
+
+  const [oidcProviders, setOidcProviders] = useState<OIDCProvider[]>([])
+
+  useEffect(() => {
+    fetch(import.meta.env.VITE_BACKEND_URL + '/auth/setup', {
+      method: 'GET',
+    }).then((res) => {
+      res.json().then((data: SetupResponse) => {
+        if (!data.isSetup) {
+          nav('/setup')
+        } else {
+          setOidcProviders(data.oidc.filter((val) => val.displayInUserPortal))
+        }
+      })
+    })
+  }, [])
 
   const clientType = 'user-client'
 
@@ -71,6 +98,33 @@ export default function Login() {
                   alt="logo"
                 />
               </Box>
+              {oidcProviders && (
+                <>
+                  <Typography>Continue with:</Typography>
+                  <Stack gap={1}>
+                    {oidcProviders.map((val) => {
+                      return (
+                        <Card
+                          key={`oidc_${val.name}`}
+                          onClick={() => {
+                            window.location.href = `${val.host}/authorize?state=${val.name}&client_id=${val.clientId}&scope=openid%20email%20profile&response_type=code&redirect_uri=${window.location.origin}/login/callback`
+                          }}
+                          sx={{
+                            border: '1px solid lightgrey',
+                            p: 1,
+                            cursor: 'pointer',
+                            ':hover': { backgroundColor: 'rgb(245,245,245)' },
+                          }}
+                        >
+                          <img style={{ objectFit: 'contain' }} height="60" src={val.icon} />
+                        </Card>
+                      )
+                    })}
+                  </Stack>
+                  <Divider />
+                </>
+              )}
+
               <TextField
                 type="email"
                 fullWidth

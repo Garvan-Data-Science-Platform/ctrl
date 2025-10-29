@@ -24,6 +24,8 @@ const schema = {
           },
           clientSecret: { type: 'string' },
           icon: { type: 'string' },
+          displayInAdminPortal: { type: 'boolean', default: true },
+          displayInUserPortal: { type: 'boolean', default: true },
         },
         required: ['name', 'providerUrl', 'icon', 'clientId', 'clientSecret'],
         additionalProperties: false,

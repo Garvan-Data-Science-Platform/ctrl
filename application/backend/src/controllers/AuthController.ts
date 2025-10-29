@@ -121,6 +121,8 @@ export class AuthController extends Controller {
         host: val.providerUrl,
         clientId: val.clientId,
         icon: val.icon,
+        displayInAdminPortal: val.displayInAdminPortal,
+        displayInUserPortal: val.displayInUserPortal,
       })),
       disableAdminPasswordLogin: config.disableAdminPasswordLogin || false,
     }
@@ -296,14 +298,18 @@ export class AuthController extends Controller {
     let user
 
     try {
-      const token_res = await fetch(`${providerUrl}/oauth2/token`, {
+      const oidc_data = await fetch(`${providerUrl}/.well-known/openid-configuration`)
+
+      const { token_endpoint, userinfo_endpoint } = await oidc_data.json()
+
+      const token_res = await fetch(token_endpoint, {
         body,
         method: 'POST',
       })
 
       const { access_token } = await token_res.json()
 
-      const userinfo_res = await fetch(`${providerUrl}/oauth2/userinfo`, {
+      const userinfo_res = await fetch(userinfo_endpoint, {
         body: new URLSearchParams({ access_token }),
         method: 'POST',
       })
