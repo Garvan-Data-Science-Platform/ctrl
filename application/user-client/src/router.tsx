@@ -15,7 +15,7 @@ import ResetPassword from './pages/ResetPassword'
 import ErrorPage from './pages/Error'
 import RegisterErrorPage from './pages/RegisterError'
 import OTP from './pages/OTP'
-import { Callback } from './pages/callback'
+import Callback from './pages/Callback'
 
 const router = createBrowserRouter([
   {

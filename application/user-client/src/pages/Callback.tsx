@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '../auth'
 import { apiClient } from '../apiClient'
 
-export const Callback = () => {
+export default function Callback() {
   const [errorMessage, setErrorMessage] = useState('')
 
   const { login } = useAuth()
