@@ -391,7 +391,7 @@ describe('IntegrationsController', () => {
 
       //Correct when two duos apply to same question
       //Does not return code for question with wrong answer (Choice 2)
-      expect(res.body.data[0].duos).toEqual(['DUO:0000002'])
+      expect(res.body.data[0].duos).toEqual(['DUO:0000006'])
       expect(res.body.data).toHaveLength(2)
     })
 
@@ -430,7 +430,7 @@ describe('IntegrationsController', () => {
         .post('/elsa/duos')
         .set({ Authorization: 'Apikey abc123' })
         .send({ participantIds: [`PID-TEST1-${PARTICIPANT_COMPLETED_ID}`] })
-      expect(res.body.data[0].duos).toEqual(['DUO:0000002'])
+      expect(res.body.data[0].duos).toEqual(['DUO:0000006'])
     })
   })
 })

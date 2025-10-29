@@ -38,7 +38,7 @@ describe('Elsa Integration', () => {
       .post('/elsa/duos')
       .set({ Authorization: `Apikey ${token}` })
       .send({ participantIds: [`PID-TEST1-${PARTICIPANT_COMPLETED_ID}`] })
-    expect(response.body.data[0].duos).toEqual(['DUO:0000002'])
+    expect(response.body.data[0].duos).toEqual(['DUO:0000006'])
   })
   it('Can disable elsa integration', async () => {
     let response = await request(app)
