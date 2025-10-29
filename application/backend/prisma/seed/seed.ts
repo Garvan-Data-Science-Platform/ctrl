@@ -58,7 +58,7 @@ const main = async () => {
       firstName: 'Michael',
       lastName: 'Wilson',
       role: 'Participant',
-      password: 'SomePassword123',
+      password: hashPassword('SomePassword123'),
       profiles: {
         create: [
           {
@@ -109,7 +109,7 @@ const main = async () => {
       firstName: 'Sally',
       lastName: 'Wilson',
       role: 'Participant',
-      password: 'SomePassword123',
+      password: hashPassword('SomePassword123'),
       profiles: {
         create: [
           {
@@ -203,7 +203,7 @@ const main = async () => {
       middleName: 'Mary',
       lastName: 'Johnson',
       role: 'Participant',
-      password: 'SomePassword123',
+      password: hashPassword('SomePassword123'),
       organisations: {},
       profiles: {
         create: [
@@ -287,7 +287,7 @@ const main = async () => {
       middleName: 'James',
       lastName: 'Doe',
       role: 'OrganisationAdmin',
-      password: 'SomePassword123',
+      password: hashPassword('SomePassword123'),
     },
   })
 
@@ -299,7 +299,7 @@ const main = async () => {
       firstName: 'Jane',
       lastName: 'Smith',
       role: 'OperatorAdmin',
-      password: 'SomePassword123',
+      password: hashPassword('SomePassword123'),
     },
   })
 
@@ -311,7 +311,7 @@ const main = async () => {
       firstName: 'Bob',
       lastName: 'Brown',
       role: 'OrganisationAdmin',
-      password: 'SomePassword123',
+      password: hashPassword('SomePassword123'),
     },
   })
 
@@ -323,7 +323,7 @@ const main = async () => {
       firstName: 'Emily',
       lastName: 'Davis',
       role: 'OperatorAdmin',
-      password: 'SomePassword123',
+      password: hashPassword('SomePassword123'),
     },
   })
 
