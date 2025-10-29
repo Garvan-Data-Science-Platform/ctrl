@@ -691,8 +691,12 @@ describe('AuthController', () => {
       })
     })
     it('Should allow oidc login', async () => {
-      fetchMock.mockGlobal().route('http://testurl/oauth2/token', { access_token: '123' })
-      fetchMock.mockGlobal().route('http://testurl/oauth2/userinfo', {
+      fetchMock.mockGlobal().route('http://testurl/.well-known/openid-configuration', {
+        token_endpoint: 'http://token',
+        userinfo_endpoint: 'http://userinfo',
+      })
+      fetchMock.mockGlobal().route('http://token', { access_token: '123' })
+      fetchMock.mockGlobal().route('http://userinfo', {
         email: 'admin@example.com',
       })
 
@@ -708,8 +712,12 @@ describe('AuthController', () => {
     })
 
     it('Should allow oidc login', async () => {
-      fetchMock.mockGlobal().route('http://testurl/oauth2/token', { access_token: '123' })
-      fetchMock.mockGlobal().route('http://testurl/oauth2/userinfo', {
+      fetchMock.mockGlobal().route('http://testurl/.well-known/openid-configuration', {
+        token_endpoint: 'http://token',
+        userinfo_endpoint: 'http://userinfo',
+      })
+      fetchMock.mockGlobal().route('http://token', { access_token: '123' })
+      fetchMock.mockGlobal().route('http://userinfo', {
         email: 'admin@example.com',
       })
 
@@ -724,8 +732,12 @@ describe('AuthController', () => {
     })
 
     it('Should fail on nonexisting provider', async () => {
-      fetchMock.mockGlobal().route('http://testurl/oauth2/token', { access_token: '123' })
-      fetchMock.mockGlobal().route('http://testurl/oauth2/userinfo', {
+      fetchMock.mockGlobal().route('http://testurl/.well-known/openid-configuration', {
+        token_endpoint: 'http://token',
+        userinfo_endpoint: 'http://userinfo',
+      })
+      fetchMock.mockGlobal().route('http://token', { access_token: '123' })
+      fetchMock.mockGlobal().route('http://userinfo', {
         email: 'admin@example.com',
       })
 
@@ -741,8 +753,12 @@ describe('AuthController', () => {
 
     it('Should enforce permissions', async () => {
       fetchMock.removeRoutes()
-      fetchMock.mockGlobal().route('http://testurl/oauth2/token', { access_token: '123' })
-      fetchMock.mockGlobal().route('http://testurl/oauth2/userinfo', {
+      fetchMock.mockGlobal().route('http://testurl/.well-known/openid-configuration', {
+        token_endpoint: 'http://token',
+        userinfo_endpoint: 'http://userinfo',
+      })
+      fetchMock.mockGlobal().route('http://token', { access_token: '123' })
+      fetchMock.mockGlobal().route('http://userinfo', {
         email: PARTICIPANT_UNANSWERED_EMAIL,
       })
 

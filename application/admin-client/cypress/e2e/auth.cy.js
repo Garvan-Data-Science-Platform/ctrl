@@ -41,6 +41,8 @@ describe('auth', () => {
           host: 'https://test.cilogon.aaf.edu.au',
           clientId: 'cilogon:/client_id/19130a96af2ad9eb0d22a6c253a3d2aa',
           icon: 'https://aaf.edu.au/wp-content/uploads/AAF_LGO_small-website.png',
+          displayInAdminPortal: true,
+          displayInUserPortal: true,
         },
       ],
       disableAdminPasswordLogin: true,
