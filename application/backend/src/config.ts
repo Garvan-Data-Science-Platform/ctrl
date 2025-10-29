@@ -51,7 +51,7 @@ if (dir) {
   })
 }
 
-const ajv = new Ajv()
+const ajv = new Ajv({ useDefaults: true })
 const validate = ajv.compile(schema)
 
 if (!validate(config)) {
