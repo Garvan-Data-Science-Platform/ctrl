@@ -13,8 +13,9 @@ spec:
       app: BACKEND
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
+        reloader.stakater.com/auto: "true"
+      {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
