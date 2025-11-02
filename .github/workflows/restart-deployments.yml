@@ -9,10 +9,10 @@ on:
         default: dev
         required: true
         options:
-        - dev
-        - demo 
-        - staging
-        - prod
+          - dev
+          - demo
+          - staging
+          - prod
   workflow_call:
     inputs:
       environment:
@@ -27,11 +27,11 @@ jobs:
     permissions:
       contents: 'read'
       id-token: 'write'
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        
+
       - name: Restart deployments on VM
         uses: Garvan-Data-Science-Platform/ctrl/.github/actions/run-vm-command@main
         with:
@@ -40,8 +40,9 @@ jobs:
           workload_identity_provider: 'projects/43338454952/locations/global/workloadIdentityPools/ctrl-id-pool/providers/github-provider'
           service_account: ctrl-ci-sa@ctrl-358804.iam.gserviceaccount.com
           command: |
+            helm dependency update /opt/ctrl/chart/ctrl
             helm dependency build /opt/ctrl/chart/ctrl
-            helm upgrade --install ctrl /opt/ctrl/chart/ctrl --kubeconfig /etc/rancher/k3s/k3s.yaml -f /opt/ctrl/values.yaml && \
-            kubectl --kubeconfig "/etc/rancher/k3s/k3s.yaml" rollout restart deployment admin && \
-            kubectl --kubeconfig "/etc/rancher/k3s/k3s.yaml" rollout restart deployment backend && \
+            helm upgrade --install ctrl /opt/ctrl/chart/ctrl --kubeconfig /etc/rancher/k3s/k3s.yaml -f /opt/ctrl/values.yaml
+            kubectl --kubeconfig "/etc/rancher/k3s/k3s.yaml" rollout restart deployment admin
+            kubectl --kubeconfig "/etc/rancher/k3s/k3s.yaml" rollout restart deployment backend
             kubectl --kubeconfig "/etc/rancher/k3s/k3s.yaml" rollout restart deployment ctrl
