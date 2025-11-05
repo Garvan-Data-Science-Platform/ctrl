@@ -55,7 +55,7 @@ import { Prefill } from 'common/types/invite'
 
 @Route('/')
 @Tags('Participants')
-@Security('jwt', ['OrganisationAdmin'])
+@Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 @Response<InternalErrorResponse>('422', 'Unprocessable Content')
@@ -408,7 +408,7 @@ export class ParticipantsController extends Controller {
 
 @Route('/')
 @Tags('Invites')
-@Security('jwt', ['OrganisationAdmin'])
+@Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 export class InvitesController extends Controller {

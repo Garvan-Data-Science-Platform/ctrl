@@ -8,6 +8,7 @@ export const roleMap: { [r in GetUserByIdResponse['data']['role']]: string } = {
   OrganisationAdmin: 'Organisation Admin',
   OperatorAdmin: 'Operator Admin',
   Participant: 'Participant',
+  StudyAdmin: 'Study Admin',
 }
 
 export const UserList = () => {

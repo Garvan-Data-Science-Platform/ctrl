@@ -31,7 +31,7 @@ import { UnprocessableError } from '../middlewares/ErrorHandler'
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 @Response<UnprocessableErrorResponse>('422', 'Unprocessable Content')
-@Security('jwt', ['OrganisationAdmin'])
+@Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
 @Middlewares(auditLog)
 export class FamiliesController extends Controller {
   participantProfileRepo = prisma.participantProfile

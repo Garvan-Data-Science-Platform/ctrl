@@ -7,7 +7,17 @@ import {
   NoTokenError,
   IncorrectPermissionsError,
   UnprocessableError,
+  NotFoundError,
 } from './middlewares/ErrorHandler'
+import prisma from 'PrismaClient'
+
+export interface RequestWithAuthentication {
+  path: string
+  user: {
+    userId: number
+    studies: number[]
+  }
+}
 
 export function expressAuthentication(
   request: express.Request,
@@ -29,24 +39,38 @@ export function expressAuthentication(
         throw new UnprocessableError('JWT_SECRET environment variable not set')
       }
 
-      jwt.verify(token, process.env.JWT_SECRET, function (err: any, decoded: any) {
+      jwt.verify(token, process.env.JWT_SECRET, async function (err: any, decoded: any) {
         if (err) {
           reject(err)
         } else {
           if (scopes) {
-            // Check if JWT contains all required scopes
-            let scope: string
-            for (scope of scopes) {
-              if (!decoded.scopes.includes(scope)) {
-                reject(
-                  new IncorrectPermissionsError({
-                    message: 'JWT does not contain required scope.',
-                    scopes,
-                  }),
-                )
+            const user = await prisma.user.findUniqueOrThrow({
+              where: { id: decoded.userId },
+              select: { role: true, adminOfStudies: { select: { id: true } } },
+            })
+            if (!scopes.includes(user.role)) {
+              reject(
+                new IncorrectPermissionsError({
+                  message: 'JWT does not contain required scope.',
+                  scopes,
+                }),
+              )
+              return
+            }
+            if (user.role == 'StudyAdmin') {
+              decoded['studies'] = user.adminOfStudies.map((val) => val.id)
+              // For any StudyAdmin protected route, if the url has /studies/x/..., check that user is an admin of that study
+              const match = request.path.match(/^\/studies\/(\d+)/)
+              if (match && !decoded['studies'].includes(Number(match[1]))) {
+                reject(new NotFoundError('Study not found'))
                 return
               }
+            } else if (user.role == 'OperatorAdmin' || user.role == 'OrganisationAdmin') {
+              decoded['studies'] = (
+                await (await prisma.study).findMany({ select: { id: true } })
+              ).map((val) => val.id)
             }
+
             resolve(decoded)
             return
           }
@@ -73,7 +97,7 @@ export async function verifyPassword(hashedPassword: string, password: string): 
   })
 }
 
-export function generateToken(user: { userId: number; roles: string[] }): string {
+export function generateToken(user: { userId: number }): string {
   if (!process.env.JWT_SECRET) {
     logger.error({ message: 'JWT_SECRET environment variable not set' })
     throw new UnprocessableError('JWT_SECRET environment variable not set')
@@ -86,5 +110,5 @@ export function generateToken(user: { userId: number; roles: string[] }): string
     expiresIn: expiryValue as jwt.SignOptions['expiresIn'],
   }
   // Generate JWT token
-  return jwt.sign({ userId: user.userId, scopes: user.roles }, process.env.JWT_SECRET, options)
+  return jwt.sign({ userId: user.userId }, process.env.JWT_SECRET, options)
 }

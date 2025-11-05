@@ -20,6 +20,7 @@ model User {
   emailHash           String?              @unique /// @encryption:hash(email)
   password            String
   role                Role                 @default(Participant)
+  adminOfStudies      Study[]
   organisations       Organisation[]
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
@@ -44,6 +45,7 @@ enum Role {
   OperatorAdmin
   Participant
   OrganisationAdmin
+  StudyAdmin
 }
 
 model ParticipantProfile {
@@ -138,6 +140,7 @@ model Study {
   surveys            SurveyVersion[]
   profiles           StudyParticipant[]
   invites            Invite[]
+  admins             User[]
   deleted            Boolean            @default(false)
 }
 

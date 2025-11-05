@@ -21,7 +21,6 @@ describe('FamiliesController', () => {
   beforeAll(async () => {
     registeredUserToken = await generateToken({
       userId: ORG_ADMIN_ID,
-      roles: ['OrganisationAdmin'],
     })
     api.run()
   })

@@ -52,6 +52,7 @@ interface ElsaDuosResponse {
 }
 
 @Route('/')
+@Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 @Response<UnprocessableErrorResponse>('422', 'Unprocessable Content')
@@ -66,7 +67,6 @@ export class IntegrationsController extends Controller {
   integrationService = new Integrations(REDCapMapping)
 
   @Post('studies/{studyId}/integrations/redcap/participant/upload/csv')
-  @Security('jwt', ['OrganisationAdmin'])
   @SuccessResponse('201', 'Created Participants from CSV')
   public async uploadRedcapParticipantCSV(
     @Path() studyId: number,
@@ -92,7 +92,6 @@ export class IntegrationsController extends Controller {
   }
 
   @Post('studies/{studyId}/integrations/redcap/participant/upload/api')
-  @Security('jwt', ['OrganisationAdmin'])
   @SuccessResponse('201', 'Created Participants from REDCap API')
   public async uploadRedcapParticipantAPI(
     @Path() studyId: number,
@@ -148,7 +147,6 @@ export class IntegrationsController extends Controller {
   }
 
   @Post('studies/{studyId}/integrations/redcap/instrument/upload/csv')
-  @Security('jwt', ['OrganisationAdmin'])
   @SuccessResponse('201', 'Upserted Survey from Instrument CSV')
   public async uploadRedcapInstrumentCSV(
     @Path() studyId: number,
@@ -169,7 +167,6 @@ export class IntegrationsController extends Controller {
   }
 
   @Post('studies/{studyId}/integrations/redcap/instrument/upload/api')
-  @Security('jwt', ['OrganisationAdmin'])
   @SuccessResponse('201', 'Created Survey from Redcap API')
   public async uploadRedcapInstrumentAPI(
     @Path() studyId: number,
