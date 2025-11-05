@@ -54,8 +54,8 @@ if (dir) {
 
 const ajv = new Ajv()
 const validate = ajv.compile(schema)
-
 if (!validate(config)) {
+  console.error('Config validation error', validate.errors)
   throw new Error('Invalid config')
 }
 
