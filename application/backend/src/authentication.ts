@@ -9,7 +9,7 @@ import {
   UnprocessableError,
   NotFoundError,
 } from './middlewares/ErrorHandler'
-import prisma from 'PrismaClient'
+import prisma from './PrismaClient'
 
 export interface RequestWithAuthentication {
   path: string
