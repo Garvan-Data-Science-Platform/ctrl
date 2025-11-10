@@ -25,8 +25,8 @@ describe('UsersController', () => {
   let orgAdminToken: string
 
   beforeAll(async () => {
-    opAdminToken = await generateToken({ userId: OPERATOR_ADMIN_ID, roles: ['OperatorAdmin'] })
-    orgAdminToken = await generateToken({ userId: ORG_ADMIN_ID, roles: ['OrganisationAdmin'] })
+    opAdminToken = await generateToken({ userId: OPERATOR_ADMIN_ID })
+    orgAdminToken = await generateToken({ userId: ORG_ADMIN_ID })
 
     api.run()
   })

@@ -87,8 +87,8 @@ export class ProfilesController extends Controller {
   @Get('/{profileId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async getParticipantProfileByID(
-    @Request() request: RequestWithAuthentication,
     @Path() profileId: number,
+    @Request() request: RequestWithAuthentication,
   ): Promise<GetParticipantProfileResponse> {
     //Check user has permission to view this profile
     await this.participantProfileRepo.findFirstOrThrow({

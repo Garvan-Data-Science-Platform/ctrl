@@ -13,6 +13,7 @@ import prisma from '../PrismaClient'
 import { Role } from '@prisma/client'
 import { resetDB, wipeDB } from 'common/testing/TestHelpers'
 import {
+  ORG_ADMIN_ID,
   PARTICIPANT_UNANSWERED_EMAIL,
   PARTICIPANT_UNANSWERED_ID,
   TEST_STUDY,
@@ -35,8 +36,7 @@ let orgAdminToken: string
 describe('AuthController', () => {
   beforeAll(async () => {
     orgAdminToken = await generateToken({
-      userId: 555,
-      roles: ['OrganisationAdmin'],
+      userId: ORG_ADMIN_ID,
     })
     api.run()
   })

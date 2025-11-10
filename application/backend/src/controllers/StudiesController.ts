@@ -130,10 +130,8 @@ export class StudiesController extends Controller {
    * @summary Get Specific Study by Id
    */
   @Get('/{studyId}')
-  public async getStudyById(
-    @Path() studyId: number,
-    @Request() request: RequestWithAuthentication,
-  ): Promise<GetStudyByIdResponse> {
+  @Security('jwt', ['OrganisationAdmin'])
+  public async getStudyById(@Path() studyId: number): Promise<GetStudyByIdResponse> {
     const study: Study | null = await this.studyRepo.findUnique({ where: { id: studyId } })
     if (!study) {
       const errorMessage: string = `Study with ID: ${studyId} not found`

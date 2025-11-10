@@ -2,7 +2,6 @@ import request from 'supertest'
 import { Api } from '../Api'
 import { generateToken } from '../authentication'
 import { resetDB } from 'common/testing/TestHelpers'
-import { Role } from '@prisma/client'
 import { NodemailerMock } from 'nodemailer-mock'
 import * as nodemailer from 'nodemailer'
 import { PARTICIPANT_COMPLETED_ID } from 'common/testing/seed'
@@ -17,7 +16,6 @@ describe('MailerController', () => {
   beforeAll(async () => {
     participantToken = await generateToken({
       userId: PARTICIPANT_COMPLETED_ID,
-      roles: [Role.Participant],
     })
 
     api.run()
@@ -69,7 +67,6 @@ describe('MailerController', () => {
     it('should ensure that the user exists before sending email', async () => {
       const invalidToken = await generateToken({
         userId: -1, // Non-existent user ID
-        roles: [Role.Participant],
       })
 
       const response = await request(app)

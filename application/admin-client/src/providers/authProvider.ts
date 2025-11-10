@@ -2,6 +2,8 @@ import type { AuthProvider } from '@refinedev/core'
 import { useAuthStore } from '../authStore'
 
 export const TOKEN_KEY = 'refine-auth'
+export const ID_KEY = 'userid'
+export const ROLE_KEY = 'userrole'
 
 export const clientType = 'admin-client'
 
@@ -33,6 +35,8 @@ export const authProvider: AuthProvider = {
         } else if (!data.token) throw new Error('No token provided')
         else {
           localStorage.setItem(TOKEN_KEY, data.token)
+          localStorage.setItem(ID_KEY, data.id)
+          localStorage.setItem(ROLE_KEY, data.role)
           return {
             success: true,
             redirectTo: '/',
@@ -65,6 +69,8 @@ export const authProvider: AuthProvider = {
   },
   logout: async () => {
     localStorage.removeItem(TOKEN_KEY)
+    localStorage.removeItem(ID_KEY)
+    localStorage.removeItem(ROLE_KEY)
     return {
       success: true,
       redirectTo: '/login',
@@ -85,12 +91,12 @@ export const authProvider: AuthProvider = {
   },
   getPermissions: async () => null,
   getIdentity: async () => {
-    const token = localStorage.getItem(TOKEN_KEY)
-    if (token) {
+    const id = localStorage.getItem(ID_KEY)
+    const role = localStorage.getItem(ROLE_KEY)
+    if (id !== null) {
       return {
-        id: 1,
-        name: 'John Doe',
-        avatar: 'https://i.pravatar.cc/300',
+        id: Number(id),
+        role,
       }
     }
     return null

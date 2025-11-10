@@ -27,7 +27,7 @@ describe('StudiesController', () => {
   beforeEach(async () => {
     await resetDB()
 
-    orgAdminToken = await generateToken({ userId: ORG_ADMIN_ID, roles: ['OrganisationAdmin'] })
+    orgAdminToken = await generateToken({ userId: ORG_ADMIN_ID })
   })
 
   afterAll(async () => {
@@ -62,7 +62,6 @@ describe('StudiesController', () => {
     it('should return a list of studies for logged in user', async () => {
       const token = await generateToken({
         userId: PARTICIPANT_UNANSWERED_ID,
-        roles: ['Participant'],
       })
 
       const response = await request(app)
@@ -85,7 +84,6 @@ describe('StudiesController', () => {
     it('should return a different list of studies for a different logged in user', async () => {
       const token = await generateToken({
         userId: PARTICIPANT_COMPLETED_ID,
-        roles: ['Participant'],
       })
 
       const response = await request(app)

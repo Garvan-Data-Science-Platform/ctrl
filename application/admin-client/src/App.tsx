@@ -51,6 +51,7 @@ import { Callback } from './pages/login/callback'
 import OTP from './pages/login/OTP'
 import { Box, Typography } from '@mui/material'
 import RestorePage from './pages/restore'
+import { accessControlProvider } from './providers/accessControlProvider'
 
 function App() {
   return (
@@ -67,6 +68,7 @@ function App() {
                   notificationProvider={notificationProvider}
                   routerProvider={routerBindings}
                   authProvider={authProvider}
+                  accessControlProvider={accessControlProvider}
                   resources={[
                     {
                       name: 'surveys',

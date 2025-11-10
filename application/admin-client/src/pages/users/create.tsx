@@ -1,4 +1,5 @@
 import { Box, MenuItem, TextField } from '@mui/material'
+import { useGetIdentity } from '@refinedev/core'
 import { Create } from '@refinedev/mui'
 import { useForm } from '@refinedev/react-hook-form'
 import { Controller } from 'react-hook-form'
@@ -11,6 +12,8 @@ export const UserCreate = () => {
     control,
     formState: { errors },
   } = useForm({})
+
+  const { data: identity } = useGetIdentity<{ role: string; id: number }>()
 
   return (
     <Create isLoading={formLoading} saveButtonProps={saveButtonProps}>
@@ -59,19 +62,19 @@ export const UserCreate = () => {
           <Controller
             name="role"
             control={control}
-            defaultValue="OrganisationAdmin"
+            defaultValue="StudyAdmin"
             render={({ field }) => {
               return (
                 <TextField
-                  disabled
+                  disabled={identity?.role == 'StudyAdmin'}
                   select
                   {...field}
                   value={field?.value}
                   label={'Role'}
                   sx={{ mt: 1 }}
                 >
-                  <MenuItem value="OrganisationAdmin">Admin</MenuItem>
-                  <MenuItem value="Participant">Participant</MenuItem>
+                  <MenuItem value="OrganisationAdmin">Organisation Admin</MenuItem>
+                  <MenuItem value="StudyAdmin">Study Admin</MenuItem>
                 </TextField>
               )
             }}

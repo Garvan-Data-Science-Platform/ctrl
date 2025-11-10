@@ -1,3 +1,4 @@
+import { Role } from '@prisma/client'
 /**
  * @example {
  *  "firstName": "John",
@@ -19,4 +20,5 @@ export interface UpdateUserRequest {
    * @pattern ^(.+)@(.+)$ please provide valid email
    */
   email?: string
+  role?: Role
 }

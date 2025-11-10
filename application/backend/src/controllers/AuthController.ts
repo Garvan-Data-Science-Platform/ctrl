@@ -330,7 +330,7 @@ export class AuthController extends Controller {
     }
 
     const token = await generateToken({ userId: user.id })
-    return { token }
+    return { token, id: user.id, role: user.role }
   }
 
   /**
@@ -409,8 +409,9 @@ export class AuthController extends Controller {
       const token = await generateToken({ userId: user.id })
       responseData = {
         token,
+        id: user.id,
+        role: user.role,
       }
-      logger.info({ ...responseData })
     }
 
     return responseData
