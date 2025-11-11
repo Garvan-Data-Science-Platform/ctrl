@@ -157,7 +157,7 @@ const models: TsoaRoute.Models = {
             "firstName": {"dataType":"string","validators":{"minLength":{"value":1}}},
             "lastName": {"dataType":"string","validators":{"minLength":{"value":1}}},
             "email": {"dataType":"string","validators":{"pattern":{"errorMsg":"please provide valid email","value":"^(.+)@(.+)$"}}},
-            "role": {"dataType":"string"},
+            "role": {"ref":"Role"},
         },
         "additionalProperties": false,
     },
@@ -1953,10 +1953,9 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsStudiesController_getStudyById: Record<string, TsoaRoute.ParameterSchema> = {
                 studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
-                request: {"in":"request","name":"request","required":true,"dataType":"object"},
         };
         app.get('/studies/:studyId',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(StudiesController)),
             ...(fetchMiddlewares<RequestHandler>(StudiesController.prototype.getStudyById)),
 
@@ -3417,6 +3416,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsFamiliesController_removeMember: Record<string, TsoaRoute.ParameterSchema> = {
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
                 studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
                 profileId: {"in":"path","name":"profileId","required":true,"dataType":"double"},
         };
@@ -3449,6 +3449,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsFamiliesController_addExistingMember: Record<string, TsoaRoute.ParameterSchema> = {
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
                 studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
                 familyId: {"in":"path","name":"familyId","required":true,"dataType":"double"},
                 profileId: {"in":"path","name":"profileId","required":true,"dataType":"double"},

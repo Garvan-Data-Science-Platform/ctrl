@@ -17,6 +17,7 @@ import {
   Body,
   Middlewares,
   Post,
+  Request,
 } from 'tsoa'
 import type { AddDependentRequest, GetFamilyResponse } from 'common/types/api/families'
 import { FamilyMember } from 'common/types/api/users/getParticipantProfile'
@@ -25,6 +26,7 @@ import { ParticipantType } from '@prisma/client'
 import { createDefaultAnswers, recalculateAnswers } from '../utils/answers'
 import { genId, genIndId } from '../utils/genId'
 import { UnprocessableError } from '../middlewares/ErrorHandler'
+import type { RequestWithAuthentication } from 'authentication'
 
 @Route('studies/{studyId}/families')
 @Tags('Families')
@@ -86,7 +88,11 @@ export class FamiliesController extends Controller {
    */
   @Post('/remove/{profileId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  public async removeMember(@Path() studyId: number, @Path() profileId: number) {
+  public async removeMember(
+    @Request() request: RequestWithAuthentication,
+    @Path() studyId: number,
+    @Path() profileId: number,
+  ) {
     const profile = await prisma.participantProfile.findUniqueOrThrow({
       where: {
         id: profileId,
@@ -97,6 +103,17 @@ export class FamiliesController extends Controller {
         },
       },
     })
+
+    const affectedStudies = await prisma.study.findMany({
+      where: { profiles: { some: { participantProfile: { familyId: profile.familyId } } } },
+      select: { id: true },
+    })
+
+    if (!affectedStudies.every((s) => request.user.studies.includes(s.id))) {
+      throw new UnprocessableError(
+        'You do not have admin permissions for every study that includes this family.',
+      )
+    }
 
     if (['DEPENDENT_AGE', 'DEPENDENT_OTHER'].includes(profile.participantType)) {
       throw new UnprocessableError('Cannot remove a dependant')
@@ -161,6 +178,7 @@ export class FamiliesController extends Controller {
   @Post('/{familyId}/add/{profileId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async addExistingMember(
+    @Request() request: RequestWithAuthentication,
     @Path() studyId: number,
     @Path() familyId: number,
     @Path() profileId: number,
@@ -176,6 +194,23 @@ export class FamiliesController extends Controller {
       },
       select: { participantType: true, familyId: true, studies: { select: { studyId: true } } },
     })
+
+    const affectedStudies = await prisma.study.findMany({
+      where: {
+        profiles: {
+          some: {
+            participantProfile: { OR: [{ familyId: profile.familyId }, { familyId }] },
+          },
+        },
+      },
+      select: { id: true },
+    })
+
+    if (!affectedStudies.every((s) => request.user.studies.includes(s.id))) {
+      throw new UnprocessableError(
+        'You do not have admin permissions for every study impacted by this change.',
+      )
+    }
 
     if (profile.participantType == 'GUARDIAN') {
       for (const study of profile.studies) {

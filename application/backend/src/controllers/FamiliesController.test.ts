@@ -4,9 +4,11 @@ import { Api } from '../Api'
 import { resetDB } from 'common/testing/TestHelpers'
 import {
   DEPENDENT_ID,
+  FE_TEST_STUDY_ID,
   ORG_ADMIN_ID,
   PARTICIPANT_UNANSWERED_ID,
   SECOND_GUARDIAN_ID,
+  STUDY_ADMIN_ID,
 } from 'common/testing/seed'
 import prisma from '../PrismaClient'
 import { GetFamilyResponse } from 'common/types/api/families'
@@ -17,10 +19,14 @@ const studyId = 1
 
 describe('FamiliesController', () => {
   let registeredUserToken: string
+  let studyAdminToken: string
 
   beforeAll(async () => {
     registeredUserToken = await generateToken({
       userId: ORG_ADMIN_ID,
+    })
+    studyAdminToken = await generateToken({
+      userId: STUDY_ADMIN_ID,
     })
     api.run()
   })
@@ -84,6 +90,22 @@ describe('FamiliesController', () => {
 
       expect(depSP.answers[1].answers).toEqual([false, 'Choice 2'])
     })
+    it('Study admin can remove from a family that is in multiple studies if they are admin of every study', async () => {
+      await prisma.user.update({
+        where: { id: STUDY_ADMIN_ID },
+        data: { adminOfStudies: { connect: { id: FE_TEST_STUDY_ID } } },
+      })
+      const res = await request(app)
+        .post(`/studies/${studyId}/families/remove/${SECOND_GUARDIAN_ID}`)
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+      expect(res.ok).toBe(true)
+    })
+    it('Study admin can not remove from a family if they are not admin for every study the family appears in', async () => {
+      const res = await request(app)
+        .post(`/studies/${studyId}/families/remove/${SECOND_GUARDIAN_ID}`)
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+      expect(res.ok).toBe(false)
+    })
   })
 
   describe('POST /studies/{studyId}/families/:familyId/add/:profileId', () => {
@@ -116,6 +138,22 @@ describe('FamiliesController', () => {
       })
 
       expect(depSP.answers[1].answers).toEqual([false, 'Choice 2'])
+    })
+    it('Study admin can move from/to a family that is in multiple studies if they are admin of every study', async () => {
+      await prisma.user.update({
+        where: { id: STUDY_ADMIN_ID },
+        data: { adminOfStudies: { connect: { id: FE_TEST_STUDY_ID } } },
+      })
+      const res = await request(app)
+        .post(`/studies/${studyId}/families/100/add/${PARTICIPANT_UNANSWERED_ID}`)
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+      expect(res.ok).toBe(true)
+    })
+    it('Study admin can not move from/to a family if they are not admin for every study the families appears in', async () => {
+      const res = await request(app)
+        .post(`/studies/${studyId}/families/100/add/${PARTICIPANT_UNANSWERED_ID}`)
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+      expect(res.ok).toBe(false)
     })
   })
 

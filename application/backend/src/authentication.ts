@@ -42,36 +42,42 @@ export function expressAuthentication(
       jwt.verify(token, process.env.JWT_SECRET, async function (err: any, decoded: any) {
         if (err) {
           reject(err)
+          return
         } else {
-          if (scopes) {
-            const user = await prisma.user.findUniqueOrThrow({
-              where: { id: decoded.userId },
-              select: { role: true, adminOfStudies: { select: { id: true } } },
-            })
-            if (!scopes.includes(user.role)) {
-              reject(
-                new IncorrectPermissionsError({
-                  message: 'JWT does not contain required scope.',
-                  scopes,
-                }),
-              )
-              return
-            }
-            if (user.role == 'StudyAdmin') {
-              decoded['studies'] = user.adminOfStudies.map((val) => val.id)
-              // For any StudyAdmin protected route, if the url has /studies/x/..., check that user is an admin of that study
-              const match = request.path.match(/^\/studies\/(\d+)/)
-              if (match && !decoded['studies'].includes(Number(match[1]))) {
-                reject(new NotFoundError('Study not found'))
+          try {
+            if (scopes) {
+              const user = await prisma.user.findUniqueOrThrow({
+                where: { id: decoded.userId },
+                select: { role: true, adminOfStudies: { select: { id: true } } },
+              })
+              if (!scopes.includes(user.role)) {
+                reject(
+                  new IncorrectPermissionsError({
+                    message: 'JWT does not contain required scope.',
+                    scopes,
+                  }),
+                )
                 return
               }
-            } else if (user.role == 'OperatorAdmin' || user.role == 'OrganisationAdmin') {
-              decoded['studies'] = (
-                await (await prisma.study).findMany({ select: { id: true } })
-              ).map((val) => val.id)
-            }
+              if (user.role == 'StudyAdmin') {
+                decoded['studies'] = user.adminOfStudies.map((val) => val.id)
+                // For any StudyAdmin protected route, if the url has /studies/x/..., check that user is an admin of that study
+                const match = request.path.match(/^\/studies\/(\d+)/)
+                if (match && !decoded['studies'].includes(Number(match[1]))) {
+                  reject(new NotFoundError('Study not found'))
+                  return
+                }
+              } else if (user.role == 'OperatorAdmin' || user.role == 'OrganisationAdmin') {
+                decoded['studies'] = (
+                  await (await prisma.study).findMany({ select: { id: true } })
+                ).map((val) => val.id)
+              }
 
-            resolve(decoded)
+              resolve(decoded)
+              return
+            }
+          } catch (e) {
+            reject(e)
             return
           }
         }

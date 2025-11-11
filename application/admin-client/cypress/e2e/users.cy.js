@@ -34,9 +34,11 @@ describe('Users', () => {
   it('Edit user', () => {
     cy.login(UserType.ADMIN)
     cy.visit('/users')
-    cy.get('[data-cy="edit-button"]').first().click()
+    cy.get('[data-cy="edit-button"]').eq(1).click()
     cy.get('input').eq(0).type('A')
     cy.contains('Save').click()
-    cy.contains('OperatorA').should('exist')
+    cy.contains('Success').should('exist')
+    cy.visit('/users')
+    cy.contains('OrganisationA').should('exist')
   })
 })

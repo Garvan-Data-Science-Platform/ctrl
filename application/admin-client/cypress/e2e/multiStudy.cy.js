@@ -10,7 +10,8 @@ beforeEach(() => {
 describe('Multi-study features', () => {
   function changeStudy(name) {
     cy.get('[data-cy="study-dropdown"]').click()
-    cy.contains(name).click()
+    cy.get('ul[role="menu"]').contains(name).click()
+    cy.get('[data-cy="study-dropdown"]').contains(name).should('exist')
   }
   it('Can changes studies, all data is updated accordingly', () => {
     cy.visit('/studies')

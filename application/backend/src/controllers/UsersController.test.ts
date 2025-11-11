@@ -11,7 +11,15 @@ import {
   ResetPasswordRequest,
 } from 'common/types/api/users'
 import { Role } from '@prisma/client'
-import { OPERATOR_ADMIN_ID, ORG_ADMIN_ID, PARTICIPANT_UNANSWERED_ID } from 'common/testing/seed'
+import {
+  FE_TEST_STUDY_ID,
+  OPERATOR_ADMIN_ID,
+  ORG_ADMIN_2_ID,
+  ORG_ADMIN_ID,
+  PARTICIPANT_UNANSWERED_ID,
+  STUDY_ADMIN_ID,
+  TEST_STUDY_ID,
+} from 'common/testing/seed'
 import { NodemailerMock } from 'nodemailer-mock'
 import * as nodemailer from 'nodemailer'
 
@@ -23,10 +31,12 @@ const app = api.app
 describe('UsersController', () => {
   let opAdminToken: string
   let orgAdminToken: string
+  let studyAdminToken: string
 
   beforeAll(async () => {
     opAdminToken = await generateToken({ userId: OPERATOR_ADMIN_ID })
     orgAdminToken = await generateToken({ userId: ORG_ADMIN_ID })
+    studyAdminToken = await generateToken({ userId: STUDY_ADMIN_ID })
 
     api.run()
   })
@@ -49,7 +59,7 @@ describe('UsersController', () => {
 
       const body: GetAllUsersResponse = response.body
       expect(body).toHaveProperty('data')
-      expect(body.data).toHaveLength(7)
+      expect(body.data).toHaveLength(8)
     })
 
     it('should return a 500 error if a database error occurs', async () => {
@@ -75,7 +85,7 @@ describe('UsersController', () => {
       expect(response.status).toBe(200)
 
       const body: GetAllUsersResponse = response.body
-      expect(body.data).toHaveLength(3)
+      expect(body.data).toHaveLength(4)
       body.data.map((user) => {
         expect(user.role).not.toEqual('Participant')
       })
@@ -129,6 +139,31 @@ describe('UsersController', () => {
 
       expect(createdUser?.email).toBe(newUser.email)
     })
+    it('Study admins can only create other study admins', async () => {
+      const newStudyAdmin = {
+        firstName: 'Jane',
+        lastName: 'Doe',
+        email: 'jane@example.com',
+        role: Role.StudyAdmin,
+      }
+      const newOrgAdmin = {
+        firstName: 'Jane2',
+        lastName: 'Doe2',
+        email: 'jane2@example.com',
+        role: Role.OrganisationAdmin,
+      }
+
+      const res1 = await request(app)
+        .post('/users')
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+        .send(newStudyAdmin)
+      expect(res1.ok).toBe(true)
+      const res2 = await request(app)
+        .post('/users')
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+        .send(newOrgAdmin)
+      expect(res2.ok).toBe(false)
+    })
   })
 
   describe('PATCH /users/:id', () => {
@@ -178,7 +213,57 @@ describe('UsersController', () => {
 
       expect(response.status).toBe(404)
 
-      expect(response.body.message).toBe(`User with ID: ${userId} not found`)
+      expect(response.body.message).toBe(`Record not found`)
+    })
+    it('Study Admins can not edit other admins', async () => {
+      const response = await request(app)
+        .patch(`/users/${ORG_ADMIN_ID}`)
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+        .send({ firstName: 'Afijodsjfo' })
+      expect(response.ok).toBe(false)
+    })
+    it('Study Admins can not edit their own role', async () => {
+      const response = await request(app)
+        .patch(`/users/${STUDY_ADMIN_ID}`)
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+        .send({ role: Role.OrganisationAdmin })
+      expect(response.ok).toBe(false)
+    })
+  })
+
+  describe('POST /users/:id/make-study-admin/:studyId', () => {
+    it('Can make a user a study admin', async () => {
+      await prisma.user.update({ where: { id: ORG_ADMIN_2_ID }, data: { role: Role.StudyAdmin } })
+      const response = await request(app)
+        .post(`/users/${ORG_ADMIN_2_ID}/make-study-admin/${TEST_STUDY_ID}`)
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+      expect(response.ok).toBe(true)
+      const updatedUser = await prisma.user.findUniqueOrThrow({
+        where: { id: ORG_ADMIN_2_ID },
+        select: { adminOfStudies: { select: { id: true } } },
+      })
+      expect(updatedUser.adminOfStudies).toHaveLength(1)
+    })
+    it('Study admins can only add admins to their own study', async () => {
+      await prisma.user.update({ where: { id: ORG_ADMIN_2_ID }, data: { role: Role.StudyAdmin } })
+      const response = await request(app)
+        .post(`/users/${ORG_ADMIN_2_ID}/make-study-admin/${FE_TEST_STUDY_ID}`)
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+      expect(response.ok).toBe(false)
+    })
+  })
+
+  describe('POST /users/:id/remove-study-admin/:studyId', () => {
+    it('Can remove a study admin from a study', async () => {
+      const response = await request(app)
+        .post(`/users/${STUDY_ADMIN_ID}/remove-study-admin/${TEST_STUDY_ID}`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(response.ok).toBe(true)
+      const updatedUser = await prisma.user.findUniqueOrThrow({
+        where: { id: STUDY_ADMIN_ID },
+        select: { adminOfStudies: { select: { id: true } } },
+      })
+      expect(updatedUser.adminOfStudies).toHaveLength(0)
     })
   })
 
@@ -401,7 +486,7 @@ describe('UsersController', () => {
     })
   })
   describe('GET /users/admin/deleted', () => {
-    it('Lists deleted studies', async () => {
+    it('Lists deleted admin users', async () => {
       const res1 = await request(app)
         .get('/users/admin/deleted')
         .set({ Authorization: `Bearer ${orgAdminToken}` })
@@ -409,7 +494,7 @@ describe('UsersController', () => {
       expect(res1.body.data).toHaveLength(0)
       await prisma.user.delete({
         where: {
-          id: ORG_ADMIN_ID,
+          id: OPERATOR_ADMIN_ID,
         },
       })
       const res2 = await request(app)
@@ -417,14 +502,14 @@ describe('UsersController', () => {
         .set({ Authorization: `Bearer ${orgAdminToken}` })
       expect(res2.ok).toBe(true)
       expect(res2.body.data).toHaveLength(1)
-      expect(res2.body.data[0].id).toBe(ORG_ADMIN_ID)
+      expect(res2.body.data[0].id).toBe(OPERATOR_ADMIN_ID)
     })
   })
 
   describe('PATCH /users/{userId}/restore', () => {
     it('Fails if user is not deleted', async () => {
       const res = await request(app)
-        .patch(`/users/${ORG_ADMIN_ID}/restore`)
+        .patch(`/users/${OPERATOR_ADMIN_ID}/restore`)
         .set({ Authorization: `Bearer ${orgAdminToken}` })
 
       expect(res.ok).toBe(false)
@@ -433,19 +518,19 @@ describe('UsersController', () => {
     it('Restores a deleted user', async () => {
       await prisma.user.delete({
         where: {
-          id: ORG_ADMIN_ID,
+          id: OPERATOR_ADMIN_ID,
         },
       })
 
       const res = await request(app)
-        .patch(`/users/${ORG_ADMIN_ID}/restore`)
+        .patch(`/users/${OPERATOR_ADMIN_ID}/restore`)
         .set({ Authorization: `Bearer ${orgAdminToken}` })
 
       expect(res.ok).toBe(true)
 
       const user = await prisma.user.findFirst({
         where: {
-          id: ORG_ADMIN_ID,
+          id: OPERATOR_ADMIN_ID,
         },
       })
       expect(user).not.toBeNull()

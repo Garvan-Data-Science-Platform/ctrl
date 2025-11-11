@@ -7,7 +7,11 @@ import {
   CreateStudyRequest,
   UpdateStudyRequest,
 } from 'common/types/api/studies'
-import { PARTICIPANT_UNANSWERED_ID, PARTICIPANT_COMPLETED_ID } from 'common/testing/seed'
+import {
+  PARTICIPANT_UNANSWERED_ID,
+  PARTICIPANT_COMPLETED_ID,
+  STUDY_ADMIN_ID,
+} from 'common/testing/seed'
 import { resetDB } from 'common/testing/TestHelpers'
 import { generateToken } from '../authentication'
 import { ORG_ADMIN_ID } from 'common/testing/seed'
@@ -17,6 +21,7 @@ const app = api.app
 
 describe('StudiesController', () => {
   let orgAdminToken: string
+  let studyAdminToken: string
 
   const testStudyId: number = 1
 
@@ -28,6 +33,7 @@ describe('StudiesController', () => {
     await resetDB()
 
     orgAdminToken = await generateToken({ userId: ORG_ADMIN_ID })
+    studyAdminToken = await generateToken({ userId: STUDY_ADMIN_ID })
   })
 
   afterAll(async () => {
@@ -43,7 +49,6 @@ describe('StudiesController', () => {
 
       const body: GetAllStudiesResponse = response.body
       expect(Array.isArray(body.data)).toBeTruthy()
-      console.log(body.data)
       expect(body.data.length).toEqual(4)
     })
 
@@ -55,6 +60,17 @@ describe('StudiesController', () => {
         .get('/studies')
         .set({ Authorization: `Bearer ${orgAdminToken}` })
       expect(response.status).toBe(500)
+    })
+
+    it('It should only return studies for study admin they are part of', async () => {
+      const response = await request(app)
+        .get('/studies')
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+      expect(response.status).toBe(200)
+
+      const body: GetAllStudiesResponse = response.body
+      expect(Array.isArray(body.data)).toBeTruthy()
+      expect(body.data.length).toEqual(1)
     })
   })
 
@@ -208,7 +224,7 @@ describe('StudiesController', () => {
 
       expect(response.status).toBe(404)
 
-      expect(response.body.message).toBe(`Record not found`)
+      expect(response.body.message).toBe(`Study not found`)
     })
   })
 

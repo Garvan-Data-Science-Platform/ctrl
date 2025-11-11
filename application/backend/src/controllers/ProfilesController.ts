@@ -190,6 +190,25 @@ export class ProfilesController extends Controller {
 
     const hasNok = Boolean(nextOfKin)
 
+    if (bodyRequest.participantType != profile.participantType) {
+      const affectedStudies = await prisma.study.findMany({
+        where: {
+          profiles: {
+            some: {
+              participantProfile: { familyId: profile.familyId },
+            },
+          },
+        },
+        select: { id: true },
+      })
+
+      if (!affectedStudies.every((s) => request.user.studies.includes(s.id))) {
+        throw new UnprocessableError(
+          'You do not have admin permissions for every study impacted by this change.',
+        )
+      }
+    }
+
     for (const study of profile.studies) {
       const familyGuardiansCount = await prisma.studyParticipant.count({
         where: {

@@ -17,8 +17,12 @@ export const StudyLoader: React.FC<PropsWithChildren> = ({ children }) => {
     if (data) {
       const studiesLength = studies.length
       setStudies(data.data.data as any)
-      if (data.data.data.length - studiesLength == 1 || activeStudyIndex > studies.length)
+      if (
+        studies.length > 0 &&
+        (data.data.data.length - studiesLength == 1 || activeStudyIndex > studies.length)
+      ) {
         setActiveStudyIndex(studies.length) // Ie new study created
+      }
     }
   }, [data])
 

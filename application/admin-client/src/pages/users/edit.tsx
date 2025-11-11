@@ -89,6 +89,7 @@ export const UserEdit = () => {
             label={'First Name'}
             name="firstName"
             disabled={identity?.role == 'StudyAdmin' && identity?.id !== Number(id)}
+            data-cy="first"
           />
           <TextField
             {...register('lastName', {
@@ -118,7 +119,6 @@ export const UserEdit = () => {
             name="email"
             disabled={identity?.role == 'StudyAdmin' && identity?.id !== Number(id)}
           />
-
           <Controller
             name="role"
             control={control}
@@ -131,6 +131,7 @@ export const UserEdit = () => {
                   label={'Role'}
                   sx={{ mt: 1 }}
                   disabled={identity?.role == 'StudyAdmin' || identity?.id == Number(id)}
+                  data-cy="role-select"
                 >
                   <MenuItem value="OrganisationAdmin">Organisation Admin</MenuItem>
                   <MenuItem value="StudyAdmin">Study Admin</MenuItem>
