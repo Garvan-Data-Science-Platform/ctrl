@@ -1,5 +1,5 @@
 import { GetSettingsResponse } from './getSettings'
 import { UpdateSettingsRequest } from './updateSettings'
-import { GetThemeResponse } from './getTheme'
+import { GetUserPortalSettingsResponse } from './getTheme'
 
-export type { GetSettingsResponse, UpdateSettingsRequest, GetThemeResponse }
+export type { GetSettingsResponse, UpdateSettingsRequest, GetUserPortalSettingsResponse }

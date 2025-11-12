@@ -9,5 +9,6 @@ export interface GetSettingsResponse {
     redcapToken: string | null
     redcapURL: string | null
     tcLink: string
+    newsLink: string | null
   }
 }

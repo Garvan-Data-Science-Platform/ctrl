@@ -126,6 +126,7 @@ model Organisation {
   elsaToken       String? /// @encrypted
   logo            Bytes?
   tcLink          String  @default("https://garvan-data-science-platform.github.io/ctrl-docs/docs/terms-and-conditions")
+  newsLink        String?
   users           User[]
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

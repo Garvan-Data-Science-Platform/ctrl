@@ -21,7 +21,7 @@ import {
 import { Readable } from 'stream'
 import type {
   GetSettingsResponse,
-  GetThemeResponse,
+  GetUserPortalSettingsResponse,
   UpdateSettingsRequest,
 } from 'common/types/api/settings'
 import { auditLog } from '../middlewares/AuditLog'
@@ -53,6 +53,7 @@ export class SettingsController extends Controller {
         redcapToken: true,
         redcapURL: true,
         tcLink: true,
+        newsLink: true,
       },
     })
     return { data: orgdata }
@@ -65,14 +66,15 @@ export class SettingsController extends Controller {
     await prisma.organisation.update({ where: { id: 1 }, data: bodyRequest })
   }
 
-  @Get('/theme')
+  @Get('/userportal')
   @NoSecurity()
-  public async getTheme(): Promise<GetThemeResponse> {
+  public async getTheme(): Promise<GetUserPortalSettingsResponse> {
     const themedata = await prisma.organisation.findFirstOrThrow({
       where: { id: 1 },
       select: {
         primaryColour: true,
         secondaryColour: true,
+        newsLink: true,
       },
     })
     return { data: themedata }
