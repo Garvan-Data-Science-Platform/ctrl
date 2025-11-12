@@ -297,7 +297,7 @@ export class IntegrationsController extends Controller {
    * @summary Returns Elsa API key if integration is enabled
    */
   @Get('elsa/token')
-  @Security('jwt', ['OrganisationAdmin'])
+  @Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
   public async elsa(): Promise<GetElsaTokenResponse> {
     const token = (await prisma.organisation.findFirstOrThrow({})).elsaToken
     return { token }

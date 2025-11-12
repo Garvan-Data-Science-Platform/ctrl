@@ -100,8 +100,15 @@ export class StudiesController extends Controller {
    * @summary Get deleted Studies
    */
   @Get('/deleted')
-  @Security('jwt', ['OrganisationAdmin'])
-  public async getDeletedStudies(): Promise<GetAllStudiesResponse> {
+  public async getDeletedStudies(
+    @Request() request: RequestWithAuthentication,
+  ): Promise<GetAllStudiesResponse> {
+    if (
+      (await prisma.user.findUniqueOrThrow({ where: { id: request.user.userId } })).role ==
+      'StudyAdmin'
+    ) {
+      return { data: [] }
+    }
     const studies: Study[] = await this.studyRepo.findMany({
       where: { deleted: true },
       orderBy: { id: 'asc' },

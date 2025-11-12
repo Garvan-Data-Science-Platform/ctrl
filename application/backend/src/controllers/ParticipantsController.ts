@@ -143,9 +143,11 @@ export class ParticipantsController extends Controller {
    * @summary List deleted participants
    */
   @Get('participants/deleted')
-  public async getDeletedParticipants(): Promise<GetDeletedParticipantsResponse> {
+  public async getDeletedParticipants(
+    @Request() request: RequestWithAuthentication,
+  ): Promise<GetDeletedParticipantsResponse> {
     const participants = await this.participantRepo.findMany({
-      where: { deleted: true },
+      where: { deleted: true, study: { id: { in: request.user.studies } } },
       select: {
         participantId: true,
         participantProfile: { select: { firstName: true, lastName: true, dob: true, id: true } },

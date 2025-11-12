@@ -1004,9 +1004,10 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsUsersController_getDeletedAdminUsers: Record<string, TsoaRoute.ParameterSchema> = {
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
         };
         app.get('/users/admin/deleted',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(UsersController)),
             ...(fetchMiddlewares<RequestHandler>(UsersController.prototype.getDeletedAdminUsers)),
 
@@ -1891,9 +1892,10 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsStudiesController_getDeletedStudies: Record<string, TsoaRoute.ParameterSchema> = {
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
         };
         app.get('/studies/deleted',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(StudiesController)),
             ...(fetchMiddlewares<RequestHandler>(StudiesController.prototype.getDeletedStudies)),
 
@@ -2338,6 +2340,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsParticipantsController_getDeletedParticipants: Record<string, TsoaRoute.ParameterSchema> = {
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
         };
         app.get('/participants/deleted',
             authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
@@ -3327,7 +3330,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         const argsIntegrationsController_elsa: Record<string, TsoaRoute.ParameterSchema> = {
         };
         app.get('/elsa/token',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(IntegrationsController)),
             ...(fetchMiddlewares<RequestHandler>(IntegrationsController.prototype.elsa)),
 

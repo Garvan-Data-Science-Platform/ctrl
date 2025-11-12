@@ -97,9 +97,17 @@ export class UsersController extends Controller {
    * @summary Get all deleted Admin Users
    */
   @Get('/admin/deleted')
-  @Security('jwt', ['OrganisationAdmin'])
+  @Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
   @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
-  public async getDeletedAdminUsers(): Promise<GetAllUsersResponse> {
+  public async getDeletedAdminUsers(
+    @Request() request: RequestWithAuthentication,
+  ): Promise<GetAllUsersResponse> {
+    if (
+      (await prisma.user.findUniqueOrThrow({ where: { id: request.user.userId } })).role ==
+      'StudyAdmin'
+    ) {
+      return { data: [] }
+    }
     const users: User[] = await this.userRepo.findMany({
       where: { role: { in: ['OperatorAdmin', 'OrganisationAdmin'] }, deleted: true },
     })

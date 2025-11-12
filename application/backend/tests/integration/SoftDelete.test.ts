@@ -21,12 +21,10 @@ describe('Soft Deletion', () => {
 
     participantToken = await generateToken({
       userId: PARTICIPANT_UNANSWERED_ID,
-      roles: ['Participant'],
     })
 
     orgAdminToken = await generateToken({
       userId: ORG_ADMIN_ID,
-      roles: ['OrganisationAdmin'],
     })
   })
 
