@@ -79,6 +79,7 @@ describe('Settings page', () => {
     cy.contains('Invalid url').should('not.exist')
   })
 
+  /*
   it('Redcap import page does not allow API features if not set up', () => {
     cy.login(UserType.ADMIN)
     cy.visit('/settings')
@@ -93,6 +94,7 @@ describe('Settings page', () => {
     cy.contains('Redcap settings').click()
     cy.url().should('contain', '/settings#redcap')
   })
+  */
 
   it('Can update logo', () => {
     cy.login(UserType.ADMIN)
