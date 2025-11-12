@@ -36,9 +36,9 @@ describe('basic', () => {
   it('can load style from backend', () => {
     cy.login(UserType.PARTICIPANT_UNANSWERED)
     cy.visit('/')
-    cy.intercept('GET', '**/settings/theme', {
+    cy.intercept('GET', '**/settings/userportal', {
       statusCode: 200,
-      body: { data: { primaryColour: 'rgb(1,2,3)', secondaryColor: 'rgb(3,2,1)' } },
+      body: { data: { primaryColour: 'rgb(1,2,3)', secondaryColor: 'rgb(3,2,1)', newsLink: null } },
     }).as('settings')
 
     cy.get('[data-cy="step-button-0"]')
