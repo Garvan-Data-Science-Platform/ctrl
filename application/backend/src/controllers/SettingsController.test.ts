@@ -39,6 +39,7 @@ describe('SettingsController', () => {
     primaryColour: 'red',
     secondaryColour: 'red',
     tcLink: 'https://garvan-data-science-platform.github.io/ctrl-docs/docs/terms-and-conditions',
+    newsLink: 'https://ctrldynamicconsent.wordpress.com',
   }
 
   describe('GET /settings', () => {
@@ -81,12 +82,16 @@ describe('SettingsController', () => {
     })
   })
 
-  describe('GET /settings/theme', () => {
-    it('should return theme', async () => {
-      const response = await request(app).get(`/settings/theme`)
+  describe('GET /settings/userportal', () => {
+    it('should return settings for user portal', async () => {
+      const response = await request(app).get(`/settings/userportal`)
 
       expect(response.status).toBe(200)
-      expect(response.body.data).toEqual({ primaryColour: 'red', secondaryColour: 'red' })
+      expect(response.body.data).toEqual({
+        primaryColour: 'red',
+        secondaryColour: 'red',
+        newsLink: 'https://ctrldynamicconsent.wordpress.com',
+      })
     })
   })
 
