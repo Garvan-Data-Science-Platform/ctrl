@@ -68,9 +68,9 @@ export function expressAuthentication(
                   return
                 }
               } else if (user.role == 'OperatorAdmin' || user.role == 'OrganisationAdmin') {
-                decoded['studies'] = (
-                  await (await prisma.study).findMany({ select: { id: true } })
-                ).map((val) => val.id)
+                decoded['studies'] = (await prisma.study.findMany({ select: { id: true } })).map(
+                  (val) => val.id,
+                )
               }
 
               resolve(decoded)

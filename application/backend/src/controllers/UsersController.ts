@@ -235,7 +235,7 @@ export class UsersController extends Controller {
   public async makeStudyAdmin(
     @Request() request: RequestWithAuthentication,
     @Path() userId: number,
-    studyId: number,
+    @Path() studyId: number,
   ) {
     if (!request.user.studies.includes(studyId)) {
       throw new UnprocessableError('You do not have admin permissions for this study')
@@ -256,7 +256,7 @@ export class UsersController extends Controller {
   public async removeStudyAdmin(
     @Request() request: RequestWithAuthentication,
     @Path() userId: number,
-    studyId: number,
+    @Path() studyId: number,
   ) {
     if (!request.user.studies.includes(studyId)) {
       throw new UnprocessableError('You do not have admin permissions for this study')
