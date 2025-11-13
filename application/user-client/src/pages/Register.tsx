@@ -83,25 +83,25 @@ export default function Register() {
         if (res.ok) {
           res.json().then((data) => {
             // Prefill form data
-            const prefill = { ...data.prefill }
-            delete prefill.password // Do not prefill password
+            const prefillProfile = { ...data.profile }
+            delete prefillProfile.password // Do not prefill password
             reset({
-              firstName: prefill.firstName ?? '',
-              lastName: prefill.lastName ?? '',
-              email: prefill.email ?? '',
+              firstName: prefillProfile.firstName ?? '',
+              lastName: prefillProfile.lastName ?? '',
+              email: prefillProfile.email ?? '',
               password: '',
               confirm_password: '',
-              dob: prefill.dob ?? '',
-              addressLine: prefill.addressLine ?? '',
-              suburb: prefill.suburb ?? '',
-              state: prefill.state ?? ('' as StateTerritory),
-              postcode: prefill.postcode ?? '',
-              mobile: prefill.mobile ?? '',
-              preferredContact: prefill.preferredContact ?? ('' as ContactMethod),
-              nok_first: prefill.nok_first ?? '',
-              nok_surname: prefill.nok_surname ?? '',
-              nok_email: prefill.nok_email ?? '',
-              dependents: prefill.dependents ?? [],
+              dob: prefillProfile.dob ?? '',
+              addressLine: prefillProfile.addressLine ?? '',
+              suburb: prefillProfile.suburb ?? '',
+              state: prefillProfile.state ?? ('' as StateTerritory),
+              postcode: prefillProfile.postcode ?? '',
+              mobile: prefillProfile.mobile ?? '',
+              preferredContact: prefillProfile.preferredContact ?? ('' as ContactMethod),
+              nok_first: prefillProfile.nok_first ?? '',
+              nok_surname: prefillProfile.nok_surname ?? '',
+              nok_email: prefillProfile.nok_email ?? '',
+              dependents: prefillProfile.dependents ?? [],
               terms: false,
             })
           })
