@@ -23,9 +23,13 @@ import type {
   UploadRedcapInstrumentResponse,
   UploadRedcapInstrumentAPIRequest,
   UploadRedcapParticipantResponse,
-  UploadRedcapParticipantAPIRequest,
 } from 'common/types/api/integrations/redcap'
-import { BadGatewayError, UnauthorizedError, UnprocessableError } from '../middlewares/ErrorHandler'
+import {
+  BadGatewayError,
+  NotFoundError,
+  UnauthorizedError,
+  UnprocessableError,
+} from '../middlewares/ErrorHandler'
 import {
   UnauthorizedErrorResponse,
   InternalErrorResponse,
@@ -37,11 +41,10 @@ import REDCapMapping from '../../../integrations/src/REDCapMapping.json'
 import { parseCSV, validateFile } from '../utils/parseCsv'
 import { FileUploadError } from '../middlewares/ErrorHandler'
 import logger from 'common/src/logger'
-import { AuthController } from './AuthController'
 import { auditLog } from '../middlewares/AuditLog'
-import { genId, genIndId } from '../utils/genId'
 import { SurveyVersionAnswers } from '@prisma/client'
 import { randomBytes } from 'crypto'
+import { Prefill, Recipient } from 'common/types/invite'
 
 interface ElsaDuosResponse {
   data: { participantId: string; duos: string[] }[]
@@ -59,6 +62,7 @@ export class IntegrationsController extends Controller {
   profileRepo = prisma.participantProfile
   surveyRepo = prisma.surveyVersion
   svaRepo = prisma.surveyVersionAnswers
+  invitesRepo = prisma.invite
   integrationService = new Integrations(REDCapMapping)
 
   @Post('studies/{studyId}/integrations/redcap/participant/upload/csv')
@@ -68,9 +72,19 @@ export class IntegrationsController extends Controller {
     @Path() studyId: number,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<UploadRedcapParticipantResponse> {
+    // Check if study exists
+    const study = await prisma.study.findUnique({
+      where: { id: studyId },
+    })
+
+    if (!study) {
+      throw new NotFoundError(`Study with id ${studyId} not found`)
+    }
+
     logger.info({ message: 'This is the file that has been uploaded', file })
     await validateFile(file, []) // no required headers here so we pass none to the headers checker
     // Create a readable stream from the buffer
+
     const readableStream = Readable.from(file.buffer.toString())
     const csvData: Record<string, string>[] = await parseCSV(readableStream)
 
@@ -82,10 +96,17 @@ export class IntegrationsController extends Controller {
   @SuccessResponse('201', 'Created Participants from REDCap API')
   public async uploadRedcapParticipantAPI(
     @Path() studyId: number,
-    @Body() bodyRequest: UploadRedcapParticipantAPIRequest,
   ): Promise<UploadRedcapParticipantResponse> {
-    const { formName } = bodyRequest
     const params = new URLSearchParams()
+
+    // Check if study exists
+    const study = await prisma.study.findUnique({
+      where: { id: studyId },
+    })
+
+    if (!study) {
+      throw new NotFoundError(`Study with id ${studyId} not found`)
+    }
 
     const redcapSettings = await prisma.organisation.findFirstOrThrow({
       where: { id: 1 },
@@ -99,18 +120,11 @@ export class IntegrationsController extends Controller {
     params.append('token', redcapSettings.redcapToken)
     params.append('content', 'record')
     params.append('format', 'json')
+
     /**
      * flat - output as one record per row [default]
      */
     params.append('type', 'flat')
-
-    /**
-     * an array of form names you wish to pull records for.
-     * If the form name has a space in it, replace the space
-     * with an underscore
-     * (by default, all records from all data collection instruments is pulled)
-     */
-    params.append('form[0]', formName)
 
     const participantData = await fetch(redcapSettings.redcapURL, {
       method: 'POST',
@@ -311,6 +325,7 @@ export class IntegrationsController extends Controller {
   }
 
   private async processParticipantData(studyId: number, rawData: Record<string, string>[]) {
+    // Map REDCap data to CTRL data
     let data: RegisterParticipantRequest[] = []
     try {
       data = this.integrationService.mapRecordToParticipantRequests(rawData)
@@ -320,70 +335,52 @@ export class IntegrationsController extends Controller {
       )
     }
 
-    const authController = new AuthController()
-    const ids: number[] = []
-    let profilesCreatedCount = 0
-    let profilesAlreadyExistedCount = 0
-    const newInvites: string[] = []
+    // Process each participant - check if they exist already
+    const newParticipants: Recipient[] = []
+    const existingUsers: string[] = []
 
     for (const participant of data) {
+      const { email, ...participantData } = participant
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      delete (participantData as any).password
+
+      // Exclude dependents and externalId from profile
+
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { email, password, middleName, ...participantData } = participant
-      newInvites.push(email)
-      const user = await this.userRepo.findFirst({
-        where: { email: email },
-        select: { id: true, profiles: true },
+      const { dependents, externalId, ...profile } = participantData
+
+      // Check if user has a participant profile associated with this study
+      const user = await this.userRepo.findUnique({
+        where: {
+          email,
+          profiles: {
+            every: {
+              studies: {
+                every: { studyId },
+              },
+            },
+          },
+        },
       })
 
-      // If user doesn't exist, create a participant using the authController and send an invitation, otherwise create a profile and attach it to the user.
-      if (!user) {
-        try {
-          const participantResponse = await authController.createParticipant(
-            participantData,
-            studyId,
-          )
-          ids.push(participantResponse.id)
-          profilesCreatedCount++
-        } catch (err) {
-          logger.error(err)
-          profilesAlreadyExistedCount++
-          continue
-        }
+      // If user is already part of that study add to existingUser
+      if (user) {
+        existingUsers.push(email)
       } else {
-        if (user.profiles.length === 0) {
-          const participantProfile = await prisma.participantProfile.create({
-            data: {
-              ...participantData,
-              user: {
-                connect: { id: user.id },
-              },
-              studies: {
-                create: {
-                  study: {
-                    connect: {
-                      id: studyId,
-                    },
-                  },
-                },
-              },
-              nextOfKin: participantData.nextOfKin
-                ? {
-                    create: participantData.nextOfKin,
-                  }
-                : undefined,
-            },
-          })
-          await genIndId(participantProfile.id)
-          await genId(studyId, participantProfile.id)
-          ids.push(participantProfile.id)
-          profilesCreatedCount++
-        } else {
-          profilesAlreadyExistedCount++
+        const alreadyAdded = newParticipants.some((recipient) => recipient.email === email)
+
+        if (!alreadyAdded) {
+          const prefill: Prefill = {
+            profile,
+            studyParticipant: { externalId },
+          }
+          newParticipants.push({ email, prefill })
         }
       }
     }
 
-    return { profilesCreatedCount, profilesAlreadyExistedCount, ids, newInvites }
+    return { newParticipants, existingUsers }
   }
 
   private async processInstrumentData(

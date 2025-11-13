@@ -8,6 +8,7 @@
       clientSecret: '',
     },
   ],
-  disablePasswordLogin: true,
+  disableAdminPasswordLogin: true,
   otp: false,
+  inviteExpiryDays: 7
 }

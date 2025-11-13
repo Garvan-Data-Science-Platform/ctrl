@@ -6,6 +6,7 @@ beforeEach(() => {
 
 describe('registration', () => {
   function fillValid() {
+    cy.wait(500) // wait for form to be fully loaded
     cy.get('[data-cy="reg-first"]').type('FIRST')
     cy.get('[data-cy="reg-last"]').type('LAST')
     cy.get('[data-cy="reg-email"]').type('invite1@pending.com')

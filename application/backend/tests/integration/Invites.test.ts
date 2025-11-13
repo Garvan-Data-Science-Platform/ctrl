@@ -13,6 +13,10 @@ import { generateToken } from '../../src/authentication'
 import { RegisterParticipantRequest } from 'common/types/api/auth'
 import { GetInvitesResponse, InviteParticipantsResponse } from 'common/types/api/participants'
 import prisma from '../../src/PrismaClient'
+
+import config from '../../src/config'
+jest.mock('../../src/config')
+
 const mockNodeMailer = nodemailer as unknown as NodemailerMock
 
 const api = new Api()
@@ -376,5 +380,70 @@ describe('Participant Invites', () => {
 
     const count = await prisma.studyParticipant.count({ where: { externalId: 'abc123' } })
     expect(count).toEqual(1)
+  })
+
+  // Invite expiry should be configurable
+  it('should allow configuring invite expiry duration', async () => {
+    const sendInviteResponse = await request(app)
+      .post('/studies/1/invites')
+      .send({
+        recipients: [{ prefill: {}, email: participantRegisterRequestBody.email }],
+        subjectText: 'Subject',
+        explanatoryText: 'Text',
+      })
+      .set({ Authorization: `Bearer ${orgAdminToken}` })
+    expect(sendInviteResponse.status).toBe(200)
+    console.log(sendInviteResponse.body)
+
+    // Check the invite expiry
+    const invite = await prisma.invite.findUnique({
+      where: {
+        studyId_emailHash: {
+          email: participantRegisterRequestBody.email,
+          studyId: 1,
+        },
+      },
+    })
+
+    expect(invite).toBeDefined()
+    expect(invite!.status).toBe('PENDING')
+    // should be 7 days from the mocked config
+    const createdAt = new Date(invite!.createdAt)
+    const expiresAt = new Date(invite!.expiresAt)
+    const diffMs = expiresAt.getTime() - createdAt.getTime()
+    const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24))
+    expect(diffDays).toBe(7)
+
+    jest.replaceProperty(config, 'inviteExpiryDays', 1) // 1 day expiry
+    console.log(config)
+    // Send another invite
+    const sendInviteResponse2 = await request(app)
+      .post('/studies/1/invites')
+      .send({
+        recipients: [{ prefill: {}, email: 'somenew@email.com' }],
+        subjectText: 'Subject',
+        explanatoryText: 'Text',
+      })
+      .set({ Authorization: `Bearer ${orgAdminToken}` })
+    expect(sendInviteResponse2.status).toBe(200)
+
+    // Check the invite expiry
+    const invite2 = await prisma.invite.findUnique({
+      where: {
+        studyId_emailHash: {
+          email: 'somenew@email.com',
+          studyId: 1,
+        },
+      },
+    })
+
+    expect(invite2).toBeDefined()
+    expect(invite2!.status).toBe('PENDING')
+    // should be 1 day from the mocked config
+    const createdAt2 = new Date(invite2!.createdAt)
+    const expiresAt2 = new Date(invite2!.expiresAt)
+    const diffMs2 = expiresAt2.getTime() - createdAt2.getTime()
+    const diffDays2 = Math.round(diffMs2 / (1000 * 60 * 60 * 24))
+    expect(diffDays2).toBe(1)
   })
 })

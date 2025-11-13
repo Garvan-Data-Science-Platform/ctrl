@@ -115,6 +115,64 @@ describe('REDCap Participant Upload', () => {
     })
 
     it('should handle successful API import', () => {
+      const redcapInterceptBody = {
+        newParticipants: [
+          {
+            email: 'first@example.com',
+            prefill: {
+              profile: {
+                firstName: 'Peter',
+                lastName: 'Louka',
+                mobile: '0426397897',
+                preferredContact: 'EMAIL',
+                addressLine: 'test address',
+                suburb: 'suburb',
+                postcode: '2088',
+                state: 'NSW',
+                dob: '07/13/2000',
+                participantType: 'STANDARD',
+                nextOfKin: {
+                  firstName: 'fake',
+                  lastName: 'fakerson',
+                  email: 'example2@example.com',
+                  mobile: '0448434946',
+                },
+              },
+              studyParticipant: { externalId: '1' },
+            },
+          },
+          {
+            email: 'example@example.com',
+            prefill: {
+              profile: {
+                firstName: 'John',
+                lastName: 'Smith',
+                mobile: '0448434946',
+                preferredContact: 'EMAIL',
+                addressLine: '2 fake st',
+                suburb: 'fakie',
+                postcode: '2010',
+                state: 'ACT',
+                dob: '01/10/1984',
+                participantType: 'STANDARD',
+                nextOfKin: {
+                  firstName: 'fake',
+                  lastName: 'fakerson',
+                  email: 'example2@example.com',
+                  mobile: '0448434946',
+                },
+              },
+              studyParticipant: { externalId: '4' },
+            },
+          },
+          {
+            email: 'new@email.com',
+            prefill: {},
+          },
+        ],
+        existingUsers: [],
+      }
+
       // Check current draft metadata
       let initialInvites
       let updatedInvites
@@ -134,12 +192,7 @@ describe('REDCap Participant Upload', () => {
 
       cy.intercept('POST', '**/integrations/redcap/participant/upload/api', {
         statusCode: 200,
-        body: {
-          profilesCreatedCount: 3,
-          profilesAlreadyExistedCount: 0,
-          ids: [],
-          newInvites: ['first@example.com', 'example@example.com', 'new@email.com'],
-        },
+        body: redcapInterceptBody,
       })
 
       cy.contains('button', 'Import from API').click()

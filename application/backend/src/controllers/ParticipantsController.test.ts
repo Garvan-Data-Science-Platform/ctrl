@@ -925,4 +925,59 @@ describe('InvitesController', () => {
       expect(body.message).toBe('Incorrect Permissions')
     })
   })
+
+  describe('GET /invites/:inviteId/prefill', () => {
+    let inviteId: string
+
+    beforeEach(async () => {
+      // Create an invite with prefill data
+      const invite = await prisma.invite.create({
+        data: {
+          email: 'prefilltest@example.com',
+          status: InviteStatus.PENDING,
+          studyId: 1,
+          prefill: JSON.stringify({
+            profile: { firstName: 'Jane', lastName: 'Doe' },
+            studyParticipant: {
+              externalId: 'REDCAPIMPORT123',
+            },
+          }),
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        },
+      })
+      inviteId = invite.id
+    })
+
+    it('should return prefill data for a valid invite', async () => {
+      const response = await request(app).get(`/invites/${inviteId}/prefill`)
+      expect(response.status).toBe(200)
+      expect(response.body).toMatchObject({
+        profile: { firstName: 'Jane', lastName: 'Doe' },
+        studyParticipant: {
+          externalId: 'REDCAPIMPORT123',
+        },
+      })
+    })
+
+    it('should return 404 for a non-existent invite', async () => {
+      const fakeId = 'not-a-real-id'
+      const response = await request(app).get(`/invites/${fakeId}/prefill`)
+      expect(response.status).toBe(404)
+    })
+
+    it('should return prefill as an empty object if not set', async () => {
+      const invite = await prisma.invite.create({
+        data: {
+          email: 'noprefill@example.com',
+          status: InviteStatus.PENDING,
+          studyId: 1,
+          prefill: JSON.stringify({}),
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        },
+      })
+      const response = await request(app).get(`/invites/${invite.id}/prefill`)
+      expect(response.status).toBe(200)
+      expect(response.body).toEqual({})
+    })
+  })
 })

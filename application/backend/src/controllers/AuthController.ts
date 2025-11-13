@@ -54,6 +54,7 @@ import { randomInt } from 'node:crypto'
 import nodemailer from 'nodemailer'
 import { createMailerTransporter, fromAddress } from '../utils/mailer'
 import { genId, genIndId } from '../utils/genId'
+import { Prefill } from 'common/types/invite'
 
 @Route('auth')
 @Tags('Auth')
@@ -232,7 +233,7 @@ export class AuthController extends Controller {
       firstName,
       lastName,
       ...participantInfo,
-      ...invite.prefill.studyParticipant,
+      ...(JSON.parse(invite.prefill || '{}') as Prefill).studyParticipant,
     }
     const study = await this.studyRepo.findFirstOrThrow({ where: { id: invite.studyId } })
     await this.createParticipant(participantData, study.id, insertedUser)

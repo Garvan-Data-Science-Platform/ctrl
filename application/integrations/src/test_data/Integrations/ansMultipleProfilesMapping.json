@@ -1,5 +1,6 @@
 [
   {
+    "externalId": "1",
     "addressLine": "2 fake st",
     "dependents": [
       { "dob": "1984-01-10", "firstName": "test", "lastName": "child", "permanent": false }
@@ -23,6 +24,7 @@
     "suburb": "fakie"
   },
   {
+    "externalId": "2",
     "addressLine": "2 fake st",
     "dependents": [
       { "dob": "1984-01-10", "firstName": "test", "lastName": "child", "permanent": false }
@@ -46,6 +48,7 @@
     "suburb": "fakie"
   },
   {
+    "externalId": "3",
     "addressLine": "2 fake st",
     "dependents": [
       { "dob": "1984-01-10", "firstName": "test", "lastName": "child", "permanent": false }

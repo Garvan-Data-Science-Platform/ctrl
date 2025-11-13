@@ -9,6 +9,7 @@ const config = {
     },
   ],
   otp: false,
+  inviteExpiryDays: 7,
 }
 
 export default config

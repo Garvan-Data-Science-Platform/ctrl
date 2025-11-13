@@ -1,4 +1,5 @@
 export const sourceData = {
+  ctrl_study_id: 'external-123',
   ctrl_pers_name: 'John',
   ctrl_pers_surname: 'Doe',
   ctrl_email: 'john.doe@example.com',
@@ -19,6 +20,7 @@ export const sourceData = {
 }
 
 export const sourceDataNoDOB = {
+  ctrl_study_id: 'external-123',
   ctrl_pers_name: 'John',
   ctrl_pers_surname: 'Doe',
   ctrl_email: 'john.doe@example.com',
@@ -38,6 +40,7 @@ export const sourceDataNoDOB = {
 }
 
 export const sourceDataNoNOKMobile = {
+  ctrl_study_id: 'external-123',
   ctrl_pers_name: 'John',
   ctrl_pers_surname: 'Doe',
   ctrl_email: 'john.doe@example.com',
