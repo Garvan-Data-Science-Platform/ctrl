@@ -54,6 +54,7 @@ import { genId } from '../utils/genId'
 import { extractOrderBy, extractWhere } from '../utils/filtering'
 import { generateInviteId, inviteExpiresAt } from '../utils/invite'
 import { Prefill } from 'common/types/invite'
+import { extractFilter, extractOrderBy } from '../utils/filtering'
 
 @Route('/')
 @Tags('Participants')
@@ -78,12 +79,20 @@ export class ParticipantsController extends Controller {
     @Path() studyId: number,
     @Queries() queryParams: { [key: string]: any },
   ): Promise<GetParticipantsResponse> {
-    const total = await prisma.studyParticipant.count({
-      where: { studyId, participantProfile: extractWhere(queryParams) },
+    let total = await prisma.studyParticipant.count({
+      where: { studyId },
     })
 
-    const participant_list = await prisma.studyParticipant.findMany({
-      where: { studyId, participantProfile: extractWhere(queryParams) },
+    const orderBy = extractOrderBy(queryParams)
+    const filter = extractFilter(queryParams)
+    let encryptedSort = false
+    if (orderBy) {
+      const key = Object.keys(orderBy).at(0) as any
+      if (['firstName', 'lastName', 'email'].includes(key)) encryptedSort = true
+    }
+
+    let participant_list = await prisma.studyParticipant.findMany({
+      where: { studyId },
       select: {
         participantProfile: {
           select: {
@@ -97,10 +106,46 @@ export class ParticipantsController extends Controller {
         participantId: true,
         externalId: true,
       },
-      orderBy: extractOrderBy(queryParams),
-      skip: queryParams._start ? Number(queryParams._start) : undefined,
-      take: queryParams._end ? Number(queryParams._end) - Number(queryParams._start) : undefined,
+      orderBy: encryptedSort ? undefined : orderBy,
+      skip: !orderBy && queryParams._start ? Number(queryParams._start) : undefined,
+      take:
+        !encryptedSort && queryParams._end
+          ? Number(queryParams._end) - Number(queryParams._start)
+          : undefined,
     })
+
+    if (filter) {
+      const { field, filterFunction } = filter
+      if (field == 'email') {
+        participant_list = participant_list.filter((val) =>
+          filterFunction(val.participantProfile.user?.email),
+        )
+      } else if (['firstName', 'lastName'].includes(field)) {
+        participant_list = participant_list.filter((val: any) =>
+          filterFunction(val.participantProfile[field]),
+        )
+      } else {
+        participant_list = participant_list.filter((val: any) => filterFunction(val[field]))
+      }
+      participant_list = participant_list.slice(queryParams._start || 0, queryParams._end)
+      total = participant_list.length
+    }
+
+    if (encryptedSort && orderBy) {
+      const [key, dir] = Object.entries(orderBy).at(0) as any
+      const dirNum = dir == 'asc' ? 1 : -1
+      if (key == 'email') {
+        participant_list.sort((a, b) =>
+          (a.participantProfile.user?.email || '') > (b.participantProfile.user?.email || '')
+            ? dirNum
+            : -1 * dirNum,
+        )
+      } else {
+        participant_list.sort((a: any, b: any) =>
+          a.participantProfile[key] > b.participantProfile[key] ? dirNum : -1 * dirNum,
+        )
+      }
+    }
 
     const participants: GetParticipantsResponse['data'] = []
 

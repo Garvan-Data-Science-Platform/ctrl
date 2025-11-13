@@ -7,6 +7,38 @@ import { Prisma } from '@prisma/client'
 
 type FilterKey = keyof Prisma.StringFilter | keyof Prisma.DateTimeFilter
 
+const arrayOperatorMap: Record<string, (fieldValue: any, filterValue: any) => boolean> = {
+  eq: (a, b) => a === b,
+  doesNotEqual: (a, b) => a !== b,
+  lt: (a, b) => a < b,
+  lte: (a, b) => a <= b,
+  gt: (a, b) => a > b,
+  gte: (a, b) => a >= b,
+  contains: (a, b) => typeof a === 'string' && a.includes(b),
+  doesNotContain: (a, b) => typeof a === 'string' && !a.includes(b),
+  startswith: (a, b) => typeof a === 'string' && a.startsWith(b),
+  endswith: (a, b) => typeof a === 'string' && a.endsWith(b),
+  in: (a, b) => String(b).split(',').includes(a),
+  null: (a) => a === null || a === '' || a === undefined,
+  nnull: (a) => !(a === null || a === '' || a === undefined),
+  ne: (a, b) => a !== b,
+}
+
+export function extractFilter(queryParams: { [key: string]: any }) {
+  for (const key of Object.keys(queryParams)) {
+    const match = key.match(/^filter\[(.+)\]\[(.+)\]$/)
+    if (match) {
+      const [, field, operator] = match
+      const opFn = arrayOperatorMap[operator as keyof typeof arrayOperatorMap]
+      if (!opFn) continue
+      const filterValue = queryParams[key]
+      return { field, filterFunction: (item: any) => opFn(item, filterValue) }
+    }
+  }
+  return undefined
+}
+
+/*
 const operatorMap: Record<
   string,
   FilterKey | ['not', FilterKey] | ['equals', any] | ['notequals', any]
@@ -69,6 +101,7 @@ export function extractWhere(queryParams: { [key: string]: any }) {
   }
   return undefined
 }
+  */
 
 export function extractOrderBy(queryParams: { [key: string]: any }) {
   for (const key of Object.keys(queryParams)) {
