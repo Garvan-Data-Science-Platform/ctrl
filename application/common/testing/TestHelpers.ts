@@ -146,7 +146,13 @@ export async function getInviteId(email: string, studyId: number): Promise<strin
 
 export async function inviteUser(email: string, studyId: number, prefill: Prefill) {
   await prisma.invite.create({
-    data: { email, studyId, expiresAt: new Date('2100-01-01'), status: 'PENDING', prefill },
+    data: {
+      email,
+      studyId,
+      expiresAt: new Date('2100-01-01'),
+      status: 'PENDING',
+      prefill: JSON.stringify(prefill),
+    },
   })
   return null
 }

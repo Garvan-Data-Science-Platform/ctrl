@@ -53,6 +53,7 @@ import { Role } from '@prisma/client'
 import { genId } from '../utils/genId'
 import { extractOrderBy, extractWhere } from '../utils/filtering'
 import { generateInviteId, inviteExpiresAt } from '../utils/invite'
+import { Prefill } from 'common/types/invite'
 
 @Route('/')
 @Tags('Participants')
@@ -538,6 +539,10 @@ export class InvitesController extends Controller {
         id: inviteId,
       },
     })
+
+    // Parse Prefill data
+    const invitePrefill: Prefill = JSON.parse(invite?.prefill || '{}')
+
     if (!invite || invite.status !== InviteStatus.PENDING) {
       throw new NotFoundError(`Pending invite not found`)
     }
@@ -587,7 +592,7 @@ export class InvitesController extends Controller {
       },
     })
 
-    if (invite.prefill.studyParticipant) {
+    if (invitePrefill.studyParticipant) {
       await prisma.studyParticipant.update({
         where: {
           participantProfileId_studyId: {
@@ -595,7 +600,7 @@ export class InvitesController extends Controller {
             studyId: invite.studyId,
           },
         },
-        data: invite.prefill.studyParticipant,
+        data: invitePrefill.studyParticipant,
       })
     }
 
@@ -792,7 +797,7 @@ export class InvitesController extends Controller {
           ...successfulInvites.map((invite) => ({
             id: invite.id,
             email: invite.recipient.email,
-            prefill: invite.recipient.prefill,
+            prefill: JSON.stringify(invite.recipient.prefill),
             studyId,
             expiresAt,
             sentAt: new Date(),
@@ -801,7 +806,7 @@ export class InvitesController extends Controller {
           ...newFailedInvites.map((invite) => ({
             id: invite.id,
             email: invite.recipient.email,
-            prefill: invite.recipient.prefill,
+            prefill: JSON.stringify(invite.recipient.prefill),
             studyId,
             expiresAt,
             status: InviteStatus.FAILED_TO_SEND,
@@ -995,7 +1000,7 @@ export class InvitesController extends Controller {
       where: { id: inviteId },
       select: { prefill: true },
     })
-    return prefillData
+    return JSON.parse(prefillData.prefill || '{}')
   }
 
   private async sendInvite(email: string, studyId: number, inviteId: string): Promise<boolean> {

@@ -936,12 +936,12 @@ describe('InvitesController', () => {
           email: 'prefilltest@example.com',
           status: InviteStatus.PENDING,
           studyId: 1,
-          prefill: {
+          prefill: JSON.stringify({
             profile: { firstName: 'Jane', lastName: 'Doe' },
             studyParticipant: {
               externalId: 'REDCAPIMPORT123',
             },
-          },
+          }),
           expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         },
       })
@@ -951,8 +951,7 @@ describe('InvitesController', () => {
     it('should return prefill data for a valid invite', async () => {
       const response = await request(app).get(`/invites/${inviteId}/prefill`)
       expect(response.status).toBe(200)
-      expect(response.body).toHaveProperty('prefill')
-      expect(response.body.prefill).toMatchObject({
+      expect(response.body).toMatchObject({
         profile: { firstName: 'Jane', lastName: 'Doe' },
         studyParticipant: {
           externalId: 'REDCAPIMPORT123',
@@ -972,14 +971,13 @@ describe('InvitesController', () => {
           email: 'noprefill@example.com',
           status: InviteStatus.PENDING,
           studyId: 1,
-          prefill: {},
+          prefill: JSON.stringify({}),
           expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         },
       })
       const response = await request(app).get(`/invites/${invite.id}/prefill`)
       expect(response.status).toBe(200)
-      expect(response.body).toHaveProperty('prefill')
-      expect(response.body.prefill).toEqual({})
+      expect(response.body).toEqual({})
     })
   })
 })
