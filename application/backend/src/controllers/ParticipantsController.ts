@@ -50,6 +50,8 @@ import { ProfilesController } from './ProfilesController'
 import { auditLog } from '../middlewares/AuditLog'
 import { Role } from '@prisma/client'
 import { genId } from '../utils/genId'
+import { generateInviteId, inviteExpiresAt } from '../utils/invite'
+import { Prefill } from 'common/types/invite'
 
 @Route('/')
 @Tags('Participants')
