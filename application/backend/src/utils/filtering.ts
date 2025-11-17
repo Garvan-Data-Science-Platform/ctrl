@@ -1,11 +1,7 @@
-import { Prisma } from '@prisma/client'
-
 /**
  * Extracts filter from queryParams and returns a Prisma-compatible 'where' object for the given model.
  * Only supports a single filter in the format filter[field][operator]=value.
  */
-
-type FilterKey = keyof Prisma.StringFilter | keyof Prisma.DateTimeFilter
 
 const arrayOperatorMap: Record<string, (fieldValue: any, filterValue: any) => boolean> = {
   eq: (a, b) => a === b,

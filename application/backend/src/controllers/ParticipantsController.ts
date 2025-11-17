@@ -31,7 +31,6 @@ import {
   Middlewares,
   Request,
   Delete,
-  Queries,
   Patch,
   NoSecurity,
 } from 'tsoa'
@@ -51,10 +50,6 @@ import { ProfilesController } from './ProfilesController'
 import { auditLog } from '../middlewares/AuditLog'
 import { Role } from '@prisma/client'
 import { genId } from '../utils/genId'
-import { extractOrderBy, extractWhere } from '../utils/filtering'
-import { generateInviteId, inviteExpiresAt } from '../utils/invite'
-import { Prefill } from 'common/types/invite'
-import { extractFilter, extractOrderBy } from '../utils/filtering'
 
 @Route('/')
 @Tags('Participants')
@@ -76,11 +71,7 @@ export class ParticipantsController extends Controller {
    */
   @Get('studies/{studyId}/participants')
   public async getParticipants(@Path() studyId: number): Promise<GetParticipantsResponse> {
-    let total = await prisma.studyParticipant.count({
-      where: { studyId },
-    })
-
-    let participant_list = await prisma.studyParticipant.findMany({
+    const participant_list = await prisma.studyParticipant.findMany({
       where: { studyId },
       select: {
         participantProfile: {
@@ -96,6 +87,8 @@ export class ParticipantsController extends Controller {
         externalId: true,
       },
     })
+
+    const total = participant_list.length
 
     const participants: GetParticipantsResponse['data'] = []
 

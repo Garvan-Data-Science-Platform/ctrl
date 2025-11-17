@@ -9,13 +9,12 @@ import {
   Menu,
   MenuItem,
   Modal,
-  TextField,
   Tooltip,
   Typography,
 } from '@mui/material'
-import { DataGrid, GridFilterOperator, type GridColDef } from '@mui/x-data-grid'
+import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import { DateField, EditButton, List, ShowButton, useDataGrid } from '@refinedev/mui'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { InviteModal } from '../../components/InviteModal'
 import { Recipient } from '@common/types/invite'
@@ -159,60 +158,6 @@ export const ParticipantList = () => {
     )
   }
 
-  // Debounced input component
-  function DebouncedInput(props: any) {
-    const { item, applyValue, InputProps } = props
-    const [value, setValue] = useState(item.value ?? '')
-    const debounceRef = useRef<number | undefined>()
-
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      const newValue = event.target.value
-      setValue(newValue)
-      if (debounceRef.current) {
-        window.clearTimeout(debounceRef.current)
-      }
-      debounceRef.current = window.setTimeout(() => {
-        applyValue({ ...item, value: newValue })
-      }, 500) // 500ms debounce
-    }
-
-    useEffect(() => {
-      return () => {
-        if (debounceRef.current) {
-          window.clearTimeout(debounceRef.current)
-        }
-      }
-    }, [])
-
-    return (
-      <div style={{ display: 'flex', alignItems: 'flex-end', height: '100%' }}>
-        <TextField
-          variant="standard"
-          value={value}
-          onChange={handleChange}
-          fullWidth
-          {...InputProps}
-        />
-      </div>
-    )
-  }
-
-  const allowedOperators: GridFilterOperator[] = [
-    {
-      label: 'Equals',
-      value: 'equals',
-      requiresFilterValue: true,
-      getApplyFilterFn: (filterItem) => (value) => value === filterItem.value,
-      InputComponent: DebouncedInput,
-    },
-    {
-      label: 'Does not equal',
-      value: 'doesNotEqual',
-      getApplyFilterFn: (filterItem) => (value) => value !== filterItem.value,
-      InputComponent: DebouncedInput,
-    },
-  ]
-
   const columns = React.useMemo<GridColDef[]>(
     () => [
       {
@@ -262,7 +207,7 @@ export const ParticipantList = () => {
         minWidth: 100,
         type: 'date',
         disableColumnMenu: true,
-        sortable: false,
+        sortable: true,
         valueGetter: (value) => {
           if (!value) return null
           return new Date(value)
