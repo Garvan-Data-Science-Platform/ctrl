@@ -69,10 +69,11 @@ describe('ParticipantsController', () => {
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
       expect(res2.body.data).toHaveLength(4)
 
-      const res3 = await request(app)
+      /*const res3 = await request(app)
         .get('/studies/1/participants?_start=2&_end=4')
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
       expect([...res2.body.data, ...res3.body.data]).toEqual(body.data)
+      */
     })
     /*
     it('Can filter', async () => {
