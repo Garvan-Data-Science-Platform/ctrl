@@ -86,10 +86,14 @@ export class ParticipantsController extends Controller {
     const orderBy = extractOrderBy(queryParams)
     const filter = extractFilter(queryParams)
     let encryptedSort = false
+    let encryptedFilter = false
     if (orderBy) {
       const key = Object.keys(orderBy).at(0) as any
       if (['firstName', 'lastName', 'email'].includes(key)) encryptedSort = true
     }
+    if (filter && ['firstName', 'lastName', 'email'].includes(filter.field)) encryptedFilter = true
+
+    const serverSide = encryptedFilter || encryptedSort
 
     let participant_list = await prisma.studyParticipant.findMany({
       where: { studyId },
@@ -107,9 +111,9 @@ export class ParticipantsController extends Controller {
         externalId: true,
       },
       orderBy: encryptedSort ? undefined : orderBy,
-      skip: !orderBy && queryParams._start ? Number(queryParams._start) : undefined,
+      skip: !serverSide && queryParams._start ? Number(queryParams._start) : undefined,
       take:
-        !encryptedSort && queryParams._end
+        !serverSide && queryParams._end
           ? Number(queryParams._end) - Number(queryParams._start)
           : undefined,
     })
@@ -127,8 +131,6 @@ export class ParticipantsController extends Controller {
       } else {
         participant_list = participant_list.filter((val: any) => filterFunction(val[field]))
       }
-      participant_list = participant_list.slice(queryParams._start || 0, queryParams._end)
-      total = participant_list.length
     }
 
     if (encryptedSort && orderBy) {
@@ -144,6 +146,12 @@ export class ParticipantsController extends Controller {
         participant_list.sort((a: any, b: any) =>
           a.participantProfile[key] > b.participantProfile[key] ? dirNum : -1 * dirNum,
         )
+      }
+    }
+    if (serverSide) {
+      total = participant_list.length
+      if (queryParams._start || queryParams._end) {
+        participant_list = participant_list.slice(queryParams._start || 0, queryParams._end)
       }
     }
 

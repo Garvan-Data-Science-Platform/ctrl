@@ -24,6 +24,10 @@ const arrayOperatorMap: Record<string, (fieldValue: any, filterValue: any) => bo
   ne: (a, b) => a !== b,
 }
 
+function toLowerIfString(val: any) {
+  return typeof val === 'string' ? val.toLowerCase() : val
+}
+
 export function extractFilter(queryParams: { [key: string]: any }) {
   for (const key of Object.keys(queryParams)) {
     const match = key.match(/^filter\[(.+)\]\[(.+)\]$/)
@@ -32,7 +36,10 @@ export function extractFilter(queryParams: { [key: string]: any }) {
       const opFn = arrayOperatorMap[operator as keyof typeof arrayOperatorMap]
       if (!opFn) continue
       const filterValue = queryParams[key]
-      return { field, filterFunction: (item: any) => opFn(item, filterValue) }
+      return {
+        field,
+        filterFunction: (item: any) => opFn(toLowerIfString(item), toLowerIfString(filterValue)),
+      }
     }
   }
   return undefined
