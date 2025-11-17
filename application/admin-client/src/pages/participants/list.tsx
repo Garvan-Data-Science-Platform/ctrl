@@ -43,9 +43,9 @@ export const statusMap = {
 export const ParticipantList = () => {
   const { dataGridProps } = useDataGrid({
     syncWithLocation: false,
-    pagination: { pageSize: 10, mode: 'server' } as any,
-    filters: { mode: 'server' },
-    sorters: { mode: 'server' },
+    pagination: { mode: 'off' },
+    filters: { mode: 'off' },
+    sorters: { mode: 'off' },
   })
   const { dataGridProps: inviteGridProps } = useDataGrid({
     syncWithLocation: false,
@@ -470,6 +470,8 @@ export const ParticipantList = () => {
       >
         <DataGrid
           {...dataGridProps}
+          pageSizeOptions={[10]}
+          initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
           columns={columns}
           autoHeight
           slotProps={{ root: { 'data-cy': 'participants-list' } }}

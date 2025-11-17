@@ -75,25 +75,10 @@ export class ParticipantsController extends Controller {
    * @summary List participants
    */
   @Get('studies/{studyId}/participants')
-  public async getParticipants(
-    @Path() studyId: number,
-    @Queries() queryParams: { [key: string]: any },
-  ): Promise<GetParticipantsResponse> {
+  public async getParticipants(@Path() studyId: number): Promise<GetParticipantsResponse> {
     let total = await prisma.studyParticipant.count({
       where: { studyId },
     })
-
-    const orderBy = extractOrderBy(queryParams)
-    const filter = extractFilter(queryParams)
-    let encryptedSort = false
-    let encryptedFilter = false
-    if (orderBy) {
-      const key = Object.keys(orderBy).at(0) as any
-      if (['firstName', 'lastName', 'email'].includes(key)) encryptedSort = true
-    }
-    if (filter && ['firstName', 'lastName', 'email'].includes(filter.field)) encryptedFilter = true
-
-    const serverSide = encryptedFilter || encryptedSort
 
     let participant_list = await prisma.studyParticipant.findMany({
       where: { studyId },
@@ -110,50 +95,7 @@ export class ParticipantsController extends Controller {
         participantId: true,
         externalId: true,
       },
-      orderBy: encryptedSort ? undefined : orderBy,
-      skip: !serverSide && queryParams._start ? Number(queryParams._start) : undefined,
-      take:
-        !serverSide && queryParams._end
-          ? Number(queryParams._end) - Number(queryParams._start)
-          : undefined,
     })
-
-    if (filter) {
-      const { field, filterFunction } = filter
-      if (field == 'email') {
-        participant_list = participant_list.filter((val) =>
-          filterFunction(val.participantProfile.user?.email),
-        )
-      } else if (['firstName', 'lastName'].includes(field)) {
-        participant_list = participant_list.filter((val: any) =>
-          filterFunction(val.participantProfile[field]),
-        )
-      } else {
-        participant_list = participant_list.filter((val: any) => filterFunction(val[field]))
-      }
-    }
-
-    if (encryptedSort && orderBy) {
-      const [key, dir] = Object.entries(orderBy).at(0) as any
-      const dirNum = dir == 'asc' ? 1 : -1
-      if (key == 'email') {
-        participant_list.sort((a, b) =>
-          (a.participantProfile.user?.email || '') > (b.participantProfile.user?.email || '')
-            ? dirNum
-            : -1 * dirNum,
-        )
-      } else {
-        participant_list.sort((a: any, b: any) =>
-          a.participantProfile[key] > b.participantProfile[key] ? dirNum : -1 * dirNum,
-        )
-      }
-    }
-    if (serverSide) {
-      total = participant_list.length
-      if (queryParams._start || queryParams._end) {
-        participant_list = participant_list.slice(queryParams._start || 0, queryParams._end)
-      }
-    }
 
     const participants: GetParticipantsResponse['data'] = []
 
