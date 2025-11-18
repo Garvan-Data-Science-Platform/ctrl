@@ -16,7 +16,7 @@ config:
     #  icon: #A link to png for login button
 
   disableAdminPasswordLogin: false
-  otp: true
+  otp: false
 
 userClient:
   hostname: ctrlhost
