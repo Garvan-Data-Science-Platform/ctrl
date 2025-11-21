@@ -86,10 +86,13 @@ export default function Register() {
             const prefillProfile = { ...data.profile }
             delete prefillProfile.password // Do not prefill password
             function toISO(date: string) {
-              const [d, m, y] = date.split('/')
-              return y && m && d ? `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}` : ''
+              try {
+                const [d, m, y] = date.split('/')
+                return y && m && d ? `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}` : ''
+              } catch {
+                return ''
+              }
             }
-            console.log('DOB', toISO(prefillProfile.dob))
             reset({
               firstName: prefillProfile.firstName ?? '',
               lastName: prefillProfile.lastName ?? '',
