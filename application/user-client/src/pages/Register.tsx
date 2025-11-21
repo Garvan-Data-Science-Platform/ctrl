@@ -99,7 +99,7 @@ export default function Register() {
               email: prefillProfile.email ?? '',
               password: '',
               confirm_password: '',
-              dob: toISO(prefillProfile.dob) ?? '',
+              dob: prefillProfile.dob ? toISO(prefillProfile.dob) : '',
               addressLine: prefillProfile.addressLine ?? '',
               suburb: prefillProfile.suburb ?? '',
               state: prefillProfile.state ?? ('' as StateTerritory),
