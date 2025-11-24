@@ -12,7 +12,7 @@ import AdbIcon from '@mui/icons-material/Adb'
 import { Button, Tab, Tabs } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth'
-import { useCurrentStudyId } from '../store'
+import { useAppStore, useCurrentStudyId } from '../store'
 
 const pages = [
   { name: 'My Activities', route: '/' },
@@ -27,6 +27,10 @@ export default function NavBar({ disabled }: { disabled?: boolean }) {
   const nav = useNavigate()
   const { logout } = useAuth()
   const studyId = useCurrentStudyId()
+
+  const { newsLink } = useAppStore()
+
+  const activePages = newsLink ? pages : pages.filter((val) => val.route != '/news')
 
   const activePage =
     pages
@@ -97,7 +101,7 @@ export default function NavBar({ disabled }: { disabled?: boolean }) {
             <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
               <Tabs value={activePage.name}>
-                {pages.map((page) => (
+                {activePages.map((page) => (
                   <Tab
                     value={page.name}
                     key={page.name}

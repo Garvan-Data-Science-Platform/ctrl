@@ -961,6 +961,10 @@
         "properties": {
           "data": {
             "properties": {
+              "newsLink": {
+                "type": "string",
+                "nullable": true
+              },
               "tcLink": {
                 "type": "string"
               },
@@ -999,6 +1003,7 @@
               }
             },
             "required": [
+              "newsLink",
               "tcLink",
               "redcapURL",
               "redcapToken",
@@ -1055,6 +1060,10 @@
           },
           "tcLink": {
             "type": "string"
+          },
+          "newsLink": {
+            "type": "string",
+            "nullable": true
           }
         },
         "type": "object",
@@ -1063,10 +1072,14 @@
       "UpdateSettingsRequest": {
         "$ref": "#/components/schemas/Partial_GetSettingsResponse-at-data_"
       },
-      "GetThemeResponse": {
+      "GetUserPortalSettingsResponse": {
         "properties": {
           "data": {
             "properties": {
+              "newsLink": {
+                "type": "string",
+                "nullable": true
+              },
               "secondaryColour": {
                 "type": "string",
                 "nullable": true
@@ -1077,6 +1090,7 @@
               }
             },
             "required": [
+              "newsLink",
               "secondaryColour",
               "primaryColour"
             ],
@@ -2093,6 +2107,10 @@
             "format": "byte",
             "nullable": true
           },
+          "newsLink": {
+            "type": "string",
+            "nullable": true
+          },
           "tcLink": {
             "type": "string"
           },
@@ -2148,6 +2166,7 @@
         "required": [
           "elsaToken",
           "logo",
+          "newsLink",
           "tcLink",
           "redcapURL",
           "redcapToken",
@@ -4079,7 +4098,7 @@
         }
       }
     },
-    "/settings/theme": {
+    "/settings/userportal": {
       "get": {
         "operationId": "GetTheme",
         "responses": {
@@ -4088,7 +4107,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetThemeResponse"
+                  "$ref": "#/components/schemas/GetUserPortalSettingsResponse"
                 }
               }
             }

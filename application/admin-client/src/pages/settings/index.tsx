@@ -1,10 +1,11 @@
-import { Box, Button, Container, TextField, Typography } from '@mui/material'
+import { Box, Button, Container, TextField, Tooltip, Typography } from '@mui/material'
 import { useNotification } from '@refinedev/core'
 import { useForm } from '@refinedev/react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { axiosInstance } from '../../providers/dataProvider'
 import { SensitiveTextField } from '../../components/SensitiveTextField'
 import { useState } from 'react'
+import { Info } from '@mui/icons-material'
 
 const SettingsPage = () => {
   type FieldValues = {
@@ -17,6 +18,7 @@ const SettingsPage = () => {
     redcapURL: string | null
     redcapToken: string | null
     tcLink: string | null
+    newsLink: string | null
   }
 
   const {
@@ -177,6 +179,30 @@ const SettingsPage = () => {
           label={'Terms and Conditions URL'}
           name="tcLink"
           data-cy="tcLink"
+        />
+        <TextField
+          {...register('newsLink', {
+            pattern: {
+              value:
+                /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/, //eslint-disable-line
+              message: 'Invalid url, must include http(s)://...',
+            },
+          })}
+          error={!!(errors as any)?.newsLink}
+          helperText={(errors as any)?.newsLink?.message}
+          margin="normal"
+          InputLabelProps={{ shrink: true }}
+          type="text"
+          label={
+            <>
+              News Site URL{' '}
+              <Tooltip title="Embedded in User Portal 'News' Page">
+                <Info sx={{ fontSize: 16 }} />
+              </Tooltip>
+            </>
+          }
+          name="newsLink"
+          data-cy="newsLink"
         />
         <Typography sx={{ mt: 2 }}>Colour Scheme (User Portal)</Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>

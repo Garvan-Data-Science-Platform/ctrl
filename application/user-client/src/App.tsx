@@ -8,11 +8,13 @@ import { AuthProvider } from './auth'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { apiClient } from './apiClient.ts'
+import { useAppStore } from './store.ts'
 
 const queryClient = new QueryClient()
 
 function App() {
   const [theme, setTheme] = useState<Theme | null>(null)
+  const { setNewsLink } = useAppStore()
 
   function standardize_color(str: string) {
     const ctx = document.createElement('canvas').getContext('2d') as any
@@ -21,8 +23,9 @@ function App() {
   }
 
   useEffect(() => {
-    apiClient.get('/settings/theme').then((res) => {
-      const { primaryColour: primary, secondaryColour: secondary } = res.data.data
+    apiClient.get('/settings/userportal').then((res) => {
+      const { primaryColour: primary, secondaryColour: secondary, newsLink } = res.data.data
+      setNewsLink(newsLink)
       setTheme(
         customTheme({
           primary: primary ? standardize_color(primary) : '#2196f3',

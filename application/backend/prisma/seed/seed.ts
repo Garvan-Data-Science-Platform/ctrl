@@ -17,6 +17,7 @@ const main = async () => {
       redcapURL: process.env.REDCAP_API_URL,
       redcapToken: process.env.REDCAP_API_TOKEN,
       elsaToken: 'ctrl-elsa-abc123',
+      newsLink: 'https://ctrldynamicconsent.wordpress.com',
     },
   })
 

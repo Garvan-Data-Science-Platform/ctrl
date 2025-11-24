@@ -39,6 +39,7 @@ export async function seedTests(prisma: PrismaClient) {
       primaryColour: 'red',
       secondaryColour: 'red',
       elsaToken: 'abc123',
+      newsLink: 'https://ctrldynamicconsent.wordpress.com',
     },
   })
 

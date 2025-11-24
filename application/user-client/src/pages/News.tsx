@@ -1,8 +1,10 @@
 import { Box, Container } from '@mui/material'
 import NavBar from '../components/NavBar'
 import { useEffect } from 'react'
+import { useAppStore } from '../store'
 
 export default function News() {
+  const { newsLink } = useAppStore()
   useEffect(() => {
     document.title = 'News and Information | CTRL'
   }, [])
@@ -14,7 +16,7 @@ export default function News() {
           <iframe
             width="100%"
             height="100%"
-            src="https://ctrldynamicconsent.wordpress.com"
+            src={newsLink || ''}
             frameBorder="0"
             allow="autoplay; encrypted-media"
           ></iframe>
