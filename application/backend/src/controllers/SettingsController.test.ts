@@ -30,12 +30,6 @@ describe('SettingsController', () => {
   })
 
   const expectedSettings = {
-    mailerHost: 'smtp.ethereal.email',
-    mailerPort: 587,
-    mailerPassword: 'b7nS4Ge8gCvHUzq6Rf',
-    mailerUser: 'eduardo.boyer@ethereal.email',
-    redcapToken: 'ABC',
-    redcapURL: 'http://redcaptest.com',
     primaryColour: 'red',
     secondaryColour: 'red',
     tcLink: 'https://garvan-data-science-platform.github.io/ctrl-docs/docs/terms-and-conditions',
@@ -57,7 +51,7 @@ describe('SettingsController', () => {
 
   describe('PATCH /settings', () => {
     it('should update settings', async () => {
-      const reqBody = { mailerHost: null, redcapToken: 'XXX' }
+      const reqBody = { primaryColour: 'blue' }
       const response = await request(app)
         .patch('/settings')
         .set({ Authorization: `Bearer ${orgAdminToken}` })
@@ -66,12 +60,11 @@ describe('SettingsController', () => {
       expect(response.status).toBe(204)
 
       const newSettings = await prisma.organisation.findFirstOrThrow({ where: { id: 1 } })
-      expect(newSettings.mailerHost).toBe(null)
-      expect(newSettings.redcapToken).toBe('XXX')
+      expect(newSettings.primaryColour).toBe('blue')
     })
 
     it('should fail to update if settings are invalid', async () => {
-      const reqBody = { mailerHost: 1 }
+      const reqBody = { primaryColour: 1 }
 
       const response = await request(app)
         .patch('/settings')

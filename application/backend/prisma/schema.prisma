@@ -115,14 +115,8 @@ enum ContactMethod {
 model Organisation {
   id              Int      @id @default(autoincrement())
   name            String   @unique
-  mailerHost      String? /// @encrypted
-  mailerPort      Int?
-  mailerUser      String? /// @encrypted
-  mailerPassword  String? /// @encrypted
   primaryColour   String?
   secondaryColour String?
-  redcapURL       String? /// @encrypted
-  redcapToken     String? /// @encrypted
   elsaToken       String? /// @encrypted
   logo            Bytes?
   tcLink          String  @default("https://garvan-data-science-platform.github.io/ctrl-docs/docs/terms-and-conditions")
@@ -137,8 +131,10 @@ model Study {
   name               String
   description        String?
   logo               Bytes?
-  inviteEmailSubject String             @default("Invitation to CTRL - Dynamic Consent Platform")
-  inviteEmailText    String             @default("You have been invited to register with CTRL dynamic consent platform.")
+  redcapURL          String? /// @encrypted
+  redcapToken        String? /// @encrypted
+  inviteEmailSubject String               @default("Invitation to CTRL - Dynamic Consent Platform")
+  inviteEmailText    String               @default("You have been invited to register with CTRL dynamic consent platform.")
   surveys            SurveyVersion[]
   profiles           StudyParticipant[]
   invites            Invite[]

@@ -1,4 +1,7 @@
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Box,
   Button,
   Container,
@@ -13,12 +16,20 @@ import {
 } from '@mui/material'
 import { useNotification } from '@refinedev/core'
 import { axiosInstance } from '../../providers/dataProvider'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { StudyEntry, useStudyStore } from '../../studyStore'
-import { AddCircle, Delete, Edit } from '@mui/icons-material'
+import { AddCircle, ArrowDropDown, Delete, Edit } from '@mui/icons-material'
 import { useQueryClient } from '@tanstack/react-query'
+import { SensitiveTextField } from '../../components/SensitiveTextField'
+import { useSearchParams } from 'react-router-dom'
 
-const StudyCard = ({ study }: { study: StudyEntry }) => {
+const StudyCard = ({
+  study,
+  advancedOpen = false,
+}: {
+  study: StudyEntry
+  advancedOpen?: boolean
+}) => {
   const { open } = useNotification()
   const queryClient = useQueryClient()
   const [editingName, setEditingName] = useState(false)
@@ -27,6 +38,20 @@ const StudyCard = ({ study }: { study: StudyEntry }) => {
   const [newDesc, setNewDesc] = useState(study.description)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const { studies, setActiveStudyIndex, activeStudyIndex } = useStudyStore()
+  const [redcapURL, setRedcapURL] = useState(study.redcapURL || '')
+  const [redcapToken, setRedcapToken] = useState(study.redcapToken || '')
+  const [redcapChanged, setRedcapChanged] = useState(false)
+  const [accordionOpen, setAccordionOpen] = useState(advancedOpen)
+
+  useEffect(() => {
+    setRedcapURL(study.redcapURL || '')
+    setRedcapToken(study.redcapToken || '')
+    setRedcapChanged(false)
+  }, [study.redcapURL, study.redcapToken])
+
+  useEffect(() => {
+    setAccordionOpen(advancedOpen)
+  }, [advancedOpen])
 
   const handleUpdate = (updateData: Partial<StudyEntry>) => {
     axiosInstance
@@ -36,6 +61,7 @@ const StudyCard = ({ study }: { study: StudyEntry }) => {
           setActiveStudyIndex(0)
         }
         queryClient.invalidateQueries(['studies'])
+        open?.({ type: 'success', message: 'Updated successfully' })
       })
       .catch((e) => {
         open?.({ type: 'error', message: `Error updating study: ${e.response.data.details}` })
@@ -76,6 +102,23 @@ const StudyCard = ({ study }: { study: StudyEntry }) => {
     } catch (e: any) {
       open?.({ type: 'error', message: `Failed to update logo: ${e.response.data.details}` })
     }
+  }
+
+  const handleRedcapApply = () => {
+    const urlRegex =
+      /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/
+    if (redcapURL && !urlRegex.test(redcapURL)) {
+      open?.({
+        type: 'error',
+        message: "Invalid Redcap API URL format. Must start with 'http(s)://'",
+      })
+      return
+    }
+    handleUpdate({
+      redcapURL,
+      redcapToken,
+    })
+    setRedcapChanged(false)
   }
 
   return (
@@ -214,6 +257,60 @@ const StudyCard = ({ study }: { study: StudyEntry }) => {
             This description appears on the user portal dashboard.
           </Typography>
         )}
+        <Accordion
+          sx={{ mt: 1, bgcolor: 'transparent', boxShadow: 0, border: 0 }}
+          expanded={accordionOpen}
+          onChange={(_, expanded) => setAccordionOpen(expanded)}
+        >
+          <AccordionSummary
+            expandIcon={<ArrowDropDown />}
+            sx={{ padding: 0, flexDirection: 'row-reverse' }}
+            data-cy="advanced-toggle"
+          >
+            <Typography component="span">Advanced Options</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Typography>Redcap Integration</Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column' }} id="redcap">
+              <TextField
+                margin="normal"
+                InputLabelProps={{ shrink: true }}
+                type="text"
+                label={'Redcap API URL'}
+                name="redcapURL"
+                data-cy="redcapURL"
+                value={redcapURL}
+                onChange={(e) => {
+                  setRedcapURL(e.target.value)
+                  setRedcapChanged(true)
+                }}
+              />
+              <SensitiveTextField
+                margin="dense"
+                InputLabelProps={{ shrink: true }}
+                type="text"
+                label={'Redcap API Token'}
+                name="redcapToken"
+                data-cy="redcapToken"
+                value={redcapToken}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setRedcapToken(e.target.value)
+                  setRedcapChanged(true)
+                }}
+              />
+              <Button
+                sx={{ mt: 1, alignSelf: 'flex-start' }}
+                variant="contained"
+                size="small"
+                disabled={!redcapChanged}
+                onClick={handleRedcapApply}
+                data-cy="redcap-apply"
+              >
+                Apply
+              </Button>
+            </Box>
+          </AccordionDetails>
+        </Accordion>
       </Box>
       <IconButton
         disabled={studies.length < 2}
@@ -232,6 +329,8 @@ const StudyCard = ({ study }: { study: StudyEntry }) => {
 const StudiesPage = () => {
   const { studies } = useStudyStore()
   const { open } = useNotification()
+  const [searchParams] = useSearchParams()
+  const advancedStudyId = searchParams.get('advanced')
 
   const [newStudyDialogOpen, setNewStudyDialogOpen] = useState(false)
   const [newStudyName, setNewStudyName] = useState('')
@@ -283,7 +382,11 @@ const StudiesPage = () => {
       <Typography variant="h4">Studies</Typography>
       <Stack gap={1} sx={{ mt: 2 }}>
         {studies.map((study) => (
-          <StudyCard study={study} key={`studybox_${study.id}`} />
+          <StudyCard
+            study={study}
+            key={`studybox_${study.id}`}
+            advancedOpen={advancedStudyId === String(study.id)}
+          />
         ))}
       </Stack>
 

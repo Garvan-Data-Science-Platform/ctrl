@@ -6,6 +6,8 @@ export interface StudyEntry {
   name: string
   description?: string
   logo?: SourceBuffer
+  redcapURL?: string
+  redcapToken?: string
 }
 
 interface StudyState {

@@ -8,21 +8,18 @@ beforeEach(() => {
 
 describe('Settings page', () => {
   const fieldMap = {
-    mailerHost: 'host.com',
-    mailerPort: '123',
-    mailerUser: 'userx',
-    mailerPassword: 'passwordx',
     primaryColour: 'red',
     secondaryColour: 'blue',
-    redcapURL: 'http://redcap.com',
-    redcapToken: 'APITOKENREDCAP',
   }
 
   it('Can edit settings and save them', () => {
     cy.login(UserType.ADMIN)
     cy.visit('/settings')
 
-    cy.get('[data-cy="mailerHost"] input').should('have.value', 'smtp.ethereal.email')
+    cy.get('[data-cy="tcLink"] input').should(
+      'have.value',
+      'https://garvan-data-science-platform.github.io/ctrl-docs/docs/terms-and-conditions',
+    )
 
     for (const [key, value] of Object.entries(fieldMap)) {
       cy.get(`[data-cy="${key}"] input`).clear().type(value)
@@ -39,7 +36,10 @@ describe('Settings page', () => {
     cy.login(UserType.ADMIN)
     cy.visit('/settings')
 
-    cy.get('[data-cy="mailerHost"] input').should('have.value', 'smtp.ethereal.email')
+    cy.get('[data-cy="tcLink"] input').should(
+      'have.value',
+      'https://garvan-data-science-platform.github.io/ctrl-docs/docs/terms-and-conditions',
+    )
 
     for (const [key, value] of Object.entries(fieldMap)) {
       cy.get(`[data-cy="${key}"] input`).clear().type(value)
@@ -47,16 +47,22 @@ describe('Settings page', () => {
 
     cy.get('[data-cy="discard-button"]').click()
 
-    cy.get('[data-cy="mailerHost"] input').should('have.value', 'smtp.ethereal.email')
+    cy.get('[data-cy="tcLink"] input').should(
+      'have.value',
+      'https://garvan-data-science-platform.github.io/ctrl-docs/docs/terms-and-conditions',
+    )
   })
 
   it('Invalid values prevent saving and show appropriate error messages', () => {
-    const values = { ...fieldMap, redcapURL: 'abc', primaryColour: 'abc' }
+    const values = { ...fieldMap, primaryColour: 'abc' }
 
     cy.login(UserType.ADMIN)
     cy.visit('/settings')
 
-    cy.get('[data-cy="mailerHost"] input').should('have.value', 'smtp.ethereal.email')
+    cy.get('[data-cy="tcLink"] input').should(
+      'have.value',
+      'https://garvan-data-science-platform.github.io/ctrl-docs/docs/terms-and-conditions',
+    )
 
     for (const [key, value] of Object.entries(values)) {
       cy.get(`[data-cy="${key}"] input`).clear().type(value)
@@ -64,47 +70,12 @@ describe('Settings page', () => {
     cy.get('[data-cy="save-button"]').click()
 
     cy.contains('Invalid colour').should('exist')
-    cy.contains('Invalid url').should('exist')
 
     for (const [key, value] of Object.entries(fieldMap)) {
       cy.get(`[data-cy="${key}"] input`).clear().type(value)
     }
 
     cy.contains('Invalid colour').should('not.exist')
-    cy.contains('Invalid url').should('not.exist')
-  })
-
-  it('Attempting to invite participants while email is not set up shows error message', () => {
-    cy.login(UserType.ADMIN)
-    cy.visit('/settings')
-
-    cy.get('[data-cy="mailerHost"] input').should('have.value', 'smtp.ethereal.email')
-
-    cy.get('[data-cy="mailerHost"] input').clear()
-    cy.get('[data-cy="save-button"]').click()
-
-    cy.visit('/participants')
-    cy.get('[data-cy="invite-button"]').click()
-
-    cy.contains('You need to set up your email').should('exist')
-    cy.contains('Go to').click()
-
-    cy.url().should('contain', '/settings')
-  })
-
-  it('Redcap import page does not allow API features if not set up', () => {
-    cy.login(UserType.ADMIN)
-    cy.visit('/settings')
-
-    cy.get('[data-cy="mailerHost"] input').should('have.value', 'smtp.ethereal.email')
-
-    cy.get('[data-cy="redcapURL"] input').clear()
-    cy.get('[data-cy="save-button"]').click()
-
-    cy.visit('/integrations/redcap/survey/import')
-    cy.contains('Redcap API is not set up').should('exist')
-    cy.contains('Redcap settings').click()
-    cy.url().should('contain', '/settings#redcap')
   })
 
   it('Can update logo', () => {

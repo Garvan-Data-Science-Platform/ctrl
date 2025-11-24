@@ -108,8 +108,8 @@ export class IntegrationsController extends Controller {
       throw new NotFoundError(`Study with id ${studyId} not found`)
     }
 
-    const redcapSettings = await prisma.organisation.findFirstOrThrow({
-      where: { id: 1 },
+    const redcapSettings = await prisma.study.findFirstOrThrow({
+      where: { id: studyId },
       select: { redcapToken: true, redcapURL: true },
     })
 
@@ -177,7 +177,7 @@ export class IntegrationsController extends Controller {
   ): Promise<UploadRedcapInstrumentResponse> {
     const { formName } = bodyRequest
 
-    const redcapSettings = await this.getRedcapConfig()
+    const redcapSettings = await this.getRedcapConfig(studyId)
 
     const params = new URLSearchParams()
     params.append('token', redcapSettings.redcapToken)
@@ -421,9 +421,11 @@ export class IntegrationsController extends Controller {
     }
   }
 
-  private async getRedcapConfig(): Promise<{ redcapToken: string; redcapURL: string }> {
-    const redcapSettings = await prisma.organisation.findFirstOrThrow({
-      where: { id: 1 },
+  private async getRedcapConfig(
+    studyId: number,
+  ): Promise<{ redcapToken: string; redcapURL: string }> {
+    const redcapSettings = await prisma.study.findFirstOrThrow({
+      where: { id: studyId },
       select: { redcapToken: true, redcapURL: true },
     })
 

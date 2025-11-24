@@ -61,10 +61,6 @@ jobs:
           cache: 'yarn'
       - run: yarn install
       - name: Run Tests
-        env:
-          MAILER_USER: ${{ secrets.TEST_MAILER_USER }}
-          MAILER_PASSWORD: ${{ secrets.TEST_MAILER_PASSWORD }}
-          CYPRESS_REDCAP_API_TOKEN: ${{ secrets.REDCAP_API_TOKEN }}
         run: yarn workspace ${{ matrix.workspace }} test
       - uses: actions/upload-artifact@v4
         if: failure()
