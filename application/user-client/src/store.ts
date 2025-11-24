@@ -8,7 +8,7 @@ interface AppState {
   contactMessageText: string
   updateContactMessageText: (newText: string) => void
   updateTheme: (primaryColor: string | null, secondaryColour: string | null) => void
-  studies: Study[]
+  studies: Study[] | null
   activeStudyIndex: number
   setActiveStudyIndex: (index: number) => void
   setStudies: (studies: Study[]) => void
@@ -31,7 +31,7 @@ export const useAppStore = create<AppState>((set, _, store) => ({
       primaryColour: primaryColour && standardize_color(primaryColour),
       secondaryColour: secondaryColour && standardize_color(secondaryColour),
     }),
-  studies: [],
+  studies: null,
   activeStudyIndex: Number(localStorage.getItem('activeStudyIndex') || 0),
   setActiveStudyIndex: (index: number) => {
     localStorage.setItem('activeStudyIndex', String(index))
@@ -54,5 +54,5 @@ export const useAppStore = create<AppState>((set, _, store) => ({
 
 export const useCurrentStudyId = () => {
   const { activeStudyIndex, studies } = useAppStore()
-  return studies[activeStudyIndex]?.id
+  return studies?.at(activeStudyIndex)?.id
 }

@@ -37,6 +37,8 @@ export default function Dashboard() {
   const studyId = useCurrentStudyId()
   const { studies, activeStudyIndex, setActiveStudyIndex } = useAppStore()
 
+  const studyName = studies?.at(activeStudyIndex)?.name || ''
+
   const { isPending, error, data } = useQuery({
     queryKey: ['steps'],
     queryFn: () => {
@@ -95,8 +97,6 @@ export default function Dashboard() {
             .get(`/studies/${studyId}/survey-answers`)
             .then((res) => res.data) as Promise<GetResponsesByIdResponse>,
       })
-
-      const studyName = studies[activeStudyIndex].name
 
       // Generate PDF with the data
       const pdfDoc = (
@@ -192,15 +192,15 @@ export default function Dashboard() {
         />
         <Stack direction="row" spacing={3}>
           <Typography variant="h5" textAlign="left">
-            {studies[activeStudyIndex].name}
+            {studyName}
           </Typography>
-          {studies.length > 1 && (
+          {(studies || []).length > 1 && (
             <Button data-cy="change-study" onClick={(e) => setAnchorEl(e.currentTarget)}>
               Change Study
             </Button>
           )}
         </Stack>
-        {studies[activeStudyIndex]?.description && (
+        {studies?.at(activeStudyIndex)?.description && (
           <Typography textAlign="left" whiteSpace="pre-wrap">
             {studies[activeStudyIndex].description}
           </Typography>
@@ -212,7 +212,7 @@ export default function Dashboard() {
           anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
           sx={{ p: 3 }}
         >
-          {studies.map((study, idx) => {
+          {(studies || []).map((study, idx) => {
             return (
               <MenuItem
                 key={study.id}

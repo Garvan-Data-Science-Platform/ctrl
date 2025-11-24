@@ -47,7 +47,8 @@ function App() {
           style={{
             bottom: 0,
             left: 0,
-            padding: 24,
+            marginTop: 12,
+            marginBottom: 12,
             width: '100%',
             textAlign: 'center',
           }}
