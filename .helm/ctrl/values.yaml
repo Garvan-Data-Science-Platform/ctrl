@@ -17,6 +17,12 @@ config:
 
   disableAdminPasswordLogin: false
   otp: true
+  inviteExpiryDays: 7
+  smtp:
+    host: ''
+    port: 587
+    username: ''
+    password: ''
 
 userClient:
   hostname: ctrlhost
