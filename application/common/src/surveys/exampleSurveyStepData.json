@@ -21,6 +21,7 @@
           "text": "Question 1",
           "value": true,
           "required": true,
+          "tooltip": "Example tooltip",
           "duoCodes": [{ "code": "DUO:0000006", "relatedAnswer": false }]
         }
       },
