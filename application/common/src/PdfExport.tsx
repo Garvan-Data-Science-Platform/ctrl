@@ -95,7 +95,7 @@ const FormatResponseElement = (element: SurveyElement, mode: 'responses' | 'opti
       <View style={styles.tableRow} wrap={false}>
         <Text style={styles.tableQuestionCell}>
           {element.data.text}{' '}
-          {mode == 'options' && element.data.tooltip && `Tooltip: ${element.data.tooltip}`}
+          {mode == 'options' && element.data.tooltip && `\n\nTooltip: ${element.data.tooltip}`}
         </Text>
 
         <Text style={styles.tableResponseCell}>

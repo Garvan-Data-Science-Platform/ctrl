@@ -25,5 +25,5 @@
       "@common/*": ["../common/*"]
     }
   },
-  "include": ["src", "../common/src/PdfExport.tsx"]
+  "include": ["src"]
 }

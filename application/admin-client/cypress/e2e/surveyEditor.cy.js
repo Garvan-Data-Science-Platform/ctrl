@@ -11,7 +11,7 @@ describe('Survey Editor', () => {
     cy.login(UserType.ADMIN)
     cy.visit('/surveys')
     cy.get('[data-rowindex="0"]').contains('Current Draft').should('exist')
-    cy.get('[data-rowindex="0"] button').click()
+    cy.get('[data-rowindex="0"] button').first().click()
     cy.contains('Survey Steps').should('exist')
     cy.wait(500)
     cy.get('[data-cy="step-title"]').type('123')

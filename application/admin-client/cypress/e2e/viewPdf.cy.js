@@ -28,7 +28,6 @@ describe('viewPdf', () => {
 
     cy.get('@pdfFile').then((pdfFile) => {
       cy.readFile(pdfFile).should('exist')
-      // Parse PDF and check contents
       cy.task('readPdf', pdfFile).then((pdfText) => {
         const cleanedText = pdfText.replace(/\n/g, ' ')
         cy.wrap(cleanedText)
@@ -41,10 +40,7 @@ describe('viewPdf', () => {
           .should('contain', 'Tooltip: Example tooltip')
       })
 
-      // Delete PDF
       cy.task('deleteFile', pdfFile)
     })
   })
-
-  // PDF contains logo, doesn't contain logo, and contains correct logo when study is changed
 })
