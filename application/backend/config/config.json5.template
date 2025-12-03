@@ -10,7 +10,7 @@
   ],
   disableAdminPasswordLogin: true,
   otp: false,
-  inviteExpiryDays: 7
+  inviteExpiryDays: 7,
   smtp: {
     host: '',
     port: 587,
