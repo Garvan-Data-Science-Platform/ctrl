@@ -6,7 +6,7 @@ import { createHmac } from 'crypto'
 //Generates a unique ID for a study participant
 export const genId = async (studyId: number, profileId: number, tx?: PrismaClient) => {
   if (!tx) {
-    tx = prisma
+    tx = prisma as PrismaClient
   }
   const last = await tx.studyParticipant.findFirst({
     where: { studyId },
@@ -49,7 +49,7 @@ export const genIndId = async (profileId: number, tx?: PrismaClient) => {
     .slice(0, 3)
   const ID = `IND-${instanceString}-${participantCode}`
   if (!tx) {
-    tx = prisma
+    tx = prisma as PrismaClient
   }
   await tx.participantProfile.update({ where: { id: profileId }, data: { individualId: ID } })
 }
