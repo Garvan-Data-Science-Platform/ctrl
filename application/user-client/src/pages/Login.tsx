@@ -96,9 +96,6 @@ export default function Login() {
             </Button>
           </form>
           <Box sx={{ mt: 3 }}>
-            <Button data-cy="register" component={Link} to="/register">
-              Register
-            </Button>
             <Button data-cy="forgot-password" component={Link} to="/forgot">
               Forgot Password
             </Button>

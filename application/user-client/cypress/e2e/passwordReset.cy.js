@@ -50,7 +50,6 @@ describe('Password Reset', () => {
     cy.get('[data-cy="return-to-login"]').click()
     cy.get('[data-cy="login-email"]').should('exist')
     cy.get('[data-cy="login-password"]').should('exist')
-    cy.get('[data-cy="register"]').should('exist')
     cy.get('[data-cy="forgot-password"]').should('exist')
   })
 
@@ -59,7 +58,6 @@ describe('Password Reset', () => {
     cy.get('[data-cy="return-to-login"]').click()
     cy.get('[data-cy="login-email"]').should('exist')
     cy.get('[data-cy="login-password"]').should('exist')
-    cy.get('[data-cy="register"]').should('exist')
     cy.get('[data-cy="forgot-password"]').should('exist')
   })
 
@@ -94,7 +92,6 @@ describe('Password Reset', () => {
     cy.get('[data-cy="return-to-login"]').click()
     cy.get('[data-cy="login-email"]').should('exist')
     cy.get('[data-cy="login-password"]').should('exist')
-    cy.get('[data-cy="register"]').should('exist')
     cy.get('[data-cy="forgot-password"]').should('exist')
   })
 
