@@ -27,7 +27,7 @@ import { GetParticipantProfileResponse } from '@common/types/api/users'
 import { GetResponsesByIdResponse } from '@common/types/api/surveys'
 import { GetUserInvitesResponse } from '@common/types/api/participants'
 import { apiClient } from '../apiClient'
-import ResponsesPdf from '../components/PdfExport'
+import ResponsesPdf from '@common/src/PdfExport'
 import { pdf } from '@react-pdf/renderer'
 import { useAppStore, useCurrentStudyId } from '../store'
 import { StudyInvitesDialog } from '../components/StudyInvites'
@@ -100,7 +100,12 @@ export default function Dashboard() {
 
       // Generate PDF with the data
       const pdfDoc = (
-        <ResponsesPdf studyName={studyName} profile={profileData} responses={responseData} />
+        <ResponsesPdf
+          studyName={studyName}
+          profile={profileData}
+          steps={responseData.data.steps}
+          responses={responseData}
+        />
       )
 
       // Create a blob from the PDF document

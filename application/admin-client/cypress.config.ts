@@ -1,4 +1,12 @@
-import { partiallyCompleteSurvey, resetDB, wipeDB } from 'common/testing/TestHelpers'
+import {
+  deleteFile,
+  getLatestFile,
+  partiallyCompleteSurvey,
+  readDir,
+  readPdf,
+  resetDB,
+  wipeDB,
+} from 'common/testing/TestHelpers'
 import { defineConfig } from 'cypress'
 
 export default defineConfig({
@@ -20,6 +28,18 @@ export default defineConfig({
         },
         wipe() {
           return wipeDB()
+        },
+        readDir(directory) {
+          return readDir(directory)
+        },
+        getLatestFile(files: string[]) {
+          return getLatestFile(files)
+        },
+        readPdf(filePath: string) {
+          return readPdf(filePath)
+        },
+        deleteFile(filePath: string) {
+          return deleteFile(filePath)
         },
       })
     },
