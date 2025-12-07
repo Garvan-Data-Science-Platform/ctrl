@@ -21,10 +21,13 @@ import {
 import type { AddDependentRequest, GetFamilyResponse } from 'common/types/api/families'
 import { FamilyMember } from 'common/types/api/users/getParticipantProfile'
 import { auditLog } from '../middlewares/AuditLog'
-import { ParticipantType } from '@prisma/client'
-import { createDefaultAnswers, recalculateAnswers } from '../utils/answers'
+import { ParticipantType, PrismaClient } from '@prisma/client'
+import { createDefaultAnswers } from '../utils/answers'
 import { genId, genIndId } from '../utils/genId'
 import { UnprocessableError } from '../middlewares/ErrorHandler'
+import actionWithEvent from '../../prisma/events/actionWithEvents'
+import actionWithEvents from '../../prisma/events/actionWithEvents'
+import { CtrlEvent } from '../../prisma/events/event.type'
 
 @Route('studies/{studyId}/families')
 @Tags('Families')
@@ -54,7 +57,7 @@ export class FamiliesController extends Controller {
         },
       },
       select: { firstName: true, lastName: true, id: true, participantType: true },
-      orderBy: { dob: 'asc' },
+      orderBy: { id: 'asc' },
     })) as FamilyMember[]
 
     const notInStudy = (await prisma.participantProfile.findMany({
@@ -68,7 +71,7 @@ export class FamiliesController extends Controller {
         },
       },
       select: { firstName: true, lastName: true, id: true, participantType: true },
-      orderBy: { dob: 'asc' },
+      orderBy: { id: 'asc' },
     })) as FamilyMember[]
 
     return {
@@ -131,23 +134,47 @@ export class FamiliesController extends Controller {
 
     const newId = lastFam.familyId + 1 //TODO: this is succeptable to race conditions right?
 
-    await prisma.participantProfile.update({
-      where: {
-        id: profileId,
-        studies: {
-          some: {
-            studyId: studyId,
+    const prevMembers = (
+      await prisma.participantProfile.findMany({ where: { familyId: oldId }, select: { id: true } })
+    ).map((v) => v.id)
+
+    await actionWithEvents(
+      'participantProfile',
+      'update',
+      {
+        where: {
+          id: profileId,
+          studies: {
+            some: {
+              studyId: studyId,
+            },
           },
         },
+        data: { familyId: newId },
       },
-      data: { familyId: newId },
-    })
+      [
+        {
+          eventType: 'family.updated',
+          payload: {
+            familyId: oldId,
+            payloadVersion: 1,
+            previousMemberProfileIds: prevMembers,
+            newMemberProfileIds: prevMembers.filter((val) => val != profileId),
+          },
+        },
+        {
+          eventType: 'family.created',
+          payload: {
+            familyId: newId,
+            payloadVersion: 1,
+            newMemberProfileIds: [profileId],
+          },
+        },
+      ],
+    )
 
     //Needed to reset the autoincrement
     await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"ParticipantProfile"', 'familyId'), coalesce(max("familyId")+1, 1), false) FROM "ParticipantProfile";`
-
-    //Recalculate answers for any dependents in the old family (if any)
-    await recalculateAnswers(oldId, studyId)
 
     return
   }
@@ -224,31 +251,49 @@ export class FamiliesController extends Controller {
 
     const oldId = profile.familyId
 
-    await prisma.participantProfile.update({
-      where: {
-        id: profileId,
-        studies: {
-          some: {
-            studyId: studyId,
+    const prevMembersOldFamily = (
+      await prisma.participantProfile.findMany({ where: { familyId: oldId }, select: { id: true } })
+    ).map((v) => v.id)
+
+    const prevMembersNewFamily = (
+      await prisma.participantProfile.findMany({ where: { familyId }, select: { id: true } })
+    ).map((v) => v.id)
+
+    await actionWithEvents(
+      'participantProfile',
+      'update',
+      {
+        where: {
+          id: profileId,
+          studies: {
+            some: {
+              studyId: studyId,
+            },
           },
         },
+        data: { familyId },
       },
-      data: { familyId },
-    })
-
-    const studies = await prisma.study.findMany({
-      where: {
-        profiles: {
-          some: { deleted: false, participantProfile: { familyId: { in: [familyId, oldId] } } },
+      [
+        {
+          eventType: 'family.updated',
+          payload: {
+            familyId: oldId,
+            payloadVersion: 1,
+            previousMemberProfileIds: prevMembersOldFamily,
+            newMemberProfileIds: prevMembersOldFamily.filter((val) => val != profileId),
+          },
         },
-      },
-    })
-
-    //Recalculate answers for any dependents in the new or old families
-    for (const study of studies) {
-      await recalculateAnswers(familyId, study.id)
-      await recalculateAnswers(oldId, study.id)
-    }
+        {
+          eventType: 'family.updated',
+          payload: {
+            familyId: familyId,
+            payloadVersion: 1,
+            previousMemberProfileIds: prevMembersNewFamily,
+            newMemberProfileIds: [profileId, ...prevMembersNewFamily],
+          },
+        },
+      ],
+    )
 
     return
   }
@@ -315,40 +360,59 @@ export class FamiliesController extends Controller {
       ? ParticipantType.DEPENDENT_OTHER
       : ParticipantType.DEPENDENT_AGE
 
-    const depProfile = await prisma.participantProfile.create({
-      data: {
-        ...existingProfile,
-        individualId: undefined,
-        userId: null, // Null userId for dependents
-        firstName: bodyRequest.firstName,
-        lastName: bodyRequest.lastName,
-        dob: bodyRequest.dob,
-        id: undefined,
-        participantType,
-        studies: {
-          create: {
-            study: {
-              connect: {
-                id: studyId,
+    await prisma.$transaction(async (tx) => {
+      const depProfile = await tx.participantProfile.create({
+        data: {
+          ...existingProfile,
+          individualId: undefined,
+          userId: null, // Null userId for dependents
+          firstName: bodyRequest.firstName,
+          lastName: bodyRequest.lastName,
+          dob: bodyRequest.dob,
+          id: undefined,
+          participantType,
+          studies: {
+            create: {
+              study: {
+                connect: {
+                  id: studyId,
+                },
               },
             },
           },
         },
-      },
+      })
+
+      await genIndId(depProfile.id, tx as PrismaClient)
+      await genId(studyId, depProfile.id, tx as PrismaClient)
+
+      await tx.surveyVersionAnswers.create({
+        data: {
+          profileId: depProfile.id,
+          versionId: currentSurvey.id,
+          answers: createDefaultAnswers(currentSurvey.data),
+        },
+      })
+
+      const prevMembers = (
+        await tx.participantProfile.findMany({
+          where: { familyId },
+          select: { id: true },
+        })
+      ).map((v) => v.id)
+
+      await tx.outbox.create({
+        data: {
+          eventType: 'family.updated',
+          payload: JSON.stringify({
+            familyId,
+            newMemberProfileIds: [depProfile.id, ...prevMembers],
+            previousMemberProfileIds: prevMembers,
+            payloadVersion: 1,
+          } as CtrlEvent['payload']),
+        },
+      })
     })
-
-    await genIndId(depProfile.id)
-    await genId(studyId, depProfile.id)
-
-    await prisma.surveyVersionAnswers.create({
-      data: {
-        profileId: depProfile.id,
-        versionId: currentSurvey.id,
-        answers: createDefaultAnswers(currentSurvey.data),
-      },
-    })
-
-    await recalculateAnswers(familyId, studyId)
 
     return
   }

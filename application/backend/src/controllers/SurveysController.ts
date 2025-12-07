@@ -33,11 +33,7 @@ import '../jsontypes'
 import { validateAnswers } from 'common/src/surveys/validateSurveyAnswers'
 import { populateSurveyStepAnswers } from 'common/src/surveys/populateSurveyStepAnswers'
 import { ValidateErrorResponse } from 'common/types/api/errors'
-import {
-  answersFromPreviousSurvey,
-  combineGuardianAnswers,
-  createDefaultAnswers,
-} from '../utils/answers'
+import { answersFromPreviousSurvey, createDefaultAnswers } from '../utils/answers'
 import { auditLog } from '../middlewares/AuditLog'
 
 @Route('studies/{studyId}')
@@ -392,6 +388,7 @@ export class SurveysController extends Controller {
     const surveySteps = survey.data
 
     const answers = participantAnswers.answers
+    const previousAnswers = { ...answers }
 
     const status =
       surveySteps[step].elements.filter((val) =>
@@ -408,106 +405,30 @@ export class SurveysController extends Controller {
     answers[step].answers = data
     answers[step].last_updated = new Date().toISOString()
 
-    await this.svaRepo.update({
-      where: {
-        id: participantAnswers.id,
+    await prisma.actionWithEvent(
+      'surveyVersionAnswers',
+      'update',
+      {
+        where: {
+          id: participantAnswers.id,
+        },
+        data: { answers, derived: null },
       },
-      data: { answers, derived: null },
-    })
-
-    //Also update any dependents
-    if (profile.participantType == 'GUARDIAN') {
-      const dependents = await this.profileRepo.findMany({
-        where: {
-          familyId: profile.familyId,
-          studies: {
-            some: {
-              studyId,
-            },
-          },
-          OR: [{ participantType: 'DEPENDENT_AGE' }, { participantType: 'DEPENDENT_OTHER' }],
-        },
-      })
-
-      const coGuardians = await this.profileRepo.findMany({
-        where: {
-          NOT: { id: profile.id },
-          familyId: profile.familyId,
-          participantType: 'GUARDIAN',
-          studies: {
-            some: {
-              studyId,
-            },
+      [
+        {
+          eventType: 'answers.updated',
+          payload: {
+            payloadVersion: 1,
+            userId: request.user.userId,
+            studyId,
+            step,
+            previousAnswers,
+            newAnswers: answers,
+            surveyVersionNumber: survey.versionNumber,
           },
         },
-      })
-
-      if (coGuardians) {
-        const coGuardianSPPromises = coGuardians.map(
-          async (val) =>
-            await this.svaRepo.findFirstOrThrow({
-              where: {
-                profileId: val.id,
-                versionId: participantAnswers.versionId,
-                version: {
-                  studyId: studyId,
-                },
-              },
-            }),
-        )
-        const coGuardianSP_ls = await Promise.all(coGuardianSPPromises)
-
-        //const coGuardianAnswers = coGuardianSP.answers
-        answers[step].answers = combineGuardianAnswers([
-          answers[step].answers,
-          ...coGuardianSP_ls.map((val) => val.answers[step].answers),
-        ])
-      }
-
-      for (const dep of dependents) {
-        const sva = await this.svaRepo.findFirstOrThrow({
-          where: {
-            profileId: dep.id,
-            versionId: participantAnswers.versionId,
-            version: {
-              studyId: studyId,
-            },
-          },
-        })
-
-        const derived = [profile, ...coGuardians]
-          .map((val) => `${val.firstName} ${val.lastName}`)
-          .join(',')
-
-        await this.svaRepo.update({
-          where: {
-            id: sva.id,
-            version: {
-              studyId: studyId,
-            },
-          },
-          data: {
-            answers,
-            derived,
-          },
-        })
-
-        await prisma.auditLog.create({
-          data: {
-            resource: 'SurveyVersionAnswers',
-            operation: 'UPDATE',
-            meta: {
-              reource: 'SurveyVersionAnswers',
-              id: sva.id,
-              message: 'Recalculated answers of dependent based on guardians answers',
-              derivedFrom: derived,
-              previousAnswers: sva.answers,
-              newAnsers: answers,
-            },
-          },
-        })
-      }
-    }
+      ],
+    )
   }
 
   /**

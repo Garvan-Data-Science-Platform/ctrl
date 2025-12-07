@@ -230,3 +230,12 @@ model OTPToken {
   code      String
   expiresAt DateTime
 }
+
+model Outbox {
+  id         Int      @id @default(autoincrement())
+  eventType  String
+  payload    String? /// @encrypted
+  processed  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  processedAt DateTime?
+}

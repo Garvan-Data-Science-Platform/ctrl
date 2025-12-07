@@ -1,10 +1,14 @@
+import { PrismaClient } from '@prisma/client'
 import prisma from '../PrismaClient'
 
 import { createHmac } from 'crypto'
 
 //Generates a unique ID for a study participant
-export const genId = async (studyId: number, profileId: number) => {
-  const last = await prisma.studyParticipant.findFirst({
+export const genId = async (studyId: number, profileId: number, tx?: PrismaClient) => {
+  if (!tx) {
+    tx = prisma
+  }
+  const last = await tx.studyParticipant.findFirst({
     where: { studyId },
     orderBy: { participantNumber: 'desc' },
   })
@@ -28,13 +32,13 @@ export const genId = async (studyId: number, profileId: number) => {
 
   const PID = `PID-${studyCode}-${participantCode}`
 
-  await prisma.studyParticipant.update({
+  await tx.studyParticipant.update({
     where: { participantProfileId_studyId: { studyId, participantProfileId: profileId } },
     data: { participantNumber: num, participantId: PID },
   })
 }
 
-export const genIndId = async (profileId: number) => {
+export const genIndId = async (profileId: number, tx?: PrismaClient) => {
   const participantCode = profileId.toString(16).padStart(5, '0').toUpperCase()
   const hostname = process.env.HOSTNAME!
   const instanceString = createHmac('sha256', 'key')
@@ -44,5 +48,8 @@ export const genIndId = async (profileId: number) => {
     .toUpperCase()
     .slice(0, 3)
   const ID = `IND-${instanceString}-${participantCode}`
-  await prisma.participantProfile.update({ where: { id: profileId }, data: { individualId: ID } })
+  if (!tx) {
+    tx = prisma
+  }
+  await tx.participantProfile.update({ where: { id: profileId }, data: { individualId: ID } })
 }

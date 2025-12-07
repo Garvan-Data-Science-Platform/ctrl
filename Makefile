@@ -41,6 +41,7 @@ check:
 db: 
 	NODE_VERSION=$(NODE_VERSION) docker compose up -d db
 	NODE_VERSION=$(NODE_VERSION) docker compose up -d admin
+	NODE_VERSION=$(NODE_VERSION) docker compose up -d redis
 
 db-down:
 	NODE_VERSION=$(NODE_VERSION) docker compose down

@@ -1,7 +1,8 @@
 {
   "name": "backend",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "LOG_LEVEL=error tsx watch src/index.ts & tsx watch events/worker.ts",
+    "worker": "tsx watch events/worker.ts",
     "build": "yarn prisma generate && esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --external:express --external:cors",
     "start": "node dist/index.js",
     "type-check": "tsc -b",
@@ -31,6 +32,7 @@
     "dotenv-cli": "^8.0.0",
     "express": "^5.1.0",
     "fast-csv": "^5.0.2",
+    "ioredis": "^5.8.2",
     "json5": "^2.2.3",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
