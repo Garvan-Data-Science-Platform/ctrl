@@ -29,6 +29,7 @@ import type {
 import { SurveyVersion as SurveyVersionPrisma } from '@prisma/client'
 import { SurveyStep } from 'common/types/survey'
 import prisma from '../PrismaClient'
+import actionWithEvents from '../../prisma/events/actionWithEvents'
 import '../jsontypes'
 import { validateAnswers } from 'common/src/surveys/validateSurveyAnswers'
 import { populateSurveyStepAnswers } from 'common/src/surveys/populateSurveyStepAnswers'
@@ -405,15 +406,13 @@ export class SurveysController extends Controller {
     answers[step].answers = data
     answers[step].last_updated = new Date().toISOString()
 
-    await prisma.actionWithEvent(
-      'surveyVersionAnswers',
-      'update',
-      {
+    await actionWithEvents(
+      prisma.surveyVersionAnswers.update({
         where: {
           id: participantAnswers.id,
         },
         data: { answers, derived: null },
-      },
+      }),
       [
         {
           eventType: 'answers.updated',

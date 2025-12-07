@@ -25,7 +25,6 @@ import { ParticipantType, PrismaClient } from '@prisma/client'
 import { createDefaultAnswers } from '../utils/answers'
 import { genId, genIndId } from '../utils/genId'
 import { UnprocessableError } from '../middlewares/ErrorHandler'
-import actionWithEvent from '../../prisma/events/actionWithEvents'
 import actionWithEvents from '../../prisma/events/actionWithEvents'
 import { CtrlEvent } from '../../prisma/events/event.type'
 
@@ -139,9 +138,7 @@ export class FamiliesController extends Controller {
     ).map((v) => v.id)
 
     await actionWithEvents(
-      'participantProfile',
-      'update',
-      {
+      prisma.participantProfile.update({
         where: {
           id: profileId,
           studies: {
@@ -151,7 +148,7 @@ export class FamiliesController extends Controller {
           },
         },
         data: { familyId: newId },
-      },
+      }),
       [
         {
           eventType: 'family.updated',
@@ -260,9 +257,7 @@ export class FamiliesController extends Controller {
     ).map((v) => v.id)
 
     await actionWithEvents(
-      'participantProfile',
-      'update',
-      {
+      prisma.participantProfile.update({
         where: {
           id: profileId,
           studies: {
@@ -272,7 +267,7 @@ export class FamiliesController extends Controller {
           },
         },
         data: { familyId },
-      },
+      }),
       [
         {
           eventType: 'family.updated',

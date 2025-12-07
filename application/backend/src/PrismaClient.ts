@@ -1,13 +1,8 @@
 import './jsontypes'
 import { PrismaClient } from '@prisma/client'
 import { fieldEncryptionExtension } from 'prisma-field-encryption'
-import actionWithEvent from '../prisma/events/actionWithEvents'
 
-interface ExtendedPrismaClient extends PrismaClient {
-  actionWithEvent: typeof actionWithEvent
-}
-
-const baseClient = new PrismaClient() as ExtendedPrismaClient
+const baseClient = new PrismaClient()
 
 /***********************************/
 /* SOFT DELETE MIDDLEWARE */
@@ -84,8 +79,6 @@ baseClient.$use(async (params, next) => {
   return next(params)
 })
 
-const prisma = baseClient.$extends(fieldEncryptionExtension()) as ExtendedPrismaClient
-
-prisma['actionWithEvent'] = actionWithEvent
+const prisma = baseClient.$extends(fieldEncryptionExtension())
 
 export default prisma
