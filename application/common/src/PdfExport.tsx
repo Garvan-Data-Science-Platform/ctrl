@@ -116,8 +116,9 @@ const FormatResponseElement = (element: SurveyElement, mode: 'responses' | 'opti
   } else if (element.type === 'video') {
     return (
       <View style={styles.tableRow} wrap={false}>
-        <Text>
+        <Text style={styles.tableQuestionCell}>
           <Link href={element.data.link.replace('embed', 'watch')}>Video content</Link>
+          <Text>{mode == 'options' && `\n\n${element.data.link}`}</Text>
         </Text>
       </View>
     )
