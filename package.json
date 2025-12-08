@@ -29,9 +29,8 @@
   },
   "resolutions": {
     "cross-spawn": "^7.0.5",
-    "glob": "^10.5.0",
-    "jws": "^3.2.3",
-    "validator": "^13.15.22"
+    "validator": "^13.15.22",
+    "jws": "^3.2.3"
   },
   "dependencies": {
     "@react-pdf/renderer": "^4.2.2"
