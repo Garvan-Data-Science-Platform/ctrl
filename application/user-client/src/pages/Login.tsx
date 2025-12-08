@@ -98,7 +98,7 @@ export default function Login() {
                   alt="logo"
                 />
               </Box>
-              {oidcProviders && (
+              {oidcProviders.length > 0 && (
                 <>
                   <Typography>Continue with:</Typography>
                   <Stack gap={1}>

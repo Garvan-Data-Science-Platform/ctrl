@@ -1,6 +1,6 @@
 {
   oidc: [
-    {
+    /*{
       name: '',
       providerUrl: '',
       icon: '',
@@ -8,7 +8,7 @@
       clientSecret: '',
       displayInAdminPortal: true,
       displayInUserPortal: true
-    },
+    },*/
   ],
   disablePasswordLogin: true,
   otp: false,

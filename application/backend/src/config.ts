@@ -18,12 +18,14 @@ const schema = {
           },
           providerUrl: {
             type: 'string',
+            minLength: 1,
           },
           clientId: {
             type: 'string',
+            minLength: 1,
           },
-          clientSecret: { type: 'string' },
-          icon: { type: 'string' },
+          clientSecret: { type: 'string', minLength: 1 },
+          icon: { type: 'string', minLength: 1 },
           displayInAdminPortal: { type: 'boolean', default: true },
           displayInUserPortal: { type: 'boolean', default: true },
         },
@@ -55,7 +57,7 @@ const ajv = new Ajv({ useDefaults: true })
 const validate = ajv.compile(schema)
 
 if (!validate(config)) {
-  throw new Error('Invalid config')
+  throw new Error(`Invalid config ${JSON.stringify(validate.errors)}`)
 }
 
 if (process.env.NODE_ENV !== 'production') {
