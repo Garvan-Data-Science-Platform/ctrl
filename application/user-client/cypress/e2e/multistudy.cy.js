@@ -46,7 +46,7 @@ describe('multistudy', () => {
 
   it('Can accept an invite to a new study', () => {
     cy.login(UserType.PARTICIPANT_UNANSWERED)
-    cy.task('createInvite', { email: 'test2@example.com', studyId: 2 })
+    cy.task('createInvite', { email: 'test2@example.com', studyId: 2, prefill: {} })
     cy.visit('/')
     cy.get('[data-cy="step-card-0"]').should('exist')
     cy.get('[data-cy="accept-invite"]').should('exist').click()
@@ -60,7 +60,7 @@ describe('multistudy', () => {
 
   it('Can no longer access study if removed from it', () => {
     cy.login(UserType.PARTICIPANT_UNANSWERED)
-    cy.task('createInvite', { email: 'test2@example.com', studyId: 2 })
+    cy.task('createInvite', { email: 'test2@example.com', studyId: 2, prefill: {} })
     cy.visit('/')
     cy.get('[data-cy="step-card-0"]').should('exist')
     cy.get('[data-cy="accept-invite"]').should('exist').click()

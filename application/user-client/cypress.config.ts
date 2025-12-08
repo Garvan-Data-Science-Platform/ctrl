@@ -61,8 +61,8 @@ export default defineConfig({
         getInviteIdtask({ email, studyId }) {
           return getInviteId(email, studyId)
         },
-        createInvite({ email, studyId }) {
-          return inviteUser(email, studyId)
+        createInvite({ email, studyId, prefill }) {
+          return inviteUser(email, studyId, prefill)
         },
         removeUserFromStudy({ email, studyId }) {
           return removeUserFromStudy(email, studyId)
