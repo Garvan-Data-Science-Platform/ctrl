@@ -10,17 +10,17 @@ export class RecalcConsumer extends Consumer {
     console.log('Recalc worker processing event', event)
 
     switch (event.eventType) {
-      case 'answers.updated':
+      case 'answers.updated': {
         const { userId, studyId } = event.payload
         const profile = await prisma.participantProfile.findFirstOrThrow({ where: { userId } })
         if (profile.participantType == 'GUARDIAN') {
           console.log('Guardian answers updated, calculating dependant answers')
           await recalculateAnswers(profile.familyId, studyId)
         }
-
         break
+      }
 
-      case 'family.updated':
+      case 'family.updated': {
         console.log('Family updated, recalculating dependant answers')
         const studies = await prisma.study.findMany({
           where: {
@@ -35,11 +35,12 @@ export class RecalcConsumer extends Consumer {
         }
 
         break
+      }
 
-      case 'profile.updated':
+      case 'profile.updated': {
         if (event.payload.fields.participantType) {
           console.log('ParticipantType updated, recalculating dependant answers')
-          const updatedProfile = await prisma.participantProfile.findFirstOrThrow({
+          const profile = await prisma.participantProfile.findFirstOrThrow({
             where: { id: event.payload.profileId },
           })
           const updatedStudies = await prisma.study.findMany({
@@ -47,7 +48,7 @@ export class RecalcConsumer extends Consumer {
               profiles: {
                 some: {
                   participantProfile: {
-                    familyId: updatedProfile.familyId,
+                    familyId: profile.familyId,
                   },
                 },
               },
@@ -61,29 +62,32 @@ export class RecalcConsumer extends Consumer {
           if (updatedStudies.length === 0) return
 
           for (const study of updatedStudies) {
-            await recalculateAnswers(updatedProfile.familyId, study.id)
+            await recalculateAnswers(profile.familyId, study.id)
           }
         }
 
         break
+      }
 
-      case 'study.participant.removed':
-        const removedProfile = await prisma.participantProfile.findFirstOrThrow({
+      case 'study.participant.removed': {
+        const profile = await prisma.participantProfile.findFirstOrThrow({
           where: { id: event.payload.profileId },
           select: { familyId: true },
         })
-        await recalculateAnswers(removedProfile.familyId, event.payload.studyId)
+        await recalculateAnswers(profile.familyId, event.payload.studyId)
 
         break
+      }
 
-      case 'study.participant.added':
-        const addedProfile = await prisma.participantProfile.findFirstOrThrow({
+      case 'study.participant.added': {
+        const profile = await prisma.participantProfile.findFirstOrThrow({
           where: { id: event.payload.profileId },
           select: { familyId: true },
         })
-        await recalculateAnswers(addedProfile.familyId, event.payload.studyId)
+        await recalculateAnswers(profile.familyId, event.payload.studyId)
 
         break
+      }
       default:
         break
     }

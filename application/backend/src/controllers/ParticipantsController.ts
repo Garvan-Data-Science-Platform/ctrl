@@ -41,12 +41,7 @@ import nodemailer from 'nodemailer'
 import { generateInviteEmail } from 'common/src/generateInviteTemplate'
 import { InviteStatus } from 'common/types/api/participants/invite'
 import { BadGatewayError, NotFoundError, UnprocessableError } from '../middlewares/ErrorHandler'
-import {
-  createDefaultAnswers,
-  determineLastUpdated,
-  determineStatus,
-  recalculateAnswers,
-} from '../utils/answers'
+import { createDefaultAnswers, determineLastUpdated, determineStatus } from '../utils/answers'
 import { ProfilesController } from './ProfilesController'
 import { auditLog } from '../middlewares/AuditLog'
 import { Role } from '@prisma/client'

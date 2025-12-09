@@ -1,44 +1,25 @@
-import request from 'supertest'
 import {
   DEPENDENT_ID,
-  ORG_ADMIN_ID,
   PARTICIPANT_COMPLETED_ID,
   PARTICIPANT_UNANSWERED_ID,
   SECOND_GUARDIAN_ID,
 } from 'common/testing/seed'
-import { Api } from '../../src/Api'
 import { resetDB } from 'common/testing/TestHelpers'
 import prisma from '../../src/PrismaClient'
-import { generateToken } from '../../src/authentication'
 import { RecalcConsumer } from './RecalcConsumer'
 import { CtrlEvent } from '../../prisma/events/event.type'
 import { FamiliesController } from '../../src/controllers/FamiliesController'
 import { ProfilesController } from '../../src/controllers/ProfilesController'
 import { ParticipantType } from 'common/types/api/users/ParticipantProfile'
 import { ParticipantsController } from '../../src/controllers/ParticipantsController'
-const api = new Api()
-const app = api.app
+import { SurveysController } from '../../src/controllers/SurveysController'
 const studyId = 1
 
 const recalcConsumer = new RecalcConsumer()
 
 describe('FamiliesController', () => {
-  let registeredUserToken: string
-
-  beforeAll(async () => {
-    registeredUserToken = await generateToken({
-      userId: ORG_ADMIN_ID,
-      roles: ['OrganisationAdmin'],
-    })
-    api.run()
-  })
-
   beforeEach(async () => {
     await resetDB()
-  })
-
-  afterAll(async () => {
-    api.stop()
   })
 
   async function processAllEvents() {
@@ -123,7 +104,7 @@ describe('FamiliesController', () => {
 
     await processAllEvents()
 
-    let depSP = await prisma.surveyVersionAnswers.findFirstOrThrow({
+    const depSP = await prisma.surveyVersionAnswers.findFirstOrThrow({
       where: { profileId: DEPENDENT_ID },
       orderBy: { versionId: 'desc' },
     })
@@ -136,7 +117,7 @@ describe('FamiliesController', () => {
 
     await processAllEvents()
 
-    let depSP2 = await prisma.surveyVersionAnswers.findFirstOrThrow({
+    const depSP2 = await prisma.surveyVersionAnswers.findFirstOrThrow({
       where: { profileId: DEPENDENT_ID },
       orderBy: { versionId: 'desc' },
     })
@@ -145,7 +126,7 @@ describe('FamiliesController', () => {
   })
 
   it('Recalculate on removing as study participant', async () => {
-    let depSP = await prisma.surveyVersionAnswers.findFirstOrThrow({
+    const depSP = await prisma.surveyVersionAnswers.findFirstOrThrow({
       where: { profileId: DEPENDENT_ID },
       orderBy: { versionId: 'desc' },
     })
@@ -155,7 +136,7 @@ describe('FamiliesController', () => {
 
     await processAllEvents()
 
-    let depSP2 = await prisma.surveyVersionAnswers.findFirstOrThrow({
+    const depSP2 = await prisma.surveyVersionAnswers.findFirstOrThrow({
       where: { profileId: DEPENDENT_ID },
       orderBy: { versionId: 'desc' },
     })
@@ -166,14 +147,14 @@ describe('FamiliesController', () => {
   it('Recalculate on adding as study participant', async () => {
     await new ParticipantsController().deleteParticipantById(studyId, PARTICIPANT_COMPLETED_ID)
     await processAllEvents()
-    let depSP = await prisma.surveyVersionAnswers.findFirstOrThrow({
+    const depSP = await prisma.surveyVersionAnswers.findFirstOrThrow({
       where: { profileId: DEPENDENT_ID },
       orderBy: { versionId: 'desc' },
     })
     expect(depSP.answers[1].answers).toEqual([null, null])
     await new ParticipantsController().addParticipantById(studyId, PARTICIPANT_COMPLETED_ID)
     await processAllEvents()
-    let depSP2 = await prisma.surveyVersionAnswers.findFirstOrThrow({
+    const depSP2 = await prisma.surveyVersionAnswers.findFirstOrThrow({
       where: { profileId: DEPENDENT_ID },
       orderBy: { versionId: 'desc' },
     })
@@ -181,5 +162,25 @@ describe('FamiliesController', () => {
     expect(depSP2.answers[1].answers).toEqual([false, 'Choice 2'])
   })
 
-  it('Recalculate on guardian submitting answers', () => {})
+  it('Recalculate on guardian submitting answers', async () => {
+    const depSP = await prisma.surveyVersionAnswers.findFirstOrThrow({
+      where: { profileId: DEPENDENT_ID },
+      orderBy: { versionId: 'desc' },
+    })
+    expect(depSP.answers[1].answers).toEqual([null, null])
+
+    await new SurveysController().updateSurveyAnswers(
+      { user: { userId: PARTICIPANT_COMPLETED_ID } },
+      studyId,
+      { step: 1, data: [true, 'Choice 2'] },
+    )
+
+    await processAllEvents()
+
+    const depSP2 = await prisma.surveyVersionAnswers.findFirstOrThrow({
+      where: { profileId: DEPENDENT_ID },
+      orderBy: { versionId: 'desc' },
+    })
+    expect(depSP2.answers[1].answers).toEqual([true, 'Choice 2'])
+  })
 })

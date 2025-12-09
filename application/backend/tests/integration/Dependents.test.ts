@@ -10,6 +10,8 @@ import {
   StateTerritory,
 } from 'common/types/api/users/ParticipantProfile'
 
+import { processEvents } from './processEvents'
+
 import prisma from '../../src/PrismaClient'
 
 const api = new Api()
@@ -94,6 +96,8 @@ describe('Survey tests', () => {
 
     expect(res.statusCode).toBe(204)
 
+    await processEvents()
+
     expect(
       (
         await prisma.surveyVersionAnswers.findFirstOrThrow({
@@ -121,6 +125,8 @@ describe('Survey tests', () => {
       .post('/studies/1/survey-answers')
       .set({ authorization: `Bearer ${p2Token}` })
       .send(reqBody)
+
+    await processEvents()
 
     expect(res.statusCode).toBe(204)
 
@@ -164,6 +170,8 @@ describe('Survey tests', () => {
         permanent: true,
       })
 
+    await processEvents()
+
     const prof = await prisma.participantProfile.findFirstOrThrow({
       where: { firstName: 'New', lastName: 'Dependent' },
     })
@@ -186,6 +194,8 @@ describe('Survey tests', () => {
         permanent: true,
       })
 
+    await processEvents()
+
     const prof = await prisma.participantProfile.findFirstOrThrow({
       where: { firstName: 'New', lastName: 'Dependent2' },
     })
@@ -199,6 +209,8 @@ describe('Survey tests', () => {
     await request(app)
       .post(`/studies/1/families/2/add/${prof.id}`)
       .set({ Authorization: `Bearer ${adminToken}` })
+
+    await processEvents()
 
     part = await prisma.surveyVersionAnswers.findFirstOrThrow({
       where: { profileId: prof.id },
@@ -215,6 +227,8 @@ describe('Survey tests', () => {
       .patch(`/profiles/${parentProfile.id}`)
       .send({ participantType: ParticipantType.STANDARD })
       .set({ Authorization: `Bearer ${adminToken}` })
+
+    await processEvents()
 
     expect(res.status).toBe(204)
 
@@ -234,6 +248,8 @@ describe('Survey tests', () => {
       .send({ participantType: ParticipantType.GUARDIAN })
       .set({ Authorization: `Bearer ${adminToken}` })
 
+    await processEvents()
+
     part = await prisma.surveyVersionAnswers.findFirstOrThrow({
       where: { profileId: depProfile.id },
     })
@@ -249,6 +265,8 @@ describe('Survey tests', () => {
     await request(app)
       .post(`/studies/1/families/remove/${parentProfile.id}`)
       .set({ Authorization: `Bearer ${adminToken}` })
+
+    await processEvents()
 
     const depProfile = await prisma.participantProfile.findFirstOrThrow({
       where: { firstName: 'New', lastName: 'Dependent2' },

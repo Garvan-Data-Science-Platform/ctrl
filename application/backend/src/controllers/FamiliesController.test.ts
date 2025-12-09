@@ -2,12 +2,7 @@ import request from 'supertest'
 import { generateToken } from '../authentication'
 import { Api } from '../Api'
 import { resetDB } from 'common/testing/TestHelpers'
-import {
-  DEPENDENT_ID,
-  ORG_ADMIN_ID,
-  PARTICIPANT_UNANSWERED_ID,
-  SECOND_GUARDIAN_ID,
-} from 'common/testing/seed'
+import { ORG_ADMIN_ID, PARTICIPANT_UNANSWERED_ID, SECOND_GUARDIAN_ID } from 'common/testing/seed'
 import prisma from '../PrismaClient'
 import { GetFamilyResponse } from 'common/types/api/families'
 

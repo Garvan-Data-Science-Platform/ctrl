@@ -10,6 +10,7 @@ export class Consumer {
   }
 
   async consumeLoop(redis: Redis, streamKey: string) {
+    // eslint-disable-next-line
     while (true) {
       try {
         // prettier-ignore
@@ -23,6 +24,7 @@ export class Consumer {
         if (!res) continue
 
         for (const streamEntry of res) {
+          // eslint-disable-next-line
           const [_streamName, messages] = streamEntry as any
           for (const message of messages) {
             const [messageId, fieldsArray] = message
