@@ -15,7 +15,7 @@ export class RecalcConsumer extends Consumer {
         const profile = await prisma.participantProfile.findFirstOrThrow({ where: { userId } })
         if (profile.participantType == 'GUARDIAN') {
           console.log('Guardian answers updated, calculating dependant answers')
-          recalculateAnswers(profile.familyId, studyId)
+          await recalculateAnswers(profile.familyId, studyId)
         }
 
         break
@@ -31,7 +31,7 @@ export class RecalcConsumer extends Consumer {
         })
 
         for (const study of studies) {
-          recalculateAnswers(event.payload.familyId, study.id)
+          await recalculateAnswers(event.payload.familyId, study.id)
         }
 
         break
@@ -64,6 +64,24 @@ export class RecalcConsumer extends Consumer {
             await recalculateAnswers(updatedProfile.familyId, study.id)
           }
         }
+
+        break
+
+      case 'study.participant.removed':
+        const removedProfile = await prisma.participantProfile.findFirstOrThrow({
+          where: { id: event.payload.profileId },
+          select: { familyId: true },
+        })
+        await recalculateAnswers(removedProfile.familyId, event.payload.studyId)
+
+        break
+
+      case 'study.participant.added':
+        const addedProfile = await prisma.participantProfile.findFirstOrThrow({
+          where: { id: event.payload.profileId },
+          select: { familyId: true },
+        })
+        await recalculateAnswers(addedProfile.familyId, event.payload.studyId)
 
         break
       default:

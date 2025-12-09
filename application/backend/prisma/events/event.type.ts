@@ -59,9 +59,29 @@ interface UserUpdateEvent {
   }
 }
 
+interface AddProfileToStudyEvent {
+  eventType: 'study.participant.added'
+  payload: {
+    payloadVersion: 1
+    profileId: number
+    studyId: number
+  }
+}
+
+interface RemoveProfileFromStudyEvent {
+  eventType: 'study.participant.removed'
+  payload: {
+    payloadVersion: 1
+    profileId: number
+    studyId: number
+  }
+}
+
 export type CtrlEvent =
   | AnswersUpdatedEvent
   | FamilyUpdatedEvent
   | FamilyCreatedEvent
   | ProfileUpdateEvent
   | UserUpdateEvent
+  | AddProfileToStudyEvent
+  | RemoveProfileFromStudyEvent

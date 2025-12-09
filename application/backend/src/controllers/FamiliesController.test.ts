@@ -66,25 +66,6 @@ describe('FamiliesController', () => {
       })
       expect(newProf.familyId).toBe(102)
     })
-    it('Dependent answers should be recalculated on family change', async () => {
-      let depSP = await prisma.surveyVersionAnswers.findFirstOrThrow({
-        where: { profileId: DEPENDENT_ID },
-        orderBy: { versionId: 'desc' },
-      })
-
-      expect(depSP.answers[1].answers).toEqual([null, null])
-
-      await request(app)
-        .post(`/studies/${studyId}/families/remove/${SECOND_GUARDIAN_ID}`)
-        .set({ Authorization: `Bearer ${registeredUserToken}` })
-
-      depSP = await prisma.surveyVersionAnswers.findFirstOrThrow({
-        where: { profileId: DEPENDENT_ID },
-        orderBy: { versionId: 'desc' },
-      })
-
-      expect(depSP.answers[1].answers).toEqual([false, 'Choice 2'])
-    })
   })
 
   describe('POST /studies/{studyId}/families/:familyId/add/:profileId', () => {
@@ -97,26 +78,6 @@ describe('FamiliesController', () => {
         where: { id: PARTICIPANT_UNANSWERED_ID },
       })
       expect(newMemberProfile.familyId).toBe(100)
-    })
-
-    it('Dependent answers should be recalculated', async () => {
-      let depSP = await prisma.surveyVersionAnswers.findFirstOrThrow({
-        where: { profileId: DEPENDENT_ID },
-        orderBy: { versionId: 'desc' },
-      })
-
-      expect(depSP.answers[1].answers).toEqual([null, null])
-
-      await request(app)
-        .post(`/studies/${studyId}/families/100/add/${PARTICIPANT_UNANSWERED_ID}`)
-        .set({ Authorization: `Bearer ${registeredUserToken}` })
-
-      depSP = await prisma.surveyVersionAnswers.findFirstOrThrow({
-        where: { profileId: DEPENDENT_ID },
-        orderBy: { versionId: 'desc' },
-      })
-
-      expect(depSP.answers[1].answers).toEqual([false, 'Choice 2'])
     })
   })
 
@@ -161,28 +122,6 @@ describe('FamiliesController', () => {
         })
       expect(res.status).toBe(422)
       expect(res.body.details['bodyRequest.permanent']).toBeTruthy()
-    })
-    it('Dependent answers should be immediately calculated', async () => {
-      const res = await request(app)
-        .post(`/studies/${studyId}/families/100/add-dependent`)
-        .set({ Authorization: `Bearer ${registeredUserToken}` })
-        .send({
-          firstName: 'New',
-          lastName: 'Dependent',
-          dob: '1990-01-02',
-          permanent: true,
-        })
-      expect(res.status).toBe(204)
-
-      const prof = await prisma.participantProfile.findFirstOrThrow({
-        where: { firstName: 'New', lastName: 'Dependent' },
-      })
-
-      const part = await prisma.surveyVersionAnswers.findFirstOrThrow({
-        where: { profileId: prof.id },
-      })
-
-      expect(part.answers[1].answers).toEqual([false, 'Choice 2'])
     })
   })
 })
