@@ -68,9 +68,7 @@ export const authProvider: AuthProvider = {
     }
   },
   logout: async () => {
-    localStorage.removeItem(TOKEN_KEY)
-    localStorage.removeItem(ID_KEY)
-    localStorage.removeItem(ROLE_KEY)
+    localStorage.clear()
     return {
       success: true,
       redirectTo: '/login',
