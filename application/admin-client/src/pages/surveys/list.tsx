@@ -24,12 +24,17 @@ export const SurveyList = () => {
       await axiosInstance.get(`/studies/${studies[activeStudyIndex].id}/surveys/${versionNumber}`)
     ).data as GetSurveyVersionByVersionNumberResponse
 
+    const orgLogoUrl = `${import.meta.env.VITE_BACKEND_URL}/settings/logo`
+    const studyLogoUrl = `${import.meta.env.VITE_BACKEND_URL}/studies/${studies[activeStudyIndex].id}/logo`
+
     // Generate PDF with the data
     const pdfDoc = (
       <SurveyPdf
         studyName={studies[activeStudyIndex].name}
         steps={surveyData.data.data}
         versionNumber={versionNumber}
+        orgLogo={orgLogoUrl}
+        studyLogo={studyLogoUrl}
       />
     )
 

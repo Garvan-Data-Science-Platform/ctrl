@@ -98,6 +98,9 @@ export default function Dashboard() {
             .then((res) => res.data) as Promise<GetResponsesByIdResponse>,
       })
 
+      const orgLogoUrl = `${import.meta.env.VITE_BACKEND_URL}/settings/logo`
+      const studyLogoUrl = `${import.meta.env.VITE_BACKEND_URL}/studies/${studyId}/logo`
+
       // Generate PDF with the data
       const pdfDoc = (
         <ResponsesPdf
@@ -105,6 +108,8 @@ export default function Dashboard() {
           profile={profileData}
           steps={responseData.data.steps}
           responses={responseData}
+          orgLogo={orgLogoUrl}
+          studyLogo={studyLogoUrl}
         />
       )
 
