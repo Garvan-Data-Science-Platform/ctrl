@@ -86,8 +86,8 @@ spec:
       
       volumes:
       - name: config
-        configMap:
-          name: ctrl-config
+        secret:
+          secretName: ctrl-config
           items:
           - key: "valuesconfig.json5"
             path: "values.json5"
