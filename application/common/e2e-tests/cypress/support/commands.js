@@ -82,9 +82,9 @@ Cypress.Commands.add('fillRegistrationForm', (data = {}) => {
   const formData = { ...defaults, ...data }
 
   cy.wait(500) // Wait for form to be fully loaded
-  cy.get('[data-cy="reg-first"]').clear().type(formData.firstName)
-  cy.get('[data-cy="reg-last"]').clear().type(formData.lastName)
-  cy.get('[data-cy="reg-email"]').clear().type(formData.email)
+  cy.get('[data-cy="reg-first"]').type(formData.firstName)
+  cy.get('[data-cy="reg-last"]').type(formData.lastName)
+  cy.get('[data-cy="reg-email"]').type(formData.email)
   cy.get('[data-cy="reg-password"]').type(formData.password)
   cy.get('[data-cy="reg-confirm-password"]').type(formData.password)
   cy.get('[data-cy="reg-dob"]').type(formData.dob)

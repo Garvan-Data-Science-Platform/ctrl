@@ -164,3 +164,13 @@ export async function removeUserFromStudy(email: string, studyId: number) {
   })
   return null
 }
+
+export async function expireInvite(inviteId: string) {
+  await prisma.invite.update({ where: { id: inviteId }, data: { status: 'EXPIRED' } })
+  return null
+}
+
+export async function revokeInvite(inviteId: string) {
+  await prisma.invite.update({ where: { id: inviteId }, data: { status: 'REVOKED' } })
+  return null
+}

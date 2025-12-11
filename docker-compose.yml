@@ -27,17 +27,34 @@ services:
       retries: 60
     command: ['postgres', '-c', 'log_statement=all', '-p', '5433']
 
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+    healthcheck:
+      test: ['CMD', 'wget', '--spider', '-q', 'http://localhost:8025']
+      interval: 2s
+      timeout: 2s
+      retries: 10
+
   backend-test:
     depends_on:
       db-test:
         condition: service_healthy
         restart: true
+      mailhog:
+        condition: service_healthy
     build:
       dockerfile: ./application/backend/Dockerfile
       args:
         NODE_VERSION: ${NODE_VERSION}
     env_file:
       - ./application/backend/.env.dockertest
+    environment:
+      - NODE_ENV=${E2E_NODE_ENV:-test}
+    volumes:
+      - ./application/common/e2e-tests/config.e2e.json5:/app/config/config.json5
     healthcheck:
       test: wget --no-verbose --tries=1 --spider http://localhost:5001/
       interval: 5s
