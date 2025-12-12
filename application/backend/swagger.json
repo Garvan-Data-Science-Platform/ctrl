@@ -1063,14 +1063,6 @@
             "type": "string",
             "nullable": true
           },
-          "redcapURL": {
-            "type": "string",
-            "nullable": true
-          },
-          "redcapToken": {
-            "type": "string",
-            "nullable": true
-          },
           "inviteEmailSubject": {
             "type": "string"
           },
@@ -1083,8 +1075,6 @@
           "id",
           "deleted",
           "description",
-          "redcapURL",
-          "redcapToken",
           "inviteEmailSubject",
           "inviteEmailText"
         ],
@@ -1134,14 +1124,6 @@
           "inviteEmailSubject": {
             "type": "string"
           },
-          "redcapToken": {
-            "type": "string",
-            "nullable": true
-          },
-          "redcapURL": {
-            "type": "string",
-            "nullable": true
-          },
           "logo": {
             "type": "string",
             "format": "byte",
@@ -1165,8 +1147,6 @@
         "required": [
           "inviteEmailText",
           "inviteEmailSubject",
-          "redcapToken",
-          "redcapURL",
           "logo",
           "description",
           "deleted",
@@ -2072,13 +2052,34 @@
             "type": "string",
             "nullable": true
           },
+          "redcapToken": {
+            "type": "string",
+            "nullable": true
+          },
+          "redcapURL": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailerPassword": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailerUser": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailerPort": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "mailerHost": {
+            "type": "string",
+            "nullable": true
+          },
           "logo": {
             "type": "string",
             "format": "byte",
-            "nullable": true
-          },
-          "newsLink": {
-            "type": "string",
             "nullable": true
           },
           "tcLink": {
@@ -2110,8 +2111,13 @@
         },
         "required": [
           "elsaToken",
+          "redcapToken",
+          "redcapURL",
+          "mailerPassword",
+          "mailerUser",
+          "mailerPort",
+          "mailerHost",
           "logo",
-          "newsLink",
           "tcLink",
           "secondaryColour",
           "primaryColour",
@@ -2420,6 +2426,12 @@
           "oidc": {
             "items": {
               "properties": {
+                "displayInUserPortal": {
+                  "type": "boolean"
+                },
+                "displayInAdminPortal": {
+                  "type": "boolean"
+                },
                 "icon": {
                   "type": "string"
                 },
@@ -2434,6 +2446,8 @@
                 }
               },
               "required": [
+                "displayInUserPortal",
+                "displayInAdminPortal",
                 "icon",
                 "clientId",
                 "host",
@@ -4688,6 +4702,48 @@
             }
           }
         }
+      },
+      "delete": {
+        "operationId": "DeleteLogo",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "tags": [
+          "Studies"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
       },
       "get": {
         "operationId": "GetLogo",

@@ -104,6 +104,22 @@ const StudyCard = ({
     }
   }
 
+  const deleteLogo = async (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault()
+
+    try {
+      await axiosInstance.delete(`/studies/${study.id}/logo`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      open?.({ type: 'success', message: 'Deleted logo' })
+      queryClient.invalidateQueries(['studies'])
+    } catch (e: any) {
+      open?.({ type: 'error', message: `Failed to delete logo: ${e.response.data.details}` })
+    }
+  }
+
   const handleRedcapApply = () => {
     const urlRegex =
       /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/
@@ -180,6 +196,14 @@ const StudyCard = ({
               id="logo-preview"
             />
             <Typography variant="caption">Update logo</Typography>
+            <Typography
+              variant="caption"
+              color="error"
+              onClick={deleteLogo}
+              sx={{ cursor: 'pointer', fontWeight: 'bold' }}
+            >
+              Remove Logo
+            </Typography>
           </Stack>
         ) : (
           'Upload Logo'

@@ -184,6 +184,15 @@ export class StudiesController extends Controller {
     await prisma.study.update({ where: { id: studyId }, data: { logo: buffer } })
   }
 
+  @Delete('/{studyId}/logo')
+  @Security('jwt', ['OrganisationAdmin'])
+  public async deleteLogo(@Path() studyId: number) {
+    await prisma.study.update({
+      where: { id: studyId },
+      data: { logo: null },
+    })
+  }
+
   @Get('/{studyId}/logo')
   @NoSecurity()
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
