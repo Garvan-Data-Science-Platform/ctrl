@@ -248,4 +248,38 @@ describe('StudiesController', () => {
       expect(response.status).toBe(422)
     })
   })
+
+  describe('POST /studies/:studyId/logo', () => {
+    it('should post a new study logo', async () => {
+      const response = await request(app)
+        .post(`/studies/${testStudyId}/logo`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .attach('file', 'tests/test_data/valid_logo.png')
+      expect(response.status).toBe(204)
+    })
+
+    it('should fail to update invalid logo', async () => {
+      const response = await request(app)
+        .post(`/studies/${testStudyId}/logo`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .attach('file', 'tests/test_data/invalid_logo.png')
+
+      expect(response.status).toBe(422)
+    })
+  })
+
+  describe('DELETE /studies/:studyId/logo', () => {
+    it('should delete an existing study logo', async () => {
+      const response = await request(app)
+        .delete(`/studies/${testStudyId}/logo`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(response.status).toBe(204)
+
+      // Check deleted logo in db
+      const studyWithDeletedLogo = await prisma.study.findFirst({
+        where: { id: testStudyId },
+      })
+      expect(studyWithDeletedLogo?.logo).toBeNull()
+    })
+  })
 })

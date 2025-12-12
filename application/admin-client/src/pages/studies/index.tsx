@@ -87,6 +87,8 @@ const StudyCard = ({
     setDeleteDialogOpen(false)
   }
 
+  const [logoVersion, setLogoVersion] = useState(Date.now())
+
   const uploadLogo = async (file: File) => {
     const formData = new FormData()
     formData.append('file', file)
@@ -102,6 +104,11 @@ const StudyCard = ({
     } catch (e: any) {
       open?.({ type: 'error', message: `Failed to update logo: ${e.response.data.details}` })
     }
+  }
+
+  const handleUploadLogo = async (file: File) => {
+    await uploadLogo(file)
+    setLogoVersion(Date.now())
   }
 
   const deleteLogo = async (e: React.MouseEvent<HTMLElement>) => {
@@ -177,20 +184,29 @@ const StudyCard = ({
           </Button>
         </DialogActions>
       </Dialog>
-      <Button component="label" sx={{ border: '1px solid grey', minWidth: 80, height: 80 }}>
+      <Button
+        component="label"
+        sx={{ border: '1px solid grey', width: 130, height: 130, padding: 1, overflow: 'hidden' }}
+      >
         <input
           type="file"
           hidden
           accept=".png,.jpg,.jpeg,.tif"
           onChange={(e) => {
-            uploadLogo(e.target.files?.item(0) as File)
+            handleUploadLogo(e.target.files?.item(0) as File)
           }}
           data-cy="logo-upload"
         />
         {study.logo ? (
           <Stack alignItems="center">
             <img
-              src={import.meta.env.VITE_BACKEND_URL + `/studies/${study.id}/logo`}
+              src={import.meta.env.VITE_BACKEND_URL + `/studies/${study.id}/logo?v=${logoVersion}`}
+              style={{
+                flexGrow: 1,
+                minHeight: 0,
+                width: '100%',
+                objectFit: 'contain',
+              }}
               height={60}
               data-cy="logo-preview"
               id="logo-preview"

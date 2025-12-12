@@ -25,6 +25,7 @@ import type {
   UpdateSettingsRequest,
 } from 'common/types/api/settings'
 import { auditLog } from '../middlewares/AuditLog'
+import { processLogoImage } from 'common/src/imageHelpers'
 import sharp from 'sharp'
 
 @Route('settings')
@@ -78,7 +79,7 @@ export class SettingsController extends Controller {
   @Security('jwt', ['OrganisationAdmin'])
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
   public async uploadLogo(@UploadedFile() file: Express.Multer.File) {
-    const buffer = await sharp(file.buffer).resize(200).png().toBuffer()
+    const buffer = await processLogoImage(file.buffer)
     await prisma.organisation.update({ where: { id: 1 }, data: { logo: buffer } })
   }
 

@@ -88,6 +88,7 @@ describe('SettingsController', () => {
     })
   })
 
+  // TODO: change these to allow null logo (rather than blank white square)
   describe('GET /settings/logo', () => {
     it('should return blank logo if no logo has been updated', async () => {
       const response = await request(app).get(`/settings/logo`).responseType('blob')
@@ -121,7 +122,7 @@ describe('SettingsController', () => {
         .set({ Authorization: `Bearer ${orgAdminToken}` })
         .attach('file', 'tests/test_data/invalid_logo.png')
 
-      expect(response.status).toBe(500)
+      expect(response.status).toBe(422)
     })
   })
 })

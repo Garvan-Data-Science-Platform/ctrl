@@ -32,8 +32,8 @@ import {
   NotFoundErrorResponse,
   UnauthorizedErrorResponse,
 } from 'common/types/api/errors'
+import { processLogoImage } from 'common/src/imageHelpers'
 import { auditLog } from '../middlewares/AuditLog'
-import sharp from 'sharp'
 import { Readable } from 'stream'
 import { SettingsController } from './SettingsController'
 
@@ -177,15 +177,15 @@ export class StudiesController extends Controller {
   }
 
   @Post('/{studyId}/logo')
-  @Security('jwt', ['OrganisationAdmin'])
+  @Security('jwt', ['OrganisationAdmin']) // TODO: check if study admin should also access this
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
   public async uploadLogo(@UploadedFile() file: Express.Multer.File, @Path() studyId: number) {
-    const buffer = await sharp(file.buffer).resize(200).png().toBuffer()
+    const buffer = await processLogoImage(file.buffer)
     await prisma.study.update({ where: { id: studyId }, data: { logo: buffer } })
   }
 
   @Delete('/{studyId}/logo')
-  @Security('jwt', ['OrganisationAdmin'])
+  @Security('jwt', ['OrganisationAdmin']) // TODO: check if study admin should also access this
   public async deleteLogo(@Path() studyId: number) {
     await prisma.study.update({
       where: { id: studyId },
