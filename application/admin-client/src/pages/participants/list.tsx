@@ -392,6 +392,7 @@ export const ParticipantList = () => {
       <ReactSpreadsheetImport
         isOpen={csvModalOpen}
         onClose={() => setCsvModalOpen(false)}
+        isNavigationEnabled
         onSubmit={(data) => {
           const recips = data.validData.map((row) => {
             const nested = unflatten(row) as any
