@@ -122,9 +122,15 @@ export async function deleteFile(filePath: string) {
   }
 }
 
-export async function updateLogo(filePath: string) {
+export async function updateOrgLogo(filePath: string) {
   const fs = await import('fs')
   await prisma.organisation.update({ where: { id: 1 }, data: { logo: fs.readFileSync(filePath) } })
+  return null
+}
+
+export async function updateStudyLogo(studyId: number, filePath: string) {
+  const fs = await import('fs')
+  await prisma.study.update({ where: { id: studyId }, data: { logo: fs.readFileSync(filePath) } })
   return null
 }
 

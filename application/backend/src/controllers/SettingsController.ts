@@ -9,6 +9,7 @@ import {
   Tags,
   Controller,
   Get,
+  Delete,
   Response,
   Patch,
   Body,
@@ -24,9 +25,10 @@ import type {
   GetUserPortalSettingsResponse,
   UpdateSettingsRequest,
 } from 'common/types/api/settings'
+import { NotFoundErrorResponse } from 'common/types/api/errors'
+import { NotFoundError } from '../middlewares/ErrorHandler'
 import { auditLog } from '../middlewares/AuditLog'
 import { processLogoImage } from 'common/src/imageHelpers'
-import sharp from 'sharp'
 
 @Route('settings')
 @Tags('Settings')
@@ -86,6 +88,7 @@ export class SettingsController extends Controller {
   @Get('/logo')
   @NoSecurity()
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async getLogo(): Promise<Readable> {
     const org = await prisma.organisation.findFirstOrThrow({
       where: { id: 1 },
@@ -93,14 +96,29 @@ export class SettingsController extends Controller {
     })
 
     if (!org.logo) {
-      const blankLogo = await sharp({
-        create: { width: 200, height: 100, channels: 3, background: { r: 255, g: 255, b: 255 } },
-      })
-        .png()
-        .toBuffer()
-      return Readable.from(blankLogo)
+      throw new NotFoundError('Study logo not found')
     }
 
     return Readable.from(org.logo as Buffer)
+  }
+
+  @Delete('/logo')
+  @Security('jwt', ['OrganisationAdmin'])
+  @Response('204', 'Logo deleted')
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
+  public async deleteLogo(): Promise<void> {
+    const org = await prisma.organisation.findUnique({
+      where: { id: 1 },
+      select: { logo: true },
+    })
+
+    if (!org || !org.logo) {
+      throw new NotFoundError('Logo not found')
+    }
+
+    await prisma.organisation.update({
+      where: { id: 1 },
+      data: { logo: null },
+    })
   }
 }

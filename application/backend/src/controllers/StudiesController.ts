@@ -35,7 +35,6 @@ import {
 import { processLogoImage } from 'common/src/imageHelpers'
 import { auditLog } from '../middlewares/AuditLog'
 import { Readable } from 'stream'
-import { SettingsController } from './SettingsController'
 
 @Route('studies')
 @Tags('Studies')
@@ -184,18 +183,10 @@ export class StudiesController extends Controller {
     await prisma.study.update({ where: { id: studyId }, data: { logo: buffer } })
   }
 
-  @Delete('/{studyId}/logo')
-  @Security('jwt', ['OrganisationAdmin']) // TODO: check if study admin should also access this
-  public async deleteLogo(@Path() studyId: number) {
-    await prisma.study.update({
-      where: { id: studyId },
-      data: { logo: null },
-    })
-  }
-
   @Get('/{studyId}/logo')
   @NoSecurity()
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async getLogo(@Path() studyId: number): Promise<Readable> {
     const study = await prisma.study.findFirstOrThrow({
       where: { id: studyId },
@@ -203,10 +194,30 @@ export class StudiesController extends Controller {
     })
 
     if (!study.logo) {
-      return new SettingsController().getLogo()
+      throw new NotFoundError('Study logo not found')
     }
 
     return Readable.from(study.logo as Buffer)
+  }
+
+  @Delete('/{studyId}/logo')
+  @Security('jwt', ['OrganisationAdmin']) // TODO: check if study admin should also access this
+  @Response('204', 'Logo deleted')
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
+  public async deleteLogo(@Path() studyId: number): Promise<void> {
+    const study = await prisma.study.findUnique({
+      where: { id: studyId },
+      select: { logo: true },
+    })
+
+    if (!study || !study.logo) {
+      throw new NotFoundError('Logo not found')
+    }
+
+    await prisma.study.update({
+      where: { id: studyId },
+      data: { logo: null },
+    })
   }
 
   /**

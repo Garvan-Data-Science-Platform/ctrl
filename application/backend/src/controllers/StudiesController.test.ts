@@ -8,9 +8,11 @@ import {
   UpdateStudyRequest,
 } from 'common/types/api/studies'
 import { PARTICIPANT_UNANSWERED_ID, PARTICIPANT_COMPLETED_ID } from 'common/testing/seed'
-import { resetDB } from 'common/testing/TestHelpers'
+import { resetDB, updateStudyLogo } from 'common/testing/TestHelpers'
+import { PROCESSED_VALID_LOGO_MD5 } from 'common/testing/fixtures'
 import { generateToken } from '../authentication'
 import { ORG_ADMIN_ID } from 'common/testing/seed'
+import { createHash } from 'crypto'
 
 const api = new Api()
 const app = api.app
@@ -268,14 +270,37 @@ describe('StudiesController', () => {
     })
   })
 
+  describe('GET /studies/:studyId/logo', () => {
+    it('should return 404 if no logo has been uploaded', async () => {
+      const response = await request(app).get(`/settings/logo`).responseType('blob')
+      expect(response.status).toBe(404)
+    })
+    it('should return non-blank logo if logo has been uploaded', async () => {
+      await updateStudyLogo(testStudyId, 'tests/test_data/valid_logo.png')
+      const response = await request(app).get(`/studies/${testStudyId}/logo`).responseType('blob')
+      const b64 = response.body.toString('base64')
+      const hash = createHash('md5').update(b64).digest('hex')
+      expect(hash).toEqual(PROCESSED_VALID_LOGO_MD5)
+      expect(response.status).toBe(200)
+    })
+  })
+
   describe('DELETE /studies/:studyId/logo', () => {
     it('should delete an existing study logo', async () => {
+      // Add a logo to be deleted
+      const createResponse = await request(app)
+        .post(`/studies/${testStudyId}/logo`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .attach('file', 'tests/test_data/valid_logo.png')
+      expect(createResponse.status).toBe(204)
+
+      // Test deletion
       const response = await request(app)
         .delete(`/studies/${testStudyId}/logo`)
         .set({ Authorization: `Bearer ${orgAdminToken}` })
       expect(response.status).toBe(204)
 
-      // Check deleted logo in db
+      // Verify logo is deleted in db
       const studyWithDeletedLogo = await prisma.study.findFirst({
         where: { id: testStudyId },
       })

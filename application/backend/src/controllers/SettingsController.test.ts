@@ -1,10 +1,11 @@
 import request from 'supertest'
 import { generateToken } from '../authentication'
 import { Api } from '../Api'
-import { resetDB, updateLogo } from 'common/testing/TestHelpers'
+import { resetDB, updateOrgLogo } from 'common/testing/TestHelpers'
+import { PROCESSED_VALID_LOGO_MD5 } from 'common/testing/fixtures'
 import { ORG_ADMIN_ID } from 'common/testing/seed'
 import prisma from '../PrismaClient'
-import * as crypto from 'crypto'
+import { createHash } from 'crypto'
 
 const api = new Api()
 const app = api.app
@@ -88,24 +89,21 @@ describe('SettingsController', () => {
     })
   })
 
-  // TODO: change these to allow null logo (rather than blank white square)
   describe('GET /settings/logo', () => {
-    it('should return blank logo if no logo has been updated', async () => {
+    it('should return 404 if no logo has been uploaded', async () => {
       const response = await request(app).get(`/settings/logo`).responseType('blob')
-      const b64 = response.body.toString('base64')
-      const hash = crypto.createHash('md5').update(b64).digest('hex')
-      expect(hash).toEqual('4b8664db5ef2b1deb13816008bc993ad')
-      expect(response.status).toBe(200)
+      expect(response.status).toBe(404)
     })
     it('should return non-blank logo if logo has been uploaded', async () => {
-      await updateLogo('tests/test_data/valid_logo.png')
+      await updateOrgLogo('tests/test_data/valid_logo.png')
       const response = await request(app).get(`/settings/logo`).responseType('blob')
       const b64 = response.body.toString('base64')
-      const hash = crypto.createHash('md5').update(b64).digest('hex')
-      expect(hash).toEqual('3516708b3c454102feef80e62a8b330a')
+      const hash = createHash('md5').update(b64).digest('hex')
+      expect(hash).toEqual(PROCESSED_VALID_LOGO_MD5)
       expect(response.status).toBe(200)
     })
   })
+
   describe('POST /settings/logo', () => {
     it('should update the logo if valid', async () => {
       const response = await request(app)

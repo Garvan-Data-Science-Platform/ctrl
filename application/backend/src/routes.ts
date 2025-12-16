@@ -1757,6 +1757,36 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsSettingsController_deleteLogo: Record<string, TsoaRoute.ParameterSchema> = {
+        };
+        app.delete('/settings/logo',
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(SettingsController)),
+            ...(fetchMiddlewares<RequestHandler>(SettingsController.prototype.deleteLogo)),
+
+            async function SettingsController_deleteLogo(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsSettingsController_deleteLogo, request, response });
+
+                const controller = new SettingsController();
+
+              await templateService.apiHandler({
+                methodName: 'deleteLogo',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsStudiesController_getAllStudies: Record<string, TsoaRoute.ParameterSchema> = {
         };
         app.get('/studies',
@@ -2011,6 +2041,36 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsStudiesController_getLogo: Record<string, TsoaRoute.ParameterSchema> = {
+                studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
+        };
+        app.get('/studies/:studyId/logo',
+            ...(fetchMiddlewares<RequestHandler>(StudiesController)),
+            ...(fetchMiddlewares<RequestHandler>(StudiesController.prototype.getLogo)),
+
+            async function StudiesController_getLogo(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsStudiesController_getLogo, request, response });
+
+                const controller = new StudiesController();
+
+              await templateService.apiHandler({
+                methodName: 'getLogo',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsStudiesController_deleteLogo: Record<string, TsoaRoute.ParameterSchema> = {
                 studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
         };
@@ -2031,36 +2091,6 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
 
               await templateService.apiHandler({
                 methodName: 'deleteLogo',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: undefined,
-              });
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsStudiesController_getLogo: Record<string, TsoaRoute.ParameterSchema> = {
-                studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
-        };
-        app.get('/studies/:studyId/logo',
-            ...(fetchMiddlewares<RequestHandler>(StudiesController)),
-            ...(fetchMiddlewares<RequestHandler>(StudiesController.prototype.getLogo)),
-
-            async function StudiesController_getLogo(request: ExRequest, response: ExResponse, next: any) {
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsStudiesController_getLogo, request, response });
-
-                const controller = new StudiesController();
-
-              await templateService.apiHandler({
-                methodName: 'getLogo',
                 controller,
                 response,
                 next,
