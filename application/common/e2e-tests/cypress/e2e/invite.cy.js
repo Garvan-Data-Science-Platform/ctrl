@@ -66,7 +66,7 @@ describe('Invites - Full E2E Flow', () => {
       cy.get('[data-cy="reg-button"]').click()
 
       // 5. Assert error message is shown
-      cy.contains(`Error Logging In: "Invite for ${testEmail} not found"`).should('exist')
+      cy.contains(`Error Registering: "Invite for ${testEmail} not found"`).should('exist')
     })
   })
 
@@ -88,89 +88,66 @@ describe('Invites - Full E2E Flow', () => {
     cy.get('[data-cy="pending-list"]', { timeout: 10000 }).should('contain.text', testEmail)
   })
 
-  // it('Participant cannot register with invalid invite token', () => {
-  //   // 1. Participant visits registration page with invalid token
-  //   cy.visit(AppUrls.USER_CLIENT + '/register/invalid-invite-id-12345')
+  it('Participant cannot register with invalid invite token', () => {
+    // 1. Participant visits registration page with invalid token
+    cy.visit(AppUrls.USER_CLIENT + '/register/invalid-invite-id-12345')
 
-  //   // 2. Attempt to fill and submit form
-  //   cy.fillRegistrationForm({ email: 'invalid@test.com' })
-  //   cy.get('[data-cy="reg-button"]').click()
+    // 2. Attempt to fill and submit form
+    cy.fillRegistrationForm({ email: 'invalid@test.com' })
+    cy.get('[data-cy="reg-button"]').click()
 
-  //   // 3. Assert error message is shown
-  //   cy.contains('not found', { matchCase: false }).should('exist')
-  // })
+    // 3. Assert error message is shown
+    cy.contains('not found', { matchCase: false }).should('exist')
+  })
 
-  // it('Participant cannot register if already registered', () => {
-  //   // Use an email that already exists in the seed data
-  //   const existingEmail = 'test3@example.com' // PARTICIPANT_COMPLETED from seed
+  it('Participant cannot register if already registered', () => {
+    // Use an email that already exists in the seed data
+    const existingEmail = 'test3@example.com' // PARTICIPANT_COMPLETED from seed
 
-  //   // 1. Admin logs in and sends invite to existing email
-  //   cy.loginAdminUI()
-  //   cy.visit(AppUrls.ADMIN_CLIENT + '/participants')
-  //   cy.get('[data-cy="invite-button"]').click()
-  //   cy.get('[data-cy="email-field"]').type(existingEmail).type('{enter}')
-  //   cy.get('[data-cy="send-button"]').click()
+    // 1. Admin logs in and sends invite to existing email
+    cy.loginAdminUI()
+    cy.visit(AppUrls.ADMIN_CLIENT + '/participants')
+    cy.get('[data-cy="invite-button"]').click()
+    cy.get('[data-cy="email-field"]').type(existingEmail).type('{enter}')
+    cy.get('[data-cy="send-button"]').click()
 
-  //   // 2. Get invite ID and visit registration
-  //   cy.task('getInviteId', { email: existingEmail, studyId: 1 }).then((inviteId) => {
-  //     cy.visit(AppUrls.USER_CLIENT + `/register/${inviteId}`)
+    // 2. Get invite ID and visit registration
+    cy.task('getInviteId', { email: existingEmail, studyId: 1 }).then((inviteId) => {
+      cy.visit(AppUrls.USER_CLIENT + `/register/${inviteId}`)
 
-  //     // 3. Fill form with existing email
-  //     cy.fillRegistrationForm({ email: existingEmail })
-  //     cy.get('[data-cy="reg-button"]').click()
+      // 3. Fill form with existing email
+      cy.fillRegistrationForm({ email: existingEmail })
+      cy.get('[data-cy="reg-button"]').click()
 
-  //     // 4. Assert error about already registered
-  //     cy.contains(/already|exists|registered/i).should('exist')
-  //   })
-  // })
+      // 4. Assert error about already registered
+      cy.contains(`Error Registering: \"Invite for ${existingEmail} not found\"`).should('exist')
+    })
+  })
 
-  // it('Admin revokes invite before participant registers', () => {
-  //   // 1. Admin logs in and sends invite
-  //   cy.loginAdminUI()
-  //   cy.visit(AppUrls.ADMIN_CLIENT + '/participants')
-  //   cy.get('[data-cy="invite-button"]').click()
-  //   cy.get('[data-cy="email-field"]').type(testEmail).type('{enter}')
-  //   cy.get('[data-cy="send-button"]').click()
-  //   cy.get('[data-cy="pending-list"]', { timeout: 10000 }).should('contain.text', testEmail)
+  it('Admin revokes invite before participant registers', () => {
+    // 1. Admin logs in and sends invite
+    cy.loginAdminUI()
+    cy.visit(AppUrls.ADMIN_CLIENT + '/participants')
+    cy.get('[data-cy="invite-button"]').click()
+    cy.get('[data-cy="email-field"]').type(testEmail).type('{enter}')
+    cy.get('[data-cy="send-button"]').click()
+    cy.get('[data-cy="pending-list"]', { timeout: 10000 }).should('contain.text', testEmail)
 
-  //   // 2. Admin revokes the invite via UI
-  //   cy.get('[data-cy="invite-actions"]').first().click()
-  //   cy.get('[data-cy="revoke-button"]').click()
-  //   cy.get('[data-cy="pending-list"]').should('contain.text', 'Revoked')
+    // 2. Admin revokes the invite via UI
+    cy.get('[data-cy="invite-actions"]').first().click()
+    cy.get('[data-cy="revoke-button"]').click()
+    cy.get('[data-cy="pending-list"]').should('contain.text', 'Revoked')
 
-  //   // 3. Participant visits revoked invite link
-  //   cy.task('getInviteId', { email: testEmail, studyId: 1 }).then((inviteId) => {
-  //     cy.visit(AppUrls.USER_CLIENT + `/register/${inviteId}`)
+    // 3. Participant visits revoked invite link
+    cy.task('getInviteId', { email: testEmail, studyId: 1 }).then((inviteId) => {
+      cy.visit(AppUrls.USER_CLIENT + `/register/${inviteId}`)
 
-  //     // 4. Attempt to register
-  //     cy.fillRegistrationForm({ email: testEmail })
-  //     cy.get('[data-cy="reg-button"]').click()
+      // 4. Attempt to register
+      cy.fillRegistrationForm({ email: testEmail })
+      cy.get('[data-cy="reg-button"]').click()
 
-  //     // 5. Assert error message
-  //     cy.contains(/revoked|invalid|expired/i).should('exist')
-  //   })
-  // })
-
-  // it('Participant sees validation errors for incomplete registration', () => {
-  //   // 1. Admin sends invite
-  //   cy.loginAdminUI()
-  //   cy.sendInviteUI(testEmail)
-
-  //   // 2. Get invite ID and visit registration
-  //   cy.task('getInviteId', { email: testEmail, studyId: 1 }).then((inviteId) => {
-  //     cy.visit(AppUrls.USER_CLIENT + `/register/${inviteId}`)
-
-  //     // 3. Submit with invalid data
-  //     cy.wait(500)
-  //     cy.get('[data-cy="reg-password"]').type('weak')
-  //     cy.get('[data-cy="reg-confirm-password"]').type('different')
-  //     cy.get('[data-cy="reg-postcode"]').type('ABC')
-  //     cy.get('[data-cy="reg-mobile"]').type('123')
-  //     cy.get('[data-cy="reg-button"]').click()
-
-  //     // 4. Assert validation errors are shown
-  //     cy.contains(/password/i).should('exist')
-  //     cy.get('[data-cy="reg-first"] input').should('be.focused').or('exist')
-  //   })
-  // })
+      // 5. Assert error message
+      cy.contains(`Error Registering: \"Invite for ${testEmail} not found\"`).should('exist')
+    })
+  })
 })
