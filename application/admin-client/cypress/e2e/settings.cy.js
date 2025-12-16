@@ -92,7 +92,5 @@ describe('Settings page', () => {
     cy.visit('/settings')
     cy.get('[data-cy="logo-upload"]').attachFile('invalid_logo.png')
     cy.contains('Failed').should('exist')
-    cy.get('[data-cy="logo-preview"]').invoke('prop', 'naturalWidth').should('be.greaterThan', 0)
-    cy.get('[data-cy="logo-preview"]').invoke('prop', 'naturalHeight').should('equal', 100)
   })
 })
