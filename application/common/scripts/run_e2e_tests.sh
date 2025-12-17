@@ -13,8 +13,19 @@ fi
 
 echo "Running tests in cypress $CYPRESS_MODE mode"
 
+
 # Spin-up backend, db, and mailhog
-NODE_VERSION=$NODE_VERSION E2E_NODE_ENV=$E2E_NODE_ENV docker compose up --build -d --wait db-test mailhog backend-test
+COMPOSE_FILES="-f ../../docker-compose.yml -f ../../docker-compose.e2e.yml"
+BACKEND_SERVICE="backend-test"
+
+if [ -n "$IMAGE_TAG" ]; then
+    echo "IMAGE_TAG detected: $IMAGE_TAG. Using image-based backend."
+    BACKEND_SERVICE="backend"
+else
+    echo "No IMAGE_TAG detected. Using local source backend-test."
+fi
+
+NODE_VERSION=$NODE_VERSION E2E_NODE_ENV=$E2E_NODE_ENV docker compose $COMPOSE_FILES up --build -d --wait db-test mailhog $BACKEND_SERVICE
 
 # Generate prisma types
 yarn workspace backend prisma:generate
@@ -24,9 +35,9 @@ yarn workspace backend prisma:generate
 npx dotenv -e ../backend/.env.test start-server-and-test \
   "yarn workspace user-client dev --port 5002 --host 0.0.0.0 & yarn workspace admin-client dev --port 5003 --host 0.0.0.0 & wait" \
   "http://localhost:5002|http://localhost:5003" \
-  "npx cypress $CYPRESS_MODE --project e2e-tests"
+  "npx cypress $CYPRESS_MODE"
 
 # Tear down
 #   Adding node version to silence a warning
-NODE_VERSION=$NODE_VERSION docker compose down db-test mailhog backend-test
+# NODE_VERSION=$NODE_VERSION docker compose $COMPOSE_FILES down db-test mailhog $BACKEND_SERVICE
 
