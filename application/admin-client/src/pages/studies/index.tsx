@@ -22,6 +22,7 @@ import { AddCircle, ArrowDropDown, Delete, Edit } from '@mui/icons-material'
 import { useQueryClient } from '@tanstack/react-query'
 import { SensitiveTextField } from '../../components/SensitiveTextField'
 import { useSearchParams } from 'react-router-dom'
+import { LogoUploader } from '../../components/LogoUploader'
 
 const StudyCard = ({
   study,
@@ -87,46 +88,6 @@ const StudyCard = ({
     setDeleteDialogOpen(false)
   }
 
-  const [logoVersion, setLogoVersion] = useState(Date.now())
-
-  const uploadLogo = async (file: File) => {
-    const formData = new FormData()
-    formData.append('file', file)
-
-    try {
-      await axiosInstance.post(`/studies/${study.id}/logo`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-      open?.({ type: 'success', message: 'Updated logo' })
-      queryClient.invalidateQueries(['studies'])
-    } catch (e: any) {
-      open?.({ type: 'error', message: `Failed to update logo: ${e.response.data.details}` })
-    }
-  }
-
-  const handleUploadLogo = async (file: File) => {
-    await uploadLogo(file)
-    setLogoVersion(Date.now())
-  }
-
-  const deleteLogo = async (e: React.MouseEvent<HTMLElement>) => {
-    e.preventDefault()
-
-    try {
-      await axiosInstance.delete(`/studies/${study.id}/logo`, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      open?.({ type: 'success', message: 'Deleted logo' })
-      queryClient.invalidateQueries(['studies'])
-    } catch (e: any) {
-      open?.({ type: 'error', message: `Failed to delete logo: ${e.response.data.details}` })
-    }
-  }
-
   const handleRedcapApply = () => {
     const urlRegex =
       /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/
@@ -184,48 +145,7 @@ const StudyCard = ({
           </Button>
         </DialogActions>
       </Dialog>
-      <Button
-        component="label"
-        sx={{ border: '1px solid grey', width: 130, height: 130, padding: 1, overflow: 'hidden' }}
-      >
-        <input
-          type="file"
-          hidden
-          accept=".png,.jpg,.jpeg,.tif"
-          onChange={(e) => {
-            handleUploadLogo(e.target.files?.item(0) as File)
-          }}
-          data-cy="logo-upload"
-        />
-        {study.logo ? (
-          <Stack alignItems="center">
-            <img
-              src={import.meta.env.VITE_BACKEND_URL + `/studies/${study.id}/logo?v=${logoVersion}`}
-              style={{
-                flexGrow: 1,
-                minHeight: 0,
-                width: '100%',
-                objectFit: 'contain',
-              }}
-              height={60}
-              data-cy="logo-preview"
-              id="logo-preview"
-            />
-            <Typography variant="caption">Update logo</Typography>
-            <Typography
-              variant="caption"
-              color="error"
-              onClick={deleteLogo}
-              data-cy="logo-delete"
-              sx={{ cursor: 'pointer', fontWeight: 'bold' }}
-            >
-              Remove Logo
-            </Typography>
-          </Stack>
-        ) : (
-          'Upload Logo'
-        )}
-      </Button>
+      <LogoUploader url={`/studies/${study.id}/logo`} hasLogo={!!study.logo} />
       <Box>
         {editingName ? (
           <Box>
