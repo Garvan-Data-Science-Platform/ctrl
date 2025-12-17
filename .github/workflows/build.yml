@@ -125,7 +125,7 @@ jobs:
       - name: Run E2E Tests
         run: |
           yarn workspace backend prisma:generate
-          npx dotenv -e ./application/backend/.env.test -- npx cypress run --project application/common/e2e-tests
+          npx dotenv -e ./application/backend/.env.test -- npx cypress run --project application/common
 
       - name: Tear Down Services
         if: always()
@@ -137,13 +137,13 @@ jobs:
         if: failure()
         with:
           name: cypress-screenshots
-          path: application/common/e2e-tests/cypress/screenshots
+          path: application/common/cypress/screenshots
 
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: cypress-videos
-          path: application/common/e2e-tests/cypress/videos
+          path: application/common/cypress/videos
 
   push_helm_charts:
     name: Push Helm Charts

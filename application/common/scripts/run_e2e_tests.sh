@@ -4,7 +4,10 @@ set -e
 NODE_VERSION=$(cat ../../.nvmrc | tr -d 'v')
 E2E_NODE_ENV="e2e"
 
-# Default mode is 'run' if no argument is provider
+# Default mode is 'run' if no argument is provided
+if [ -z "$CYPRESS_MODE" ]; then
+    CYPRESS_MODE="run"
+fi
 
 if [ "$CYPRESS_MODE" != "open" ] && [ "$CYPRESS_MODE" != "run" ]; then
     echo "Invalid mode. Use 'open' or 'run'"
