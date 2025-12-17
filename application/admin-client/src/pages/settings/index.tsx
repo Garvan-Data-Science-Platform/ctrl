@@ -3,11 +3,13 @@ import { useNotification } from '@refinedev/core'
 import { useForm } from '@refinedev/react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { axiosInstance } from '../../providers/dataProvider'
-import { useState } from 'react'
 import { Info } from '@mui/icons-material'
+import { LogoUploader } from '../../components/LogoUploader'
+import { RESOURCES } from '../../constants'
 
 const SettingsPage = () => {
   type FieldValues = {
+    logo: string | null
     primaryColour: string | null
     secondaryColour: string | null
     tcLink: string | null
@@ -19,6 +21,7 @@ const SettingsPage = () => {
     handleSubmit,
     formState: { errors },
     watch,
+    refineCore: { queryResult },
   } = useForm<any, any, FieldValues>({
     refineCoreProps: {
       resource: 'settings',
@@ -30,6 +33,8 @@ const SettingsPage = () => {
   })
 
   const { open } = useNotification()
+  const orgSettingsData = queryResult?.data?.data
+  console.log('SETTINGS DATA:', orgSettingsData)
 
   const handleSave = async (data: FieldValues) => {
     for (const key of Object.keys(data) as (keyof FieldValues)[]) {
@@ -56,25 +61,6 @@ const SettingsPage = () => {
     return s.color !== ''
   }
 
-  const [reloader, setReloader] = useState('')
-
-  const uploadLogo = async (file: File) => {
-    const formData = new FormData()
-    formData.append('file', file)
-
-    try {
-      await axiosInstance.post('/settings/logo', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-      open?.({ type: 'success', message: 'Updated logo' })
-      setReloader('#' + Math.random())
-    } catch (e: any) {
-      open?.({ type: 'error', message: `Failed to update logo: ${e.response.data.details}` })
-    }
-  }
-
   return (
     <Container maxWidth="sm" sx={{ ml: 1, mt: 3 }}>
       <Typography variant="h4" gutterBottom>
@@ -89,23 +75,10 @@ const SettingsPage = () => {
         <Box sx={{ mt: 2 }}>
           <Typography>Logo</Typography>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Button variant="outlined" component="label" sx={{ mr: 3, height: 40 }}>
-              UPLOAD FILE
-              <input
-                type="file"
-                hidden
-                accept=".png,.jpg,.jpeg,.tif"
-                onChange={(e) => {
-                  uploadLogo(e.target.files?.item(0) as File)
-                }}
-                data-cy="logo-upload"
-              />
-            </Button>
-            <img
-              src={import.meta.env.VITE_BACKEND_URL + '/settings/logo' + reloader}
-              height={60}
-              data-cy="logo-preview"
-              id="logo-preview"
+            <LogoUploader
+              resource={RESOURCES.SETTINGS}
+              url={`/settings/logo`}
+              hasLogo={!!orgSettingsData?.logo}
             />
           </Box>
         </Box>

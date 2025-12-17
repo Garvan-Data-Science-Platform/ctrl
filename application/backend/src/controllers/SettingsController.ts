@@ -47,6 +47,7 @@ export class SettingsController extends Controller {
     const orgdata = await prisma.organisation.findFirstOrThrow({
       where: { id: 1 },
       select: {
+        logo: true,
         primaryColour: true,
         secondaryColour: true,
         tcLink: true,

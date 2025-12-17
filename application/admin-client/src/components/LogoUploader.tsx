@@ -1,13 +1,26 @@
 import { Button, Stack, Typography } from '@mui/material'
 import { useNotification } from '@refinedev/core'
 import { useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { axiosInstance } from '../providers/dataProvider'
 
-export const LogoUploader = ({ url, hasLogo = false }: { url: string; hasLogo?: boolean }) => {
+export const LogoUploader = ({
+  resource,
+  url,
+  hasLogo,
+}: {
+  resource: string
+  url: string
+  hasLogo?: boolean
+}) => {
   const { open } = useNotification()
   const queryClient = useQueryClient()
   const [logoVersion, setLogoVersion] = useState(Date.now())
+  const [localHasLogo, setLocalHasLogo] = useState(hasLogo)
+
+  useEffect(() => {
+    setLocalHasLogo(hasLogo)
+  }, [hasLogo])
 
   const uploadLogo = async (file: File) => {
     const formData = new FormData()
@@ -20,18 +33,16 @@ export const LogoUploader = ({ url, hasLogo = false }: { url: string; hasLogo?: 
         },
       })
       open?.({ type: 'success', message: 'Updated logo' })
-      queryClient.invalidateQueries(['studies'])
+      setLogoVersion(Date.now())
+      setLocalHasLogo(true)
+
+      queryClient.invalidateQueries([resource])
     } catch (e: any) {
       open?.({
         type: 'error',
         message: `Failed to update logo: ${e.response.data.details}`,
       })
     }
-  }
-
-  const handleUploadLogo = async (file: File) => {
-    await uploadLogo(file)
-    setLogoVersion(Date.now())
   }
 
   const deleteLogo = async (e: React.MouseEvent<HTMLElement>) => {
@@ -44,7 +55,9 @@ export const LogoUploader = ({ url, hasLogo = false }: { url: string; hasLogo?: 
         },
       })
       open?.({ type: 'success', message: 'Deleted logo' })
-      queryClient.invalidateQueries(['studies'])
+      setLocalHasLogo(false)
+
+      queryClient.invalidateQueries([resource])
     } catch (e: any) {
       open?.({
         type: 'error',
@@ -69,11 +82,11 @@ export const LogoUploader = ({ url, hasLogo = false }: { url: string; hasLogo?: 
         hidden
         accept=".png,.jpg,.jpeg,.tif"
         onChange={(e) => {
-          handleUploadLogo(e.target.files?.item(0) as File)
+          uploadLogo(e.target.files?.item(0) as File)
         }}
         data-cy="logo-upload"
       />
-      {hasLogo ? (
+      {localHasLogo ? (
         <Stack alignItems="center">
           <img
             src={import.meta.env.VITE_BACKEND_URL + `${url}?v=${logoVersion}`}

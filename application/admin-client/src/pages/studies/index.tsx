@@ -23,6 +23,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { SensitiveTextField } from '../../components/SensitiveTextField'
 import { useSearchParams } from 'react-router-dom'
 import { LogoUploader } from '../../components/LogoUploader'
+import { RESOURCES } from '../../constants'
 
 const StudyCard = ({
   study,
@@ -145,7 +146,11 @@ const StudyCard = ({
           </Button>
         </DialogActions>
       </Dialog>
-      <LogoUploader url={`/studies/${study.id}/logo`} hasLogo={!!study.logo} />
+      <LogoUploader
+        resource={RESOURCES.STUDIES}
+        url={`/studies/${study.id}/logo`}
+        hasLogo={!!study.logo}
+      />
       <Box>
         {editingName ? (
           <Box>
