@@ -9,7 +9,7 @@ import { RESOURCES } from '../../constants'
 
 const SettingsPage = () => {
   type FieldValues = {
-    logo: string | null
+    logoSet: string | null
     primaryColour: string | null
     secondaryColour: string | null
     tcLink: string | null
@@ -37,13 +37,16 @@ const SettingsPage = () => {
   console.log('SETTINGS DATA:', orgSettingsData)
 
   const handleSave = async (data: FieldValues) => {
-    for (const key of Object.keys(data) as (keyof FieldValues)[]) {
-      if (data[key] === '') {
-        data[key] = null
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { logoSet: _logoSet, ...payload } = data
+
+    for (const key of Object.keys(payload) as (keyof typeof payload)[]) {
+      if (payload[key] === '') {
+        payload[key] = null
       }
     }
     try {
-      await axiosInstance.patch('/settings', data)
+      await axiosInstance.patch('/settings', payload)
       open?.({ type: 'success', message: 'Settings updated successfully' })
     } catch (e: any) {
       open?.({ type: 'error', message: `Failed to save: ${e}` })
@@ -78,7 +81,7 @@ const SettingsPage = () => {
             <LogoUploader
               resource={RESOURCES.SETTINGS}
               url={`/settings/logo`}
-              hasLogo={!!orgSettingsData?.logo}
+              hasLogo={!!orgSettingsData?.logoSet}
             />
           </Box>
         </Box>

@@ -54,7 +54,12 @@ export class SettingsController extends Controller {
         newsLink: true,
       },
     })
-    return { data: orgdata }
+    return {
+      data: {
+        ...orgdata,
+        logoSet: orgdata.logo ? 'present' : null,
+      },
+    }
   }
 
   @Patch('/')

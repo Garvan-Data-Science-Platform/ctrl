@@ -1,6 +1,6 @@
 export interface GetSettingsResponse {
   data: {
-    logo: string | null
+    logoSet: string | null
     primaryColour: string | null
     secondaryColour: string | null
     tcLink: string
