@@ -200,10 +200,20 @@ export default function Dashboard() {
             setStudyInvitesOpen(false)
           }}
         />
-        <Stack direction="row" spacing={3}>
+        <Stack direction="row" spacing={3} sx={{ width: '100%' }}>
           <Typography variant="h5" textAlign="left">
             {studyName}
           </Typography>
+          <Box>
+            <img
+              src={studyId ? import.meta.env.VITE_BACKEND_URL + `/studies/${studyId}/logo` : ''}
+              height={30}
+              style={{ marginRight: 20 }}
+              data-cy="study-logo"
+              alt=""
+            />
+          </Box>
+          <Box sx={{ flexGrow: 1 }} />
           {(studies || []).length > 1 && (
             <Button data-cy="change-study" onClick={(e) => setAnchorEl(e.currentTarget)}>
               Change Study

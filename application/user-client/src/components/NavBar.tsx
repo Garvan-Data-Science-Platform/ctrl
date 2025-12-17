@@ -12,7 +12,7 @@ import AdbIcon from '@mui/icons-material/Adb'
 import { Button, Tab, Tabs } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth'
-import { useAppStore, useCurrentStudyId } from '../store'
+import { useAppStore } from '../store'
 
 const pages = [
   { name: 'My Activities', route: '/' },
@@ -26,7 +26,6 @@ export default function NavBar({ disabled }: { disabled?: boolean }) {
   const location = useLocation()
   const nav = useNavigate()
   const { logout } = useAuth()
-  const studyId = useCurrentStudyId()
 
   const { newsLink } = useAppStore()
 
@@ -55,12 +54,12 @@ export default function NavBar({ disabled }: { disabled?: boolean }) {
             <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
             <Box>
               <img
-                src={studyId ? import.meta.env.VITE_BACKEND_URL + `/studies/${studyId}/logo` : ''}
+                src={import.meta.env.VITE_BACKEND_URL + `/settings/logo`}
                 height={30}
                 onClick={() => nav('/')}
                 style={{ marginRight: 20, cursor: 'pointer' }}
                 data-cy="logo"
-                alt="logo"
+                alt=""
               />
             </Box>
 
