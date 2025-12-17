@@ -39,5 +39,5 @@ npx dotenv -e ../backend/.env.test start-server-and-test \
 
 # Tear down
 #   Adding node version to silence a warning
-# NODE_VERSION=$NODE_VERSION docker compose $COMPOSE_FILES down db-test mailhog $BACKEND_SERVICE
+NODE_VERSION=$NODE_VERSION docker compose $COMPOSE_FILES down db-test mailhog $BACKEND_SERVICE
 
