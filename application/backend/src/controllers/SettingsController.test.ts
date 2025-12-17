@@ -1,8 +1,8 @@
 import request from 'supertest'
 import { generateToken } from '../authentication'
 import { Api } from '../Api'
-import { resetDB, updateOrgLogo } from 'common/testing/TestHelpers'
-import { PROCESSED_VALID_LOGO_MD5 } from 'common/testing/fixtures'
+import { resetDB, updateLogo } from 'common/testing/TestHelpers'
+import logoHashes from '../../../common/testing/fixtures/logo_hashes.json'
 import { ORG_ADMIN_ID } from 'common/testing/seed'
 import prisma from '../PrismaClient'
 import { createHash } from 'crypto'
@@ -95,17 +95,19 @@ describe('SettingsController', () => {
       expect(response.status).toBe(404)
     })
     it('should return non-blank logo if logo has been uploaded', async () => {
-      await updateOrgLogo('tests/test_data/valid_logo.png')
+      await updateLogo({
+        target: 'organisation',
+        filePath: 'tests/test_data/valid_logo.png',
+      })
       const response = await request(app).get(`/settings/logo`).responseType('blob')
-      const b64 = response.body.toString('base64')
-      const hash = createHash('md5').update(b64).digest('hex')
-      expect(hash).toEqual(PROCESSED_VALID_LOGO_MD5)
+      const hash = createHash('md5').update(response.body).digest('hex')
+      expect(hash).toEqual(logoHashes.validLogoResizedHash)
       expect(response.status).toBe(200)
     })
   })
 
   describe('POST /settings/logo', () => {
-    it('should update the logo if valid', async () => {
+    it('should poste the logo if valid', async () => {
       const response = await request(app)
         .post('/settings/logo')
         .set({ Authorization: `Bearer ${orgAdminToken}` })
@@ -121,6 +123,61 @@ describe('SettingsController', () => {
         .attach('file', 'tests/test_data/invalid_logo.png')
 
       expect(response.status).toBe(422)
+    })
+
+    it('should change logo if a logo gets updated', async () => {
+      // Post logo
+      const originalLogoPostResponse = await request(app)
+        .post(`/settings/logo`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .attach('file', 'tests/test_data/valid_logo.png')
+      expect(originalLogoPostResponse.status).toBe(204)
+      const originalLogoGetResponse = await request(app).get(`/settings/logo`).responseType('blob')
+      const originalLogoHash = createHash('md5').update(originalLogoGetResponse.body).digest('hex')
+      expect(originalLogoHash).toEqual(logoHashes.validLogoResizedHash)
+      expect(originalLogoGetResponse.status).toBe(200)
+      // Update logo
+      const alternateLogoPostResponse = await request(app)
+        .post(`/settings/logo`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .attach('file', 'tests/test_data/alternate_logo.png')
+      expect(alternateLogoPostResponse.status).toBe(204)
+      // Test logo has changed
+      const alternateLogoGetResponse = await request(app).get(`/settings/logo`).responseType('blob')
+      const alternateLogoHash = createHash('md5')
+        .update(alternateLogoGetResponse.body)
+        .digest('hex')
+      expect(alternateLogoHash).toEqual(logoHashes.alternateLogoResizedHash)
+      expect(alternateLogoGetResponse.status).toBe(200)
+    })
+  })
+
+  // TODO: Add test to verify that study admin cannot change logo
+
+  describe('DELETE /settings/logo', () => {
+    it('should delete an existing org logo', async () => {
+      // Add a logo to be deleted
+      const createResponse = await request(app)
+        .post(`/settings/logo`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .attach('file', 'tests/test_data/valid_logo.png')
+      expect(createResponse.status).toBe(204)
+
+      // Test deletion
+      const response = await request(app)
+        .delete(`/settings/logo`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(response.status).toBe(204)
+
+      // Try to get logo (expecting 404)
+      const getResponse = await request(app).get(`/settings/logo`).responseType('blob')
+      expect(getResponse.status).toBe(404)
+
+      // Verify logo is deleted in db
+      const orgWithDeletedLogo = await prisma.organisation.findFirst({
+        where: { id: 1 }, // Hard coded due to not yet supporting multitenancy.
+      })
+      expect(orgWithDeletedLogo?.logo).toBeNull()
     })
   })
 })

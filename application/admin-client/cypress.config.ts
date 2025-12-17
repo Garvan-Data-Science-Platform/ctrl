@@ -6,6 +6,7 @@ import {
   readPdf,
   resetDB,
   wipeDB,
+  calculateHash,
 } from 'common/testing/TestHelpers'
 import { defineConfig } from 'cypress'
 
@@ -40,6 +41,9 @@ export default defineConfig({
         },
         deleteFile(filePath: string) {
           return deleteFile(filePath)
+        },
+        calculateHash(base64String: string) {
+          return calculateHash(base64String)
         },
       })
     },

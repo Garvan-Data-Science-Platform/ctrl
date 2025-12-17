@@ -216,6 +216,7 @@ const StudyCard = ({
               variant="caption"
               color="error"
               onClick={deleteLogo}
+              data-cy="logo-delete"
               sx={{ cursor: 'pointer', fontWeight: 'bold' }}
             >
               Remove Logo

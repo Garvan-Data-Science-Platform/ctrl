@@ -3,6 +3,8 @@ import { SurveysController } from '../../backend/src/controllers/SurveysControll
 import logger from 'common/src/logger'
 import { PARTICIPANT_UNANSWERED_ID, seedTests } from './seed'
 import { Prefill } from 'common/types/invite'
+import { createHash } from 'crypto'
+import { processLogoImage } from '../src/imageHelpers'
 
 // Function to reset DB state
 export async function resetDB(): Promise<null> {
@@ -122,15 +124,33 @@ export async function deleteFile(filePath: string) {
   }
 }
 
-export async function updateOrgLogo(filePath: string) {
-  const fs = await import('fs')
-  await prisma.organisation.update({ where: { id: 1 }, data: { logo: fs.readFileSync(filePath) } })
-  return null
-}
+type LogoUpdateOptions =
+  | { target: 'organisation'; filePath: string; id?: never }
+  | { target: 'study'; filePath: string; id: number }
 
-export async function updateStudyLogo(studyId: number, filePath: string) {
+export async function updateLogo(options: LogoUpdateOptions) {
   const fs = await import('fs')
-  await prisma.study.update({ where: { id: studyId }, data: { logo: fs.readFileSync(filePath) } })
+  const rawBuffer = fs.readFileSync(options.filePath)
+  // Process image using the same function the controller uses
+  // (This turns the raw >200px image into the standardized 200px PNG)
+  const processedBuffer = await processLogoImage(rawBuffer)
+
+  switch (options.target) {
+    case 'organisation':
+      // Hardcoded ID 1 as we don't support multi-tennant
+      await prisma.organisation.update({
+        where: { id: 1 },
+        data: { logo: processedBuffer },
+      })
+      break
+
+    case 'study':
+      await prisma.study.update({
+        where: { id: options.id },
+        data: { logo: processedBuffer },
+      })
+      break
+  }
   return null
 }
 
@@ -169,4 +189,8 @@ export async function removeUserFromStudy(email: string, studyId: number) {
     where: { participantProfileId_studyId: { participantProfileId: prof.id, studyId } },
   })
   return null
+}
+
+export function calculateHash(base64String: string) {
+  return createHash('md5').update(base64String, 'base64').digest('hex')
 }
