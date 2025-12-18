@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-const { UserType } = require('../support/commands')
+const { UserType } = require('../../../common/cypress/support/commands')
 
 beforeEach(() => {
   cy.task('reset')
@@ -46,6 +46,7 @@ describe('basic', () => {
       .and('equal', 'rgb(1, 2, 3)')
   })
 
+  // TODO: SEED db so that org has a logo. replace with hashes
   it('can load logo from backend', () => {
     cy.login(UserType.PARTICIPANT_UNANSWERED)
     cy.visit('/')
@@ -56,6 +57,8 @@ describe('basic', () => {
     cy.get('[data-cy="logo"]').invoke('prop', 'naturalWidth').should('be.greaterThan', 0)
     cy.get('[data-cy="logo"]').invoke('prop', 'naturalHeight').should('equal', 93)
   })
+
+  // TODO: add study logo to test seed? test for study logo?
 
   it('Is redirected to login when attempting to use expired token', () => {
     cy.login(UserType.PARTICIPANT_UNANSWERED)

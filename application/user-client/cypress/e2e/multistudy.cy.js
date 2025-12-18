@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-const { UserType } = require('../support/commands')
+const { UserType } = require('../../../common/cypress/support/commands')
 
 beforeEach(() => {
   cy.task('reset')
@@ -73,4 +73,6 @@ describe('multistudy', () => {
     cy.get('[data-cy="change-study"]').click()
     cy.contains('Study 2').should('not.exist')
   })
+
+  // TODO: add alternate logo to different study, check logos change between studies
 })

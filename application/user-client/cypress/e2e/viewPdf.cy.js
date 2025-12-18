@@ -4,7 +4,7 @@ beforeEach(() => {
   cy.task('reset')
 })
 
-const { UserType } = require('../support/commands')
+const { UserType } = require('../../../common/cypress/support/commands')
 const downloadsPath = 'cypress/downloads/'
 
 // TODO: Add logo tests
