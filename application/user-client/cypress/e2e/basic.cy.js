@@ -83,16 +83,12 @@ describe('basic', () => {
     cy.task('updateLogo', {
       target: 'study',
       filePath: '../common/testing/fixtures/alternate_logo.png',
-      id: 1,
+      id: 3,
     })
-    // This forces the browser to ignore previous 404s
-    cy.visit('/', {
-      onBeforeLoad: (win) => {
-        win.caches.keys().then((names) => {
-          names.forEach((name) => win.caches.delete(name))
-        })
-      },
-    })
+    // Make sure you are on study with logo
+    cy.get('[data-cy="change-study"]').click()
+    cy.contains('Study FE').click()
+    // verify logo is correct
     cy.readFile('../common/testing/fixtures/logo_hashes.json').then((data) => {
       cy.get('[data-cy="study-logo"]')
         .should('be.visible')
