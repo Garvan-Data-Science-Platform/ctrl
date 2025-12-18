@@ -8,7 +8,6 @@ import Menu from '@mui/material/Menu'
 import MenuIcon from '@mui/icons-material/Menu'
 import Container from '@mui/material/Container'
 import MenuItem from '@mui/material/MenuItem'
-import AdbIcon from '@mui/icons-material/Adb'
 import { Button, Tab, Tabs } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth'
@@ -51,7 +50,6 @@ export default function NavBar({ disabled }: { disabled?: boolean }) {
       <AppBar position="static" sx={{ boxShadow: 'none', left: 0, backgroundColor: 'white' }}>
         <Container sx={{ maxWidth: 1200 }}>
           <Toolbar disableGutters>
-            <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
             <Box>
               <img
                 src={import.meta.env.VITE_BACKEND_URL + `/settings/logo`}
@@ -97,7 +95,6 @@ export default function NavBar({ disabled }: { disabled?: boolean }) {
                 ))}
               </Menu>
             </Box>
-            <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
               <Tabs value={activePage.name}>
                 {activePages.map((page) => (
