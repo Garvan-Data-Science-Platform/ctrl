@@ -14,6 +14,8 @@ import { generateToken } from '../authentication'
 import { ORG_ADMIN_ID } from 'common/testing/seed'
 import { createHash } from 'crypto'
 
+const fixturesPath = '../common/testing/fixtures/'
+
 const api = new Api()
 const app = api.app
 
@@ -259,7 +261,7 @@ describe('StudiesController', () => {
     it('should return non-blank logo if logo has been uploaded', async () => {
       await updateLogo({
         target: 'study',
-        filePath: 'tests/test_data/valid_logo.png',
+        filePath: `${fixturesPath}/valid_logo.png`,
         id: testStudyId,
       })
       const response = await request(app).get(`/studies/${testStudyId}/logo`).responseType('blob')
@@ -274,7 +276,7 @@ describe('StudiesController', () => {
       const response = await request(app)
         .post(`/studies/${testStudyId}/logo`)
         .set({ Authorization: `Bearer ${orgAdminToken}` })
-        .attach('file', 'tests/test_data/valid_logo.png')
+        .attach('file', `${fixturesPath}/valid_logo.png`)
       expect(response.status).toBe(204)
     })
 
@@ -282,7 +284,7 @@ describe('StudiesController', () => {
       const response = await request(app)
         .post(`/studies/${testStudyId}/logo`)
         .set({ Authorization: `Bearer ${orgAdminToken}` })
-        .attach('file', 'tests/test_data/invalid_logo.png')
+        .attach('file', `${fixturesPath}/invalid_logo.png`)
 
       expect(response.status).toBe(422)
     })
@@ -292,7 +294,7 @@ describe('StudiesController', () => {
       const originalLogoPostResponse = await request(app)
         .post(`/studies/${testStudyId}/logo`)
         .set({ Authorization: `Bearer ${orgAdminToken}` })
-        .attach('file', 'tests/test_data/valid_logo.png')
+        .attach('file', `${fixturesPath}/valid_logo.png`)
       expect(originalLogoPostResponse.status).toBe(204)
       const originalLogoGetResponse = await request(app)
         .get(`/studies/${testStudyId}/logo`)
@@ -304,7 +306,7 @@ describe('StudiesController', () => {
       const alternateLogoPostResponse = await request(app)
         .post(`/studies/${testStudyId}/logo`)
         .set({ Authorization: `Bearer ${orgAdminToken}` })
-        .attach('file', 'tests/test_data/alternate_logo.png')
+        .attach('file', `${fixturesPath}/alternate_logo.png`)
       expect(alternateLogoPostResponse.status).toBe(204)
       // Test logo has changed
       const alternateLogoGetResponse = await request(app)
@@ -326,7 +328,7 @@ describe('StudiesController', () => {
       const createResponse = await request(app)
         .post(`/studies/${testStudyId}/logo`)
         .set({ Authorization: `Bearer ${orgAdminToken}` })
-        .attach('file', 'tests/test_data/valid_logo.png')
+        .attach('file', `${fixturesPath}/valid_logo.png`)
       expect(createResponse.status).toBe(204)
 
       // Test deletion

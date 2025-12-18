@@ -96,7 +96,7 @@ describe('Study management page', () => {
   it('Can upload a study logo', () => {
     cy.login(UserType.ADMIN)
     cy.visit('/studies')
-    cy.get('[data-cy="logo-upload"]').attachFile('valid_logo.png')
+    cy.uploadCommonFile('[data-cy="logo-upload"]', 'valid_logo.png')
     cy.contains('Updated logo').should('exist')
     cy.readFile('../common/testing/fixtures/logo_hashes.json').then((data) => {
       cy.get('[data-cy="logo-preview"]')
@@ -116,7 +116,7 @@ describe('Study management page', () => {
     cy.login(UserType.ADMIN)
     cy.visit('/studies')
     // Upload original logo
-    cy.get('[data-cy="logo-upload"]').attachFile('valid_logo.png')
+    cy.uploadCommonFile('[data-cy="logo-upload"]', 'valid_logo.png')
     cy.contains('Updated logo').should('exist')
     cy.readFile('../common/testing/fixtures/logo_hashes.json').then((data) => {
       cy.get('[data-cy="logo-preview"]')
@@ -132,7 +132,7 @@ describe('Study management page', () => {
     })
 
     // Update logo to another image
-    cy.get('[data-cy="logo-upload"]').attachFile('alternate_logo.png')
+    cy.uploadCommonFile('[data-cy="logo-upload"]', 'alternate_logo.png')
     cy.contains('Updated logo').should('exist')
     cy.readFile('../common/testing/fixtures/logo_hashes.json').then((data) => {
       cy.get('[data-cy="logo-preview"]')
@@ -141,7 +141,6 @@ describe('Study management page', () => {
         .then((src) => {
           cy.request({ url: src, encoding: 'base64' }).then((response) => {
             cy.task('calculateHash', response.body).then((hash) => {
-              cy.writeFile('cypress/debug_logo.png', response.body, 'base64')
               expect(hash).to.equal(data.alternateLogoResizedHash)
             })
           })
@@ -152,7 +151,7 @@ describe('Study management page', () => {
   it('Invalid logo fails to update', () => {
     cy.login(UserType.ADMIN)
     cy.visit('/studies')
-    cy.get('[data-cy="logo-upload"]').attachFile('invalid_logo.png')
+    cy.uploadCommonFile('[data-cy="logo-upload"]', 'invalid_logo.png')
     cy.contains('Failed').should('exist')
     cy.get('[data-cy="logo-preview"]').should('not.exist')
   })
@@ -161,7 +160,7 @@ describe('Study management page', () => {
     cy.login(UserType.ADMIN)
     cy.visit('/studies')
     // Upload a logo to delete
-    cy.get('[data-cy="logo-upload"]').attachFile('valid_logo.png')
+    cy.uploadCommonFile('[data-cy="logo-upload"]', 'valid_logo.png')
     cy.contains('Updated logo').should('exist')
     cy.readFile('../common/testing/fixtures/logo_hashes.json').then((data) => {
       cy.get('[data-cy="logo-preview"]')

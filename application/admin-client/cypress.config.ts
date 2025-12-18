@@ -7,6 +7,7 @@ import {
   resetDB,
   wipeDB,
   calculateHash,
+  readCommonFile,
 } from 'common/testing/TestHelpers'
 import { defineConfig } from 'cypress'
 
@@ -44,6 +45,9 @@ export default defineConfig({
         },
         calculateHash(base64String: string) {
           return calculateHash(base64String)
+        },
+        readCommonFile(fileName: string) {
+          return readCommonFile(fileName)
         },
       })
     },

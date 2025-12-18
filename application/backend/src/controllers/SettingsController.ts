@@ -54,9 +54,14 @@ export class SettingsController extends Controller {
         newsLink: true,
       },
     })
+
+    // logoSet is used by admin client to determine if a logo is set on page load
+    // returns 'present' or null rather than sending whole logo in payload
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { logo: _logo, ...settingsWithoutLogo } = orgdata
     return {
       data: {
-        ...orgdata,
+        ...settingsWithoutLogo,
         logoSet: orgdata.logo ? 'present' : null,
       },
     }

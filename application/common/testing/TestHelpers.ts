@@ -5,6 +5,8 @@ import { PARTICIPANT_UNANSWERED_ID, seedTests } from './seed'
 import { Prefill } from 'common/types/invite'
 import { createHash } from 'crypto'
 import { processLogoImage } from '../src/imageHelpers'
+import fs from 'fs'
+import path from 'path'
 
 // Function to reset DB state
 export async function resetDB(): Promise<null> {
@@ -193,4 +195,14 @@ export async function removeUserFromStudy(email: string, studyId: number) {
 
 export function calculateHash(base64String: string) {
   return createHash('md5').update(base64String, 'base64').digest('hex')
+}
+
+export async function readCommonFile(fileName: string) {
+  // Adjust this path based on where 'common' sits relative to your cypress.config.ts
+  const filePath = path.resolve(__dirname, '../../common/testing/fixtures', fileName)
+
+  if (fs.existsSync(filePath)) {
+    return fs.readFileSync(filePath, 'base64')
+  }
+  return null
 }

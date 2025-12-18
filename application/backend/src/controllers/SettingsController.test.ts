@@ -7,6 +7,8 @@ import { ORG_ADMIN_ID } from 'common/testing/seed'
 import prisma from '../PrismaClient'
 import { createHash } from 'crypto'
 
+const fixturesPath = '../common/testing/fixtures/'
+
 const api = new Api()
 const app = api.app
 
@@ -31,6 +33,7 @@ describe('SettingsController', () => {
   })
 
   const expectedSettings = {
+    logoSet: null, // This is used to tell the admin-client if there is a logo set
     primaryColour: 'red',
     secondaryColour: 'red',
     tcLink: 'https://garvan-data-science-platform.github.io/ctrl-docs/docs/terms-and-conditions',
@@ -97,7 +100,7 @@ describe('SettingsController', () => {
     it('should return non-blank logo if logo has been uploaded', async () => {
       await updateLogo({
         target: 'organisation',
-        filePath: 'tests/test_data/valid_logo.png',
+        filePath: `${fixturesPath}/valid_logo.png`,
       })
       const response = await request(app).get(`/settings/logo`).responseType('blob')
       const hash = createHash('md5').update(response.body).digest('hex')
@@ -111,7 +114,7 @@ describe('SettingsController', () => {
       const response = await request(app)
         .post('/settings/logo')
         .set({ Authorization: `Bearer ${orgAdminToken}` })
-        .attach('file', 'tests/test_data/valid_logo.png')
+        .attach('file', `${fixturesPath}/valid_logo.png`)
 
       expect(response.status).toBe(204)
     })
@@ -120,7 +123,7 @@ describe('SettingsController', () => {
       const response = await request(app)
         .post('/settings/logo')
         .set({ Authorization: `Bearer ${orgAdminToken}` })
-        .attach('file', 'tests/test_data/invalid_logo.png')
+        .attach('file', `${fixturesPath}/invalid_logo.png`)
 
       expect(response.status).toBe(422)
     })
@@ -130,7 +133,7 @@ describe('SettingsController', () => {
       const originalLogoPostResponse = await request(app)
         .post(`/settings/logo`)
         .set({ Authorization: `Bearer ${orgAdminToken}` })
-        .attach('file', 'tests/test_data/valid_logo.png')
+        .attach('file', `${fixturesPath}/valid_logo.png`)
       expect(originalLogoPostResponse.status).toBe(204)
       const originalLogoGetResponse = await request(app).get(`/settings/logo`).responseType('blob')
       const originalLogoHash = createHash('md5').update(originalLogoGetResponse.body).digest('hex')
@@ -140,7 +143,7 @@ describe('SettingsController', () => {
       const alternateLogoPostResponse = await request(app)
         .post(`/settings/logo`)
         .set({ Authorization: `Bearer ${orgAdminToken}` })
-        .attach('file', 'tests/test_data/alternate_logo.png')
+        .attach('file', `${fixturesPath}/alternate_logo.png`)
       expect(alternateLogoPostResponse.status).toBe(204)
       // Test logo has changed
       const alternateLogoGetResponse = await request(app).get(`/settings/logo`).responseType('blob')
@@ -160,7 +163,7 @@ describe('SettingsController', () => {
       const createResponse = await request(app)
         .post(`/settings/logo`)
         .set({ Authorization: `Bearer ${orgAdminToken}` })
-        .attach('file', 'tests/test_data/valid_logo.png')
+        .attach('file', `${fixturesPath}/valid_logo.png`)
       expect(createResponse.status).toBe(204)
 
       // Test deletion
