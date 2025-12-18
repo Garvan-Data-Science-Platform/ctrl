@@ -1,6 +1,7 @@
 /// <reference types="cypress" />
 
 const { UserType } = require('../../../common/cypress/support/commands')
+// TODO: import study name and id constants
 
 beforeEach(() => {
   cy.task('reset')
@@ -46,7 +47,7 @@ describe('multistudy', () => {
 
   it('Can accept an invite to a new study', () => {
     cy.login(UserType.PARTICIPANT_UNANSWERED)
-    cy.task('createInvite', { email: 'test2@example.com', studyId: 2 })
+    cy.task('createInvite', { email: UserType.PARTICIPANT_UNANSWERED, studyId: 2 })
     cy.visit('/')
     cy.get('[data-cy="step-card-0"]').should('exist')
     cy.get('[data-cy="accept-invite"]').should('exist').click()
@@ -60,7 +61,7 @@ describe('multistudy', () => {
 
   it('Can no longer access study if removed from it', () => {
     cy.login(UserType.PARTICIPANT_UNANSWERED)
-    cy.task('createInvite', { email: 'test2@example.com', studyId: 2 })
+    cy.task('createInvite', { email: UserType.PARTICIPANT_UNANSWERED, studyId: 2 })
     cy.visit('/')
     cy.get('[data-cy="step-card-0"]').should('exist')
     cy.get('[data-cy="accept-invite"]').should('exist').click()
@@ -74,5 +75,59 @@ describe('multistudy', () => {
     cy.contains('Study 2').should('not.exist')
   })
 
-  // TODO: add alternate logo to different study, check logos change between studies
+  it('changing studies changes study logo', () => {
+    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.visit('/')
+    cy.get('[data-cy="study-logo"]').should('not.exist')
+    // upload logos for two studies
+    cy.task('updateLogo', {
+      target: 'study',
+      filePath: '../common/testing/fixtures/valid_logo.png',
+      id: 1,
+    })
+    cy.task('updateLogo', {
+      target: 'study',
+      filePath: '../common/testing/fixtures/alternate_logo.png',
+      id: 3,
+    })
+    // Move to alternate study
+    cy.get('[data-cy="change-study"]').click()
+    cy.contains('Study FE').click()
+    // verify logo is correct
+    cy.readFile('../common/testing/fixtures/logo_hashes.json').then((data) => {
+      cy.get('[data-cy="study-logo"]')
+        .should('be.visible')
+        .and(($img) => {
+          expect($img[0].naturalWidth).to.be.greaterThan(0)
+        })
+        .and('have.attr', 'src')
+        .then((src) => {
+          cy.request({ url: src, encoding: 'base64' }).then((response) => {
+            cy.task('calculateHash', response.body).then((hash) => {
+              expect(hash).to.equal(data.alternateLogoResizedHash)
+            })
+          })
+        })
+    })
+
+    // Change back to test study
+    cy.get('[data-cy="change-study"]').click()
+    cy.contains('Test Study').click()
+    // verify logo is correct
+    cy.readFile('../common/testing/fixtures/logo_hashes.json').then((data) => {
+      cy.get('[data-cy="study-logo"]')
+        .should('be.visible')
+        .and(($img) => {
+          expect($img[0].naturalWidth).to.be.greaterThan(0)
+        })
+        .and('have.attr', 'src')
+        .then((src) => {
+          cy.request({ url: src, encoding: 'base64' }).then((response) => {
+            cy.task('calculateHash', response.body).then((hash) => {
+              expect(hash).to.equal(data.validLogoResizedHash)
+            })
+          })
+        })
+    })
+  })
 })

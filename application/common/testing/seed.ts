@@ -4,7 +4,9 @@ import { SurveyStep } from 'common/types/survey'
 import { hashPassword } from '../../backend/src/authentication'
 
 export const OPERATOR_ADMIN_ID = 96
+export const OPERATOR_ADMIN_EMAIL = 'operatoradmin@example.com'
 export const ORG_ADMIN_ID = 97
+export const ORG_ADMIN_EMAIL = 'admin@example.com'
 export const ORG_ADMIN_2_ID = 101
 export const PARTICIPANT_UNANSWERED_ID = 98
 export const PARTICIPANT_UNANSWERED_EMAIL = 'test2@example.com'
@@ -81,7 +83,7 @@ export async function seedTests(prisma: PrismaClient) {
   await prisma.user.create({
     data: {
       id: OPERATOR_ADMIN_ID,
-      email: 'operatoradmin@example.com',
+      email: OPERATOR_ADMIN_EMAIL,
       firstName: 'Operator',
       lastName: 'Admin',
       password: hashPassword('Testpassword1'),
@@ -93,7 +95,7 @@ export async function seedTests(prisma: PrismaClient) {
   await prisma.user.create({
     data: {
       id: ORG_ADMIN_ID,
-      email: 'admin@example.com',
+      email: ORG_ADMIN_EMAIL,
       firstName: 'Organisation',
       lastName: 'Admin',
       password: hashPassword('Testpassword1'),
