@@ -46,19 +46,69 @@ describe('basic', () => {
       .and('equal', 'rgb(1, 2, 3)')
   })
 
-  // TODO: SEED db so that org has a logo. replace with hashes
-  it('can load logo from backend', () => {
+  it('can load org logo from backend', () => {
     cy.login(UserType.PARTICIPANT_UNANSWERED)
     cy.visit('/')
-    cy.get('[data-cy="logo"]').invoke('prop', 'naturalWidth').should('be.greaterThan', 0)
-    cy.get('[data-cy="logo"]').invoke('prop', 'naturalHeight').should('equal', 100)
-    cy.task('updateLogo', 'cypress/fixtures/valid_logo.png')
-    cy.visit('/')
-    cy.get('[data-cy="logo"]').invoke('prop', 'naturalWidth').should('be.greaterThan', 0)
-    cy.get('[data-cy="logo"]').invoke('prop', 'naturalHeight').should('equal', 93)
+    cy.get('[data-cy="logo"]').should('not.exist')
+    cy.task('updateLogo', {
+      target: 'organisation',
+      filePath: '../common/testing/fixtures/valid_logo.png',
+    })
+    // This forces the browser to ignore previous 404s
+    cy.visit('/', {
+      onBeforeLoad: (win) => {
+        win.caches.keys().then((names) => {
+          names.forEach((name) => win.caches.delete(name))
+        })
+      },
+    })
+    cy.readFile('../common/testing/fixtures/logo_hashes.json').then((data) => {
+      cy.get('[data-cy="logo"]')
+        .should('be.visible')
+        .and('have.attr', 'src')
+        .then((src) => {
+          cy.request({ url: src, encoding: 'base64' }).then((response) => {
+            cy.task('calculateHash', response.body).then((hash) => {
+              expect(hash).to.equal(data.validLogoResizedHash)
+            })
+          })
+        })
+    })
   })
 
-  // TODO: add study logo to test seed? test for study logo?
+  it('can load study logo', () => {
+    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.visit('/')
+    cy.get('[data-cy="study-logo"]').should('not.exist')
+    cy.task('updateLogo', {
+      target: 'study',
+      filePath: '../common/testing/fixtures/alternate_logo.png',
+      id: 1,
+    })
+    // This forces the browser to ignore previous 404s
+    cy.visit('/', {
+      onBeforeLoad: (win) => {
+        win.caches.keys().then((names) => {
+          names.forEach((name) => win.caches.delete(name))
+        })
+      },
+    })
+    cy.readFile('../common/testing/fixtures/logo_hashes.json').then((data) => {
+      cy.get('[data-cy="study-logo"]')
+        .should('be.visible')
+        .and(($img) => {
+          expect($img[0].naturalWidth).to.be.greaterThan(0)
+        })
+        .and('have.attr', 'src')
+        .then((src) => {
+          cy.request({ url: src, encoding: 'base64' }).then((response) => {
+            cy.task('calculateHash', response.body).then((hash) => {
+              expect(hash).to.equal(data.alternateLogoResizedHash)
+            })
+          })
+        })
+    })
+  })
 
   it('Is redirected to login when attempting to use expired token', () => {
     cy.login(UserType.PARTICIPANT_UNANSWERED)
