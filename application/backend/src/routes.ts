@@ -8,9 +8,9 @@ import { UsersController } from './controllers/UsersController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { SurveysController } from './controllers/SurveysController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import { SettingsController } from './controllers/SettingsController';
-// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { StudiesController } from './controllers/StudiesController';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { SettingsController } from './controllers/SettingsController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { ProfilesController } from './controllers/ProfilesController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -390,32 +390,6 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "GetSettingsResponse": {
-        "dataType": "refObject",
-        "properties": {
-            "data": {"dataType":"nestedObjectLiteral","nestedProperties":{"newsLink":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"tcLink":{"dataType":"string","required":true},"secondaryColour":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"primaryColour":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true}},"required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Partial_GetSettingsResponse-at-data_": {
-        "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"primaryColour":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]},{"dataType":"undefined"}]},"secondaryColour":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]},{"dataType":"undefined"}]},"tcLink":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"newsLink":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]},{"dataType":"undefined"}]}},"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "UpdateSettingsRequest": {
-        "dataType": "refAlias",
-        "type": {"ref":"Partial_GetSettingsResponse-at-data_","validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "GetUserPortalSettingsResponse": {
-        "dataType": "refObject",
-        "properties": {
-            "data": {"dataType":"nestedObjectLiteral","nestedProperties":{"newsLink":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"secondaryColour":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"primaryColour":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true}},"required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Pick_Study.Exclude_keyofStudy.logo__": {
         "dataType": "refAlias",
         "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"name":{"dataType":"string","required":true},"id":{"dataType":"double","required":true},"deleted":{"dataType":"boolean","required":true},"description":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"redcapURL":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"redcapToken":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"inviteEmailSubject":{"dataType":"string","required":true},"inviteEmailText":{"dataType":"string","required":true}},"validators":{}},
@@ -475,6 +449,32 @@ const models: TsoaRoute.Models = {
             "description": {"dataType":"string"},
             "redcapToken": {"dataType":"string"},
             "redcapURL": {"dataType":"string"},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GetSettingsResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "data": {"dataType":"nestedObjectLiteral","nestedProperties":{"newsLink":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"tcLink":{"dataType":"string","required":true},"secondaryColour":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"primaryColour":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"logoSet":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true}},"required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Partial_Omit_SettingsData.logoSet__": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"primaryColour":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]},{"dataType":"undefined"}]},"secondaryColour":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]},{"dataType":"undefined"}]},"tcLink":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"newsLink":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]},{"dataType":"undefined"}]}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "UpdateSettingsRequest": {
+        "dataType": "refAlias",
+        "type": {"ref":"Partial_Omit_SettingsData.logoSet__","validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GetUserPortalSettingsResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "data": {"dataType":"nestedObjectLiteral","nestedProperties":{"newsLink":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"secondaryColour":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"primaryColour":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true}},"required":true},
         },
         "additionalProperties": false,
     },
@@ -692,7 +692,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "DefaultSelection_Prisma._36_OrganisationPayload_": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"elsaToken":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"logo":{"dataType":"union","subSchemas":[{"dataType":"buffer"},{"dataType":"enum","enums":[null]}],"required":true},"newsLink":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"tcLink":{"dataType":"string","required":true},"secondaryColour":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"primaryColour":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"updatedAt":{"dataType":"datetime","required":true},"createdAt":{"dataType":"datetime","required":true},"id":{"dataType":"double","required":true},"name":{"dataType":"string","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"elsaToken":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"newsLink":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"tcLink":{"dataType":"string","required":true},"secondaryColour":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"primaryColour":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"logo":{"dataType":"union","subSchemas":[{"dataType":"buffer"},{"dataType":"enum","enums":[null]}],"required":true},"updatedAt":{"dataType":"datetime","required":true},"createdAt":{"dataType":"datetime","required":true},"id":{"dataType":"double","required":true},"name":{"dataType":"string","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Organisation": {
@@ -1601,192 +1601,6 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsSettingsController_getSettings: Record<string, TsoaRoute.ParameterSchema> = {
-        };
-        app.get('/settings',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
-            ...(fetchMiddlewares<RequestHandler>(SettingsController)),
-            ...(fetchMiddlewares<RequestHandler>(SettingsController.prototype.getSettings)),
-
-            async function SettingsController_getSettings(request: ExRequest, response: ExResponse, next: any) {
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsSettingsController_getSettings, request, response });
-
-                const controller = new SettingsController();
-
-              await templateService.apiHandler({
-                methodName: 'getSettings',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: undefined,
-              });
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsSettingsController_updateSettings: Record<string, TsoaRoute.ParameterSchema> = {
-                bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"UpdateSettingsRequest"},
-        };
-        app.patch('/settings',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
-            ...(fetchMiddlewares<RequestHandler>(SettingsController)),
-            ...(fetchMiddlewares<RequestHandler>(SettingsController.prototype.updateSettings)),
-
-            async function SettingsController_updateSettings(request: ExRequest, response: ExResponse, next: any) {
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsSettingsController_updateSettings, request, response });
-
-                const controller = new SettingsController();
-
-              await templateService.apiHandler({
-                methodName: 'updateSettings',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: undefined,
-              });
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsSettingsController_getTheme: Record<string, TsoaRoute.ParameterSchema> = {
-        };
-        app.get('/settings/userportal',
-            ...(fetchMiddlewares<RequestHandler>(SettingsController)),
-            ...(fetchMiddlewares<RequestHandler>(SettingsController.prototype.getTheme)),
-
-            async function SettingsController_getTheme(request: ExRequest, response: ExResponse, next: any) {
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsSettingsController_getTheme, request, response });
-
-                const controller = new SettingsController();
-
-              await templateService.apiHandler({
-                methodName: 'getTheme',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: undefined,
-              });
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsSettingsController_uploadLogo: Record<string, TsoaRoute.ParameterSchema> = {
-                file: {"in":"formData","name":"file","required":true,"dataType":"file"},
-        };
-        app.post('/settings/logo',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
-            upload.fields([
-                {
-                    name: "file",
-                    maxCount: 1
-                }
-            ]),
-            ...(fetchMiddlewares<RequestHandler>(SettingsController)),
-            ...(fetchMiddlewares<RequestHandler>(SettingsController.prototype.uploadLogo)),
-
-            async function SettingsController_uploadLogo(request: ExRequest, response: ExResponse, next: any) {
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsSettingsController_uploadLogo, request, response });
-
-                const controller = new SettingsController();
-
-              await templateService.apiHandler({
-                methodName: 'uploadLogo',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: undefined,
-              });
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsSettingsController_getLogo: Record<string, TsoaRoute.ParameterSchema> = {
-        };
-        app.get('/settings/logo',
-            ...(fetchMiddlewares<RequestHandler>(SettingsController)),
-            ...(fetchMiddlewares<RequestHandler>(SettingsController.prototype.getLogo)),
-
-            async function SettingsController_getLogo(request: ExRequest, response: ExResponse, next: any) {
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsSettingsController_getLogo, request, response });
-
-                const controller = new SettingsController();
-
-              await templateService.apiHandler({
-                methodName: 'getLogo',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: undefined,
-              });
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsSettingsController_deleteLogo: Record<string, TsoaRoute.ParameterSchema> = {
-        };
-        app.delete('/settings/logo',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
-            ...(fetchMiddlewares<RequestHandler>(SettingsController)),
-            ...(fetchMiddlewares<RequestHandler>(SettingsController.prototype.deleteLogo)),
-
-            async function SettingsController_deleteLogo(request: ExRequest, response: ExResponse, next: any) {
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsSettingsController_deleteLogo, request, response });
-
-                const controller = new SettingsController();
-
-              await templateService.apiHandler({
-                methodName: 'deleteLogo',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: undefined,
-              });
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsStudiesController_getAllStudies: Record<string, TsoaRoute.ParameterSchema> = {
         };
         app.get('/studies',
@@ -2122,6 +1936,192 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
 
               await templateService.apiHandler({
                 methodName: 'deleteStudy',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsSettingsController_getSettings: Record<string, TsoaRoute.ParameterSchema> = {
+        };
+        app.get('/settings',
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(SettingsController)),
+            ...(fetchMiddlewares<RequestHandler>(SettingsController.prototype.getSettings)),
+
+            async function SettingsController_getSettings(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsSettingsController_getSettings, request, response });
+
+                const controller = new SettingsController();
+
+              await templateService.apiHandler({
+                methodName: 'getSettings',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsSettingsController_updateSettings: Record<string, TsoaRoute.ParameterSchema> = {
+                bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"UpdateSettingsRequest"},
+        };
+        app.patch('/settings',
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(SettingsController)),
+            ...(fetchMiddlewares<RequestHandler>(SettingsController.prototype.updateSettings)),
+
+            async function SettingsController_updateSettings(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsSettingsController_updateSettings, request, response });
+
+                const controller = new SettingsController();
+
+              await templateService.apiHandler({
+                methodName: 'updateSettings',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsSettingsController_getTheme: Record<string, TsoaRoute.ParameterSchema> = {
+        };
+        app.get('/settings/userportal',
+            ...(fetchMiddlewares<RequestHandler>(SettingsController)),
+            ...(fetchMiddlewares<RequestHandler>(SettingsController.prototype.getTheme)),
+
+            async function SettingsController_getTheme(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsSettingsController_getTheme, request, response });
+
+                const controller = new SettingsController();
+
+              await templateService.apiHandler({
+                methodName: 'getTheme',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsSettingsController_uploadLogo: Record<string, TsoaRoute.ParameterSchema> = {
+                file: {"in":"formData","name":"file","required":true,"dataType":"file"},
+        };
+        app.post('/settings/logo',
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            upload.fields([
+                {
+                    name: "file",
+                    maxCount: 1
+                }
+            ]),
+            ...(fetchMiddlewares<RequestHandler>(SettingsController)),
+            ...(fetchMiddlewares<RequestHandler>(SettingsController.prototype.uploadLogo)),
+
+            async function SettingsController_uploadLogo(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsSettingsController_uploadLogo, request, response });
+
+                const controller = new SettingsController();
+
+              await templateService.apiHandler({
+                methodName: 'uploadLogo',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsSettingsController_getLogo: Record<string, TsoaRoute.ParameterSchema> = {
+        };
+        app.get('/settings/logo',
+            ...(fetchMiddlewares<RequestHandler>(SettingsController)),
+            ...(fetchMiddlewares<RequestHandler>(SettingsController.prototype.getLogo)),
+
+            async function SettingsController_getLogo(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsSettingsController_getLogo, request, response });
+
+                const controller = new SettingsController();
+
+              await templateService.apiHandler({
+                methodName: 'getLogo',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsSettingsController_deleteLogo: Record<string, TsoaRoute.ParameterSchema> = {
+        };
+        app.delete('/settings/logo',
+            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(SettingsController)),
+            ...(fetchMiddlewares<RequestHandler>(SettingsController.prototype.deleteLogo)),
+
+            async function SettingsController_deleteLogo(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsSettingsController_deleteLogo, request, response });
+
+                const controller = new SettingsController();
+
+              await templateService.apiHandler({
+                methodName: 'deleteLogo',
                 controller,
                 response,
                 next,

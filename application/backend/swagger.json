@@ -957,96 +957,6 @@
         "type": "object",
         "additionalProperties": false
       },
-      "GetSettingsResponse": {
-        "properties": {
-          "data": {
-            "properties": {
-              "newsLink": {
-                "type": "string",
-                "nullable": true
-              },
-              "tcLink": {
-                "type": "string"
-              },
-              "secondaryColour": {
-                "type": "string",
-                "nullable": true
-              },
-              "primaryColour": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "required": [
-              "newsLink",
-              "tcLink",
-              "secondaryColour",
-              "primaryColour"
-            ],
-            "type": "object"
-          }
-        },
-        "required": [
-          "data"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "Partial_GetSettingsResponse-at-data_": {
-        "properties": {
-          "primaryColour": {
-            "type": "string",
-            "nullable": true
-          },
-          "secondaryColour": {
-            "type": "string",
-            "nullable": true
-          },
-          "tcLink": {
-            "type": "string"
-          },
-          "newsLink": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "type": "object",
-        "description": "Make all properties in T optional"
-      },
-      "UpdateSettingsRequest": {
-        "$ref": "#/components/schemas/Partial_GetSettingsResponse-at-data_"
-      },
-      "GetUserPortalSettingsResponse": {
-        "properties": {
-          "data": {
-            "properties": {
-              "newsLink": {
-                "type": "string",
-                "nullable": true
-              },
-              "secondaryColour": {
-                "type": "string",
-                "nullable": true
-              },
-              "primaryColour": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "required": [
-              "newsLink",
-              "secondaryColour",
-              "primaryColour"
-            ],
-            "type": "object"
-          }
-        },
-        "required": [
-          "data"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
       "Pick_Study.Exclude_keyofStudy.logo__": {
         "properties": {
           "name": {
@@ -1229,6 +1139,101 @@
             "type": "string"
           }
         },
+        "type": "object",
+        "additionalProperties": false
+      },
+      "GetSettingsResponse": {
+        "properties": {
+          "data": {
+            "properties": {
+              "newsLink": {
+                "type": "string",
+                "nullable": true
+              },
+              "tcLink": {
+                "type": "string"
+              },
+              "secondaryColour": {
+                "type": "string",
+                "nullable": true
+              },
+              "primaryColour": {
+                "type": "string",
+                "nullable": true
+              },
+              "logoSet": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "required": [
+              "newsLink",
+              "tcLink",
+              "secondaryColour",
+              "primaryColour",
+              "logoSet"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "Partial_Omit_SettingsData.logoSet__": {
+        "properties": {
+          "primaryColour": {
+            "type": "string",
+            "nullable": true
+          },
+          "secondaryColour": {
+            "type": "string",
+            "nullable": true
+          },
+          "tcLink": {
+            "type": "string"
+          },
+          "newsLink": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "type": "object",
+        "description": "Make all properties in T optional"
+      },
+      "UpdateSettingsRequest": {
+        "$ref": "#/components/schemas/Partial_Omit_SettingsData.logoSet__"
+      },
+      "GetUserPortalSettingsResponse": {
+        "properties": {
+          "data": {
+            "properties": {
+              "newsLink": {
+                "type": "string",
+                "nullable": true
+              },
+              "secondaryColour": {
+                "type": "string",
+                "nullable": true
+              },
+              "primaryColour": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "required": [
+              "newsLink",
+              "secondaryColour",
+              "primaryColour"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
         "type": "object",
         "additionalProperties": false
       },
@@ -2072,11 +2077,6 @@
             "type": "string",
             "nullable": true
           },
-          "logo": {
-            "type": "string",
-            "format": "byte",
-            "nullable": true
-          },
           "newsLink": {
             "type": "string",
             "nullable": true
@@ -2090,6 +2090,11 @@
           },
           "primaryColour": {
             "type": "string",
+            "nullable": true
+          },
+          "logo": {
+            "type": "string",
+            "format": "byte",
             "nullable": true
           },
           "updatedAt": {
@@ -2110,11 +2115,11 @@
         },
         "required": [
           "elsaToken",
-          "logo",
           "newsLink",
           "tcLink",
           "secondaryColour",
           "primaryColour",
+          "logo",
           "updatedAt",
           "createdAt",
           "id",
@@ -3936,337 +3941,6 @@
         ]
       }
     },
-    "/settings": {
-      "get": {
-        "operationId": "GetSettings",
-        "responses": {
-          "200": {
-            "description": "Ok",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetSettingsResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "description": "Get the current organisation",
-        "summary": "Get the current organisation settings",
-        "tags": [
-          "Settings"
-        ],
-        "security": [
-          {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
-          }
-        ],
-        "parameters": []
-      },
-      "patch": {
-        "operationId": "UpdateSettings",
-        "responses": {
-          "204": {
-            "description": "No content"
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Failed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Settings"
-        ],
-        "security": [
-          {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
-          }
-        ],
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateSettingsRequest"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/settings/userportal": {
-      "get": {
-        "operationId": "GetTheme",
-        "responses": {
-          "200": {
-            "description": "Ok",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetUserPortalSettingsResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Settings"
-        ],
-        "security": [],
-        "parameters": []
-      }
-    },
-    "/settings/logo": {
-      "post": {
-        "operationId": "UploadLogo",
-        "responses": {
-          "204": {
-            "description": "No content"
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Failed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Settings"
-        ],
-        "security": [
-          {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
-          }
-        ],
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary"
-                  }
-                },
-                "required": [
-                  "file"
-                ]
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "operationId": "GetLogo",
-        "responses": {
-          "200": {
-            "description": "Ok",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string",
-                  "format": "byte"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NotFoundErrorResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Failed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Settings"
-        ],
-        "security": [],
-        "parameters": []
-      },
-      "delete": {
-        "operationId": "DeleteLogo",
-        "responses": {
-          "204": {
-            "description": "No content"
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NotFoundErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Settings"
-        ],
-        "security": [
-          {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
-          }
-        ],
-        "parameters": []
-      }
-    },
     "/studies": {
       "get": {
         "operationId": "GetAllStudies",
@@ -4871,6 +4545,337 @@
             }
           }
         ]
+      }
+    },
+    "/settings": {
+      "get": {
+        "operationId": "GetSettings",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetSettingsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Get the current organisation",
+        "summary": "Get the current organisation settings",
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": []
+      },
+      "patch": {
+        "operationId": "UpdateSettings",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSettingsRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/userportal": {
+      "get": {
+        "operationId": "GetTheme",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetUserPortalSettingsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Settings"
+        ],
+        "security": [],
+        "parameters": []
+      }
+    },
+    "/settings/logo": {
+      "post": {
+        "operationId": "UploadLogo",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "GetLogo",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Settings"
+        ],
+        "security": [],
+        "parameters": []
+      },
+      "delete": {
+        "operationId": "DeleteLogo",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": []
       }
     },
     "/profiles/current": {
