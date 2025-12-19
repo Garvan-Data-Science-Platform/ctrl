@@ -1,5 +1,5 @@
 import { ParticipantAnswerStatus } from '@common/types/api/participants/participant'
-import { GetSurveyVersionsResponse } from '@common/types/api/surveys'
+import { GetResponsesByIdResponse, GetSurveyVersionsResponse } from '@common/types/api/surveys'
 import {
   Box,
   Button,
@@ -21,8 +21,11 @@ import { Recipient } from '@common/types/invite'
 import { axiosInstance } from '../../providers/dataProvider'
 import { useInvalidate, useNotification } from '@refinedev/core'
 import { InviteStatus } from '@common/types/api/participants/invite'
-import { MoreVert, People } from '@mui/icons-material'
-import { useCurrentStudyId } from '../../studyStore'
+import { MoreVert, People, PictureAsPdf } from '@mui/icons-material'
+import ResponsesPdf from '@common/src/PdfExport'
+import { pdfUtils, downloadPdfBlob } from '@common/src/pdfHelpers'
+import { useStudyStore } from '../../studyStore'
+import { GetParticipantResponse } from '@common/types/api/participants'
 
 export const statusMap = {
   incomplete: {
@@ -51,6 +54,8 @@ export const ParticipantList = () => {
     resource: 'invites',
   })
 
+  const { studies, activeStudyIndex } = useStudyStore()
+
   const location = useLocation()
   const invalidate = useInvalidate()
 
@@ -63,11 +68,9 @@ export const ParticipantList = () => {
 
   const { open } = useNotification()
 
-  const studyId = useCurrentStudyId()
-
   useEffect(() => {
     // Check Published Survey
-    axiosInstance.get(`/studies/${studyId}/surveys`).then((response) => {
+    axiosInstance.get(`/studies/${studies[activeStudyIndex].id}/surveys`).then((response) => {
       const allSurveys = response.data.data as GetSurveyVersionsResponse['data']
       const publishedSurveys = allSurveys.filter((survey) => survey.status === 'PUBLISHED')
       setPublishedSurvey(true)
@@ -82,12 +85,16 @@ export const ParticipantList = () => {
       // Clear the navigation state
       window.history.replaceState({}, document.title)
     }
-  }, [location, studyId])
+  }, [location, studies[activeStudyIndex].id])
 
   const sendInvites = (recipients: Recipient[], subjectText: string, explanatoryText: string) => {
     setLoading(true)
     axiosInstance
-      .post(`/studies/${studyId}/invites`, { recipients, subjectText, explanatoryText })
+      .post(`/studies/${studies[activeStudyIndex].id}/invites`, {
+        recipients,
+        subjectText,
+        explanatoryText,
+      })
       .then(() => {
         setModalOpen(false)
         open?.({ type: 'success', message: `Invites sent` })
@@ -107,7 +114,7 @@ export const ParticipantList = () => {
 
   const revokeInvite = (id: string) => {
     axiosInstance
-      .post(`studies/${studyId}/invites/${id}/revoke`)
+      .post(`studies/${studies[activeStudyIndex].id}/invites/${id}/revoke`)
       .then(() => {
         open?.({ type: 'success', message: 'Invite Revoked' })
         invalidate({ resource: 'invites', invalidates: ['list'] })
@@ -119,7 +126,7 @@ export const ParticipantList = () => {
   }
   const resendInvite = (id: string) => {
     axiosInstance
-      .post(`studies/${studyId}/invites/${id}/resend`)
+      .post(`studies/${studies[activeStudyIndex].id}/invites/${id}/resend`)
       .then(() => {
         open?.({ type: 'success', message: 'Invite Resent' })
         invalidate({ resource: 'invites', invalidates: ['list'] })
@@ -142,6 +149,41 @@ export const ParticipantList = () => {
     )
   }
 
+  const generatePdf = async (id: number, version: number) => {
+    try {
+      const profileData = (
+        await axiosInstance.get(`/studies/${studies[activeStudyIndex].id}/participants/${id}/`)
+      ).data as GetParticipantResponse
+
+      const responseData = (
+        await axiosInstance.get(
+          `/studies/${studies[activeStudyIndex].id}/surveys/${version}/participants/${id}/answers`,
+        )
+      ).data as GetResponsesByIdResponse
+
+      const logos = pdfUtils.getLogoUrls(studies[activeStudyIndex].id)
+      const participantName = `${profileData.data.firstName}_${profileData.data.lastName}`
+      // Note: this formats the filename to have the current date-time.
+      const fileName = pdfUtils.formatFileName(
+        'CTRL-responses',
+        studies[activeStudyIndex].name,
+        participantName,
+      )
+
+      await downloadPdfBlob(
+        <ResponsesPdf
+          studyName={studies[activeStudyIndex].name}
+          profile={profileData.data.profile}
+          steps={responseData.data.steps}
+          responses={responseData}
+          {...logos}
+        />,
+        fileName,
+      )
+    } catch (error) {
+      open?.({ type: 'error', message: `Could not generate PDF: ${error}` })
+    }
+  }
   // Debounced input component
   function DebouncedInput(props: any) {
     const { item, applyValue, InputProps } = props
@@ -275,12 +317,21 @@ export const ParticipantList = () => {
                   <People />
                 </IconButton>
               </Tooltip>
+              <Tooltip title="Responses PDF">
+                <IconButton
+                  onClick={() => generatePdf(row.id, row.answers.at(-1)?.surveyVersionNumber)}
+                  color="primary"
+                  data-cy="pdf-button"
+                >
+                  <PictureAsPdf />
+                </IconButton>
+              </Tooltip>
             </>
           )
         },
         align: 'center',
         headerAlign: 'center',
-        minWidth: 140,
+        minWidth: 180,
       },
     ],
     [],
