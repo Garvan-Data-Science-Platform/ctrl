@@ -1,8 +1,8 @@
 /// <reference types="vite/client" />
 
 import { pdf } from '@react-pdf/renderer'
+import { formatStudyName } from '../testing/TestHelpers'
 
-//Pure utility for filename and logo logic
 export const pdfUtils = {
   formatFileName: (prefix: string, studyName: string, participantName = '') => {
     const now = new Date()
@@ -12,7 +12,7 @@ export const pdfUtils = {
     //   - no whitespace
     //   - no characters in this list: `/\<>|:&`
     //   - constrained to a maximum number of characters (nominally 100, to allow space for participant's name)
-    const cleanStudyName = studyName.replace(/[\s/<\\>|:&]+/g, '_').substring(0, 99)
+    const cleanStudyName = formatStudyName(studyName)
 
     const cleanParticipantName = participantName ? `-${participantName}` : ''
 

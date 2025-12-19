@@ -10,8 +10,8 @@ import {
   getInviteId,
   inviteUser,
   removeUserFromStudy,
+  formatStudyName
 } from 'common/testing/TestHelpers'
-import { formatStudyName } from 'common/src/pdfHelpers'
 
 import {
   PASSWORD_RESET_USER_EMAIL,
@@ -65,8 +65,8 @@ export default defineConfig({
         getInviteIdtask({ email, studyId }) {
           return getInviteId(email, studyId)
         },
-        createInvite({ email, studyId }) {
-          return inviteUser(email, studyId)
+        createInvite({ email, studyId, prefill }) {
+          return inviteUser(email, studyId, prefill)
         },
         removeUserFromStudy({ email, studyId }) {
           return removeUserFromStudy(email, studyId)
