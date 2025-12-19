@@ -10,8 +10,8 @@ import {
   getInviteId,
   inviteUser,
   removeUserFromStudy,
-  formatStudyName
 } from 'common/testing/TestHelpers'
+import { formatStudyName } from 'common/src/utils'
 
 import {
   PASSWORD_RESET_USER_EMAIL,

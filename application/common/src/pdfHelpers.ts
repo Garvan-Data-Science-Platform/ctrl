@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 
 import { pdf } from '@react-pdf/renderer'
-import { formatStudyName } from '../testing/TestHelpers'
+import { formatStudyName } from './utils'
 
 export const pdfUtils = {
   formatFileName: (prefix: string, studyName: string, participantName = '') => {
