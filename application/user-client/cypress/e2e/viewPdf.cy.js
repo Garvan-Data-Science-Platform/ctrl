@@ -7,8 +7,6 @@ beforeEach(() => {
 const { UserType } = require('../../../common/cypress/support/commands')
 const downloadsPath = 'cypress/downloads/'
 
-// TODO: Add logo tests
-
 // Note: the tests below make heavy use of environment variables
 //   specified in `application/user-client/cypress.config.ts`.
 //   These env vars pull in variables specified in the test seed data
@@ -19,6 +17,12 @@ const feStudyName = Cypress.env('FE_TEST_STUDY')
 const feStudyId = Cypress.env('FE_TEST_STUDY_ID')
 
 describe('viewPdf', () => {
+  let hashes
+
+  before(() => {
+    cy.readFile('../common/testing/fixtures/logo_hashes.json').then((data) => (hashes = data))
+  })
+
   function assertPdfContains(studyId, text_string) {
     // Function to:
     //  - click 'View responses' button,
@@ -177,5 +181,57 @@ describe('viewPdf', () => {
     })
   })
 
-  // PDF contains logo, doesn't contain logo, and contains correct logo when study is changed
+  it('PDF fetches logos correctly', () => {
+    const orgLogoEndpoint = '**/settings/logo'
+    const studyLogoEndpoint = `**/studies/${studyId}/logo*`
+
+    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.visit('/')
+
+    // Intercept logo fetch
+    cy.intercept('GET', orgLogoEndpoint).as('orgLogo404')
+    cy.intercept('GET', studyLogoEndpoint).as('studyLogo404')
+
+    // Trigger PDF generation
+    cy.get('[data-cy="view-pdf"]').click()
+
+    // Verify that both requests were attempted but returned 404
+    cy.wait('@orgLogo404').its('response.statusCode').should('eq', 404)
+    cy.wait('@studyLogo404').its('response.statusCode').should('eq', 404)
+
+    // Set Org and study logos
+    cy.task('updateLogo', {
+      type: 'organisation',
+      filePath: '../common/testing/fixtures/valid_logo.png',
+    })
+    cy.task('updateLogo', {
+      type: 'study',
+      id: studyId,
+      filePath: '../common/testing/fixtures/alternate_logo.png',
+    })
+
+    // Intercept fetch
+    cy.intercept('GET', orgLogoEndpoint, (req) => {
+      req.continue((res) => {
+        const actualHash = yourHashFunction(res.body)
+        expect(actualHash, 'Org Logo Hash Match').to.equal(hashes.validLogoResizedHash)
+        expect(res.statusCode).to.equal(200)
+      })
+    }).as('fetchOrgLogo')
+
+    cy.intercept('GET', studyLogoEndpoint, (req) => {
+      req.continue((res) => {
+        const actualHash = yourHashFunction(res.body)
+        expect(actualHash, 'Study Logo Hash Match').to.equal(hashes.alternateLogoResizedHash)
+        expect(res.statusCode).to.equal(200)
+      })
+    }).as('fetchStudyLogo')
+
+    // generate PDF
+    cy.get('[data-cy="view-pdf"]').click()
+
+    // run logo hash checks
+    cy.wait('@fetchOrgLogo')
+    cy.wait('@fetchStudyLogo')
+  })
 })
