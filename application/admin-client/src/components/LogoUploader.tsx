@@ -101,15 +101,16 @@ export const LogoUploader = ({
             id="logo-preview"
           />
           <Typography variant="caption">Update logo</Typography>
-          <Typography
-            variant="caption"
+          <Button
+            variant="outlined"
             color="error"
+            size="small"
             onClick={deleteLogo}
             data-cy="logo-delete"
-            sx={{ cursor: 'pointer', fontWeight: 'bold' }}
+            sx={{ px: 0.25, py: 0.25, pt: '4px', cursor: 'pointer', fontSize: '10px' }}
           >
             Remove Logo
-          </Typography>
+          </Button>
         </Stack>
       ) : (
         'Upload Logo'
