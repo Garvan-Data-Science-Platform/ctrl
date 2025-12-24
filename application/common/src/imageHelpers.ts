@@ -4,13 +4,21 @@ import logger from 'common/src/logger'
 
 export async function processLogoImage(fileBuffer: Buffer): Promise<Buffer> {
   try {
+    if (!fileBuffer || fileBuffer.length === 0) {
+      throw new Error('Input buffer is empty')
+    }
     return await sharp(fileBuffer)
       .resize(200)
       .png() // Convert all logo images to png
       .toBuffer()
-  } catch (err) {
-    const errorMessage: string = 'The uploaded file is not a valid image or is corrupted'
-    logger.error({ errorMessage, err })
-    throw new UnprocessableError(errorMessage)
+  } catch (err: any) {
+    logger.error({
+      message: 'Image processing failed',
+      stack: err.stack,
+      sharpMessage: err.message,
+    })
+    throw new UnprocessableError(
+      `Image processing failed: ${err.message || 'Invalid or currupted image'}`,
+    )
   }
 }
