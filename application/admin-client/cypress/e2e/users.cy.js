@@ -8,19 +8,19 @@ beforeEach(() => {
 
 describe('Users', () => {
   it('List users', () => {
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/users')
     cy.contains('Users').should('exist')
   })
 
   it('View single user', () => {
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/users')
     cy.get('[data-cy="view-button"]').first().click()
     cy.contains('First Name').should('exist')
   })
   it('Create user', () => {
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/users')
     cy.contains('Create').click()
     cy.url().should('contain', '/users/create')
@@ -32,7 +32,7 @@ describe('Users', () => {
     cy.contains('elvis@example.com').should('exist')
   })
   it('Edit user', () => {
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/users')
     cy.get('[data-cy="edit-button"]').eq(1).click()
     cy.get('input').eq(0).type('A')

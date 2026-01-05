@@ -8,7 +8,7 @@ beforeEach(() => {
 
 describe('Study Admins', () => {
   it('Add and remove studyadmin from studies', () => {
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/users')
     cy.get('[data-cy="edit-button"]').eq(3).click()
     cy.contains('Study 2').click()

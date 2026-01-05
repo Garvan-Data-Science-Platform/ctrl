@@ -8,7 +8,7 @@ beforeEach(() => {
 
 describe('Delete and restore', () => {
   it('Delete and restore user', () => {
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit(`/users/101`)
     cy.contains('Delete').click()
     cy.contains('Are you sure').parent().contains('Delete').click()
@@ -24,7 +24,7 @@ describe('Delete and restore', () => {
   })
 
   it('Delete and restore study', () => {
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/studies')
     cy.get('[data-cy="delete-study"]').first().click()
     cy.get('[data-cy="confirm-delete"]').click()
@@ -39,7 +39,7 @@ describe('Delete and restore', () => {
   })
 
   it('Delete and restore participant', () => {
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/participants/98')
     cy.contains('Delete').click()
     cy.contains('Are you sure').parent().contains('Delete').click()

@@ -4,7 +4,7 @@ const { UserType } = require('../support/commands')
 
 beforeEach(() => {
   cy.task('reset')
-  cy.login(UserType.ADMIN)
+  cy.login(UserType.ORG_ADMIN)
   cy.visit('/integrations')
   cy.contains('Import Participants').should('exist').click()
 })
