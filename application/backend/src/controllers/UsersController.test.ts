@@ -215,9 +215,19 @@ describe('UsersController', () => {
 
       expect(response.body.message).toBe(`Record not found`)
     })
-    it('Study Admins can not edit other admins', async () => {
+    it('Study Admins can not edit org admins', async () => {
       const response = await request(app)
         .patch(`/users/${ORG_ADMIN_ID}`)
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+        .send({ firstName: 'Afijodsjfo' })
+      expect(response.ok).toBe(false)
+    })
+    it('Study Admins can not edit other study admins', async () => {
+      const u = await prisma.user.create({
+        data: { email: 'studyadmin2@example.com', firstName: 'a', lastName: 'b', password: '' },
+      })
+      const response = await request(app)
+        .patch(`/users/${u.id}`)
         .set({ Authorization: `Bearer ${studyAdminToken}` })
         .send({ firstName: 'Afijodsjfo' })
       expect(response.ok).toBe(false)
