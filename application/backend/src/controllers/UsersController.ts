@@ -94,7 +94,7 @@ export class UsersController extends Controller {
   /**
    * Get all deleted Admin Users
    *
-   * @summary Get all deleted Admin Users
+   * @summary Get all deleted Organisation and Study Admin Users
    */
   @Get('/admin/deleted')
   @Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
@@ -109,7 +109,7 @@ export class UsersController extends Controller {
       return { data: [] }
     }
     const users: User[] = await this.userRepo.findMany({
-      where: { role: { in: ['OperatorAdmin', 'OrganisationAdmin'] }, deleted: true },
+      where: { role: { in: ['OperatorAdmin', 'OrganisationAdmin', 'StudyAdmin'] }, deleted: true },
     })
     const responseData = { data: users }
     return responseData
