@@ -168,6 +168,7 @@ export class UsersController extends Controller {
   ): Promise<CreateUserResponse> {
     const callingUser = await this.userRepo.findUniqueOrThrow({
       where: { id: request.user.userId },
+      select: { id: true, role: true, adminOfStudies: { select: { id: true } } },
     })
     if (callingUser.role == 'StudyAdmin' && bodyRequest.role !== 'StudyAdmin') {
       throw new UnprocessableError('As a study admin, you can only create other study admins')
@@ -185,9 +186,20 @@ export class UsersController extends Controller {
       throw new UnprocessableError('Email already exists')
     }
     const password = hashPassword(randomBytes(8).toString('hex'))
+
+    let studyToAdd = undefined
+    if (callingUser.adminOfStudies.length == 1 && bodyRequest.role === 'StudyAdmin') {
+      studyToAdd = callingUser.adminOfStudies[0].id
+    }
+
     const insertedUser = await this.userRepo.create({
-      data: { ...bodyRequest, password },
+      data: {
+        ...bodyRequest,
+        password,
+        adminOfStudies: studyToAdd !== undefined ? { connect: { id: studyToAdd } } : undefined,
+      },
     })
+
     const responseData = {
       id: insertedUser.id,
     }
