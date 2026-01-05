@@ -62,7 +62,7 @@ describe('StudiesController', () => {
       expect(response.status).toBe(500)
     })
 
-    it('It should only return studies for study admin they are part of', async () => {
+    it('It should only return studies that study admin is admin of', async () => {
       const response = await request(app)
         .get('/studies')
         .set({ Authorization: `Bearer ${studyAdminToken}` })

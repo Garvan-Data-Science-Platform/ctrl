@@ -254,7 +254,7 @@ describe('UsersController', () => {
       })
       expect(updatedUser.adminOfStudies).toHaveLength(1)
     })
-    it('Study admins can only add admins to their own study', async () => {
+    it('Study admins can only add study admins to their own study', async () => {
       await prisma.user.update({ where: { id: ORG_ADMIN_2_ID }, data: { role: Role.StudyAdmin } })
       const response = await request(app)
         .post(`/users/${ORG_ADMIN_2_ID}/make-study-admin/${FE_TEST_STUDY_ID}`)
@@ -271,6 +271,23 @@ describe('UsersController', () => {
       expect(response.ok).toBe(true)
       const updatedUser = await prisma.user.findUniqueOrThrow({
         where: { id: STUDY_ADMIN_ID },
+        select: { adminOfStudies: { select: { id: true } } },
+      })
+      expect(updatedUser.adminOfStudies).toHaveLength(0)
+    })
+
+    it('Study admins can remove other study admins', async () => {
+      await prisma.user.update({
+        where: { id: ORG_ADMIN_2_ID },
+        data: { role: Role.StudyAdmin, adminOfStudies: { connect: { id: TEST_STUDY_ID } } },
+      })
+
+      const response = await request(app)
+        .post(`/users/${ORG_ADMIN_2_ID}/remove-study-admin/${TEST_STUDY_ID}`)
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+      expect(response.ok).toBe(true)
+      const updatedUser = await prisma.user.findUniqueOrThrow({
+        where: { id: ORG_ADMIN_2_ID },
         select: { adminOfStudies: { select: { id: true } } },
       })
       expect(updatedUser.adminOfStudies).toHaveLength(0)
