@@ -1,6 +1,7 @@
 import {
   Box,
   Checkbox,
+  Divider,
   FormControlLabel,
   MenuItem,
   Stack,
@@ -38,15 +39,18 @@ export const UserEdit = () => {
   const invalidate = useInvalidate()
   const { id } = useParsed()
 
-  const removeFromStudy = async (studyId: number) => {
+  const editingDisabled = identity?.role == 'StudyAdmin' && identity?.id !== Number(id)
+  saveButtonProps.disabled = editingDisabled
+
+  const removeFromStudy = async (studyId: number, studyName: string) => {
     try {
       await axiosInstance.post(`/users/${id}/remove-study-admin/${studyId}`)
-      open?.({ type: 'success', message: 'Removed as study admin' })
+      open?.({ type: 'success', message: `Removed as admin of study ${studyName}` })
       invalidate({ resource: 'users', invalidates: ['all'] })
     } catch (e: any) {
       open?.({
         type: 'error',
-        message: `Failed to remove study admin: ${e.response.data.details}`,
+        message: `Failed to remove as admin of study ${studyName}: ${e.response.data.details}`,
       })
     }
   }
@@ -69,6 +73,9 @@ export const UserEdit = () => {
       isLoading={formLoading}
       saveButtonProps={saveButtonProps}
       canDelete={identity?.role == 'OrganisationAdmin'}
+      footerButtonProps={{
+        sx: { display: 'flex', justifyContent: 'flex-start', width: '100%', pl: 2, pb: 2 },
+      }}
     >
       <Stack direction="row" gap={3}>
         <Box
@@ -88,7 +95,7 @@ export const UserEdit = () => {
             type="text"
             label={'First Name'}
             name="firstName"
-            disabled={identity?.role == 'StudyAdmin' && identity?.id !== Number(id)}
+            disabled={editingDisabled}
             data-cy="first"
           />
           <TextField
@@ -103,7 +110,7 @@ export const UserEdit = () => {
             type="text"
             label={'Last Name'}
             name="lastName"
-            disabled={identity?.role == 'StudyAdmin' && identity?.id !== Number(id)}
+            disabled={editingDisabled}
           />
           <TextField
             {...register('email', {
@@ -117,7 +124,7 @@ export const UserEdit = () => {
             type="text"
             label={'Email'}
             name="email"
-            disabled={identity?.role == 'StudyAdmin' && identity?.id !== Number(id)}
+            disabled={editingDisabled}
           />
           <Controller
             name="role"
@@ -140,6 +147,7 @@ export const UserEdit = () => {
             }}
           />
         </Box>
+        <Box borderLeft="1px solid lightgrey" />
         <Stack flex={1}>
           <Typography variant="body1" fontWeight="bold">
             {'Admin of Study:'}
@@ -163,7 +171,7 @@ export const UserEdit = () => {
                       if (e.target.checked) {
                         await addToStudy(val.id)
                       } else {
-                        await removeFromStudy(val.id)
+                        await removeFromStudy(val.id, val.name)
                       }
                     }}
                   />
