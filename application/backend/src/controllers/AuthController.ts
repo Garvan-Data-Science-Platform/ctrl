@@ -322,11 +322,15 @@ export class AuthController extends Controller {
     }
 
     if (!user) {
+      throw new IncorrectPermissionsError('This email is not registered with CTRL.')
+    }
+
+    if (clientType === 'admin-client' && user.role === 'Participant') {
       throw new IncorrectPermissionsError('User does not have admin privileges')
     }
 
-    if (!user || (clientType === 'admin-client' && user.role == 'Participant')) {
-      throw new IncorrectPermissionsError('User does not have admin privileges')
+    if (clientType === 'user-client' && user.role !== 'Participant') {
+      throw new IncorrectPermissionsError('User is not a study participant')
     }
 
     const token = await generateToken({ userId: user.id })
