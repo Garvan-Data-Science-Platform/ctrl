@@ -36,7 +36,8 @@ axiosInstance.interceptors.response.use(
       localStorage.removeItem(TOKEN_KEY)
       window.location.href = '/login'
     }
-    error.message = error?.response?.data?.details || error.message
+    const eMsg = error?.response?.data?.details || error.message
+    error.message = typeof eMsg == 'object' ? JSON.stringify(eMsg) : eMsg
     return Promise.reject(error)
   },
 )

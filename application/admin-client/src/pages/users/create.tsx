@@ -22,8 +22,8 @@ export const UserCreate = () => {
           {...register('firstName', {
             required: 'This field is required',
           })}
-          error={!!(errors as any)?.title}
-          helperText={(errors as any)?.title?.message}
+          error={!!(errors as any)?.firstName}
+          helperText={(errors as any)?.firstName?.message}
           margin="normal"
           fullWidth
           InputLabelProps={{ shrink: true }}
@@ -36,8 +36,8 @@ export const UserCreate = () => {
           {...register('lastName', {
             required: 'This field is required',
           })}
-          error={!!(errors as any)?.title}
-          helperText={(errors as any)?.title?.message}
+          error={!!(errors as any)?.lastName}
+          helperText={(errors as any)?.lastName?.message}
           margin="normal"
           fullWidth
           InputLabelProps={{ shrink: true }}
@@ -49,8 +49,8 @@ export const UserCreate = () => {
           {...register('email', {
             required: 'This field is required',
           })}
-          error={!!(errors as any)?.title}
-          helperText={(errors as any)?.title?.message}
+          error={!!(errors as any)?.email}
+          helperText={(errors as any)?.email?.message}
           margin="normal"
           fullWidth
           InputLabelProps={{ shrink: true }}

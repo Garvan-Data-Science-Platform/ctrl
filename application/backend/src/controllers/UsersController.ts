@@ -172,6 +172,18 @@ export class UsersController extends Controller {
     if (callingUser.role == 'StudyAdmin' && bodyRequest.role !== 'StudyAdmin') {
       throw new UnprocessableError('As a study admin, you can only create other study admins')
     }
+
+    const isDeleted =
+      (await this.userRepo.count({ where: { email: bodyRequest.email, deleted: true } })) > 0
+    if (isDeleted) {
+      throw new UnprocessableError(
+        'This email belongs to a deleted user, you must restore the user instead of creating a new one',
+      )
+    }
+    const emailExists = (await this.userRepo.count({ where: { email: bodyRequest.email } })) > 0
+    if (emailExists) {
+      throw new UnprocessableError('Email already exists')
+    }
     const password = hashPassword(randomBytes(8).toString('hex'))
     const insertedUser = await this.userRepo.create({
       data: { ...bodyRequest, password },
