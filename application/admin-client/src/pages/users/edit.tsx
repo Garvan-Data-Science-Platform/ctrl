@@ -147,40 +147,44 @@ export const UserEdit = () => {
             }}
           />
         </Box>
-        <Box borderLeft="1px solid lightgrey" />
-        <Stack flex={1}>
-          <Typography variant="body1" fontWeight="bold">
-            {'Admin of Study:'}
-          </Typography>
-          {studies.map((val, idx) => {
-            return (
-              <FormControlLabel
-                key={`stud_${idx}`}
-                disabled={
-                  record?.role != 'StudyAdmin' ||
-                  (identity?.role == 'StudyAdmin' && identity?.id == Number(id))
-                }
-                control={
-                  <Checkbox
-                    checked={
-                      record?.role == 'OrganisationAdmin' ||
-                      record?.adminOfStudies.map((v: any) => Number(v.id)).includes(val.id) ||
-                      false
+        {record?.role == 'StudyAdmin' && (
+          <>
+            <Box borderLeft="1px solid lightgrey" />
+            <Stack flex={1}>
+              <Typography variant="body1" fontWeight="bold">
+                {'Admin of Study:'}
+              </Typography>
+              {studies.map((val, idx) => {
+                return (
+                  <FormControlLabel
+                    key={`stud_${idx}`}
+                    disabled={
+                      record?.role != 'StudyAdmin' ||
+                      (identity?.role == 'StudyAdmin' && identity?.id == Number(id))
                     }
-                    onChange={async (e) => {
-                      if (e.target.checked) {
-                        await addToStudy(val.id)
-                      } else {
-                        await removeFromStudy(val.id, val.name)
-                      }
-                    }}
+                    control={
+                      <Checkbox
+                        checked={
+                          record?.role == 'OrganisationAdmin' ||
+                          record?.adminOfStudies.map((v: any) => Number(v.id)).includes(val.id) ||
+                          false
+                        }
+                        onChange={async (e) => {
+                          if (e.target.checked) {
+                            await addToStudy(val.id)
+                          } else {
+                            await removeFromStudy(val.id, val.name)
+                          }
+                        }}
+                      />
+                    }
+                    label={val.name}
                   />
-                }
-                label={val.name}
-              />
-            )
-          })}
-        </Stack>
+                )
+              })}
+            </Stack>
+          </>
+        )}
       </Stack>
     </Edit>
   )

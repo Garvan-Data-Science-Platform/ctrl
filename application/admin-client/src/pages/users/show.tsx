@@ -53,29 +53,31 @@ export const UserShow = () => {
           </Typography>
           <DateField value={record?.createdAt} />
         </Stack>
-        <Stack flex={1}>
-          <Typography variant="body1" fontWeight="bold">
-            {'Admin of Study:'}
-          </Typography>
-          {studies.map((val, idx) => {
-            return (
-              <FormControlLabel
-                key={`stud_${idx}`}
-                disabled
-                control={
-                  <Checkbox
-                    checked={
-                      record?.role == 'OrganisationAdmin' ||
-                      record?.adminOfStudies.map((v: any) => Number(v.id)).includes(val.id) ||
-                      false
-                    }
-                  />
-                }
-                label={val.name}
-              />
-            )
-          })}
-        </Stack>
+        {record?.role == 'StudyAdmin' && (
+          <Stack flex={1}>
+            <Typography variant="body1" fontWeight="bold">
+              {'Admin of Study:'}
+            </Typography>
+            {studies.map((val, idx) => {
+              return (
+                <FormControlLabel
+                  key={`stud_${idx}`}
+                  disabled
+                  control={
+                    <Checkbox
+                      checked={
+                        record?.role == 'OrganisationAdmin' ||
+                        record?.adminOfStudies.map((v: any) => Number(v.id)).includes(val.id) ||
+                        false
+                      }
+                    />
+                  }
+                  label={val.name}
+                />
+              )
+            })}
+          </Stack>
+        )}
       </Stack>
     </Show>
   )
