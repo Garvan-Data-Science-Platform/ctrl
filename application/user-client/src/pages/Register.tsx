@@ -16,7 +16,7 @@ import {
   Typography,
   Link as MLink,
 } from '@mui/material'
-import { useForm, useFieldArray } from 'react-hook-form'
+import { useForm, useFieldArray, Controller } from 'react-hook-form'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../auth'
 import { RegisterParticipantRequest, RegisterParticipantResponse } from '@common/types/api/auth'
@@ -61,7 +61,9 @@ export default function Register() {
     watch,
     reset,
     formState: { errors },
-  } = useForm<FormValues>()
+  } = useForm<FormValues>({
+    defaultValues: { preferredContact: '' as ContactMethod, state: '' as StateTerritory },
+  })
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -105,10 +107,10 @@ export default function Register() {
               state: prefillProfile.state ?? ('' as StateTerritory),
               postcode: prefillProfile.postcode ?? '',
               mobile: prefillProfile.mobile ?? '',
-              preferredContact: prefillProfile.preferredContact ?? ('' as ContactMethod),
-              nok_first: prefillProfile.nok_first ?? '',
-              nok_surname: prefillProfile.nok_surname ?? '',
-              nok_email: prefillProfile.nok_email ?? '',
+              preferredContact: prefillProfile.preferredContact ?? ('MOBILE' as ContactMethod),
+              nok_first: prefillProfile.nextOfKin?.lastName ?? '',
+              nok_surname: prefillProfile.nextOfKin?.lastName ?? '',
+              nok_email: prefillProfile.nextOfKin?.email ?? '',
               dependents: prefillProfile.dependents ?? [],
               terms: false,
             })
@@ -290,21 +292,27 @@ export default function Register() {
               />
               <FormControl sx={{ m: 1, flexGrow: 1 }}>
                 <InputLabel id="state-select-label">State</InputLabel>
-                <Select
-                  labelId="state-select-label"
-                  label="State"
-                  error={Boolean(errors.state)}
-                  data-cy="reg-state"
-                  {...register('state', { required: 'This field is required' })}
-                >
-                  {Object.keys(StateTerritory).map((val, idx) => {
-                    return (
-                      <MenuItem value={val} key={`state_${idx}`}>
-                        {val}
-                      </MenuItem>
-                    )
-                  })}
-                </Select>
+                <Controller
+                  name="state"
+                  control={control}
+                  rules={{ required: 'This field is required' }}
+                  render={({ field }) => (
+                    <Select
+                      labelId="state-select-label"
+                      label="State"
+                      error={Boolean(errors.state)}
+                      data-cy="reg-state"
+                      {...field}
+                    >
+                      {Object.values(StateTerritory).map((val, idx) => (
+                        <MenuItem value={val} key={`state_${idx}`}>
+                          {val}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  )}
+                />
+                {errors.state && <FormHelperText error>{errors.state.message}</FormHelperText>}
               </FormControl>
 
               <TextField
@@ -341,21 +349,29 @@ export default function Register() {
               />
               <FormControl sx={{ m: 1, flexGrow: 1, minWidth: 240 }}>
                 <InputLabel id="pref-select-label">Preferred Contact Method</InputLabel>
-                <Select
-                  labelId="pref-select-label"
-                  label="Preferred Contact Method"
-                  error={Boolean(errors.preferredContact)}
-                  data-cy="reg-contact-method"
-                  {...register('preferredContact', { required: 'This field is required' })}
-                >
-                  {Object.keys(ContactMethod).map((val, idx) => {
-                    return (
-                      <MenuItem value={val} key={`contact_${idx}`}>
-                        {val}
-                      </MenuItem>
-                    )
-                  })}
-                </Select>
+                <Controller
+                  name="preferredContact"
+                  control={control}
+                  rules={{ required: 'This field is required' }}
+                  render={({ field }) => (
+                    <Select
+                      labelId="pref-select-label"
+                      label="Preferred Contact Method"
+                      error={Boolean(errors.preferredContact)}
+                      data-cy="reg-contact-method"
+                      {...field}
+                    >
+                      {Object.values(ContactMethod).map((val, idx) => (
+                        <MenuItem value={val} key={`contact_${idx}`}>
+                          {val[0] + val.slice(1).toLowerCase()}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  )}
+                />
+                {errors.preferredContact && (
+                  <FormHelperText error>{errors.preferredContact.message}</FormHelperText>
+                )}
               </FormControl>
 
               <>
