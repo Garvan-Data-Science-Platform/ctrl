@@ -36,7 +36,7 @@ export const importFields: Fields<PrefillKey> = [
     fieldType: { type: 'input' },
   },
   {
-    label: 'Date of Birth',
+    label: 'Date of Birth (d/m/y)',
     key: 'profile.dob',
     alternateMatches: ['dob', 'ctrl_dob'],
     fieldType: { type: 'input' },
