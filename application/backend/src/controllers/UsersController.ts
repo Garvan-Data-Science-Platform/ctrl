@@ -217,7 +217,9 @@ export class UsersController extends Controller {
     const targetUser = await this.userRepo.findUniqueOrThrow({ where: { id: userId } })
     if (callingUser.role == 'StudyAdmin') {
       if (targetUser.id !== callingUser.id) {
-        throw new UnprocessableError('Study admins cannot edit details of other admins')
+        throw new UnprocessableError(
+          'Study admins cannot edit details of other study/organisation admins',
+        )
       }
       if (bodyRequest.role && bodyRequest.role !== targetUser.role) {
         throw new UnprocessableError('Study admins cannot edit roles')
