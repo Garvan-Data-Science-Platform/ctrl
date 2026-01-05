@@ -295,8 +295,9 @@ const main = async () => {
       email: 'janesmith@example.com',
       firstName: 'Jane',
       lastName: 'Smith',
-      role: 'OperatorAdmin',
+      role: 'StudyAdmin',
       password: hashPassword('SomePassword123'),
+      adminOfStudies: { connect: [{ id: defaultStudy.id }, { id: shortStudy.id }] },
     },
   })
 
@@ -319,8 +320,9 @@ const main = async () => {
       email: 'emilydavis@example.com',
       firstName: 'Emily',
       lastName: 'Davis',
-      role: 'OperatorAdmin',
+      role: 'StudyAdmin',
       password: hashPassword('SomePassword123'),
+      adminOfStudies: { connect: { id: shortStudy.id } },
     },
   })
 
