@@ -30,6 +30,13 @@ describe('Study Admins', () => {
     cy.visit('/users/update/97')
     cy.get('[data-cy="role-select"] input').should('be.disabled')
     cy.get('[data-cy="first"] input').should('be.disabled')
+    //Can't delete another admin
+    cy.visit('/users/update/97')
+    cy.contains('Delete').should('not.exist')
+  })
+  it('Study admin checkboxes not visible when editing an org admin', () => {
+    cy.visit('/users/update/97')
+    cy.contains('Admin of Study').should('not.exist')
   })
   it('Can only see studies they are admin of', () => {
     cy.login(UserType.STUDY_ADMIN)
@@ -37,12 +44,21 @@ describe('Study Admins', () => {
     cy.contains('Study FE').should('not.exist')
     cy.contains('Test Study').should('exist')
   })
-
   it('Cannot edit a family if they are not admin of every related study', () => {
     cy.login(UserType.STUDY_ADMIN)
     cy.visit('/participants/family/edit/100')
     cy.get('[data-cy="remove-member-button"]').click()
     cy.get('[data-cy="remove-icon-button"]').eq(1).click()
     cy.contains('Failed to remove').should('exist')
+  })
+  it("Displays correct message when a study admin logs in but they don't have access to any studies", () => {
+    cy.login(UserType.ORG_ADMIN)
+    cy.visit('/users')
+    cy.get('[data-cy="edit-button"]').eq(3).click()
+    cy.contains('Test Study').click()
+    cy.contains('Removed').should('exist')
+    cy.login(UserType.STUDY_ADMIN)
+    cy.visit('/users')
+    cy.contains('You do not have access').should('exist')
   })
 })

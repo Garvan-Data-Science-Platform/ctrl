@@ -14,11 +14,24 @@ describe('Delete and restore', () => {
     cy.contains('Are you sure').parent().contains('Delete').click()
     cy.contains('Success').should('exist')
     cy.contains('testOrgAdmin2@example.com').should('not.exist')
+
+    cy.visit(`/users/106`)
+    cy.contains('Delete').click()
+    cy.contains('Are you sure').parent().contains('Delete').click()
+    cy.contains('Success').should('exist')
+    cy.contains('studyadmin@example.com').should('not.exist')
+
     cy.visit('/restore')
     cy.contains('101').should('exist')
-    cy.get('[data-cy="restore-user"]').click()
+    cy.get('[data-cy="restore-user"]').eq(0).click()
     cy.contains('Successfully restored').should('exist')
     cy.contains('101').should('not.exist')
+
+    cy.contains('106').should('exist')
+    cy.get('[data-cy="restore-user"]').eq(0).click()
+    cy.contains('Successfully restored').should('exist')
+    cy.contains('106').should('not.exist')
+
     cy.visit('/users')
     cy.contains('testOrgAdmin2@example.com').should('exist')
   })
