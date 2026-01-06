@@ -89,7 +89,7 @@ export default function Register() {
             delete prefillProfile.password // Do not prefill password
             function toISO(date: string) {
               try {
-                const [d, m, y] = date.split('/')
+                const [d, m, y] = date.split(/[/\-]/)
                 return y && m && d ? `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}` : ''
               } catch {
                 return ''

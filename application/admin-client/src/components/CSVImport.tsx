@@ -43,8 +43,8 @@ export const importFields: Fields<PrefillKey> = [
     validations: [
       {
         rule: 'regex',
-        value: '^(0?[1-9]|[12][0-9]|3[01])/(0?[1-9]|1[0-2])/\\d{4}$',
-        errorMessage: 'Must be format d/m/yyyy',
+        value: '^(0?[1-9]|[12][0-9]|3[01])[/\\-](0?[1-9]|1[0-2])[/\\-]\\d{4}$',
+        errorMessage: 'Must be format d/m/yyyy or d-m-yyyy',
       },
     ],
   },
