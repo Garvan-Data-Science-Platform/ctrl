@@ -87,8 +87,8 @@ export const UserEdit = () => {
             {...register('firstName', {
               required: 'This field is required',
             })}
-            error={!!(errors as any)?.title}
-            helperText={(errors as any)?.title?.message}
+            error={!!(errors as any)?.firstName}
+            helperText={(errors as any)?.firstName?.message}
             margin="normal"
             fullWidth
             InputLabelProps={{ shrink: true }}
@@ -102,8 +102,8 @@ export const UserEdit = () => {
             {...register('lastName', {
               required: 'This field is required',
             })}
-            error={!!(errors as any)?.title}
-            helperText={(errors as any)?.title?.message}
+            error={!!(errors as any)?.lastName}
+            helperText={(errors as any)?.lastName?.message}
             margin="normal"
             fullWidth
             InputLabelProps={{ shrink: true }}
@@ -115,9 +115,11 @@ export const UserEdit = () => {
           <TextField
             {...register('email', {
               required: 'This field is required',
+              validate: (email: string | undefined) =>
+                /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email || '') || 'Invalid email address',
             })}
-            error={!!(errors as any)?.title}
-            helperText={(errors as any)?.title?.message}
+            error={!!(errors as any)?.email}
+            helperText={(errors as any)?.email?.message}
             margin="normal"
             fullWidth
             InputLabelProps={{ shrink: true }}
