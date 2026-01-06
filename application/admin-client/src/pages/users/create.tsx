@@ -15,11 +15,6 @@ export const UserCreate = () => {
 
   const { data: identity } = useGetIdentity<{ role: string; id: number }>()
 
-  const validateEmail = (email: string) => {
-    const r = new RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) //eslint-disable-line
-    return r.test(email)
-  }
-
   return (
     <Create isLoading={formLoading} saveButtonProps={saveButtonProps}>
       <Box component="form" sx={{ display: 'flex', flexDirection: 'column' }} autoComplete="off">
@@ -54,7 +49,7 @@ export const UserCreate = () => {
           {...register('email', {
             required: 'This field is required',
             validate: (email: string) =>
-              /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email) || 'Invalid email address',
+              /^[\w.-]+@([\w-]+\.)+[\w-]{2,4}$/.test(email) || 'Invalid email address',
           })}
           error={!!(errors as any)?.email}
           helperText={(errors as any)?.email?.message}

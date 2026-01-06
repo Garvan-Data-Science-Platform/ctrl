@@ -1,7 +1,6 @@
 import {
   Box,
   Checkbox,
-  Divider,
   FormControlLabel,
   MenuItem,
   Stack,
@@ -116,7 +115,7 @@ export const UserEdit = () => {
             {...register('email', {
               required: 'This field is required',
               validate: (email: string | undefined) =>
-                /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email || '') || 'Invalid email address',
+                /^[\w.-]+@([\w-]+\.)+[\w-]{2,4}$/.test(email || '') || 'Invalid email address',
             })}
             error={!!(errors as any)?.email}
             helperText={(errors as any)?.email?.message}
