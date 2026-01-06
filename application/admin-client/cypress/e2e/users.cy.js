@@ -39,7 +39,7 @@ describe('Users', () => {
     cy.visit('/users')
     cy.get('[data-cy="edit-button"]').eq(1).click()
     cy.get('input').eq(0).type('A')
-    cy.get('input').eq(2).type('elvisexample.com')
+    cy.get('input').eq(2).clear().type('elvisexample.com')
     cy.contains('Save').click()
     cy.contains('Invalid email').should('exist')
     cy.get('input').eq(2).clear().type('elvis@example.com')
