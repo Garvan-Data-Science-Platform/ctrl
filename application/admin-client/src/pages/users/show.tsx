@@ -20,6 +20,7 @@ export const UserShow = () => {
       isLoading={isLoading}
       title={<Typography variant="h4">{`${record?.firstName} ${record?.lastName}`}</Typography>}
       canEdit={identity?.role != 'StudyAdmin' || record?.role == 'StudyAdmin'}
+      canDelete={identity?.role == 'OrganisationAdmin'}
     >
       <Stack direction="row">
         <Stack gap={1} flex={1}>
