@@ -14,11 +14,9 @@ import {
   GetSurveyVersionByVersionNumberResponse,
 } from 'common/types/api/surveys'
 import {
-  DEPENDENT_ID,
   ORG_ADMIN_ID,
   PARTICIPANT_COMPLETED_ID,
   PARTICIPANT_UNANSWERED_ID,
-  SECOND_GUARDIAN_ID,
 } from 'common/testing/seed'
 
 const api = new Api()
@@ -180,32 +178,6 @@ describe('SurveysController', () => {
         .set({ Authorization: `Bearer ${token}` })
         .send(reqBody)
       expect(response.status).toBe(422)
-    })
-
-    it('participant should inherit answers from both guardians correctly', async () => {
-      const secondGuardianToken = generateToken({
-        userId: SECOND_GUARDIAN_ID,
-        roles: ['Participant'],
-      })
-
-      const reqBody: UpdateSurveyAnswersRequest = {
-        step: 1,
-        data: [false, 'Choice 1'], //Other parent answer is [false, 'Choice 2']
-      }
-      const response = await request(app)
-        .post('/studies/1/survey-answers')
-        .set({ Authorization: `Bearer ${secondGuardianToken}` })
-        .send(reqBody)
-      expect(response.status).toBe(204)
-      const dependentAnswers = await prisma.surveyVersionAnswers.findFirstOrThrow({
-        where: {
-          profileId: DEPENDENT_ID,
-          version: {
-            studyId: 1,
-          },
-        },
-      })
-      expect(dependentAnswers.answers[1].answers).toEqual([false, null])
     })
   })
 

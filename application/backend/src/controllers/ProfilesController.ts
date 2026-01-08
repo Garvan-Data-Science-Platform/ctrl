@@ -30,7 +30,7 @@ import {
 } from 'common/types/api/users/ParticipantProfile'
 import { FamilyMember } from 'common/types/api/users/getParticipantProfile'
 import { auditLog } from '../middlewares/AuditLog'
-import { recalculateAnswers } from '../utils/answers'
+import { CtrlEvent } from '../../prisma/events/event.type'
 
 @Route('profiles')
 @Tags('Profiles')
@@ -213,40 +213,44 @@ export class ProfilesController extends Controller {
       }
     }
 
-    await this.participantProfileRepo.update({
-      where: { id: profile.id },
-      data: { ...updateData, nextOfKin: hasNok ? { update: nextOfKin } : undefined },
-    })
-
-    if (profile.userId) {
-      await this.userRepo.update({
-        where: { id: profile.userId },
-        data: { email: email, firstName: bodyRequest.firstName, lastName: bodyRequest.lastName },
+    await prisma.$transaction(async (tx) => {
+      await tx.participantProfile.update({
+        where: { id: profile.id },
+        data: { ...updateData, nextOfKin: hasNok ? { update: nextOfKin } : undefined },
       })
-    }
 
-    if (bodyRequest.participantType) {
-      const studies = await prisma.study.findMany({
-        where: {
-          profiles: {
-            some: {
-              participantProfile: {
-                familyId: profile.familyId,
-              },
-            },
+      await tx.outbox.create({
+        data: {
+          eventType: 'profile.updated',
+          payload: JSON.stringify({
+            payloadVersion: 1,
+            profileId,
+            fields: bodyRequest,
+          } as CtrlEvent['payload']),
+        },
+      })
+
+      if (profile.userId) {
+        const updateData = {
+          email: email,
+          firstName: bodyRequest.firstName,
+          lastName: bodyRequest.lastName,
+        }
+        await tx.user.update({
+          where: { id: profile.userId },
+          data: updateData,
+        })
+        await tx.outbox.create({
+          data: {
+            eventType: 'user.updated',
+            payload: JSON.stringify({
+              payloadVersion: 1,
+              userId: profile.userId,
+              fields: updateData,
+            } as CtrlEvent['payload']),
           },
-        },
-        select: {
-          id: true,
-          name: true,
-        },
-      })
-
-      if (studies.length === 0) return
-
-      for (const study of studies) {
-        await recalculateAnswers(profile.familyId, study.id)
+        })
       }
-    }
+    })
   }
 }

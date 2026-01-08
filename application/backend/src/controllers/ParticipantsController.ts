@@ -41,12 +41,7 @@ import nodemailer from 'nodemailer'
 import { generateInviteEmail } from 'common/src/generateInviteTemplate'
 import { InviteStatus } from 'common/types/api/participants/invite'
 import { BadGatewayError, NotFoundError, UnprocessableError } from '../middlewares/ErrorHandler'
-import {
-  createDefaultAnswers,
-  determineLastUpdated,
-  determineStatus,
-  recalculateAnswers,
-} from '../utils/answers'
+import { createDefaultAnswers, determineLastUpdated, determineStatus } from '../utils/answers'
 import { ProfilesController } from './ProfilesController'
 import { auditLog } from '../middlewares/AuditLog'
 import { Role } from '@prisma/client'
@@ -54,6 +49,7 @@ import { genId } from '../utils/genId'
 import { extractOrderBy, extractWhere } from '../utils/filtering'
 import { generateInviteId, inviteExpiresAt } from '../utils/invite'
 import { Prefill } from 'common/types/invite'
+import actionWithEvents from '../../prisma/events/actionWithEvents'
 
 @Route('/')
 @Tags('Participants')
@@ -323,16 +319,22 @@ export class ParticipantsController extends Controller {
       throw new UnprocessableError('Cannot leave a dependent with no guardian')
     }
 
-    await prisma.studyParticipant.delete({
-      where: {
-        participantProfileId_studyId: {
-          participantProfileId: profileId,
-          studyId: studyId,
+    await actionWithEvents(
+      prisma.studyParticipant.delete({
+        where: {
+          participantProfileId_studyId: {
+            participantProfileId: profileId,
+            studyId: studyId,
+          },
         },
-      },
-    })
-
-    await recalculateAnswers(profile.familyId, studyId)
+      }),
+      [
+        {
+          eventType: 'study.participant.removed',
+          payload: { payloadVersion: 1, profileId, studyId },
+        },
+      ],
+    )
   }
 
   /**
@@ -369,50 +371,63 @@ export class ParticipantsController extends Controller {
 
     const profile = await this.profileRepo.findUniqueOrThrow({ where: { id: profileId } })
 
-    if (
-      profile.participantType == 'DEPENDENT_AGE' ||
-      profile.participantType == 'DEPENDENT_OTHER'
-    ) {
-      const guardian = await this.participantRepo.findFirst({
-        where: {
-          studyId,
-          participantProfile: { familyId: profile.familyId, participantType: 'GUARDIAN' },
-        },
-      })
-      if (!guardian) {
+    await prisma.$transaction(async (tx) => {
+      if (
+        profile.participantType == 'DEPENDENT_AGE' ||
+        profile.participantType == 'DEPENDENT_OTHER'
+      ) {
+        const guardian = await tx.studyParticipant.findFirst({
+          where: {
+            studyId,
+            participantProfile: { familyId: profile.familyId, participantType: 'GUARDIAN' },
+          },
+        })
+        if (!guardian) {
+          throw new UnprocessableError(
+            "Can't add a dependent to a study if no guardian is a member of the study",
+          )
+        }
+      }
+      if (deletedP) {
+        await tx.studyParticipant.update({
+          where: {
+            participantProfileId_studyId: {
+              participantProfileId: deletedP.participantProfileId,
+              studyId: deletedP.studyId,
+            },
+            deleted: true,
+          },
+          data: { deleted: false },
+        })
+        await tx.outbox.create({
+          data: {
+            eventType: 'study.participant.added',
+            payload: JSON.stringify({ studyId, profileId }),
+          },
+        })
+      } else if (!profile.userId) {
+        await tx.studyParticipant.create({
+          data: { studyId: studyId, participantProfileId: profileId },
+        })
+        await tx.surveyVersionAnswers.create({
+          data: {
+            profileId: profile.id,
+            versionId: currentSurvey.id,
+            answers: createDefaultAnswers(currentSurvey.data),
+          },
+        })
+        await tx.outbox.create({
+          data: {
+            eventType: 'study.participant.added',
+            payload: JSON.stringify({ studyId, profileId }),
+          },
+        })
+      } else {
         throw new UnprocessableError(
-          "Can't add a dependent to a study if no guardian is a member of the study",
+          'The participant must be invited to join the study via email (via the Participants page)',
         )
       }
-    }
-    if (deletedP) {
-      await this.participantRepo.update({
-        where: {
-          participantProfileId_studyId: {
-            participantProfileId: deletedP.participantProfileId,
-            studyId: deletedP.studyId,
-          },
-          deleted: true,
-        },
-        data: { deleted: false },
-      })
-    } else if (!profile.userId) {
-      await this.participantRepo.create({
-        data: { studyId: studyId, participantProfileId: profileId },
-      })
-      await prisma.surveyVersionAnswers.create({
-        data: {
-          profileId: profile.id,
-          versionId: currentSurvey.id,
-          answers: createDefaultAnswers(currentSurvey.data),
-        },
-      })
-    } else {
-      throw new UnprocessableError(
-        'The participant must be invited to join the study via email (via the Participants page)',
-      )
-    }
-    await recalculateAnswers(profile.familyId, studyId)
+    })
   }
 }
 

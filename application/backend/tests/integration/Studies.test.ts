@@ -14,6 +14,7 @@ import { GetAllStudiesResponse } from 'common/types/api/studies'
 import prisma from '../../src/PrismaClient'
 
 import { TEST_STUDY, SECOND_TEST_STUDY } from 'common/testing/seed'
+import { processEvents } from './processEvents'
 
 const api = new Api()
 const app = api.app
@@ -102,6 +103,8 @@ describe('Studies tests', () => {
       .send(requestBody)
 
     expect(res.statusCode).toBe(204)
+
+    await processEvents()
 
     expect(
       (
@@ -345,6 +348,8 @@ describe('Studies tests', () => {
       .set({ authorization: `Bearer ${token}` })
       .send(reqBody)
     expect(res.statusCode).toBe(204)
+
+    await processEvents()
 
     // get dependent answers. get parent 1 answsers from study1 again
     const dep1AnswersAfter = (
