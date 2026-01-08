@@ -17,8 +17,7 @@
     <a href="https://www.australiangenomics.org.au/tools-and-resources/dynamic-consent-and-ctrl/"><b>Website</b></a>
   </div>
   <br/>
-  <img src="docs/ctrl.gif" alt="GIF" width="100%" style="margin: 0 20px;"/>
-
+  <img src="docs/ctrl.gif" alt="Ctrl GIF" width="100%" style="margin: 0 20px;"/>
 </div>
 
 CTRL, developed by [Garvan Institute of Medical Research](https://www.garvan.org.au/), is a secure, web-based dynamic consent platform that empowers research participants to manage their consent preferences, update personal details, and make informed decisions about the use of their genomic and health data. For research organizations, CTRL streamlines consent management by replacing paper records with electronic ones, offering interoperability with databases like [REDCap](https://projectredcap.org/), and managing permissions.
