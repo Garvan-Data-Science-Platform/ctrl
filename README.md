@@ -20,7 +20,7 @@
   <img src="docs/ctrl.gif" alt="Ctrl GIF" width="100%" style="margin: 0 20px;"/>
 </div>
 
-CTRL, developed by [Garvan Institute of Medical Research](https://www.garvan.org.au/), is a secure, web-based dynamic consent platform that empowers research participants to manage their consent preferences, update personal details, and make informed decisions about the use of their genomic and health data. For research organizations, CTRL streamlines consent management by replacing paper records with electronic ones, offering interoperability with databases like [REDCap](https://projectredcap.org/), and managing permissions.
+CTRL, developed by [Garvan Institute of Medical Research](https://www.garvan.org.au/), is a secure, web-based dynamic consent platform that empowers research participants to manage their consent preferences, update personal details, and make informed decisions about the use of their genomic and health data. For research organisations, CTRL streamlines consent management by replacing paper records with electronic ones, offering interoperability with databases like [REDCap](https://projectredcap.org/), and managing permissions.
 
 **Demo Login Information**
 
@@ -69,7 +69,7 @@ We take special care to ensure upgrading this way is always safe. If you are usi
 
 The use of `nvm` to manage node versions is highly recommended. Install `nvm` using [these instructions](https://github.com/nvm-sh/nvm).
 
-Docker is required to run this project locally to containerise and manage the application's services, including the frontend clients (user-client, admin-client), backend API, and supporting services like PostgreSQL. Each main component has its own Dockerfile for building optimized images, and docker-compose.yml is used to orchestrate local environments, making it easy to spin up, test, and manage dependencies consistently across different setups.
+Docker is required to run this project locally to containerise and manage the application's services, including the frontend clients (user-client, admin-client), backend API, and supporting services like PostgreSQL. Each main component has its own Dockerfile for building optimised images, and docker-compose.yml is used to orchestrate local environments, making it easy to spin up, test, and manage dependencies consistently across different setups.
 
 Then from the root of the `ctrl-next` repository run the following commands:
 
@@ -158,6 +158,18 @@ yarn test
 # Build swagger docs for all workspaces.
 yarn build-docs
 ```
+
+## Features
+
+- **PDF Export of Questions & Consent** Instantly download or print comprehensive PDFs of consent forms and questionnaire responses for your records.
+- **Custom Participant Invite via Email** Engage participants with personalised email invitations, fully customisable to match your study's voice and branding.
+- **REDCap Integration** Seamlessly pull data from an existing [REDCap](https://project-redcap.org/) Project to streamline your research workflow and ensure data consistency.
+- **Elsa Integration** Connect effortlessly with [elsa-data](https://github.com/elsa-data/elsa-data) for managing the sharing and access to your genomic data using [DUO codes](https://www.ga4gh.org/product/data-use-ontology-duo/).
+- **Authentication** Enable secure and simple access through [Australian Access Federation (AAF)](https://aaf.edu.au/) or [Auth0](https://auth0.com/).
+- **Study Management** Centralise your research administration with powerful tools to manage multiple studies, cohorts, and sites.
+- **Audit Trail** Maintain complete transparency and compliance with detailed, immutable audit logs of all system activities including changes to participant consent.
+- **Family Managment** Manage complex family relationships through which consent is calculated for dependants.
+- **Branding & Customisation** Make the platform your own with extensive theming options to align with your organisation and your study's brand identity.
 
 ## About CTRL
 
