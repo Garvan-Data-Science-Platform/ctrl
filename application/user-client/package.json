@@ -20,7 +20,7 @@
     "@mui/icons-material": "^6.0.2",
     "@mui/material": "^6.1.5",
     "@tanstack/react-query": "^5.56.2",
-    "axios": "^1.11.0",
+    "axios": "^1.12.0",
     "dotenv": "^16.4.7",
     "dotenv-cli": "^8.0.0",
     "immer": "^10.1.1",
