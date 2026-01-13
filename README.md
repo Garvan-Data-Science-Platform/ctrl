@@ -17,7 +17,7 @@
     <a href="https://www.australiangenomics.org.au/tools-and-resources/dynamic-consent-and-ctrl/"><b>Website</b></a>
   </div>
   <br/>
-  <img src="docs/ctrl.gif" alt="Ctrl GIF" width="100%" style="margin: 0 20px;"/>
+  <img src="docs/ctrl-consent-page.png" alt="Ctrl Consent Page" width="100%" style="margin: 0 20px;"/>
 </div>
 
 CTRL, developed by [Garvan Institute of Medical Research](https://www.garvan.org.au/), is a secure, web-based dynamic consent platform that empowers research participants to manage their consent preferences, update personal details, and make informed decisions about the use of their genomic and health data. For research organisations, CTRL streamlines consent management by replacing paper records with electronic ones, offering interoperability with databases like [REDCap](https://projectredcap.org/), and managing permissions.
@@ -188,6 +188,13 @@ CTRL is also partially funded through [GUARDIANS](https://www.biocommons.org.au/
   <img src="docs/australian-genomics-logo.png" alt="Australian Genomics Logo" width="200" style="margin: 0 20px;"/>
   <img src="docs/australian-biocommons-logo.png" alt="Australian Biocommons Logo" width="200" style="margin: 0 20px;"/>
 </div>
+
+## Screenshots
+**Admin Portal**
+<img src="docs/ctrl-participant-portal.gif" alt="Ctrl Participant Portal" width="100%" style="margin: 0 20px;"/>
+
+**Participant Portal**
+<img src="docs/ctrl-admin-portal.gif" alt="Ctrl Admin Portal" width="100%" style="margin: 0 20px;"/>
 
 ## Want to contribute?
 
