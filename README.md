@@ -34,6 +34,16 @@ URL: [http://admin.ctrldemo.dsp.garvan.org.au/](http://admin.ctrldemo.dsp.garvan
 Login: `admin@example.com`
 Password: `Testpassword1`
 
+## Features
+
+- User Portal: A mobile friendly web portal where users can submit and update their consent, update personal details, a 'contact us' form and more.
+- Admin Portal: A dashboard for creating consent forms, inviting participants, viewing and exporting consent responses
+- Multiple studies: manage participant consent for multiple studies in a single platform
+- Authentication via OIDC or email/password
+- Quick and easy installation via helm
+- REDCap Integration
+- Production Grade Security: full audit logging, encryption at rest, MFA
+
 ## Installation
 
 ### Prod installation: Helm (CTRL Standalone)
@@ -158,18 +168,6 @@ yarn test
 # Build swagger docs for all workspaces.
 yarn build-docs
 ```
-
-## Features
-
-- **PDF Export of Questions & Consent** Instantly download or print comprehensive PDFs of consent forms and questionnaire responses for your records.
-- **Custom Participant Invite via Email** Engage participants with personalised email invitations, fully customisable to match your study's voice and branding.
-- **REDCap Integration** Seamlessly pull data from an existing [REDCap](https://project-redcap.org/) Project to streamline your research workflow and ensure data consistency.
-- **Elsa Integration** Connect effortlessly with [elsa-data](https://github.com/elsa-data/elsa-data) for managing the sharing and access to your genomic data using [DUO codes](https://www.ga4gh.org/product/data-use-ontology-duo/).
-- **Authentication** Enable secure and simple access through [Australian Access Federation (AAF)](https://aaf.edu.au/) or [Auth0](https://auth0.com/).
-- **Study Management** Centralise your research administration with powerful tools to manage multiple studies, cohorts, and sites.
-- **Audit Trail** Maintain complete transparency and compliance with detailed, immutable audit logs of all system activities including changes to participant consent.
-- **Family Managment** Manage complex family relationships through which consent is calculated for dependants.
-- **Branding & Customisation** Make the platform your own with extensive theming options to align with your organisation and your study's brand identity.
 
 ## About CTRL
 
