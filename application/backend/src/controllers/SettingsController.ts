@@ -107,7 +107,7 @@ export class SettingsController extends Controller {
     })
 
     if (!org.logo) {
-      throw new NotFoundError('Study logo not found')
+      throw new NotFoundError('Org logo not found')
     }
 
     return Readable.from(org.logo as Buffer)
