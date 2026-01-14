@@ -20,7 +20,9 @@ describe('viewPdf', () => {
   let hashes
 
   before(() => {
-    cy.readFile('../common/testing/fixtures/logo_hashes.json').then((data) => (hashes = data))
+    cy.readFile('../common/testing/fixtures/logo_hashes.json').then(
+      (hash_data) => (hashes = hash_data),
+    )
   })
 
   function assertPdfContains(studyId, text_string) {
@@ -182,9 +184,8 @@ describe('viewPdf', () => {
   })
 
   it('PDF fetches logos correctly', () => {
-    const orgLogoEndpoint = '**/settings/logo'
-    const studyLogoEndpoint = `**/studies/${studyId}/logo*`
-
+    const orgLogoEndpoint = '**/settings/logo?t=*'
+    const studyLogoEndpoint = `**/studies/${studyId}/logo?t=*`
     cy.login(UserType.PARTICIPANT_UNANSWERED)
     cy.visit('/')
 
@@ -201,29 +202,24 @@ describe('viewPdf', () => {
 
     // Set Org and study logos
     cy.task('updateLogo', {
-      type: 'organisation',
+      target: 'organisation',
       filePath: '../common/testing/fixtures/valid_logo.png',
     })
     cy.task('updateLogo', {
-      type: 'study',
+      target: 'study',
       id: studyId,
       filePath: '../common/testing/fixtures/alternate_logo.png',
     })
 
-    // Intercept fetch
     cy.intercept('GET', orgLogoEndpoint, (req) => {
       req.continue((res) => {
-        const actualHash = yourHashFunction(res.body)
-        expect(actualHash, 'Org Logo Hash Match').to.equal(hashes.validLogoResizedHash)
-        expect(res.statusCode).to.equal(200)
+        res.body = Buffer.from(res.body)
       })
     }).as('fetchOrgLogo')
 
     cy.intercept('GET', studyLogoEndpoint, (req) => {
       req.continue((res) => {
-        const actualHash = yourHashFunction(res.body)
-        expect(actualHash, 'Study Logo Hash Match').to.equal(hashes.alternateLogoResizedHash)
-        expect(res.statusCode).to.equal(200)
+        res.body = Buffer.from(res.body)
       })
     }).as('fetchStudyLogo')
 
@@ -231,7 +227,20 @@ describe('viewPdf', () => {
     cy.get('[data-cy="view-pdf"]').click()
 
     // run logo hash checks
-    cy.wait('@fetchOrgLogo')
-    cy.wait('@fetchStudyLogo')
+    cy.wait('@fetchOrgLogo').then((req) => {
+      expect(req.response.statusCode).to.equal(200)
+      const base64Body = req.response.body.toString('base64')
+      cy.task('calculateHash', base64Body).then((hash) => {
+        expect(hash, 'Org Logo Hash').to.equal(hashes.validLogoResizedHash)
+      })
+    })
+
+    cy.wait('@fetchStudyLogo').then((req) => {
+      expect(req.response.statusCode).to.equal(200)
+      const base64Body = req.response.body.toString('base64')
+      cy.task('calculateHash', base64Body).then((hash) => {
+        expect(hash, 'Study Logo Hash').to.equal(hashes.alternateLogoResizedHash)
+      })
+    })
   })
 })
