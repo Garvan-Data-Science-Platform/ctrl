@@ -146,13 +146,13 @@ export default function Register() {
         } else {
           res.json().then((data) => {
             setError('root.serverError', {
-              message: `Error Logging In: ${JSON.stringify(data.message)}`,
+              message: `Error Registering: ${JSON.stringify(data.message)}`,
             })
           })
         }
       })
       .catch((e) => {
-        setError('root.serverError', { message: `Error Logging In: ${e}` })
+        setError('root.serverError', { message: `Error Registering: ${e}` })
       })
   }
 
@@ -173,7 +173,7 @@ export default function Register() {
                 Already registered? Log In
               </Button>
             </Box>
-            {Object.keys(errors) && <Typography>{}</Typography>}
+            {Object.keys(errors) && <Typography>{ }</Typography>}
             <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
               <TextField
                 sx={{ m: 1, flexGrow: 1 }}

@@ -2,9 +2,7 @@ name: Security Checks
 
 on:
   push:
-    branches:
-      - main
-      - dev
+    branches: ["dev", "main", "rel*"]
   workflow_dispatch:
 
 jobs:

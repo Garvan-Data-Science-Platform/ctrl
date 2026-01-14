@@ -1,0 +1,10 @@
+{
+  smtp: {
+    host: 'mailhog',
+    port: 1025,
+    username: 'test',
+    password: 'test'
+  },
+  inviteExpiryDays: 7,
+  otp: false
+}
