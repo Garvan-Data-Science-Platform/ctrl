@@ -2420,6 +2420,12 @@
           "oidc": {
             "items": {
               "properties": {
+                "displayInUserPortal": {
+                  "type": "boolean"
+                },
+                "displayInAdminPortal": {
+                  "type": "boolean"
+                },
                 "icon": {
                   "type": "string"
                 },
@@ -2434,6 +2440,8 @@
                 }
               },
               "required": [
+                "displayInUserPortal",
+                "displayInAdminPortal",
                 "icon",
                 "clientId",
                 "host",
