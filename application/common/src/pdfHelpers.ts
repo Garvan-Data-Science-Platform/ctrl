@@ -19,10 +19,15 @@ export const pdfUtils = {
     return `${prefix}-${cleanStudyName}${cleanParticipantName}_${cleanDate}.pdf`
   },
 
-  getLogoUrls: (studyId?: number) => ({
-    orgLogo: `${import.meta.env.VITE_BACKEND_URL}/settings/logo`,
-    studyLogo: studyId ? `${import.meta.env.VITE_BACKEND_URL}/studies/${studyId}/logo` : null,
-  }),
+  getLogoUrls: (studyId?: number) => {
+    const timestamp = Date.now() // break cache
+    return {
+      orgLogo: `${import.meta.env.VITE_BACKEND_URL}/settings/logo?t=${timestamp}`,
+      studyLogo: studyId
+        ? `${import.meta.env.VITE_BACKEND_URL}/studies/${studyId}/logo?t=${timestamp}`
+        : null,
+    }
+  },
 }
 
 export const downloadPdfBlob = async (pdfDoc: React.ReactElement, fileName: string) => {
