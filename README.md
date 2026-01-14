@@ -5,7 +5,6 @@
   Dynamic Consent Management Platform
 
   [![Build checks](https://github.com/Garvan-Data-Science-Platform/ctrl-next/actions/workflows/check.yml/badge.svg)](https://github.com/Garvan-Data-Science-Platform/ctrl-next/actions/workflows/check.yml)
-  [![Release](https://github.com/Garvan-Data-Science-Platform/ctrl-next/actions/workflows/release.yml/badge.svg)](https://github.com/Garvan-Data-Science-Platform/ctrl-next/actions/workflows/release.yml)
 
   <div>
     <a href="https://ctrldemo.dsp.garvan.org.au/login"><b>Participant Portal Demo</b></a>
