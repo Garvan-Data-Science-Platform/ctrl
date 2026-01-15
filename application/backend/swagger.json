@@ -2424,6 +2424,12 @@
           "oidc": {
             "items": {
               "properties": {
+                "displayInUserPortal": {
+                  "type": "boolean"
+                },
+                "displayInAdminPortal": {
+                  "type": "boolean"
+                },
                 "icon": {
                   "type": "string"
                 },
@@ -2438,6 +2444,8 @@
                 }
               },
               "required": [
+                "displayInUserPortal",
+                "displayInAdminPortal",
                 "icon",
                 "clientId",
                 "host",
@@ -2904,7 +2912,7 @@
           }
         },
         "description": "Get all deleted Admin Users",
-        "summary": "Get all deleted Admin Users",
+        "summary": "Get all deleted Organisation and Study Admin Users",
         "tags": [
           "Users"
         ],

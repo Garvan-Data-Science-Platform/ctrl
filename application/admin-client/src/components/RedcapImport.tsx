@@ -12,7 +12,7 @@ import {
   DialogContentText,
   DialogActions,
 } from '@mui/material'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Close, ArrowBack } from '@mui/icons-material'
 import ReactMarkdown from 'react-markdown'
 import { useNotification, useBack } from '@refinedev/core'
