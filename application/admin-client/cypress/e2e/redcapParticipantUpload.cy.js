@@ -28,21 +28,6 @@ describe('REDCap Participant Upload', () => {
     })
 
     it('should handle file upload', () => {
-      const fileName0 = 'test_participant0.csv'
-      cy.get('Confirm').should('not.exist')
-      cy.get('[data-cy="participantAttach"]').attachFile(fileName0)
-      cy.get('Confirm').should('not.exist')
-      cy.contains(fileName0).should('be.visible')
-
-      //
-      const fileName1 = 'test_instrument1.csv'
-      cy.get('[data-cy="participantAttach"]').attachFile(fileName1)
-      cy.get('Confirm').should('not.exist')
-      cy.contains(fileName1).should('be.visible')
-    })
-
-    it('should handle successful file upload submission', () => {
-      // Check current draft metadata
       let initialInvites
       let updatedInvites
       cy.request({
@@ -57,16 +42,25 @@ describe('REDCap Participant Upload', () => {
         cy.wrap(initialInvites).as('initialInvites')
       })
 
-      const fileName = 'test_participant0.csv'
-      cy.get('[data-cy="participantAttach"]').attachFile(fileName)
+      const fileName0 = 'test_participant0.csv'
+      cy.get('Confirm').should('not.exist')
+      cy.get('[data-cy="upload-button"]').click()
+      cy.get('input[type="file"]').attachFile(fileName0)
+      cy.contains('Select header row').should('exist')
+      cy.contains('Next').click()
+      cy.contains('Next').click()
+      cy.contains('Confirm').click()
+      cy.contains('Errors detected').should('be.visible')
+      cy.contains('Cancel').click()
+      cy.contains('Cancel').should('not.exist')
+      cy.get('input[type="checkbox"]').eq(7).check({ force: true })
+      cy.get('input[type="checkbox"]').eq(8).check({ force: true })
+      cy.contains('Discard').click()
+      cy.contains('Confirm').click()
 
-      // Click the initial confirm button
-      cy.contains('button', 'Confirm').click()
-
-      cy.url({ timeout: 10000 }).should('include', '/participants/')
-
-      // Check that the invite modal is opened and it has the correct emails
-      cy.get('[data-cy="invite-modal"]').should('be.visible')
+      cy.url().should('include', 'participants')
+      cy.get('[data-cy="prefill-details"]').first().trigger('mouseover')
+      cy.contains('1/1/2001').should('be.visible')
 
       const expectedEmailsInModal = [
         'peter@louka.com',

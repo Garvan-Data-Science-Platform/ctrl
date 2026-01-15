@@ -20,8 +20,11 @@ import { Recipient } from '@common/types/invite'
 import { axiosInstance } from '../../providers/dataProvider'
 import { useInvalidate, useNotification } from '@refinedev/core'
 import { InviteStatus } from '@common/types/api/participants/invite'
-import { MoreVert, People } from '@mui/icons-material'
+import { MoreVert, People, UploadFile } from '@mui/icons-material'
 import { useCurrentStudyId } from '../../studyStore'
+import { ReactSpreadsheetImport } from 'react-spreadsheet-import'
+import { importFields } from '../../components/CSVImport'
+import { unflatten } from 'flat'
 
 export const statusMap = {
   incomplete: {
@@ -55,6 +58,7 @@ export const ParticipantList = () => {
 
   const [initialRecipients, setInitialRecipients] = useState<Recipient[]>([])
   const [modalOpen, setModalOpen] = useState(false)
+  const [csvModalOpen, setCsvModalOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [inviteRowId, setInviteRowId] = useState('')
@@ -78,7 +82,10 @@ export const ParticipantList = () => {
     if (location.state?.openInviteModal) {
       setModalOpen(true)
       setInitialRecipients(location.state.initialRecipients || [])
-      // Clear the navigation state
+      window.history.replaceState({}, document.title)
+    }
+    if (location.state?.openCsvModal) {
+      setCsvModalOpen(true)
       window.history.replaceState({}, document.title)
     }
   }, [location, studyId])
@@ -310,6 +317,47 @@ export const ParticipantList = () => {
           }}
         />
       </Modal>
+      <ReactSpreadsheetImport
+        isOpen={csvModalOpen}
+        onClose={() => setCsvModalOpen(false)}
+        isNavigationEnabled
+        translations={{
+          uploadStep: {
+            manifestTitle: 'Available fields',
+            manifestDescription:
+              "When you upload a file you will have a chance to match the column headers with the fields listed below. These fields will be used to: (1) determine what email address to send an invitation to. (2) Prefill the registration form (if applicable). (3) Populate the user's externalID for this study.",
+          },
+        }}
+        onSubmit={(data) => {
+          const recips = data.validData.map((row) => {
+            const nested = unflatten(row) as any
+            return {
+              email: nested.profile.email,
+              prefill: nested,
+            }
+          })
+          setInitialRecipients(recips)
+          setModalOpen(true)
+        }}
+        fields={importFields}
+        allowInvalidSubmit={false}
+        customTheme={{
+          colors: {
+            rsi: {
+              50: '#e3f2fd',
+              100: '#bbdefb',
+              200: '#90caf9',
+              300: '#64b5f6',
+              400: '#42a5f5',
+              500: '#2196f3', // MUI primary.main
+              600: '#1e88e5',
+              700: '#1976d2',
+              800: '#1565c0',
+              900: '#0d47a1',
+            },
+          },
+        }}
+      />
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <Box
           sx={{
@@ -361,7 +409,18 @@ export const ParticipantList = () => {
         </MenuItem>
       </Menu>
       <List
-        headerButtons={
+        headerButtons={[
+          <Tooltip title="Import from CSV">
+            <Button
+              variant="contained"
+              onClick={() => {
+                setCsvModalOpen(true)
+              }}
+              data-cy="csv-button"
+            >
+              <UploadFile />
+            </Button>
+          </Tooltip>,
           <Button
             variant="contained"
             onClick={() => {
@@ -370,8 +429,8 @@ export const ParticipantList = () => {
             data-cy="invite-button"
           >
             Invite Participants
-          </Button>
-        }
+          </Button>,
+        ]}
       >
         <DataGrid
           {...dataGridProps}

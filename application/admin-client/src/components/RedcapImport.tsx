@@ -152,16 +152,29 @@ export const RedcapImport = ({
             <Typography variant="h6" gutterBottom sx={{ textTransform: 'capitalize' }}>
               Upload {type} File
             </Typography>
-            <Button variant="outlined" component="label">
-              UPLOAD FILE
-              <input
-                type="file"
-                hidden
-                accept=".csv"
-                onChange={handleFileChange}
-                data-cy={`${type}Attach`}
-              />
-            </Button>
+            {type == 'participant' ? (
+              <Button
+                variant="outlined"
+                component={Link}
+                to="/participants"
+                state={{ openCsvModal: true }}
+                data-cy="upload-button"
+              >
+                UPLOAD FILE
+              </Button>
+            ) : (
+              <Button variant="outlined" component="label">
+                UPLOAD FILE
+                <input
+                  type="file"
+                  hidden
+                  accept=".csv"
+                  onChange={handleFileChange}
+                  data-cy={`${type}Attach`}
+                />
+              </Button>
+            )}
+
             {file && (
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <Box sx={{ mt: 2, textAlign: 'center' }}>

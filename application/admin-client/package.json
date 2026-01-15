@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@chakra-ui/icon": "^3.2.0",
+    "@chakra-ui/popper": "^3.1.0",
+    "@chakra-ui/react-context": "^2.1.0",
+    "@chakra-ui/system": "^2.6.2",
     "@emotion/react": "^11.8.2",
     "@emotion/styled": "^11.8.1",
     "@mui/icons-material": "^5.8.3",
@@ -18,6 +22,7 @@
     "@refinedev/react-router-v6": "^4.6.2",
     "@refinedev/simple-rest": "^5.0.11",
     "@tanstack/react-query": "^4.10.1",
+    "flat": "^6.0.1",
     "immer": "^10.1.1",
     "mui-one-time-password-input": "^5.0.0",
     "react": "^18.0.0",
@@ -28,6 +33,7 @@
     "react-markdown": "^10.0.1",
     "react-router-dom": "^6.8.1",
     "react-router-hash-link": "^2.4.3",
+    "react-spreadsheet-import": "^4.7.1",
     "x-data-grid-8": "npm:@mui/x-data-grid@8.14",
     "zustand": "^5.0.0"
   },

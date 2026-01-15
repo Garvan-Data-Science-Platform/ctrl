@@ -1,4 +1,4 @@
-import { Add, Delete } from '@mui/icons-material'
+import { Add, Delete, MoreHoriz } from '@mui/icons-material'
 import {
   Box,
   Button,
@@ -175,10 +175,15 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
                 sx={{ display: 'flex', flexDirection: 'row' }}
               >
                 <Typography>
-                  {recipient.email}{' '}
+                  {recipient.email}
                   {recipient.prefill.studyParticipant?.externalId &&
                     `(${recipient.prefill.studyParticipant.externalId})`}
                 </Typography>
+                {recipient.prefill.profile && (
+                  <Tooltip title={Object.values(recipient.prefill.profile || {}).join('\n')}>
+                    <MoreHoriz sx={{ ml: 4 }} data-cy="prefill-details" />
+                  </Tooltip>
+                )}
               </ListItem>
             )
           })}
