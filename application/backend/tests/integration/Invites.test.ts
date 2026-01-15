@@ -6,13 +6,14 @@ import {
   ParticipantType,
   StateTerritory,
 } from 'common/types/api/users/ParticipantProfile'
-import { InviteStatus, Role } from '@prisma/client'
+import { InviteStatus } from '@prisma/client'
 import { NodemailerMock } from 'nodemailer-mock'
 import * as nodemailer from 'nodemailer'
 import { generateToken } from '../../src/authentication'
 import { RegisterParticipantRequest } from 'common/types/api/auth'
 import { GetInvitesResponse, InviteParticipantsResponse } from 'common/types/api/participants'
 import prisma from '../../src/PrismaClient'
+import { ORG_ADMIN_ID } from 'common/testing/seed'
 
 import config from '../../src/config'
 jest.mock('../../src/config')
@@ -51,7 +52,7 @@ describe('Participant Invites', () => {
 
   beforeAll(async () => {
     api.run()
-    orgAdminToken = await generateToken({ userId: 97, roles: [Role.OrganisationAdmin] })
+    orgAdminToken = await generateToken({ userId: ORG_ADMIN_ID })
     await resetDB()
   })
 

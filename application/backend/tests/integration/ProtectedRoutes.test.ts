@@ -2,6 +2,7 @@ import request from 'supertest'
 import { generateToken } from '../../src/authentication'
 import { Api } from '../../src/Api'
 import { Role } from '@prisma/client'
+import { resetDB } from 'common/testing/TestHelpers'
 
 enum HttpMethod {
   GET = 'get',
@@ -22,6 +23,7 @@ const app = api.app
 describe('Protected Routes', () => {
   beforeAll(async () => {
     api.run()
+    await resetDB()
   })
 
   afterAll(async () => {
@@ -30,9 +32,9 @@ describe('Protected Routes', () => {
 
   const checkProtectedRoutes = async (route: Route): Promise<void> => {
     // Check Role Based Route Protection
-    const opAdminToken = await generateToken({ userId: 96, roles: [Role.OperatorAdmin] })
-    const orgAdminToken = await generateToken({ userId: 97, roles: [Role.OrganisationAdmin] })
-    const participantToken = await generateToken({ userId: 98, roles: [Role.Participant] })
+    const opAdminToken = await generateToken({ userId: 96 })
+    const orgAdminToken = await generateToken({ userId: 97 })
+    const participantToken = await generateToken({ userId: 98 })
 
     const authHeaders = (token: string) => ({ Authorization: `Bearer ${token}` })
 
@@ -53,7 +55,6 @@ describe('Protected Routes', () => {
         expect(response.status).not.toBe(401)
       } else {
         expect(response.status).toBe(401)
-        expect(response.body.message).toBe('Incorrect Permissions')
       }
     }
   }

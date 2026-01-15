@@ -34,7 +34,6 @@ describe('ParticipantsController', () => {
   beforeAll(async () => {
     organisationAdminToken = await generateToken({
       userId: ORG_ADMIN_ID,
-      roles: ['OrganisationAdmin'],
     })
 
     api.run()
@@ -254,7 +253,6 @@ describe('InvitesController', () => {
   beforeAll(async () => {
     organisationAdminToken = await generateToken({
       userId: ORG_ADMIN_ID,
-      roles: ['OrganisationAdmin'],
     })
 
     api.run()
@@ -692,7 +690,6 @@ describe('InvitesController', () => {
     it('should fail if inviteId does not exist', async () => {
       const token = await generateToken({
         userId: PARTICIPANT_UNANSWERED_ID,
-        roles: ['Participant'],
       })
 
       const fakeIdString = 'this-is-not-real'
@@ -724,7 +721,6 @@ describe('InvitesController', () => {
 
       const token = await generateToken({
         userId: PARTICIPANT_UNANSWERED_ID,
-        roles: ['Participant'],
       })
 
       const response = await request(app)
@@ -745,7 +741,7 @@ describe('InvitesController', () => {
       })
 
       // Incorrect ID
-      const token = await generateToken({ userId: PASSWORD_RESET_USER_ID, roles: ['Participant'] })
+      const token = await generateToken({ userId: PASSWORD_RESET_USER_ID })
 
       const response = await request(app)
         .post(`/invites/${invite.id}/accept`)
@@ -781,7 +777,7 @@ describe('InvitesController', () => {
       })
 
       // Incorrect ID
-      const token = await generateToken({ userId: user.id, roles: ['Participant'] })
+      const token = await generateToken({ userId: user.id })
 
       const response = await request(app)
         .post(`/invites/${invite.id}/accept`)
@@ -802,7 +798,6 @@ describe('InvitesController', () => {
       // need valid invite and token for user that does exist
       const token = await generateToken({
         userId: PARTICIPANT_UNANSWERED_ID,
-        roles: ['Participant'],
       })
 
       const response = await request(app)
@@ -830,7 +825,6 @@ describe('InvitesController', () => {
       // need valid invite and token for user that does exist
       const token = await generateToken({
         userId: PARTICIPANT_COMPLETED_ID,
-        roles: ['Participant'],
       })
 
       const response = await request(app)
@@ -855,7 +849,6 @@ describe('InvitesController', () => {
       // One initial invite
       const token = await generateToken({
         userId: PARTICIPANT_UNANSWERED_ID,
-        roles: ['Participant'],
       })
 
       const response = await request(app)

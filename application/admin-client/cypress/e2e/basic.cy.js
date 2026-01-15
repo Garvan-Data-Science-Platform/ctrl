@@ -12,7 +12,7 @@ describe('basic', () => {
     cy.contains('Sign in to your account').should('exist')
   })
   it('can navigate to tabs', () => {
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/users')
     cy.contains('Surveys').click()
     cy.url().should('contain', '/surveys')
@@ -20,7 +20,7 @@ describe('basic', () => {
     cy.url().should('contain', '/participants')
   })
   it('Sidebar hide and show', () => {
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/users')
     cy.get('button[tabindex="0"]').first().click()
     cy.contains('CTRL Admin').should('not.be.visible')
@@ -29,7 +29,7 @@ describe('basic', () => {
   })
 
   it('Is redirected to login when attempting to use expired token', () => {
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/users')
     cy.contains('OrganisationAdmin').should('exist')
     cy.login_expired()

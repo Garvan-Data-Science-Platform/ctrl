@@ -15,7 +15,7 @@ describe('auth', () => {
 
   it('can login as admin to the admin portal', () => {
     cy.visit('/')
-    cy.get('input[name="email"]').type(UserType.ADMIN)
+    cy.get('input[name="email"]').type(UserType.ORG_ADMIN)
     cy.get('input[name="password"]').type('Testpassword1')
     cy.get('button[type="submit"]').click()
     cy.url().should('include', '/surveys') // Redirects to /surveys after login

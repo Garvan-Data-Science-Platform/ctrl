@@ -16,11 +16,9 @@ describe('ProfilesController', () => {
   beforeAll(async () => {
     orgAdminToken = await generateToken({
       userId: ORG_ADMIN_ID,
-      roles: ['OrganisationAdmin'],
     })
     registeredParticipantToken = await generateToken({
       userId: PARTICIPANT_COMPLETED_ID,
-      roles: ['Participant'],
     })
     api.run()
   })

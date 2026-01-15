@@ -14,6 +14,7 @@ import {
   ValidateError,
   Middlewares,
   NoSecurity,
+  Request,
 } from 'tsoa'
 import logger from 'common/src/logger'
 import type {
@@ -34,8 +35,13 @@ import {
   UnauthorizedErrorResponse,
   ValidateErrorResponse,
 } from 'common/types/api/errors'
-import { NotFoundError, PasswordResetTokenInvalidError } from '../middlewares/ErrorHandler'
+import {
+  NotFoundError,
+  PasswordResetTokenInvalidError,
+  UnprocessableError,
+} from '../middlewares/ErrorHandler'
 import { hashPassword } from '../authentication'
+import type { RequestWithAuthentication } from '../authentication'
 import { checkPasswordStrength } from 'common/src/PasswordStrength'
 import { generatePasswordResetEmail } from '../utils/passwordResetTemplate'
 import crypto, { randomBytes } from 'crypto'
@@ -72,11 +78,13 @@ export class UsersController extends Controller {
    * @summary Get all Admin Users
    */
   @Get('/admin')
-  @Security('jwt', ['OrganisationAdmin'])
+  @Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
   @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
   public async getAllAdminUsers(): Promise<GetAllUsersResponse> {
     const users: User[] = await this.userRepo.findMany({
-      where: { role: { in: ['OperatorAdmin', 'OrganisationAdmin'] } },
+      where: { role: { in: ['OperatorAdmin', 'OrganisationAdmin', 'StudyAdmin'] } },
+      include: { adminOfStudies: { select: { id: true, name: true } } },
+      orderBy: { id: 'asc' },
     })
     const responseData = { data: users }
     logger.info({ ...responseData })
@@ -86,14 +94,22 @@ export class UsersController extends Controller {
   /**
    * Get all deleted Admin Users
    *
-   * @summary Get all deleted Admin Users
+   * @summary Get all deleted Organisation and Study Admin Users
    */
   @Get('/admin/deleted')
-  @Security('jwt', ['OrganisationAdmin'])
+  @Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
   @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
-  public async getDeletedAdminUsers(): Promise<GetAllUsersResponse> {
+  public async getDeletedAdminUsers(
+    @Request() request: RequestWithAuthentication,
+  ): Promise<GetAllUsersResponse> {
+    if (
+      (await prisma.user.findUniqueOrThrow({ where: { id: request.user.userId } })).role ==
+      'StudyAdmin'
+    ) {
+      return { data: [] }
+    }
     const users: User[] = await this.userRepo.findMany({
-      where: { role: { in: ['OperatorAdmin', 'OrganisationAdmin'] }, deleted: true },
+      where: { role: { in: ['OperatorAdmin', 'OrganisationAdmin', 'StudyAdmin'] }, deleted: true },
     })
     const responseData = { data: users }
     return responseData
@@ -118,12 +134,13 @@ export class UsersController extends Controller {
    * @summary Get Specific User
    */
   @Get('/{userId}')
-  @Security('jwt', ['OrganisationAdmin'])
+  @Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
   public async getUserById(@Path() userId: number): Promise<GetUserByIdResponse> {
     const user: User | null = await this.userRepo.findUnique({
       where: { id: userId },
+      include: { adminOfStudies: { select: { name: true, id: true } } },
     })
     if (!user) {
       const errorMessage: string = `User with ID: ${userId} not found`
@@ -142,26 +159,53 @@ export class UsersController extends Controller {
    */
   @Post('/')
   @SuccessResponse('201', 'Created')
-  @Security('jwt', ['OrganisationAdmin'])
+  @Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
   @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
-  public async createUser(@Body() bodyRequest: CreateUserRequest): Promise<CreateUserResponse> {
-    try {
-      const password = hashPassword(randomBytes(8).toString('hex'))
-      const insertedUser = await this.userRepo.create({
-        data: { ...bodyRequest, password },
-      })
-      const responseData = {
-        id: insertedUser.id,
-      }
-      await this.generatePasswordResetLink({ email: bodyRequest.email })
-      logger.info({ ...responseData })
-      return responseData
-    } catch (err) {
-      const errorMessage: string = 'Error creating user'
-      logger.error({ errorMessage, err })
-      throw new Error(errorMessage)
+  public async createUser(
+    @Request() request: RequestWithAuthentication,
+    @Body() bodyRequest: CreateUserRequest,
+  ): Promise<CreateUserResponse> {
+    const callingUser = await this.userRepo.findUniqueOrThrow({
+      where: { id: request.user.userId },
+      select: { id: true, role: true, adminOfStudies: { select: { id: true } } },
+    })
+    if (callingUser.role == 'StudyAdmin' && bodyRequest.role !== 'StudyAdmin') {
+      throw new UnprocessableError('As a study admin, you can only create other study admins')
     }
+
+    const isDeleted =
+      (await this.userRepo.count({ where: { email: bodyRequest.email, deleted: true } })) > 0
+    if (isDeleted) {
+      throw new UnprocessableError(
+        'This email belongs to a deleted user, you must restore the user instead of creating a new one',
+      )
+    }
+    const emailExists = (await this.userRepo.count({ where: { email: bodyRequest.email } })) > 0
+    if (emailExists) {
+      throw new UnprocessableError('Email already exists')
+    }
+    const password = hashPassword(randomBytes(8).toString('hex'))
+
+    let studyToAdd = undefined
+    if (callingUser.adminOfStudies.length == 1 && bodyRequest.role === 'StudyAdmin') {
+      studyToAdd = callingUser.adminOfStudies[0].id
+    }
+
+    const insertedUser = await this.userRepo.create({
+      data: {
+        ...bodyRequest,
+        password,
+        adminOfStudies: studyToAdd !== undefined ? { connect: { id: studyToAdd } } : undefined,
+      },
+    })
+
+    const responseData = {
+      id: insertedUser.id,
+    }
+    await this.generatePasswordResetLink({ email: bodyRequest.email })
+    logger.info({ ...responseData })
+    return responseData
   }
 
   /**
@@ -170,21 +214,83 @@ export class UsersController extends Controller {
    * @summary Update a User
    */
   @Patch('/{userId}')
-  @Security('jwt', ['OrganisationAdmin'])
+  @Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
   @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
-  public async updateUser(@Path() userId: number, @Body() bodyRequest: UpdateUserRequest) {
-    try {
-      await this.userRepo.update({
-        where: { id: userId },
-        data: bodyRequest,
-      })
-    } catch (err) {
-      const errorMessage: string = `User with ID: ${userId} not found`
-      logger.error({ errorMessage, err })
-      throw new NotFoundError(errorMessage)
+  public async updateUser(
+    @Request() request: RequestWithAuthentication,
+    @Path() userId: number,
+    @Body() bodyRequest: UpdateUserRequest,
+  ) {
+    const callingUser = await this.userRepo.findUniqueOrThrow({
+      where: { id: request.user.userId },
+    })
+    const targetUser = await this.userRepo.findUniqueOrThrow({ where: { id: userId } })
+    if (callingUser.role == 'StudyAdmin') {
+      if (targetUser.id !== callingUser.id) {
+        throw new UnprocessableError(
+          'Study admins cannot edit details of other study/organisation admins',
+        )
+      }
+      if (bodyRequest.role && bodyRequest.role !== targetUser.role) {
+        throw new UnprocessableError('Study admins cannot edit roles')
+      }
     }
+    if (
+      targetUser.id == callingUser.id &&
+      bodyRequest.role &&
+      bodyRequest.role !== targetUser.role
+    ) {
+      throw new UnprocessableError('Cannot edit your own role')
+    }
+
+    await this.userRepo.update({
+      where: { id: userId },
+      data: bodyRequest,
+    })
+  }
+
+  /**
+   * Make a user a study admin
+   *
+   * @summary Make a user admin of a study
+   */
+  @Post('/{userId}/make-study-admin/{studyId}')
+  @Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
+  public async makeStudyAdmin(
+    @Request() request: RequestWithAuthentication,
+    @Path() userId: number,
+    @Path() studyId: number,
+  ) {
+    if (!request.user.studies.includes(studyId)) {
+      throw new UnprocessableError('You do not have admin permissions for this study')
+    }
+    await this.userRepo.update({
+      where: { id: userId, role: 'StudyAdmin' },
+      data: { adminOfStudies: { connect: { id: studyId } } },
+    })
+  }
+
+  /**
+   * Remove a user as admin of a study
+   *
+   * @summary Remove a study admin
+   */
+  @Post('/{userId}/remove-study-admin/{studyId}')
+  @Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
+  public async removeStudyAdmin(
+    @Request() request: RequestWithAuthentication,
+    @Path() userId: number,
+    @Path() studyId: number,
+  ) {
+    if (!request.user.studies.includes(studyId)) {
+      throw new UnprocessableError('You do not have admin permissions for this study')
+    }
+    await this.userRepo.update({
+      where: { id: userId, role: 'StudyAdmin' },
+      data: { adminOfStudies: { disconnect: { id: studyId } } },
+    })
   }
 
   /**

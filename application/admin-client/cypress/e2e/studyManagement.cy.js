@@ -4,7 +4,7 @@ const { UserType } = require('../support/commands')
 
 beforeEach(() => {
   cy.task('reset')
-  cy.login(UserType.ADMIN)
+  cy.login(UserType.ORG_ADMIN)
 })
 
 describe('Study management page', () => {
@@ -68,7 +68,7 @@ describe('Study management page', () => {
   })
 
   it('Redcap import page does not allow API features if not set up', () => {
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/integrations/redcap/survey/import')
     cy.get('[data-cy="study-dropdown"]').click()
     cy.contains('Study 2').click()
@@ -94,7 +94,7 @@ describe('Study management page', () => {
   })
 
   it('Can upload a study logo', () => {
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/studies')
     cy.get('[data-cy="logo-upload"]').attachFile('valid_logo.png')
     cy.contains('Updated logo').should('exist')

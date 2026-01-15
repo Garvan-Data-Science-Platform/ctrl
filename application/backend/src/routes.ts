@@ -89,7 +89,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "_36_Enums.Role": {
         "dataType": "refAlias",
-        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["OperatorAdmin"]},{"dataType":"enum","enums":["Participant"]},{"dataType":"enum","enums":["OrganisationAdmin"]}],"validators":{}},
+        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["OperatorAdmin"]},{"dataType":"enum","enums":["Participant"]},{"dataType":"enum","enums":["OrganisationAdmin"]},{"dataType":"enum","enums":["StudyAdmin"]}],"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "DefaultSelection_Prisma._36_UserPayload_": {
@@ -157,6 +157,7 @@ const models: TsoaRoute.Models = {
             "firstName": {"dataType":"string","validators":{"minLength":{"value":1}}},
             "lastName": {"dataType":"string","validators":{"minLength":{"value":1}}},
             "email": {"dataType":"string","validators":{"pattern":{"errorMsg":"please provide valid email","value":"^(.+)@(.+)$"}}},
+            "role": {"ref":"Role"},
         },
         "additionalProperties": false,
     },
@@ -890,6 +891,8 @@ const models: TsoaRoute.Models = {
         "properties": {
             "token": {"dataType":"string"},
             "otp_token": {"dataType":"string"},
+            "id": {"dataType":"double"},
+            "role": {"dataType":"string"},
         },
         "additionalProperties": false,
     },
@@ -973,7 +976,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         const argsUsersController_getAllAdminUsers: Record<string, TsoaRoute.ParameterSchema> = {
         };
         app.get('/users/admin',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(UsersController)),
             ...(fetchMiddlewares<RequestHandler>(UsersController.prototype.getAllAdminUsers)),
 
@@ -1001,9 +1004,10 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsUsersController_getDeletedAdminUsers: Record<string, TsoaRoute.ParameterSchema> = {
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
         };
         app.get('/users/admin/deleted',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(UsersController)),
             ...(fetchMiddlewares<RequestHandler>(UsersController.prototype.getDeletedAdminUsers)),
 
@@ -1065,7 +1069,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 userId: {"in":"path","name":"userId","required":true,"dataType":"double"},
         };
         app.get('/users/:userId',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(UsersController)),
             ...(fetchMiddlewares<RequestHandler>(UsersController.prototype.getUserById)),
 
@@ -1093,10 +1097,11 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsUsersController_createUser: Record<string, TsoaRoute.ParameterSchema> = {
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
                 bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"CreateUserRequest"},
         };
         app.post('/users',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(UsersController)),
             ...(fetchMiddlewares<RequestHandler>(UsersController.prototype.createUser)),
 
@@ -1124,11 +1129,12 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsUsersController_updateUser: Record<string, TsoaRoute.ParameterSchema> = {
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
                 userId: {"in":"path","name":"userId","required":true,"dataType":"double"},
                 bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"UpdateUserRequest"},
         };
         app.patch('/users/:userId',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(UsersController)),
             ...(fetchMiddlewares<RequestHandler>(UsersController.prototype.updateUser)),
 
@@ -1144,6 +1150,72 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
 
               await templateService.apiHandler({
                 methodName: 'updateUser',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsUsersController_makeStudyAdmin: Record<string, TsoaRoute.ParameterSchema> = {
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
+                userId: {"in":"path","name":"userId","required":true,"dataType":"double"},
+                studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
+        };
+        app.post('/users/:userId/make-study-admin/:studyId',
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(UsersController)),
+            ...(fetchMiddlewares<RequestHandler>(UsersController.prototype.makeStudyAdmin)),
+
+            async function UsersController_makeStudyAdmin(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsUsersController_makeStudyAdmin, request, response });
+
+                const controller = new UsersController();
+
+              await templateService.apiHandler({
+                methodName: 'makeStudyAdmin',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsUsersController_removeStudyAdmin: Record<string, TsoaRoute.ParameterSchema> = {
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
+                userId: {"in":"path","name":"userId","required":true,"dataType":"double"},
+                studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
+        };
+        app.post('/users/:userId/remove-study-admin/:studyId',
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(UsersController)),
+            ...(fetchMiddlewares<RequestHandler>(UsersController.prototype.removeStudyAdmin)),
+
+            async function UsersController_removeStudyAdmin(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsUsersController_removeStudyAdmin, request, response });
+
+                const controller = new UsersController();
+
+              await templateService.apiHandler({
+                methodName: 'removeStudyAdmin',
                 controller,
                 response,
                 next,
@@ -1282,7 +1354,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
         };
         app.get('/studies/:studyId/surveys',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(SurveysController)),
             ...(fetchMiddlewares<RequestHandler>(SurveysController.prototype.getAllSurveys)),
 
@@ -1314,7 +1386,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 versionNumber: {"in":"path","name":"versionNumber","required":true,"dataType":"double"},
         };
         app.get('/studies/:studyId/surveys/:versionNumber',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(SurveysController)),
             ...(fetchMiddlewares<RequestHandler>(SurveysController.prototype.getSurveyVersionByVersionNumber)),
 
@@ -1443,7 +1515,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
         };
         app.get('/studies/:studyId/surveys/:versionNumber/participants/answers',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(SurveysController)),
             ...(fetchMiddlewares<RequestHandler>(SurveysController.prototype.getAllResponses)),
 
@@ -1476,7 +1548,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 profileId: {"in":"path","name":"profileId","required":true,"dataType":"double"},
         };
         app.get('/studies/:studyId/surveys/:versionNumber/participants/:profileId/answers',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(SurveysController)),
             ...(fetchMiddlewares<RequestHandler>(SurveysController.prototype.getResponsesById)),
 
@@ -1542,7 +1614,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"UpdateSurveyRequest"},
         };
         app.patch('/studies/:studyId/surveys/:versionNumber',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(SurveysController)),
             ...(fetchMiddlewares<RequestHandler>(SurveysController.prototype.updateSurvey)),
 
@@ -1574,7 +1646,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 versionNumber: {"in":"path","name":"versionNumber","required":true,"dataType":"double"},
         };
         app.post('/studies/:studyId/surveys/:versionNumber/publish',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(SurveysController)),
             ...(fetchMiddlewares<RequestHandler>(SurveysController.prototype.publishSurvey)),
 
@@ -1758,9 +1830,10 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsStudiesController_getAllStudies: Record<string, TsoaRoute.ParameterSchema> = {
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
         };
         app.get('/studies',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(StudiesController)),
             ...(fetchMiddlewares<RequestHandler>(StudiesController.prototype.getAllStudies)),
 
@@ -1819,9 +1892,10 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsStudiesController_getDeletedStudies: Record<string, TsoaRoute.ParameterSchema> = {
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
         };
         app.get('/studies/deleted',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(StudiesController)),
             ...(fetchMiddlewares<RequestHandler>(StudiesController.prototype.getDeletedStudies)),
 
@@ -1943,10 +2017,11 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsStudiesController_updateStudy: Record<string, TsoaRoute.ParameterSchema> = {
                 studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
                 bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"UpdateStudyRequest"},
         };
         app.patch('/studies/:studyId',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(StudiesController)),
             ...(fetchMiddlewares<RequestHandler>(StudiesController.prototype.updateStudy)),
 
@@ -1976,9 +2051,10 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         const argsStudiesController_uploadLogo: Record<string, TsoaRoute.ParameterSchema> = {
                 file: {"in":"formData","name":"file","required":true,"dataType":"file"},
                 studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
         };
         app.post('/studies/:studyId/logo',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             upload.fields([
                 {
                     name: "file",
@@ -2104,10 +2180,11 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsProfilesController_getParticipantProfileByUserID: Record<string, TsoaRoute.ParameterSchema> = {
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
                 userId: {"in":"path","name":"userId","required":true,"dataType":"double"},
         };
         app.get('/profiles/user/:userId',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(ProfilesController)),
             ...(fetchMiddlewares<RequestHandler>(ProfilesController.prototype.getParticipantProfileByUserID)),
 
@@ -2136,9 +2213,10 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsProfilesController_getParticipantProfileByID: Record<string, TsoaRoute.ParameterSchema> = {
                 profileId: {"in":"path","name":"profileId","required":true,"dataType":"double"},
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
         };
         app.get('/profiles/:profileId',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(ProfilesController)),
             ...(fetchMiddlewares<RequestHandler>(ProfilesController.prototype.getParticipantProfileByID)),
 
@@ -2198,11 +2276,12 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsProfilesController_updateProfileById: Record<string, TsoaRoute.ParameterSchema> = {
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
                 profileId: {"in":"path","name":"profileId","required":true,"dataType":"double"},
                 bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"UpdateProfileRequest"},
         };
         app.patch('/profiles/:profileId',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(ProfilesController)),
             ...(fetchMiddlewares<RequestHandler>(ProfilesController.prototype.updateProfileById)),
 
@@ -2233,7 +2312,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
         };
         app.get('/studies/:studyId/participants',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(ParticipantsController)),
             ...(fetchMiddlewares<RequestHandler>(ParticipantsController.prototype.getParticipants)),
 
@@ -2261,9 +2340,10 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsParticipantsController_getDeletedParticipants: Record<string, TsoaRoute.ParameterSchema> = {
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
         };
         app.get('/participants/deleted',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(ParticipantsController)),
             ...(fetchMiddlewares<RequestHandler>(ParticipantsController.prototype.getDeletedParticipants)),
 
@@ -2295,7 +2375,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 profileId: {"in":"path","name":"profileId","required":true,"dataType":"double"},
         };
         app.patch('/studies/:studyId/participants/:profileId/restore',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(ParticipantsController)),
             ...(fetchMiddlewares<RequestHandler>(ParticipantsController.prototype.restoreParticipantById)),
 
@@ -2323,11 +2403,12 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsParticipantsController_getParticipantById: Record<string, TsoaRoute.ParameterSchema> = {
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
                 studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
                 profileId: {"in":"path","name":"profileId","required":true,"dataType":"double"},
         };
         app.get('/studies/:studyId/participants/:profileId',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(ParticipantsController)),
             ...(fetchMiddlewares<RequestHandler>(ParticipantsController.prototype.getParticipantById)),
 
@@ -2355,6 +2436,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsParticipantsController_updateProfileById: Record<string, TsoaRoute.ParameterSchema> = {
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
                 studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
                 profileId: {"in":"path","name":"profileId","required":true,"dataType":"double"},
                 bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"UpdateParticipantRequest"},
@@ -2392,7 +2474,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 profileId: {"in":"path","name":"profileId","required":true,"dataType":"double"},
         };
         app.delete('/studies/:studyId/participants/:profileId',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(ParticipantsController)),
             ...(fetchMiddlewares<RequestHandler>(ParticipantsController.prototype.deleteParticipantById)),
 
@@ -2424,7 +2506,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 profileId: {"in":"path","name":"profileId","required":true,"dataType":"double"},
         };
         app.post('/studies/:studyId/participants/:profileId',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(ParticipantsController)),
             ...(fetchMiddlewares<RequestHandler>(ParticipantsController.prototype.addParticipantById)),
 
@@ -2518,7 +2600,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
         };
         app.get('/studies/:studyId/invites',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(InvitesController)),
             ...(fetchMiddlewares<RequestHandler>(InvitesController.prototype.getInvites)),
 
@@ -2550,7 +2632,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"InviteParticipantsRequest"},
         };
         app.post('/studies/:studyId/invites',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(InvitesController)),
             ...(fetchMiddlewares<RequestHandler>(InvitesController.prototype.createInvites)),
 
@@ -2582,7 +2664,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 inviteId: {"in":"path","name":"inviteId","required":true,"dataType":"string"},
         };
         app.post('/studies/:studyId/invites/:inviteId/resend',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(InvitesController)),
             ...(fetchMiddlewares<RequestHandler>(InvitesController.prototype.resendInviteById)),
 
@@ -2613,7 +2695,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
         };
         app.post('/studies/:studyId/invites/resend',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(InvitesController)),
             ...(fetchMiddlewares<RequestHandler>(InvitesController.prototype.resendPendingInvites)),
 
@@ -2645,7 +2727,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 inviteId: {"in":"path","name":"inviteId","required":true,"dataType":"string"},
         };
         app.post('/studies/:studyId/invites/:inviteId/revoke',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(InvitesController)),
             ...(fetchMiddlewares<RequestHandler>(InvitesController.prototype.revokeInvite)),
 
@@ -2676,7 +2758,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
         };
         app.get('/studies/:studyId/invites/text',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(InvitesController)),
             ...(fetchMiddlewares<RequestHandler>(InvitesController.prototype.getInviteText)),
 
@@ -3020,7 +3102,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 file: {"in":"formData","name":"file","required":true,"dataType":"file"},
         };
         app.post('/studies/:studyId/integrations/redcap/participant/upload/csv',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             upload.fields([
                 {
                     name: "file",
@@ -3057,7 +3139,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
         };
         app.post('/studies/:studyId/integrations/redcap/participant/upload/api',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(IntegrationsController)),
             ...(fetchMiddlewares<RequestHandler>(IntegrationsController.prototype.uploadRedcapParticipantAPI)),
 
@@ -3089,7 +3171,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 file: {"in":"formData","name":"file","required":true,"dataType":"file"},
         };
         app.post('/studies/:studyId/integrations/redcap/instrument/upload/csv',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             upload.fields([
                 {
                     name: "file",
@@ -3127,7 +3209,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"UploadRedcapInstrumentAPIRequest"},
         };
         app.post('/studies/:studyId/integrations/redcap/instrument/upload/api',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(IntegrationsController)),
             ...(fetchMiddlewares<RequestHandler>(IntegrationsController.prototype.uploadRedcapInstrumentAPI)),
 
@@ -3248,7 +3330,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         const argsIntegrationsController_elsa: Record<string, TsoaRoute.ParameterSchema> = {
         };
         app.get('/elsa/token',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(IntegrationsController)),
             ...(fetchMiddlewares<RequestHandler>(IntegrationsController.prototype.elsa)),
 
@@ -3309,7 +3391,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 familyId: {"in":"path","name":"familyId","required":true,"dataType":"double"},
         };
         app.get('/studies/:studyId/families/:familyId',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(FamiliesController)),
             ...(fetchMiddlewares<RequestHandler>(FamiliesController.prototype.getFamilyById)),
 
@@ -3337,11 +3419,12 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsFamiliesController_removeMember: Record<string, TsoaRoute.ParameterSchema> = {
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
                 studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
                 profileId: {"in":"path","name":"profileId","required":true,"dataType":"double"},
         };
         app.post('/studies/:studyId/families/remove/:profileId',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(FamiliesController)),
             ...(fetchMiddlewares<RequestHandler>(FamiliesController.prototype.removeMember)),
 
@@ -3369,12 +3452,13 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsFamiliesController_addExistingMember: Record<string, TsoaRoute.ParameterSchema> = {
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
                 studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
                 familyId: {"in":"path","name":"familyId","required":true,"dataType":"double"},
                 profileId: {"in":"path","name":"profileId","required":true,"dataType":"double"},
         };
         app.post('/studies/:studyId/families/:familyId/add/:profileId',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(FamiliesController)),
             ...(fetchMiddlewares<RequestHandler>(FamiliesController.prototype.addExistingMember)),
 
@@ -3407,7 +3491,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"AddDependentRequest"},
         };
         app.post('/studies/:studyId/families/:familyId/add-dependent',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(FamiliesController)),
             ...(fetchMiddlewares<RequestHandler>(FamiliesController.prototype.addNewDependent)),
 

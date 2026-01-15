@@ -328,8 +328,8 @@ export const ParticipantList = () => {
               "When you upload a file you will have a chance to match the column headers with the fields listed below. These fields will be used to: (1) determine what email address to send an invitation to. (2) Prefill the registration form (if applicable). (3) Populate the user's externalID for this study.",
           },
         }}
-        onSubmit={(data) => {
-          const recips = data.validData.map((row) => {
+        onSubmit={(data: any) => {
+          const recips = data.validData.map((row: any) => {
             const nested = unflatten(row) as any
             return {
               email: nested.profile.email,
