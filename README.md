@@ -190,10 +190,10 @@ CTRL is also partially funded through [GUARDIANS](https://www.biocommons.org.au/
 
 ## Screenshots
 **Admin Portal**
-<img src="docs/ctrl-participant-portal.gif" alt="Ctrl Participant Portal" width="100%" style="margin: 0 20px;"/>
+<img src="docs/ctrl-admin-portal.gif" alt="Ctrl Admin Portal" width="100%" style="margin: 0 20px;"/>
 
 **Participant Portal**
-<img src="docs/ctrl-admin-portal.gif" alt="Ctrl Admin Portal" width="100%" style="margin: 0 20px;"/>
+<img src="docs/ctrl-participant-portal.gif" alt="Ctrl Participant Portal" width="100%" style="margin: 0 20px;"/>
 
 ## Want to contribute?
 
