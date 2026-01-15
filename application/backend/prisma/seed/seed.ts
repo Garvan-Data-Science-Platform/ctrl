@@ -327,14 +327,14 @@ const main = async () => {
   })
 
   const exampleAdmin = await prisma.user.upsert({
-    where: { email: String(process.env.EXAMPLE_ADMIN_EMAIL) },
+    where: { email: String(process.env.EXAMPLE_ORG_ADMIN_EMAIL) },
     update: {},
     create: {
-      email: String(process.env.EXAMPLE_ADMIN_EMAIL),
+      email: String(process.env.EXAMPLE_ORG_ADMIN_EMAIL),
       firstName: 'Example',
       lastName: 'Admin',
       role: 'OrganisationAdmin',
-      password: hashPassword(String(process.env.EXAMPLE_ADMIN_PASSWORD)),
+      password: hashPassword(String(process.env.EXAMPLE_ORG_ADMIN_PASSWORD)),
     },
   })
   console.log('Added the following users:', exampleAdmin)

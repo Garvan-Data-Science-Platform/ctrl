@@ -78,8 +78,8 @@ describe('MailerController', () => {
       expect(response.body.message).toBe('Record not found')
     }, 100000)
 
-    it('should send emails to ADMIN_EMAIL if it is set', async () => {
-      process.env.ADMIN_EMAIL = 'testorg-admin@testorg.org.au'
+    it('should send emails to ORG_ADMIN_EMAIL if it is set', async () => {
+      process.env.ORG_ADMIN_EMAIL = 'testorg-admin@testorg.org.au'
 
       const response = await request(app)
         .post('/mailer/contact-us')
@@ -110,8 +110,8 @@ describe('MailerController', () => {
       expect(sentEmails).toEqual(expectedSentEmails)
     })
 
-    it('should send emails to all Organisation Admins if ADMIN_EMAIL is not set', async () => {
-      delete process.env.ADMIN_EMAIL
+    it('should send emails to all Organisation Admins if ORG_ADMIN_EMAIL is not set', async () => {
+      delete process.env.ORG_ADMIN_EMAIL
 
       const response = await request(app)
         .post('/mailer/contact-us')
