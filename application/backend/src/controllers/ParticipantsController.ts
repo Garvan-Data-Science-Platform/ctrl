@@ -31,7 +31,6 @@ import {
   Middlewares,
   Request,
   Delete,
-  Queries,
   Patch,
   NoSecurity,
 } from 'tsoa'
@@ -51,7 +50,6 @@ import { ProfilesController } from './ProfilesController'
 import { auditLog } from '../middlewares/AuditLog'
 import { Role } from '@prisma/client'
 import { genId } from '../utils/genId'
-import { extractOrderBy, extractWhere } from '../utils/filtering'
 import { generateInviteId, inviteExpiresAt } from '../utils/invite'
 import { Prefill } from 'common/types/invite'
 
@@ -74,16 +72,9 @@ export class ParticipantsController extends Controller {
    * @summary List participants
    */
   @Get('studies/{studyId}/participants')
-  public async getParticipants(
-    @Path() studyId: number,
-    @Queries() queryParams: { [key: string]: any },
-  ): Promise<GetParticipantsResponse> {
-    const total = await prisma.studyParticipant.count({
-      where: { studyId, participantProfile: extractWhere(queryParams) },
-    })
-
+  public async getParticipants(@Path() studyId: number): Promise<GetParticipantsResponse> {
     const participant_list = await prisma.studyParticipant.findMany({
-      where: { studyId, participantProfile: extractWhere(queryParams) },
+      where: { studyId },
       select: {
         participantProfile: {
           select: {
@@ -97,10 +88,9 @@ export class ParticipantsController extends Controller {
         participantId: true,
         externalId: true,
       },
-      orderBy: extractOrderBy(queryParams),
-      skip: queryParams._start ? Number(queryParams._start) : undefined,
-      take: queryParams._end ? Number(queryParams._end) - Number(queryParams._start) : undefined,
     })
+
+    const total = participant_list.length
 
     const participants: GetParticipantsResponse['data'] = []
 
