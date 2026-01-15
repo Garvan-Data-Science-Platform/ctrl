@@ -36,7 +36,7 @@ export const importFields: Fields<PrefillKey> = [
     fieldType: { type: 'input' },
   },
   {
-    label: 'Date of Birth (d/m/y)',
+    label: 'Date of Birth (dd/mm/yyyy)',
     key: 'profile.dob',
     alternateMatches: ['dob', 'ctrl_dob'],
     fieldType: { type: 'input' },
@@ -44,7 +44,7 @@ export const importFields: Fields<PrefillKey> = [
       {
         rule: 'regex',
         value: '^(0?[1-9]|[12][0-9]|3[01])[/\\-](0?[1-9]|1[0-2])[/\\-]\\d{4}$',
-        errorMessage: 'Must be format d/m/yyyy or d-m-yyyy',
+        errorMessage: 'Must be format dd/mm/yyyy or dd-mm-yyyy',
       },
     ],
   },
