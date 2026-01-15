@@ -79,23 +79,6 @@ describe('Settings page', () => {
     cy.contains('Invalid url').should('not.exist')
   })
 
-  /*
-  it('Redcap import page does not allow API features if not set up', () => {
-    cy.login(UserType.ORG_ADMIN)
-    cy.visit('/settings')
-
-    cy.get('[data-cy="mailerHost"] input').should('have.value', 'smtp.ethereal.email')
-
-    cy.get('[data-cy="redcapURL"] input').clear()
-    cy.get('[data-cy="save-button"]').click()
-
-    cy.visit('/integrations/redcap/survey/import')
-    cy.contains('Redcap API is not set up').should('exist')
-    cy.contains('Redcap settings').click()
-    cy.url().should('contain', '/settings#redcap')
-  })
-  */
-
   it('Can update logo', () => {
     cy.login(UserType.ORG_ADMIN)
     cy.visit('/settings')

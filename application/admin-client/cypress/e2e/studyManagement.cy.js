@@ -68,7 +68,7 @@ describe('Study management page', () => {
   })
 
   it('Redcap import page does not allow API features if not set up', () => {
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/integrations/redcap/survey/import')
     cy.get('[data-cy="study-dropdown"]').click()
     cy.contains('Study 2').click()
