@@ -4,7 +4,7 @@ beforeEach(() => {
   cy.task('reset')
 })
 
-const { UserType } = require('../../../common/cypress/support/commands')
+const { TestUsers } = require('../../../common/testing/constants.ts')
 const downloadsPath = 'cypress/downloads/'
 
 // Note: the tests below make heavy use of environment variables
@@ -84,7 +84,7 @@ describe('viewPdf', () => {
   }
 
   it('If unanswered, PDF shows "not answered"', () => {
-    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
     cy.visit('/')
     cy.contains('Intro').should('exist')
     // Check UI to ensure it matches expectations
@@ -93,7 +93,7 @@ describe('viewPdf', () => {
   })
 
   it('If answered, PDF shows correct answer', () => {
-    cy.login(UserType.PARTICIPANT_COMPLETED)
+    cy.login(TestUsers.PARTICIPANT_COMPLETED.email)
     cy.visit('/')
     cy.contains('Intro').should('exist')
     // Check UI to ensure it matches expectations
@@ -102,7 +102,7 @@ describe('viewPdf', () => {
   })
 
   it('checks answers, changes them and checks updated answers are updated in PDF', () => {
-    cy.login(UserType.PARTICIPANT_COMPLETED)
+    cy.login(TestUsers.PARTICIPANT_COMPLETED.email)
     cy.visit('/')
     cy.contains('Intro').should('exist')
     // Check UI to ensure it matches expectations
@@ -130,7 +130,7 @@ describe('viewPdf', () => {
   })
 
   it('should display error when PDF generation fails', () => {
-    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
     cy.visit('/')
 
     // Mock the API response to return an error
@@ -146,7 +146,7 @@ describe('viewPdf', () => {
   })
 
   it('PDF text contains study name', () => {
-    cy.login(UserType.PARTICIPANT_COMPLETED)
+    cy.login(TestUsers.PARTICIPANT_COMPLETED.email)
     cy.visit('/')
     cy.contains('Intro').should('exist')
     // Check UI to ensure it matches expectations
@@ -154,7 +154,7 @@ describe('viewPdf', () => {
     assertPdfContains(studyId, studyName)
 
     // changing study results in different study name
-    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
     cy.visit('/')
     cy.get('[data-cy="change-study"]').click()
     cy.contains('Study FE').click()
@@ -163,7 +163,7 @@ describe('viewPdf', () => {
   })
 
   it('PDF file name contains study name', () => {
-    cy.login(UserType.PARTICIPANT_COMPLETED)
+    cy.login(TestUsers.PARTICIPANT_COMPLETED.email)
     cy.visit('/')
     cy.contains('Intro').should('exist')
     // Check UI to ensure it matches expectations
@@ -173,7 +173,7 @@ describe('viewPdf', () => {
     })
 
     // changing study results in different study file name
-    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
     cy.visit('/')
     cy.get('[data-cy="change-study"]').click()
     cy.contains('Study FE').click()
@@ -186,7 +186,7 @@ describe('viewPdf', () => {
   it('PDF fetches logos correctly', () => {
     const orgLogoEndpoint = '**/settings/logo?t=*'
     const studyLogoEndpoint = `**/studies/${studyId}/logo?t=*`
-    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
     cy.visit('/')
 
     // Intercept logo fetch

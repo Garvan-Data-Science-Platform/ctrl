@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-const { UserType } = require('../../../common/cypress/support/commands')
+const { TestUsers } = require('../../../common/testing/constants')
 
 beforeEach(() => {
   cy.task('reset')
@@ -12,7 +12,7 @@ describe('basic', () => {
     cy.contains('Log In').should('exist')
   })
   it('can navigate to tabs', () => {
-    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
     cy.visit('/')
     cy.contains('Welcome').should('exist')
     cy.contains('My Personal').click()
@@ -26,7 +26,7 @@ describe('basic', () => {
   })
   it('can navigate in mobile view', () => {
     cy.viewport('iphone-8')
-    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
     cy.visit('/')
     cy.get('[data-cy="hamburger"]').click()
     cy.get('ul li').eq(2).click({ force: true })
@@ -34,7 +34,7 @@ describe('basic', () => {
   })
 
   it('can load style from backend', () => {
-    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
     cy.visit('/')
     cy.intercept('GET', '**/settings/userportal', {
       statusCode: 200,
@@ -47,7 +47,7 @@ describe('basic', () => {
   })
 
   it('can load org logo from backend', () => {
-    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
     cy.visit('/')
     cy.get('[data-cy="logo"]').should('not.exist')
     cy.task('updateLogo', {
@@ -77,7 +77,7 @@ describe('basic', () => {
   })
 
   it('can load study logo', () => {
-    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
     cy.visit('/')
     cy.get('[data-cy="study-logo"]').should('not.exist')
     cy.task('updateLogo', {
@@ -107,7 +107,7 @@ describe('basic', () => {
   })
 
   it('Is redirected to login when attempting to use expired token', () => {
-    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
     cy.visit('/')
     cy.contains('Welcome').should('exist')
     cy.login_expired()
@@ -115,7 +115,7 @@ describe('basic', () => {
     cy.get('[data-cy="login"]').should('exist')
   })
   it('Can log out', () => {
-    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
     cy.visit('/')
     cy.get('[data-cy="log-out"]').click()
     cy.url().should('contain', '/login')
