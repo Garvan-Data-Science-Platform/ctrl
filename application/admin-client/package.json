@@ -31,7 +31,7 @@
     "react-dom": "^18.0.0",
     "react-hook-form": "^7.30.0",
     "react-markdown": "^10.0.1",
-    "react-router-dom": "^6.8.1",
+    "react-router-dom": "^6.30.3",
     "react-router-hash-link": "^2.4.3",
     "react-spreadsheet-import": "^4.7.1",
     "x-data-grid-8": "npm:@mui/x-data-grid@8.14",
