@@ -16,12 +16,9 @@
 //
 import 'cypress-file-upload'
 
-export enum UserType {
-  PARTICIPANT_COMPLETED = 'test3@example.com',
-  PARTICIPANT_UNANSWERED = 'test2@example.com',
-  ORG_ADMIN = 'admin@example.com',
-  STUDY_ADMIN = 'studyadmin@example.com',
-}
+// import common cypress commands
+import '../../../common/cypress/support/commands'
+
 Cypress.Commands.add('login', (type: UserType) => {
   cy.request({
     method: 'POST',

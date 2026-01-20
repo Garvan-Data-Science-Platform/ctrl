@@ -2,9 +2,12 @@ import request from 'supertest'
 import { generateToken } from '../authentication'
 import { Api } from '../Api'
 import { resetDB, updateLogo } from 'common/testing/TestHelpers'
+import logoHashes from '../../../common/testing/fixtures/logo_hashes.json'
 import { ORG_ADMIN_ID } from 'common/testing/seed'
 import prisma from '../PrismaClient'
-import * as crypto from 'crypto'
+import { createHash } from 'crypto'
+
+const fixturesPath = '../common/testing/fixtures/'
 
 const api = new Api()
 const app = api.app
@@ -29,6 +32,7 @@ describe('SettingsController', () => {
   })
 
   const expectedSettings = {
+    logoSet: null, // This is used to tell the admin-client if there is a logo set
     primaryColour: 'red',
     secondaryColour: 'red',
     tcLink: 'https://garvan-data-science-platform.github.io/ctrl-docs/docs/terms-and-conditions',
@@ -88,28 +92,28 @@ describe('SettingsController', () => {
   })
 
   describe('GET /settings/logo', () => {
-    it('should return blank logo if no logo has been updated', async () => {
+    it('should return 404 if no logo has been uploaded', async () => {
       const response = await request(app).get(`/settings/logo`).responseType('blob')
-      const b64 = response.body.toString('base64')
-      const hash = crypto.createHash('md5').update(b64).digest('hex')
-      expect(hash).toEqual('4b8664db5ef2b1deb13816008bc993ad')
-      expect(response.status).toBe(200)
+      expect(response.status).toBe(404)
     })
     it('should return non-blank logo if logo has been uploaded', async () => {
-      await updateLogo('tests/test_data/valid_logo.png')
+      await updateLogo({
+        target: 'organisation',
+        filePath: `${fixturesPath}/valid_logo.png`,
+      })
       const response = await request(app).get(`/settings/logo`).responseType('blob')
-      const b64 = response.body.toString('base64')
-      const hash = crypto.createHash('md5').update(b64).digest('hex')
-      expect(hash).toEqual('3516708b3c454102feef80e62a8b330a')
+      const hash = createHash('md5').update(response.body).digest('hex')
+      expect(hash).toEqual(logoHashes.validLogoResizedHash)
       expect(response.status).toBe(200)
     })
   })
+
   describe('POST /settings/logo', () => {
-    it('should update the logo if valid', async () => {
+    it('should poste the logo if valid', async () => {
       const response = await request(app)
         .post('/settings/logo')
         .set({ Authorization: `Bearer ${orgAdminToken}` })
-        .attach('file', 'tests/test_data/valid_logo.png')
+        .attach('file', `${fixturesPath}/valid_logo.png`)
 
       expect(response.status).toBe(204)
     })
@@ -118,9 +122,64 @@ describe('SettingsController', () => {
       const response = await request(app)
         .post('/settings/logo')
         .set({ Authorization: `Bearer ${orgAdminToken}` })
-        .attach('file', 'tests/test_data/invalid_logo.png')
+        .attach('file', `${fixturesPath}/invalid_logo.png`)
 
-      expect(response.status).toBe(500)
+      expect(response.status).toBe(422)
+    })
+
+    it('should change logo if a logo gets updated', async () => {
+      // Post logo
+      const originalLogoPostResponse = await request(app)
+        .post(`/settings/logo`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .attach('file', `${fixturesPath}/valid_logo.png`)
+      expect(originalLogoPostResponse.status).toBe(204)
+      const originalLogoGetResponse = await request(app).get(`/settings/logo`).responseType('blob')
+      const originalLogoHash = createHash('md5').update(originalLogoGetResponse.body).digest('hex')
+      expect(originalLogoHash).toEqual(logoHashes.validLogoResizedHash)
+      expect(originalLogoGetResponse.status).toBe(200)
+      // Update logo
+      const alternateLogoPostResponse = await request(app)
+        .post(`/settings/logo`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .attach('file', `${fixturesPath}/alternate_logo.png`)
+      expect(alternateLogoPostResponse.status).toBe(204)
+      // Test logo has changed
+      const alternateLogoGetResponse = await request(app).get(`/settings/logo`).responseType('blob')
+      const alternateLogoHash = createHash('md5')
+        .update(alternateLogoGetResponse.body)
+        .digest('hex')
+      expect(alternateLogoHash).toEqual(logoHashes.alternateLogoResizedHash)
+      expect(alternateLogoGetResponse.status).toBe(200)
+    })
+  })
+
+  // TODO: Add test to verify that study admin cannot change logo
+
+  describe('DELETE /settings/logo', () => {
+    it('should delete an existing org logo', async () => {
+      // Add a logo to be deleted
+      const createResponse = await request(app)
+        .post(`/settings/logo`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .attach('file', `${fixturesPath}/valid_logo.png`)
+      expect(createResponse.status).toBe(204)
+
+      // Test deletion
+      const response = await request(app)
+        .delete(`/settings/logo`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(response.status).toBe(204)
+
+      // Try to get logo (expecting 404)
+      const getResponse = await request(app).get(`/settings/logo`).responseType('blob')
+      expect(getResponse.status).toBe(404)
+
+      // Verify logo is deleted in db
+      const orgWithDeletedLogo = await prisma.organisation.findFirst({
+        where: { id: 1 }, // Hard coded due to not yet supporting multitenancy.
+      })
+      expect(orgWithDeletedLogo?.logo).toBeNull()
     })
   })
 })

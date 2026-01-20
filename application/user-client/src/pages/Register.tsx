@@ -183,7 +183,7 @@ export default function Register() {
                 Already registered? Log In
               </Button>
             </Box>
-            {Object.keys(errors) && <Typography>{ }</Typography>}
+            {Object.keys(errors) && <Typography>{}</Typography>}
             <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
               <TextField
                 sx={{ m: 1, flexGrow: 1 }}

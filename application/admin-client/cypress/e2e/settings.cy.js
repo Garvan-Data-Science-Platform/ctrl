@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-const { UserType } = require('../support/commands')
+const { UserType } = require('../../../common/cypress/support/commands')
 
 beforeEach(() => {
   cy.task('reset')
@@ -79,21 +79,91 @@ describe('Settings page', () => {
     cy.contains('Invalid url').should('not.exist')
   })
 
-  it('Can update logo', () => {
+  it('Can upload a logo', () => {
     cy.login(UserType.ORG_ADMIN)
     cy.visit('/settings')
-    cy.get('[data-cy="logo-upload"]').attachFile('valid_logo.png')
+    cy.uploadCommonFile('[data-cy="logo-upload"]', 'valid_logo.png')
     cy.contains('Updated logo').should('exist')
-    cy.get('[data-cy="logo-preview"]').invoke('prop', 'naturalWidth').should('be.greaterThan', 0)
-    cy.get('[data-cy="logo-preview"]').invoke('prop', 'naturalHeight').should('equal', 85)
+    cy.readFile('../common/testing/fixtures/logo_hashes.json').then((data) => {
+      cy.get('[data-cy="logo-preview"]')
+        .should('be.visible')
+        .and('have.attr', 'src')
+        .then((src) => {
+          cy.request({ url: src, encoding: 'base64' }).then((response) => {
+            cy.task('calculateHash', response.body).then((hash) => {
+              expect(hash).to.equal(data.validLogoResizedHash)
+            })
+          })
+        })
+    })
+  })
+
+  it('Can update an org logo', () => {
+    cy.login(UserType.ORG_ADMIN)
+    cy.visit('/settings')
+    // Upload original logo
+    cy.uploadCommonFile('[data-cy="logo-upload"]', 'valid_logo.png')
+    cy.contains('Updated logo').should('exist')
+    cy.readFile('../common/testing/fixtures/logo_hashes.json').then((data) => {
+      cy.get('[data-cy="logo-preview"]')
+        .should('be.visible')
+        .and('have.attr', 'src')
+        .then((src) => {
+          cy.request({ url: src, encoding: 'base64' }).then((response) => {
+            cy.task('calculateHash', response.body).then((hash) => {
+              expect(hash).to.equal(data.validLogoResizedHash)
+            })
+          })
+        })
+    })
+
+    // Update logo to another image
+    cy.uploadCommonFile('[data-cy="logo-upload"]', 'alternate_logo.png')
+    cy.contains('Updated logo').should('exist')
+    cy.readFile('../common/testing/fixtures/logo_hashes.json').then((data) => {
+      cy.get('[data-cy="logo-preview"]')
+        .should('be.visible')
+        .and('have.attr', 'src')
+        .then((src) => {
+          cy.request({ url: src, encoding: 'base64' }).then((response) => {
+            cy.task('calculateHash', response.body).then((hash) => {
+              expect(hash).to.equal(data.alternateLogoResizedHash)
+            })
+          })
+        })
+    })
   })
 
   it('Invalid logo fails to update', () => {
     cy.login(UserType.ORG_ADMIN)
     cy.visit('/settings')
-    cy.get('[data-cy="logo-upload"]').attachFile('invalid_logo.png')
+    cy.uploadCommonFile('[data-cy="logo-upload"]', 'invalid_logo.png')
     cy.contains('Failed').should('exist')
-    cy.get('[data-cy="logo-preview"]').invoke('prop', 'naturalWidth').should('be.greaterThan', 0)
-    cy.get('[data-cy="logo-preview"]').invoke('prop', 'naturalHeight').should('equal', 100)
+    cy.get('[data-cy="logo-preview"]').should('not.exist')
+  })
+
+  it('Can delete an org Logo', () => {
+    cy.login(UserType.ORG_ADMIN)
+    cy.visit('/settings')
+    // Upload a logo to delete
+    cy.uploadCommonFile('[data-cy="logo-upload"]', 'valid_logo.png')
+    cy.contains('Updated logo').should('exist')
+    cy.readFile('../common/testing/fixtures/logo_hashes.json').then((data) => {
+      cy.get('[data-cy="logo-preview"]')
+        .should('be.visible')
+        .and('have.attr', 'src')
+        .then((src) => {
+          cy.request({ url: src, encoding: 'base64' }).then((response) => {
+            cy.task('calculateHash', response.body).then((hash) => {
+              expect(hash).to.equal(data.validLogoResizedHash)
+            })
+          })
+        })
+    })
+
+    // test logo delete
+    cy.get('[data-cy="logo-delete"]').click()
+    cy.contains('Deleted logo').should('exist')
+    cy.get('[data-cy="logo-preview"]').should('not.exist')
   })
 })

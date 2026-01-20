@@ -1,4 +1,4 @@
-import { Document, Page, Text, View, StyleSheet, Link } from '@react-pdf/renderer'
+import { Document, Image, Page, Text, View, StyleSheet, Link } from '@react-pdf/renderer'
 import { GetParticipantProfileResponse } from '../types/api/users'
 import { GetResponsesByIdResponse } from '../types/api/surveys'
 import { SurveyElement, SurveyStep } from '../types/survey'
@@ -68,6 +68,22 @@ const styles = StyleSheet.create({
     borderColor: '#bfbfbf',
     width: '100%',
   },
+  headerLogoContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  orgLogo: {
+    width: 'auto',
+    height: '50',
+    marginBottom: 10,
+  },
+  studyLogo: {
+    width: 'auto',
+    height: '50',
+    marginBottom: 10,
+  },
 })
 
 // Take a response question type and format a table row accordingly
@@ -130,9 +146,11 @@ const FormatResponseElement = (element: SurveyElement, mode: 'responses' | 'opti
 interface ResponsesPdfProps {
   studyName: string
   steps: SurveyStep[]
-  profile?: GetParticipantProfileResponse
+  profile?: GetParticipantProfileResponse['data']
   responses?: GetResponsesByIdResponse
   versionNumber?: number
+  orgLogo?: string | null
+  studyLogo?: string | null
 }
 
 // Create a PDF document component
@@ -142,13 +160,19 @@ const ResponsesPdf = ({
   steps,
   responses,
   versionNumber,
+  orgLogo,
+  studyLogo,
 }: ResponsesPdfProps) => (
   <Document>
     <Page size="A4" style={styles.page}>
+      <View style={styles.headerLogoContainer}>
+        <View>{orgLogo && <Image style={styles.orgLogo} src={orgLogo} />}</View>
+        <View>{studyLogo && <Image style={styles.studyLogo} src={studyLogo} />}</View>
+      </View>
       <Text style={styles.title}>{studyName}</Text>
       {profile && (
         <Text style={styles.title}>
-          Responses for {profile.data.firstName} {profile.data.lastName}
+          Responses for {profile.firstName} {profile.lastName}
         </Text>
       )}
       <View style={styles.profileSection}>
@@ -170,26 +194,26 @@ const ResponsesPdf = ({
           <Text style={styles.subtitle}>Participant Information</Text>
           <Text>
             Date of birth:{' '}
-            {new Date(profile.data.dob).toLocaleDateString('en-GB', {
+            {new Date(profile.dob).toLocaleDateString('en-GB', {
               day: 'numeric',
               month: 'long',
               year: 'numeric',
             })}
           </Text>
-          <Text>Email: {profile.data.email}</Text>
-          <Text>Mobile: {profile.data.mobile}</Text>
+          <Text>Email: {profile.email}</Text>
+          <Text>Mobile: {profile.mobile}</Text>
           <Text>Address:</Text>
           <Text>
             {'    '}
-            {profile.data.addressLine}
+            {profile.addressLine}
           </Text>
           <Text>
             {'    '}
-            {profile.data.suburb}
+            {profile.suburb}
           </Text>
           <Text>
             {'    '}
-            {profile.data.state} {profile.data.postcode}
+            {profile.state} {profile.postcode}
           </Text>
         </View>
       )}

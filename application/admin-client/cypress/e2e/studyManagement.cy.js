@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-const { UserType } = require('../support/commands')
+const { UserType } = require('../../../common/cypress/support/commands')
 
 beforeEach(() => {
   cy.task('reset')
@@ -68,7 +68,6 @@ describe('Study management page', () => {
   })
 
   it('Redcap import page does not allow API features if not set up', () => {
-    cy.login(UserType.ORG_ADMIN)
     cy.visit('/integrations/redcap/survey/import')
     cy.get('[data-cy="study-dropdown"]').click()
     cy.contains('Study 2').click()
@@ -94,11 +93,86 @@ describe('Study management page', () => {
   })
 
   it('Can upload a study logo', () => {
-    cy.login(UserType.ORG_ADMIN)
     cy.visit('/studies')
-    cy.get('[data-cy="logo-upload"]').attachFile('valid_logo.png')
+    cy.uploadCommonFile('[data-cy="logo-upload"]', 'valid_logo.png')
     cy.contains('Updated logo').should('exist')
-    cy.get('[data-cy="logo-preview"]').invoke('prop', 'naturalWidth').should('be.greaterThan', 0)
-    cy.get('[data-cy="logo-preview"]').invoke('prop', 'naturalHeight').should('equal', 85)
+    cy.readFile('../common/testing/fixtures/logo_hashes.json').then((data) => {
+      cy.get('[data-cy="logo-preview"]')
+        .should('be.visible')
+        .and('have.attr', 'src')
+        .then((src) => {
+          cy.request({ url: src, encoding: 'base64' }).then((response) => {
+            cy.task('calculateHash', response.body).then((hash) => {
+              expect(hash).to.equal(data.validLogoResizedHash)
+            })
+          })
+        })
+    })
+  })
+
+  it('Can update a study logo', () => {
+    cy.visit('/studies')
+    // Upload original logo
+    cy.uploadCommonFile('[data-cy="logo-upload"]', 'valid_logo.png')
+    cy.contains('Updated logo').should('exist')
+    cy.readFile('../common/testing/fixtures/logo_hashes.json').then((data) => {
+      cy.get('[data-cy="logo-preview"]')
+        .should('be.visible')
+        .and('have.attr', 'src')
+        .then((src) => {
+          cy.request({ url: src, encoding: 'base64' }).then((response) => {
+            cy.task('calculateHash', response.body).then((hash) => {
+              expect(hash).to.equal(data.validLogoResizedHash)
+            })
+          })
+        })
+    })
+
+    // Update logo to another image
+    cy.uploadCommonFile('[data-cy="logo-upload"]', 'alternate_logo.png')
+    cy.contains('Updated logo').should('exist')
+    cy.readFile('../common/testing/fixtures/logo_hashes.json').then((data) => {
+      cy.get('[data-cy="logo-preview"]')
+        .should('be.visible')
+        .and('have.attr', 'src')
+        .then((src) => {
+          cy.request({ url: src, encoding: 'base64' }).then((response) => {
+            cy.task('calculateHash', response.body).then((hash) => {
+              expect(hash).to.equal(data.alternateLogoResizedHash)
+            })
+          })
+        })
+    })
+  })
+
+  it('Invalid logo fails to update', () => {
+    cy.visit('/studies')
+    cy.uploadCommonFile('[data-cy="logo-upload"]', 'invalid_logo.png')
+    cy.contains('Failed').should('exist')
+    cy.get('[data-cy="logo-preview"]').should('not.exist')
+  })
+
+  it('Can delete a study logo', () => {
+    cy.visit('/studies')
+    // Upload a logo to delete
+    cy.uploadCommonFile('[data-cy="logo-upload"]', 'valid_logo.png')
+    cy.contains('Updated logo').should('exist')
+    cy.readFile('../common/testing/fixtures/logo_hashes.json').then((data) => {
+      cy.get('[data-cy="logo-preview"]')
+        .should('be.visible')
+        .and('have.attr', 'src')
+        .then((src) => {
+          cy.request({ url: src, encoding: 'base64' }).then((response) => {
+            cy.task('calculateHash', response.body).then((hash) => {
+              expect(hash).to.equal(data.validLogoResizedHash)
+            })
+          })
+        })
+    })
+
+    // test logo delete
+    cy.get('[data-cy="logo-delete"]').click()
+    cy.contains('Deleted logo').should('exist')
+    cy.get('[data-cy="logo-preview"]').should('not.exist')
   })
 })

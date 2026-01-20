@@ -138,9 +138,7 @@ describe('Invites - Full E2E Flow', () => {
 
     // 2. Admin revokes the invite via UI
     // Find the row with the email and click its action button
-    cy.contains('[role="row"]', revokedEmail)
-      .find('[data-cy="invite-actions"]')
-      .click()
+    cy.contains('[role="row"]', revokedEmail).find('[data-cy="invite-actions"]').click()
     cy.get('[data-cy="revoke-button"]').click()
     cy.get('[data-cy="pending-list"]').should('contain.text', 'Revoked')
 

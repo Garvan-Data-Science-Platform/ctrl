@@ -2,12 +2,12 @@ import { ChecklistRtl, PictureAsPdf } from '@mui/icons-material'
 import { Button, IconButton } from '@mui/material'
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import { EditButton, List, ShowButton, useDataGrid } from '@refinedev/mui'
+import { useNotification } from '@refinedev/core'
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { useStudyStore } from '../../studyStore'
 import SurveyPdf from '@common/src/PdfExport'
-import { formatStudyName } from '@common/src/pdfHelpers'
-import { pdf } from '@react-pdf/renderer'
+import { pdfUtils, downloadPdfBlob } from '@common/src/pdfHelpers'
 import { axiosInstance } from '../../providers/dataProvider'
 import { GetSurveyVersionByVersionNumberResponse } from '@common/types/api/surveys'
 
@@ -18,35 +18,30 @@ export const SurveyList = () => {
   })
 
   const { studies, activeStudyIndex } = useStudyStore()
+  const { open } = useNotification()
 
-  const downloadPdf = async (versionNumber: number) => {
-    const surveyData = (
-      await axiosInstance.get(`/studies/${studies[activeStudyIndex].id}/surveys/${versionNumber}`)
-    ).data as GetSurveyVersionByVersionNumberResponse
+  const generatePdf = async (versionNumber: number) => {
+    try {
+      const surveyData = (
+        await axiosInstance.get(`/studies/${studies[activeStudyIndex].id}/surveys/${versionNumber}`)
+      ).data as GetSurveyVersionByVersionNumberResponse
 
-    // Generate PDF with the data
-    const pdfDoc = (
-      <SurveyPdf
-        studyName={studies[activeStudyIndex].name}
-        steps={surveyData.data.data}
-        versionNumber={versionNumber}
-      />
-    )
+      const logos = pdfUtils.getLogoUrls(studies[activeStudyIndex].id)
+      const fileName = pdfUtils.formatFileName('CTRL-consent-form', studies[activeStudyIndex].name)
 
-    // Create a blob from the PDF document
-    const blob = await pdf(pdfDoc).toBlob()
-
-    // Format datetime for appending to filename. Ugly code but avoids adding another dependency
-    const now = new Date()
-    const formattedDatetime = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}`
-
-    const formattedStudyName = formatStudyName(studies[activeStudyIndex].name)
-
-    // Trigger download
-    const link = document.createElement('a')
-    link.href = URL.createObjectURL(blob)
-    link.download = `CTRL-consent-form-${formattedStudyName}_${formattedDatetime}.pdf`
-    link.click()
+      // Generate PDF with the data
+      await downloadPdfBlob(
+        <SurveyPdf
+          studyName={studies[activeStudyIndex].name}
+          steps={surveyData.data.data}
+          versionNumber={versionNumber}
+          {...logos}
+        />,
+        fileName,
+      )
+    } catch (error) {
+      open?.({ type: 'error', message: `Could not generate PDF: ${error}` })
+    }
   }
 
   const columns = React.useMemo<GridColDef[]>(
@@ -88,7 +83,7 @@ export const SurveyList = () => {
                 </>
               )}
               <IconButton
-                onClick={() => downloadPdf(row.versionNumber)}
+                onClick={() => generatePdf(row.versionNumber)}
                 title="Export to PDF"
                 color="primary"
                 data-cy="pdf-button"

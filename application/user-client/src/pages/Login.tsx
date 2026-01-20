@@ -92,11 +92,7 @@ export default function Login() {
           <form onSubmit={handleSubmit(onSubmit)}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <Box sx={{ mt: 5, mb: 2 }}>
-                <img
-                  src={import.meta.env.VITE_BACKEND_URL + '/settings/logo'}
-                  height={40}
-                  alt="logo"
-                />
+                <img src={import.meta.env.VITE_BACKEND_URL + '/settings/logo'} height={40} alt="" />
               </Box>
               {oidcProviders.length > 0 && (
                 <>

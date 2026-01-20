@@ -1,2 +1,3 @@
 import { GetSettingsResponse } from './getSettings'
-export type UpdateSettingsRequest = Partial<GetSettingsResponse['data']>
+type SettingsData = GetSettingsResponse['data']
+export type UpdateSettingsRequest = Partial<Omit<SettingsData, 'logoSet'>>

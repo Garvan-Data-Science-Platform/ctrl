@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-const { UserType } = require('../support/commands')
+const { UserType } = require('../../../common/cypress/support/commands')
 
 beforeEach(() => {
   cy.task('reset')

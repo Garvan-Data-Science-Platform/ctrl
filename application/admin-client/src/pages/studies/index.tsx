@@ -22,6 +22,8 @@ import { AddCircle, ArrowDropDown, Delete, Edit } from '@mui/icons-material'
 import { useQueryClient } from '@tanstack/react-query'
 import { SensitiveTextField } from '../../components/SensitiveTextField'
 import { useSearchParams } from 'react-router-dom'
+import { LogoUploader } from '../../components/LogoUploader'
+import { RESOURCES } from '../../constants'
 
 const StudyCard = ({
   study,
@@ -87,23 +89,6 @@ const StudyCard = ({
     setDeleteDialogOpen(false)
   }
 
-  const uploadLogo = async (file: File) => {
-    const formData = new FormData()
-    formData.append('file', file)
-
-    try {
-      await axiosInstance.post(`/studies/${study.id}/logo`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-      open?.({ type: 'success', message: 'Updated logo' })
-      queryClient.invalidateQueries(['studies'])
-    } catch (e: any) {
-      open?.({ type: 'error', message: `Failed to update logo: ${e.response.data.details}` })
-    }
-  }
-
   const handleRedcapApply = () => {
     const urlRegex =
       /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/
@@ -161,30 +146,11 @@ const StudyCard = ({
           </Button>
         </DialogActions>
       </Dialog>
-      <Button component="label" sx={{ border: '1px solid grey', minWidth: 80, height: 80 }}>
-        <input
-          type="file"
-          hidden
-          accept=".png,.jpg,.jpeg,.tif"
-          onChange={(e) => {
-            uploadLogo(e.target.files?.item(0) as File)
-          }}
-          data-cy="logo-upload"
-        />
-        {study.logo ? (
-          <Stack alignItems="center">
-            <img
-              src={import.meta.env.VITE_BACKEND_URL + `/studies/${study.id}/logo`}
-              height={60}
-              data-cy="logo-preview"
-              id="logo-preview"
-            />
-            <Typography variant="caption">Update logo</Typography>
-          </Stack>
-        ) : (
-          'Upload Logo'
-        )}
-      </Button>
+      <LogoUploader
+        resource={RESOURCES.STUDIES}
+        url={`/studies/${study.id}/logo`}
+        hasLogo={!!study.logo}
+      />
       <Box>
         {editingName ? (
           <Box>

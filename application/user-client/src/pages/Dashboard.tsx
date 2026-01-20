@@ -28,10 +28,9 @@ import { GetResponsesByIdResponse } from '@common/types/api/surveys'
 import { GetUserInvitesResponse } from '@common/types/api/participants'
 import { apiClient } from '../apiClient'
 import ResponsesPdf from '@common/src/PdfExport'
-import { pdf } from '@react-pdf/renderer'
 import { useAppStore, useCurrentStudyId } from '../store'
 import { StudyInvitesDialog } from '../components/StudyInvites'
-import { formatStudyName } from '@common/src/pdfHelpers'
+import { pdfUtils, downloadPdfBlob } from '@common/src/pdfHelpers'
 
 export default function Dashboard() {
   const studyId = useCurrentStudyId()
@@ -98,30 +97,20 @@ export default function Dashboard() {
             .then((res) => res.data) as Promise<GetResponsesByIdResponse>,
       })
 
-      // Generate PDF with the data
-      const pdfDoc = (
+      const logos = pdfUtils.getLogoUrls(studyId)
+      const participantName = `${profileData.data.firstName}_${profileData.data.lastName}`
+      const fileName = pdfUtils.formatFileName('CTRL-responses', studyName, participantName)
+
+      await downloadPdfBlob(
         <ResponsesPdf
           studyName={studyName}
-          profile={profileData}
+          profile={profileData.data}
           steps={responseData.data.steps}
           responses={responseData}
-        />
+          {...logos}
+        />,
+        fileName,
       )
-
-      // Create a blob from the PDF document
-      const blob = await pdf(pdfDoc).toBlob()
-
-      // Format datetime for appending to filename. Ugly code but avoids adding another dependency
-      const now = new Date()
-      const formattedDatetime = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}`
-
-      const formattedStudyName = formatStudyName(studyName)
-
-      // Trigger download
-      const link = document.createElement('a')
-      link.href = URL.createObjectURL(blob)
-      link.download = `CTRL-responses-${formattedStudyName}-${profileData!.data.firstName}_${profileData!.data.lastName}_${formattedDatetime}.pdf`
-      link.click()
     } catch {
       setShowPdfError(true)
     } finally {
@@ -195,10 +184,20 @@ export default function Dashboard() {
             setStudyInvitesOpen(false)
           }}
         />
-        <Stack direction="row" spacing={3}>
+        <Stack direction="row" spacing={3} sx={{ width: '100%' }}>
           <Typography variant="h5" textAlign="left">
             {studyName}
           </Typography>
+          <Box>
+            <img
+              src={studyId ? import.meta.env.VITE_BACKEND_URL + `/studies/${studyId}/logo` : ''}
+              height={30}
+              style={{ marginRight: 20 }}
+              data-cy="study-logo"
+              alt=""
+            />
+          </Box>
+          <Box sx={{ flexGrow: 1 }} />
           {(studies || []).length > 1 && (
             <Button data-cy="change-study" onClick={(e) => setAnchorEl(e.currentTarget)}>
               Change Study

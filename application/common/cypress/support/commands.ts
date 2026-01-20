@@ -1,27 +1,41 @@
 /// <reference types="cypress" />
 
-// Test user credentials (from seed data)
-export const TestUsers = {
-  ADMIN: {
-    email: 'admin@example.com',
-    password: 'Testpassword1',
-  },
-  PARTICIPANT_UNANSWERED: {
-    email: 'test2@example.com',
-    password: 'Testpassword1',
-  },
-  PARTICIPANT_COMPLETED: {
-    email: 'test3@example.com',
-    password: 'Testpassword1',
-  },
+// LEAVING THESE HERE TEMPORARILY WHILE MIGRATING TO CONTSANTS FILE
+// TODO: REMOVE THIS AND POINT ALL FILES TO USE CONSTANTS FILE
+export enum UserType {
+  PARTICIPANT_COMPLETED = 'test3@example.com',
+  PARTICIPANT_UNANSWERED = 'test2@example.com',
+  ORG_ADMIN = 'admin@example.com',
+  STUDY_ADMIN = 'studyadmin@example.com',
 }
 
-// App URLs
-export const AppUrls = {
-  ADMIN_CLIENT: 'http://localhost:5003',
-  USER_CLIENT: 'http://localhost:5002',
-  API: 'http://localhost:5001',
-}
+// Shared Cypress commands
+
+// Import from the SHARED testing folder
+import { TestUsers, AppUrls, MIME_TYPES } from '../../testing/constants'
+
+Cypress.Commands.add('uploadCommonFile', (selector, fileName) => {
+  cy.task('readCommonFile', fileName).then((base64) => {
+    if (!base64) throw new Error(`File "${fileName}" not found in common fixtures.`)
+
+    const extension = fileName.split('.').pop()?.toLowerCase() || ''
+    const mimeType = MIME_TYPES[extension] || 'application/octet-stream'
+    // Note: this gets the first element matched
+    //   for Settings page there is only one logo upload component
+    //   but studies page can have multiple.
+    //   If this is problematic, one option is to pass in an id and use string interpolation in the data-cy tag
+    cy.get(selector)
+      .first()
+      .selectFile(
+        {
+          contents: Cypress.Buffer.from(base64 as string, 'base64'),
+          fileName: fileName,
+          mimeType: mimeType,
+        },
+        { force: true },
+      )
+  })
+})
 
 /**
  * Login to admin-client via browser UI

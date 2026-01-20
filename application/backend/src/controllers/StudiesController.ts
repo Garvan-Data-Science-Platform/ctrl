@@ -32,10 +32,9 @@ import {
   NotFoundErrorResponse,
   UnauthorizedErrorResponse,
 } from 'common/types/api/errors'
+import { processLogoImage } from 'common/src/imageHelpers'
 import { auditLog } from '../middlewares/AuditLog'
-import sharp from 'sharp'
 import { Readable } from 'stream'
-import { SettingsController } from './SettingsController'
 import type { RequestWithAuthentication } from 'authentication'
 
 @Route('studies')
@@ -213,13 +212,14 @@ export class StudiesController extends Controller {
     if (!request.user.studies.includes(studyId)) {
       throw new NotFoundError('Study not found')
     }
-    const buffer = await sharp(file.buffer).resize(200).png().toBuffer()
+    const buffer = await processLogoImage(file.buffer)
     await prisma.study.update({ where: { id: studyId }, data: { logo: buffer } })
   }
 
   @Get('/{studyId}/logo')
   @NoSecurity()
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async getLogo(@Path() studyId: number): Promise<Readable> {
     const study = await prisma.study.findFirstOrThrow({
       where: { id: studyId },
@@ -227,10 +227,30 @@ export class StudiesController extends Controller {
     })
 
     if (!study.logo) {
-      return new SettingsController().getLogo()
+      throw new NotFoundError('Study logo not found')
     }
 
     return Readable.from(study.logo as Buffer)
+  }
+
+  @Delete('/{studyId}/logo')
+  @Security('jwt', ['OrganisationAdmin']) // TODO: check if study admin should also access this
+  @Response('204', 'Logo deleted')
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
+  public async deleteLogo(@Path() studyId: number): Promise<void> {
+    const study = await prisma.study.findUnique({
+      where: { id: studyId },
+      select: { logo: true },
+    })
+
+    if (!study || !study.logo) {
+      throw new NotFoundError('Logo not found')
+    }
+
+    await prisma.study.update({
+      where: { id: studyId },
+      data: { logo: null },
+    })
   }
 
   /**

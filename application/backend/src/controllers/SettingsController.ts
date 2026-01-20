@@ -9,6 +9,7 @@ import {
   Tags,
   Controller,
   Get,
+  Delete,
   Response,
   Patch,
   Body,
@@ -24,8 +25,10 @@ import type {
   GetUserPortalSettingsResponse,
   UpdateSettingsRequest,
 } from 'common/types/api/settings'
+import { NotFoundErrorResponse } from 'common/types/api/errors'
+import { NotFoundError } from '../middlewares/ErrorHandler'
 import { auditLog } from '../middlewares/AuditLog'
-import sharp from 'sharp'
+import { processLogoImage } from 'common/src/imageHelpers'
 
 @Route('settings')
 @Tags('Settings')
@@ -44,13 +47,24 @@ export class SettingsController extends Controller {
     const orgdata = await prisma.organisation.findFirstOrThrow({
       where: { id: 1 },
       select: {
+        logo: true,
         primaryColour: true,
         secondaryColour: true,
         tcLink: true,
         newsLink: true,
       },
     })
-    return { data: orgdata }
+
+    // logoSet is used by admin client to determine if a logo is set on page load
+    // returns 'present' or null rather than sending whole logo in payload
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { logo: _logo, ...settingsWithoutLogo } = orgdata
+    return {
+      data: {
+        ...settingsWithoutLogo,
+        logoSet: orgdata.logo ? 'present' : null,
+      },
+    }
   }
 
   @Patch('/')
@@ -78,13 +92,14 @@ export class SettingsController extends Controller {
   @Security('jwt', ['OrganisationAdmin'])
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
   public async uploadLogo(@UploadedFile() file: Express.Multer.File) {
-    const buffer = await sharp(file.buffer).resize(200).png().toBuffer()
+    const buffer = await processLogoImage(file.buffer)
     await prisma.organisation.update({ where: { id: 1 }, data: { logo: buffer } })
   }
 
   @Get('/logo')
   @NoSecurity()
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async getLogo(): Promise<Readable> {
     const org = await prisma.organisation.findFirstOrThrow({
       where: { id: 1 },
@@ -92,14 +107,29 @@ export class SettingsController extends Controller {
     })
 
     if (!org.logo) {
-      const blankLogo = await sharp({
-        create: { width: 200, height: 100, channels: 3, background: { r: 255, g: 255, b: 255 } },
-      })
-        .png()
-        .toBuffer()
-      return Readable.from(blankLogo)
+      throw new NotFoundError('Org logo not found')
     }
 
     return Readable.from(org.logo as Buffer)
+  }
+
+  @Delete('/logo')
+  @Security('jwt', ['OrganisationAdmin'])
+  @Response('204', 'Logo deleted')
+  @Response<NotFoundErrorResponse>('404', 'Not Found')
+  public async deleteLogo(): Promise<void> {
+    const org = await prisma.organisation.findUnique({
+      where: { id: 1 },
+      select: { logo: true },
+    })
+
+    if (!org || !org.logo) {
+      throw new NotFoundError('Logo not found')
+    }
+
+    await prisma.organisation.update({
+      where: { id: 1 },
+      data: { logo: null },
+    })
   }
 }

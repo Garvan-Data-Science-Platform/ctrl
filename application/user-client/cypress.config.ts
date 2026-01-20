@@ -5,12 +5,13 @@ import {
   getLatestFile,
   readPdf,
   deleteFile,
+  calculateHash,
   updateLogo,
   getInviteId,
   inviteUser,
   removeUserFromStudy,
 } from 'common/testing/TestHelpers'
-import { formatStudyName } from 'common/src/pdfHelpers'
+import { formatStudyName } from 'common/src/utils'
 
 import {
   PASSWORD_RESET_USER_EMAIL,
@@ -55,8 +56,11 @@ export default defineConfig({
         deleteFile(filePath: string) {
           return deleteFile(filePath)
         },
-        updateLogo(filePath: string) {
-          return updateLogo(filePath)
+        calculateHash(base64String: string) {
+          return calculateHash(base64String)
+        },
+        updateLogo({ target, filePath, id }) {
+          return updateLogo({ target, filePath, id })
         },
         getInviteIdtask({ email, studyId }) {
           return getInviteId(email, studyId)
