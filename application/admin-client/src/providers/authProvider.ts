@@ -10,14 +10,21 @@ export const clientType = 'admin-client'
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
 export const authProvider: AuthProvider = {
-  login: async ({ providerName, email, password, token }) => {
+  login: async ({ providerName, email, password, token, role, id }) => {
+    // Mode 1: RESUME / CALLBACK
+    // This handles the callback from SSO/Auth0 and OTP flows
     if (token) {
       localStorage.setItem(TOKEN_KEY, token)
+      if (role) localStorage.setItem(ROLE_KEY, role)
+      if (id) localStorage.setItem(ID_KEY, id)
+
       return {
         success: true,
         redirectTo: '/',
       }
     }
+
+    // Mode 2: EMAIL / PASSWORD CREDENTIALS
     if (email && password) {
       const res = await fetch(BACKEND_URL + '/auth/login', {
         method: 'POST',
@@ -53,6 +60,7 @@ export const authProvider: AuthProvider = {
       }
     }
 
+    // Mode 3: SSO (Redirects away)
     const providers = useAuthStore.getState().providers
     const match = providers.find((val) => val.name == providerName)
 
