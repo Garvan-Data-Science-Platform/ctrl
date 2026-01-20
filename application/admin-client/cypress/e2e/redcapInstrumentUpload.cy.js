@@ -4,7 +4,7 @@ const { UserType } = require('../../../common/cypress/support/commands')
 
 beforeEach(() => {
   cy.task('reset')
-  cy.login(UserType.ADMIN)
+  cy.login(UserType.ORG_ADMIN)
   cy.visit('/integrations')
   cy.contains('Import Survey').should('exist').click()
 })

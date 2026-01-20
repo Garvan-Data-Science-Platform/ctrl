@@ -31,7 +31,6 @@ import {
   Middlewares,
   Request,
   Delete,
-  Queries,
   Patch,
   NoSecurity,
 } from 'tsoa'
@@ -51,13 +50,13 @@ import { ProfilesController } from './ProfilesController'
 import { auditLog } from '../middlewares/AuditLog'
 import { Role } from '@prisma/client'
 import { genId } from '../utils/genId'
-import { extractOrderBy, extractWhere } from '../utils/filtering'
 import { generateInviteId, inviteExpiresAt } from '../utils/invite'
 import { Prefill } from 'common/types/invite'
+import type { RequestWithAuthentication } from '../authentication'
 
 @Route('/')
 @Tags('Participants')
-@Security('jwt', ['OrganisationAdmin'])
+@Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 @Response<InternalErrorResponse>('422', 'Unprocessable Content')
@@ -74,16 +73,9 @@ export class ParticipantsController extends Controller {
    * @summary List participants
    */
   @Get('studies/{studyId}/participants')
-  public async getParticipants(
-    @Path() studyId: number,
-    @Queries() queryParams: { [key: string]: any },
-  ): Promise<GetParticipantsResponse> {
-    const total = await prisma.studyParticipant.count({
-      where: { studyId, participantProfile: extractWhere(queryParams) },
-    })
-
+  public async getParticipants(@Path() studyId: number): Promise<GetParticipantsResponse> {
     const participant_list = await prisma.studyParticipant.findMany({
-      where: { studyId, participantProfile: extractWhere(queryParams) },
+      where: { studyId },
       select: {
         participantProfile: {
           select: {
@@ -97,10 +89,9 @@ export class ParticipantsController extends Controller {
         participantId: true,
         externalId: true,
       },
-      orderBy: extractOrderBy(queryParams),
-      skip: queryParams._start ? Number(queryParams._start) : undefined,
-      take: queryParams._end ? Number(queryParams._end) - Number(queryParams._start) : undefined,
     })
+
+    const total = participant_list.length
 
     const participants: GetParticipantsResponse['data'] = []
 
@@ -152,9 +143,11 @@ export class ParticipantsController extends Controller {
    * @summary List deleted participants
    */
   @Get('participants/deleted')
-  public async getDeletedParticipants(): Promise<GetDeletedParticipantsResponse> {
+  public async getDeletedParticipants(
+    @Request() request: RequestWithAuthentication,
+  ): Promise<GetDeletedParticipantsResponse> {
     const participants = await this.participantRepo.findMany({
-      where: { deleted: true },
+      where: { deleted: true, study: { id: { in: request.user.studies } } },
       select: {
         participantId: true,
         participantProfile: { select: { firstName: true, lastName: true, dob: true, id: true } },
@@ -222,6 +215,7 @@ export class ParticipantsController extends Controller {
   @Get('studies/{studyId}/participants/{profileId}/')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async getParticipantById(
+    @Request() request: RequestWithAuthentication,
     @Path() studyId: number,
     @Path() profileId: number,
   ): Promise<GetParticipantResponse> {
@@ -236,7 +230,10 @@ export class ParticipantsController extends Controller {
       },
     })
 
-    const profileDataResponse = await new ProfilesController().getParticipantProfileByID(profileId)
+    const profileDataResponse = await new ProfilesController().getParticipantProfileByID(
+      profileId,
+      request,
+    )
     const profileData = profileDataResponse.data
 
     const p_answers = await this.svaRepo.findMany({
@@ -276,12 +273,13 @@ export class ParticipantsController extends Controller {
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
   @Security('jwt', ['OrganisationAdmin'])
   public async updateProfileById(
+    @Request() request: RequestWithAuthentication,
     @Path() studyId: number,
     @Path() profileId: number,
     @Body() bodyRequest: UpdateParticipantRequest,
   ) {
     const { profile, ...participant } = bodyRequest
-    await new ProfilesController().updateProfileById(profileId, profile)
+    await new ProfilesController().updateProfileById(request, profileId, profile)
     if (participant) {
       await this.participantRepo.update({
         where: { participantProfileId_studyId: { participantProfileId: profileId, studyId } },
@@ -418,7 +416,7 @@ export class ParticipantsController extends Controller {
 
 @Route('/')
 @Tags('Invites')
-@Security('jwt', ['OrganisationAdmin'])
+@Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 export class InvitesController extends Controller {

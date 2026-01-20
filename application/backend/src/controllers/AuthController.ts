@@ -95,7 +95,7 @@ export class AuthController extends Controller {
       },
     })
 
-    const token = await generateToken({ userId: insertedUser.id, roles: [insertedUser.role] })
+    const token = await generateToken({ userId: insertedUser.id })
 
     const responseData = {
       token,
@@ -180,7 +180,7 @@ export class AuthController extends Controller {
       data: { data: [], status: 'DRAFT', studyId: study.id, versionNumber: 1 },
     })
 
-    const token = await generateToken({ userId: insertedUser.id, roles: [insertedUser.role] })
+    const token = await generateToken({ userId: insertedUser.id })
 
     const responseData = {
       token,
@@ -242,7 +242,7 @@ export class AuthController extends Controller {
     logger.info(`Participant ${insertedUser.id} created`)
 
     // Generate token
-    const token = await generateToken({ userId: insertedUser.id, roles: [insertedUser.role] })
+    const token = await generateToken({ userId: insertedUser.id })
 
     const responseData = {
       id: insertedUser.id,
@@ -322,15 +322,19 @@ export class AuthController extends Controller {
     }
 
     if (!user) {
+      throw new IncorrectPermissionsError('This email is not registered with CTRL.')
+    }
+
+    if (clientType === 'admin-client' && user.role === 'Participant') {
       throw new IncorrectPermissionsError('User does not have admin privileges')
     }
 
-    if (!user || (clientType === 'admin-client' && user.role !== 'OrganisationAdmin')) {
-      throw new IncorrectPermissionsError('User does not have admin privileges')
+    if (clientType === 'user-client' && user.role !== 'Participant') {
+      throw new IncorrectPermissionsError('User is not a study participant')
     }
 
-    const token = await generateToken({ userId: user.id, roles: [user.role] })
-    return { token }
+    const token = await generateToken({ userId: user.id })
+    return { token, id: user.id, role: user.role }
   }
 
   /**
@@ -365,7 +369,7 @@ export class AuthController extends Controller {
     }
 
     // Check client type and roles
-    if (clientType === 'admin-client' && user.role !== 'OrganisationAdmin') {
+    if (clientType === 'admin-client' && user.role == 'Participant') {
       throw new IncorrectPermissionsError('User does not have admin privileges')
     }
     if (clientType === 'user-client' && user.role !== 'Participant') {
@@ -406,11 +410,12 @@ export class AuthController extends Controller {
       mailerTransporter.sendMail(mailToUserOptions)
     } else {
       await this.userRepo.update({ where: { id: user.id }, data: { retriesRemaining: 10 } })
-      const token = await generateToken({ userId: user.id, roles: [user.role] })
+      const token = await generateToken({ userId: user.id })
       responseData = {
         token,
+        id: user.id,
+        role: user.role,
       }
-      logger.info({ ...responseData })
     }
 
     return responseData
@@ -463,14 +468,14 @@ export class AuthController extends Controller {
     }
 
     // Check client type and roles
-    if (clientType === 'admin-client' && user.role !== 'OrganisationAdmin') {
+    if (clientType === 'admin-client' && user.role == 'Participant') {
       throw new IncorrectPermissionsError('User does not have admin privileges')
     }
     if (clientType === 'user-client' && user.role !== 'Participant') {
       throw new IncorrectPermissionsError('User is not a participant')
     }
 
-    const token = await generateToken({ userId: user.id, roles: [user.role] })
+    const token = await generateToken({ userId: user.id })
     await this.userRepo.update({ where: { id: user.id }, data: { retriesRemaining: 10 } })
 
     const responseData = {

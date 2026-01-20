@@ -5,6 +5,7 @@ import { generateToken } from '../authentication'
 import prisma from '../PrismaClient'
 import {
   FE_TEST_STUDY_ID,
+  ORG_ADMIN_ID,
   PARTICIPANT_COMPLETED_ID,
   PARTICIPANT_UNANSWERED_ID,
 } from 'common/testing/seed'
@@ -18,7 +19,7 @@ let token: string
 
 describe('IntegrationsController', () => {
   beforeAll(async () => {
-    token = await generateToken({ userId: PARTICIPANT_COMPLETED_ID, roles: ['OrganisationAdmin'] })
+    token = await generateToken({ userId: ORG_ADMIN_ID })
     api.run()
   })
 

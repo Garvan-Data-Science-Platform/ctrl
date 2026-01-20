@@ -30,8 +30,9 @@ Cypress.Commands.add('login', (type: UserType) => {
   }).then((res) => {
     expect(res.status).to.equal(200)
     expect(res.body.token).to.exist
-    console.log('TOKEN', res.body.token)
     window.localStorage.setItem('refine-auth', res.body.token)
+    window.localStorage.setItem('userrole', res.body.role)
+    window.localStorage.setItem('userid', res.body.id)
   })
 })
 

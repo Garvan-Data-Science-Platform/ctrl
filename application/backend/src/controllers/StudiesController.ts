@@ -35,12 +35,13 @@ import {
 import { processLogoImage } from 'common/src/imageHelpers'
 import { auditLog } from '../middlewares/AuditLog'
 import { Readable } from 'stream'
+import type { RequestWithAuthentication } from 'authentication'
 
 @Route('studies')
 @Tags('Studies')
 @Response('500', 'Internal Server Error')
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
-@Security('jwt', ['OrganisationAdmin'])
+@Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
 @Middlewares(auditLog)
 export class StudiesController extends Controller {
   studyRepo = prisma.study
@@ -53,8 +54,13 @@ export class StudiesController extends Controller {
    * @summary Get all Studies
    */
   @Get('/')
-  public async getAllStudies(): Promise<GetAllStudiesResponse> {
-    const studies: Study[] = await this.studyRepo.findMany({ orderBy: { id: 'asc' } })
+  public async getAllStudies(
+    @Request() request: RequestWithAuthentication,
+  ): Promise<GetAllStudiesResponse> {
+    const studies: Study[] = await this.studyRepo.findMany({
+      where: { id: { in: request.user.studies } },
+      orderBy: { id: 'asc' },
+    })
     const responseData = { data: studies.map((val) => ({ ...val, logo: Boolean(val.logo) })) }
     logger.info({ ...responseData })
     return responseData
@@ -67,7 +73,9 @@ export class StudiesController extends Controller {
    */
   @Get('/list')
   @Security('jwt', ['Participant'])
-  public async listStudies(@Request() request: any): Promise<GetAllStudiesResponse> {
+  public async listStudies(
+    @Request() request: RequestWithAuthentication,
+  ): Promise<GetAllStudiesResponse> {
     // get profile id from token
     const participantProfile = await this.profileRepo.findFirstOrThrow({
       where: { userId: request.user.userId },
@@ -91,7 +99,15 @@ export class StudiesController extends Controller {
    * @summary Get deleted Studies
    */
   @Get('/deleted')
-  public async getDeletedStudies(): Promise<GetAllStudiesResponse> {
+  public async getDeletedStudies(
+    @Request() request: RequestWithAuthentication,
+  ): Promise<GetAllStudiesResponse> {
+    if (
+      (await prisma.user.findUniqueOrThrow({ where: { id: request.user.userId } })).role ==
+      'StudyAdmin'
+    ) {
+      return { data: [] }
+    }
     const studies: Study[] = await this.studyRepo.findMany({
       where: { deleted: true },
       orderBy: { id: 'asc' },
@@ -106,6 +122,7 @@ export class StudiesController extends Controller {
    * @summary Restore Deleted Study by Id
    */
   @Patch('{studyId}/restore')
+  @Security('jwt', ['OrganisationAdmin'])
   public async restoreStudyById(@Path() studyId: number) {
     await this.studyRepo.update({
       where: { id: studyId, deleted: true },
@@ -119,6 +136,7 @@ export class StudiesController extends Controller {
    * @summary Get Specific Study by Id
    */
   @Get('/{studyId}')
+  @Security('jwt', ['OrganisationAdmin'])
   public async getStudyById(@Path() studyId: number): Promise<GetStudyByIdResponse> {
     const study: Study | null = await this.studyRepo.findUnique({ where: { id: studyId } })
     if (!study) {
@@ -137,6 +155,7 @@ export class StudiesController extends Controller {
    * @summary Create a new Study
    */
   @Post('/')
+  @Security('jwt', ['OrganisationAdmin'])
   @SuccessResponse('201', 'Created')
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
   public async createStudy(@Body() bodyRequest: CreateStudyRequest): Promise<CreateStudyResponse> {
@@ -161,7 +180,15 @@ export class StudiesController extends Controller {
   @Patch('/{studyId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
-  public async updateStudy(@Path() studyId: number, @Body() bodyRequest: UpdateStudyRequest) {
+  public async updateStudy(
+    @Path() studyId: number,
+    @Request() request: RequestWithAuthentication,
+    @Body() bodyRequest: UpdateStudyRequest,
+  ) {
+    if (!request.user.studies.includes(studyId)) {
+      throw new NotFoundError('Study not found')
+    }
+
     if (
       bodyRequest.name &&
       (await this.studyRepo.count({ where: { name: bodyRequest.name, deleted: false } })) > 0
@@ -176,9 +203,15 @@ export class StudiesController extends Controller {
   }
 
   @Post('/{studyId}/logo')
-  @Security('jwt', ['OrganisationAdmin']) // TODO: check if study admin should also access this
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
-  public async uploadLogo(@UploadedFile() file: Express.Multer.File, @Path() studyId: number) {
+  public async uploadLogo(
+    @UploadedFile() file: Express.Multer.File,
+    @Path() studyId: number,
+    @Request() request: RequestWithAuthentication,
+  ) {
+    if (!request.user.studies.includes(studyId)) {
+      throw new NotFoundError('Study not found')
+    }
     const buffer = await processLogoImage(file.buffer)
     await prisma.study.update({ where: { id: studyId }, data: { logo: buffer } })
   }
@@ -226,6 +259,7 @@ export class StudiesController extends Controller {
    * @summary Delete a study
    */
   @Delete('/{studyId}')
+  @Security('jwt', ['OrganisationAdmin'])
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async deleteStudy(@Path() studyId: number) {
     const studyCount = await this.studyRepo.count({})

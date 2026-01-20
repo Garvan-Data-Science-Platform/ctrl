@@ -8,24 +8,26 @@ import {
   Menu,
   MenuItem,
   Modal,
-  TextField,
   Tooltip,
   Typography,
 } from '@mui/material'
-import { DataGrid, GridFilterOperator, type GridColDef } from '@mui/x-data-grid'
+import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import { DateField, EditButton, List, ShowButton, useDataGrid } from '@refinedev/mui'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { InviteModal } from '../../components/InviteModal'
 import { Recipient } from '@common/types/invite'
 import { axiosInstance } from '../../providers/dataProvider'
 import { useInvalidate, useNotification } from '@refinedev/core'
 import { InviteStatus } from '@common/types/api/participants/invite'
-import { MoreVert, People, PictureAsPdf } from '@mui/icons-material'
+import { MoreVert, People, PictureAsPdf, UploadFile } from '@mui/icons-material'
 import ResponsesPdf from '@common/src/PdfExport'
 import { pdfUtils, downloadPdfBlob } from '@common/src/pdfHelpers'
 import { useStudyStore } from '../../studyStore'
 import { GetParticipantResponse } from '@common/types/api/participants'
+import { ReactSpreadsheetImport } from 'react-spreadsheet-import'
+import { importFields } from '../../components/CSVImport'
+import { unflatten } from 'flat'
 
 export const statusMap = {
   incomplete: {
@@ -45,9 +47,9 @@ export const statusMap = {
 export const ParticipantList = () => {
   const { dataGridProps } = useDataGrid({
     syncWithLocation: false,
-    pagination: { pageSize: 10, mode: 'server' } as any,
-    filters: { mode: 'server' },
-    sorters: { mode: 'server' },
+    pagination: { mode: 'off' },
+    filters: { mode: 'off' },
+    sorters: { mode: 'off' },
   })
   const { dataGridProps: inviteGridProps } = useDataGrid({
     syncWithLocation: false,
@@ -61,6 +63,7 @@ export const ParticipantList = () => {
 
   const [initialRecipients, setInitialRecipients] = useState<Recipient[]>([])
   const [modalOpen, setModalOpen] = useState(false)
+  const [csvModalOpen, setCsvModalOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [inviteRowId, setInviteRowId] = useState('')
@@ -82,7 +85,10 @@ export const ParticipantList = () => {
     if (location.state?.openInviteModal) {
       setModalOpen(true)
       setInitialRecipients(location.state.initialRecipients || [])
-      // Clear the navigation state
+      window.history.replaceState({}, document.title)
+    }
+    if (location.state?.openCsvModal) {
+      setCsvModalOpen(true)
       window.history.replaceState({}, document.title)
     }
   }, [location, studies[activeStudyIndex].id])
@@ -184,59 +190,6 @@ export const ParticipantList = () => {
       open?.({ type: 'error', message: `Could not generate PDF: ${error}` })
     }
   }
-  // Debounced input component
-  function DebouncedInput(props: any) {
-    const { item, applyValue, InputProps } = props
-    const [value, setValue] = useState(item.value ?? '')
-    const debounceRef = useRef<number | undefined>()
-
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      const newValue = event.target.value
-      setValue(newValue)
-      if (debounceRef.current) {
-        window.clearTimeout(debounceRef.current)
-      }
-      debounceRef.current = window.setTimeout(() => {
-        applyValue({ ...item, value: newValue })
-      }, 500) // 500ms debounce
-    }
-
-    useEffect(() => {
-      return () => {
-        if (debounceRef.current) {
-          window.clearTimeout(debounceRef.current)
-        }
-      }
-    }, [])
-
-    return (
-      <div style={{ display: 'flex', alignItems: 'flex-end', height: '100%' }}>
-        <TextField
-          variant="standard"
-          value={value}
-          onChange={handleChange}
-          fullWidth
-          {...InputProps}
-        />
-      </div>
-    )
-  }
-
-  const allowedOperators: GridFilterOperator[] = [
-    {
-      label: 'Equals',
-      value: 'equals',
-      requiresFilterValue: true,
-      getApplyFilterFn: (filterItem) => (value) => value === filterItem.value,
-      InputComponent: DebouncedInput,
-    },
-    {
-      label: 'Does not equal',
-      value: 'doesNotEqual',
-      getApplyFilterFn: (filterItem) => (value) => value !== filterItem.value,
-      InputComponent: DebouncedInput,
-    },
-  ]
 
   const columns = React.useMemo<GridColDef[]>(
     () => [
@@ -246,31 +199,31 @@ export const ParticipantList = () => {
         headerName: 'ID',
         renderCell: ({ value, row }) => (row.externalId ? `${value} (${row.externalId})` : value),
         minWidth: 180,
-        filterOperators: allowedOperators,
+        //filterOperators: allowedOperators,
       },
       {
         field: 'firstName',
         flex: 1,
         headerName: 'First Name',
         minWidth: 100,
-        sortable: false,
-        filterOperators: allowedOperators,
+        sortable: true,
+        //filterOperators: allowedOperators,
       },
       {
         field: 'lastName',
         flex: 1,
         headerName: 'Last Name',
         minWidth: 100,
-        sortable: false,
-        filterOperators: allowedOperators,
+        sortable: true,
+        //filterOperators: allowedOperators,
       },
       {
         field: 'email',
         flex: 1,
         headerName: 'Email',
         minWidth: 100,
-        sortable: false,
-        filterOperators: allowedOperators,
+        sortable: true,
+        //filterOperators: allowedOperators,
       },
       {
         field: 'answers',
@@ -287,7 +240,7 @@ export const ParticipantList = () => {
         minWidth: 100,
         type: 'date',
         disableColumnMenu: true,
-        sortable: false,
+        sortable: true,
         valueGetter: (value) => {
           if (!value) return null
           return new Date(value)
@@ -416,6 +369,47 @@ export const ParticipantList = () => {
           }}
         />
       </Modal>
+      <ReactSpreadsheetImport
+        isOpen={csvModalOpen}
+        onClose={() => setCsvModalOpen(false)}
+        isNavigationEnabled
+        translations={{
+          uploadStep: {
+            manifestTitle: 'Available fields',
+            manifestDescription:
+              "When you upload a file you will have a chance to match the column headers with the fields listed below. These fields will be used to: (1) determine what email address to send an invitation to. (2) Prefill the registration form (if applicable). (3) Populate the user's externalID for this study.",
+          },
+        }}
+        onSubmit={(data: any) => {
+          const recips = data.validData.map((row: any) => {
+            const nested = unflatten(row) as any
+            return {
+              email: nested.profile.email,
+              prefill: nested,
+            }
+          })
+          setInitialRecipients(recips)
+          setModalOpen(true)
+        }}
+        fields={importFields}
+        allowInvalidSubmit={false}
+        customTheme={{
+          colors: {
+            rsi: {
+              50: '#e3f2fd',
+              100: '#bbdefb',
+              200: '#90caf9',
+              300: '#64b5f6',
+              400: '#42a5f5',
+              500: '#2196f3', // MUI primary.main
+              600: '#1e88e5',
+              700: '#1976d2',
+              800: '#1565c0',
+              900: '#0d47a1',
+            },
+          },
+        }}
+      />
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <Box
           sx={{
@@ -467,7 +461,18 @@ export const ParticipantList = () => {
         </MenuItem>
       </Menu>
       <List
-        headerButtons={
+        headerButtons={[
+          <Tooltip title="Import from CSV">
+            <Button
+              variant="contained"
+              onClick={() => {
+                setCsvModalOpen(true)
+              }}
+              data-cy="csv-button"
+            >
+              <UploadFile />
+            </Button>
+          </Tooltip>,
           <Button
             variant="contained"
             onClick={() => {
@@ -476,11 +481,13 @@ export const ParticipantList = () => {
             data-cy="invite-button"
           >
             Invite Participants
-          </Button>
-        }
+          </Button>,
+        ]}
       >
         <DataGrid
           {...dataGridProps}
+          pageSizeOptions={[10]}
+          initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
           columns={columns}
           autoHeight
           slotProps={{ root: { 'data-cy': 'participants-list' } }}

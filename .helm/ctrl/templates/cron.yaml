@@ -22,9 +22,9 @@ spec:
               {{ with .Values.ingress.hosts.userClient }}
                 value: {{ .hostname | quote }}
               {{ end }}
-              - name: EXAMPLE_ADMIN_EMAIL
+              - name: EXAMPLE_ORG_ADMIN_EMAIL
                 value: admin@example.com
-              - name: EXAMPLE_ADMIN_PASSWORD
+              - name: EXAMPLE_ORG_ADMIN_PASSWORD
                 value: Testpassword1
               - name: EXAMPLE_PARTICIPANT_EMAIL
                 value: user@example.com

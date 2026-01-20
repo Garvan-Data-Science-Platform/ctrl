@@ -4,7 +4,7 @@ const { UserType } = require('../../../common/cypress/support/commands')
 
 beforeEach(() => {
   cy.task('reset')
-  cy.login(UserType.ADMIN)
+  cy.login(UserType.ORG_ADMIN)
 })
 
 describe('Family Editing', () => {

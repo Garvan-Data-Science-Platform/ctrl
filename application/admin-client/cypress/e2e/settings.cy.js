@@ -13,7 +13,7 @@ describe('Settings page', () => {
   }
 
   it('Can edit settings and save them', () => {
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/settings')
 
     cy.get('[data-cy="tcLink"] input').should(
@@ -33,7 +33,7 @@ describe('Settings page', () => {
   })
 
   it('Can reset settings', () => {
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/settings')
 
     cy.get('[data-cy="tcLink"] input').should(
@@ -56,7 +56,7 @@ describe('Settings page', () => {
   it('Invalid values prevent saving and show appropriate error messages', () => {
     const values = { ...fieldMap, primaryColour: 'abc' }
 
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/settings')
 
     cy.get('[data-cy="tcLink"] input').should(
@@ -76,10 +76,11 @@ describe('Settings page', () => {
     }
 
     cy.contains('Invalid colour').should('not.exist')
+    cy.contains('Invalid url').should('not.exist')
   })
 
-  it('Can upload an org logo', () => {
-    cy.login(UserType.ADMIN)
+  it('Can upload a logo', () => {
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/settings')
     cy.uploadCommonFile('[data-cy="logo-upload"]', 'valid_logo.png')
     cy.contains('Updated logo').should('exist')
@@ -98,7 +99,7 @@ describe('Settings page', () => {
   })
 
   it('Can update an org logo', () => {
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/settings')
     // Upload original logo
     cy.uploadCommonFile('[data-cy="logo-upload"]', 'valid_logo.png')
@@ -134,7 +135,7 @@ describe('Settings page', () => {
   })
 
   it('Invalid logo fails to update', () => {
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/settings')
     cy.uploadCommonFile('[data-cy="logo-upload"]', 'invalid_logo.png')
     cy.contains('Failed').should('exist')
@@ -142,7 +143,7 @@ describe('Settings page', () => {
   })
 
   it('Can delete an org Logo', () => {
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/settings')
     // Upload a logo to delete
     cy.uploadCommonFile('[data-cy="logo-upload"]', 'valid_logo.png')

@@ -258,7 +258,8 @@
         "enum": [
           "OperatorAdmin",
           "Participant",
-          "OrganisationAdmin"
+          "OrganisationAdmin",
+          "StudyAdmin"
         ]
       },
       "CreateUserRequest": {
@@ -307,6 +308,9 @@
           "email": {
             "type": "string",
             "pattern": "^(.+)@(.+)$"
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
           }
         },
         "type": "object",
@@ -2619,6 +2623,13 @@
           },
           "otp_token": {
             "type": "string"
+          },
+          "id": {
+            "type": "number",
+            "format": "double"
+          },
+          "role": {
+            "type": "string"
           }
         },
         "type": "object",
@@ -2801,7 +2812,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -2861,7 +2873,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -2904,14 +2917,15 @@
           }
         },
         "description": "Get all deleted Admin Users",
-        "summary": "Get all deleted Admin Users",
+        "summary": "Get all deleted Organisation and Study Admin Users",
         "tags": [
           "Users"
         ],
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -3034,7 +3048,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -3105,7 +3120,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -3184,6 +3200,112 @@
           {
             "in": "path",
             "name": "userId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/users/{userId}/make-study-admin/{studyId}": {
+      "post": {
+        "operationId": "MakeStudyAdmin",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Make a user a study admin",
+        "summary": "Make a user admin of a study",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin",
+              "StudyAdmin"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/users/{userId}/remove-study-admin/{studyId}": {
+      "post": {
+        "operationId": "RemoveStudyAdmin",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Remove a user as admin of a study",
+        "summary": "Remove a study admin",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin",
+              "StudyAdmin"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "studyId",
             "required": true,
             "schema": {
               "format": "double",
@@ -3397,7 +3519,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -3446,7 +3569,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -3504,7 +3628,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -3788,7 +3913,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -3846,7 +3972,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -3915,7 +4042,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -3977,7 +4105,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -4124,7 +4253,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -4277,7 +4407,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -4395,7 +4526,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -5040,7 +5172,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -5108,7 +5241,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -5167,7 +5301,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -5247,7 +5382,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -5317,7 +5453,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -5380,7 +5517,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -5469,7 +5607,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -5627,7 +5766,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -5707,7 +5847,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -5933,7 +6074,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -6001,7 +6143,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -6064,7 +6207,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -6125,7 +6269,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -6188,7 +6333,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -6266,7 +6412,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -7050,7 +7197,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -7137,7 +7285,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -7205,7 +7354,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -7292,7 +7442,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -7586,7 +7737,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -7678,7 +7830,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -7760,7 +7913,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -7842,7 +7996,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -7933,7 +8088,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],

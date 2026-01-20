@@ -1,11 +1,10 @@
 import request from 'supertest'
 import { Api } from '../../src/Api'
 import { resetDB } from 'common/testing/TestHelpers'
-import { Role } from '@prisma/client'
 
 import { generateToken } from '../../src/authentication'
 import prisma from '../../src/PrismaClient'
-import { PARTICIPANT_COMPLETED_ID } from 'common/testing/seed'
+import { ORG_ADMIN_ID, PARTICIPANT_COMPLETED_ID } from 'common/testing/seed'
 
 const api = new Api()
 const app = api.app
@@ -15,7 +14,7 @@ describe('Elsa Integration', () => {
 
   beforeAll(async () => {
     api.run()
-    orgAdminToken = await generateToken({ userId: 97, roles: [Role.OrganisationAdmin] })
+    orgAdminToken = await generateToken({ userId: ORG_ADMIN_ID })
     await resetDB()
   })
 

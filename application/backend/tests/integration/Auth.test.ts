@@ -7,7 +7,7 @@ import {
   RegisterResponse,
 } from 'common/types/api/auth'
 import { resetDB } from 'common/testing/TestHelpers'
-import { PARTICIPANT_UNANSWERED_EMAIL, TEST_STUDY } from 'common/testing/seed'
+import { ORG_ADMIN_ID, PARTICIPANT_UNANSWERED_EMAIL, TEST_STUDY } from 'common/testing/seed'
 import {
   ContactMethod,
   ParticipantType,
@@ -53,8 +53,7 @@ describe('Auth', () => {
     await resetDB()
 
     const orgAdminToken = await generateToken({
-      userId: 555,
-      roles: ['OrganisationAdmin'],
+      userId: ORG_ADMIN_ID,
     })
 
     // Register Admin

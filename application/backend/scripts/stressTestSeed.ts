@@ -22,7 +22,7 @@ const main = async () => {
     const pData: Partial<ParticipantProfile> = {
       id: 1000 + i,
       addressLine: faker.string.alphanumeric(),
-      dob: faker.date.birthdate(),
+      dob: String(faker.date.birthdate()),
       firstName: faker.person.firstName(),
       lastName: faker.person.lastName(),
       mobile: faker.phone.number(),
@@ -40,7 +40,7 @@ const main = async () => {
       participantNumber: 1000 + i,
     })
 
-    answers.push({ profileId: 1000 + i, versionId: 1000, answers: exampleAnswers })
+    answers.push({ profileId: 1000 + i, versionId: 900, answers: exampleAnswers })
   }
   await prisma.participantProfile.createMany({ data: profiles as any })
   await prisma.studyParticipant.createMany({ data: participants as any })

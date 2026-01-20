@@ -23,7 +23,7 @@ const testCases = [
 describe('Admin PDF Export', () => {
   testCases.forEach(({ description, selectorIndex, expectedText }) => {
     it(`Show correct information in PDF for ${description}`, () => {
-      cy.login(UserType.ADMIN)
+      cy.login(UserType.ORG_ADMIN)
       cy.visit('/participants')
 
       cy.intercept('GET', '/studies/1/participants/*/').as('requestPdf')

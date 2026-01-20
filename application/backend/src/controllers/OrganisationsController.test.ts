@@ -28,7 +28,7 @@ describe('OrganisationsController', () => {
   beforeEach(async () => {
     await resetDB()
 
-    orgAdmintoken = await generateToken({ userId: ORG_ADMIN_ID, roles: ['OrganisationAdmin'] })
+    orgAdmintoken = await generateToken({ userId: ORG_ADMIN_ID })
   })
 
   afterAll(async () => {
@@ -214,7 +214,7 @@ describe('OrganisationsController', () => {
 
       const body: GetOrganisationUsersResponse = response.body
 
-      expect(body.data.length).toBe(3)
+      expect(body.data.length).toBe(4)
       expect(body.data[0].id).toBe(ORG_ADMIN_ID)
     })
 

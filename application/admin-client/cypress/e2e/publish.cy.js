@@ -8,7 +8,7 @@ beforeEach(() => {
 
 describe('Publish and complete', () => {
   it('Publish', () => {
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/surveys/edit/2')
     cy.contains('Publish').click()
     cy.get('[data-cy="publish-confirm"]').click()

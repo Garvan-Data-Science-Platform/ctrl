@@ -1,4 +1,5 @@
 import { Box, MenuItem, TextField } from '@mui/material'
+import { useGetIdentity } from '@refinedev/core'
 import { Create } from '@refinedev/mui'
 import { useForm } from '@refinedev/react-hook-form'
 import { Controller } from 'react-hook-form'
@@ -12,6 +13,8 @@ export const UserCreate = () => {
     formState: { errors },
   } = useForm({})
 
+  const { data: identity } = useGetIdentity<{ role: string; id: number }>()
+
   return (
     <Create isLoading={formLoading} saveButtonProps={saveButtonProps}>
       <Box component="form" sx={{ display: 'flex', flexDirection: 'column' }} autoComplete="off">
@@ -19,8 +22,8 @@ export const UserCreate = () => {
           {...register('firstName', {
             required: 'This field is required',
           })}
-          error={!!(errors as any)?.title}
-          helperText={(errors as any)?.title?.message}
+          error={!!(errors as any)?.firstName}
+          helperText={(errors as any)?.firstName?.message}
           margin="normal"
           fullWidth
           InputLabelProps={{ shrink: true }}
@@ -33,8 +36,8 @@ export const UserCreate = () => {
           {...register('lastName', {
             required: 'This field is required',
           })}
-          error={!!(errors as any)?.title}
-          helperText={(errors as any)?.title?.message}
+          error={!!(errors as any)?.lastName}
+          helperText={(errors as any)?.lastName?.message}
           margin="normal"
           fullWidth
           InputLabelProps={{ shrink: true }}
@@ -45,9 +48,11 @@ export const UserCreate = () => {
         <TextField
           {...register('email', {
             required: 'This field is required',
+            validate: (email: string) =>
+              /^[\w.-]+@([\w-]+\.)+[\w-]{2,4}$/.test(email) || 'Invalid email address',
           })}
-          error={!!(errors as any)?.title}
-          helperText={(errors as any)?.title?.message}
+          error={!!(errors as any)?.email}
+          helperText={(errors as any)?.email?.message}
           margin="normal"
           fullWidth
           InputLabelProps={{ shrink: true }}
@@ -59,19 +64,19 @@ export const UserCreate = () => {
           <Controller
             name="role"
             control={control}
-            defaultValue="OrganisationAdmin"
+            defaultValue="StudyAdmin"
             render={({ field }) => {
               return (
                 <TextField
-                  disabled
+                  disabled={identity?.role == 'StudyAdmin'}
                   select
                   {...field}
                   value={field?.value}
                   label={'Role'}
                   sx={{ mt: 1 }}
                 >
-                  <MenuItem value="OrganisationAdmin">Admin</MenuItem>
-                  <MenuItem value="Participant">Participant</MenuItem>
+                  <MenuItem value="OrganisationAdmin">Organisation Admin</MenuItem>
+                  <MenuItem value="StudyAdmin">Study Admin</MenuItem>
                 </TextField>
               )
             }}

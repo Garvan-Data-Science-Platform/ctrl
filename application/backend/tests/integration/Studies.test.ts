@@ -92,7 +92,7 @@ describe('Studies tests', () => {
 
     // Answer a question on survey 1
     const p = await prisma.user.findFirstOrThrow({ where: { email: 'parent1@gmail.com' } })
-    const p1Token = await generateToken({ userId: p.id, roles: ['Participant'] })
+    const p1Token = await generateToken({ userId: p.id })
 
     const requestBody: UpdateSurveyAnswersRequest = { step: 1, data: [true, 'Choice 1'] }
 
@@ -186,7 +186,6 @@ describe('Studies tests', () => {
     // Log in as Parent1
     const token = await generateToken({
       userId: parent1User.id,
-      roles: ['Participant'],
     })
 
     // list pending invites
@@ -261,7 +260,6 @@ describe('Studies tests', () => {
 
     const token = await generateToken({
       userId: parent1User.id,
-      roles: ['Participant'],
     })
 
     // Answer study2 questions
@@ -328,7 +326,6 @@ describe('Studies tests', () => {
 
     const token = await generateToken({
       userId: parent2User.id,
-      roles: ['Participant'],
     })
 
     // Accept invite

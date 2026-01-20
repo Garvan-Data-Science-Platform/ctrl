@@ -26,4 +26,6 @@ export interface OIDCLoginRequest {
 export interface LoginResponse {
   token?: string
   otp_token?: string
+  id?: number
+  role?: string
 }

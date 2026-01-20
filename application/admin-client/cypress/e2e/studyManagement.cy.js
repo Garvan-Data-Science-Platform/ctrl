@@ -4,7 +4,7 @@ const { UserType } = require('../../../common/cypress/support/commands')
 
 beforeEach(() => {
   cy.task('reset')
-  cy.login(UserType.ADMIN)
+  cy.login(UserType.ORG_ADMIN)
 })
 
 describe('Study management page', () => {
@@ -68,7 +68,6 @@ describe('Study management page', () => {
   })
 
   it('Redcap import page does not allow API features if not set up', () => {
-    cy.login(UserType.ADMIN)
     cy.visit('/integrations/redcap/survey/import')
     cy.get('[data-cy="study-dropdown"]').click()
     cy.contains('Study 2').click()
@@ -94,7 +93,6 @@ describe('Study management page', () => {
   })
 
   it('Can upload a study logo', () => {
-    cy.login(UserType.ADMIN)
     cy.visit('/studies')
     cy.uploadCommonFile('[data-cy="logo-upload"]', 'valid_logo.png')
     cy.contains('Updated logo').should('exist')
@@ -113,7 +111,6 @@ describe('Study management page', () => {
   })
 
   it('Can update a study logo', () => {
-    cy.login(UserType.ADMIN)
     cy.visit('/studies')
     // Upload original logo
     cy.uploadCommonFile('[data-cy="logo-upload"]', 'valid_logo.png')
@@ -149,7 +146,6 @@ describe('Study management page', () => {
   })
 
   it('Invalid logo fails to update', () => {
-    cy.login(UserType.ADMIN)
     cy.visit('/studies')
     cy.uploadCommonFile('[data-cy="logo-upload"]', 'invalid_logo.png')
     cy.contains('Failed').should('exist')
@@ -157,7 +153,6 @@ describe('Study management page', () => {
   })
 
   it('Can delete a study logo', () => {
-    cy.login(UserType.ADMIN)
     cy.visit('/studies')
     // Upload a logo to delete
     cy.uploadCommonFile('[data-cy="logo-upload"]', 'valid_logo.png')

@@ -31,9 +31,11 @@ import {
 import { FamilyMember } from 'common/types/api/users/getParticipantProfile'
 import { auditLog } from '../middlewares/AuditLog'
 import { recalculateAnswers } from '../utils/answers'
+import type { RequestWithAuthentication } from '../authentication'
 
 @Route('profiles')
 @Tags('Profiles')
+@Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 @Middlewares(auditLog)
@@ -72,20 +74,26 @@ export class ProfilesController extends Controller {
    */
   @Get('/user/{userId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  @Security('jwt', ['OrganisationAdmin'])
   public async getParticipantProfileByUserID(
+    @Request() request: RequestWithAuthentication,
     @Path() userId: number,
   ): Promise<GetParticipantProfileResponse> {
-    const p = await this.participantProfileRepo.findFirstOrThrow({ where: { userId } })
+    const p = await this.participantProfileRepo.findFirstOrThrow({
+      where: { userId, studies: { some: { studyId: { in: request.user.studies } } } },
+    })
     return this.getParticipantProfile(p.id)
   }
 
   @Get('/{profileId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  @Security('jwt', ['OrganisationAdmin'])
   public async getParticipantProfileByID(
     @Path() profileId: number,
+    @Request() request: RequestWithAuthentication,
   ): Promise<GetParticipantProfileResponse> {
+    //Check user has permission to view this profile
+    await this.participantProfileRepo.findFirstOrThrow({
+      where: { id: profileId, studies: { some: { studyId: { in: request.user.studies } } } },
+    })
     return this.getParticipantProfile(profileId)
   }
 
@@ -163,13 +171,13 @@ export class ProfilesController extends Controller {
 
   @Patch('/{profileId}')
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
-  @Security('jwt', ['OrganisationAdmin'])
   public async updateProfileById(
+    @Request() request: RequestWithAuthentication,
     @Path() profileId: number,
     @Body() bodyRequest: UpdateProfileRequest,
   ) {
     const profile = await this.participantProfileRepo.findUniqueOrThrow({
-      where: { id: profileId },
+      where: { id: profileId, studies: { some: { studyId: { in: request.user.studies } } } },
       select: {
         participantType: true,
         familyId: true,
@@ -181,6 +189,25 @@ export class ProfilesController extends Controller {
     const { nextOfKin, email, ...updateData } = { ...bodyRequest }
 
     const hasNok = Boolean(nextOfKin)
+
+    if (bodyRequest.participantType != profile.participantType) {
+      const affectedStudies = await prisma.study.findMany({
+        where: {
+          profiles: {
+            some: {
+              participantProfile: { familyId: profile.familyId },
+            },
+          },
+        },
+        select: { id: true },
+      })
+
+      if (!affectedStudies.every((s) => request.user.studies.includes(s.id))) {
+        throw new UnprocessableError(
+          'You do not have admin permissions for every study impacted by this change.',
+        )
+      }
+    }
 
     for (const study of profile.studies) {
       const familyGuardiansCount = await prisma.studyParticipant.count({

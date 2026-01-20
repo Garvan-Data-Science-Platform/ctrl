@@ -5,8 +5,8 @@
 export enum UserType {
   PARTICIPANT_COMPLETED = 'test3@example.com',
   PARTICIPANT_UNANSWERED = 'test2@example.com',
-  ADMIN = 'admin@example.com',
-  // TODO: Add study admin here
+  ORG_ADMIN = 'admin@example.com',
+  STUDY_ADMIN = 'studyadmin@example.com',
 }
 
 // Shared Cypress commands

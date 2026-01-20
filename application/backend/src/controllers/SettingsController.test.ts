@@ -18,7 +18,6 @@ describe('SettingsController', () => {
   beforeAll(async () => {
     orgAdminToken = await generateToken({
       userId: ORG_ADMIN_ID,
-      roles: ['OrganisationAdmin'],
     })
 
     api.run()

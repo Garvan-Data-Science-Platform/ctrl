@@ -11,6 +11,7 @@ import {
 } from 'common/types/api/users/ParticipantProfile'
 
 import prisma from '../../src/PrismaClient'
+import { ORG_ADMIN_ID } from 'common/testing/seed'
 
 const api = new Api()
 const app = api.app
@@ -21,7 +22,7 @@ describe('Survey tests', () => {
   beforeAll(async () => {
     api.run()
     await resetDB()
-    adminToken = await generateToken({ userId: 1, roles: ['OrganisationAdmin'] })
+    adminToken = await generateToken({ userId: ORG_ADMIN_ID })
   })
 
   afterAll(async () => {
@@ -83,7 +84,7 @@ describe('Survey tests', () => {
 
   it('One parent submits answers and both dependents inherit all answers', async () => {
     const p = await prisma.user.findFirstOrThrow({ where: { email: 'parent1@gmail.com' } })
-    const p1Token = await generateToken({ userId: p.id, roles: ['Participant'] })
+    const p1Token = await generateToken({ userId: p.id })
 
     const reqBody: UpdateSurveyAnswersRequest = { step: 1, data: [true, 'Choice 1'] }
 
@@ -113,7 +114,7 @@ describe('Survey tests', () => {
 
   it('Second parent answers with a conflict, and children inherit correct answers', async () => {
     const p2 = await prisma.user.findFirstOrThrow({ where: { email: 'parent2@gmail.com' } })
-    const p2Token = await generateToken({ userId: p2.id, roles: ['Participant'] })
+    const p2Token = await generateToken({ userId: p2.id })
 
     const reqBody: UpdateSurveyAnswersRequest = { step: 1, data: [false, 'Choice 1'] }
 

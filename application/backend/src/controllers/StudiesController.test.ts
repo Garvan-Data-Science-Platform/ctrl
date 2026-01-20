@@ -7,7 +7,11 @@ import {
   CreateStudyRequest,
   UpdateStudyRequest,
 } from 'common/types/api/studies'
-import { PARTICIPANT_UNANSWERED_ID, PARTICIPANT_COMPLETED_ID } from 'common/testing/seed'
+import {
+  PARTICIPANT_UNANSWERED_ID,
+  PARTICIPANT_COMPLETED_ID,
+  STUDY_ADMIN_ID,
+} from 'common/testing/seed'
 import { resetDB, updateLogo } from 'common/testing/TestHelpers'
 import logoHashes from '../../../common/testing/fixtures/logo_hashes.json'
 import { generateToken } from '../authentication'
@@ -21,6 +25,7 @@ const app = api.app
 
 describe('StudiesController', () => {
   let orgAdminToken: string
+  let studyAdminToken: string
 
   const testStudyId: number = 1
 
@@ -31,7 +36,8 @@ describe('StudiesController', () => {
   beforeEach(async () => {
     await resetDB()
 
-    orgAdminToken = await generateToken({ userId: ORG_ADMIN_ID, roles: ['OrganisationAdmin'] })
+    orgAdminToken = await generateToken({ userId: ORG_ADMIN_ID })
+    studyAdminToken = await generateToken({ userId: STUDY_ADMIN_ID })
   })
 
   afterAll(async () => {
@@ -47,7 +53,6 @@ describe('StudiesController', () => {
 
       const body: GetAllStudiesResponse = response.body
       expect(Array.isArray(body.data)).toBeTruthy()
-      console.log(body.data)
       expect(body.data.length).toEqual(4)
     })
 
@@ -60,13 +65,23 @@ describe('StudiesController', () => {
         .set({ Authorization: `Bearer ${orgAdminToken}` })
       expect(response.status).toBe(500)
     })
+
+    it('It should only return studies that study admin is admin of', async () => {
+      const response = await request(app)
+        .get('/studies')
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+      expect(response.status).toBe(200)
+
+      const body: GetAllStudiesResponse = response.body
+      expect(Array.isArray(body.data)).toBeTruthy()
+      expect(body.data.length).toEqual(1)
+    })
   })
 
   describe('GET /studies/list', () => {
     it('should return a list of studies for logged in user', async () => {
       const token = await generateToken({
         userId: PARTICIPANT_UNANSWERED_ID,
-        roles: ['Participant'],
       })
 
       const response = await request(app)
@@ -89,7 +104,6 @@ describe('StudiesController', () => {
     it('should return a different list of studies for a different logged in user', async () => {
       const token = await generateToken({
         userId: PARTICIPANT_COMPLETED_ID,
-        roles: ['Participant'],
       })
 
       const response = await request(app)
@@ -214,7 +228,7 @@ describe('StudiesController', () => {
 
       expect(response.status).toBe(404)
 
-      expect(response.body.message).toBe(`Record not found`)
+      expect(response.body.message).toBe(`Study not found`)
     })
   })
 

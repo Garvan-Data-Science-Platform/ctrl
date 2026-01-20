@@ -15,6 +15,7 @@ export const PARTICIPANT_COMPLETED_EMAIL = 'test3@example.com'
 export const DEPENDENT_ID = 100
 export const SECOND_GUARDIAN_ID = 102
 export const PASSWORD_RESET_USER_ID = 105
+export const STUDY_ADMIN_ID = 106
 export const PASSWORD_RESET_USER_EMAIL = 'test-reset-password@example.com'
 export const TEST_STUDY = 'Test Study'
 export const TEST_STUDY_ID = 1
@@ -118,6 +119,28 @@ export async function seedTests(prisma: PrismaClient) {
       password: hashPassword('Testpassword1'),
       role: Role.OrganisationAdmin,
       organisations: {
+        connect: {
+          id: 1,
+        },
+      },
+    },
+  })
+
+  //StudyAdminUser
+  await prisma.user.create({
+    data: {
+      id: STUDY_ADMIN_ID,
+      email: 'studyadmin@example.com',
+      firstName: 'Study',
+      lastName: 'Admin',
+      password: hashPassword('Testpassword1'),
+      role: Role.StudyAdmin,
+      organisations: {
+        connect: {
+          id: 1,
+        },
+      },
+      adminOfStudies: {
         connect: {
           id: 1,
         },
@@ -345,6 +368,7 @@ export async function seedTests(prisma: PrismaClient) {
       answers: [{ status: 'review_required', answers: [null] }],
     },
   })
+
   await prisma.surveyVersionAnswers.create({
     data: {
       versionId: 1,
@@ -486,6 +510,24 @@ export async function seedTests(prisma: PrismaClient) {
 
   await prisma.participantProfile.update({
     where: {
+      id: SECOND_GUARDIAN_ID,
+    },
+    data: {
+      studies: {
+        create: {
+          participantId: `PID-TEST2-${SECOND_GUARDIAN_ID}`,
+          study: {
+            connect: {
+              id: frontendTestStudy.id,
+            },
+          },
+        },
+      },
+    },
+  })
+
+  await prisma.participantProfile.update({
+    where: {
       id: participantUnansweredProfile.id,
     },
     data: {
@@ -506,6 +548,13 @@ export async function seedTests(prisma: PrismaClient) {
     data: {
       versionId: frontendTestSurveryVersion.id,
       profileId: PARTICIPANT_UNANSWERED_ID,
+      answers: [{ status: 'review_required', answers: [null] }],
+    },
+  })
+  await prisma.surveyVersionAnswers.create({
+    data: {
+      versionId: frontendTestSurveryVersion.id,
+      profileId: SECOND_GUARDIAN_ID,
       answers: [{ status: 'review_required', answers: [null] }],
     },
   })
