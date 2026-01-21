@@ -31,15 +31,15 @@ import { unflatten } from 'flat'
 
 export const statusMap = {
   incomplete: {
-    color: 'grey',
+    color: 'text.disabled',
     tooltip: 'Incomplete',
   },
   partially_complete: {
-    color: 'orange',
+    color: 'warning.main',
     tooltip: 'Partially Complete',
   },
   complete: {
-    color: 'primary',
+    color: 'primary.main',
     tooltip: 'Complete',
   },
 }
