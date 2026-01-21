@@ -113,7 +113,7 @@ const StudyCard = ({
         flexDirection: 'row',
         gap: 2,
         p: 2,
-        bgcolor: 'rgb(240,243,252)',
+        bgcolor: 'action.hover',
         borderRadius: 3,
         position: 'relative',
       }}

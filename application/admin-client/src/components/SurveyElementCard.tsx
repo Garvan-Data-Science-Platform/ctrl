@@ -132,7 +132,7 @@ export function SurveyElementCard({
                     }
                   >
                     <Chip
-                      onClick={() => {}}
+                      onClick={() => { }}
                       onDelete={() => {
                         const newDuoCodes = data.duoCodes?.filter((val) => val.code != duoEntry?.ID)
                         handleUpdateField('duoCodes', newDuoCodes)
@@ -332,7 +332,7 @@ export function SurveyElementCard({
         flexDirection: 'row',
         gap: 1,
         p: 2,
-        bgcolor: 'rgb(240,243,252)',
+        bgcolor: 'action.hover',
         borderRadius: 3,
         opacity,
       }}
@@ -376,7 +376,7 @@ export function SurveyDropSpace({ index }: SurveyDropSpaceProps) {
     <Box
       ref={drop}
       data-cy="drop-zone"
-      sx={{ width: '100%', height: 15, bgcolor: isOver ? '#fffccc' : 'transparent' }}
+      sx={{ width: '100%', height: 15, bgcolor: isOver ? 'action.selected' : 'transparent' }}
     />
   )
 }

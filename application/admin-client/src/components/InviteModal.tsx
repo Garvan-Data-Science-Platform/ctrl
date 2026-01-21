@@ -155,7 +155,7 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
         </Typography>
         <List
           dense
-          sx={{ height: 180, overflow: 'auto', bgcolor: 'rgba(0,0,0,0.05)', borderRadius: 2 }}
+          sx={{ height: 180, overflow: 'auto', bgcolor: 'action.hover', borderRadius: 2 }}
           data-cy="recipients-list"
         >
           {recipients.map((recipient, idx) => {
