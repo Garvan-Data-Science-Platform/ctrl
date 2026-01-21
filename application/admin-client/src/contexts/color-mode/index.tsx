@@ -10,7 +10,7 @@ export const ColorModeContext = createContext<ColorModeContextType>({} as ColorM
 
 export const ColorModeContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
-  const mode = 'light' // Force light mode for now. TODO: resolve dark mode issues prefersDarkMode ? 'dark' : 'light'
+  const mode = prefersDarkMode ? 'dark' : 'light'
 
   return (
     <ColorModeContext.Provider value={{ mode }}>
