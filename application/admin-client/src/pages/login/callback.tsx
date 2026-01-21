@@ -24,7 +24,12 @@ export const Callback = () => {
           redirect_uri: redirectUri,
         })
         .then((data) => {
-          login({ token: data.data.token, id: data.data.id, role: data.data.role })
+          login({
+            loginType: 'Token',
+            token: data.data.token,
+            id: data.data.id,
+            role: data.data.role,
+          })
         })
         .catch((error) => {
           setErrorMessage(error.response.data.details)

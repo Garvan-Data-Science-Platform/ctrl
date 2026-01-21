@@ -30,7 +30,7 @@ export default function OTP() {
         if (res.ok) {
           res.json().then((data: LoginResponse) => {
             if (!data.token) throw new Error('No token provided')
-            login({ token: data.token })
+            login({ loginType: 'Token', token: data.token })
           })
         } else {
           res.json().then((data) => {
