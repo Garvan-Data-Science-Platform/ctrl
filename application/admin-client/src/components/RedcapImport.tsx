@@ -201,12 +201,13 @@ export const RedcapImport = ({
             )}
             <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
               Need help?{' '}
-              <span
-                style={{ color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}
+              <Typography
+                component="span"
+                sx={{ color: 'primary.main', textDecoration: 'underline', cursor: 'pointer' }}
                 onClick={handleHelpPageOpen}
               >
                 How to export {type}s from REDCap
-              </span>
+              </Typography>
             </Typography>
 
             <Modal open={openHelpPage} onClose={handleHelpPageClose} data-cy="helpPage">
@@ -219,7 +220,8 @@ export const RedcapImport = ({
                   width: '75%',
                   maxHeight: '80vh',
                   bgcolor: 'background.paper',
-                  border: '2px solid #000',
+                  border: 1,
+                  borderColor: 'divider',
                   boxShadow: 24,
                   p: 4,
                   overflow: 'auto',
