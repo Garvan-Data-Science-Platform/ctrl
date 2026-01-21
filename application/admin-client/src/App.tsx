@@ -261,7 +261,20 @@ function App() {
                       <Route path="/forgot-password" element={<ForgotPassword />} />
                     </Route>
                   </Routes>
-
+                  <Box sx={{ flex: '1 0 auto' }} />
+                  <Box
+                    component="footer"
+                    sx={{
+                      p: 3,
+                      width: '100%',
+                      textAlign: 'center',
+                      backgroundColor: 'transparent',
+                    }}
+                  >
+                    <Typography variant="body2">
+                      {import.meta.env['VITE_APP_VERSION']} © 2025 Garvan Institute of Medical Research
+                    </Typography>
+                  </Box>
                   <RefineKbar />
                   <UnsavedChangesNotifier />
                   <DocumentTitleHandler
@@ -276,20 +289,6 @@ function App() {
           </ColorModeContextProvider>
         </RefineKbarProvider>
       </BrowserRouter>
-      <Box sx={{ flex: '1 0 auto' }} />
-      <footer
-        style={{
-          bottom: 0,
-          left: 0,
-          padding: 24,
-          width: '100%',
-          textAlign: 'center',
-        }}
-      >
-        <Typography variant="body2">
-          {import.meta.env['VITE_APP_VERSION']} © 2025 Garvan Institute of Medical Research
-        </Typography>
-      </footer>
     </Box>
   )
 }
