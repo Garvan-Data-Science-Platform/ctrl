@@ -8,6 +8,7 @@
       clientSecret: '',
       displayInAdminPortal: true,
       displayInUserPortal: true
+      authorizeUrlParams: 'a=b&c=d'
     },*/
   ],
   disableAdminPasswordLogin: false,

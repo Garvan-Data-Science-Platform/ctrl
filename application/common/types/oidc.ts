@@ -5,4 +5,5 @@ export interface OIDCProvider {
   icon: string
   displayInAdminPortal: boolean
   displayInUserPortal: boolean
+  authorizeUrlParams: string
 }
