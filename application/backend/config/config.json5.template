@@ -8,7 +8,7 @@
       clientSecret: '',
       displayInAdminPortal: true,
       displayInUserPortal: true
-      authorizeUrlParams: 'a=b&c=d'
+      authorizeUrlParams: 'a=b&c=d' //appended to /authorize url when user is redirected to IdP. Can be left blank in most cases.
     },*/
   ],
   disableAdminPasswordLogin: false,

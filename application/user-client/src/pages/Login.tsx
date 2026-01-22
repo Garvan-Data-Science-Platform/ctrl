@@ -103,7 +103,10 @@ export default function Login() {
                         <Card
                           key={`oidc_${val.name}`}
                           onClick={() => {
-                            window.location.href = `${val.host}/authorize?state=${val.name}&client_id=${val.clientId}&scope=openid%20email%20profile&response_type=code&redirect_uri=${window.location.origin}/login/callback&${val.authorizeUrlParams}`
+                            const additionalParams = val.authorizeUrlParams
+                              ? '&' + val.authorizeUrlParams
+                              : ''
+                            window.location.href = `${val.host}/authorize?state=${val.name}&client_id=${val.clientId}&scope=openid%20email%20profile&response_type=code&redirect_uri=${window.location.origin}/login/callback${additionalParams}`
                           }}
                           sx={{
                             border: '1px solid lightgrey',
