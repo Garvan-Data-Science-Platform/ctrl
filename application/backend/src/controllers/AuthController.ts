@@ -3,12 +3,15 @@ import type {
   RegisterResponse,
   LoginRequest,
   LoginResponse,
+  LoginChallengeResponse,
+  LoginSuccessResponse,
   RegisterParticipantRequest,
   RegisterParticipantResponse,
   CreateParticipantResponse,
   CreateParticipantRequest,
   RegisterSetupRequest,
   OIDCLoginRequest,
+  OTPLoginRequest,
   SetupResponse,
 } from 'common/types/api/auth'
 import {
@@ -49,7 +52,6 @@ import { ParticipantType } from 'common/types/api/users/ParticipantProfile'
 import { createDefaultAnswers } from '../utils/answers'
 import { auditLog } from '../middlewares/AuditLog'
 import config from '../config'
-import type { OTPLoginRequest } from 'common/types/api/auth/login'
 import { randomInt } from 'node:crypto'
 import nodemailer from 'nodemailer'
 import { createMailerTransporter, fromAddress } from '../utils/mailer'
@@ -275,7 +277,7 @@ export class AuthController extends Controller {
   public async loginOIDC(
     @Body() bodyRequest: OIDCLoginRequest,
     @Header('x-client-type') clientType?: string,
-  ): Promise<LoginResponse> {
+  ): Promise<LoginSuccessResponse> {
     if (!config.oidc) {
       throw new Error('OIDC Not Configured')
     }
@@ -383,7 +385,7 @@ export class AuthController extends Controller {
       })
       throw new InvalidCredentialsError('Invalid credentials provided')
     }
-    let responseData
+    let responseData: LoginResponse
 
     if (config.otp) {
       const zeroPad = (num: number, places: number) => String(num).padStart(places, '0')
@@ -395,9 +397,12 @@ export class AuthController extends Controller {
           expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 mins in future
         },
       })
-      responseData = {
+      const challenge: LoginChallengeResponse = {
         otp_token: otp.id,
       }
+
+      responseData = challenge
+
       const mailToUserOptions: nodemailer.SendMailOptions = {
         from: fromAddress,
         to: user.email,
@@ -432,7 +437,7 @@ export class AuthController extends Controller {
   public async loginOtp(
     @Body() bodyRequest: OTPLoginRequest,
     @Header('x-client-type') clientType?: string,
-  ): Promise<LoginResponse> {
+  ): Promise<LoginSuccessResponse> {
     const otp = await prisma.oTPToken.findUnique({
       where: { id: bodyRequest.otp_token },
     })
@@ -479,7 +484,9 @@ export class AuthController extends Controller {
     await this.userRepo.update({ where: { id: user.id }, data: { retriesRemaining: 10 } })
 
     const responseData = {
-      token,
+      token: token,
+      id: user.id,
+      role: user.role,
     }
 
     await prisma.oTPToken.delete({ where: { id: otp.id } })

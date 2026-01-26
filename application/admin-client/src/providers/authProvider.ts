@@ -10,10 +10,10 @@ export const clientType = 'admin-client'
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
 type OIDCLoginParams = {
-  loginType: 'OIDC'
+  loginType?: undefined
   providerName: string
 }
-export type PasswordLoginParams = {
+type PasswordLoginParams = {
   loginType: 'Password'
   email: string
   password: string
@@ -21,30 +21,37 @@ export type PasswordLoginParams = {
 type TokenLoginParams = {
   loginType: 'Token'
   token: string
-  id: string
+  id: number
   role: string
 }
 
-type LoginParams = OIDCLoginParams | PasswordLoginParams | TokenLoginParams
+export type LoginParams = OIDCLoginParams | PasswordLoginParams | TokenLoginParams
 
 export const authProvider: AuthProvider = {
-  login: async (variables: any) => {
-    let params = variables
+  login: async (params: LoginParams) => {
+    if (!params.loginType && 'providerName' in params) {
+      // OIDC (Redirects away)
+      const providers = useAuthStore.getState().providers
+      const match = providers.find((val) => val.name == params.providerName)
 
-    // Refine's OIDC buttons only send providerName
-    if (params.providerName && !params.loginType) {
-      params = { ...params, loginType: 'OIDC' }
+      if (match) {
+        const { host, clientId } = match
+        const redirectUri = `${window.location.href.split('/login').at(0)}/login/callback`
+        window.location.replace(
+          `${host}/authorize?state=${params.providerName}&client_id=${clientId}&scope=openid%20email%20profile&response_type=code&redirect_uri=${redirectUri}`,
+        )
+      }
+      return {
+        success: true,
+      }
     }
 
-    const strictParams = params as LoginParams
-
-    switch (strictParams.loginType) {
+    switch (params.loginType) {
       case 'Token': {
-        // Mode 1: RESUME / CALLBACK
         // This handles the callback from SSO/Auth0 and OTP flows
-        localStorage.setItem(TOKEN_KEY, strictParams.token)
-        localStorage.setItem(ROLE_KEY, strictParams.role)
-        localStorage.setItem(ID_KEY, strictParams.id)
+        localStorage.setItem(TOKEN_KEY, params.token)
+        localStorage.setItem(ROLE_KEY, params.role)
+        localStorage.setItem(ID_KEY, params.id.toString()) // localStorage expects strings
 
         return {
           success: true,
@@ -52,9 +59,9 @@ export const authProvider: AuthProvider = {
         }
       }
 
-      // Mode 2: EMAIL / PASSWORD CREDENTIALS
+      // EMAIL / PASSWORD CREDENTIALS
       case 'Password': {
-        const { email, password } = strictParams
+        const { email, password } = params
 
         const res = await fetch(BACKEND_URL + '/auth/login', {
           method: 'POST',
@@ -90,22 +97,6 @@ export const authProvider: AuthProvider = {
         }
       }
 
-      // Mode 3: SSO (Redirects away)
-      case 'OIDC': {
-        const providers = useAuthStore.getState().providers
-        const match = providers.find((val) => val.name == strictParams.providerName)
-
-        if (match) {
-          const { host, clientId } = match
-          const redirectUri = `${window.location.href.split('/login').at(0)}/login/callback`
-          window.location.replace(
-            `${host}/authorize?state=${strictParams.providerName}&client_id=${clientId}&scope=openid%20email%20profile&response_type=code&redirect_uri=${redirectUri}`,
-          )
-        }
-        return {
-          success: true,
-        }
-      }
       default:
         return {
           success: false,
