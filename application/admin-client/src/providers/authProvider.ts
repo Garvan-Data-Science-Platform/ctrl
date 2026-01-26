@@ -51,7 +51,7 @@ export const authProvider: AuthProvider = {
         // This handles the callback from SSO/Auth0 and OTP flows
         localStorage.setItem(TOKEN_KEY, params.token)
         localStorage.setItem(ROLE_KEY, params.role)
-        localStorage.setItem(ID_KEY, params.id.toString()) // localStorage expects strings
+        localStorage.setItem(ID_KEY, String(params.id)) // localStorage expects strings
 
         return {
           success: true,

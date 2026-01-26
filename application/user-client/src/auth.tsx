@@ -1,22 +1,33 @@
 import React, { createContext, useContext, useState } from 'react'
 import { Outlet, Navigate } from 'react-router-dom'
 import { StudyLoader } from './components/StudyLoader'
+import { LoginSuccessResponse } from '@common/types/api/auth'
 
-const AuthContext = createContext({
+interface AuthContextType {
+  isAuthenticated: boolean
+  login: (params: LoginSuccessResponse) => void
+  logout: () => void
+}
+
+const AuthContext = createContext<AuthContextType>({
   isAuthenticated: true,
-  login: (_: string) => {}, // eslint-disable-line
+  login: () => {},
   logout: () => {},
 })
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('access_token'))
 
-  const login = (userToken: string) => {
-    localStorage.setItem('access_token', userToken)
+  const login = (params: LoginSuccessResponse) => {
+    localStorage.setItem('access_token', params.token)
+    localStorage.setItem('userid', String(params))
+    localStorage.setItem('userrole', params.role)
     setIsAuthenticated(true)
   }
   const logout = () => {
     localStorage.removeItem('access_token')
+    localStorage.removeItem('userid')
+    localStorage.removeItem('userrole')
     setIsAuthenticated(false)
   }
 

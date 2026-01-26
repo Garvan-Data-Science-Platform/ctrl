@@ -27,14 +27,10 @@ export interface LoginSuccessResponse {
   token: string
   id: number
   role: string
-  otp_token?: never
 }
 
 export interface LoginChallengeResponse {
   otp_token: string
-  token?: never
-  id?: never
-  role?: never
 }
 
 export type LoginResponse = LoginSuccessResponse | LoginChallengeResponse

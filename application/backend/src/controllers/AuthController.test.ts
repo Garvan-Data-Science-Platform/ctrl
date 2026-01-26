@@ -2,7 +2,7 @@ import request from 'supertest'
 import { Api } from '../Api'
 import type {
   LoginRequest,
-  LoginResponse,
+  LoginSuccessResponse,
   OIDCLoginRequest,
   OTPLoginRequest,
   RegisterParticipantRequest,
@@ -488,7 +488,7 @@ describe('AuthController', () => {
       const loginResponse = await request(app).post('/auth/login').send(loginRequest)
       expect(loginResponse.status).toEqual(200)
 
-      const loginBody: LoginResponse = loginResponse.body
+      const loginBody = loginResponse.body as LoginSuccessResponse
       expect(loginBody.token).toBeDefined()
 
       expect(loginBody.id).toBe(ORG_ADMIN_ID)
@@ -514,7 +514,7 @@ describe('AuthController', () => {
       const loginResponse = await request(app).post('/auth/login').send(loginRequest)
       expect(loginResponse.status).toEqual(200)
 
-      const loginBody: LoginResponse = loginResponse.body
+      const loginBody = loginResponse.body as LoginSuccessResponse
       expect(loginBody.token).not.toBeNull()
 
       // Add token to protected route request

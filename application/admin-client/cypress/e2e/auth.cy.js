@@ -49,6 +49,8 @@ describe('auth', () => {
     })
     cy.intercept('**/oidc', {
       token: 'dummy_token',
+      id: 1,
+      role: 'Participant',
     })
     cy.intercept('**/studies').as('studyReq')
     cy.visit('/')

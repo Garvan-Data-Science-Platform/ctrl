@@ -150,7 +150,7 @@ export default function Register() {
         if (res.ok) {
           res.json().then((rdata: RegisterParticipantResponse) => {
             if (!rdata.token) throw new Error('No token provided')
-            login(rdata.token)
+            login(rdata)
             nav('/')
           })
         } else {

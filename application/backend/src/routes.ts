@@ -886,13 +886,12 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "LoginResponse": {
+    "LoginSuccessResponse": {
         "dataType": "refObject",
         "properties": {
-            "token": {"dataType":"string"},
-            "otp_token": {"dataType":"string"},
-            "id": {"dataType":"double"},
-            "role": {"dataType":"string"},
+            "token": {"dataType":"string","required":true},
+            "id": {"dataType":"double","required":true},
+            "role": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },
@@ -905,6 +904,19 @@ const models: TsoaRoute.Models = {
             "redirect_uri": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "LoginChallengeResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "otp_token": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "LoginResponse": {
+        "dataType": "refAlias",
+        "type": {"dataType":"union","subSchemas":[{"ref":"LoginSuccessResponse"},{"ref":"LoginChallengeResponse"}],"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "LoginRequest": {

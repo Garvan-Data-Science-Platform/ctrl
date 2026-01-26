@@ -249,6 +249,7 @@ export class AuthController extends Controller {
     const responseData = {
       id: insertedUser.id,
       token,
+      role: insertedUser.role,
     }
 
     // Once a participant has been registered, we need

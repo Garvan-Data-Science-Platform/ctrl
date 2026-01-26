@@ -2616,12 +2616,9 @@
           "dependents": []
         }
       },
-      "LoginResponse": {
+      "LoginSuccessResponse": {
         "properties": {
           "token": {
-            "type": "string"
-          },
-          "otp_token": {
             "type": "string"
           },
           "id": {
@@ -2632,6 +2629,11 @@
             "type": "string"
           }
         },
+        "required": [
+          "token",
+          "id",
+          "role"
+        ],
         "type": "object",
         "additionalProperties": false
       },
@@ -2654,6 +2656,28 @@
         ],
         "type": "object",
         "additionalProperties": false
+      },
+      "LoginChallengeResponse": {
+        "properties": {
+          "otp_token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "otp_token"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "LoginResponse": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/LoginSuccessResponse"
+          },
+          {
+            "$ref": "#/components/schemas/LoginChallengeResponse"
+          }
+        ]
       },
       "LoginRequest": {
         "properties": {
@@ -8355,7 +8379,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
+                  "$ref": "#/components/schemas/LoginSuccessResponse"
                 }
               }
             }
@@ -8501,7 +8525,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
+                  "$ref": "#/components/schemas/LoginSuccessResponse"
                 }
               }
             }
