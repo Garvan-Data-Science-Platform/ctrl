@@ -18,6 +18,7 @@ import ReactMarkdown from 'react-markdown'
 import { useNotification, useBack } from '@refinedev/core'
 import { Link } from 'react-router-dom'
 import { useCurrentStudyId, useStudyStore } from '../studyStore'
+import { RedcapLogo } from './RedcapLogo'
 
 interface RedcapImportProps {
   type: 'survey' | 'participant'
@@ -139,11 +140,7 @@ export const RedcapImport = ({
           }
         }}
       >
-        <img
-          src="/redcap.png"
-          alt="REDCap Logo"
-          style={{ height: '100px', marginBottom: '16px' }}
-        />
+        <RedcapLogo />
         <Typography variant="body2" color="error" gutterBottom>
           {warningMessage}
         </Typography>

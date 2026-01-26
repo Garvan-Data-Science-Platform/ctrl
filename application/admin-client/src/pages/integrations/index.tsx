@@ -18,10 +18,13 @@ import { SensitiveTextField } from '../../components/SensitiveTextField'
 import { useCustom, useGetIdentity } from '@refinedev/core'
 import { GetElsaTokenResponse } from '@common/types/api/integrations/getElsaToken'
 import { axiosInstance } from '../../providers/dataProvider'
-import { useState } from 'react'
+import { useState, useContext } from 'react'
+import { ColorModeContext } from '../../contexts/color-mode'
+import { RedcapLogo } from '../../components/RedcapLogo'
 
 export const IntegrationsHome = () => {
   const navigate = useNavigate()
+  const { mode } = useContext(ColorModeContext)
   const [dialogOpen, setDialogOpen] = useState(false)
   const { data: identity } = useGetIdentity<{ role: string; id: number }>()
 
@@ -60,7 +63,7 @@ export const IntegrationsHome = () => {
       </Typography>
 
       <Box sx={{ mt: 4 }}>
-        <img src="/redcap.png" alt="REDCap Logo" style={{ height: '70px' }} />
+        <RedcapLogo />
 
         <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
           <Button
