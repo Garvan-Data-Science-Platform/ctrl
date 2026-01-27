@@ -28,6 +28,7 @@ const schema = {
           icon: { type: 'string', minLength: 1 },
           displayInAdminPortal: { type: 'boolean', default: true },
           displayInUserPortal: { type: 'boolean', default: true },
+          authorizeUrlParams: { type: 'string', default: '' },
         },
         required: ['name', 'providerUrl', 'icon', 'clientId', 'clientSecret'],
         additionalProperties: false,

@@ -126,6 +126,7 @@ export class AuthController extends Controller {
         icon: val.icon,
         displayInAdminPortal: val.displayInAdminPortal,
         displayInUserPortal: val.displayInUserPortal,
+        authorizeUrlParams: val.authorizeUrlParams,
       })),
       disableAdminPasswordLogin: config.disableAdminPasswordLogin || false,
     }

@@ -2429,6 +2429,9 @@
           "oidc": {
             "items": {
               "properties": {
+                "authorizeUrlParams": {
+                  "type": "string"
+                },
                 "displayInUserPortal": {
                   "type": "boolean"
                 },
@@ -2449,6 +2452,7 @@
                 }
               },
               "required": [
+                "authorizeUrlParams",
                 "displayInUserPortal",
                 "displayInAdminPortal",
                 "icon",
@@ -2502,11 +2506,15 @@
           },
           "token": {
             "type": "string"
+          },
+          "role": {
+            "type": "string"
           }
         },
         "required": [
           "id",
-          "token"
+          "token",
+          "role"
         ],
         "type": "object",
         "additionalProperties": false
