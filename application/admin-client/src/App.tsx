@@ -261,6 +261,13 @@ function App() {
                       <Route path="/forgot-password" element={<ForgotPassword />} />
                     </Route>
                   </Routes>
+                  <RefineKbar />
+                  <UnsavedChangesNotifier />
+                  <DocumentTitleHandler
+                    handler={({ resource }) =>
+                      resource ? `${resource.meta?.label} | CTRL Admin Portal` : 'CTRL Admin Portal'
+                    }
+                  />
                   <Box sx={{ flex: '1 0 auto' }} />
                   <Box
                     component="footer"
@@ -275,13 +282,6 @@ function App() {
                       {import.meta.env['VITE_APP_VERSION']} © 2025 Garvan Institute of Medical Research
                     </Typography>
                   </Box>
-                  <RefineKbar />
-                  <UnsavedChangesNotifier />
-                  <DocumentTitleHandler
-                    handler={({ resource }) =>
-                      resource ? `${resource.meta?.label} | CTRL Admin Portal` : 'CTRL Admin Portal'
-                    }
-                  />
                 </Refine>
                 <DevtoolsPanel />
               </DevtoolsProvider>

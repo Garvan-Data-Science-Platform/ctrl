@@ -10,6 +10,7 @@ import {
   Modal,
   Tooltip,
   Typography,
+  useTheme,
 } from '@mui/material'
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import { DateField, EditButton, List, ShowButton, useDataGrid } from '@refinedev/mui'
@@ -45,6 +46,8 @@ export const statusMap = {
 }
 
 export const ParticipantList = () => {
+  const theme = useTheme()
+  console.log(theme.palette)
   const { dataGridProps } = useDataGrid({
     syncWithLocation: false,
     pagination: { mode: 'off' },
@@ -358,7 +361,7 @@ export const ParticipantList = () => {
   )
 
   return (
-    <>
+    <Box>
       <Modal open={loading}>
         <CircularProgress
           sx={{
@@ -394,18 +397,34 @@ export const ParticipantList = () => {
         fields={importFields}
         allowInvalidSubmit={false}
         customTheme={{
+          styles: {
+            global: {
+              body: {
+                bg: theme.palette.background.default,
+                color: theme.palette.text.primary,
+              },
+            },
+          },
           colors: {
+            background: theme.palette.background.default,
+            secondaryBackground:
+              theme.palette.mode === 'dark' ? theme.palette.primary.dark : theme.palette.primary.light,
+            textColor: theme.palette.text.primary,
+            subtitleColor: theme.palette.text.secondary,
+            highlight: theme.palette.info.main,
+            border: theme.palette.divider,
+            inactiveColor: theme.palette.error.light,
             rsi: {
-              50: '#e3f2fd',
-              100: '#bbdefb',
-              200: '#90caf9',
-              300: '#64b5f6',
-              400: '#42a5f5',
-              500: '#2196f3', // MUI primary.main
-              600: '#1e88e5',
-              700: '#1976d2',
-              800: '#1565c0',
-              900: '#0d47a1',
+              50: theme.palette.mode === 'dark' ? '#0d47a1' : '#e3f2fd',
+              100: theme.palette.mode === 'dark' ? '#1565c0' : '#bbdefb',
+              200: theme.palette.mode === 'dark' ? '#1976d2' : '#90caf9',
+              300: theme.palette.mode === 'dark' ? '#1e88e5' : '#64b5f6',
+              400: theme.palette.mode === 'dark' ? '#2196f3' : '#42a5f5',
+              500: theme.palette.mode === 'dark' ? '#42a5f5' : '#2196f3',
+              600: theme.palette.mode === 'dark' ? '#64b5f6' : '#1e88e5',
+              700: theme.palette.mode === 'dark' ? '#90caf9' : '#1976d2',
+              800: theme.palette.mode === 'dark' ? '#bbdefb' : '#1565c0',
+              900: theme.palette.mode === 'dark' ? '#e3f2fd' : '#0d47a1',
             },
           },
         }}
@@ -502,6 +521,6 @@ export const ParticipantList = () => {
           slotProps={{ root: { 'data-cy': 'pending-list' } }}
         />
       </List>
-    </>
+    </Box>
   )
 }
