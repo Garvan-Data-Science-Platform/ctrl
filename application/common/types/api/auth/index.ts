@@ -1,5 +1,12 @@
 import type { RegisterRequest, RegisterResponse } from './register'
-import type { LoginRequest, LoginResponse, OIDCLoginRequest } from './login'
+import type {
+  LoginRequest,
+  LoginResponse,
+  LoginSuccessResponse,
+  LoginChallengeResponse,
+  OTPLoginRequest,
+  OIDCLoginRequest,
+} from './login'
 import type { RegisterParticipantRequest, RegisterParticipantResponse } from './registerParticipant'
 import type { CreateParticipantRequest, CreateParticipantResponse } from './createParticipant'
 import type { RegisterSetupRequest } from './registerSetup'
@@ -11,6 +18,9 @@ export {
   RegisterSetupRequest,
   LoginRequest,
   LoginResponse,
+  LoginChallengeResponse,
+  LoginSuccessResponse,
+  OTPLoginRequest,
   OIDCLoginRequest,
   RegisterParticipantRequest,
   RegisterParticipantResponse,

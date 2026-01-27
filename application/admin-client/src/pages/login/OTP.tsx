@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { LoginResponse } from '@common/types/api/auth'
 import { FormEvent, useEffect, useState } from 'react'
 import { MuiOtpInput } from 'mui-one-time-password-input'
-import { useLogin } from '@refinedev/core'
+import { useLogin } from '../../hooks/useLogin'
 
 export default function OTP() {
   const { mutate: login } = useLogin()
@@ -29,8 +29,11 @@ export default function OTP() {
       .then((res) => {
         if (res.ok) {
           res.json().then((data: LoginResponse) => {
+            if ('otp_token' in data) {
+              throw new Error('Unexpected response: received another OTP challenge')
+            }
             if (!data.token) throw new Error('No token provided')
-            login({ token: data.token })
+            login({ loginType: 'Token', token: data.token, id: data.id, role: data.role })
           })
         } else {
           res.json().then((data) => {

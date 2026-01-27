@@ -23,9 +23,14 @@ export interface OIDCLoginRequest {
   redirect_uri: string
 }
 
-export interface LoginResponse {
-  token?: string
-  otp_token?: string
-  id?: number
-  role?: string
+export interface LoginSuccessResponse {
+  token: string
+  id: number
+  role: string
 }
+
+export interface LoginChallengeResponse {
+  otp_token: string
+}
+
+export type LoginResponse = LoginSuccessResponse | LoginChallengeResponse

@@ -86,4 +86,5 @@ export interface RegisterParticipantRequest {
 export interface RegisterParticipantResponse {
   id: number
   token: string
+  role: string
 }

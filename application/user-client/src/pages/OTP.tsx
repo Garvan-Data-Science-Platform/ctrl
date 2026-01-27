@@ -31,8 +31,11 @@ export default function OTP() {
       .then((res) => {
         if (res.ok) {
           res.json().then((data: LoginResponse) => {
+            if ('otp_token' in data) {
+              throw new Error('Unexpected response: recieved another OPT challenge')
+            }
             if (!data.token) throw new Error('No token provided')
-            login(data.token)
+            login(data)
             nav('/')
           })
         } else {

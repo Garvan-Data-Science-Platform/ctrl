@@ -1,22 +1,31 @@
 import React, { createContext, useContext, useState } from 'react'
 import { Outlet, Navigate } from 'react-router-dom'
 import { StudyLoader } from './components/StudyLoader'
+import { LoginSuccessResponse } from '@common/types/api/auth'
 
-const AuthContext = createContext({
+interface AuthContextType {
+  isAuthenticated: boolean
+  login: (params: LoginSuccessResponse) => void
+  logout: () => void
+}
+
+const AuthContext = createContext<AuthContextType>({
   isAuthenticated: true,
-  login: (_: string) => {}, // eslint-disable-line
+  login: () => {},
   logout: () => {},
 })
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('access_token'))
 
-  const login = (userToken: string) => {
-    localStorage.setItem('access_token', userToken)
+  const login = (params: LoginSuccessResponse) => {
+    localStorage.setItem('access_token', params.token)
+    // Note: ID and Role information is not currently used in user-client, but could be in the future.
+    // For this info to be used, it will need to be saved to localStorage and to the state store.
     setIsAuthenticated(true)
   }
   const logout = () => {
-    localStorage.removeItem('access_token')
+    localStorage.clear()
     setIsAuthenticated(false)
   }
 

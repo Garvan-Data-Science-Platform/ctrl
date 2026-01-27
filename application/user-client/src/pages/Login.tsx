@@ -58,11 +58,11 @@ export default function Login() {
       .then((res) => {
         if (res.ok) {
           res.json().then((data: LoginResponse) => {
-            if (data.otp_token) {
+            if ('otp_token' in data) {
               nav('/login/otp', { state: data.otp_token })
             } else if (!data.token) throw new Error('No token provided')
             else {
-              login(data.token)
+              login(data)
               nav('/')
             }
           })

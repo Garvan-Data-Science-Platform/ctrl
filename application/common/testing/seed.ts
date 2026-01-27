@@ -7,6 +7,7 @@ export const OPERATOR_ADMIN_ID = 96
 export const OPERATOR_ADMIN_EMAIL = 'operatoradmin@example.com'
 export const ORG_ADMIN_ID = 97
 export const ORG_ADMIN_EMAIL = 'admin@example.com'
+export const ORG_ADMIN_PASSWORD = 'Testpassword1'
 export const ORG_ADMIN_2_ID = 101
 export const PARTICIPANT_UNANSWERED_ID = 98
 export const PARTICIPANT_UNANSWERED_EMAIL = 'test2@example.com'
@@ -99,7 +100,7 @@ export async function seedTests(prisma: PrismaClient) {
       email: ORG_ADMIN_EMAIL,
       firstName: 'Organisation',
       lastName: 'Admin',
-      password: hashPassword('Testpassword1'),
+      password: hashPassword(ORG_ADMIN_PASSWORD),
       role: Role.OrganisationAdmin,
       organisations: {
         connect: {

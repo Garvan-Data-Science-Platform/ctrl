@@ -9,62 +9,102 @@ export const clientType = 'admin-client'
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
+type OIDCLoginParams = {
+  loginType?: undefined
+  providerName: string
+}
+type PasswordLoginParams = {
+  loginType: 'Password'
+  email: string
+  password: string
+}
+type TokenLoginParams = {
+  loginType: 'Token'
+  token: string
+  id: number
+  role: string
+}
+
+export type LoginParams = OIDCLoginParams | PasswordLoginParams | TokenLoginParams
+
 export const authProvider: AuthProvider = {
-  login: async ({ providerName, email, password, token }) => {
-    if (token) {
-      localStorage.setItem(TOKEN_KEY, token)
+  login: async (params: LoginParams) => {
+    if (!params.loginType && 'providerName' in params) {
+      // OIDC (Redirects away)
+      const providers = useAuthStore.getState().providers
+      const match = providers.find((val) => val.name == params.providerName)
+
+      if (match) {
+        const { host, clientId } = match
+        const redirectUri = `${window.location.href.split('/login').at(0)}/login/callback`
+        window.location.replace(
+          `${host}/authorize?state=${params.providerName}&client_id=${clientId}&scope=openid%20email%20profile&response_type=code&redirect_uri=${redirectUri}`,
+        )
+      }
       return {
         success: true,
-        redirectTo: '/',
       }
     }
-    if (email && password) {
-      const res = await fetch(BACKEND_URL + '/auth/login', {
-        method: 'POST',
-        body: JSON.stringify({ email, password }),
-        headers: { 'Content-Type': 'application/json', 'x-client-type': clientType },
-      })
-      const data = await res.json()
 
-      if (res.ok) {
-        if (data.otp_token) {
-          return {
-            success: true,
-            redirectTo: `/login/otp?token=${data.otp_token}`,
-          }
-        } else if (!data.token) throw new Error('No token provided')
-        else {
-          localStorage.setItem(TOKEN_KEY, data.token)
-          localStorage.setItem(ID_KEY, data.id)
-          localStorage.setItem(ROLE_KEY, data.role)
-          return {
-            success: true,
-            redirectTo: '/',
-          }
+    switch (params.loginType) {
+      case 'Token': {
+        // This handles the callback from SSO/Auth0 and OTP flows
+        localStorage.setItem(TOKEN_KEY, params.token)
+        localStorage.setItem(ROLE_KEY, params.role)
+        localStorage.setItem(ID_KEY, String(params.id)) // localStorage expects strings
+
+        return {
+          success: true,
+          redirectTo: '/',
         }
       }
-      // Handle invalid credentials
-      return {
-        success: false,
-        error: {
-          name: 'LoginError',
-          message: `Error Logging In: ${JSON.stringify(data.details)}`,
-        },
+
+      // EMAIL / PASSWORD CREDENTIALS
+      case 'Password': {
+        const { email, password } = params
+
+        const res = await fetch(BACKEND_URL + '/auth/login', {
+          method: 'POST',
+          body: JSON.stringify({ email, password }),
+          headers: { 'Content-Type': 'application/json', 'x-client-type': clientType },
+        })
+        const data = await res.json()
+
+        if (res.ok) {
+          if (data.otp_token) {
+            return {
+              success: true,
+              redirectTo: `/login/otp?token=${data.otp_token}`,
+            }
+          } else if (!data.token) throw new Error('No token provided')
+          else {
+            localStorage.setItem(TOKEN_KEY, data.token)
+            localStorage.setItem(ID_KEY, data.id)
+            localStorage.setItem(ROLE_KEY, data.role)
+            return {
+              success: true,
+              redirectTo: '/',
+            }
+          }
+        }
+        // Handle invalid credentials
+        return {
+          success: false,
+          error: {
+            name: 'LoginError',
+            message: `Error Logging In: ${JSON.stringify(data.details)}`,
+          },
+        }
       }
-    }
 
-    const providers = useAuthStore.getState().providers
-    const match = providers.find((val) => val.name == providerName)
-
-    if (match) {
-      const { host, clientId } = match
-      const redirectUri = `${window.location.href.split('/login').at(0)}/login/callback`
-      window.location.replace(
-        `${host}/authorize?state=${providerName}&client_id=${clientId}&scope=openid%20email%20profile&response_type=code&redirect_uri=${redirectUri}`,
-      )
-    }
-    return {
-      success: true,
+      default:
+        return {
+          success: false,
+          error: {
+            name: 'LoginError',
+            message: 'Invalid login type',
+          },
+        }
     }
   },
   logout: async () => {

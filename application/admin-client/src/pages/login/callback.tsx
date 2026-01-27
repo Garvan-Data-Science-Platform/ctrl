@@ -1,5 +1,6 @@
 import { Button, CircularProgress, Stack, Typography } from '@mui/material'
-import { useLogin, useParsed } from '@refinedev/core'
+import { useParsed } from '@refinedev/core'
+import { useLogin } from '../../hooks/useLogin'
 import { Link } from 'react-router-dom'
 
 import { axiosInstance } from '@refinedev/simple-rest'
@@ -24,7 +25,12 @@ export const Callback = () => {
           redirect_uri: redirectUri,
         })
         .then((data) => {
-          login({ token: data.data.token })
+          login({
+            loginType: 'Token',
+            token: data.data.token,
+            id: data.data.id,
+            role: data.data.role,
+          })
         })
         .catch((error) => {
           setErrorMessage(error.response.data.details)
