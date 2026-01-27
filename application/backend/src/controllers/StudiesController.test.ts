@@ -168,6 +168,24 @@ describe('StudiesController', () => {
       expect(createdStudy?.name).toBe(newStudyName)
     })
 
+    it('a study admin creating a study adds them as an admin of that study', async () => {
+      const newStudyName = 'Study Admin Test Study'
+
+      const response = await request(app)
+        .post('/studies')
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+        .send({ name: newStudyName } as CreateStudyRequest)
+      expect(response.status).toBe(201)
+
+      // Check study now exists in db
+      const createdStudy = await prisma.study.findFirst({
+        where: { name: newStudyName },
+        select: { name: true, admins: true },
+      })
+      expect(createdStudy?.name).toBe(newStudyName)
+      expect(createdStudy?.admins.map((val) => val.id)).toContain(STUDY_ADMIN_ID)
+    })
+
     it('should return an error if the study already exists', async () => {
       const studyNameAlreadyExists = 'Test Study'
       const response = await request(app)

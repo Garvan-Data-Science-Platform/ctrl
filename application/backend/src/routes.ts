@@ -1843,9 +1843,10 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsStudiesController_createStudy: Record<string, TsoaRoute.ParameterSchema> = {
                 bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"CreateStudyRequest"},
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
         };
         app.post('/studies',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(StudiesController)),
             ...(fetchMiddlewares<RequestHandler>(StudiesController.prototype.createStudy)),
 

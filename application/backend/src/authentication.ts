@@ -10,11 +10,13 @@ import {
   NotFoundError,
 } from './middlewares/ErrorHandler'
 import prisma from './PrismaClient'
+import { Role } from '@prisma/client'
 
 export interface RequestWithAuthentication {
   path: string
   user: {
     userId: number
+    role: Role
     studies: number[]
   }
 }
@@ -23,7 +25,7 @@ export function expressAuthentication(
   request: express.Request,
   securityName: string,
   scopes?: string[],
-): Promise<any> {
+): Promise<RequestWithAuthentication | undefined> {
   if (securityName === 'jwt') {
     // Extract token from Authorization header
     const token = request.headers['authorization']?.split(' ')[1]
@@ -72,7 +74,7 @@ export function expressAuthentication(
                   (val) => val.id,
                 )
               }
-
+              decoded['role'] = user.role
               resolve(decoded)
               return
             }
