@@ -47,7 +47,6 @@ export const statusMap = {
 
 export const ParticipantList = () => {
   const theme = useTheme()
-  console.log(theme.palette)
   const { dataGridProps } = useDataGrid({
     syncWithLocation: false,
     pagination: { mode: 'off' },
