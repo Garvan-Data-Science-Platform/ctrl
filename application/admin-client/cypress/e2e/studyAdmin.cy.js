@@ -61,4 +61,17 @@ describe('Study Admins', () => {
     cy.visit('/users')
     cy.contains('You do not have access').should('exist')
   })
+
+  it('Study admin can create a study and gets added to it', () => {
+    cy.login(UserType.STUDY_ADMIN)
+    cy.visit('/studies')
+    cy.get('[data-cy="new-study-button"]').click()
+    cy.get('[data-cy="study-create"]').click()
+    cy.get('[data-cy="study-name"] input').should('be.focused').type('STUDY X')
+    cy.get('[data-cy="study-create"]').click()
+    cy.get('[data-cy="study-create"]').should('not.exist')
+    cy.contains('STUDY X').should('exist')
+    cy.reload()
+    cy.contains('STUDY X').should('exist')
+  })
 })

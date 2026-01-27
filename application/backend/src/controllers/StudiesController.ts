@@ -155,15 +155,23 @@ export class StudiesController extends Controller {
    * @summary Create a new Study
    */
   @Post('/')
-  @Security('jwt', ['OrganisationAdmin'])
+  @Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
   @SuccessResponse('201', 'Created')
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
-  public async createStudy(@Body() bodyRequest: CreateStudyRequest): Promise<CreateStudyResponse> {
+  public async createStudy(
+    @Body() bodyRequest: CreateStudyRequest,
+    @Request() request: RequestWithAuthentication,
+  ): Promise<CreateStudyResponse> {
     if ((await this.studyRepo.count({ where: { name: bodyRequest.name, deleted: false } })) > 0) {
       throw new Error('Study with that name already exists')
     }
     const newStudy = await this.studyRepo.create({
-      data: { name: bodyRequest.name }, // Note: Study also has email invite info, but this is set via UI
+      data: {
+        name: bodyRequest.name,
+        admins: {
+          connect: request.user.role == 'StudyAdmin' ? { id: request.user.userId } : undefined,
+        },
+      }, // Note: Study also has email invite info, but this is set via UI
     })
     const responseData = {
       id: newStudy.id,

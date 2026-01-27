@@ -14,7 +14,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import { useGetIdentity, useNotification } from '@refinedev/core'
+import { useNotification } from '@refinedev/core'
 import { axiosInstance } from '../../providers/dataProvider'
 import { useState, useEffect } from 'react'
 import { StudyEntry, useStudyStore } from '../../studyStore'
@@ -302,7 +302,6 @@ const StudiesPage = () => {
   const [newStudyName, setNewStudyName] = useState('')
 
   const queryClient = useQueryClient()
-  const { data: identity } = useGetIdentity<{ role: string; id: number }>()
 
   const handleCreateNewStudy = (e: React.FormEvent) => {
     e.preventDefault()
@@ -357,18 +356,16 @@ const StudiesPage = () => {
         ))}
       </Stack>
 
-      {identity?.role == 'OrganisationAdmin' && (
-        <Button
-          sx={{ mt: 2 }}
-          startIcon={<AddCircle />}
-          onClick={() => {
-            setNewStudyDialogOpen(true)
-          }}
-          data-cy="new-study-button"
-        >
-          New study
-        </Button>
-      )}
+      <Button
+        sx={{ mt: 2 }}
+        startIcon={<AddCircle />}
+        onClick={() => {
+          setNewStudyDialogOpen(true)
+        }}
+        data-cy="new-study-button"
+      >
+        New study
+      </Button>
     </Container>
   )
 }
