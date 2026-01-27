@@ -859,6 +859,7 @@ const models: TsoaRoute.Models = {
         "properties": {
             "id": {"dataType":"double","required":true},
             "token": {"dataType":"string","required":true},
+            "role": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },

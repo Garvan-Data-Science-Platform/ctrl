@@ -2506,11 +2506,15 @@
           },
           "token": {
             "type": "string"
+          },
+          "role": {
+            "type": "string"
           }
         },
         "required": [
           "id",
-          "token"
+          "token",
+          "role"
         ],
         "type": "object",
         "additionalProperties": false

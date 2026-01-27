@@ -39,7 +39,7 @@ export const authProvider: AuthProvider = {
         const redirectUri = `${window.location.href.split('/login').at(0)}/login/callback`
         const additionalParams = authorizeUrlParams ? '&' + authorizeUrlParams : ''
         window.location.replace(
-`${host}/authorize?state=${params.providerName}&client_id=${clientId}&scope=openid%20email%20profile&response_type=code&redirect_uri=${redirectUri}${additionalParams}`,
+          `${host}/authorize?state=${params.providerName}&client_id=${clientId}&scope=openid%20email%20profile&response_type=code&redirect_uri=${redirectUri}${additionalParams}`,
         )
       }
       return {
@@ -98,20 +98,14 @@ export const authProvider: AuthProvider = {
         }
       }
 
-    const providers = useAuthStore.getState().providers
-    const match = providers.find((val) => val.name == providerName)
-
-    if (match) {
-      const { host, clientId, authorizeUrlParams } = match
-      const redirectUri = `${window.location.href.split('/login').at(0)}/login/callback`
-      const additionalParams = authorizeUrlParams ? '&' + authorizeUrlParams : ''
-      const additionalParams = authorizeUrlParams ? '&' + authorizeUrlParams : ''
-      window.location.replace(
-        `${host}/authorize?state=${providerName}&client_id=${clientId}&scope=openid%20email%20profile&response_type=code&redirect_uri=${redirectUri}${additionalParams}`,
-      )
-    }
-    return {
-      success: true,
+      default:
+        return {
+          success: false,
+          error: {
+            name: 'LoginError',
+            message: 'Invalid login type',
+          },
+        }
     }
   },
   logout: async () => {
