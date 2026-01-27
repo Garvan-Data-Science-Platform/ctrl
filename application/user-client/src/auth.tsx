@@ -20,8 +20,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = (params: LoginSuccessResponse) => {
     localStorage.setItem('access_token', params.token)
-    localStorage.setItem('userid', String(params))
-    localStorage.setItem('userrole', params.role)
+    // Note: ID and Role information is not currently used in user-client, but could be in the future.
+    // For this info to be used, it will need to be saved to localStorage and to the state store.
     setIsAuthenticated(true)
   }
   const logout = () => {
