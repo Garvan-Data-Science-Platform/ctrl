@@ -359,6 +359,71 @@ export const ParticipantList = () => {
     [],
   )
 
+  const customRSITheme = {
+    styles: {
+      global: {
+        body: {
+          bg: theme.palette.background.default,
+          color: theme.palette.text.primary,
+        },
+        ".rdg-cell-error": {
+          backgroundColor: theme.palette.mode === 'dark' ? theme.palette.error.dark : theme.palette.error.light
+        },
+      },
+    },
+    colors: {
+      background: theme.palette.background.default,
+      secondaryBackground:
+        theme.palette.mode === 'dark' ? theme.palette.primary.dark : theme.palette.primary.main,
+      textColor: theme.palette.text.primary,
+      subtitleColor: theme.palette.text.secondary,
+      highlight: theme.palette.info.main,
+      border: theme.palette.divider,
+      inactiveColor: theme.palette.error.light,
+      rsi: {
+        50: theme.palette.mode === 'dark' ? '#0d47a1' : '#e3f2fd',
+        100: theme.palette.mode === 'dark' ? '#1565c0' : '#bbdefb',
+        200: theme.palette.mode === 'dark' ? '#1976d2' : '#90caf9',
+        300: theme.palette.mode === 'dark' ? '#1e88e5' : '#64b5f6',
+        400: theme.palette.mode === 'dark' ? '#2196f3' : '#42a5f5',
+        500: theme.palette.mode === 'dark' ? '#42a5f5' : '#2196f3',
+        600: theme.palette.mode === 'dark' ? '#64b5f6' : '#1e88e5',
+        700: theme.palette.mode === 'dark' ? '#90caf9' : '#1976d2',
+        800: theme.palette.mode === 'dark' ? '#bbdefb' : '#1565c0',
+        900: theme.palette.mode === 'dark' ? '#e3f2fd' : '#0d47a1',
+      },
+    },
+    components: {
+      MatchColumnsStep: {
+        baseStyle: {
+          userTable: {
+            ignoreButton: {
+              bg: theme.palette.divider,
+            },
+          },
+        }
+      },
+      Modal: {
+        baseStyle: {
+          backButton: {
+            color: theme.palette.text.secondary,
+          },
+          continueButton: {
+            color: theme.palette.text.primary,
+            bg: theme.palette.mode === 'dark' ? theme.palette.primary.dark : theme.palette.primary.light,
+          }
+        },
+        variants: {
+          rsi: {
+            footer: {
+              bg: theme.palette.mode === 'dark' ? theme.palette.background.default : theme.palette.background.paper,
+            }
+          }
+        }
+      }
+    }
+  }
+
   return (
     <Box>
       <Modal open={loading}>
@@ -395,38 +460,7 @@ export const ParticipantList = () => {
         }}
         fields={importFields}
         allowInvalidSubmit={false}
-        customTheme={{
-          styles: {
-            global: {
-              body: {
-                bg: theme.palette.background.default,
-                color: theme.palette.text.primary,
-              },
-            },
-          },
-          colors: {
-            background: theme.palette.background.default,
-            secondaryBackground:
-              theme.palette.mode === 'dark' ? theme.palette.primary.dark : theme.palette.primary.light,
-            textColor: theme.palette.text.primary,
-            subtitleColor: theme.palette.text.secondary,
-            highlight: theme.palette.info.main,
-            border: theme.palette.divider,
-            inactiveColor: theme.palette.error.light,
-            rsi: {
-              50: theme.palette.mode === 'dark' ? '#0d47a1' : '#e3f2fd',
-              100: theme.palette.mode === 'dark' ? '#1565c0' : '#bbdefb',
-              200: theme.palette.mode === 'dark' ? '#1976d2' : '#90caf9',
-              300: theme.palette.mode === 'dark' ? '#1e88e5' : '#64b5f6',
-              400: theme.palette.mode === 'dark' ? '#2196f3' : '#42a5f5',
-              500: theme.palette.mode === 'dark' ? '#42a5f5' : '#2196f3',
-              600: theme.palette.mode === 'dark' ? '#64b5f6' : '#1e88e5',
-              700: theme.palette.mode === 'dark' ? '#90caf9' : '#1976d2',
-              800: theme.palette.mode === 'dark' ? '#bbdefb' : '#1565c0',
-              900: theme.palette.mode === 'dark' ? '#e3f2fd' : '#0d47a1',
-            },
-          },
-        }}
+        customTheme={customRSITheme}
       />
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <Box
