@@ -99,7 +99,7 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
   return (
     <Box sx={{ width: 1000, display: 'flex', flexDirection: 'row' }} data-cy="invite-modal">
       <Box sx={{ flex: 1.3 }}>
-        <Typography variant="h4">Invite Participants</Typography>
+        <Typography variant="h4" sx={{ color: 'text.primary' }}>Invite Participants</Typography>
 
         <Box sx={{ display: 'flex', flexDirection: 'row', mt: 2, alignItems: 'center' }}>
           <TextField
@@ -142,7 +142,7 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
             Invalid email <br />
           </Typography>
         )}
-        <Typography variant="caption">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           Enter manually or paste from spreadsheet.{' '}
           <Tooltip title="The ID field is for providing an external participant ID (e.g. from REDCap) that will be stored alongside the CTRL generated Participant ID, for reference purposes only.">
             <Typography variant="caption" color="primary">
@@ -150,7 +150,7 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
             </Typography>
           </Tooltip>
         </Typography>
-        <Typography sx={{ mt: 1 }}>
+        <Typography sx={{ mt: 1, color: 'text.primary' }}>
           Recipients{emails.length > 0 && ` (${emails.length})`}:
         </Typography>
         <List
@@ -174,7 +174,7 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
                 key={`email_${idx}`}
                 sx={{ display: 'flex', flexDirection: 'row' }}
               >
-                <Typography>
+                <Typography sx={{ color: 'text.primary' }}>
                   {recipient.email}
                   {recipient.prefill.studyParticipant?.externalId &&
                     `(${recipient.prefill.studyParticipant.externalId})`}
@@ -248,15 +248,15 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
         </Box>
       </Box>
       <Box sx={{ flex: 1, ml: 2, mt: 5 }}>
-        <Typography variant="h5" textAlign="center">
+        <Typography variant="h5" textAlign="center" sx={{ color: 'text.primary' }}>
           Email Preview
         </Typography>
-        <Box sx={{ maxHeight: 600, overflow: 'auto' }}>
-          <div
-            dangerouslySetInnerHTML={{
-              __html: emailPreview.replaceAll('href="http://exampleregisterurl"', ''),
-            }}
-          ></div>
+        <Box sx={{ overflow: 'auto', height: 600, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+          <iframe
+            title="Email Preview"
+            style={{ width: '100%', height: '100%', border: 'none' }}
+            srcDoc={emailPreview.replaceAll('href="http://exampleregisterurl"', '')}
+          />
         </Box>
       </Box>
     </Box>
