@@ -311,8 +311,9 @@ export async function seedTests(prisma: PrismaClient) {
     },
   })
 
-  await prisma.surveyVersion.create({
+  const testSurveyVersion = await prisma.surveyVersion.create({
     data: {
+      id: 800,
       status: 'PUBLISHED',
       versionNumber: 1,
       data: ExampleSurveyStepData as SurveyStep[],
@@ -354,7 +355,7 @@ export async function seedTests(prisma: PrismaClient) {
 
   await prisma.surveyVersionAnswers.create({
     data: {
-      versionId: 1,
+      versionId: testSurveyVersion.id,
       profileId: PARTICIPANT_UNANSWERED_ID,
       answers: [
         { status: 'review_required', answers: [] },
@@ -372,7 +373,7 @@ export async function seedTests(prisma: PrismaClient) {
 
   await prisma.surveyVersionAnswers.create({
     data: {
-      versionId: 1,
+      versionId: testSurveyVersion.id,
       profileId: PARTICIPANT_COMPLETED_ID,
       answers: [
         { status: 'viewed', answers: [] },
@@ -387,7 +388,7 @@ export async function seedTests(prisma: PrismaClient) {
 
   await prisma.surveyVersionAnswers.create({
     data: {
-      versionId: 1,
+      versionId: testSurveyVersion.id,
       profileId: DEPENDENT_ID,
       answers: [
         { status: 'viewed', answers: [] },
@@ -402,7 +403,7 @@ export async function seedTests(prisma: PrismaClient) {
 
   await prisma.surveyVersionAnswers.create({
     data: {
-      versionId: 1,
+      versionId: testSurveyVersion.id,
       profileId: SECOND_GUARDIAN_ID,
       answers: [
         { status: 'viewed', answers: [] },
