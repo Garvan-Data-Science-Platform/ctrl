@@ -122,7 +122,6 @@ export class StudiesController extends Controller {
    * @summary Restore Deleted Study by Id
    */
   @Patch('{studyId}/restore')
-  @Security('jwt', ['OrganisationAdmin'])
   public async restoreStudyById(@Path() studyId: number) {
     await this.studyRepo.update({
       where: { id: studyId, deleted: true },
@@ -155,7 +154,6 @@ export class StudiesController extends Controller {
    * @summary Create a new Study
    */
   @Post('/')
-  @Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
   @SuccessResponse('201', 'Created')
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
   public async createStudy(
@@ -242,7 +240,6 @@ export class StudiesController extends Controller {
   }
 
   @Delete('/{studyId}/logo')
-  @Security('jwt', ['OrganisationAdmin']) // TODO: check if study admin should also access this
   @Response('204', 'Logo deleted')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async deleteLogo(@Path() studyId: number): Promise<void> {
@@ -267,7 +264,6 @@ export class StudiesController extends Controller {
    * @summary Delete a study
    */
   @Delete('/{studyId}')
-  @Security('jwt', ['OrganisationAdmin'])
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async deleteStudy(@Path() studyId: number) {
     const studyCount = await this.studyRepo.count({})
