@@ -104,7 +104,7 @@ export const ParticipantShow = () => {
               return (
                 <tr key={`fam_${idx}`}>
                   <td>
-                    <Link to={`/participants/${val.id}`}>
+                    <Link to={`/participants/${val.id}`} style={{ color: 'inherit' }}>
                       <Typography>
                         {val.firstName} {val.lastName}
                       </Typography>
