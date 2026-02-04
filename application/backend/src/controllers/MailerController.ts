@@ -90,7 +90,7 @@ export class MailerController extends Controller {
       from: fromAddress,
       to: user.email,
       subject: subjectToUser,
-      text: `This email is to confirm that We have received your contact us message. A copy of the message is provided below: \n ${bodyRequest.content}`,
+      text: `This email is to confirm that we have received your contact us message. A copy of the message is provided below: \n ${bodyRequest.content}`,
     }
 
     await mailerTransporter.sendMail(mailToUserOptions)
