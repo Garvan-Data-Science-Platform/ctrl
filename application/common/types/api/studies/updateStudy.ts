@@ -11,4 +11,5 @@ export interface UpdateStudyRequest {
   description?: string
   redcapToken?: string
   redcapURL?: string
+  contactUsEmail?: string
 }

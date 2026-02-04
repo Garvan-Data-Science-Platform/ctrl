@@ -51,21 +51,31 @@ export class MailerController extends Controller {
     await mailerTransporter.verify()
 
     // Get the organisation admins email(s)
-    const organisationAdminEmails = await prisma.user.findMany({
-      where: { role: Role.OrganisationAdmin },
-      select: { email: true },
-    })
+    const orgAdminEmails = (
+      await prisma.user.findMany({
+        where: { role: Role.OrganisationAdmin },
+        select: { email: true },
+      })
+    ).map((v) => v.email)
 
-    // Send the email to admin(s)
-    const mailListAdmins: string[] | string = process.env.ORG_ADMIN_EMAIL
-      ? [process.env.ORG_ADMIN_EMAIL]
-      : organisationAdminEmails.map((admin) => admin.email)
+    const studyAdminEmails = (
+      await prisma.user.findMany({
+        where: { role: Role.StudyAdmin, adminOfStudies: { some: { id: bodyRequest.studyId } } },
+        select: { email: true },
+      })
+    ).map((v) => v.email)
 
-    const subjectToAdmin: string = `New Contact Us Request RE: ${bodyRequest.subject}`
+    const study = await prisma.study.findUniqueOrThrow({ where: { id: bodyRequest.studyId } })
+
+    const recipientEmails = study.contactUsEmail
+      ? [study.contactUsEmail]
+      : [...orgAdminEmails, ...studyAdminEmails]
+
+    const subjectToAdmin: string = `New Contact Us Request From CTRL Participant`
 
     const mailToAdminsOptions: nodemailer.SendMailOptions = {
       from: fromAddress,
-      to: mailListAdmins,
+      to: recipientEmails,
       subject: subjectToAdmin,
       text: bodyRequest.content,
     }
@@ -74,13 +84,13 @@ export class MailerController extends Controller {
     logger.info(`Email sent to ${mailToAdminsOptions.to}`, mailToAdminsOptions)
 
     // Send the email to the user
-    const subjectToUser: string = `Copy of your message submitted to CTRL Administration Team RE: ${bodyRequest.subject}`
+    const subjectToUser: string = `CTRL Message Confirmation`
 
     const mailToUserOptions: nodemailer.SendMailOptions = {
       from: fromAddress,
       to: user.email,
       subject: subjectToUser,
-      text: bodyRequest.content,
+      text: `This email is to confirm that We have received your contact us message. A copy of the message is provided below: \n ${bodyRequest.content}`,
     }
 
     await mailerTransporter.sendMail(mailToUserOptions)

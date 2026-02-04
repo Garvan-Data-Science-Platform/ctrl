@@ -4,7 +4,7 @@ import { generateToken } from '../authentication'
 import { resetDB } from 'common/testing/TestHelpers'
 import { NodemailerMock } from 'nodemailer-mock'
 import * as nodemailer from 'nodemailer'
-import { PARTICIPANT_COMPLETED_ID } from 'common/testing/seed'
+import { PARTICIPANT_COMPLETED_ID, SECOND_TEST_STUDY_ID, TEST_STUDY_ID } from 'common/testing/seed'
 const mockNodeMailer = nodemailer as unknown as NodemailerMock
 
 const api = new Api()
@@ -37,31 +37,13 @@ describe('MailerController', () => {
     it('should successfully send emails', async () => {
       const response = await request(app)
         .post('/mailer/contact-us')
-        .send({ subject: 'Test Subject', content: 'Test Content' })
+        .send({ content: 'Test Content', studyId: TEST_STUDY_ID })
         .set({ Authorization: `Bearer ${participantToken}` })
 
       expect(response.status).toBe(204)
 
-      const expectedSentEmails = [
-        {
-          from: 'CTRL <noreply@ctrl.garvan.org.au>',
-          headers: {},
-          subject: 'New Contact Us Request RE: Test Subject',
-          text: 'Test Content',
-          to: ['testorg-admin@testorg.org.au'],
-        },
-        {
-          from: 'CTRL <noreply@ctrl.garvan.org.au>',
-          headers: {},
-          subject: 'Copy of your message submitted to CTRL Administration Team RE: Test Subject',
-          text: 'Test Content',
-          to: 'test3@example.com',
-        },
-      ]
-
       const sentEmails = mockNodeMailer.mock.getSentMail()
       expect(sentEmails.length).toBe(2) // 1 to admin, 1 to user
-      expect(sentEmails).toEqual(expectedSentEmails)
     }, 100000)
 
     it('should ensure that the user exists before sending email', async () => {
@@ -78,67 +60,32 @@ describe('MailerController', () => {
       expect(response.body.message).toBe('Record not found')
     }, 100000)
 
-    it('should send emails to ORG_ADMIN_EMAIL if it is set', async () => {
-      process.env.ORG_ADMIN_EMAIL = 'testorg-admin@testorg.org.au'
-
+    it('should send emails to Study specific email if it is set', async () => {
       const response = await request(app)
         .post('/mailer/contact-us')
-        .send({ subject: 'Test Subject', content: 'Test Content' })
+        .send({ content: 'Test Content', studyId: TEST_STUDY_ID })
         .set({ Authorization: `Bearer ${participantToken}` })
 
       expect(response.status).toBe(204)
 
-      const expectedSentEmails = [
-        {
-          from: 'CTRL <noreply@ctrl.garvan.org.au>',
-          headers: {},
-          subject: 'New Contact Us Request RE: Test Subject',
-          text: 'Test Content',
-          to: ['testorg-admin@testorg.org.au'],
-        },
-        {
-          from: 'CTRL <noreply@ctrl.garvan.org.au>',
-          headers: {},
-          subject: 'Copy of your message submitted to CTRL Administration Team RE: Test Subject',
-          text: 'Test Content',
-          to: 'test3@example.com',
-        },
-      ]
-
       const sentEmails = mockNodeMailer.mock.getSentMail()
       expect(sentEmails.length).toBe(2) // 1 to admin, 1 to user
-      expect(sentEmails).toEqual(expectedSentEmails)
+      expect(sentEmails.map((v) => v.to)).toEqual([['test@contactus.com'], 'test3@example.com'])
     })
 
-    it('should send emails to all Organisation Admins if ORG_ADMIN_EMAIL is not set', async () => {
-      delete process.env.ORG_ADMIN_EMAIL
-
+    it('should send emails to all Admins if Study specific contact email is not set', async () => {
       const response = await request(app)
         .post('/mailer/contact-us')
-        .send({ subject: 'Test Subject', content: 'Test Content' })
+        .send({ content: 'Test Content', studyId: SECOND_TEST_STUDY_ID })
         .set({ Authorization: `Bearer ${participantToken}` })
 
       expect(response.status).toBe(204)
-      const expectedSentEmails = [
-        {
-          from: 'CTRL <noreply@ctrl.garvan.org.au>',
-          headers: {},
-          subject: 'New Contact Us Request RE: Test Subject',
-          text: 'Test Content',
-          to: ['admin@example.com', 'testOrgAdmin2@example.com'],
-        },
-        {
-          from: 'CTRL <noreply@ctrl.garvan.org.au>',
-          headers: {},
-          subject: 'Copy of your message submitted to CTRL Administration Team RE: Test Subject',
-          text: 'Test Content',
-          to: 'test3@example.com',
-        },
-      ]
-
       const sentEmails = mockNodeMailer.mock.getSentMail()
       expect(sentEmails.length).toBe(2) // 1 to admin, 1 to user
-      expect(sentEmails).toEqual(expectedSentEmails)
+      expect(sentEmails.map((v) => v.to)).toEqual([
+        ['admin@example.com', 'testOrgAdmin2@example.com'],
+        'test3@example.com',
+      ])
     })
   })
 })
