@@ -20,6 +20,7 @@ describe('', () => {
   it('Can see answers table', () => {
     cy.visit('/responses/all/1')
     cy.get('[role="row"]').eq(1).should('not.contain.text', 'Unanswered User (')
+    cy.get('[role="row"]').eq(0).get('[role="gridcell"]').eq(2).should('contain.text', '1')
     cy.get('[data-cy="display-sensitive"]').click()
     cy.get('[role="row"]').should('have.length', 5)
     cy.get('[role="row"]')

@@ -313,7 +313,7 @@ describe('IntegrationsController', () => {
       expect(response.status).toBe(201)
       const survey = await prisma.surveyVersion.findFirst({
         where: {
-          id: 2,
+          id: 1,
           studyId: studyId,
         },
       })

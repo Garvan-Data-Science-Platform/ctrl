@@ -296,7 +296,7 @@ describe('SurveysController', () => {
     it('should fail to publish an invalid survey', async () => {
       await prisma.surveyVersion.update({
         where: {
-          id: 2,
+          id: 1,
           studyId: 1,
         },
         data: {
