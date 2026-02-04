@@ -46,15 +46,19 @@ describe('Study management page', () => {
     cy.contains('STUDY DESCRIPTION').should('exist')
   })
 
-  it('Can edit redcap settings', () => {
+  it('Can edit advanced settings', () => {
     cy.visit('/studies')
     cy.get('[data-cy="advanced-toggle"]').eq(1).click()
     cy.get('[data-cy="redcapURL"] input').eq(1).type('abc')
     cy.get('[data-cy="redcapToken"] input').eq(1).type('abc123')
-    cy.get('[data-cy="redcap-apply"]').eq(1).click()
+    cy.get('[data-cy="settings-apply"]').eq(1).click()
     cy.contains('Invalid Redcap').should('exist')
     cy.get('[data-cy="redcapURL"] input').eq(1).clear().type('https://abc.com')
-    cy.get('[data-cy="redcap-apply"]').eq(1).click()
+    cy.get('[data-cy="contactUsEmail"] input').eq(1).clear().type('a')
+    cy.get('[data-cy="settings-apply"]').eq(1).click()
+    cy.contains('Invalid Email').should('exist')
+    cy.get('[data-cy="contactUsEmail"] input').eq(1).clear().type('a@b.com')
+    cy.get('[data-cy="settings-apply"]').eq(1).click()
     cy.contains('Updated').should('exist')
   })
 
