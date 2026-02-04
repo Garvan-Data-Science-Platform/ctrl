@@ -33,6 +33,7 @@ export const SurveyList = () => {
       await downloadPdfBlob(
         <SurveyPdf
           studyName={studies[activeStudyIndex].name}
+          studyDescription={studies[activeStudyIndex].description}
           steps={surveyData.data.data}
           versionNumber={versionNumber}
           {...logos}

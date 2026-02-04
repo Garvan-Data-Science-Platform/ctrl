@@ -179,6 +179,7 @@ export const ParticipantList = () => {
       await downloadPdfBlob(
         <ResponsesPdf
           studyName={studies[activeStudyIndex].name}
+          studyDescription={studies[activeStudyIndex].description}
           profile={profileData.data.profile}
           steps={responseData.data.steps}
           responses={responseData}

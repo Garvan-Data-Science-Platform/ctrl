@@ -26,12 +26,15 @@ import { LogoUploader } from '../../components/LogoUploader'
 import { RESOURCES } from '../../constants'
 
 const StudyCard = ({
-  study,
+  studyIdx,
   advancedOpen = false,
 }: {
-  study: StudyEntry
+  studyIdx: number
   advancedOpen?: boolean
 }) => {
+  const { studies, setActiveStudyIndex, activeStudyIndex, setStudies } = useStudyStore()
+  const study: StudyEntry = studies[studyIdx]
+
   const { open } = useNotification()
   const queryClient = useQueryClient()
   const [editingName, setEditingName] = useState(false)
@@ -39,7 +42,6 @@ const StudyCard = ({
   const [newName, setNewName] = useState(study.name)
   const [newDesc, setNewDesc] = useState(study.description)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const { studies, setActiveStudyIndex, activeStudyIndex } = useStudyStore()
   const [redcapURL, setRedcapURL] = useState(study.redcapURL || '')
   const [redcapToken, setRedcapToken] = useState(study.redcapToken || '')
   const [redcapChanged, setRedcapChanged] = useState(false)
@@ -71,6 +73,9 @@ const StudyCard = ({
       .finally(() => {
         setEditingName(false)
         setEditingDescription(false)
+        const newStudies = [...studies]
+        newStudies[studyIdx] = { ...newStudies[studyIdx], ...updateData }
+        setStudies(newStudies)
       })
   }
 
@@ -347,9 +352,9 @@ const StudiesPage = () => {
       </Dialog>
       <Typography variant="h4">Studies</Typography>
       <Stack gap={1} sx={{ mt: 2 }}>
-        {studies.map((study) => (
+        {studies.map((study, idx) => (
           <StudyCard
-            study={study}
+            studyIdx={idx}
             key={`studybox_${study.id}`}
             advancedOpen={advancedStudyId === String(study.id)}
           />

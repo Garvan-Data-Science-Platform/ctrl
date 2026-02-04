@@ -37,6 +37,7 @@ export default function Dashboard() {
   const { studies, activeStudyIndex, setActiveStudyIndex } = useAppStore()
 
   const studyName = studies?.at(activeStudyIndex)?.name || ''
+  const studyDescription = studies?.at(activeStudyIndex)?.description || undefined
 
   const { isPending, error, data } = useQuery({
     queryKey: ['steps'],
@@ -104,6 +105,7 @@ export default function Dashboard() {
       await downloadPdfBlob(
         <ResponsesPdf
           studyName={studyName}
+          studyDescription={studyDescription}
           profile={profileData.data}
           steps={responseData.data.steps}
           responses={responseData}
