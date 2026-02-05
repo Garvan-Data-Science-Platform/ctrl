@@ -65,6 +65,9 @@ const StudyCard = ({
           setActiveStudyIndex(0)
         }
         queryClient.invalidateQueries(['studies'])
+        const newStudies = [...studies]
+        newStudies[studyIdx] = { ...newStudies[studyIdx], ...updateData }
+        setStudies(newStudies)
         open?.({ type: 'success', message: 'Updated successfully' })
       })
       .catch((e) => {
@@ -73,9 +76,6 @@ const StudyCard = ({
       .finally(() => {
         setEditingName(false)
         setEditingDescription(false)
-        const newStudies = [...studies]
-        newStudies[studyIdx] = { ...newStudies[studyIdx], ...updateData }
-        setStudies(newStudies)
       })
   }
 
