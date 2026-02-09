@@ -203,7 +203,7 @@ const RestorePage = () => {
           slotProps={{ root: { 'data-cy': 'participants-list' } }}
         />
       </List>
-      {identity?.role === 'OrganisationAdmin' || identity?.role === 'StudyAdmin' && (
+      {(identity?.role === 'OrganisationAdmin' || identity?.role === 'StudyAdmin') && (
         <>
           <Box sx={{ mt: 1 }} />
           <List headerProps={{ title: 'Deleted Studies' }} breadcrumb={false}>

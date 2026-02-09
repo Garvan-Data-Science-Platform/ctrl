@@ -102,16 +102,22 @@ export class StudiesController extends Controller {
   public async getDeletedStudies(
     @Request() request: RequestWithAuthentication,
   ): Promise<GetAllStudiesResponse> {
-    if (
-      (await prisma.user.findUniqueOrThrow({ where: { id: request.user.userId } })).role ==
-      'StudyAdmin'
-    ) {
-      return { data: [] }
+
+    let studyQuery = {}
+
+    // Constructs StudyAdmins query
+    if (request.user.role === 'StudyAdmin') {
+      studyQuery = { admins: { some: { id: request.user.userId } } }
     }
+
     const studies: Study[] = await this.studyRepo.findMany({
-      where: { deleted: true },
+      where: {
+        deleted: true,
+        ...studyQuery,
+      },
       orderBy: { id: 'asc' },
     })
+
     const responseData = { data: studies.map((val) => ({ ...val, logo: Boolean(val.logo) })) }
     return responseData
   }
