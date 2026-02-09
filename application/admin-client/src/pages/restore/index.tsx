@@ -203,7 +203,7 @@ const RestorePage = () => {
           slotProps={{ root: { 'data-cy': 'participants-list' } }}
         />
       </List>
-      {identity?.role === 'OrganisationAdmin' && (
+      {identity?.role === 'OrganisationAdmin' || identity?.role === 'StudyAdmin' && (
         <>
           <Box sx={{ mt: 1 }} />
           <List headerProps={{ title: 'Deleted Studies' }} breadcrumb={false}>
@@ -214,6 +214,10 @@ const RestorePage = () => {
               slotProps={{ root: { 'data-cy': 'studies-list' } }}
             />
           </List>
+        </>
+      )}
+      {identity?.role === 'OrganisationAdmin' && (
+        <>
           <Box sx={{ mt: 1 }} />
           <List headerProps={{ title: 'Deleted Admin Users' }} breadcrumb={false}>
             <DataGrid
@@ -225,7 +229,7 @@ const RestorePage = () => {
           </List>
         </>
       )}
-    </Box>
+    </Box >
   )
 }
 
