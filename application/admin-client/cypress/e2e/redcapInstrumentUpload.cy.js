@@ -14,7 +14,8 @@ describe('REDCap Survey Upload', () => {
     it('should display REDCap logo', () => {
       cy.get('img[alt="REDCap Logo"]')
         .should('be.visible')
-        .should('have.attr', 'src', '/redcap.png')
+        .should('have.attr', 'src')
+        .and('match', /redcap-logo-(light|dark)\.png/)
     })
 
     it('should display both import sections', () => {

@@ -19,6 +19,7 @@ import { useCustom, useGetIdentity } from '@refinedev/core'
 import { GetElsaTokenResponse } from '@common/types/api/integrations/getElsaToken'
 import { axiosInstance } from '../../providers/dataProvider'
 import { useState } from 'react'
+import { RedcapLogo } from '../../components/RedcapLogo'
 
 export const IntegrationsHome = () => {
   const navigate = useNavigate()
@@ -60,7 +61,7 @@ export const IntegrationsHome = () => {
       </Typography>
 
       <Box sx={{ mt: 4 }}>
-        <img src="/redcap.png" alt="REDCap Logo" style={{ height: '70px' }} />
+        <RedcapLogo />
 
         <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
           <Button

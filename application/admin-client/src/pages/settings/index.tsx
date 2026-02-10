@@ -199,7 +199,6 @@ const SettingsPage = () => {
         </Box>
       </Box>
 
-      <Box sx={{ height: 300 }} />
     </Container>
   )
 }
