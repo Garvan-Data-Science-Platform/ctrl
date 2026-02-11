@@ -282,7 +282,7 @@ const StudyCard = ({
       <Tooltip
         title={
           studies.length < 2
-            ? 'You cannot delete the only study you are part of'
+            ? 'You cannot delete the only study you are part of.'
             : ''
         }
       >
