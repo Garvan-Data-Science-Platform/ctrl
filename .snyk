@@ -22,4 +22,9 @@ ignore:
         reason: No known upgrade path to resolve.
         expires: 2026-03-19T03:15:51.667Z
         created: 2026-01-20T03:15:51.671Z
+  SNYK-JS-AXIOS-15252993:
+    - "*":
+        reason: No known upgrade path to resolve.
+        expires: 2026-05-14T00:58:38.009Z
+        created: 2026-02-12T00:58:38.018Z
 patch: {}
