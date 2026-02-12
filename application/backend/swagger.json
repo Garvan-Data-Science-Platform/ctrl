@@ -4189,7 +4189,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -4322,7 +4323,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -4504,7 +4506,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -4694,7 +4697,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],

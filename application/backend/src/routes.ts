@@ -1783,7 +1783,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
         };
         app.patch('/studies/:studyId/restore',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(StudiesController)),
             ...(fetchMiddlewares<RequestHandler>(StudiesController.prototype.restoreStudyById)),
 
@@ -1979,7 +1979,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
         };
         app.delete('/studies/:studyId/logo',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(StudiesController)),
             ...(fetchMiddlewares<RequestHandler>(StudiesController.prototype.deleteLogo)),
 
@@ -2010,7 +2010,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 studyId: {"in":"path","name":"studyId","required":true,"dataType":"double"},
         };
         app.delete('/studies/:studyId',
-            authenticateMiddleware([{"jwt":["OrganisationAdmin"]}]),
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
             ...(fetchMiddlewares<RequestHandler>(StudiesController)),
             ...(fetchMiddlewares<RequestHandler>(StudiesController.prototype.deleteStudy)),
 

@@ -283,6 +283,13 @@ describe('StudiesController', () => {
         .set({ Authorization: `Bearer ${orgAdminToken}` })
       expect(response.status).toBe(422)
     })
+
+    it('should allow study admins to delete a study', async () => {
+      const response = await request(app)
+        .delete(`/studies/${testStudyId}`)
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+      expect(response.status).toBe(204)
+    })
   })
 
   describe('GET /studies/:studyId/logo', () => {
@@ -352,8 +359,6 @@ describe('StudiesController', () => {
     })
   })
 
-  // TODO: Add test to verify that study admin can also change logo
-
   describe('DELETE /studies/:studyId/logo', () => {
     it('should delete an existing study logo', async () => {
       // Add a logo to be deleted
@@ -380,6 +385,102 @@ describe('StudiesController', () => {
         where: { id: testStudyId },
       })
       expect(studyWithDeletedLogo?.logo).toBeNull()
+    })
+
+    it('should allow study admins to delete a study logo', async () => {
+      // Add a logo to be deleted
+      const createResponse = await request(app)
+        .post(`/studies/${testStudyId}/logo`)
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+        .attach('file', `${fixturesPath}/valid_logo.png`)
+      expect(createResponse.status).toBe(204)
+
+      // Test deletion
+      const response = await request(app)
+        .delete(`/studies/${testStudyId}/logo`)
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+      expect(response.status).toBe(204)
+
+      // Try to get logo (expecting 404)
+      const getResponse = await request(app)
+        .get(`/studies/${testStudyId}/logo`)
+        .responseType('blob')
+      expect(getResponse.status).toBe(404)
+
+      // Verify logo is deleted in db
+      const studyWithDeletedLogo = await prisma.study.findFirst({
+        where: { id: testStudyId },
+      })
+      expect(studyWithDeletedLogo?.logo).toBeNull()
+    })
+  })
+
+  describe('PATCH /studies/:studyId/restore', () => {
+    it('should restore a deleted study', async () => {
+
+      const studyBeforeDelete = await prisma.study.findFirst({
+        where: { id: testStudyId },
+      })
+
+      expect(studyBeforeDelete?.deleted).toBe(false)
+
+      // Delete the study
+      const deleteResponse = await request(app)
+        .delete(`/studies/${testStudyId}`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(deleteResponse.status).toBe(204)
+
+      // Verify the study is deleted
+      const deletedStudy = await prisma.study.findFirst({
+        where: { id: testStudyId, deleted: true },
+      })
+
+      expect(deletedStudy?.deleted).toBe(true)
+
+      // Restore the study
+      const response = await request(app)
+        .patch(`/studies/${testStudyId}/restore`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(response.status).toBe(204)
+
+      // Verify the study is restored
+      const restoredStudy = await prisma.study.findFirst({
+        where: { id: testStudyId },
+      })
+      expect(restoredStudy?.deleted).toBe(false)
+    })
+
+    it('should allow study admins to restore a deleted study', async () => {
+      const studyBeforeDelete = await prisma.study.findFirst({
+        where: { id: testStudyId },
+      })
+
+      expect(studyBeforeDelete?.deleted).toBe(false)
+
+      // Delete the study
+      const deleteResponse = await request(app)
+        .delete(`/studies/${testStudyId}`)
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+      expect(deleteResponse.status).toBe(204)
+
+      // Verify the study is deleted
+      const deletedStudy = await prisma.study.findFirst({
+        where: { id: testStudyId, deleted: true },
+      })
+
+      expect(deletedStudy?.deleted).toBe(true)
+
+      // Restore the study
+      const response = await request(app)
+        .patch(`/studies/${testStudyId}/restore`)
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+      expect(response.status).toBe(204)
+
+      // Verify the study is restored
+      const restoredStudy = await prisma.study.findFirst({
+        where: { id: testStudyId },
+      })
+      expect(restoredStudy?.deleted).toBe(false)
     })
   })
 })

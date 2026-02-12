@@ -13,6 +13,7 @@ import {
   Stack,
   TextField,
   Typography,
+  Tooltip
 } from '@mui/material'
 import { useNotification } from '@refinedev/core'
 import { axiosInstance } from '../../providers/dataProvider'
@@ -278,16 +279,25 @@ const StudyCard = ({
           </AccordionDetails>
         </Accordion>
       </Box>
-      <IconButton
-        disabled={studies.length < 2}
-        sx={{ position: 'absolute', right: 10, top: 10 }}
-        onClick={() => {
-          setDeleteDialogOpen(true)
-        }}
-        data-cy="delete-study"
+      <Tooltip
+        title={
+          studies.length < 2
+            ? 'You cannot delete the only study you are part of.'
+            : ''
+        }
       >
-        <Delete />
-      </IconButton>
+        <span style={{ position: 'absolute', right: 10, top: 10 }}>
+          <IconButton
+            disabled={studies.length < 2}
+            onClick={() => {
+              setDeleteDialogOpen(true)
+            }}
+            data-cy="delete-study"
+          >
+            <Delete />
+          </IconButton>
+        </span>
+      </Tooltip>
     </Box>
   )
 }
