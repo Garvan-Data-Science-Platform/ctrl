@@ -43,7 +43,7 @@ export class MailerController extends Controller {
     // Check if user exists
     const user = await this.userRepo.findUniqueOrThrow({
       where: { id: userId },
-      select: { email: true },
+      select: { email: true, firstName: true, lastName: true },
     })
 
     const mailerTransporter = await createMailerTransporter()
@@ -71,13 +71,20 @@ export class MailerController extends Controller {
       ? [study.contactUsEmail]
       : [...orgAdminEmails, ...studyAdminEmails]
 
-    const subjectToAdmin: string = `New Contact Us Request From CTRL Participant`
+    const subjectToAdmin: string = `New Contact Us Request From CTRL Participant: ${user.firstName} ${user.lastName}`
+
+    const bodyToAdmin = `You have received a message via the CTRL 'Contact Us' form.
+    Study: ${study.name}
+    Participant: ${user.firstName} ${user.lastName} (${user.email})
+    Message: ${bodyRequest.content}
+    `
 
     const mailToAdminsOptions: nodemailer.SendMailOptions = {
       from: fromAddress,
       to: recipientEmails,
+      replyTo: user.email,
       subject: subjectToAdmin,
-      text: bodyRequest.content,
+      text: bodyToAdmin,
     }
 
     await mailerTransporter.sendMail(mailToAdminsOptions)
@@ -90,7 +97,7 @@ export class MailerController extends Controller {
       from: fromAddress,
       to: user.email,
       subject: subjectToUser,
-      text: `This email is to confirm that we have received your contact us message. A copy of the message is provided below: \n ${bodyRequest.content}`,
+      text: `This email is to confirm that CTRL ${study.name} admins have received your contact us message. A copy of the message is provided below: \n ${bodyRequest.content}`,
     }
 
     await mailerTransporter.sendMail(mailToUserOptions)

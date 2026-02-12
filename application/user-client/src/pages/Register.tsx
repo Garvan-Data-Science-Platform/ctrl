@@ -29,6 +29,7 @@ import {
 } from '@common/types/api/users/ParticipantProfile'
 import { AddCircle, Close } from '@mui/icons-material'
 import { useEffect } from 'react'
+import { emailRegex } from '@common/src/regex'
 
 interface FormValues {
   firstName: string
@@ -218,7 +219,7 @@ export default function Register() {
                 {...register('email', {
                   required: 'This field is required',
                   pattern: {
-                    value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, //eslint-disable-line
+                    value: emailRegex, //eslint-disable-line
                     message: 'Enter a valid email',
                   },
                 })}

@@ -25,6 +25,7 @@ import { SensitiveTextField } from '../../components/SensitiveTextField'
 import { useSearchParams } from 'react-router-dom'
 import { LogoUploader } from '../../components/LogoUploader'
 import { RESOURCES } from '../../constants'
+import { emailRegex } from '@common/src/regex'
 
 const StudyCard = ({
   studyIdx,
@@ -106,7 +107,6 @@ const StudyCard = ({
       })
       return
     }
-    const emailRegex = /^[\w-.]+@([\w-]+.)+[\w-]{2,4}$/
     if (contactUsEmail && !emailRegex.test(contactUsEmail)) {
       open?.({
         type: 'error',
