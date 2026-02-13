@@ -84,6 +84,10 @@ const styles = StyleSheet.create({
     height: '50',
     marginBottom: 10,
   },
+  bodyText: {
+    fontSize: 12,
+    marginBottom: 10,
+  },
 })
 
 // Take a response question type and format a table row accordingly
@@ -145,6 +149,7 @@ const FormatResponseElement = (element: SurveyElement, mode: 'responses' | 'opti
 
 interface ResponsesPdfProps {
   studyName: string
+  studyDescription?: string
   steps: SurveyStep[]
   profile?: GetParticipantProfileResponse['data']
   responses?: GetResponsesByIdResponse
@@ -156,6 +161,7 @@ interface ResponsesPdfProps {
 // Create a PDF document component
 const ResponsesPdf = ({
   studyName,
+  studyDescription,
   profile,
   steps,
   responses,
@@ -170,6 +176,7 @@ const ResponsesPdf = ({
         <View>{studyLogo && <Image style={styles.studyLogo} src={studyLogo} />}</View>
       </View>
       <Text style={styles.title}>{studyName}</Text>
+      {studyDescription && <Text style={styles.bodyText}>{studyDescription}</Text>}
       {profile && (
         <Text style={styles.title}>
           Responses for {profile.firstName} {profile.lastName}
@@ -221,6 +228,7 @@ const ResponsesPdf = ({
       {steps.map((page) => (
         <View style={styles.section}>
           <Text style={styles.subtitle}>{page.title}</Text>
+          <Text style={styles.bodyText}>{page.text}</Text>
           <View style={styles.table}>
             <View style={[styles.tableRow, styles.tableHeader]}>
               <Text style={styles.tableQuestionCell}>Question text</Text>
