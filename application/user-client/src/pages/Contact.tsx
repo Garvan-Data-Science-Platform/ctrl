@@ -73,6 +73,11 @@ export default function Contact({ disableHeader }: { disableHeader: boolean }) {
             rows={10}
             sx={{ mt: 2 }}
             disabled={sending}
+            helperText={
+              store.contactMessageText.length > 990
+                ? `${store.contactMessageText.length} / 1000 Characters`
+                : undefined
+            }
             data-cy="message-box"
           />
           <Button
