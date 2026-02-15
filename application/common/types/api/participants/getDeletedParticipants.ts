@@ -4,7 +4,7 @@ export interface GetDeletedParticipantsResponse {
     profileId: number
     firstName: string
     lastName: string
-    dob: Date
+    dob: string
     study: string
     studyId: number
   }[]

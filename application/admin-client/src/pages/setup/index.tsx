@@ -1,6 +1,6 @@
 import { RegisterParticipantResponse } from '@common/types/api/auth'
 import { Alert, Box, Button, Card, Container, TextField, Typography } from '@mui/material'
-import { useLogin } from '@refinedev/core'
+import { useLogin } from '../../hooks/useLogin'
 import { useForm } from 'react-hook-form'
 import { checkPasswordStrength } from '@common/src/PasswordStrength'
 
@@ -12,12 +12,7 @@ export const SetupPage = () => {
     formState: { errors },
   } = useForm()
 
-  type LoginVariables = {
-    username: string
-    password: string
-  }
-
-  const { mutate: login } = useLogin<LoginVariables>()
+  const { mutate: login } = useLogin()
 
   const onSubmit = (data: any) => {
     fetch(import.meta.env.VITE_BACKEND_URL + '/auth/register/setup', {
@@ -29,7 +24,11 @@ export const SetupPage = () => {
         if (res.ok) {
           res.json().then((rdata: RegisterParticipantResponse) => {
             if (!rdata.token) throw new Error('No token provided')
-            login(data)
+            login({
+              loginType: 'Password',
+              email: data.email,
+              password: data.password,
+            })
           })
         } else {
           res.json().then((data) => {

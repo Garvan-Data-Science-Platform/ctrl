@@ -16,11 +16,9 @@
 //
 import 'cypress-file-upload'
 
-export enum UserType {
-  PARTICIPANT_COMPLETED = 'test3@example.com',
-  PARTICIPANT_UNANSWERED = 'test2@example.com',
-  ADMIN = 'admin@example.com',
-}
+// import common cypress commands
+import '../../../common/cypress/support/commands'
+
 Cypress.Commands.add('login', (type: UserType) => {
   cy.request({
     method: 'POST',
@@ -32,8 +30,9 @@ Cypress.Commands.add('login', (type: UserType) => {
   }).then((res) => {
     expect(res.status).to.equal(200)
     expect(res.body.token).to.exist
-    console.log('TOKEN', res.body.token)
     window.localStorage.setItem('refine-auth', res.body.token)
+    window.localStorage.setItem('userrole', res.body.role)
+    window.localStorage.setItem('userid', res.body.id)
   })
 })
 

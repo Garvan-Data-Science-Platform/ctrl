@@ -4,6 +4,7 @@ import { axiosInstance } from '../../providers/dataProvider'
 import { participantUploadCSVDocumentation } from './helpPageRedcap'
 import { useNavigate } from 'react-router-dom'
 import { useCurrentStudyId } from '../../studyStore'
+import { Recipient } from '@common/types/invite'
 
 export const ParticipantImport = () => {
   const studyId = useCurrentStudyId()
@@ -39,7 +40,7 @@ export const ParticipantImport = () => {
         navigate(SUCCESS_REDIRECT, {
           state: {
             openInviteModal: true,
-            initialEmails: await getInitialEmailsFromFile(file),
+            initialRecipients: data.newParticipants as Recipient[],
           },
         })
       })
@@ -71,7 +72,7 @@ export const ParticipantImport = () => {
         navigate(SUCCESS_REDIRECT, {
           state: {
             openInviteModal: true,
-            initialEmails: await getInitialEmailsFromApi(data.newInvites),
+            initialRecipients: data.newParticipants as Recipient[],
           },
         })
       })
@@ -81,28 +82,6 @@ export const ParticipantImport = () => {
           message: `Internal Server Error: ${response.response.data.message}`,
         })
       })
-  }
-
-  const getInitialEmailsFromFile = async (file: File): Promise<string[]> => {
-    const content = await file.text()
-    const rows = content.split('\n').slice(1) // Skip header row
-    const uniqueEmails = new Set<string>()
-
-    rows.forEach((row: string) => {
-      const columns = row.split(',')
-      const participantEmail = columns[5] // ctrl_email index
-
-      if (participantEmail && participantEmail !== 'ctrl_email') {
-        uniqueEmails.add(participantEmail)
-      }
-    })
-
-    return Array.from(uniqueEmails)
-  }
-
-  const getInitialEmailsFromApi = async (newInvites: string[]): Promise<string[]> => {
-    const uniqueEmails = new Set<string>(newInvites)
-    return Array.from(uniqueEmails)
   }
 
   return (

@@ -1,9 +1,10 @@
 #Must be built from top directory
 
 ARG NODE_VERSION
-ARG APP_VERSION
 
 FROM node:${NODE_VERSION}-alpine AS build
+
+ARG APP_VERSION
 
 ARG NODE_ENV=production
 ENV NODE_ENV $NODE_ENV
@@ -11,7 +12,7 @@ ENV NODE_ENV $NODE_ENV
 WORKDIR /usr/src/app
 
 ENV VITE_BACKEND_URL "/api"
-ENV VITE_APP_VERSION $APP_VERSION
+ENV VITE_APP_VERSION ${APP_VERSION}
 
 COPY package.json .yarnrc.yml yarn.lock ./
 COPY application/admin-client/package.json application/admin-client/

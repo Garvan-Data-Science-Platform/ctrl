@@ -1,4 +1,4 @@
-import { Button, Card, Container, Typography, Link as MLink } from '@mui/material'
+import { Button, Card, Container, Typography, Link as MLink, Box } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import NavBar from '../components/NavBar'
 import { useQuery } from '@tanstack/react-query'
@@ -229,12 +229,17 @@ export default function Profile() {
           )}
         </Grid>
       </Container>
-
-      <Link to="/profile/update">
-        <Button size="large" variant="contained" sx={{ mt: 3 }}>
+      <Box>
+        <Button
+          component={Link}
+          to="/profile/update"
+          size="large"
+          variant="contained"
+          sx={{ mt: 3 }}
+        >
           Update
         </Button>
-      </Link>
+      </Box>
     </>
   )
 }

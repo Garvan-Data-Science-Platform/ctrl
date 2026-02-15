@@ -17,6 +17,12 @@ config:
 
   disableAdminPasswordLogin: false
   otp: true
+  inviteExpiryDays: 7
+  smtp:
+    host: ''
+    port: 587
+    username: ''
+    password: ''
 
 userClient:
   hostname: ctrlhost
@@ -102,6 +108,8 @@ postgresql:
     security:
       allowInsecureImages: true
   fullnameOverride: ctrl-postgres
+  auth:
+    existingSecret: ctrl-postgres
 
 serviceAccount:
   # Specifies whether a service account should be created

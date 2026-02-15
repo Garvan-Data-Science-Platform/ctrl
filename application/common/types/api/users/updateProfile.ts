@@ -21,8 +21,7 @@ import { RegisterParticipantRequest } from '../auth'
  *    "lastName": "Doe",
  *    "mobile": "0412341432",
  *    "email": "jeremydoe@email.com"
- *  },
- *  "dependents": []
+ *  }
  * }
  */
 export type UpdateProfileRequest = Partial<RegisterParticipantRequest>

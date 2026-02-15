@@ -1,0 +1,68 @@
+services:
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+    healthcheck:
+      test: ['CMD', 'wget', '--spider', '-q', 'http://localhost:8025']
+      interval: 2s
+      timeout: 2s
+      retries: 10
+
+  backend:
+    image: australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-backend:${IMAGE_TAG}
+    depends_on:
+      db-test:
+        condition: service_healthy
+      mailhog:
+        condition: service_healthy
+    env_file:
+      - ./application/backend/.env.dockere2e
+    environment:
+      - NODE_ENV=e2e
+      - CONFIG_DIR=/app/config
+    volumes:
+      - ./application/common/config.e2e.json5:/app/config/config.json5
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:5001/
+      interval: 5s
+      timeout: 2s
+      retries: 10
+    ports:
+      - '5001:5001'
+
+  # Overlay for local development E2E tests using the build-context backend
+  backend-test:
+    depends_on:
+      mailhog:
+        condition: service_healthy
+    env_file:
+      - ./application/backend/.env.dockere2e
+    environment:
+      - STUB_MAILER=false
+      - NODE_ENV=e2e
+      - CONFIG_DIR=/app/config
+    volumes:
+      - ./application/common/config.e2e.json5:/app/config/config.json5
+
+  user-client:
+    image: australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-user-client:${IMAGE_TAG}
+    ports:
+      - '5002:80'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:80']
+      interval: 2s
+      timeout: 2s
+      retries: 10
+
+  admin-client:
+    image: australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-admin-client:${IMAGE_TAG}
+    ports:
+      - '5003:80'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:80']
+      interval: 2s
+      timeout: 2s
+      retries: 10

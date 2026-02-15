@@ -57,7 +57,7 @@ export class SurveysController extends Controller {
    * @summary Get all Survey versions
    */
   @Get('/surveys')
-  @Security('jwt', ['OrganisationAdmin'])
+  @Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
   public async getAllSurveys(@Path() studyId: number): Promise<GetSurveyVersionsResponse> {
     const surveys: SurveyVersionPrisma[] = await this.surveyRepo.findMany({
       where: { studyId },
@@ -90,7 +90,7 @@ export class SurveysController extends Controller {
    * @summary Get Specific Survey
    */
   @Get('/surveys/{versionNumber}')
-  @Security('jwt', ['OrganisationAdmin'])
+  @Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
   @Response('404', 'Not Found')
   public async getSurveyVersionByVersionNumber(
     @Path() studyId: number,
@@ -252,7 +252,7 @@ export class SurveysController extends Controller {
    * @summary Get all participants answers for a survey version
    */
   @Get('/surveys/{versionNumber}/participants/answers')
-  @Security('jwt', ['OrganisationAdmin'])
+  @Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
   @Response('404', 'Not Found')
   public async getAllResponses(
     @Path() versionNumber: number,
@@ -309,7 +309,7 @@ export class SurveysController extends Controller {
    */
   @Get('/surveys/{versionNumber}/participants/{profileId}/answers')
   @Response('404', 'Not Found')
-  @Security('jwt', ['OrganisationAdmin'])
+  @Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
   public async getResponsesById(
     @Path() studyId: number,
     @Path() versionNumber: number,
@@ -517,7 +517,7 @@ export class SurveysController extends Controller {
   @Patch('/surveys/{versionNumber}')
   @Response('404', 'Not Found')
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
-  @Security('jwt', ['OrganisationAdmin'])
+  @Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
   public async updateSurvey(
     @Path() studyId: number,
     @Path() versionNumber: number,
@@ -554,7 +554,7 @@ export class SurveysController extends Controller {
   @Post('/surveys/{versionNumber}/publish')
   @Response('404', 'Not Found')
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
-  @Security('jwt', ['OrganisationAdmin'])
+  @Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
   public async publishSurvey(@Path() studyId: number, @Path() versionNumber: number) {
     const survey = await this.surveyRepo.findUniqueOrThrow({
       where: {

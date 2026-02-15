@@ -5,6 +5,9 @@ export interface SetupResponse {
     host: string
     clientId: string
     icon: string
+    displayInAdminPortal: boolean
+    displayInUserPortal: boolean
+    authorizeUrlParams: string
   }[]
   disableAdminPasswordLogin: boolean
 }

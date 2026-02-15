@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import { hashPassword } from '../../src/authentication'
 import { SurveyStep } from '../../../common/types/survey'
-import { createDefaultAnswers } from '../../src/utils/answers'
+import { createDefaultAnswers, recalculateAnswers } from '../../src/utils/answers'
 import prisma from '../../src/PrismaClient'
 
 const main = async () => {
@@ -10,13 +10,235 @@ const main = async () => {
     update: {},
     create: {
       name: 'OrgName',
-      mailerHost: process.env.MAILER_HOST,
-      mailerPort: process.env.MAILER_PORT ? Number(process.env.MAILER_PORT) : null,
-      mailerUser: process.env.MAILER_USER,
-      mailerPassword: process.env.MAILER_PASSWORD,
-      redcapURL: process.env.REDCAP_API_URL,
-      redcapToken: process.env.REDCAP_API_TOKEN,
       elsaToken: 'ctrl-elsa-abc123',
+      newsLink: 'https://ctrldynamicconsent.wordpress.com',
+    },
+  })
+
+  const ShortSurveyStepData = require('./shortSurveyData.json')
+  const shortStudy = await prisma.study.create({
+    data: {
+      name: 'Short Study',
+    },
+  })
+  console.log('Short Study created:', shortStudy)
+
+  await prisma.surveyVersion.create({
+    data: {
+      id: 900,
+      versionNumber: 1,
+      studyId: shortStudy.id,
+      status: 'PUBLISHED',
+      data: ShortSurveyStepData as SurveyStep[],
+    },
+  })
+
+  await prisma.surveyVersion.create({
+    data: {
+      id: 901,
+      versionNumber: 2,
+      studyId: shortStudy.id,
+      status: 'DRAFT',
+      data: ShortSurveyStepData as SurveyStep[],
+    },
+  })
+
+  const baseAnswers = createDefaultAnswers(ShortSurveyStepData)
+
+  const michael = await prisma.user.upsert({
+    where: { email: 'michaelwilson@example.com' },
+    update: {},
+    create: {
+      email: 'michaelwilson@example.com',
+      firstName: 'Michael',
+      lastName: 'Wilson',
+      role: 'Participant',
+      password: hashPassword('SomePassword123'),
+      profiles: {
+        create: [
+          {
+            individualId: 'IND-ABC-001',
+            firstName: 'Michael',
+            middleName: 'Arundell',
+            lastName: 'Wilson',
+            dob: '1915-05-31',
+            mobile: '0412345678',
+            addressLine: '123 Main St',
+            suburb: 'Armidale',
+            state: 'NSW',
+            postcode: '2000',
+            participantType: 'GUARDIAN',
+            preferredContact: 'EMAIL',
+            familyId: 100,
+            nextOfKin: {
+              create: {
+                firstName: 'Jack',
+                lastName: 'McKinney',
+                email: 'jackmckinney@example.com',
+                mobile: '0412345679',
+              },
+            },
+            studies: {
+              create: {
+                studyId: shortStudy.id,
+                participantId: 'PID-XAY-00000',
+              },
+            },
+            surveys: {
+              create: {
+                versionId: 900,
+                answers: baseAnswers,
+              },
+            },
+          },
+        ],
+      },
+    },
+  })
+
+  await prisma.user.upsert({
+    where: { email: 'sallywilson@example.com' },
+    update: {},
+    create: {
+      email: 'sallywilson@example.com',
+      firstName: 'Sally',
+      lastName: 'Wilson',
+      role: 'Participant',
+      password: hashPassword('SomePassword123'),
+      profiles: {
+        create: [
+          {
+            individualId: 'IND-ABC-002',
+            firstName: 'Sally',
+            middleName: 'Arundell',
+            lastName: 'Wilson',
+            dob: '1915-05-31',
+            mobile: '0412345678',
+            addressLine: '123 Main St',
+            suburb: 'Armidale',
+            state: 'NSW',
+            postcode: '2000',
+            participantType: 'GUARDIAN',
+            preferredContact: 'EMAIL',
+            familyId: 100,
+            nextOfKin: {
+              create: {
+                firstName: 'Jack',
+                lastName: 'McKinney',
+                email: 'jackmckinney@example.com',
+                mobile: '0412345679',
+              },
+            },
+            studies: {
+              create: {
+                studyId: shortStudy.id,
+                participantId: 'PID-XAY-00001',
+              },
+            },
+            surveys: {
+              create: {
+                versionId: 900,
+                answers: baseAnswers,
+              },
+            },
+          },
+        ],
+      },
+    },
+  })
+
+  await prisma.participantProfile.upsert({
+    where: {
+      individualId: 'IND-ABC-003',
+    },
+    update: {},
+    create: {
+      individualId: 'IND-ABC-003',
+      firstName: 'Johnny',
+      middleName: 'Arundell',
+      lastName: 'Wilson',
+      dob: '2025-05-31',
+      mobile: '0412345678',
+      addressLine: '123 Main St',
+      suburb: 'Armidale',
+      state: 'NSW',
+      postcode: '2000',
+      participantType: 'DEPENDENT_AGE',
+      preferredContact: 'EMAIL',
+      familyId: 100,
+      nextOfKin: {
+        create: {
+          firstName: 'Jack',
+          lastName: 'McKinney',
+          email: 'jackmckinney@example.com',
+          mobile: '0412345679',
+        },
+      },
+      studies: {
+        create: {
+          studyId: shortStudy.id,
+          participantId: 'PID-XAY-00002',
+        },
+      },
+      surveys: {
+        create: {
+          versionId: 900,
+          answers: baseAnswers,
+        },
+      },
+    },
+  })
+
+  const alice = await prisma.user.upsert({
+    where: { email: 'alicejohnson@example.com' },
+    update: {},
+    create: {
+      email: 'alicejohnson@example.com',
+      firstName: 'Alice',
+      middleName: 'Mary',
+      lastName: 'Johnson',
+      role: 'Participant',
+      password: hashPassword('SomePassword123'),
+      organisations: {},
+      profiles: {
+        create: [
+          {
+            individualId: 'IND-ABC-004',
+            firstName: 'Alice',
+            middleName: 'Arundell',
+            lastName: 'Johnson',
+            dob: '1915-05-31',
+            mobile: '0412345678',
+            addressLine: '123 Main St',
+            suburb: 'Armidale',
+            state: 'NSW',
+            postcode: '2000',
+            participantType: 'STANDARD',
+            preferredContact: 'EMAIL',
+            familyId: 2,
+            nextOfKin: {
+              create: {
+                firstName: 'Jack',
+                lastName: 'McKinney',
+                email: 'jackmckinney@example.com',
+                mobile: '0412345679',
+              },
+            },
+            studies: {
+              create: {
+                studyId: shortStudy.id,
+                participantId: 'PID-XAY-00003',
+              },
+            },
+            surveys: {
+              create: {
+                versionId: 900,
+                answers: baseAnswers,
+              },
+            },
+          },
+        ],
+      },
     },
   })
 
@@ -24,6 +246,8 @@ const main = async () => {
   const defaultStudy = await prisma.study.create({
     data: {
       name: 'Seed Study',
+      redcapURL: process.env.REDCAP_API_URL,
+      redcapToken: process.env.REDCAP_API_TOKEN,
     },
   })
 
@@ -60,10 +284,9 @@ const main = async () => {
       middleName: 'James',
       lastName: 'Doe',
       role: 'OrganisationAdmin',
-      password: 'SomePassword123',
+      password: hashPassword('SomePassword123'),
     },
   })
-  console.log('Added the following users:', john)
 
   const jane = await prisma.user.upsert({
     where: { email: 'janesmith@example.com' },
@@ -72,26 +295,11 @@ const main = async () => {
       email: 'janesmith@example.com',
       firstName: 'Jane',
       lastName: 'Smith',
-      role: 'OperatorAdmin',
-      password: 'SomePassword123',
+      role: 'StudyAdmin',
+      password: hashPassword('SomePassword123'),
+      adminOfStudies: { connect: [{ id: defaultStudy.id }, { id: shortStudy.id }] },
     },
   })
-  console.log('Added the following users:', jane)
-
-  const alice = await prisma.user.upsert({
-    where: { email: 'alicejohnson@example.com' },
-    update: {},
-    create: {
-      email: 'alicejohnson@example.com',
-      firstName: 'Alice',
-      middleName: 'Mary',
-      lastName: 'Johnson',
-      role: 'Participant',
-      password: 'SomePassword123',
-      organisations: {},
-    },
-  })
-  console.log('Added the following users:', alice)
 
   const bob = await prisma.user.upsert({
     where: { email: 'bobbrown@example.com' },
@@ -101,10 +309,9 @@ const main = async () => {
       firstName: 'Bob',
       lastName: 'Brown',
       role: 'OrganisationAdmin',
-      password: 'SomePassword123',
+      password: hashPassword('SomePassword123'),
     },
   })
-  console.log('Added the following users:', bob)
 
   const emily = await prisma.user.upsert({
     where: { email: 'emilydavis@example.com' },
@@ -113,34 +320,21 @@ const main = async () => {
       email: 'emilydavis@example.com',
       firstName: 'Emily',
       lastName: 'Davis',
-      role: 'OperatorAdmin',
-      password: 'SomePassword123',
+      role: 'StudyAdmin',
+      password: hashPassword('SomePassword123'),
+      adminOfStudies: { connect: { id: shortStudy.id } },
     },
   })
-  console.log('Added the following users:', emily)
-
-  const michael = await prisma.user.upsert({
-    where: { email: 'michaelwilson@example.com' },
-    update: {},
-    create: {
-      email: 'michaelwilson@example.com',
-      firstName: 'Michael',
-      lastName: 'Wilson',
-      role: 'Participant',
-      password: 'SomePassword123',
-    },
-  })
-  console.log('Added the following users:', michael)
 
   const exampleAdmin = await prisma.user.upsert({
-    where: { email: String(process.env.EXAMPLE_ADMIN_EMAIL) },
+    where: { email: String(process.env.EXAMPLE_ORG_ADMIN_EMAIL) },
     update: {},
     create: {
-      email: String(process.env.EXAMPLE_ADMIN_EMAIL),
+      email: String(process.env.EXAMPLE_ORG_ADMIN_EMAIL),
       firstName: 'Example',
       lastName: 'Admin',
       role: 'OrganisationAdmin',
-      password: hashPassword(String(process.env.EXAMPLE_ADMIN_PASSWORD)),
+      password: hashPassword(String(process.env.EXAMPLE_ORG_ADMIN_PASSWORD)),
     },
   })
   console.log('Added the following users:', exampleAdmin)
@@ -164,7 +358,7 @@ const main = async () => {
             firstName: 'Judith',
             middleName: 'Arundell',
             lastName: 'Wright',
-            dob: new Date('1915-05-31'),
+            dob: '1915-05-31',
             mobile: '0412345678',
             addressLine: '123 Main St',
             suburb: 'Armidale',
@@ -181,15 +375,31 @@ const main = async () => {
               },
             },
             studies: {
-              create: {
-                studyId: defaultStudy.id,
-                participantId: 'PID-TYT-00000',
+              createMany: {
+                data: [
+                  {
+                    studyId: defaultStudy.id,
+                    participantId: 'PID-TYT-00000',
+                  },
+                  {
+                    studyId: shortStudy.id,
+                    participantId: 'PID-XAY-00004',
+                  },
+                ],
               },
             },
             surveys: {
-              create: {
-                versionId: 1000,
-                answers: exampleAnswers,
+              createMany: {
+                data: [
+                  {
+                    versionId: 1000,
+                    answers: exampleAnswers,
+                  },
+                  {
+                    versionId: 900,
+                    answers: baseAnswers,
+                  },
+                ],
               },
             },
           },
@@ -198,6 +408,37 @@ const main = async () => {
     },
   })
   console.log('Added the following users:', exampleUser)
+
+  const judithShortAnswers = await prisma.surveyVersionAnswers.findFirstOrThrow({
+    where: { versionId: 900, profile: { userId: exampleUser.id } },
+  })
+  const michaelShortAnswers = await prisma.surveyVersionAnswers.findFirstOrThrow({
+    where: { versionId: 900, profile: { userId: michael.id } },
+  })
+  const aliceShortAnswers = await prisma.surveyVersionAnswers.findFirstOrThrow({
+    where: { versionId: 900, profile: { userId: alice.id } },
+  })
+
+  const ans = baseAnswers
+  ans[1].last_updated = new Date().toISOString()
+  ans[1].status = 'completed'
+  ans[1].answers = [true, true, 'Musculoskeletal diseases only', true]
+  await prisma.surveyVersionAnswers.update({
+    where: { id: judithShortAnswers.id },
+    data: { answers: ans },
+  })
+  ans[1].answers = [true, false, 'Musculoskeletal diseases only', false]
+  ans[0].status = 'completed'
+  await prisma.surveyVersionAnswers.update({
+    where: { id: michaelShortAnswers.id },
+    data: { answers: ans },
+  })
+  await recalculateAnswers(100, 1)
+  ans[1].answers = [true, true, 'Any biomedical research', false]
+  await prisma.surveyVersionAnswers.update({
+    where: { id: aliceShortAnswers.id },
+    data: { answers: ans },
+  })
 }
 
 main()

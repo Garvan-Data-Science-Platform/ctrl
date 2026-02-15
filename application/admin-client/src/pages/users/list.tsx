@@ -1,6 +1,8 @@
 import { GetUserByIdResponse } from '@common/types/api/users'
+import { Info } from '@mui/icons-material'
+import { Box, Tooltip } from '@mui/material'
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
-import { useMany } from '@refinedev/core'
+import { useGetIdentity, useMany } from '@refinedev/core'
 import { DateField, DeleteButton, EditButton, List, ShowButton, useDataGrid } from '@refinedev/mui'
 import React from 'react'
 
@@ -8,6 +10,7 @@ export const roleMap: { [r in GetUserByIdResponse['data']['role']]: string } = {
   OrganisationAdmin: 'Organisation Admin',
   OperatorAdmin: 'Operator Admin',
   Participant: 'Participant',
+  StudyAdmin: 'Study Admin',
 }
 
 export const UserList = () => {
@@ -25,6 +28,8 @@ export const UserList = () => {
       enabled: !!dataGridProps?.rows,
     },
   })
+
+  const { data: identity } = useGetIdentity<{ role: string; id: number }>()
 
   const columns = React.useMemo<GridColDef[]>(
     () => [
@@ -57,7 +62,25 @@ export const UserList = () => {
         flex: 1,
         headerName: 'Role',
         minWidth: 100,
-        renderCell: ({ value }) => roleMap[value as GetUserByIdResponse['data']['role']],
+        renderCell: ({ value, row }) => {
+          const role = value as GetUserByIdResponse['data']['role']
+          if (role == 'StudyAdmin') {
+            return (
+              <Box display="flex" alignItems="center" gap={1}>
+                Study Admin
+                <Tooltip
+                  title=<div style={{ whiteSpace: 'pre-line' }}>
+                    {row.adminOfStudies.map((v: any) => v.name).join('\n') ||
+                      '***Not currently assigned to any studies, click edit to assign studies***'}
+                  </div>
+                >
+                  <Info />
+                </Tooltip>
+              </Box>
+            )
+          }
+          return roleMap[role]
+        },
         type: 'singleSelect',
         valueOptions: Object.keys(roleMap),
       },
@@ -82,7 +105,9 @@ export const UserList = () => {
         renderCell: function render({ row }) {
           return (
             <>
-              <EditButton data-cy="edit-button" hideText recordItemId={row.id} />
+              {(identity?.role != 'StudyAdmin' || row.role == 'StudyAdmin') && (
+                <EditButton data-cy="edit-button" hideText recordItemId={row.id} />
+              )}
               <ShowButton data-cy="view-button" hideText recordItemId={row.id} />
               <DeleteButton data-cy="delete-button" hideText recordItemId={row.id} />
             </>

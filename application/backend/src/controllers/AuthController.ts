@@ -3,12 +3,15 @@ import type {
   RegisterResponse,
   LoginRequest,
   LoginResponse,
+  LoginChallengeResponse,
+  LoginSuccessResponse,
   RegisterParticipantRequest,
   RegisterParticipantResponse,
   CreateParticipantResponse,
   CreateParticipantRequest,
   RegisterSetupRequest,
   OIDCLoginRequest,
+  OTPLoginRequest,
   SetupResponse,
 } from 'common/types/api/auth'
 import {
@@ -49,11 +52,11 @@ import { ParticipantType } from 'common/types/api/users/ParticipantProfile'
 import { createDefaultAnswers } from '../utils/answers'
 import { auditLog } from '../middlewares/AuditLog'
 import config from '../config'
-import type { OTPLoginRequest } from 'common/types/api/auth/login'
 import { randomInt } from 'node:crypto'
 import nodemailer from 'nodemailer'
 import { createMailerTransporter, fromAddress } from '../utils/mailer'
 import { genId, genIndId } from '../utils/genId'
+import { Prefill } from 'common/types/invite'
 
 @Route('auth')
 @Tags('Auth')
@@ -94,7 +97,7 @@ export class AuthController extends Controller {
       },
     })
 
-    const token = await generateToken({ userId: insertedUser.id, roles: [insertedUser.role] })
+    const token = await generateToken({ userId: insertedUser.id })
 
     const responseData = {
       token,
@@ -121,6 +124,9 @@ export class AuthController extends Controller {
         host: val.providerUrl,
         clientId: val.clientId,
         icon: val.icon,
+        displayInAdminPortal: val.displayInAdminPortal,
+        displayInUserPortal: val.displayInUserPortal,
+        authorizeUrlParams: val.authorizeUrlParams,
       })),
       disableAdminPasswordLogin: config.disableAdminPasswordLogin || false,
     }
@@ -177,7 +183,7 @@ export class AuthController extends Controller {
       data: { data: [], status: 'DRAFT', studyId: study.id, versionNumber: 1 },
     })
 
-    const token = await generateToken({ userId: insertedUser.id, roles: [insertedUser.role] })
+    const token = await generateToken({ userId: insertedUser.id })
 
     const responseData = {
       token,
@@ -228,17 +234,23 @@ export class AuthController extends Controller {
     const insertedUser = await this.userRepo.create({ data })
 
     // Extract info for participant creation
-    const participantData: CreateParticipantRequest = { firstName, lastName, ...participantInfo }
+    const participantData: CreateParticipantRequest = {
+      firstName,
+      lastName,
+      ...participantInfo,
+      ...(JSON.parse(invite.prefill || '{}') as Prefill).studyParticipant,
+    }
     const study = await this.studyRepo.findFirstOrThrow({ where: { id: invite.studyId } })
     await this.createParticipant(participantData, study.id, insertedUser)
     logger.info(`Participant ${insertedUser.id} created`)
 
     // Generate token
-    const token = await generateToken({ userId: insertedUser.id, roles: [insertedUser.role] })
+    const token = await generateToken({ userId: insertedUser.id })
 
     const responseData = {
       id: insertedUser.id,
       token,
+      role: insertedUser.role,
     }
 
     // Once a participant has been registered, we need
@@ -267,7 +279,7 @@ export class AuthController extends Controller {
   public async loginOIDC(
     @Body() bodyRequest: OIDCLoginRequest,
     @Header('x-client-type') clientType?: string,
-  ): Promise<LoginResponse> {
+  ): Promise<LoginSuccessResponse> {
     if (!config.oidc) {
       throw new Error('OIDC Not Configured')
     }
@@ -291,14 +303,18 @@ export class AuthController extends Controller {
     let user
 
     try {
-      const token_res = await fetch(`${providerUrl}/oauth2/token`, {
+      const oidc_data = await fetch(`${providerUrl}/.well-known/openid-configuration`)
+
+      const { token_endpoint, userinfo_endpoint } = await oidc_data.json()
+
+      const token_res = await fetch(token_endpoint, {
         body,
         method: 'POST',
       })
 
       const { access_token } = await token_res.json()
 
-      const userinfo_res = await fetch(`${providerUrl}/oauth2/userinfo`, {
+      const userinfo_res = await fetch(userinfo_endpoint, {
         body: new URLSearchParams({ access_token }),
         method: 'POST',
       })
@@ -310,15 +326,19 @@ export class AuthController extends Controller {
     }
 
     if (!user) {
+      throw new IncorrectPermissionsError('This email is not registered with CTRL.')
+    }
+
+    if (clientType === 'admin-client' && user.role === 'Participant') {
       throw new IncorrectPermissionsError('User does not have admin privileges')
     }
 
-    if (!user || (clientType === 'admin-client' && user.role !== 'OrganisationAdmin')) {
-      throw new IncorrectPermissionsError('User does not have admin privileges')
+    if (clientType === 'user-client' && user.role !== 'Participant') {
+      throw new IncorrectPermissionsError('User is not a study participant')
     }
 
-    const token = await generateToken({ userId: user.id, roles: [user.role] })
-    return { token }
+    const token = await generateToken({ userId: user.id })
+    return { token, id: user.id, role: user.role }
   }
 
   /**
@@ -353,7 +373,7 @@ export class AuthController extends Controller {
     }
 
     // Check client type and roles
-    if (clientType === 'admin-client' && user.role !== 'OrganisationAdmin') {
+    if (clientType === 'admin-client' && user.role == 'Participant') {
       throw new IncorrectPermissionsError('User does not have admin privileges')
     }
     if (clientType === 'user-client' && user.role !== 'Participant') {
@@ -367,11 +387,9 @@ export class AuthController extends Controller {
       })
       throw new InvalidCredentialsError('Invalid credentials provided')
     }
-    let responseData
+    let responseData: LoginResponse
 
-    const smtp = await prisma.organisation.findFirstOrThrow({})
-
-    if (config.otp && smtp.mailerHost && smtp.mailerUser) {
+    if (config.otp) {
       const zeroPad = (num: number, places: number) => String(num).padStart(places, '0')
       const code = zeroPad(randomInt(9999), 4)
       const otp = await prisma.oTPToken.create({
@@ -381,9 +399,12 @@ export class AuthController extends Controller {
           expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 mins in future
         },
       })
-      responseData = {
+      const challenge: LoginChallengeResponse = {
         otp_token: otp.id,
       }
+
+      responseData = challenge
+
       const mailToUserOptions: nodemailer.SendMailOptions = {
         from: fromAddress,
         to: user.email,
@@ -396,11 +417,12 @@ export class AuthController extends Controller {
       mailerTransporter.sendMail(mailToUserOptions)
     } else {
       await this.userRepo.update({ where: { id: user.id }, data: { retriesRemaining: 10 } })
-      const token = await generateToken({ userId: user.id, roles: [user.role] })
+      const token = await generateToken({ userId: user.id })
       responseData = {
         token,
+        id: user.id,
+        role: user.role,
       }
-      logger.info({ ...responseData })
     }
 
     return responseData
@@ -417,7 +439,7 @@ export class AuthController extends Controller {
   public async loginOtp(
     @Body() bodyRequest: OTPLoginRequest,
     @Header('x-client-type') clientType?: string,
-  ): Promise<LoginResponse> {
+  ): Promise<LoginSuccessResponse> {
     const otp = await prisma.oTPToken.findUnique({
       where: { id: bodyRequest.otp_token },
     })
@@ -453,18 +475,20 @@ export class AuthController extends Controller {
     }
 
     // Check client type and roles
-    if (clientType === 'admin-client' && user.role !== 'OrganisationAdmin') {
+    if (clientType === 'admin-client' && user.role == 'Participant') {
       throw new IncorrectPermissionsError('User does not have admin privileges')
     }
     if (clientType === 'user-client' && user.role !== 'Participant') {
       throw new IncorrectPermissionsError('User is not a participant')
     }
 
-    const token = await generateToken({ userId: user.id, roles: [user.role] })
+    const token = await generateToken({ userId: user.id })
     await this.userRepo.update({ where: { id: user.id }, data: { retriesRemaining: 10 } })
 
     const responseData = {
-      token,
+      token: token,
+      id: user.id,
+      role: user.role,
     }
 
     await prisma.oTPToken.delete({ where: { id: otp.id } })
@@ -512,7 +536,7 @@ export class AuthController extends Controller {
     user?: User,
   ): Promise<CreateParticipantResponse> {
     // Extract user and profile data
-    const { firstName, lastName, dob, ...profileData } = participantData
+    const { firstName, lastName, dob, externalId, ...profileData } = participantData
     const { nextOfKin, dependents, ...noNextOfKinProfileData } = profileData
     const nextOfKinCreateData = { nextOfKin: { create: { ...nextOfKin } } }
 
@@ -523,7 +547,7 @@ export class AuthController extends Controller {
         where: {
           firstName: dependents[0].firstName,
           lastName: dependents[0].lastName,
-          dob: new Date(dependents[0].dob),
+          dob: dependents[0].dob,
         },
       })
       if (existingDep) {
@@ -536,7 +560,7 @@ export class AuthController extends Controller {
       where: {
         firstName: firstName,
         lastName: lastName,
-        dob: new Date(dob),
+        dob: dob,
       },
     })
 
@@ -558,7 +582,7 @@ export class AuthController extends Controller {
         ...nextOfKinCreateData,
         firstName: firstName,
         lastName: lastName,
-        dob: new Date(dob),
+        dob: dob,
         familyId,
         studies: {
           create: {
@@ -573,6 +597,14 @@ export class AuthController extends Controller {
           dependents.length > 0 ? ParticipantType.GUARDIAN : ParticipantType.STANDARD,
       },
     })
+
+    if (externalId) {
+      await prisma.studyParticipant.update({
+        where: { participantProfileId_studyId: { participantProfileId: profile.id, studyId } },
+        data: { externalId },
+      })
+    }
+
     await genIndId(profile.id)
 
     //Generate unique Ids
@@ -596,7 +628,7 @@ export class AuthController extends Controller {
             ...nextOfKinCreateData,
             firstName: dep.firstName,
             lastName: dep.lastName,
-            dob: new Date(dep.dob),
+            dob: dep.dob,
             familyId: profile.familyId,
             studies: {
               create: {

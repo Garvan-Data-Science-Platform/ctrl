@@ -1,0 +1,59 @@
+[
+  {
+    "title": "CTRL introduction",
+    "text": "Watch our short video about the consent process for taking part in medical research, and how you can use this website during the study.",
+    "elements": [
+      {
+        "type": "video",
+        "data": {
+          "link": "https://www.youtube.com/embed/Du8kYb_9AKY?si=PE8IMh34NKcUUPr_"
+        }
+      }
+    ]
+  },
+  {
+    "title": "Consent for the genomic test",
+    "text": "This section follows on from your consent to have a genomic test as part of the Australian Genomics study. Your doctor or genetic counsellor will have already discussed the genomic test with you.",
+    "elements": [
+      {
+        "type": "question-checkbox",
+        "data": {
+          "text": "I agree to participate in the study.",
+          "tooltip": "This field is required",
+          "required": true
+        }
+      },
+      {
+        "type": "subheading",
+        "data": {
+          "text": "What kinds of research can they do with my de-identified samples and information?"
+        }
+      },
+      {
+        "type": "question-checkbox",
+        "data": {
+          "text": "I agree that my data may be used in other biomedical research studies.",
+          "duoCodes": [{ "code": "DUO:0000006", "relatedAnswer": true }]
+        }
+      },
+      {
+        "type": "question-choices",
+        "data": {
+          "text": "My data can be used for research into:",
+          "choices": ["Musculoskeletal diseases only", "Any biomedical research"],
+          "value": "Any biomedical research",
+          "duoCodes": [
+            { "code": "SNOMED:363212003", "relatedAnswer": "Musculoskeletal diseases only" }
+          ]
+        }
+      },
+      {
+        "type": "question-checkbox",
+        "data": {
+          "text": "Use of my data must be for non-commercial research purposes",
+          "duoCodes": [{ "code": "DUO:0000046", "relatedAnswer": true }]
+        }
+      }
+    ]
+  }
+]

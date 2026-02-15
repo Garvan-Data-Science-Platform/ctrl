@@ -27,12 +27,11 @@ let token: string, tokenNoAnswers: string, tokenAdmin: string
 
 describe('SurveysController', () => {
   beforeAll(async () => {
-    token = await generateToken({ userId: PARTICIPANT_COMPLETED_ID, roles: ['Participant'] })
+    token = await generateToken({ userId: PARTICIPANT_COMPLETED_ID })
     tokenNoAnswers = await generateToken({
       userId: PARTICIPANT_UNANSWERED_ID,
-      roles: ['Participant'],
     })
-    tokenAdmin = await generateToken({ userId: ORG_ADMIN_ID, roles: ['OrganisationAdmin'] })
+    tokenAdmin = await generateToken({ userId: ORG_ADMIN_ID })
     api.run()
   })
 
@@ -185,7 +184,6 @@ describe('SurveysController', () => {
     it('participant should inherit answers from both guardians correctly', async () => {
       const secondGuardianToken = generateToken({
         userId: SECOND_GUARDIAN_ID,
-        roles: ['Participant'],
       })
 
       const reqBody: UpdateSurveyAnswersRequest = {
@@ -298,7 +296,7 @@ describe('SurveysController', () => {
     it('should fail to publish an invalid survey', async () => {
       await prisma.surveyVersion.update({
         where: {
-          id: 2,
+          id: 1,
           studyId: 1,
         },
         data: {

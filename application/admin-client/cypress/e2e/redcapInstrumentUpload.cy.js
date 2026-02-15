@@ -1,10 +1,10 @@
 /// <reference types="cypress" />
 
-const { UserType } = require('../support/commands')
+const { UserType } = require('../../../common/cypress/support/commands')
 
 beforeEach(() => {
   cy.task('reset')
-  cy.login(UserType.ADMIN)
+  cy.login(UserType.ORG_ADMIN)
   cy.visit('/integrations')
   cy.contains('Import Survey').should('exist').click()
 })
@@ -14,7 +14,8 @@ describe('REDCap Survey Upload', () => {
     it('should display REDCap logo', () => {
       cy.get('img[alt="REDCap Logo"]')
         .should('be.visible')
-        .should('have.attr', 'src', '/redcap.png')
+        .should('have.attr', 'src')
+        .and('match', /redcap-logo-(light|dark)\.png/)
     })
 
     it('should display both import sections', () => {

@@ -1,4 +1,4 @@
-import { useInvalidate, useNotification } from '@refinedev/core'
+import { useGetIdentity, useInvalidate, useNotification } from '@refinedev/core'
 import { List, useDataGrid } from '@refinedev/mui'
 import { Box, IconButton, Tooltip } from '@mui/material'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
@@ -11,6 +11,7 @@ const RestorePage = () => {
   const invalidate = useInvalidate()
   const { open } = useNotification()
   const queryClient = useQueryClient()
+  const { data: identity } = useGetIdentity<{ role: string; id: number }>()
 
   const restore = async (resource: string, endpoint: string) => {
     try {
@@ -202,25 +203,33 @@ const RestorePage = () => {
           slotProps={{ root: { 'data-cy': 'participants-list' } }}
         />
       </List>
-      <Box sx={{ mt: 1 }} />
-      <List headerProps={{ title: 'Deleted Studies' }} breadcrumb={false}>
-        <DataGrid
-          {...studiesDataGridProps}
-          columns={studiesColumns}
-          autoHeight
-          slotProps={{ root: { 'data-cy': 'studies-list' } }}
-        />
-      </List>
-      <Box sx={{ mt: 1 }} />
-      <List headerProps={{ title: 'Deleted Admin Users' }} breadcrumb={false}>
-        <DataGrid
-          {...usersDataGridProps}
-          columns={usersColumns}
-          autoHeight
-          slotProps={{ root: { 'data-cy': 'studies-list' } }}
-        />
-      </List>
-    </Box>
+      {(identity?.role === 'OrganisationAdmin' || identity?.role === 'StudyAdmin') && (
+        <>
+          <Box sx={{ mt: 1 }} />
+          <List headerProps={{ title: 'Deleted Studies' }} breadcrumb={false}>
+            <DataGrid
+              {...studiesDataGridProps}
+              columns={studiesColumns}
+              autoHeight
+              slotProps={{ root: { 'data-cy': 'studies-list' } }}
+            />
+          </List>
+        </>
+      )}
+      {identity?.role === 'OrganisationAdmin' && (
+        <>
+          <Box sx={{ mt: 1 }} />
+          <List headerProps={{ title: 'Deleted Admin Users' }} breadcrumb={false}>
+            <DataGrid
+              {...usersDataGridProps}
+              columns={usersColumns}
+              autoHeight
+              slotProps={{ root: { 'data-cy': 'studies-list' } }}
+            />
+          </List>
+        </>
+      )}
+    </Box >
   )
 }
 

@@ -13,8 +13,9 @@ spec:
       app: BACKEND
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
+        reloader.stakater.com/auto: "true"
+      {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
@@ -85,8 +86,8 @@ spec:
       
       volumes:
       - name: config
-        configMap:
-          name: ctrl-config
+        secret:
+          secretName: ctrl-config
           items:
           - key: "valuesconfig.json5"
             path: "values.json5"

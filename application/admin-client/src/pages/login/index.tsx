@@ -21,7 +21,7 @@ export const Login = () => {
         if (!data.isSetup) {
           nav('/setup')
         } else {
-          authStore.setProviders(data.oidc)
+          authStore.setProviders(data.oidc.filter((val) => val.displayInAdminPortal))
           authStore.setPasswordLoginDisabled(data.disableAdminPasswordLogin)
         }
       })
@@ -39,6 +39,13 @@ export const Login = () => {
             <Link href="#"> Forgot Password </Link>
           </Tooltip>
         }
+        formProps={{
+          defaultValues: {
+            email: '',
+            password: '',
+            loginType: 'Password',
+          },
+        }}
         hideForm={authStore.passwordLoginDisabled}
         providers={authStore.providers.map((provider) => ({
           name: provider.name,

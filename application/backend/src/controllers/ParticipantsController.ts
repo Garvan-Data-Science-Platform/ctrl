@@ -13,6 +13,7 @@ import type {
   GetParticipantsResponse,
   InviteParticipantsRequest,
   InviteParticipantsResponse,
+  UpdateParticipantRequest,
   GetDeletedParticipantsResponse,
 } from 'common/types/api/participants'
 import logger from 'common/src/logger'
@@ -30,8 +31,8 @@ import {
   Middlewares,
   Request,
   Delete,
-  Queries,
   Patch,
+  NoSecurity,
 } from 'tsoa'
 import { Participant } from 'common/types/api/participants/participant'
 import { createMailerTransporter, fromAddress } from '../utils/mailer'
@@ -48,13 +49,14 @@ import {
 import { ProfilesController } from './ProfilesController'
 import { auditLog } from '../middlewares/AuditLog'
 import { Role } from '@prisma/client'
-import { v4 as uuidv4 } from 'uuid'
 import { genId } from '../utils/genId'
-import { extractOrderBy, extractWhere } from '../utils/filtering'
+import { generateInviteId, inviteExpiresAt } from '../utils/invite'
+import { Prefill } from 'common/types/invite'
+import type { RequestWithAuthentication } from '../authentication'
 
 @Route('/')
 @Tags('Participants')
-@Security('jwt', ['OrganisationAdmin'])
+@Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 @Response<InternalErrorResponse>('422', 'Unprocessable Content')
@@ -71,16 +73,9 @@ export class ParticipantsController extends Controller {
    * @summary List participants
    */
   @Get('studies/{studyId}/participants')
-  public async getParticipants(
-    @Path() studyId: number,
-    @Queries() queryParams: { [key: string]: any },
-  ): Promise<GetParticipantsResponse> {
-    const total = await prisma.studyParticipant.count({
-      where: { studyId, participantProfile: extractWhere(queryParams) },
-    })
-
+  public async getParticipants(@Path() studyId: number): Promise<GetParticipantsResponse> {
     const participant_list = await prisma.studyParticipant.findMany({
-      where: { studyId, participantProfile: extractWhere(queryParams) },
+      where: { studyId },
       select: {
         participantProfile: {
           select: {
@@ -92,11 +87,11 @@ export class ParticipantsController extends Controller {
           },
         },
         participantId: true,
+        externalId: true,
       },
-      orderBy: extractOrderBy(queryParams),
-      skip: queryParams._start ? Number(queryParams._start) : undefined,
-      take: queryParams._end ? Number(queryParams._end) - Number(queryParams._start) : undefined,
     })
+
+    const total = participant_list.length
 
     const participants: GetParticipantsResponse['data'] = []
 
@@ -127,6 +122,7 @@ export class ParticipantsController extends Controller {
         email: profile.user?.email,
         firstName: profile.firstName,
         lastName: profile.lastName,
+        externalId: p.externalId || undefined,
         lastUpdated: lastUpdated ? new Date(lastUpdated).toISOString() : undefined,
         familyId: profile.familyId,
         answers: p_answers.map((val) => ({
@@ -147,9 +143,11 @@ export class ParticipantsController extends Controller {
    * @summary List deleted participants
    */
   @Get('participants/deleted')
-  public async getDeletedParticipants(): Promise<GetDeletedParticipantsResponse> {
+  public async getDeletedParticipants(
+    @Request() request: RequestWithAuthentication,
+  ): Promise<GetDeletedParticipantsResponse> {
     const participants = await this.participantRepo.findMany({
-      where: { deleted: true },
+      where: { deleted: true, study: { id: { in: request.user.studies } } },
       select: {
         participantId: true,
         participantProfile: { select: { firstName: true, lastName: true, dob: true, id: true } },
@@ -217,6 +215,7 @@ export class ParticipantsController extends Controller {
   @Get('studies/{studyId}/participants/{profileId}/')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async getParticipantById(
+    @Request() request: RequestWithAuthentication,
     @Path() studyId: number,
     @Path() profileId: number,
   ): Promise<GetParticipantResponse> {
@@ -231,7 +230,10 @@ export class ParticipantsController extends Controller {
       },
     })
 
-    const profileDataResponse = await new ProfilesController().getParticipantProfileByID(profileId)
+    const profileDataResponse = await new ProfilesController().getParticipantProfileByID(
+      profileId,
+      request,
+    )
     const profileData = profileDataResponse.data
 
     const p_answers = await this.svaRepo.findMany({
@@ -252,6 +254,7 @@ export class ParticipantsController extends Controller {
       data: {
         id: profileId,
         participantId: sp.participantId || '',
+        externalId: sp.externalId ?? undefined,
         profile: profileData,
         firstName: profile.firstName,
         lastName: profile.lastName,
@@ -263,6 +266,25 @@ export class ParticipantsController extends Controller {
           status: determineStatus(val.answers, new Date(val.version.updatedAt)),
         })),
       },
+    }
+  }
+
+  @Patch('studies/{studyId}/participants/{profileId}')
+  @Response<ValidateErrorResponse>('422', 'Validation Failed')
+  @Security('jwt', ['OrganisationAdmin'])
+  public async updateProfileById(
+    @Request() request: RequestWithAuthentication,
+    @Path() studyId: number,
+    @Path() profileId: number,
+    @Body() bodyRequest: UpdateParticipantRequest,
+  ) {
+    const { profile, ...participant } = bodyRequest
+    await new ProfilesController().updateProfileById(request, profileId, profile)
+    if (participant) {
+      await this.participantRepo.update({
+        where: { participantProfileId_studyId: { participantProfileId: profileId, studyId } },
+        data: participant,
+      })
     }
   }
 
@@ -307,6 +329,8 @@ export class ParticipantsController extends Controller {
         },
       },
     })
+
+    await recalculateAnswers(profile.familyId, studyId)
   }
 
   /**
@@ -392,7 +416,7 @@ export class ParticipantsController extends Controller {
 
 @Route('/')
 @Tags('Invites')
-@Security('jwt', ['OrganisationAdmin'])
+@Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
 export class InvitesController extends Controller {
@@ -513,6 +537,10 @@ export class InvitesController extends Controller {
         id: inviteId,
       },
     })
+
+    // Parse Prefill data
+    const invitePrefill: Prefill = JSON.parse(invite?.prefill || '{}')
+
     if (!invite || invite.status !== InviteStatus.PENDING) {
       throw new NotFoundError(`Pending invite not found`)
     }
@@ -561,6 +589,18 @@ export class InvitesController extends Controller {
         },
       },
     })
+
+    if (invitePrefill.studyParticipant) {
+      await prisma.studyParticipant.update({
+        where: {
+          participantProfileId_studyId: {
+            participantProfileId: existingProfile.id,
+            studyId: invite.studyId,
+          },
+        },
+        data: invitePrefill.studyParticipant,
+      })
+    }
 
     await genId(invite.studyId, existingProfile.id)
 
@@ -649,8 +689,10 @@ export class InvitesController extends Controller {
       data: { inviteEmailSubject: subjectText, inviteEmailText: explanatoryText },
     })
 
-    const emails = [...new Set(bodyRequest.emails)]
-    const expiresAt = new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000) // TODO: MAKE EXPIRY CONFIGURABLE
+    const recipients = [...new Set(bodyRequest.recipients)]
+    const emails = recipients.map((val) => val.email)
+
+    const expiresAt = inviteExpiresAt()
 
     // Fetch existing invites
     let existingInvites = await this.invitesRepo.findMany({
@@ -662,13 +704,13 @@ export class InvitesController extends Controller {
     //Has to be done by backend server due to encryption
     existingInvites = existingInvites.filter((invite) => emails.includes(invite.email))
 
-    const newEmails = emails.filter(
-      (email) => !existingInvites.map((invite) => invite.email).includes(email),
+    const newRecipients = recipients.filter(
+      (r) => !existingInvites.map((invite) => invite.email).includes(r.email),
     )
 
     const responseData = {
       resendEmailRequestCount: emails.length,
-      newInvitesCount: newEmails.length,
+      newInvitesCount: newRecipients.length,
       emailsResentCount: 0, // this gets assigned below
       alreadyAcceptedCount: 0, // this gets assigned below
       failedEmailsCount: 0, // this gets assigned below
@@ -730,33 +772,30 @@ export class InvitesController extends Controller {
     }
 
     // Create new invites
-    if (newEmails.length > 0) {
+    if (newRecipients.length > 0) {
       const inviteResults = await Promise.all(
-        newEmails.map(async (email) => {
-          const inviteId: string = uuidv4()
-          const success = await this.sendInvite(email, studyId, inviteId)
+        newRecipients.map(async (r) => {
+          const inviteId: string = generateInviteId()
+          const success = await this.sendInvite(r.email, studyId, inviteId)
           if (!success) {
-            logger.error(`Failed to send email to ${email}`)
-            failedEmails.push(email)
+            logger.error(`Failed to send email to ${r.email}`)
+            failedEmails.push(r.email)
           }
-          return { email, id: inviteId, success }
+          return { recipient: r, id: inviteId, success }
         }),
       )
 
-      const successfulInvites = inviteResults
-        .filter((invite) => invite.success)
-        .map((invite) => ({ emailString: invite.email, id: invite.id }))
+      const successfulInvites = inviteResults.filter((invite) => invite.success)
 
-      const newFailedInvites = inviteResults
-        .filter((invite) => !invite.success)
-        .map((invite) => ({ emailString: invite.email, id: invite.id }))
+      const newFailedInvites = inviteResults.filter((invite) => !invite.success)
 
       // Create invites with appropriate status
       await this.invitesRepo.createMany({
         data: [
           ...successfulInvites.map((invite) => ({
             id: invite.id,
-            email: invite.emailString,
+            email: invite.recipient.email,
+            prefill: JSON.stringify(invite.recipient.prefill),
             studyId,
             expiresAt,
             sentAt: new Date(),
@@ -764,7 +803,8 @@ export class InvitesController extends Controller {
           })),
           ...newFailedInvites.map((invite) => ({
             id: invite.id,
-            email: invite.emailString,
+            email: invite.recipient.email,
+            prefill: JSON.stringify(invite.recipient.prefill),
             studyId,
             expiresAt,
             status: InviteStatus.FAILED_TO_SEND,
@@ -935,7 +975,6 @@ export class InvitesController extends Controller {
    *
    * @summary Get invite email subject and text
    */
-  //TODO: make invite register link include inviteId uuid string
   @Get('/studies/{studyId}/invites/text')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async getInviteText(@Path() studyId: number): Promise<GetInviteTextResponse> {
@@ -947,7 +986,21 @@ export class InvitesController extends Controller {
     return inviteText
   }
 
-  //TODO: make registerLink include inviteId uuid string
+  /**
+   * Get invite prefill data by ID
+   *
+   * @summary Get invite prefill data by ID
+   */
+  @NoSecurity()
+  @Get('/invites/{inviteId}/prefill')
+  public async getPrefillDataById(inviteId: string) {
+    const prefillData = await this.invitesRepo.findUniqueOrThrow({
+      where: { id: inviteId },
+      select: { prefill: true },
+    })
+    return JSON.parse(prefillData.prefill || '{}')
+  }
+
   private async sendInvite(email: string, studyId: number, inviteId: string): Promise<boolean> {
     try {
       const registerLink = `${process.env.HOSTNAME}/register/${inviteId}`

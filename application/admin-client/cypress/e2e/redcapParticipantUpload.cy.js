@@ -1,10 +1,10 @@
 /// <reference types="cypress" />
 
-const { UserType } = require('../support/commands')
+const { UserType } = require('../../../common/cypress/support/commands')
 
 beforeEach(() => {
   cy.task('reset')
-  cy.login(UserType.ADMIN)
+  cy.login(UserType.ORG_ADMIN)
   cy.visit('/integrations')
   cy.contains('Import Participants').should('exist').click()
 })
@@ -14,7 +14,8 @@ describe('REDCap Participant Upload', () => {
     it('should display REDCap logo', () => {
       cy.get('img[alt="REDCap Logo"]')
         .should('be.visible')
-        .should('have.attr', 'src', '/redcap.png')
+        .should('have.attr', 'src')
+        .and('match', /redcap-logo-(light|dark)\.png/)
     })
 
     it('should display both import sections', () => {
@@ -28,21 +29,6 @@ describe('REDCap Participant Upload', () => {
     })
 
     it('should handle file upload', () => {
-      const fileName0 = 'test_participant0.csv'
-      cy.get('Confirm').should('not.exist')
-      cy.get('[data-cy="participantAttach"]').attachFile(fileName0)
-      cy.get('Confirm').should('not.exist')
-      cy.contains(fileName0).should('be.visible')
-
-      //
-      const fileName1 = 'test_instrument1.csv'
-      cy.get('[data-cy="participantAttach"]').attachFile(fileName1)
-      cy.get('Confirm').should('not.exist')
-      cy.contains(fileName1).should('be.visible')
-    })
-
-    it('should handle successful file upload submission', () => {
-      // Check current draft metadata
       let initialInvites
       let updatedInvites
       cy.request({
@@ -57,16 +43,25 @@ describe('REDCap Participant Upload', () => {
         cy.wrap(initialInvites).as('initialInvites')
       })
 
-      const fileName = 'test_participant0.csv'
-      cy.get('[data-cy="participantAttach"]').attachFile(fileName)
+      const fileName0 = 'test_participant0.csv'
+      cy.get('Confirm').should('not.exist')
+      cy.get('[data-cy="upload-button"]').click()
+      cy.get('input[type="file"]').attachFile(fileName0)
+      cy.contains('Select header row').should('exist')
+      cy.contains('Next').click()
+      cy.contains('Next').click()
+      cy.contains('Confirm').click()
+      cy.contains('Errors detected').should('be.visible')
+      cy.contains('Cancel').click()
+      cy.contains('Cancel').should('not.exist')
+      cy.get('input[type="checkbox"]').eq(7).check({ force: true })
+      cy.get('input[type="checkbox"]').eq(8).check({ force: true })
+      cy.contains('Discard').click()
+      cy.contains('Confirm').click()
 
-      // Click the initial confirm button
-      cy.contains('button', 'Confirm').click()
-
-      cy.url({ timeout: 10000 }).should('include', '/participants/')
-
-      // Check that the invite modal is opened and it has the correct emails
-      cy.get('[data-cy="invite-modal"]').should('be.visible')
+      cy.url().should('include', 'participants')
+      cy.get('[data-cy="prefill-details"]').first().trigger('mouseover')
+      cy.contains('1/1/2001').should('be.visible')
 
       const expectedEmailsInModal = [
         'peter@louka.com',
@@ -87,7 +82,7 @@ describe('REDCap Participant Upload', () => {
       })
 
       cy.get('[data-cy="send-button"]').should('be.visible').click()
-      cy.wait(10000)
+      cy.contains('Invites sent').should('exist')
 
       // Check updated invites
       cy.request({
@@ -115,6 +110,64 @@ describe('REDCap Participant Upload', () => {
     })
 
     it('should handle successful API import', () => {
+      const redcapInterceptBody = {
+        newParticipants: [
+          {
+            email: 'first@example.com',
+            prefill: {
+              profile: {
+                firstName: 'Peter',
+                lastName: 'Louka',
+                mobile: '0426397897',
+                preferredContact: 'EMAIL',
+                addressLine: 'test address',
+                suburb: 'suburb',
+                postcode: '2088',
+                state: 'NSW',
+                dob: '07/13/2000',
+                participantType: 'STANDARD',
+                nextOfKin: {
+                  firstName: 'fake',
+                  lastName: 'fakerson',
+                  email: 'example2@example.com',
+                  mobile: '0448434946',
+                },
+              },
+              studyParticipant: { externalId: '1' },
+            },
+          },
+          {
+            email: 'example@example.com',
+            prefill: {
+              profile: {
+                firstName: 'John',
+                lastName: 'Smith',
+                mobile: '0448434946',
+                preferredContact: 'EMAIL',
+                addressLine: '2 fake st',
+                suburb: 'fakie',
+                postcode: '2010',
+                state: 'ACT',
+                dob: '01/10/1984',
+                participantType: 'STANDARD',
+                nextOfKin: {
+                  firstName: 'fake',
+                  lastName: 'fakerson',
+                  email: 'example2@example.com',
+                  mobile: '0448434946',
+                },
+              },
+              studyParticipant: { externalId: '4' },
+            },
+          },
+          {
+            email: 'new@email.com',
+            prefill: {},
+          },
+        ],
+        existingUsers: [],
+      }
+
       // Check current draft metadata
       let initialInvites
       let updatedInvites
@@ -134,12 +187,7 @@ describe('REDCap Participant Upload', () => {
 
       cy.intercept('POST', '**/integrations/redcap/participant/upload/api', {
         statusCode: 200,
-        body: {
-          profilesCreatedCount: 3,
-          profilesAlreadyExistedCount: 0,
-          ids: [],
-          newInvites: ['first@example.com', 'example@example.com', 'new@email.com'],
-        },
+        body: redcapInterceptBody,
       })
 
       cy.contains('button', 'Import from API').click()

@@ -101,6 +101,7 @@ export const AllResponsesView = () => {
           field: 'versionId',
           headerName: 'Survey Version',
           minWidth: 100,
+          valueGetter: () => id,
         },
         ...(questions || []).map((val, idx) => {
           return {

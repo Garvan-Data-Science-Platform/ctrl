@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-const { UserType } = require('../support/commands')
+const { UserType } = require('../../../common/cypress/support/commands')
 
 beforeEach(() => {
   cy.task('reset')
@@ -15,7 +15,7 @@ describe('auth', () => {
 
   it('can login as admin to the admin portal', () => {
     cy.visit('/')
-    cy.get('input[name="email"]').type(UserType.ADMIN)
+    cy.get('input[name="email"]').type(UserType.ORG_ADMIN)
     cy.get('input[name="password"]').type('Testpassword1')
     cy.get('button[type="submit"]').click()
     cy.url().should('include', '/surveys') // Redirects to /surveys after login
@@ -41,12 +41,16 @@ describe('auth', () => {
           host: 'https://test.cilogon.aaf.edu.au',
           clientId: 'cilogon:/client_id/19130a96af2ad9eb0d22a6c253a3d2aa',
           icon: 'https://aaf.edu.au/wp-content/uploads/AAF_LGO_small-website.png',
+          displayInAdminPortal: true,
+          displayInUserPortal: true,
         },
       ],
       disableAdminPasswordLogin: true,
     })
     cy.intercept('**/oidc', {
       token: 'dummy_token',
+      id: 1,
+      role: 'Participant',
     })
     cy.intercept('**/studies').as('studyReq')
     cy.visit('/')
@@ -55,6 +59,45 @@ describe('auth', () => {
     cy.visit('/login/callback?code=123&state=aaf')
     cy.wait('@studyReq').then((int) => {
       expect(int.request.headers['authorization']).equal('Bearer dummy_token')
+    })
+  })
+
+  it('persists user role after oidc login', () => {
+    let TOKEN = 'dummy_oidc_token'
+    let ROLE = 'OrganisationAdmin'
+    let ID = '5'
+
+    cy.intercept('*/setup', {
+      isSetup: true,
+      oidc: [
+        {
+          name: 'aaf',
+          host: 'https://test.cilogon.aaf.edu.au',
+          clientId: 'cilogon:/client_id/19130a96af2ad9eb0d22a6c253a3d2aa',
+          icon: 'https://aaf.edu.au/wp-content/uploads/AAF_LGO_small-website.png',
+          displayInAdminPortal: true,
+          displayInUserPortal: true,
+        },
+      ],
+      disableAdminPasswordLogin: true,
+    })
+
+    // Mock the OIDC exchange to return role alongside token
+    cy.intercept('**/oidc', {
+      token: TOKEN,
+      role: ROLE,
+      id: ID,
+    }).as('oidcTokenExchange')
+
+    cy.visit('/login/callback?code=123&state=aaf')
+
+    cy.wait('@oidcTokenExchange')
+
+    // Assert that the Role made it into LocalStorage
+    cy.window().then((window) => {
+      expect(window.localStorage.getItem('refine-auth')).to.eq(TOKEN)
+      expect(window.localStorage.getItem('userrole')).to.eq(ROLE)
+      expect(window.localStorage.getItem('userid')).to.eq(ID)
     })
   })
 })

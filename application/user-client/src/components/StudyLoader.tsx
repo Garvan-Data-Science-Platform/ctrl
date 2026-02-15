@@ -36,13 +36,19 @@ export const StudyLoader: React.FC<PropsWithChildren> = ({ children }) => {
   }, [data])
 
   useEffect(() => {
-    if (prevStudiesRef.current.length > 0 && studies.length > prevStudiesRef.current.length) {
+    if (
+      prevStudiesRef.current.length > 0 &&
+      studies !== null &&
+      studies.length > prevStudiesRef.current.length
+    ) {
       //A new study was added after old studies already loaded
       const old_ids = prevStudiesRef.current.map((v: any) => v.id)
       const newStudyIdx = studies.findIndex((s) => !old_ids.includes(s.id))
       setActiveStudyIndex(newStudyIdx)
     }
-    prevStudiesRef.current = studies
+    if (studies !== null) {
+      prevStudiesRef.current = studies
+    }
   }, [studies])
 
   useEffect(() => {
@@ -60,12 +66,13 @@ export const StudyLoader: React.FC<PropsWithChildren> = ({ children }) => {
     )
   }
   const hasValidActiveStudy =
+    studies !== null &&
     studies.length > 0 &&
     activeStudyIndex >= 0 &&
     activeStudyIndex < studies.length &&
     studies[activeStudyIndex]
 
-  if (studies && studies.length < 1) {
+  if (studies !== null && studies.length < 1) {
     return (
       <>
         <NavBar disabled />

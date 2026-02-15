@@ -24,6 +24,7 @@ export function mapToParticipantRequest(
     lastName: getField('lastName'),
     email: getField('email'),
     mobile: getField('mobile'),
+    externalId: getField('externalId'),
     preferredContact: Object.values(ContactMethod)[Number(getField('preferredContact'))], // potential indexing error
     addressLine: getField('addressLine'),
     suburb: getField('suburb'),

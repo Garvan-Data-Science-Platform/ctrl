@@ -2,8 +2,9 @@ import request from 'supertest'
 import { Api } from '../Api'
 import type {
   LoginRequest,
-  LoginResponse,
+  LoginSuccessResponse,
   OIDCLoginRequest,
+  OTPLoginRequest,
   RegisterParticipantRequest,
   RegisterParticipantResponse,
   RegisterRequest,
@@ -13,6 +14,9 @@ import prisma from '../PrismaClient'
 import { Role } from '@prisma/client'
 import { resetDB, wipeDB } from 'common/testing/TestHelpers'
 import {
+  ORG_ADMIN_EMAIL,
+  ORG_ADMIN_PASSWORD,
+  ORG_ADMIN_ID,
   PARTICIPANT_UNANSWERED_EMAIL,
   PARTICIPANT_UNANSWERED_ID,
   TEST_STUDY,
@@ -26,7 +30,6 @@ import { generateToken } from '../authentication'
 import fetchMock from 'fetch-mock'
 jest.mock('../config')
 import config from '../config'
-import { OTPLoginRequest } from 'common/types/api/auth/login'
 
 const api = new Api()
 const app = api.app
@@ -35,8 +38,7 @@ let orgAdminToken: string
 describe('AuthController', () => {
   beforeAll(async () => {
     orgAdminToken = await generateToken({
-      userId: 555,
-      roles: ['OrganisationAdmin'],
+      userId: ORG_ADMIN_ID,
     })
     api.run()
   })
@@ -475,6 +477,25 @@ describe('AuthController', () => {
       if (response.status != 201) throw Error('Could not register user!')
     })
 
+    it('should return token, id, and role on standard login (OTP disabled)', async () => {
+      jest.replaceProperty(config, 'otp', false)
+
+      const loginRequest: LoginRequest = {
+        email: ORG_ADMIN_EMAIL,
+        password: ORG_ADMIN_PASSWORD,
+      }
+
+      const loginResponse = await request(app).post('/auth/login').send(loginRequest)
+      expect(loginResponse.status).toEqual(200)
+
+      const loginBody = loginResponse.body as LoginSuccessResponse
+      expect(loginBody.token).toBeDefined()
+
+      expect(loginBody.id).toBe(ORG_ADMIN_ID)
+      expect(loginBody.role).toBe(Role.OrganisationAdmin)
+      expect(loginBody).not.toHaveProperty('otp_token')
+    })
+
     it('should allow access to protected routes', async () => {
       // Try to make a protected route request
       const protectedRouteResponse1 = await request(app).get('/users')
@@ -493,7 +514,7 @@ describe('AuthController', () => {
       const loginResponse = await request(app).post('/auth/login').send(loginRequest)
       expect(loginResponse.status).toEqual(200)
 
-      const loginBody: LoginResponse = loginResponse.body
+      const loginBody = loginResponse.body as LoginSuccessResponse
       expect(loginBody.token).not.toBeNull()
 
       // Add token to protected route request
@@ -571,6 +592,7 @@ describe('AuthController', () => {
       }
       const loginResponse = await request(app).post('/auth/login').send(loginRequest)
       expect(loginResponse.ok).toBe(true)
+
       expect(loginResponse.body.otp_token).toBeDefined()
     })
     it('Should lock access for 10 mins if retries exceeded', async () => {
@@ -630,7 +652,7 @@ describe('AuthController', () => {
         },
       })
     })
-    it('Should allow login if otp is valid', async () => {
+    it('Should allow login if otp is valid and return id and role', async () => {
       const loginRequest: OTPLoginRequest = {
         otp_code: '1223',
         otp_token: 'abc123',
@@ -638,6 +660,8 @@ describe('AuthController', () => {
       const loginResponse = await request(app).post('/auth/login/otp').send(loginRequest)
       expect(loginResponse.ok).toBe(true)
       expect(loginResponse.body.token).toBeDefined()
+      expect(loginResponse.body.id).toBe(PARTICIPANT_UNANSWERED_ID)
+      expect(loginResponse.body.role).toBe(Role.Participant)
     })
     it('Should decrement available retries if code is invalid', async () => {
       const loginRequest: OTPLoginRequest = {
@@ -690,9 +714,13 @@ describe('AuthController', () => {
         ],
       })
     })
-    it('Should allow oidc login', async () => {
-      fetchMock.mockGlobal().route('http://testurl/oauth2/token', { access_token: '123' })
-      fetchMock.mockGlobal().route('http://testurl/oauth2/userinfo', {
+    it('Should allow oidc login and return id and role', async () => {
+      fetchMock.mockGlobal().route('http://testurl/.well-known/openid-configuration', {
+        token_endpoint: 'http://token',
+        userinfo_endpoint: 'http://userinfo',
+      })
+      fetchMock.mockGlobal().route('http://token', { access_token: '123' })
+      fetchMock.mockGlobal().route('http://userinfo', {
         email: 'admin@example.com',
       })
 
@@ -704,12 +732,18 @@ describe('AuthController', () => {
 
       const response = await request(app).post('/auth/login/oidc').send(loginRequest)
       expect(response.status).toEqual(200)
-      expect(response.body)
+      expect(response.body.token).toBeDefined()
+      expect(response.body.role).toBe(Role.OrganisationAdmin)
+      expect(response.body.id).toBe(ORG_ADMIN_ID)
     })
 
     it('Should allow oidc login', async () => {
-      fetchMock.mockGlobal().route('http://testurl/oauth2/token', { access_token: '123' })
-      fetchMock.mockGlobal().route('http://testurl/oauth2/userinfo', {
+      fetchMock.mockGlobal().route('http://testurl/.well-known/openid-configuration', {
+        token_endpoint: 'http://token',
+        userinfo_endpoint: 'http://userinfo',
+      })
+      fetchMock.mockGlobal().route('http://token', { access_token: '123' })
+      fetchMock.mockGlobal().route('http://userinfo', {
         email: 'admin@example.com',
       })
 
@@ -724,8 +758,12 @@ describe('AuthController', () => {
     })
 
     it('Should fail on nonexisting provider', async () => {
-      fetchMock.mockGlobal().route('http://testurl/oauth2/token', { access_token: '123' })
-      fetchMock.mockGlobal().route('http://testurl/oauth2/userinfo', {
+      fetchMock.mockGlobal().route('http://testurl/.well-known/openid-configuration', {
+        token_endpoint: 'http://token',
+        userinfo_endpoint: 'http://userinfo',
+      })
+      fetchMock.mockGlobal().route('http://token', { access_token: '123' })
+      fetchMock.mockGlobal().route('http://userinfo', {
         email: 'admin@example.com',
       })
 
@@ -741,8 +779,12 @@ describe('AuthController', () => {
 
     it('Should enforce permissions', async () => {
       fetchMock.removeRoutes()
-      fetchMock.mockGlobal().route('http://testurl/oauth2/token', { access_token: '123' })
-      fetchMock.mockGlobal().route('http://testurl/oauth2/userinfo', {
+      fetchMock.mockGlobal().route('http://testurl/.well-known/openid-configuration', {
+        token_endpoint: 'http://token',
+        userinfo_endpoint: 'http://userinfo',
+      })
+      fetchMock.mockGlobal().route('http://token', { access_token: '123' })
+      fetchMock.mockGlobal().route('http://userinfo', {
         email: PARTICIPANT_UNANSWERED_EMAIL,
       })
 

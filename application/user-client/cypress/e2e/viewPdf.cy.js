@@ -4,10 +4,8 @@ beforeEach(() => {
   cy.task('reset')
 })
 
-const { UserType } = require('../support/commands')
+const { TestUsers } = require('../../../common/testing/constants.ts')
 const downloadsPath = 'cypress/downloads/'
-
-// TODO: Add logo tests
 
 // Note: the tests below make heavy use of environment variables
 //   specified in `application/user-client/cypress.config.ts`.
@@ -19,6 +17,14 @@ const feStudyName = Cypress.env('FE_TEST_STUDY')
 const feStudyId = Cypress.env('FE_TEST_STUDY_ID')
 
 describe('viewPdf', () => {
+  let hashes
+
+  before(() => {
+    cy.readFile('../common/testing/fixtures/logo_hashes.json').then(
+      (hash_data) => (hashes = hash_data),
+    )
+  })
+
   function assertPdfContains(studyId, text_string) {
     // Function to:
     //  - click 'View responses' button,
@@ -78,7 +84,7 @@ describe('viewPdf', () => {
   }
 
   it('If unanswered, PDF shows "not answered"', () => {
-    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
     cy.visit('/')
     cy.contains('Intro').should('exist')
     // Check UI to ensure it matches expectations
@@ -87,7 +93,7 @@ describe('viewPdf', () => {
   })
 
   it('If answered, PDF shows correct answer', () => {
-    cy.login(UserType.PARTICIPANT_COMPLETED)
+    cy.login(TestUsers.PARTICIPANT_COMPLETED.email)
     cy.visit('/')
     cy.contains('Intro').should('exist')
     // Check UI to ensure it matches expectations
@@ -96,7 +102,7 @@ describe('viewPdf', () => {
   })
 
   it('checks answers, changes them and checks updated answers are updated in PDF', () => {
-    cy.login(UserType.PARTICIPANT_COMPLETED)
+    cy.login(TestUsers.PARTICIPANT_COMPLETED.email)
     cy.visit('/')
     cy.contains('Intro').should('exist')
     // Check UI to ensure it matches expectations
@@ -124,7 +130,7 @@ describe('viewPdf', () => {
   })
 
   it('should display error when PDF generation fails', () => {
-    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
     cy.visit('/')
 
     // Mock the API response to return an error
@@ -140,7 +146,7 @@ describe('viewPdf', () => {
   })
 
   it('PDF text contains study name', () => {
-    cy.login(UserType.PARTICIPANT_COMPLETED)
+    cy.login(TestUsers.PARTICIPANT_COMPLETED.email)
     cy.visit('/')
     cy.contains('Intro').should('exist')
     // Check UI to ensure it matches expectations
@@ -148,7 +154,7 @@ describe('viewPdf', () => {
     assertPdfContains(studyId, studyName)
 
     // changing study results in different study name
-    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
     cy.visit('/')
     cy.get('[data-cy="change-study"]').click()
     cy.contains('Study FE').click()
@@ -157,7 +163,7 @@ describe('viewPdf', () => {
   })
 
   it('PDF file name contains study name', () => {
-    cy.login(UserType.PARTICIPANT_COMPLETED)
+    cy.login(TestUsers.PARTICIPANT_COMPLETED.email)
     cy.visit('/')
     cy.contains('Intro').should('exist')
     // Check UI to ensure it matches expectations
@@ -167,7 +173,7 @@ describe('viewPdf', () => {
     })
 
     // changing study results in different study file name
-    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
     cy.visit('/')
     cy.get('[data-cy="change-study"]').click()
     cy.contains('Study FE').click()
@@ -177,5 +183,64 @@ describe('viewPdf', () => {
     })
   })
 
-  // PDF contains logo, doesn't contain logo, and contains correct logo when study is changed
+  it('PDF fetches logos correctly', () => {
+    const orgLogoEndpoint = '**/settings/logo?t=*'
+    const studyLogoEndpoint = `**/studies/${studyId}/logo?t=*`
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
+    cy.visit('/')
+
+    // Intercept logo fetch
+    cy.intercept('GET', orgLogoEndpoint).as('orgLogo404')
+    cy.intercept('GET', studyLogoEndpoint).as('studyLogo404')
+
+    // Trigger PDF generation
+    cy.get('[data-cy="view-pdf"]').click()
+
+    // Verify that both requests were attempted but returned 404
+    cy.wait('@orgLogo404').its('response.statusCode').should('eq', 404)
+    cy.wait('@studyLogo404').its('response.statusCode').should('eq', 404)
+
+    // Set Org and study logos
+    cy.task('updateLogo', {
+      target: 'organisation',
+      filePath: '../common/testing/fixtures/valid_logo.png',
+    })
+    cy.task('updateLogo', {
+      target: 'study',
+      id: studyId,
+      filePath: '../common/testing/fixtures/alternate_logo.png',
+    })
+
+    cy.intercept('GET', orgLogoEndpoint, (req) => {
+      req.continue((res) => {
+        res.body = Buffer.from(res.body)
+      })
+    }).as('fetchOrgLogo')
+
+    cy.intercept('GET', studyLogoEndpoint, (req) => {
+      req.continue((res) => {
+        res.body = Buffer.from(res.body)
+      })
+    }).as('fetchStudyLogo')
+
+    // generate PDF
+    cy.get('[data-cy="view-pdf"]').click()
+
+    // run logo hash checks
+    cy.wait('@fetchOrgLogo').then((req) => {
+      expect(req.response.statusCode).to.equal(200)
+      const base64Body = req.response.body.toString('base64')
+      cy.task('calculateHash', base64Body).then((hash) => {
+        expect(hash, 'Org Logo Hash').to.equal(hashes.validLogoResizedHash)
+      })
+    })
+
+    cy.wait('@fetchStudyLogo').then((req) => {
+      expect(req.response.statusCode).to.equal(200)
+      const base64Body = req.response.body.toString('base64')
+      cy.task('calculateHash', base64Body).then((hash) => {
+        expect(hash, 'Study Logo Hash').to.equal(hashes.alternateLogoResizedHash)
+      })
+    })
+  })
 })

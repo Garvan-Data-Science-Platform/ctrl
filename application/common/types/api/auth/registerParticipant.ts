@@ -80,9 +80,11 @@ export interface RegisterParticipantRequest {
   participantType: ParticipantType
   nextOfKin: AlternativeContact
   dependents: OnBehalf[]
+  externalId?: string
 }
 
 export interface RegisterParticipantResponse {
   id: number
   token: string
+  role: string
 }

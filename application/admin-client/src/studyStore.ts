@@ -6,6 +6,8 @@ export interface StudyEntry {
   name: string
   description?: string
   logo?: SourceBuffer
+  redcapURL?: string
+  redcapToken?: string
 }
 
 interface StudyState {
@@ -28,6 +30,7 @@ export const useStudyStore = create<StudyState>((set) => ({
     set(
       produce((state) => {
         state.studies = studies
+        state.activeStudyIndex = Math.max(0, Math.min(studies.length - 1, state.activeStudyIndex))
       }),
     ),
 }))

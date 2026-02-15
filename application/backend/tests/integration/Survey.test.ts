@@ -28,8 +28,8 @@ describe('Survey tests', () => {
     api.run()
     await resetDB()
 
-    participantToken = await generateToken({ userId: 1, roles: ['Participant'] })
-    adminToken = await generateToken({ userId: ORG_ADMIN_ID, roles: ['OrganisationAdmin'] })
+    participantToken = await generateToken({ userId: 1 })
+    adminToken = await generateToken({ userId: ORG_ADMIN_ID })
   })
 
   afterAll(async () => {

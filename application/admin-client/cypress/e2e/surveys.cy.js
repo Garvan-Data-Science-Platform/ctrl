@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-const { UserType } = require('../support/commands')
+const { UserType } = require('../../../common/cypress/support/commands')
 
 beforeEach(() => {
   cy.task('reset')
@@ -8,7 +8,7 @@ beforeEach(() => {
 
 describe('Surveys', () => {
   it('List surveys', () => {
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/surveys')
     cy.contains('Surveys').should('exist')
     cy.contains('Current Draft').should('exist')
@@ -17,7 +17,7 @@ describe('Surveys', () => {
   })
 
   it('View a survey', () => {
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/surveys')
     cy.get('[data-cy="view-button"]').click()
 

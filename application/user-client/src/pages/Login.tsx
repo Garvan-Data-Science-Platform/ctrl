@@ -1,11 +1,22 @@
-import { Alert, Box, Button, Card, Container, TextField } from '@mui/material'
+import {
+  Alert,
+  Box,
+  Button,
+  Card,
+  Container,
+  Divider,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth'
-import { LoginRequest, LoginResponse } from '@common/types/api/auth'
-import { useEffect } from 'react'
+import { LoginRequest, LoginResponse, SetupResponse } from '@common/types/api/auth'
+import { useEffect, useState } from 'react'
 import { useAppStore } from '../store'
 import { useQueryClient } from '@tanstack/react-query'
+import { OIDCProvider } from '@common/types/oidc'
 
 export default function Login() {
   const {
@@ -17,6 +28,22 @@ export default function Login() {
   const { login } = useAuth()
   const nav = useNavigate()
   const { reset } = useAppStore()
+
+  const [oidcProviders, setOidcProviders] = useState<OIDCProvider[]>([])
+
+  useEffect(() => {
+    fetch(import.meta.env.VITE_BACKEND_URL + '/auth/setup', {
+      method: 'GET',
+    }).then((res) => {
+      res.json().then((data: SetupResponse) => {
+        if (!data.isSetup) {
+          nav('/setup')
+        } else {
+          setOidcProviders(data.oidc.filter((val) => val.displayInUserPortal))
+        }
+      })
+    })
+  }, [])
 
   const clientType = 'user-client'
 
@@ -31,11 +58,11 @@ export default function Login() {
       .then((res) => {
         if (res.ok) {
           res.json().then((data: LoginResponse) => {
-            if (data.otp_token) {
+            if ('otp_token' in data) {
               nav('/login/otp', { state: data.otp_token })
             } else if (!data.token) throw new Error('No token provided')
             else {
-              login(data.token)
+              login(data)
               nav('/')
             }
           })
@@ -65,12 +92,38 @@ export default function Login() {
           <form onSubmit={handleSubmit(onSubmit)}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <Box sx={{ mt: 5, mb: 2 }}>
-                <img
-                  src={import.meta.env.VITE_BACKEND_URL + '/settings/logo'}
-                  height={40}
-                  alt="logo"
-                />
+                <img src={import.meta.env.VITE_BACKEND_URL + '/settings/logo'} height={40} alt="" />
               </Box>
+              {oidcProviders.length > 0 && (
+                <>
+                  <Typography>Continue with:</Typography>
+                  <Stack gap={1}>
+                    {oidcProviders.map((val) => {
+                      return (
+                        <Card
+                          key={`oidc_${val.name}`}
+                          onClick={() => {
+                            const additionalParams = val.authorizeUrlParams
+                              ? '&' + val.authorizeUrlParams
+                              : ''
+                            window.location.href = `${val.host}/authorize?state=${val.name}&client_id=${val.clientId}&scope=openid%20email%20profile&response_type=code&redirect_uri=${window.location.origin}/login/callback${additionalParams}`
+                          }}
+                          sx={{
+                            border: '1px solid lightgrey',
+                            p: 1,
+                            cursor: 'pointer',
+                            ':hover': { backgroundColor: 'rgb(245,245,245)' },
+                          }}
+                        >
+                          <img style={{ objectFit: 'contain' }} height="60" src={val.icon} />
+                        </Card>
+                      )
+                    })}
+                  </Stack>
+                  <Divider />
+                </>
+              )}
+
               <TextField
                 type="email"
                 fullWidth
@@ -96,9 +149,6 @@ export default function Login() {
             </Button>
           </form>
           <Box sx={{ mt: 3 }}>
-            <Button data-cy="register" component={Link} to="/register">
-              Register
-            </Button>
             <Button data-cy="forgot-password" component={Link} to="/forgot">
               Forgot Password
             </Button>

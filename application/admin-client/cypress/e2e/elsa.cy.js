@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-const { UserType } = require('../support/commands')
+const { UserType } = require('../../../common/cypress/support/commands')
 
 beforeEach(() => {
   cy.task('reset')
@@ -8,7 +8,7 @@ beforeEach(() => {
 
 describe('Elsa Integration', () => {
   it('Can disable and enable Elsa Integration', () => {
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/integrations')
     cy.get('[data-cy="elsa-checkbox"] input').should('be.checked').click()
     cy.get('[data-cy="confirm"]').click()

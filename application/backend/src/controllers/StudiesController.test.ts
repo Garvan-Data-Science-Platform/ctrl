@@ -7,16 +7,25 @@ import {
   CreateStudyRequest,
   UpdateStudyRequest,
 } from 'common/types/api/studies'
-import { PARTICIPANT_UNANSWERED_ID, PARTICIPANT_COMPLETED_ID } from 'common/testing/seed'
-import { resetDB } from 'common/testing/TestHelpers'
+import {
+  PARTICIPANT_UNANSWERED_ID,
+  PARTICIPANT_COMPLETED_ID,
+  STUDY_ADMIN_ID,
+} from 'common/testing/seed'
+import { resetDB, updateLogo } from 'common/testing/TestHelpers'
+import logoHashes from '../../../common/testing/fixtures/logo_hashes.json'
 import { generateToken } from '../authentication'
 import { ORG_ADMIN_ID } from 'common/testing/seed'
+import { createHash } from 'crypto'
+
+const fixturesPath = '../common/testing/fixtures/'
 
 const api = new Api()
 const app = api.app
 
 describe('StudiesController', () => {
   let orgAdminToken: string
+  let studyAdminToken: string
 
   const testStudyId: number = 1
 
@@ -27,7 +36,8 @@ describe('StudiesController', () => {
   beforeEach(async () => {
     await resetDB()
 
-    orgAdminToken = await generateToken({ userId: ORG_ADMIN_ID, roles: ['OrganisationAdmin'] })
+    orgAdminToken = await generateToken({ userId: ORG_ADMIN_ID })
+    studyAdminToken = await generateToken({ userId: STUDY_ADMIN_ID })
   })
 
   afterAll(async () => {
@@ -43,7 +53,6 @@ describe('StudiesController', () => {
 
       const body: GetAllStudiesResponse = response.body
       expect(Array.isArray(body.data)).toBeTruthy()
-      console.log(body.data)
       expect(body.data.length).toEqual(4)
     })
 
@@ -56,13 +65,23 @@ describe('StudiesController', () => {
         .set({ Authorization: `Bearer ${orgAdminToken}` })
       expect(response.status).toBe(500)
     })
+
+    it('It should only return studies that study admin is admin of', async () => {
+      const response = await request(app)
+        .get('/studies')
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+      expect(response.status).toBe(200)
+
+      const body: GetAllStudiesResponse = response.body
+      expect(Array.isArray(body.data)).toBeTruthy()
+      expect(body.data.length).toEqual(1)
+    })
   })
 
   describe('GET /studies/list', () => {
     it('should return a list of studies for logged in user', async () => {
       const token = await generateToken({
         userId: PARTICIPANT_UNANSWERED_ID,
-        roles: ['Participant'],
       })
 
       const response = await request(app)
@@ -85,7 +104,6 @@ describe('StudiesController', () => {
     it('should return a different list of studies for a different logged in user', async () => {
       const token = await generateToken({
         userId: PARTICIPANT_COMPLETED_ID,
-        roles: ['Participant'],
       })
 
       const response = await request(app)
@@ -150,6 +168,24 @@ describe('StudiesController', () => {
       expect(createdStudy?.name).toBe(newStudyName)
     })
 
+    it('a study admin creating a study adds them as an admin of that study', async () => {
+      const newStudyName = 'Study Admin Test Study'
+
+      const response = await request(app)
+        .post('/studies')
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+        .send({ name: newStudyName } as CreateStudyRequest)
+      expect(response.status).toBe(201)
+
+      // Check study now exists in db
+      const createdStudy = await prisma.study.findFirst({
+        where: { name: newStudyName },
+        select: { name: true, admins: true },
+      })
+      expect(createdStudy?.name).toBe(newStudyName)
+      expect(createdStudy?.admins.map((val) => val.id)).toContain(STUDY_ADMIN_ID)
+    })
+
     it('should return an error if the study already exists', async () => {
       const studyNameAlreadyExists = 'Test Study'
       const response = await request(app)
@@ -210,7 +246,7 @@ describe('StudiesController', () => {
 
       expect(response.status).toBe(404)
 
-      expect(response.body.message).toBe(`Record not found`)
+      expect(response.body.message).toBe(`Study not found`)
     })
   })
 
@@ -246,6 +282,205 @@ describe('StudiesController', () => {
         .delete(`/studies/${testStudyId}`)
         .set({ Authorization: `Bearer ${orgAdminToken}` })
       expect(response.status).toBe(422)
+    })
+
+    it('should allow study admins to delete a study', async () => {
+      const response = await request(app)
+        .delete(`/studies/${testStudyId}`)
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+      expect(response.status).toBe(204)
+    })
+  })
+
+  describe('GET /studies/:studyId/logo', () => {
+    it('should return 404 if no logo has been uploaded', async () => {
+      const response = await request(app).get(`/studies/${testStudyId}/logo`).responseType('blob')
+      expect(response.status).toBe(404)
+    })
+    it('should return non-blank logo if logo has been uploaded', async () => {
+      await updateLogo({
+        target: 'study',
+        filePath: `${fixturesPath}/valid_logo.png`,
+        id: testStudyId,
+      })
+      const response = await request(app).get(`/studies/${testStudyId}/logo`).responseType('blob')
+      const hash = createHash('md5').update(response.body).digest('hex')
+      expect(hash).toEqual(logoHashes.validLogoResizedHash)
+      expect(response.status).toBe(200)
+    })
+  })
+
+  describe('POST /studies/:studyId/logo', () => {
+    it('should post a study logo', async () => {
+      const response = await request(app)
+        .post(`/studies/${testStudyId}/logo`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .attach('file', `${fixturesPath}/valid_logo.png`)
+      expect(response.status).toBe(204)
+    })
+
+    it('should fail to update invalid logo', async () => {
+      const response = await request(app)
+        .post(`/studies/${testStudyId}/logo`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .attach('file', `${fixturesPath}/invalid_logo.png`)
+
+      expect(response.status).toBe(422)
+    })
+
+    it('should change logo if a logo gets updated', async () => {
+      // Post logo
+      const originalLogoPostResponse = await request(app)
+        .post(`/studies/${testStudyId}/logo`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .attach('file', `${fixturesPath}/valid_logo.png`)
+      expect(originalLogoPostResponse.status).toBe(204)
+      const originalLogoGetResponse = await request(app)
+        .get(`/studies/${testStudyId}/logo`)
+        .responseType('blob')
+      const originalLogoHash = createHash('md5').update(originalLogoGetResponse.body).digest('hex')
+      expect(originalLogoHash).toEqual(logoHashes.validLogoResizedHash)
+      expect(originalLogoGetResponse.status).toBe(200)
+      // Update logo
+      const alternateLogoPostResponse = await request(app)
+        .post(`/studies/${testStudyId}/logo`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .attach('file', `${fixturesPath}/alternate_logo.png`)
+      expect(alternateLogoPostResponse.status).toBe(204)
+      // Test logo has changed
+      const alternateLogoGetResponse = await request(app)
+        .get(`/studies/${testStudyId}/logo`)
+        .responseType('blob')
+      const alternateLogoHash = createHash('md5')
+        .update(alternateLogoGetResponse.body)
+        .digest('hex')
+      expect(alternateLogoHash).toEqual(logoHashes.alternateLogoResizedHash)
+      expect(alternateLogoGetResponse.status).toBe(200)
+    })
+  })
+
+  describe('DELETE /studies/:studyId/logo', () => {
+    it('should delete an existing study logo', async () => {
+      // Add a logo to be deleted
+      const createResponse = await request(app)
+        .post(`/studies/${testStudyId}/logo`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .attach('file', `${fixturesPath}/valid_logo.png`)
+      expect(createResponse.status).toBe(204)
+
+      // Test deletion
+      const response = await request(app)
+        .delete(`/studies/${testStudyId}/logo`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(response.status).toBe(204)
+
+      // Try to get logo (expecting 404)
+      const getResponse = await request(app)
+        .get(`/studies/${testStudyId}/logo`)
+        .responseType('blob')
+      expect(getResponse.status).toBe(404)
+
+      // Verify logo is deleted in db
+      const studyWithDeletedLogo = await prisma.study.findFirst({
+        where: { id: testStudyId },
+      })
+      expect(studyWithDeletedLogo?.logo).toBeNull()
+    })
+
+    it('should allow study admins to delete a study logo', async () => {
+      // Add a logo to be deleted
+      const createResponse = await request(app)
+        .post(`/studies/${testStudyId}/logo`)
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+        .attach('file', `${fixturesPath}/valid_logo.png`)
+      expect(createResponse.status).toBe(204)
+
+      // Test deletion
+      const response = await request(app)
+        .delete(`/studies/${testStudyId}/logo`)
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+      expect(response.status).toBe(204)
+
+      // Try to get logo (expecting 404)
+      const getResponse = await request(app)
+        .get(`/studies/${testStudyId}/logo`)
+        .responseType('blob')
+      expect(getResponse.status).toBe(404)
+
+      // Verify logo is deleted in db
+      const studyWithDeletedLogo = await prisma.study.findFirst({
+        where: { id: testStudyId },
+      })
+      expect(studyWithDeletedLogo?.logo).toBeNull()
+    })
+  })
+
+  describe('PATCH /studies/:studyId/restore', () => {
+    it('should restore a deleted study', async () => {
+
+      const studyBeforeDelete = await prisma.study.findFirst({
+        where: { id: testStudyId },
+      })
+
+      expect(studyBeforeDelete?.deleted).toBe(false)
+
+      // Delete the study
+      const deleteResponse = await request(app)
+        .delete(`/studies/${testStudyId}`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(deleteResponse.status).toBe(204)
+
+      // Verify the study is deleted
+      const deletedStudy = await prisma.study.findFirst({
+        where: { id: testStudyId, deleted: true },
+      })
+
+      expect(deletedStudy?.deleted).toBe(true)
+
+      // Restore the study
+      const response = await request(app)
+        .patch(`/studies/${testStudyId}/restore`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(response.status).toBe(204)
+
+      // Verify the study is restored
+      const restoredStudy = await prisma.study.findFirst({
+        where: { id: testStudyId },
+      })
+      expect(restoredStudy?.deleted).toBe(false)
+    })
+
+    it('should allow study admins to restore a deleted study', async () => {
+      const studyBeforeDelete = await prisma.study.findFirst({
+        where: { id: testStudyId },
+      })
+
+      expect(studyBeforeDelete?.deleted).toBe(false)
+
+      // Delete the study
+      const deleteResponse = await request(app)
+        .delete(`/studies/${testStudyId}`)
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+      expect(deleteResponse.status).toBe(204)
+
+      // Verify the study is deleted
+      const deletedStudy = await prisma.study.findFirst({
+        where: { id: testStudyId, deleted: true },
+      })
+
+      expect(deletedStudy?.deleted).toBe(true)
+
+      // Restore the study
+      const response = await request(app)
+        .patch(`/studies/${testStudyId}/restore`)
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+      expect(response.status).toBe(204)
+
+      // Verify the study is restored
+      const restoredStudy = await prisma.study.findFirst({
+        where: { id: testStudyId },
+      })
+      expect(restoredStudy?.deleted).toBe(false)
     })
   })
 })

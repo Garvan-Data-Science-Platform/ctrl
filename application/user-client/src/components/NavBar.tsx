@@ -8,11 +8,10 @@ import Menu from '@mui/material/Menu'
 import MenuIcon from '@mui/icons-material/Menu'
 import Container from '@mui/material/Container'
 import MenuItem from '@mui/material/MenuItem'
-import AdbIcon from '@mui/icons-material/Adb'
 import { Button, Tab, Tabs } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth'
-import { useCurrentStudyId } from '../store'
+import { useAppStore } from '../store'
 
 const pages = [
   { name: 'My Activities', route: '/' },
@@ -26,7 +25,10 @@ export default function NavBar({ disabled }: { disabled?: boolean }) {
   const location = useLocation()
   const nav = useNavigate()
   const { logout } = useAuth()
-  const studyId = useCurrentStudyId()
+
+  const { newsLink } = useAppStore()
+
+  const activePages = newsLink ? pages : pages.filter((val) => val.route != '/news')
 
   const activePage =
     pages
@@ -48,15 +50,14 @@ export default function NavBar({ disabled }: { disabled?: boolean }) {
       <AppBar position="static" sx={{ boxShadow: 'none', left: 0, backgroundColor: 'white' }}>
         <Container sx={{ maxWidth: 1200 }}>
           <Toolbar disableGutters>
-            <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
             <Box>
               <img
-                src={studyId ? import.meta.env.VITE_BACKEND_URL + `/studies/${studyId}/logo` : ''}
+                src={import.meta.env.VITE_BACKEND_URL + `/settings/logo`}
                 height={30}
                 onClick={() => nav('/')}
                 style={{ marginRight: 20, cursor: 'pointer' }}
                 data-cy="logo"
-                alt="logo"
+                alt=""
               />
             </Box>
 
@@ -94,10 +95,9 @@ export default function NavBar({ disabled }: { disabled?: boolean }) {
                 ))}
               </Menu>
             </Box>
-            <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
               <Tabs value={activePage.name}>
-                {pages.map((page) => (
+                {activePages.map((page) => (
                   <Tab
                     value={page.name}
                     key={page.name}

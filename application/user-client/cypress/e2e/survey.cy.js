@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-const { UserType } = require('../support/commands')
+const { UserType } = require('../../../common/cypress/support/commands')
 
 beforeEach(() => {
   cy.task('reset')
@@ -39,7 +39,6 @@ describe('Profile Edit', () => {
     cy.contains('Intro').should('exist')
     cy.get('[data-cy="step-button-1"]').click()
     cy.get('[data-cy="checkbox-0"]').click()
-    cy.get('[data-cy="checkbox-0"]').click()
     cy.get('[data-cy="checkbox-0"] input').should('be.checked')
     cy.get('input[type="radio"]').eq(1).should('not.be.checked')
     cy.get('input[type="radio"]').eq(1).click()
@@ -54,7 +53,6 @@ describe('Profile Edit', () => {
     cy.visit('/')
     cy.contains('Intro').should('exist')
     cy.get('[data-cy="step-button-1"]').click()
-    cy.get('[data-cy="checkbox-0"]').click()
     cy.get('[data-cy="checkbox-0"]').click()
     cy.get('[data-cy="checkbox-0"] input').should('be.checked')
     cy.get('input[type="radio"]').eq(0).should('not.be.checked')

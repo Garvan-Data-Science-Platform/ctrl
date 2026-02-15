@@ -1,6 +1,5 @@
 import { ParticipantAnswerStatus } from '@common/types/api/participants/participant'
-import { GetSettingsResponse } from '@common/types/api/settings'
-import { GetSurveyVersionsResponse } from '@common/types/api/surveys'
+import { GetResponsesByIdResponse, GetSurveyVersionsResponse } from '@common/types/api/surveys'
 import {
   Box,
   Button,
@@ -9,81 +8,74 @@ import {
   Menu,
   MenuItem,
   Modal,
-  TextField,
   Tooltip,
   Typography,
+  useTheme,
 } from '@mui/material'
-import { DataGrid, GridFilterOperator, type GridColDef } from '@mui/x-data-grid'
+import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import { DateField, EditButton, List, ShowButton, useDataGrid } from '@refinedev/mui'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { InviteModal } from '../../components/InviteModal'
+import { Recipient } from '@common/types/invite'
 import { axiosInstance } from '../../providers/dataProvider'
 import { useInvalidate, useNotification } from '@refinedev/core'
 import { InviteStatus } from '@common/types/api/participants/invite'
-import { MoreVert, People } from '@mui/icons-material'
-import { useCurrentStudyId } from '../../studyStore'
+import { MoreVert, People, PictureAsPdf, UploadFile } from '@mui/icons-material'
+import ResponsesPdf from '@common/src/PdfExport'
+import { pdfUtils, downloadPdfBlob } from '@common/src/pdfHelpers'
+import { useStudyStore } from '../../studyStore'
+import { GetParticipantResponse } from '@common/types/api/participants'
+import { ReactSpreadsheetImport } from 'react-spreadsheet-import'
+import { importFields } from '../../components/CSVImport'
+import { unflatten } from 'flat'
 
 export const statusMap = {
   incomplete: {
-    color: 'grey',
+    color: 'text.disabled',
     tooltip: 'Incomplete',
   },
   partially_complete: {
-    color: 'orange',
+    color: 'warning.main',
     tooltip: 'Partially Complete',
   },
   complete: {
-    color: 'primary',
+    color: 'primary.main',
     tooltip: 'Complete',
   },
 }
 
 export const ParticipantList = () => {
+  const theme = useTheme()
   const { dataGridProps } = useDataGrid({
     syncWithLocation: false,
-    pagination: { pageSize: 10, mode: 'server' } as any,
-    filters: { mode: 'server' },
-    sorters: { mode: 'server' },
+    pagination: { mode: 'off' },
+    filters: { mode: 'off' },
+    sorters: { mode: 'off' },
   })
   const { dataGridProps: inviteGridProps } = useDataGrid({
     syncWithLocation: false,
     resource: 'invites',
   })
 
+  const { studies, activeStudyIndex } = useStudyStore()
+
   const location = useLocation()
   const invalidate = useInvalidate()
 
-  const [initialEmails, setInitialEmails] = useState<string[]>([])
+  const [initialRecipients, setInitialRecipients] = useState<Recipient[]>([])
   const [modalOpen, setModalOpen] = useState(false)
+  const [csvModalOpen, setCsvModalOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [inviteRowId, setInviteRowId] = useState('')
-  const [emailIsSetup, setEmailIsSetup] = useState(true)
   const [publishedSurvey, setPublishedSurvey] = useState(true)
 
   const { open } = useNotification()
 
-  const studyId = useCurrentStudyId()
-
   useEffect(() => {
-    // Check Mailer Settings
-    axiosInstance.get('/settings').then((res) => {
-      const settings = res.data.data as GetSettingsResponse['data']
-      if (
-        !(
-          settings.mailerHost &&
-          settings.mailerPassword &&
-          settings.mailerPort &&
-          settings.mailerUser
-        )
-      ) {
-        setEmailIsSetup(false)
-      }
-    })
-
     // Check Published Survey
-    axiosInstance.get(`/studies/${studyId}/surveys`).then((response) => {
+    axiosInstance.get(`/studies/${studies[activeStudyIndex].id}/surveys`).then((response) => {
       const allSurveys = response.data.data as GetSurveyVersionsResponse['data']
       const publishedSurveys = allSurveys.filter((survey) => survey.status === 'PUBLISHED')
       setPublishedSurvey(true)
@@ -94,16 +86,23 @@ export const ParticipantList = () => {
 
     if (location.state?.openInviteModal) {
       setModalOpen(true)
-      setInitialEmails(location.state.initialEmails || [])
-      // Clear the navigation state
+      setInitialRecipients(location.state.initialRecipients || [])
       window.history.replaceState({}, document.title)
     }
-  }, [location, studyId])
+    if (location.state?.openCsvModal) {
+      setCsvModalOpen(true)
+      window.history.replaceState({}, document.title)
+    }
+  }, [location, studies[activeStudyIndex].id])
 
-  const sendInvites = (emails: string[], subjectText: string, explanatoryText: string) => {
+  const sendInvites = (recipients: Recipient[], subjectText: string, explanatoryText: string) => {
     setLoading(true)
     axiosInstance
-      .post(`/studies/${studyId}/invites`, { emails, subjectText, explanatoryText })
+      .post(`/studies/${studies[activeStudyIndex].id}/invites`, {
+        recipients,
+        subjectText,
+        explanatoryText,
+      })
       .then(() => {
         setModalOpen(false)
         open?.({ type: 'success', message: `Invites sent` })
@@ -123,7 +122,7 @@ export const ParticipantList = () => {
 
   const revokeInvite = (id: string) => {
     axiosInstance
-      .post(`studies/${studyId}/invites/${id}/revoke`)
+      .post(`studies/${studies[activeStudyIndex].id}/invites/${id}/revoke`)
       .then(() => {
         open?.({ type: 'success', message: 'Invite Revoked' })
         invalidate({ resource: 'invites', invalidates: ['list'] })
@@ -135,7 +134,7 @@ export const ParticipantList = () => {
   }
   const resendInvite = (id: string) => {
     axiosInstance
-      .post(`studies/${studyId}/invites/${id}/resend`)
+      .post(`studies/${studies[activeStudyIndex].id}/invites/${id}/resend`)
       .then(() => {
         open?.({ type: 'success', message: 'Invite Resent' })
         invalidate({ resource: 'invites', invalidates: ['list'] })
@@ -158,59 +157,41 @@ export const ParticipantList = () => {
     )
   }
 
-  // Debounced input component
-  function DebouncedInput(props: any) {
-    const { item, applyValue, InputProps } = props
-    const [value, setValue] = useState(item.value ?? '')
-    const debounceRef = useRef<number | undefined>()
+  const generatePdf = async (id: number, version: number) => {
+    try {
+      const profileData = (
+        await axiosInstance.get(`/studies/${studies[activeStudyIndex].id}/participants/${id}/`)
+      ).data as GetParticipantResponse
 
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      const newValue = event.target.value
-      setValue(newValue)
-      if (debounceRef.current) {
-        window.clearTimeout(debounceRef.current)
-      }
-      debounceRef.current = window.setTimeout(() => {
-        applyValue({ ...item, value: newValue })
-      }, 500) // 500ms debounce
+      const responseData = (
+        await axiosInstance.get(
+          `/studies/${studies[activeStudyIndex].id}/surveys/${version}/participants/${id}/answers`,
+        )
+      ).data as GetResponsesByIdResponse
+
+      const logos = pdfUtils.getLogoUrls(studies[activeStudyIndex].id)
+      const participantName = `${profileData.data.firstName}_${profileData.data.lastName}`
+      // Note: this formats the filename to have the current date-time.
+      const fileName = pdfUtils.formatFileName(
+        'CTRL-responses',
+        studies[activeStudyIndex].name,
+        participantName,
+      )
+
+      await downloadPdfBlob(
+        <ResponsesPdf
+          studyName={studies[activeStudyIndex].name}
+          profile={profileData.data.profile}
+          steps={responseData.data.steps}
+          responses={responseData}
+          {...logos}
+        />,
+        fileName,
+      )
+    } catch (error) {
+      open?.({ type: 'error', message: `Could not generate PDF: ${error}` })
     }
-
-    useEffect(() => {
-      return () => {
-        if (debounceRef.current) {
-          window.clearTimeout(debounceRef.current)
-        }
-      }
-    }, [])
-
-    return (
-      <div style={{ display: 'flex', alignItems: 'flex-end', height: '100%' }}>
-        <TextField
-          variant="standard"
-          value={value}
-          onChange={handleChange}
-          fullWidth
-          {...InputProps}
-        />
-      </div>
-    )
   }
-
-  const allowedOperators: GridFilterOperator[] = [
-    {
-      label: 'Equals',
-      value: 'equals',
-      requiresFilterValue: true,
-      getApplyFilterFn: (filterItem) => (value) => value === filterItem.value,
-      InputComponent: DebouncedInput,
-    },
-    {
-      label: 'Does not equal',
-      value: 'doesNotEqual',
-      getApplyFilterFn: (filterItem) => (value) => value !== filterItem.value,
-      InputComponent: DebouncedInput,
-    },
-  ]
 
   const columns = React.useMemo<GridColDef[]>(
     () => [
@@ -218,36 +199,38 @@ export const ParticipantList = () => {
         field: 'participantId',
         flex: 1,
         headerName: 'ID',
-        filterOperators: allowedOperators,
+        renderCell: ({ value, row }) => (row.externalId ? `${value} (${row.externalId})` : value),
+        minWidth: 180,
+        //filterOperators: allowedOperators,
       },
       {
         field: 'firstName',
         flex: 1,
         headerName: 'First Name',
         minWidth: 100,
-        sortable: false,
-        filterOperators: allowedOperators,
+        sortable: true,
+        //filterOperators: allowedOperators,
       },
       {
         field: 'lastName',
         flex: 1,
         headerName: 'Last Name',
         minWidth: 100,
-        sortable: false,
-        filterOperators: allowedOperators,
+        sortable: true,
+        //filterOperators: allowedOperators,
       },
       {
         field: 'email',
         flex: 1,
         headerName: 'Email',
         minWidth: 100,
-        sortable: false,
-        filterOperators: allowedOperators,
+        sortable: true,
+        //filterOperators: allowedOperators,
       },
       {
         field: 'answers',
         headerName: 'Latest Answers',
-        minWidth: 250,
+        minWidth: 120,
         renderCell: ({ value, row }) => renderAnswer(row.id, value.at(-1)),
         sortable: false,
         disableColumnMenu: true,
@@ -259,7 +242,7 @@ export const ParticipantList = () => {
         minWidth: 100,
         type: 'date',
         disableColumnMenu: true,
-        sortable: false,
+        sortable: true,
         valueGetter: (value) => {
           if (!value) return null
           return new Date(value)
@@ -289,12 +272,21 @@ export const ParticipantList = () => {
                   <People />
                 </IconButton>
               </Tooltip>
+              <Tooltip title="Responses PDF">
+                <IconButton
+                  onClick={() => generatePdf(row.id, row.answers.at(-1)?.surveyVersionNumber)}
+                  color="primary"
+                  data-cy="pdf-button"
+                >
+                  <PictureAsPdf />
+                </IconButton>
+              </Tooltip>
             </>
           )
         },
         align: 'center',
         headerAlign: 'center',
-        minWidth: 140,
+        minWidth: 180,
       },
     ],
     [],
@@ -367,8 +359,73 @@ export const ParticipantList = () => {
     [],
   )
 
+  const customRSITheme = {
+    styles: {
+      global: {
+        body: {
+          bg: theme.palette.background.default,
+          color: theme.palette.text.primary,
+        },
+        ".rdg-cell-error": {
+          backgroundColor: theme.palette.mode === 'dark' ? theme.palette.error.dark : theme.palette.error.light
+        },
+      },
+    },
+    colors: {
+      background: theme.palette.background.default,
+      secondaryBackground:
+        theme.palette.mode === 'dark' ? theme.palette.primary.dark : theme.palette.primary.main,
+      textColor: theme.palette.text.primary,
+      subtitleColor: theme.palette.text.secondary,
+      highlight: theme.palette.info.main,
+      border: theme.palette.divider,
+      inactiveColor: theme.palette.error.light,
+      rsi: {
+        50: theme.palette.mode === 'dark' ? '#0d47a1' : '#e3f2fd',
+        100: theme.palette.mode === 'dark' ? '#1565c0' : '#bbdefb',
+        200: theme.palette.mode === 'dark' ? '#1976d2' : '#90caf9',
+        300: theme.palette.mode === 'dark' ? '#1e88e5' : '#64b5f6',
+        400: theme.palette.mode === 'dark' ? '#2196f3' : '#42a5f5',
+        500: theme.palette.mode === 'dark' ? '#42a5f5' : '#2196f3',
+        600: theme.palette.mode === 'dark' ? '#64b5f6' : '#1e88e5',
+        700: theme.palette.mode === 'dark' ? '#90caf9' : '#1976d2',
+        800: theme.palette.mode === 'dark' ? '#bbdefb' : '#1565c0',
+        900: theme.palette.mode === 'dark' ? '#e3f2fd' : '#0d47a1',
+      },
+    },
+    components: {
+      MatchColumnsStep: {
+        baseStyle: {
+          userTable: {
+            ignoreButton: {
+              bg: theme.palette.divider,
+            },
+          },
+        }
+      },
+      Modal: {
+        baseStyle: {
+          backButton: {
+            color: theme.palette.text.secondary,
+          },
+          continueButton: {
+            color: theme.palette.text.primary,
+            bg: theme.palette.mode === 'dark' ? theme.palette.primary.dark : theme.palette.primary.light,
+          }
+        },
+        variants: {
+          rsi: {
+            footer: {
+              bg: theme.palette.mode === 'dark' ? theme.palette.background.default : theme.palette.background.paper,
+            }
+          }
+        }
+      }
+    }
+  }
+
   return (
-    <>
+    <Box>
       <Modal open={loading}>
         <CircularProgress
           sx={{
@@ -379,6 +436,32 @@ export const ParticipantList = () => {
           }}
         />
       </Modal>
+      <ReactSpreadsheetImport
+        isOpen={csvModalOpen}
+        onClose={() => setCsvModalOpen(false)}
+        isNavigationEnabled
+        translations={{
+          uploadStep: {
+            manifestTitle: 'Available fields',
+            manifestDescription:
+              "When you upload a file you will have a chance to match the column headers with the fields listed below. These fields will be used to: (1) determine what email address to send an invitation to. (2) Prefill the registration form (if applicable). (3) Populate the user's externalID for this study.",
+          },
+        }}
+        onSubmit={(data: any) => {
+          const recips = data.validData.map((row: any) => {
+            const nested = unflatten(row) as any
+            return {
+              email: nested.profile.email,
+              prefill: nested,
+            }
+          })
+          setInitialRecipients(recips)
+          setModalOpen(true)
+        }}
+        fields={importFields}
+        allowInvalidSubmit={false}
+        customTheme={customRSITheme}
+      />
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <Box
           sx={{
@@ -392,53 +475,30 @@ export const ParticipantList = () => {
             borderRadius: 2,
           }}
         >
-          {emailIsSetup && publishedSurvey ? (
+          {publishedSurvey ? (
             <InviteModal
               onCancel={() => {
                 setModalOpen(false)
               }}
               onSend={sendInvites}
-              initialEmails={initialEmails}
+              initialRecipients={initialRecipients}
             />
           ) : (
             <Box>
-              {!emailIsSetup && (
-                <Box sx={{ mb: !publishedSurvey ? 3 : 0 }}>
-                  <Typography sx={{ mb: 1 }}>
-                    You need to set up your email SMTP settings to invite participants
-                  </Typography>
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    component={Link}
-                    to="/settings"
-                    sx={{ textTransform: 'none' }}
-                  >
-                    Go to settings
-                  </Button>
-                </Box>
-              )}
-              {!emailIsSetup && !publishedSurvey && (
-                <Box sx={{ my: 2 }}>
-                  <hr style={{ border: 0, borderTop: '1px solid #eee' }} />
-                </Box>
-              )}
-              {!publishedSurvey && (
-                <Box data-cy="no-published-survey-modal">
-                  <Typography sx={{ mb: 1 }}>
-                    You need to publish a survey before inviting participants
-                  </Typography>
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    component={Link}
-                    to="/surveys/edit/1"
-                    sx={{ textTransform: 'none' }}
-                  >
-                    Go to surveys
-                  </Button>
-                </Box>
-              )}
+              <Box data-cy="no-published-survey-modal">
+                <Typography sx={{ mb: 1 }}>
+                  You need to publish a survey before inviting participants
+                </Typography>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  component={Link}
+                  to="/surveys/edit/1"
+                  sx={{ textTransform: 'none' }}
+                >
+                  Go to surveys
+                </Button>
+              </Box>
             </Box>
           )}
         </Box>
@@ -453,7 +513,18 @@ export const ParticipantList = () => {
         </MenuItem>
       </Menu>
       <List
-        headerButtons={
+        headerButtons={[
+          <Tooltip title="Import from CSV">
+            <Button
+              variant="contained"
+              onClick={() => {
+                setCsvModalOpen(true)
+              }}
+              data-cy="csv-button"
+            >
+              <UploadFile />
+            </Button>
+          </Tooltip>,
           <Button
             variant="contained"
             onClick={() => {
@@ -462,11 +533,13 @@ export const ParticipantList = () => {
             data-cy="invite-button"
           >
             Invite Participants
-          </Button>
-        }
+          </Button>,
+        ]}
       >
         <DataGrid
           {...dataGridProps}
+          pageSizeOptions={[10]}
+          initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
           columns={columns}
           autoHeight
           slotProps={{ root: { 'data-cy': 'participants-list' } }}
@@ -481,6 +554,6 @@ export const ParticipantList = () => {
           slotProps={{ root: { 'data-cy': 'pending-list' } }}
         />
       </List>
-    </>
+    </Box>
   )
 }

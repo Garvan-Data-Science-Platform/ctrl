@@ -1,16 +1,17 @@
 /// <reference types="cypress" />
 
-const { UserType } = require('../support/commands')
+const { UserType } = require('../../../common/cypress/support/commands')
 
 beforeEach(() => {
   cy.task('reset')
-  cy.login(UserType.ADMIN)
+  cy.login(UserType.ORG_ADMIN)
 })
 
 describe('Multi-study features', () => {
   function changeStudy(name) {
     cy.get('[data-cy="study-dropdown"]').click()
-    cy.contains(name).click()
+    cy.get('ul[role="menu"]').contains(name).click()
+    cy.get('[data-cy="study-dropdown"]').contains(name).should('exist')
   }
   it('Can changes studies, all data is updated accordingly', () => {
     cy.visit('/studies')

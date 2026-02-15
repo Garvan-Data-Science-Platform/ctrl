@@ -6,6 +6,7 @@ beforeEach(() => {
 
 describe('registration', () => {
   function fillValid() {
+    cy.wait(500) // wait for form to be fully loaded
     cy.get('[data-cy="reg-first"]').type('FIRST')
     cy.get('[data-cy="reg-last"]').type('LAST')
     cy.get('[data-cy="reg-email"]').type('invite1@pending.com')
@@ -19,7 +20,7 @@ describe('registration', () => {
     cy.get('[data-cy="reg-postcode"]').type('1234')
     cy.get('[data-cy="reg-mobile"]').type('0412345678')
     cy.get('[data-cy="reg-contact-method"]').click()
-    cy.contains('EMAIL').click()
+    cy.get('[data-value="EMAIL"]').click()
     cy.get('[data-cy="nok-first"]').type('ALT')
     cy.get('[data-cy="nok-surname"]').type('LAST')
     cy.get('[data-cy="nok-email"]').type('alt@email.com')

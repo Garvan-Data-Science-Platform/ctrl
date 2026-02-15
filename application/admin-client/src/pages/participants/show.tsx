@@ -39,6 +39,10 @@ export const ParticipantShow = () => {
         </Typography>
         <TextField value={record?.participantId} />
         <Typography variant="body1" fontWeight="bold">
+          {'External ID'}
+        </Typography>
+        <TextField value={record?.externalId} />
+        <Typography variant="body1" fontWeight="bold">
           {'First Name'}
         </Typography>
         <TextField value={record?.firstName} />
@@ -100,7 +104,7 @@ export const ParticipantShow = () => {
               return (
                 <tr key={`fam_${idx}`}>
                   <td>
-                    <Link to={`/participants/${val.id}`}>
+                    <Link to={`/participants/${val.id}`} style={{ color: 'inherit' }}>
                       <Typography>
                         {val.firstName} {val.lastName}
                       </Typography>

@@ -5,6 +5,7 @@ import { generateToken } from '../authentication'
 import prisma from '../PrismaClient'
 import {
   FE_TEST_STUDY_ID,
+  ORG_ADMIN_ID,
   PARTICIPANT_COMPLETED_ID,
   PARTICIPANT_UNANSWERED_ID,
 } from 'common/testing/seed'
@@ -18,7 +19,7 @@ let token: string
 
 describe('IntegrationsController', () => {
   beforeAll(async () => {
-    token = await generateToken({ userId: PARTICIPANT_COMPLETED_ID, roles: ['OrganisationAdmin'] })
+    token = await generateToken({ userId: ORG_ADMIN_ID })
     api.run()
   })
 
@@ -37,7 +38,7 @@ describe('IntegrationsController', () => {
   })
 
   describe('POST /studies/{studyId}/integrations/redcap/participant/upload/csv', () => {
-    it('should create a new participant from a given csv', async () => {
+    it('should return a list of existing users and new invites from a given csv', async () => {
       const studyId = 1
       const csvPath = path.resolve(__dirname, '../../tests/test_data/one_user.csv')
       const response = await request(app)
@@ -48,29 +49,42 @@ describe('IntegrationsController', () => {
       expect(response.status).toBe(201)
 
       expect(response.body).toStrictEqual({
-        profilesCreatedCount: 1,
-        ids: [1],
-        profilesAlreadyExistedCount: 0,
-        newInvites: ['example@example.com'],
-      })
-
-      const createdParticipant = await prisma.participantProfile.findFirstOrThrow({
-        where: {
-          firstName: 'John',
-          studies: {
-            some: {
-              studyId: studyId,
+        existingUsers: [],
+        newParticipants: [
+          {
+            email: 'example@example.com',
+            prefill: {
+              profile: {
+                addressLine: '2 fake st',
+                dob: '01/10/1984',
+                firstName: 'John',
+                lastName: 'Smith',
+                mobile: '0448434946',
+                nextOfKin: {
+                  email: 'example2@example.com',
+                  firstName: 'fake',
+                  lastName: 'fakerson',
+                  mobile: '0448434946',
+                },
+                participantType: 'STANDARD',
+                postcode: '2010',
+                preferredContact: 'EMAIL',
+                state: 'ACT',
+                suburb: 'fakie',
+              },
+              studyParticipant: {
+                externalId: '1',
+              },
             },
           },
-        },
+        ],
       })
-
-      expect(createdParticipant).not.toBe(null)
     })
+
     it('should register multiple users from one csv', async () => {
-      const initialLen = await prisma.participantProfile.count()
       const studyId = 1
       const csvPath = path.resolve(__dirname, '../../tests/test_data/90_users.csv')
+
       const response = await request(app)
         .post(`/studies/${studyId}/integrations/redcap/participant/upload/csv`)
         .set({ Authorization: `Bearer ${token}` })
@@ -78,23 +92,22 @@ describe('IntegrationsController', () => {
 
       expect(response.status).toBe(201)
 
-      const postCreationLen = await prisma.participantProfile.count({
-        where: {
-          studies: {
-            some: {
-              studyId: studyId,
-            },
-          },
-        },
-      })
-
-      expect(postCreationLen - initialLen).toBe(90) // test still passes if db seed changes
-
-      expect(response.body.ids.length).toBe(90)
+      expect(response.body.newParticipants.length).toBe(90)
     }, 15000)
 
-    it('should not create a profile for details that already have a user', async () => {
+    it('should not return an email that already has a user in that study', async () => {
       const studyId = 1
+      const csvPath = path.resolve(__dirname, '../../tests/test_data/one_user.csv')
+
+      const response0 = await request(app)
+        .post(`/studies/${studyId}/integrations/redcap/participant/upload/csv`)
+        .set({ Authorization: `Bearer ${token}` })
+        .attach('file', csvPath)
+
+      expect(response0.status).toBe(201)
+      expect(response0.body.newParticipants.length).toBe(1)
+
+      // Create the user and participant profile that matches the csv upload
       const user = await prisma.user.create({
         data: {
           firstName: 'John',
@@ -108,7 +121,7 @@ describe('IntegrationsController', () => {
         data: {
           firstName: 'John',
           lastName: 'Smith',
-          dob: new Date('1990-01-01'),
+          dob: '1990-01-01',
           mobile: '1234567890',
           addressLine: '123 Main St',
           suburb: 'Anytown',
@@ -129,16 +142,14 @@ describe('IntegrationsController', () => {
         },
       })
 
-      const csvPath = path.resolve(__dirname, '../../tests/test_data/one_user.csv')
-
-      const response = await request(app)
+      const response1 = await request(app)
         .post(`/studies/${studyId}/integrations/redcap/participant/upload/csv`)
         .set({ Authorization: `Bearer ${token}` })
         .attach('file', csvPath)
 
-      expect(response.status).toBe(201)
-
-      expect(response.body.profilesAlreadyExistedCount).toBe(1)
+      expect(response1.status).toBe(201)
+      expect(response1.body.newParticipants.length).toBe(0)
+      expect(response1.body.existingUsers.length).toBe(1)
     }, 15000)
 
     it('should throw a 400 error if no file is given', async () => {
@@ -242,54 +253,53 @@ describe('IntegrationsController', () => {
         .attach('file', csvPath)
       expect(response.status).toBe(400)
     })
+
+    it('should throw an error if the studyId does not exist', async () => {
+      const response = await request(app)
+        .post('/studies/999/integrations/redcap/participant/upload/api')
+        .set({ Authorization: `Bearer ${token}` })
+
+      expect(response.status).toBe(404)
+      expect(response.body.message).toBe('Study with id 999 not found')
+    })
   })
 
   describe('POST /studies/{studyId}/integrations/redcap/participant/upload/api', () => {
-    it('should register multiple users from one api call', async () => {
+    it('should return a list of emails to be invited to the study', async () => {
       const studyId = 1
-      const initialLen = await prisma.participantProfile.count({
-        where: {
-          studies: {
-            some: {
-              studyId: studyId,
-            },
-          },
-        },
-      })
 
       const response = await request(app)
         .post(`/studies/${studyId}/integrations/redcap/participant/upload/api`)
-        .send({ formName: 'ctrl_test_1' })
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(201)
 
-      const postCreationLen = await prisma.participantProfile.count({
-        where: {
-          studies: {
-            some: {
-              studyId: studyId,
-            },
-          },
-        },
-      })
-
-      expect(postCreationLen - initialLen).toBe(10) // adds the 10 users
+      console.log('RESPONSE TEST', response.body)
 
       // check correct response message
-      expect(response.body.ids.length).toBe(10)
+      expect(response.body.newParticipants.length).toBe(10)
     })
 
-    it('should return a BadGatewayErorr if the api is offline, or unavailable when adding participants', async () => {
+    it('should return a BadGatewayError if the api is offline, or unavailable when adding participants', async () => {
       jest
         .spyOn(global, 'fetch')
         .mockRejectedValueOnce({ message: 'API offline or unavailable', status: 500 })
 
+      const studyId = 1
+
       const response = await request(app)
-        .post('/studies/1/integrations/redcap/participant/upload/api')
-        .send({ formName: 'ctrl_test_1' })
+        .post(`/studies/${studyId}/integrations/redcap/participant/upload/api`)
         .set({ Authorization: `Bearer ${token}` })
 
       expect(response.status).toBe(502)
+    })
+
+    it('should throw an error if the studyId does not exist', async () => {
+      const response = await request(app)
+        .post('/studies/999/integrations/redcap/participant/upload/api')
+        .set({ Authorization: `Bearer ${token}` })
+
+      expect(response.status).toBe(404)
+      expect(response.body.message).toBe('Study with id 999 not found')
     })
   })
 
@@ -303,7 +313,7 @@ describe('IntegrationsController', () => {
       expect(response.status).toBe(201)
       const survey = await prisma.surveyVersion.findFirst({
         where: {
-          id: 2,
+          id: 1,
           studyId: studyId,
         },
       })
@@ -355,7 +365,7 @@ describe('IntegrationsController', () => {
 
     PARTICIPANT_COMPLETED
       answers: [false, 'Choice 2'],
-    
+
     PARTICIPANT_UNANSWERED
       answers: [null, null]
     */
@@ -391,7 +401,7 @@ describe('IntegrationsController', () => {
 
       //Correct when two duos apply to same question
       //Does not return code for question with wrong answer (Choice 2)
-      expect(res.body.data[0].duos).toEqual(['DUO:0000002'])
+      expect(res.body.data[0].duos).toEqual(['DUO:0000006'])
       expect(res.body.data).toHaveLength(2)
     })
 
@@ -430,7 +440,7 @@ describe('IntegrationsController', () => {
         .post('/elsa/duos')
         .set({ Authorization: 'Apikey abc123' })
         .send({ participantIds: [`PID-TEST1-${PARTICIPANT_COMPLETED_ID}`] })
-      expect(res.body.data[0].duos).toEqual(['DUO:0000002'])
+      expect(res.body.data[0].duos).toEqual(['DUO:0000006'])
     })
   })
 })

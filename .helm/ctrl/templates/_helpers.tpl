@@ -84,3 +84,16 @@ aeskey: {{ $secret.data.aeskey }}
 aeskey: {{ (print "k1.aesgcm256." (randAlphaNum 43) "=") | b64enc }}
 {{- end -}}
 {{- end -}}
+
+
+{{/*
+Create or generate postgres password
+*/}}
+{{- define "secret.postgres" -}}
+{{- $secret := lookup "v1" "Secret" .Release.Namespace "ctrl-postgres" -}}
+{{- if $secret.data -}}
+postgres-password: {{ index $secret.data "postgres-password" }}
+{{- else -}}
+postgres-password: {{ randAlphaNum 10 | b64enc }}
+{{- end -}}
+{{- end -}}

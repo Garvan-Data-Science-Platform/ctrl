@@ -258,7 +258,8 @@
         "enum": [
           "OperatorAdmin",
           "Participant",
-          "OrganisationAdmin"
+          "OrganisationAdmin",
+          "StudyAdmin"
         ]
       },
       "CreateUserRequest": {
@@ -307,6 +308,9 @@
           "email": {
             "type": "string",
             "pattern": "^(.+)@(.+)$"
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
           }
         },
         "type": "object",
@@ -845,8 +849,7 @@
                 "format": "double"
               },
               "dob": {
-                "type": "string",
-                "format": "date-time"
+                "type": "string"
               },
               "lastName": {
                 "type": "string"
@@ -958,138 +961,6 @@
         "type": "object",
         "additionalProperties": false
       },
-      "GetSettingsResponse": {
-        "properties": {
-          "data": {
-            "properties": {
-              "tcLink": {
-                "type": "string"
-              },
-              "redcapURL": {
-                "type": "string",
-                "nullable": true
-              },
-              "redcapToken": {
-                "type": "string",
-                "nullable": true
-              },
-              "secondaryColour": {
-                "type": "string",
-                "nullable": true
-              },
-              "primaryColour": {
-                "type": "string",
-                "nullable": true
-              },
-              "mailerPassword": {
-                "type": "string",
-                "nullable": true
-              },
-              "mailerUser": {
-                "type": "string",
-                "nullable": true
-              },
-              "mailerPort": {
-                "type": "number",
-                "format": "double",
-                "nullable": true
-              },
-              "mailerHost": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "required": [
-              "tcLink",
-              "redcapURL",
-              "redcapToken",
-              "secondaryColour",
-              "primaryColour",
-              "mailerPassword",
-              "mailerUser",
-              "mailerPort",
-              "mailerHost"
-            ],
-            "type": "object"
-          }
-        },
-        "required": [
-          "data"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "Partial_GetSettingsResponse-at-data_": {
-        "properties": {
-          "mailerHost": {
-            "type": "string",
-            "nullable": true
-          },
-          "mailerPort": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "mailerUser": {
-            "type": "string",
-            "nullable": true
-          },
-          "mailerPassword": {
-            "type": "string",
-            "nullable": true
-          },
-          "primaryColour": {
-            "type": "string",
-            "nullable": true
-          },
-          "secondaryColour": {
-            "type": "string",
-            "nullable": true
-          },
-          "redcapToken": {
-            "type": "string",
-            "nullable": true
-          },
-          "redcapURL": {
-            "type": "string",
-            "nullable": true
-          },
-          "tcLink": {
-            "type": "string"
-          }
-        },
-        "type": "object",
-        "description": "Make all properties in T optional"
-      },
-      "UpdateSettingsRequest": {
-        "$ref": "#/components/schemas/Partial_GetSettingsResponse-at-data_"
-      },
-      "GetThemeResponse": {
-        "properties": {
-          "data": {
-            "properties": {
-              "secondaryColour": {
-                "type": "string",
-                "nullable": true
-              },
-              "primaryColour": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "required": [
-              "secondaryColour",
-              "primaryColour"
-            ],
-            "type": "object"
-          }
-        },
-        "required": [
-          "data"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
       "Pick_Study.Exclude_keyofStudy.logo__": {
         "properties": {
           "name": {
@@ -1106,6 +977,14 @@
             "type": "string",
             "nullable": true
           },
+          "redcapURL": {
+            "type": "string",
+            "nullable": true
+          },
+          "redcapToken": {
+            "type": "string",
+            "nullable": true
+          },
           "inviteEmailSubject": {
             "type": "string"
           },
@@ -1118,6 +997,8 @@
           "id",
           "deleted",
           "description",
+          "redcapURL",
+          "redcapToken",
           "inviteEmailSubject",
           "inviteEmailText"
         ],
@@ -1167,6 +1048,14 @@
           "inviteEmailSubject": {
             "type": "string"
           },
+          "redcapToken": {
+            "type": "string",
+            "nullable": true
+          },
+          "redcapURL": {
+            "type": "string",
+            "nullable": true
+          },
           "logo": {
             "type": "string",
             "format": "byte",
@@ -1190,6 +1079,8 @@
         "required": [
           "inviteEmailText",
           "inviteEmailSubject",
+          "redcapToken",
+          "redcapURL",
           "logo",
           "description",
           "deleted",
@@ -1244,8 +1135,109 @@
           },
           "description": {
             "type": "string"
+          },
+          "redcapToken": {
+            "type": "string"
+          },
+          "redcapURL": {
+            "type": "string"
           }
         },
+        "type": "object",
+        "additionalProperties": false
+      },
+      "GetSettingsResponse": {
+        "properties": {
+          "data": {
+            "properties": {
+              "newsLink": {
+                "type": "string",
+                "nullable": true
+              },
+              "tcLink": {
+                "type": "string"
+              },
+              "secondaryColour": {
+                "type": "string",
+                "nullable": true
+              },
+              "primaryColour": {
+                "type": "string",
+                "nullable": true
+              },
+              "logoSet": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "required": [
+              "newsLink",
+              "tcLink",
+              "secondaryColour",
+              "primaryColour",
+              "logoSet"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "Partial_Omit_SettingsData.logoSet__": {
+        "properties": {
+          "primaryColour": {
+            "type": "string",
+            "nullable": true
+          },
+          "secondaryColour": {
+            "type": "string",
+            "nullable": true
+          },
+          "tcLink": {
+            "type": "string"
+          },
+          "newsLink": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "type": "object",
+        "description": "Make all properties in T optional"
+      },
+      "UpdateSettingsRequest": {
+        "$ref": "#/components/schemas/Partial_Omit_SettingsData.logoSet__"
+      },
+      "GetUserPortalSettingsResponse": {
+        "properties": {
+          "data": {
+            "properties": {
+              "newsLink": {
+                "type": "string",
+                "nullable": true
+              },
+              "secondaryColour": {
+                "type": "string",
+                "nullable": true
+              },
+              "primaryColour": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "required": [
+              "newsLink",
+              "secondaryColour",
+              "primaryColour"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
         "type": "object",
         "additionalProperties": false
       },
@@ -1498,6 +1490,9 @@
               "$ref": "#/components/schemas/OnBehalf"
             },
             "type": "array"
+          },
+          "externalId": {
+            "type": "string"
           }
         },
         "type": "object",
@@ -1525,8 +1520,7 @@
             "lastName": "Doe",
             "mobile": "0412341432",
             "email": "jeremydoe@email.com"
-          },
-          "dependents": []
+          }
         }
       },
       "ParticipantAnswerStatus": {
@@ -1563,6 +1557,9 @@
             "format": "double"
           },
           "participantId": {
+            "type": "string"
+          },
+          "externalId": {
             "type": "string"
           },
           "email": {
@@ -1632,8 +1629,7 @@
                   "type": "string"
                 },
                 "dob": {
-                  "type": "string",
-                  "format": "date-time"
+                  "type": "string"
                 },
                 "lastName": {
                   "type": "string"
@@ -1764,6 +1760,21 @@
         ],
         "type": "object",
         "additionalProperties": false
+      },
+      "UpdateParticipantRequest": {
+        "properties": {
+          "profile": {
+            "$ref": "#/components/schemas/UpdateProfileRequest"
+          },
+          "externalId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "profile",
+          "externalId"
+        ],
+        "type": "object"
       },
       "GetUserInvitesResponse": {
         "properties": {
@@ -1924,11 +1935,103 @@
         "type": "string",
         "pattern": "^(.+)@(.+)$"
       },
+      "Partial_GetParticipantProfileResponse-at-data_": {
+        "properties": {
+          "id": {
+            "type": "number",
+            "format": "double"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "middleName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "dob": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "mobile": {
+            "type": "string"
+          },
+          "addressLine": {
+            "type": "string"
+          },
+          "suburb": {
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/StateTerritory"
+          },
+          "postcode": {
+            "type": "string"
+          },
+          "preferredContact": {
+            "$ref": "#/components/schemas/ContactMethod"
+          },
+          "participantType": {
+            "$ref": "#/components/schemas/ParticipantType"
+          },
+          "nextOfKin": {
+            "$ref": "#/components/schemas/AlternativeContact"
+          },
+          "familyMembers": {
+            "items": {
+              "$ref": "#/components/schemas/FamilyMember"
+            },
+            "type": "array"
+          },
+          "familyId": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "type": "object",
+        "description": "Make all properties in T optional"
+      },
+      "Prefill": {
+        "properties": {
+          "profile": {
+            "$ref": "#/components/schemas/Partial_GetParticipantProfileResponse-at-data_"
+          },
+          "studyParticipant": {
+            "properties": {
+              "externalId": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object",
+        "additionalProperties": false
+      },
+      "Recipient": {
+        "properties": {
+          "email": {
+            "$ref": "#/components/schemas/Email"
+          },
+          "prefill": {
+            "$ref": "#/components/schemas/Prefill"
+          }
+        },
+        "required": [
+          "email",
+          "prefill"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
       "InviteParticipantsRequest": {
         "properties": {
-          "emails": {
+          "recipients": {
             "items": {
-              "$ref": "#/components/schemas/Email"
+              "$ref": "#/components/schemas/Recipient"
             },
             "type": "array"
           },
@@ -1940,7 +2043,7 @@
           }
         },
         "required": [
-          "emails",
+          "recipients",
           "subjectText",
           "explanatoryText"
         ],
@@ -1978,21 +2081,12 @@
             "type": "string",
             "nullable": true
           },
-          "logo": {
+          "newsLink": {
             "type": "string",
-            "format": "byte",
             "nullable": true
           },
           "tcLink": {
             "type": "string"
-          },
-          "redcapURL": {
-            "type": "string",
-            "nullable": true
-          },
-          "redcapToken": {
-            "type": "string",
-            "nullable": true
           },
           "secondaryColour": {
             "type": "string",
@@ -2002,21 +2096,9 @@
             "type": "string",
             "nullable": true
           },
-          "mailerPassword": {
+          "logo": {
             "type": "string",
-            "nullable": true
-          },
-          "mailerUser": {
-            "type": "string",
-            "nullable": true
-          },
-          "mailerPort": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "mailerHost": {
-            "type": "string",
+            "format": "byte",
             "nullable": true
           },
           "updatedAt": {
@@ -2037,16 +2119,11 @@
         },
         "required": [
           "elsaToken",
-          "logo",
+          "newsLink",
           "tcLink",
-          "redcapURL",
-          "redcapToken",
           "secondaryColour",
           "primaryColour",
-          "mailerPassword",
-          "mailerUser",
-          "mailerPort",
-          "mailerHost",
+          "logo",
           "updatedAt",
           "createdAt",
           "id",
@@ -2152,350 +2229,24 @@
           "content": "There was some problem with this thing that I was doing.\nBut I don't know why?\n\nCheers,\nJohn Doe"
         }
       },
-      "RegisterResponse": {
-        "properties": {
-          "token": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "token"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "RegisterRequest": {
-        "properties": {
-          "firstName": {
-            "type": "string",
-            "minLength": 1
-          },
-          "middleName": {
-            "type": "string",
-            "minLength": 1
-          },
-          "lastName": {
-            "type": "string",
-            "minLength": 1
-          },
-          "email": {
-            "type": "string",
-            "pattern": "^(.+)@(.+)$"
-          },
-          "password": {
-            "type": "string",
-            "minLength": 8
-          },
-          "role": {
-            "$ref": "#/components/schemas/Role"
-          }
-        },
-        "required": [
-          "firstName",
-          "lastName",
-          "email",
-          "password",
-          "role"
-        ],
-        "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "firstName": "John",
-          "lastName": "Doe",
-          "email": "john.doe@email.com",
-          "password": "Password123",
-          "role": "OrganisationAdmin"
-        }
-      },
-      "SetupResponse": {
-        "properties": {
-          "isSetup": {
-            "type": "boolean"
-          },
-          "oidc": {
-            "items": {
-              "properties": {
-                "icon": {
-                  "type": "string"
-                },
-                "clientId": {
-                  "type": "string"
-                },
-                "host": {
-                  "type": "string"
-                },
-                "name": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "icon",
-                "clientId",
-                "host",
-                "name"
-              ],
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "disableAdminPasswordLogin": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "isSetup",
-          "oidc",
-          "disableAdminPasswordLogin"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "RegisterSetupRequest": {
-        "properties": {
-          "email": {
-            "type": "string",
-            "pattern": "^(.+)@(.+)$"
-          },
-          "password": {
-            "type": "string",
-            "minLength": 8
-          }
-        },
-        "required": [
-          "email",
-          "password"
-        ],
-        "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "email": "john.doe@email.com",
-          "password": "Password123"
-        }
-      },
-      "RegisterParticipantResponse": {
-        "properties": {
-          "id": {
-            "type": "number",
-            "format": "double"
-          },
-          "token": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "token"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "RegisterParticipantRequest": {
-        "properties": {
-          "firstName": {
-            "type": "string",
-            "minLength": 1
-          },
-          "middleName": {
-            "type": "string",
-            "minLength": 1
-          },
-          "lastName": {
-            "type": "string",
-            "minLength": 1
-          },
-          "email": {
-            "type": "string",
-            "pattern": "^(.+)@(.+)$"
-          },
-          "mobile": {
-            "type": "string",
-            "pattern": "^(\\+\\d{1,2}\\s?)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$"
-          },
-          "preferredContact": {
-            "$ref": "#/components/schemas/ContactMethod"
-          },
-          "addressLine": {
-            "type": "string",
-            "minLength": 1
-          },
-          "suburb": {
-            "type": "string",
-            "minLength": 1
-          },
-          "postcode": {
-            "type": "string",
-            "minLength": 1
-          },
-          "state": {
-            "$ref": "#/components/schemas/StateTerritory"
-          },
-          "password": {
-            "type": "string",
-            "minLength": 8
-          },
-          "dob": {
-            "type": "string"
-          },
-          "participantType": {
-            "$ref": "#/components/schemas/ParticipantType"
-          },
-          "nextOfKin": {
-            "$ref": "#/components/schemas/AlternativeContact"
-          },
-          "dependents": {
-            "items": {
-              "$ref": "#/components/schemas/OnBehalf"
-            },
-            "type": "array"
-          }
-        },
-        "required": [
-          "firstName",
-          "lastName",
-          "email",
-          "mobile",
-          "preferredContact",
-          "addressLine",
-          "suburb",
-          "postcode",
-          "state",
-          "password",
-          "dob",
-          "participantType",
-          "nextOfKin",
-          "dependents"
-        ],
-        "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "firstName": "John",
-          "middleName": "James",
-          "lastName": "Doe",
-          "email": "john.doe@email.com",
-          "password": "Password123",
-          "dob": "2000-05-21",
-          "mobile": "0412341234",
-          "addressLine": "123 Sydney Street",
-          "suburb": "Sydney",
-          "postcode": "2000",
-          "state": "NSW",
-          "participantType": "STANDARD",
-          "preferredContact": "MOBILE",
-          "nextOfKin": {
-            "firstName": "Jeremy",
-            "middleName": "Jimmy",
-            "lastName": "Doe",
-            "mobile": "0412341432",
-            "email": "jeremydoe@email.com"
-          },
-          "dependents": []
-        }
-      },
-      "LoginResponse": {
-        "properties": {
-          "token": {
-            "type": "string"
-          },
-          "otp_token": {
-            "type": "string"
-          }
-        },
-        "type": "object",
-        "additionalProperties": false
-      },
-      "OIDCLoginRequest": {
-        "properties": {
-          "code": {
-            "type": "string"
-          },
-          "provider": {
-            "type": "string"
-          },
-          "redirect_uri": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "code",
-          "provider",
-          "redirect_uri"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "LoginRequest": {
-        "properties": {
-          "email": {
-            "type": "string",
-            "pattern": "^(.+)@(.+)$"
-          },
-          "password": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "email",
-          "password"
-        ],
-        "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "email": "john.doe@email.com",
-          "password": "Password123"
-        }
-      },
-      "OTPLoginRequest": {
-        "properties": {
-          "otp_token": {
-            "type": "string"
-          },
-          "otp_code": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "otp_token",
-          "otp_code"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
       "UploadRedcapParticipantResponse": {
         "properties": {
-          "profilesCreatedCount": {
-            "type": "number",
-            "format": "double"
-          },
-          "profilesAlreadyExistedCount": {
-            "type": "number",
-            "format": "double"
-          },
-          "ids": {
+          "newParticipants": {
             "items": {
-              "type": "number",
-              "format": "double"
+              "$ref": "#/components/schemas/Recipient"
+            },
+            "type": "array"
+          },
+          "existingUsers": {
+            "items": {
+              "type": "string"
             },
             "type": "array"
           }
         },
         "required": [
-          "profilesCreatedCount",
-          "profilesAlreadyExistedCount",
-          "ids"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "UploadRedcapParticipantAPIRequest": {
-        "description": "This is the name of the redcap instrument you are importing from.\nNOTE: These 'forms' are not the form label values that are seen on the webpages,\nbut instead they are the unique form names seen in Column B of the data dictionary.",
-        "properties": {
-          "formName": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "required": [
-          "formName"
+          "newParticipants",
+          "existingUsers"
         ],
         "type": "object",
         "additionalProperties": false
@@ -2614,6 +2365,364 @@
       },
       "AddDependentRequest": {
         "$ref": "#/components/schemas/OnBehalf"
+      },
+      "RegisterResponse": {
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "RegisterRequest": {
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "middleName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "lastName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "email": {
+            "type": "string",
+            "pattern": "^(.+)@(.+)$"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "email",
+          "password",
+          "role"
+        ],
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "firstName": "John",
+          "lastName": "Doe",
+          "email": "john.doe@email.com",
+          "password": "Password123",
+          "role": "OrganisationAdmin"
+        }
+      },
+      "SetupResponse": {
+        "properties": {
+          "isSetup": {
+            "type": "boolean"
+          },
+          "oidc": {
+            "items": {
+              "properties": {
+                "authorizeUrlParams": {
+                  "type": "string"
+                },
+                "displayInUserPortal": {
+                  "type": "boolean"
+                },
+                "displayInAdminPortal": {
+                  "type": "boolean"
+                },
+                "icon": {
+                  "type": "string"
+                },
+                "clientId": {
+                  "type": "string"
+                },
+                "host": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "authorizeUrlParams",
+                "displayInUserPortal",
+                "displayInAdminPortal",
+                "icon",
+                "clientId",
+                "host",
+                "name"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "disableAdminPasswordLogin": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "isSetup",
+          "oidc",
+          "disableAdminPasswordLogin"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "RegisterSetupRequest": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "pattern": "^(.+)@(.+)$"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ],
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "email": "john.doe@email.com",
+          "password": "Password123"
+        }
+      },
+      "RegisterParticipantResponse": {
+        "properties": {
+          "id": {
+            "type": "number",
+            "format": "double"
+          },
+          "token": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "token",
+          "role"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "RegisterParticipantRequest": {
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "middleName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "lastName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "email": {
+            "type": "string",
+            "pattern": "^(.+)@(.+)$"
+          },
+          "mobile": {
+            "type": "string",
+            "pattern": "^(\\+\\d{1,2}\\s?)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$"
+          },
+          "preferredContact": {
+            "$ref": "#/components/schemas/ContactMethod"
+          },
+          "addressLine": {
+            "type": "string",
+            "minLength": 1
+          },
+          "suburb": {
+            "type": "string",
+            "minLength": 1
+          },
+          "postcode": {
+            "type": "string",
+            "minLength": 1
+          },
+          "state": {
+            "$ref": "#/components/schemas/StateTerritory"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8
+          },
+          "dob": {
+            "type": "string"
+          },
+          "participantType": {
+            "$ref": "#/components/schemas/ParticipantType"
+          },
+          "nextOfKin": {
+            "$ref": "#/components/schemas/AlternativeContact"
+          },
+          "dependents": {
+            "items": {
+              "$ref": "#/components/schemas/OnBehalf"
+            },
+            "type": "array"
+          },
+          "externalId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "email",
+          "mobile",
+          "preferredContact",
+          "addressLine",
+          "suburb",
+          "postcode",
+          "state",
+          "password",
+          "dob",
+          "participantType",
+          "nextOfKin",
+          "dependents"
+        ],
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "firstName": "John",
+          "middleName": "James",
+          "lastName": "Doe",
+          "email": "john.doe@email.com",
+          "password": "Password123",
+          "dob": "2000-05-21",
+          "mobile": "0412341234",
+          "addressLine": "123 Sydney Street",
+          "suburb": "Sydney",
+          "postcode": "2000",
+          "state": "NSW",
+          "participantType": "STANDARD",
+          "preferredContact": "MOBILE",
+          "nextOfKin": {
+            "firstName": "Jeremy",
+            "middleName": "Jimmy",
+            "lastName": "Doe",
+            "mobile": "0412341432",
+            "email": "jeremydoe@email.com"
+          },
+          "dependents": []
+        }
+      },
+      "LoginSuccessResponse": {
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "id": {
+            "type": "number",
+            "format": "double"
+          },
+          "role": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "id",
+          "role"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "OIDCLoginRequest": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "redirect_uri": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "provider",
+          "redirect_uri"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "LoginChallengeResponse": {
+        "properties": {
+          "otp_token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "otp_token"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "LoginResponse": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/LoginSuccessResponse"
+          },
+          {
+            "$ref": "#/components/schemas/LoginChallengeResponse"
+          }
+        ]
+      },
+      "LoginRequest": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "pattern": "^(.+)@(.+)$"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ],
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "email": "john.doe@email.com",
+          "password": "Password123"
+        }
+      },
+      "OTPLoginRequest": {
+        "properties": {
+          "otp_token": {
+            "type": "string"
+          },
+          "otp_code": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "otp_token",
+          "otp_code"
+        ],
+        "type": "object",
+        "additionalProperties": false
       }
     },
     "securitySchemes": {
@@ -2735,7 +2844,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -2795,7 +2905,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -2838,14 +2949,15 @@
           }
         },
         "description": "Get all deleted Admin Users",
-        "summary": "Get all deleted Admin Users",
+        "summary": "Get all deleted Organisation and Study Admin Users",
         "tags": [
           "Users"
         ],
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -2968,7 +3080,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -3039,7 +3152,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -3118,6 +3232,112 @@
           {
             "in": "path",
             "name": "userId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/users/{userId}/make-study-admin/{studyId}": {
+      "post": {
+        "operationId": "MakeStudyAdmin",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Make a user a study admin",
+        "summary": "Make a user admin of a study",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin",
+              "StudyAdmin"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/users/{userId}/remove-study-admin/{studyId}": {
+      "post": {
+        "operationId": "RemoveStudyAdmin",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Remove a user as admin of a study",
+        "summary": "Remove a study admin",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin",
+              "StudyAdmin"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "studyId",
             "required": true,
             "schema": {
               "format": "double",
@@ -3331,7 +3551,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -3380,7 +3601,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -3438,7 +3660,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -3722,7 +3945,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -3780,7 +4004,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -3849,7 +4074,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -3866,6 +4092,620 @@
           {
             "in": "path",
             "name": "versionNumber",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/studies": {
+      "get": {
+        "operationId": "GetAllStudies",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllStudiesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Get all Studies",
+        "summary": "Get all Studies",
+        "tags": [
+          "Studies"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin",
+              "StudyAdmin"
+            ]
+          }
+        ],
+        "parameters": []
+      },
+      "post": {
+        "operationId": "CreateStudy",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateStudyResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Create a new study.",
+        "summary": "Create a new Study",
+        "tags": [
+          "Studies"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin",
+              "StudyAdmin"
+            ]
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStudyRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/studies/list": {
+      "get": {
+        "operationId": "ListStudies",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllStudiesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "List users Studies",
+        "summary": "List all Studies that a user is participating in, by token (doesn't include pending invitations)",
+        "tags": [
+          "Studies"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "Participant"
+            ]
+          }
+        ],
+        "parameters": []
+      }
+    },
+    "/studies/deleted": {
+      "get": {
+        "operationId": "GetDeletedStudies",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllStudiesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Get deleted Studies",
+        "summary": "Get deleted Studies",
+        "tags": [
+          "Studies"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin",
+              "StudyAdmin"
+            ]
+          }
+        ],
+        "parameters": []
+      }
+    },
+    "/studies/{studyId}/restore": {
+      "patch": {
+        "operationId": "RestoreStudyById",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Restores a Deleted Study by ID",
+        "summary": "Restore Deleted Study by Id",
+        "tags": [
+          "Studies"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin",
+              "StudyAdmin"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/studies/{studyId}": {
+      "get": {
+        "operationId": "GetStudyById",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetStudyByIdResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Gets a Specific Study by ID",
+        "summary": "Get Specific Study by Id",
+        "tags": [
+          "Studies"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "UpdateStudy",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Update an existing study.",
+        "summary": "Update an existing Study",
+        "tags": [
+          "Studies"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin",
+              "StudyAdmin"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStudyRequest"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "DeleteStudy",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Delete a study",
+        "summary": "Delete a study",
+        "tags": [
+          "Studies"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin",
+              "StudyAdmin"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/studies/{studyId}/logo": {
+      "post": {
+        "operationId": "UploadLogo",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "tags": [
+          "Studies"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin",
+              "StudyAdmin"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "GetLogo",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "tags": [
+          "Studies"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "DeleteLogo",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "tags": [
+          "Studies"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin",
+              "StudyAdmin"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
             "required": true,
             "schema": {
               "format": "double",
@@ -3984,7 +4824,7 @@
         }
       }
     },
-    "/settings/theme": {
+    "/settings/userportal": {
       "get": {
         "operationId": "GetTheme",
         "responses": {
@@ -3993,7 +4833,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetThemeResponse"
+                  "$ref": "#/components/schemas/GetUserPortalSettingsResponse"
                 }
               }
             }
@@ -4119,6 +4959,16 @@
               }
             }
           },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Validation Failed",
             "content": {
@@ -4145,372 +4995,9 @@
         ],
         "security": [],
         "parameters": []
-      }
-    },
-    "/studies": {
-      "get": {
-        "operationId": "GetAllStudies",
-        "responses": {
-          "200": {
-            "description": "Ok",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetAllStudiesResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "description": "Get all Studies",
-        "summary": "Get all Studies",
-        "tags": [
-          "Studies"
-        ],
-        "security": [
-          {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
-          }
-        ],
-        "parameters": []
-      },
-      "post": {
-        "operationId": "CreateStudy",
-        "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CreateStudyResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Failed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "description": "Create a new study.",
-        "summary": "Create a new Study",
-        "tags": [
-          "Studies"
-        ],
-        "security": [
-          {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
-          }
-        ],
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateStudyRequest"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/studies/list": {
-      "get": {
-        "operationId": "ListStudies",
-        "responses": {
-          "200": {
-            "description": "Ok",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetAllStudiesResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "description": "List users Studies",
-        "summary": "List all Studies that a user is participating in, by token (doesn't include pending invitations)",
-        "tags": [
-          "Studies"
-        ],
-        "security": [
-          {
-            "jwt": [
-              "Participant"
-            ]
-          }
-        ],
-        "parameters": []
-      }
-    },
-    "/studies/deleted": {
-      "get": {
-        "operationId": "GetDeletedStudies",
-        "responses": {
-          "200": {
-            "description": "Ok",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetAllStudiesResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "description": "Get deleted Studies",
-        "summary": "Get deleted Studies",
-        "tags": [
-          "Studies"
-        ],
-        "security": [
-          {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
-          }
-        ],
-        "parameters": []
-      }
-    },
-    "/studies/{studyId}/restore": {
-      "patch": {
-        "operationId": "RestoreStudyById",
-        "responses": {
-          "204": {
-            "description": "No content"
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "description": "Restores a Deleted Study by ID",
-        "summary": "Restore Deleted Study by Id",
-        "tags": [
-          "Studies"
-        ],
-        "security": [
-          {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "studyId",
-            "required": true,
-            "schema": {
-              "format": "double",
-              "type": "number"
-            }
-          }
-        ]
-      }
-    },
-    "/studies/{studyId}": {
-      "get": {
-        "operationId": "GetStudyById",
-        "responses": {
-          "200": {
-            "description": "Ok",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetStudyByIdResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "description": "Gets a Specific Study by ID",
-        "summary": "Get Specific Study by Id",
-        "tags": [
-          "Studies"
-        ],
-        "security": [
-          {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "studyId",
-            "required": true,
-            "schema": {
-              "format": "double",
-              "type": "number"
-            }
-          }
-        ]
-      },
-      "patch": {
-        "operationId": "UpdateStudy",
-        "responses": {
-          "204": {
-            "description": "No content"
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NotFoundErrorResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Failed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "description": "Update an existing study.",
-        "summary": "Update an existing Study",
-        "tags": [
-          "Studies"
-        ],
-        "security": [
-          {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "studyId",
-            "required": true,
-            "schema": {
-              "format": "double",
-              "type": "number"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateStudyRequest"
-              }
-            }
-          }
-        }
       },
       "delete": {
-        "operationId": "DeleteStudy",
+        "operationId": "DeleteLogo",
         "responses": {
           "204": {
             "description": "No content"
@@ -4536,13 +5023,18 @@
             }
           },
           "500": {
-            "description": "Internal Server Error"
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
           }
         },
-        "description": "Delete a study",
-        "summary": "Delete a study",
         "tags": [
-          "Studies"
+          "Settings"
         ],
         "security": [
           {
@@ -4551,144 +5043,7 @@
             ]
           }
         ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "studyId",
-            "required": true,
-            "schema": {
-              "format": "double",
-              "type": "number"
-            }
-          }
-        ]
-      }
-    },
-    "/studies/{studyId}/logo": {
-      "post": {
-        "operationId": "UploadLogo",
-        "responses": {
-          "204": {
-            "description": "No content"
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Failed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "tags": [
-          "Studies"
-        ],
-        "security": [
-          {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "studyId",
-            "required": true,
-            "schema": {
-              "format": "double",
-              "type": "number"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary"
-                  }
-                },
-                "required": [
-                  "file"
-                ]
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "operationId": "GetLogo",
-        "responses": {
-          "200": {
-            "description": "Ok",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string",
-                  "format": "byte"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Failed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "tags": [
-          "Studies"
-        ],
-        "security": [],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "studyId",
-            "required": true,
-            "schema": {
-              "format": "double",
-              "type": "number"
-            }
-          }
-        ]
+        "parameters": []
       }
     },
     "/profiles/current": {
@@ -4853,7 +5208,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -4921,7 +5277,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -4980,7 +5337,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -5060,7 +5418,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -5130,7 +5489,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -5193,7 +5553,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -5282,7 +5643,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -5306,6 +5668,84 @@
             }
           }
         ]
+      },
+      "patch": {
+        "operationId": "UpdateProfileById",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Participants"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "studyId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "profileId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateParticipantRequest"
+              }
+            }
+          }
+        }
       },
       "delete": {
         "operationId": "DeleteParticipantById",
@@ -5362,7 +5802,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -5442,7 +5883,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -5668,7 +6110,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -5736,7 +6179,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -5799,7 +6243,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -5860,7 +6305,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -5923,7 +6369,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -6001,7 +6448,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -6013,6 +6461,57 @@
             "schema": {
               "format": "double",
               "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/invites/{inviteId}/prefill": {
+      "get": {
+        "operationId": "GetPrefillDataById",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Get invite prefill data by ID",
+        "summary": "Get invite prefill data by ID",
+        "tags": [
+          "Invites"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "inviteId",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ]
@@ -6683,483 +7182,6 @@
         }
       }
     },
-    "/auth/register": {
-      "post": {
-        "operationId": "RegisterUser",
-        "responses": {
-          "201": {
-            "description": "User Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RegisterResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Content",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnprocessableError"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "description": "register",
-        "summary": "Register a new user",
-        "tags": [
-          "Auth"
-        ],
-        "security": [
-          {
-            "jwt": [
-              "OrganisationAdmin"
-            ]
-          }
-        ],
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegisterRequest"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/auth/setup": {
-      "get": {
-        "operationId": "CheckSetup",
-        "responses": {
-          "200": {
-            "description": "Ok",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SetupResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Content",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnprocessableError"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "description": "Check setup",
-        "summary": "Check if CTRL is setup",
-        "tags": [
-          "Auth"
-        ],
-        "security": [],
-        "parameters": []
-      }
-    },
-    "/auth/register/setup": {
-      "post": {
-        "operationId": "RegisterInitialUser",
-        "responses": {
-          "201": {
-            "description": "User Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RegisterResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Content",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnprocessableError"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "description": "register admin",
-        "summary": "Register initial admin user",
-        "tags": [
-          "Auth"
-        ],
-        "security": [],
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegisterSetupRequest"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/auth/register/participants/{inviteId}": {
-      "post": {
-        "operationId": "RegisterParticipant",
-        "responses": {
-          "201": {
-            "description": "Participant Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RegisterParticipantResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Content",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnprocessableError"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "description": "registerParticipant",
-        "summary": "Register a participant",
-        "tags": [
-          "Auth"
-        ],
-        "security": [],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "inviteId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegisterParticipantRequest"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/auth/login/oidc": {
-      "post": {
-        "operationId": "LoginOIDC",
-        "responses": {
-          "200": {
-            "description": "Ok",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Content",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnprocessableError"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "description": "OIDC login",
-        "summary": "Login using OIDC",
-        "tags": [
-          "Auth"
-        ],
-        "security": [],
-        "parameters": [
-          {
-            "in": "header",
-            "name": "x-client-type",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/OIDCLoginRequest"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/auth/login": {
-      "post": {
-        "operationId": "Login",
-        "responses": {
-          "200": {
-            "description": "Ok",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Content",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnprocessableError"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "description": "login",
-        "summary": "Login a User",
-        "tags": [
-          "Auth"
-        ],
-        "security": [],
-        "parameters": [
-          {
-            "in": "header",
-            "name": "x-client-type",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginRequest"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/auth/login/otp": {
-      "post": {
-        "operationId": "LoginOtp",
-        "responses": {
-          "200": {
-            "description": "Ok",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Content",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnprocessableError"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "description": "One time password",
-        "summary": "Log in with a OTP code",
-        "tags": [
-          "Auth"
-        ],
-        "security": [],
-        "parameters": [
-          {
-            "in": "header",
-            "name": "x-client-type",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/OTPLoginRequest"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/auth/tcs": {
-      "get": {
-        "operationId": "Tcs",
-        "responses": {
-          "302": {
-            "description": "Redirect"
-          },
-          "422": {
-            "description": "Unprocessable Content",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnprocessableError"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "description": "Terms and conditions link",
-        "summary": "Redirects to configured terms and conditions url",
-        "tags": [
-          "Auth"
-        ],
-        "security": [],
-        "parameters": []
-      }
-    },
     "/studies/{studyId}/integrations/redcap/participant/upload/csv": {
       "post": {
         "operationId": "UploadRedcapParticipantCSV",
@@ -7211,7 +7233,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -7298,7 +7321,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -7312,17 +7336,7 @@
               "type": "number"
             }
           }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UploadRedcapParticipantAPIRequest"
-              }
-            }
-          }
-        }
+        ]
       }
     },
     "/studies/{studyId}/integrations/redcap/instrument/upload/csv": {
@@ -7376,7 +7390,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -7463,7 +7478,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -7757,7 +7773,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -7849,7 +7866,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -7931,7 +7949,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -8013,7 +8032,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -8104,7 +8124,8 @@
         "security": [
           {
             "jwt": [
-              "OrganisationAdmin"
+              "OrganisationAdmin",
+              "StudyAdmin"
             ]
           }
         ],
@@ -8138,6 +8159,483 @@
             }
           }
         }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "operationId": "RegisterUser",
+        "responses": {
+          "201": {
+            "description": "User Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "register",
+        "summary": "Register a new user",
+        "tags": [
+          "Auth"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin"
+            ]
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/setup": {
+      "get": {
+        "operationId": "CheckSetup",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SetupResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Check setup",
+        "summary": "Check if CTRL is setup",
+        "tags": [
+          "Auth"
+        ],
+        "security": [],
+        "parameters": []
+      }
+    },
+    "/auth/register/setup": {
+      "post": {
+        "operationId": "RegisterInitialUser",
+        "responses": {
+          "201": {
+            "description": "User Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "register admin",
+        "summary": "Register initial admin user",
+        "tags": [
+          "Auth"
+        ],
+        "security": [],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterSetupRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/register/participants/{inviteId}": {
+      "post": {
+        "operationId": "RegisterParticipant",
+        "responses": {
+          "201": {
+            "description": "Participant Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterParticipantResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "registerParticipant",
+        "summary": "Register a participant",
+        "tags": [
+          "Auth"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "inviteId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterParticipantRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login/oidc": {
+      "post": {
+        "operationId": "LoginOIDC",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginSuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "OIDC login",
+        "summary": "Login using OIDC",
+        "tags": [
+          "Auth"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-client-type",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OIDCLoginRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "Login",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "login",
+        "summary": "Login a User",
+        "tags": [
+          "Auth"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-client-type",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login/otp": {
+      "post": {
+        "operationId": "LoginOtp",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginSuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "One time password",
+        "summary": "Log in with a OTP code",
+        "tags": [
+          "Auth"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-client-type",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OTPLoginRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/tcs": {
+      "get": {
+        "operationId": "Tcs",
+        "responses": {
+          "302": {
+            "description": "Redirect"
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Terms and conditions link",
+        "summary": "Redirects to configured terms and conditions url",
+        "tags": [
+          "Auth"
+        ],
+        "security": [],
+        "parameters": []
       }
     }
   },

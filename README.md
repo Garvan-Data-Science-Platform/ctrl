@@ -1,11 +1,10 @@
 <div align="center">
 
   <h1>CTRL</h1>
-  
+
   Dynamic Consent Management Platform
-  
+
   [![Build checks](https://github.com/Garvan-Data-Science-Platform/ctrl-next/actions/workflows/check.yml/badge.svg)](https://github.com/Garvan-Data-Science-Platform/ctrl-next/actions/workflows/check.yml)
-  [![Release](https://github.com/Garvan-Data-Science-Platform/ctrl-next/actions/workflows/release.yml/badge.svg)](https://github.com/Garvan-Data-Science-Platform/ctrl-next/actions/workflows/release.yml)
 
   <div>
     <a href="https://ctrldemo.dsp.garvan.org.au/login"><b>Participant Portal Demo</b></a>
@@ -17,23 +16,32 @@
     <a href="https://www.australiangenomics.org.au/tools-and-resources/dynamic-consent-and-ctrl/"><b>Website</b></a>
   </div>
   <br/>
-  <img src="docs/participant-portal.png" alt="GIF" width="100%" style="margin: 0 20px;"/>
-
+  <img src="docs/ctrl-consent-page.png" alt="Ctrl Consent Page" width="100%" style="margin: 0 20px;"/>
 </div>
 
-CTRL, developed by [Garvan Institute of Medical Research](https://www.garvan.org.au/), is a secure, web-based dynamic consent platform that empowers research participants to manage their consent preferences, update personal details, and make informed decisions about the use of their genomic and health data. For research organizations, CTRL streamlines consent management by replacing paper records with electronic ones, offering interoperability with databases like [REDCap](https://projectredcap.org/), and managing permissions.
+CTRL, developed by [Garvan Institute of Medical Research](https://www.garvan.org.au/), is a secure, web-based dynamic consent platform that empowers research participants to manage their consent preferences, update personal details, and make informed decisions about the use of their genomic and health data. For research organisations, CTRL streamlines consent management by replacing paper records with electronic ones, offering interoperability with databases like [REDCap](https://projectredcap.org/), and managing permissions.
 
 **Demo Login Information**
 
-**User Portal**  
-URL: [http://ctrldemo.dsp.garvan.org.au/](http://ctrldemo.dsp.garvan.org.au/)  
-Login: `user@example.com`  
+**User Portal**
+URL: [http://ctrldemo.dsp.garvan.org.au/](http://ctrldemo.dsp.garvan.org.au/)
+Login: `user@example.com`
 Password: `Testpassword2`
 
-**Admin Portal**  
-URL: [http://admin.ctrldemo.dsp.garvan.org.au/](http://admin.ctrldemo.dsp.garvan.org.au/)  
-Login: `admin@example.com`  
+**Admin Portal**
+URL: [http://admin.ctrldemo.dsp.garvan.org.au/](http://admin.ctrldemo.dsp.garvan.org.au/)
+Login: `admin@example.com`
 Password: `Testpassword1`
+
+## Features
+
+- User Portal: A mobile friendly web portal where users can submit and update their consent, update personal details, a 'contact us' form and more.
+- Admin Portal: A dashboard for creating consent forms, inviting participants, viewing and exporting consent responses
+- Multiple studies: manage participant consent for multiple studies in a single platform
+- Authentication via OIDC or email/password
+- Quick and easy installation via helm
+- REDCap Integration
+- Production Grade Security: full audit logging, encryption at rest, MFA
 
 ## Installation
 
@@ -70,7 +78,7 @@ We take special care to ensure upgrading this way is always safe. If you are usi
 
 The use of `nvm` to manage node versions is highly recommended. Install `nvm` using [these instructions](https://github.com/nvm-sh/nvm).
 
-Docker is required to run this project locally to containerise and manage the application's services, including the frontend clients (user-client, admin-client), backend API, and supporting services like PostgreSQL. Each main component has its own Dockerfile for building optimized images, and docker-compose.yml is used to orchestrate local environments, making it easy to spin up, test, and manage dependencies consistently across different setups.
+Docker is required to run this project locally to containerise and manage the application's services, including the frontend clients (user-client, admin-client), backend API, and supporting services like PostgreSQL. Each main component has its own Dockerfile for building optimised images, and docker-compose.yml is used to orchestrate local environments, making it easy to spin up, test, and manage dependencies consistently across different setups.
 
 Then from the root of the `ctrl-next` repository run the following commands:
 
@@ -179,6 +187,13 @@ CTRL is also partially funded through [GUARDIANS](https://www.biocommons.org.au/
   <img src="docs/australian-genomics-logo.png" alt="Australian Genomics Logo" width="200" style="margin: 0 20px;"/>
   <img src="docs/australian-biocommons-logo.png" alt="Australian Biocommons Logo" width="200" style="margin: 0 20px;"/>
 </div>
+
+## Screenshots
+**Admin Portal**
+<img src="docs/ctrl-admin-portal.gif" alt="Ctrl Admin Portal" width="100%" style="margin: 0 20px;"/>
+
+**Participant Portal**
+<img src="docs/ctrl-participant-portal.gif" alt="Ctrl Participant Portal" width="100%" style="margin: 0 20px;"/>
 
 ## Want to contribute?
 

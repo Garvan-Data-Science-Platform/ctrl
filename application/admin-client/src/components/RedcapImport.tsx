@@ -16,9 +16,9 @@ import { useEffect, useState } from 'react'
 import { Close, ArrowBack } from '@mui/icons-material'
 import ReactMarkdown from 'react-markdown'
 import { useNotification, useBack } from '@refinedev/core'
-import { GetSettingsResponse } from '@common/types/api/settings'
-import { HashLink } from 'react-router-hash-link'
-import { axiosInstance } from '../providers/dataProvider'
+import { Link } from 'react-router-dom'
+import { useCurrentStudyId, useStudyStore } from '../studyStore'
+import { RedcapLogo } from './RedcapLogo'
 
 interface RedcapImportProps {
   type: 'survey' | 'participant'
@@ -82,14 +82,17 @@ export const RedcapImport = ({
 
   const [redcapIsSetup, setRedcapIsSetup] = useState(true)
 
+  const { studies } = useStudyStore()
+  const studyId = useCurrentStudyId()
+
   useEffect(() => {
-    axiosInstance.get('/settings').then((res) => {
-      const settings = res.data.data as GetSettingsResponse['data']
-      if (!settings.redcapToken || !settings.redcapURL) {
-        setRedcapIsSetup(false)
-      }
-    })
-  }, [])
+    const currentStudy = studies.find((val) => val.id == studyId)
+    if (!currentStudy?.redcapToken || !currentStudy?.redcapURL) {
+      setRedcapIsSetup(false)
+    } else {
+      setRedcapIsSetup(true)
+    }
+  }, [studies, studyId])
 
   return (
     <Box>
@@ -137,11 +140,7 @@ export const RedcapImport = ({
           }
         }}
       >
-        <img
-          src="/redcap.png"
-          alt="REDCap Logo"
-          style={{ height: '100px', marginBottom: '16px' }}
-        />
+        <RedcapLogo />
         <Typography variant="body2" color="error" gutterBottom>
           {warningMessage}
         </Typography>
@@ -150,16 +149,29 @@ export const RedcapImport = ({
             <Typography variant="h6" gutterBottom sx={{ textTransform: 'capitalize' }}>
               Upload {type} File
             </Typography>
-            <Button variant="outlined" component="label">
-              UPLOAD FILE
-              <input
-                type="file"
-                hidden
-                accept=".csv"
-                onChange={handleFileChange}
-                data-cy={`${type}Attach`}
-              />
-            </Button>
+            {type == 'participant' ? (
+              <Button
+                variant="outlined"
+                component={Link}
+                to="/participants"
+                state={{ openCsvModal: true }}
+                data-cy="upload-button"
+              >
+                UPLOAD FILE
+              </Button>
+            ) : (
+              <Button variant="outlined" component="label">
+                UPLOAD FILE
+                <input
+                  type="file"
+                  hidden
+                  accept=".csv"
+                  onChange={handleFileChange}
+                  data-cy={`${type}Attach`}
+                />
+              </Button>
+            )}
+
             {file && (
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <Box sx={{ mt: 2, textAlign: 'center' }}>
@@ -186,12 +198,13 @@ export const RedcapImport = ({
             )}
             <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
               Need help?{' '}
-              <span
-                style={{ color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}
+              <Typography
+                component="span"
+                sx={{ color: 'primary.main', textDecoration: 'underline', cursor: 'pointer' }}
                 onClick={handleHelpPageOpen}
               >
                 How to export {type}s from REDCap
-              </span>
+              </Typography>
             </Typography>
 
             <Modal open={openHelpPage} onClose={handleHelpPageClose} data-cy="helpPage">
@@ -204,7 +217,8 @@ export const RedcapImport = ({
                   width: '75%',
                   maxHeight: '80vh',
                   bgcolor: 'background.paper',
-                  border: '2px solid #000',
+                  border: 1,
+                  borderColor: 'divider',
                   boxShadow: 24,
                   p: 4,
                   overflow: 'auto',
@@ -260,7 +274,7 @@ export const RedcapImport = ({
                 <Typography>Redcap API is not set up</Typography>
                 {/* 
                 // @ts-ignore */}
-                <Button component={HashLink} to="/settings#redcap">
+                <Button component={Link} to={`/studies?advanced=${studyId}`}>
                   Redcap settings
                 </Button>
               </>

@@ -2,6 +2,11 @@ import prisma from '../../backend/src/PrismaClient'
 import { SurveysController } from '../../backend/src/controllers/SurveysController'
 import logger from 'common/src/logger'
 import { PARTICIPANT_UNANSWERED_ID, seedTests } from './seed'
+import { Prefill } from 'common/types/invite'
+import { createHash } from 'crypto'
+import { processLogoImage } from '../src/imageHelpers'
+import fs from 'fs'
+import path from 'path'
 
 // Function to reset DB state
 export async function resetDB(): Promise<null> {
@@ -121,9 +126,33 @@ export async function deleteFile(filePath: string) {
   }
 }
 
-export async function updateLogo(filePath: string) {
+type LogoUpdateOptions =
+  | { target: 'organisation'; filePath: string; id?: never }
+  | { target: 'study'; filePath: string; id: number }
+
+export async function updateLogo(options: LogoUpdateOptions) {
   const fs = await import('fs')
-  await prisma.organisation.update({ where: { id: 1 }, data: { logo: fs.readFileSync(filePath) } })
+  const rawBuffer = fs.readFileSync(options.filePath)
+  // Process image using the same function the controller uses
+  // (This turns the raw >200px image into the standardized 200px PNG)
+  const processedBuffer = await processLogoImage(rawBuffer)
+
+  switch (options.target) {
+    case 'organisation':
+      // Hardcoded ID 1 as we don't support multi-tennant
+      await prisma.organisation.update({
+        where: { id: 1 },
+        data: { logo: processedBuffer },
+      })
+      break
+
+    case 'study':
+      await prisma.study.update({
+        where: { id: options.id },
+        data: { logo: processedBuffer },
+      })
+      break
+  }
   return null
 }
 
@@ -143,9 +172,15 @@ export async function getInviteId(email: string, studyId: number): Promise<strin
   }
 }
 
-export async function inviteUser(email: string, studyId: number) {
+export async function inviteUser(email: string, studyId: number, prefill: Prefill) {
   await prisma.invite.create({
-    data: { email, studyId, expiresAt: new Date('2100-01-01'), status: 'PENDING' },
+    data: {
+      email,
+      studyId,
+      expiresAt: new Date('2100-01-01'),
+      status: 'PENDING',
+      prefill: JSON.stringify(prefill),
+    },
   })
   return null
 }
@@ -155,5 +190,29 @@ export async function removeUserFromStudy(email: string, studyId: number) {
   await prisma.studyParticipant.delete({
     where: { participantProfileId_studyId: { participantProfileId: prof.id, studyId } },
   })
+  return null
+}
+
+export function calculateHash(base64String: string) {
+  return createHash('md5').update(base64String, 'base64').digest('hex')
+}
+
+export async function readCommonFile(fileName: string) {
+  // Adjust this path based on where 'common' sits relative to your cypress.config.ts
+  const filePath = path.resolve(__dirname, '../../common/testing/fixtures', fileName)
+
+  if (fs.existsSync(filePath)) {
+    return fs.readFileSync(filePath, 'base64')
+  }
+  return null
+}
+
+export async function expireInvite(inviteId: string) {
+  await prisma.invite.update({ where: { id: inviteId }, data: { status: 'EXPIRED' } })
+  return null
+}
+
+export async function revokeInvite(inviteId: string) {
+  await prisma.invite.update({ where: { id: inviteId }, data: { status: 'REVOKED' } })
   return null
 }

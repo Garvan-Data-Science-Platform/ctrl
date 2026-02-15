@@ -6,13 +6,18 @@ import {
   ParticipantType,
   StateTerritory,
 } from 'common/types/api/users/ParticipantProfile'
-import { InviteStatus, Role } from '@prisma/client'
+import { InviteStatus } from '@prisma/client'
 import { NodemailerMock } from 'nodemailer-mock'
 import * as nodemailer from 'nodemailer'
 import { generateToken } from '../../src/authentication'
 import { RegisterParticipantRequest } from 'common/types/api/auth'
 import { GetInvitesResponse, InviteParticipantsResponse } from 'common/types/api/participants'
 import prisma from '../../src/PrismaClient'
+import { ORG_ADMIN_ID } from 'common/testing/seed'
+
+import config from '../../src/config'
+jest.mock('../../src/config')
+
 const mockNodeMailer = nodemailer as unknown as NodemailerMock
 
 const api = new Api()
@@ -47,7 +52,7 @@ describe('Participant Invites', () => {
 
   beforeAll(async () => {
     api.run()
-    orgAdminToken = await generateToken({ userId: 97, roles: [Role.OrganisationAdmin] })
+    orgAdminToken = await generateToken({ userId: ORG_ADMIN_ID })
     await resetDB()
   })
 
@@ -81,7 +86,7 @@ describe('Participant Invites', () => {
     const response = await request(app)
       .post('/studies/1/invites')
       .send({
-        emails: [participantRegisterRequestBody.email],
+        recipients: [{ prefill: {}, email: participantRegisterRequestBody.email }],
         subjectText: 'Subject',
         explanatoryText: 'Text',
       })
@@ -116,7 +121,7 @@ describe('Participant Invites', () => {
     const response = await request(app)
       .post('/studies/1/invites')
       .send({
-        emails: [participantRegisterRequestBody.email],
+        recipients: [{ prefill: {}, email: participantRegisterRequestBody.email }],
         subjectText: 'Subject',
         explanatoryText: 'Text',
       })
@@ -173,7 +178,7 @@ describe('Participant Invites', () => {
     const response = await request(app)
       .post('/studies/1/invites')
       .send({
-        emails: [participantRegisterRequestBody.email],
+        recipients: [{ prefill: {}, email: participantRegisterRequestBody.email }],
         subjectText: 'Subject',
         explanatoryText: 'Text',
       })
@@ -221,7 +226,7 @@ describe('Participant Invites', () => {
     const responseToBeRevoked = await request(app)
       .post('/studies/1/invites')
       .send({
-        emails: [participantRegisterRequestBody.email],
+        recipients: [{ prefill: {}, email: participantRegisterRequestBody.email }],
         subjectText: 'Subject',
         explanatoryText: 'Text',
       })
@@ -280,7 +285,7 @@ describe('Participant Invites', () => {
     const responseToBeExpired = await request(app)
       .post('/studies/1/invites')
       .send({
-        emails: [participantRegisterRequestBody.email],
+        recipients: [{ prefill: {}, email: participantRegisterRequestBody.email }],
         subjectText: 'Subject',
         explanatoryText: 'Text',
       })
@@ -339,7 +344,12 @@ describe('Participant Invites', () => {
     const response = await request(app)
       .post('/studies/1/invites')
       .send({
-        emails: [participantRegisterRequestBody.email],
+        recipients: [
+          {
+            prefill: { studyParticipant: { externalId: 'abc123' } },
+            email: participantRegisterRequestBody.email,
+          },
+        ],
         subjectText: 'Subject',
         explanatoryText: 'Text',
       })
@@ -368,5 +378,73 @@ describe('Participant Invites', () => {
 
     expect(registerResponse.status).toBe(201)
     expect(registerResponse.body.token).not.toBe(undefined)
+
+    const count = await prisma.studyParticipant.count({ where: { externalId: 'abc123' } })
+    expect(count).toEqual(1)
+  })
+
+  // Invite expiry should be configurable
+  it('should allow configuring invite expiry duration', async () => {
+    const sendInviteResponse = await request(app)
+      .post('/studies/1/invites')
+      .send({
+        recipients: [{ prefill: {}, email: participantRegisterRequestBody.email }],
+        subjectText: 'Subject',
+        explanatoryText: 'Text',
+      })
+      .set({ Authorization: `Bearer ${orgAdminToken}` })
+    expect(sendInviteResponse.status).toBe(200)
+    console.log(sendInviteResponse.body)
+
+    // Check the invite expiry
+    const invite = await prisma.invite.findUnique({
+      where: {
+        studyId_emailHash: {
+          email: participantRegisterRequestBody.email,
+          studyId: 1,
+        },
+      },
+    })
+
+    expect(invite).toBeDefined()
+    expect(invite!.status).toBe('PENDING')
+    // should be 7 days from the mocked config
+    const createdAt = new Date(invite!.createdAt)
+    const expiresAt = new Date(invite!.expiresAt)
+    const diffMs = expiresAt.getTime() - createdAt.getTime()
+    const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24))
+    expect(diffDays).toBe(7)
+
+    jest.replaceProperty(config, 'inviteExpiryDays', 1) // 1 day expiry
+    console.log(config)
+    // Send another invite
+    const sendInviteResponse2 = await request(app)
+      .post('/studies/1/invites')
+      .send({
+        recipients: [{ prefill: {}, email: 'somenew@email.com' }],
+        subjectText: 'Subject',
+        explanatoryText: 'Text',
+      })
+      .set({ Authorization: `Bearer ${orgAdminToken}` })
+    expect(sendInviteResponse2.status).toBe(200)
+
+    // Check the invite expiry
+    const invite2 = await prisma.invite.findUnique({
+      where: {
+        studyId_emailHash: {
+          email: 'somenew@email.com',
+          studyId: 1,
+        },
+      },
+    })
+
+    expect(invite2).toBeDefined()
+    expect(invite2!.status).toBe('PENDING')
+    // should be 1 day from the mocked config
+    const createdAt2 = new Date(invite2!.createdAt)
+    const expiresAt2 = new Date(invite2!.expiresAt)
+    const diffMs2 = expiresAt2.getTime() - createdAt2.getTime()
+    const diffDays2 = Math.round(diffMs2 / (1000 * 60 * 60 * 24))
+    expect(diffDays2).toBe(1)
   })
 })

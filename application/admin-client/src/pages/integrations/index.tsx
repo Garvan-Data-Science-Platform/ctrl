@@ -15,14 +15,16 @@ import GroupAddIcon from '@mui/icons-material/GroupAdd'
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
 import { useNavigate } from 'react-router-dom'
 import { SensitiveTextField } from '../../components/SensitiveTextField'
-import { useCustom } from '@refinedev/core'
+import { useCustom, useGetIdentity } from '@refinedev/core'
 import { GetElsaTokenResponse } from '@common/types/api/integrations/getElsaToken'
 import { axiosInstance } from '../../providers/dataProvider'
 import { useState } from 'react'
+import { RedcapLogo } from '../../components/RedcapLogo'
 
 export const IntegrationsHome = () => {
   const navigate = useNavigate()
   const [dialogOpen, setDialogOpen] = useState(false)
+  const { data: identity } = useGetIdentity<{ role: string; id: number }>()
 
   // Add a queryKey for invalidation
   const { data, refetch } = useCustom<GetElsaTokenResponse>({
@@ -59,7 +61,7 @@ export const IntegrationsHome = () => {
       </Typography>
 
       <Box sx={{ mt: 4 }}>
-        <img src="/redcap.png" alt="REDCap Logo" style={{ height: '70px' }} />
+        <RedcapLogo />
 
         <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
           <Button
@@ -97,7 +99,12 @@ export const IntegrationsHome = () => {
         <FormControl>
           <FormControlLabel
             control={
-              <Checkbox data-cy="elsa-checkbox" checked={enabled} onChange={handleCheckboxChange} />
+              <Checkbox
+                disabled={identity?.role != 'OrganisationAdmin'}
+                data-cy="elsa-checkbox"
+                checked={enabled}
+                onChange={handleCheckboxChange}
+              />
             }
             label={<Typography>Enable Elsa Integration</Typography>}
           />

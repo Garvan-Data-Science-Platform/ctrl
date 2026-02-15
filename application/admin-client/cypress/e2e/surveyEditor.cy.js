@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-const { UserType } = require('../support/commands')
+const { UserType } = require('../../../common/cypress/support/commands')
 
 beforeEach(() => {
   cy.task('reset')
@@ -8,10 +8,10 @@ beforeEach(() => {
 
 describe('Survey Editor', () => {
   it('Edit title and description', () => {
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/surveys')
     cy.get('[data-rowindex="0"]').contains('Current Draft').should('exist')
-    cy.get('[data-rowindex="0"] button').click()
+    cy.get('[data-rowindex="0"] button').first().click()
     cy.contains('Survey Steps').should('exist')
     cy.wait(500)
     cy.get('[data-cy="step-title"]').type('123')
@@ -23,7 +23,7 @@ describe('Survey Editor', () => {
   })
 
   it('Add, delete and rearrange questions', () => {
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/surveys/edit/2')
     cy.contains('Checkbox').click()
     cy.contains('Mandatory').should('exist')
@@ -64,7 +64,7 @@ describe('Survey Editor', () => {
     cy.get('[data-cy="survey-element"]').eq(1).contains('Subheading').should('exist')
   })
   it('Add, delete and rearrange steps', () => {
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/surveys/edit/2')
     cy.get('[data-cy="options-button"]').should('not.be.disabled').click()
     cy.contains('step up').should('have.class', 'Mui-disabled')
@@ -79,7 +79,7 @@ describe('Survey Editor', () => {
     cy.get('[data-cy="step-list"]').children().first().contains('New Step').should('exist')
   })
   it('Publish', () => {
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/surveys/edit/2')
     cy.contains('Publish').click()
     cy.contains('new version').should('exist')
@@ -90,37 +90,37 @@ describe('Survey Editor', () => {
     cy.contains('2').should('exist')
   })
   it('DUO Code Lookup', () => {
-    cy.login(UserType.ADMIN)
+    cy.login(UserType.ORG_ADMIN)
     cy.visit('/surveys/edit/2')
     cy.contains('Step 2').click()
 
     //DUO for checkbox question
     cy.get('[data-cy="advanced-toggle"]').eq(0).click()
     cy.get('[data-cy="add-duo"]').eq(0).click()
-    cy.get('[data-cy="duo-filter"]').type('ancestry')
-    cy.get('[data-cy="duo-results"] li').should('have.length', 4).first().click()
+    cy.get('[data-cy="duo-filter"]').type('biomed')
+    cy.get('[data-cy="duo-results"] li').should('have.length', 2).first().click()
     cy.get('[data-cy="confirm-duo"]').should('be.disabled')
     cy.get('[data-cy="duo-answer"]').click()
     cy.contains('false').click()
     cy.get('[data-cy="confirm-duo"]').should('be.enabled').click()
-    cy.contains('no restriction').should('exist')
+    cy.contains('health or').should('exist')
+    cy.contains('non-commercial').should('exist')
 
     //Remove DUO Code
 
-    cy.contains('no restriction').should('not.exist')
+    cy.contains('non-biomed').should('not.exist')
     cy.get('[data-cy="advanced-toggle"]').eq(0).click()
     cy.get('[data-cy="advanced-toggle"]').eq(1).click()
-    cy.get('[data-cy="duo-chip"] svg').eq(3).click()
-    cy.get('[data-cy="duo-chip"] svg').eq(3).click()
+    cy.get('[data-cy="duo-chip"] svg').eq(2).click()
     cy.get('[data-cy="add-duo"]').eq(1).click()
     cy.get('[data-cy="duo-results"] li').first().click()
     cy.get('[data-cy="confirm-duo"]').should('be.disabled')
     cy.get('[data-cy="duo-answer"]').click()
     cy.contains('Choice 1').click()
     cy.get('[data-cy="confirm-duo"]').should('be.enabled').click()
-    cy.contains('no restriction').should('exist')
+    cy.contains('non-bio').should('exist')
     //Editing choice will remove the duo code
     cy.get('[data-cy="choice-text"]').first().type('B')
-    cy.contains('no restriction').should('not.exist')
+    cy.contains('non-commercial').should('not.exist')
   })
 })

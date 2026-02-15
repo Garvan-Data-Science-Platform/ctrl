@@ -11,8 +11,8 @@ import { useNavigation, useParsed } from '@refinedev/core'
 import { Edit } from '@refinedev/mui'
 import { useForm } from '@refinedev/react-hook-form'
 import { Controller } from 'react-hook-form'
-import { UpdateProfileRequest } from '@common/types/api/users/updateProfile'
 import { ContactMethod, StateTerritory } from '@common/types/api/users/ParticipantProfile'
+import { GetParticipantResponse, UpdateParticipantRequest } from '@common/types/api/participants'
 
 export const ParticipantEdit = () => {
   const { id } = useParsed()
@@ -21,29 +21,41 @@ export const ParticipantEdit = () => {
 
   const {
     saveButtonProps,
-    refineCore: { formLoading },
+    refineCore: { formLoading, onFinish },
     register,
     control,
     formState: { errors },
-  } = useForm<any, any, UpdateProfileRequest>({
+    handleSubmit,
+  } = useForm<GetParticipantResponse, any, UpdateParticipantRequest>({
     refineCoreProps: {
-      resource: 'profiles',
       id,
       action: 'edit',
       onMutationSuccess: () => show('participants', id || '1'),
       redirect: false,
     },
   })
+  const handleSubmitCustom = (values: GetParticipantResponse['data']) => {
+    const { externalId, profile } = values
+    // eslint-disable-next-line
+    const { familyId, familyMembers, id, ...rest } = profile
+    onFinish({
+      externalId: externalId || '',
+      profile: rest,
+    })
+  }
 
   return (
-    <Edit isLoading={formLoading} saveButtonProps={saveButtonProps}>
+    <Edit
+      isLoading={formLoading}
+      saveButtonProps={{ ...saveButtonProps, onClick: handleSubmit(handleSubmitCustom as any) }}
+    >
       <Box component="form" sx={{ display: 'flex', flexDirection: 'column' }} autoComplete="off">
         <TextField
-          {...register('firstName', {
+          {...register('profile.firstName', {
             required: 'This field is required',
           })}
-          error={!!errors.firstName}
-          helperText={errors.firstName?.message}
+          error={!!errors.profile?.firstName}
+          helperText={errors.profile?.firstName?.message}
           margin="normal"
           fullWidth
           InputLabelProps={{ shrink: true }}
@@ -51,11 +63,11 @@ export const ParticipantEdit = () => {
           label={'First Name'}
         />
         <TextField
-          {...register('lastName', {
+          {...register('profile.lastName', {
             required: 'This field is required',
           })}
-          error={!!errors.lastName}
-          helperText={errors.lastName?.message}
+          error={!!errors.profile?.lastName}
+          helperText={errors.profile?.lastName?.message}
           margin="normal"
           fullWidth
           InputLabelProps={{ shrink: true }}
@@ -63,23 +75,33 @@ export const ParticipantEdit = () => {
           label={'Last Name'}
         />
         <TextField
-          {...register('email', {
+          {...register('profile.email', {
             required: 'This field is required',
             pattern: {
               value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, //eslint-disable-line
               message: 'Invalid email',
             },
           })}
-          error={!!errors.email}
-          helperText={errors.email?.message}
+          error={!!errors.profile?.email}
+          helperText={errors.profile?.email?.message}
           margin="normal"
           fullWidth
           InputLabelProps={{ shrink: true }}
           type="text"
           label={'Email'}
         />
+        <TextField
+          {...register('externalId')}
+          error={!!errors.externalId}
+          helperText={errors.externalId?.message}
+          margin="normal"
+          fullWidth
+          InputLabelProps={{ shrink: true }}
+          type="text"
+          label={'External Id'}
+        />
         <Controller
-          name="dob"
+          name="profile.dob"
           control={control}
           rules={{
             required: true,
@@ -90,8 +112,8 @@ export const ParticipantEdit = () => {
           }}
           render={({ field }) => (
             <TextField
-              error={!!errors.dob}
-              helperText={errors.dob?.message}
+              error={!!errors.profile?.dob}
+              helperText={errors.profile?.dob?.message}
               margin="normal"
               fullWidth
               InputLabelProps={{ shrink: true }}
@@ -104,11 +126,11 @@ export const ParticipantEdit = () => {
           )}
         />
         <TextField
-          {...register('addressLine', {
+          {...register('profile.addressLine', {
             required: 'This field is required',
           })}
-          error={!!errors.addressLine}
-          helperText={errors.addressLine?.message}
+          error={!!errors.profile?.addressLine}
+          helperText={errors.profile?.addressLine?.message}
           margin="normal"
           fullWidth
           InputLabelProps={{ shrink: true }}
@@ -116,11 +138,11 @@ export const ParticipantEdit = () => {
           label={'Address Line'}
         />
         <TextField
-          {...register('suburb', {
+          {...register('profile.suburb', {
             required: 'This field is required',
           })}
-          error={!!errors.suburb}
-          helperText={errors.suburb?.message}
+          error={!!errors.profile?.suburb}
+          helperText={errors.profile?.suburb?.message}
           margin="normal"
           fullWidth
           InputLabelProps={{ shrink: true }}
@@ -128,7 +150,7 @@ export const ParticipantEdit = () => {
           label={'Suburb'}
         />
         <Controller
-          name="state"
+          name="profile.state"
           control={control}
           rules={{ required: true }}
           render={({ field }) => (
@@ -137,7 +159,7 @@ export const ParticipantEdit = () => {
               <Select
                 labelId="state-select-label"
                 label="State"
-                error={Boolean(errors.state)}
+                error={Boolean(errors.profile?.state)}
                 value={field.value || StateTerritory.NSW}
                 onChange={field.onChange}
               >
@@ -153,15 +175,15 @@ export const ParticipantEdit = () => {
           )}
         />
         <TextField
-          {...register('postcode', {
+          {...register('profile.postcode', {
             required: 'This field is required',
             pattern: {
               value: /^\d{4}$/,
               message: 'Invalid postcode',
             },
           })}
-          error={!!errors.postcode}
-          helperText={errors.postcode?.message}
+          error={!!errors.profile?.postcode}
+          helperText={errors.profile?.postcode?.message}
           margin="normal"
           fullWidth
           InputLabelProps={{ shrink: true }}
@@ -169,15 +191,15 @@ export const ParticipantEdit = () => {
           label={'Postcode'}
         />
         <TextField
-          {...register('mobile', {
+          {...register('profile.mobile', {
             required: 'This field is required',
             pattern: {
               value: /04\d{8}$/,
               message: 'Invalid mobile number',
             },
           })}
-          error={!!errors.mobile}
-          helperText={errors.mobile?.message}
+          error={!!errors.profile?.mobile}
+          helperText={errors.profile?.mobile?.message}
           margin="normal"
           fullWidth
           InputLabelProps={{ shrink: true }}
@@ -185,7 +207,7 @@ export const ParticipantEdit = () => {
           label={'Mobile Number'}
         />
         <Controller
-          name="preferredContact"
+          name="profile.preferredContact"
           control={control}
           rules={{ required: true }}
           render={({ field }) => (
@@ -194,7 +216,7 @@ export const ParticipantEdit = () => {
               <Select
                 labelId="pref-select-label"
                 label="Preferred Contact Method"
-                error={Boolean(errors.preferredContact)}
+                error={Boolean(errors.profile?.preferredContact)}
                 value={field.value || ContactMethod.EMAIL}
                 onChange={field.onChange}
               >
@@ -213,11 +235,11 @@ export const ParticipantEdit = () => {
           Alternative Contact
         </Typography>
         <TextField
-          {...register('nextOfKin.firstName', {
+          {...register('profile.nextOfKin.firstName', {
             required: 'This field is required',
           })}
-          error={!!errors.nextOfKin?.firstName}
-          helperText={errors.nextOfKin?.firstName?.message}
+          error={!!errors.profile?.nextOfKin?.firstName}
+          helperText={errors.profile?.nextOfKin?.firstName?.message}
           margin="normal"
           fullWidth
           InputLabelProps={{ shrink: true }}
@@ -225,11 +247,11 @@ export const ParticipantEdit = () => {
           label={'First Name'}
         />
         <TextField
-          {...register('nextOfKin.lastName', {
+          {...register('profile.nextOfKin.lastName', {
             required: 'This field is required',
           })}
-          error={!!errors.nextOfKin?.lastName}
-          helperText={errors.nextOfKin?.lastName?.message}
+          error={!!errors.profile?.nextOfKin?.lastName}
+          helperText={errors.profile?.nextOfKin?.lastName?.message}
           margin="normal"
           fullWidth
           InputLabelProps={{ shrink: true }}
@@ -237,15 +259,15 @@ export const ParticipantEdit = () => {
           label={'Last Name'}
         />
         <TextField
-          {...register('nextOfKin.email', {
+          {...register('profile.nextOfKin.email', {
             required: 'This field is required',
             pattern: {
               value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, //eslint-disable-line
               message: 'Invalid email',
             },
           })}
-          error={!!errors.nextOfKin?.email}
-          helperText={errors.nextOfKin?.email?.message}
+          error={!!errors.profile?.nextOfKin?.email}
+          helperText={errors.profile?.nextOfKin?.email?.message}
           margin="normal"
           fullWidth
           InputLabelProps={{ shrink: true }}
@@ -253,14 +275,14 @@ export const ParticipantEdit = () => {
           label={'Email'}
         />
         <TextField
-          {...register('nextOfKin.mobile', {
+          {...register('profile.nextOfKin.mobile', {
             pattern: {
               value: /04\d{8}$/,
               message: 'Invalid mobile number',
             },
           })}
-          error={!!errors.nextOfKin?.mobile}
-          helperText={errors.nextOfKin?.mobile?.message}
+          error={!!errors.profile?.nextOfKin?.mobile}
+          helperText={errors.profile?.nextOfKin?.mobile?.message}
           margin="normal"
           fullWidth
           InputLabelProps={{ shrink: true }}

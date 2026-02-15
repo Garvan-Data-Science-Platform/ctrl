@@ -1,5 +1,6 @@
 [
   {
+    "externalId": "997",
     "addressLine": "2 fake st",
     "dependents": [
       { "dob": "1984-01-10", "firstName": "test", "lastName": "child", "permanent": false }
