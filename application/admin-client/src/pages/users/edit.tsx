@@ -14,6 +14,7 @@ import { useStudyStore } from '../../studyStore'
 import { useGetIdentity, useInvalidate, useNotification, useParsed, useShow } from '@refinedev/core'
 import { Controller } from 'react-hook-form'
 import { axiosInstance } from '../../providers/dataProvider'
+import { emailRegex } from '@common/src/regex'
 
 export const UserEdit = () => {
   type FieldValues = UpdateUserRequest
@@ -115,7 +116,7 @@ export const UserEdit = () => {
             {...register('email', {
               required: 'This field is required',
               validate: (email: string | undefined) =>
-                /^[\w.-]+@([\w-]+\.)+[\w-]{2,4}$/.test(email || '') || 'Invalid email address',
+                emailRegex.test(email || '') || 'Invalid email address',
             })}
             error={!!(errors as any)?.email}
             helperText={(errors as any)?.email?.message}

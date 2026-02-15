@@ -12,19 +12,20 @@ import {
   IconButton,
   Stack,
   TextField,
+  Tooltip,
   Typography,
-  Tooltip
 } from '@mui/material'
 import { useNotification } from '@refinedev/core'
 import { axiosInstance } from '../../providers/dataProvider'
 import { useState, useEffect } from 'react'
 import { StudyEntry, useStudyStore } from '../../studyStore'
-import { AddCircle, ArrowDropDown, Delete, Edit } from '@mui/icons-material'
+import { AddCircle, ArrowDropDown, Delete, Edit, Info } from '@mui/icons-material'
 import { useQueryClient } from '@tanstack/react-query'
 import { SensitiveTextField } from '../../components/SensitiveTextField'
 import { useSearchParams } from 'react-router-dom'
 import { LogoUploader } from '../../components/LogoUploader'
 import { RESOURCES } from '../../constants'
+import { emailRegex } from '@common/src/regex'
 
 const StudyCard = ({
   studyIdx,
@@ -43,16 +44,17 @@ const StudyCard = ({
   const [newName, setNewName] = useState(study.name)
   const [newDesc, setNewDesc] = useState(study.description)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [contactUsEmail, setContactUsEmail] = useState(study.contactUsEmail || '')
   const [redcapURL, setRedcapURL] = useState(study.redcapURL || '')
   const [redcapToken, setRedcapToken] = useState(study.redcapToken || '')
-  const [redcapChanged, setRedcapChanged] = useState(false)
+  const [settingsChanged, setSettingsChanged] = useState(false)
   const [accordionOpen, setAccordionOpen] = useState(advancedOpen)
 
   useEffect(() => {
     setRedcapURL(study.redcapURL || '')
     setRedcapToken(study.redcapToken || '')
-    setRedcapChanged(false)
-  }, [study.redcapURL, study.redcapToken])
+    setSettingsChanged(false)
+  }, [study.redcapURL, study.redcapToken, study.contactUsEmail])
 
   useEffect(() => {
     setAccordionOpen(advancedOpen)
@@ -95,7 +97,7 @@ const StudyCard = ({
     setDeleteDialogOpen(false)
   }
 
-  const handleRedcapApply = () => {
+  const handleSettingsApply = () => {
     const urlRegex =
       /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/
     if (redcapURL && !urlRegex.test(redcapURL)) {
@@ -105,11 +107,19 @@ const StudyCard = ({
       })
       return
     }
+    if (contactUsEmail && !emailRegex.test(contactUsEmail)) {
+      open?.({
+        type: 'error',
+        message: 'Invalid Email Address.',
+      })
+      return
+    }
     handleUpdate({
       redcapURL,
       redcapToken,
+      contactUsEmail,
     })
-    setRedcapChanged(false)
+    setSettingsChanged(false)
   }
 
   return (
@@ -242,6 +252,27 @@ const StudyCard = ({
             <Typography component="span">Advanced Options</Typography>
           </AccordionSummary>
           <AccordionDetails>
+            <Typography>Participant Portal</Typography>
+            <TextField
+              margin="normal"
+              InputLabelProps={{ shrink: true }}
+              type="text"
+              label={
+                <>
+                  {"'Contact Us' Email "}
+                  <Tooltip title="Messages from the 'Contact Us' form are sent to this address">
+                    <Info />
+                  </Tooltip>
+                </>
+              }
+              name="contactUsEmail"
+              data-cy="contactUsEmail"
+              value={contactUsEmail}
+              onChange={(e) => {
+                setContactUsEmail(e.target.value)
+                setSettingsChanged(true)
+              }}
+            />
             <Typography>Redcap Integration</Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column' }} id="redcap">
               <TextField
@@ -254,7 +285,7 @@ const StudyCard = ({
                 value={redcapURL}
                 onChange={(e) => {
                   setRedcapURL(e.target.value)
-                  setRedcapChanged(true)
+                  setSettingsChanged(true)
                 }}
               />
               <SensitiveTextField
@@ -267,16 +298,16 @@ const StudyCard = ({
                 value={redcapToken}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setRedcapToken(e.target.value)
-                  setRedcapChanged(true)
+                  setSettingsChanged(true)
                 }}
               />
               <Button
                 sx={{ mt: 1, alignSelf: 'flex-start' }}
                 variant="contained"
                 size="small"
-                disabled={!redcapChanged}
-                onClick={handleRedcapApply}
-                data-cy="redcap-apply"
+                disabled={!settingsChanged}
+                onClick={handleSettingsApply}
+                data-cy="settings-apply"
               >
                 Apply
               </Button>
@@ -285,11 +316,7 @@ const StudyCard = ({
         </Accordion>
       </Box>
       <Tooltip
-        title={
-          studies.length < 2
-            ? 'You cannot delete the only study you are part of.'
-            : ''
-        }
+        title={studies.length < 2 ? 'You cannot delete the only study you are part of.' : ''}
       >
         <span style={{ position: 'absolute', right: 10, top: 10 }}>
           <IconButton
