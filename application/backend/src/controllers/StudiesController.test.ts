@@ -413,6 +413,31 @@ describe('StudiesController', () => {
       })
       expect(studyWithDeletedLogo?.logo).toBeNull()
     })
+
+    it("shouldn't allow a StudyAdmin to change the logo of a study they are not part of", async () => {
+      // Add a logo to be deleted
+      const createResponse = await request(app)
+        .post(`/studies/${testStudyId}/logo`)
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+        .attach('file', `${fixturesPath}/valid_logo.png`)
+      expect(createResponse.status).toBe(403)
+
+    })
+
+    it("shouldn't allow a StudyAdmin to delete a logo of a study they are not part of", async () => {
+      // Add a logo to be deleted
+      const createResponse = await request(app)
+        .post(`/studies/${testStudyId}/logo`)
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+        .attach('file', `${fixturesPath}/valid_logo.png`)
+      expect(createResponse.status).toBe(204)
+
+      // Test deletion
+      const response = await request(app)
+        .delete(`/studies/${testStudyId}/logo`)
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+      expect(response.status).toBe(403)
+    })
   })
 
   describe('PATCH /studies/:studyId/restore', () => {
