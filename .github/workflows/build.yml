@@ -84,6 +84,8 @@ jobs:
     permissions:
       contents: "read"
       id-token: "write"
+    env:
+      REGISTRY_URL: australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
@@ -120,6 +122,9 @@ jobs:
       - name: Pull and Start Services
         run: |
           export IMAGE_TAG=${{ needs.build_push.outputs.image_tag }}
+          export BACKEND_IMAGE_URL=${{ env.REGISTRY_URL }}/ctrl-backend:$IMAGE_TAG
+          export USER_CLIENT_IMAGE_URL=${{ env.REGISTRY_URL }}/ctrl-user-client:$IMAGE_TAG
+          export ADMIN_CLIENT_IMAGE_URL=${{ env.REGISTRY_URL }}/ctrl-admin-client:$IMAGE_TAG
           docker compose -f docker-compose.e2e.yml up -d --wait
 
       - name: Run E2E Tests
