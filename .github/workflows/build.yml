@@ -5,13 +5,13 @@ on:
     workflows: ["Build checks"]
     branches: ["dev", "rel*", "fix*"]
     types: [completed]
-  workflow_dispatch:
+  workflow_dispatch: #TODO
 
 jobs:
   build_push:
     name: Build and Push ${{ matrix.name }}
     runs-on: ubuntu-latest
-    # if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    # if: ${{ github.event.workflow_run.conclusion == 'success' }} #TODO
     outputs:
       image_tag: ${{ steps.branch_sha.outputs.sha }}
     permissions:
@@ -32,7 +32,7 @@ jobs:
         run: |
           git fetch origin ${{ github.event.workflow_run.head_branch }}
           echo "sha=$(git rev-parse origin/fix/e2e-tests)" >> $GITHUB_OUTPUT
-      # ${{ github.event.workflow_run.head_branch }})" >> $GITHUB_OUTPUT
+      # ${{ github.event.workflow_run.head_branch }})" >> $GITHUB_OUTPUT #TODO
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
@@ -130,6 +130,7 @@ jobs:
 
       - name: Run E2E Tests
         run: |
+          yarn workspace backend prisma:generate
           npx cypress run --project application/common
 
       - name: Tear Down Services
