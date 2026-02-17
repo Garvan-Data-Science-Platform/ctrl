@@ -109,9 +109,12 @@ Cypress.Commands.add('fillRegistrationForm', (data = {}) => {
   cy.get('[data-cy="reg-postcode"]').type(formData.postcode)
   cy.get('[data-cy="reg-mobile"]').type(formData.mobile)
   cy.get('[data-cy="reg-contact-method"]').click()
-  cy.contains(formData.contactMethod).click()
+  cy.get(`[data-cy="reg-contact-method-${formData.contactMethod}"]`).click()
   cy.get('[data-cy="nok-first"]').type(formData.nokFirst)
   cy.get('[data-cy="nok-surname"]').type(formData.nokLast)
   cy.get('[data-cy="nok-email"]').type(formData.nokEmail)
   cy.get('[data-cy="terms"] input').click()
 })
+
+
+export { AppUrls };
