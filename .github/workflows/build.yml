@@ -2,9 +2,10 @@ name: Build and Push
 
 on:
   workflow_run:
-    workflows: ['Build checks']
-    branches: ['dev', 'rel*']
+    workflows: ["Build checks"]
+    branches: ["dev", "rel*"]
     types: [completed]
+  workflow_dispatch:
 
 jobs:
   build_push:
@@ -14,8 +15,8 @@ jobs:
     outputs:
       image_tag: ${{ steps.branch_sha.outputs.sha }}
     permissions:
-      contents: 'read'
-      id-token: 'write'
+      contents: "read"
+      id-token: "write"
     strategy:
       matrix:
         name: [backend, user-client, admin-client]
@@ -35,8 +36,8 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: 'projects/43338454952/locations/global/workloadIdentityPools/ctrl-id-pool/providers/github-provider'
-          service_account: 'ctrl-ci-sa@ctrl-358804.iam.gserviceaccount.com'
+          workload_identity_provider: "projects/43338454952/locations/global/workloadIdentityPools/ctrl-id-pool/providers/github-provider"
+          service_account: "ctrl-ci-sa@ctrl-358804.iam.gserviceaccount.com"
 
       - name: Docker auth
         run: gcloud auth configure-docker australia-southeast1-docker.pkg.dev
@@ -66,7 +67,7 @@ jobs:
         with:
           context: .
           file: application/${{ matrix.name }}/Dockerfile
-          platforms: 'linux/amd64,linux/arm64'
+          platforms: "linux/amd64,linux/arm64"
           push: true
           tags: |
             australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-${{ matrix.name }}:${{ github.event.workflow_run.head_branch == 'main' && 'latest' || 'dev' }}
@@ -82,8 +83,10 @@ jobs:
     name: E2E Tests
     runs-on: ubuntu-latest
     permissions:
-      contents: 'read'
-      id-token: 'write'
+      contents: "read"
+      id-token: "write"
+    env:
+      REGISTRY_URL: australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
@@ -93,8 +96,8 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: 'projects/43338454952/locations/global/workloadIdentityPools/ctrl-id-pool/providers/github-provider'
-          service_account: 'ctrl-ci-sa@ctrl-358804.iam.gserviceaccount.com'
+          workload_identity_provider: "projects/43338454952/locations/global/workloadIdentityPools/ctrl-id-pool/providers/github-provider"
+          service_account: "ctrl-ci-sa@ctrl-358804.iam.gserviceaccount.com"
 
       - name: Docker auth
         run: gcloud auth configure-docker australia-southeast1-docker.pkg.dev
@@ -113,24 +116,25 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ steps.nvm.outputs.node_version }}
-          cache: 'yarn'
+          cache: "yarn"
 
       - run: yarn install
 
       - name: Pull and Start Services
         run: |
           export IMAGE_TAG=${{ needs.build_push.outputs.image_tag }}
+          export BACKEND_IMAGE_URL=${{ env.REGISTRY_URL }}/ctrl-backend:$IMAGE_TAG
+          export USER_CLIENT_IMAGE_URL=${{ env.REGISTRY_URL }}/ctrl-user-client:$IMAGE_TAG
+          export ADMIN_CLIENT_IMAGE_URL=${{ env.REGISTRY_URL }}/ctrl-admin-client:$IMAGE_TAG
           docker compose -f docker-compose.e2e.yml up -d --wait
 
       - name: Run E2E Tests
         run: |
-          yarn workspace backend prisma:generate
-          npx dotenv -e ./application/backend/.env.test -- npx cypress run --project application/common
+          npx cypress run --project application/common
 
       - name: Tear Down Services
         if: always()
         run: |
-          export IMAGE_TAG=${{ needs.build_push.outputs.image_tag }}
           docker compose -f docker-compose.e2e.yml down
 
       - uses: actions/upload-artifact@v4
@@ -151,8 +155,8 @@ jobs:
     needs: build_push
     if: ${{ github.event.workflow_run.head_branch == 'dev' }} # Only push updated helm charts if on dev branch
     permissions:
-      contents: 'read'
-      id-token: 'write'
+      contents: "read"
+      id-token: "write"
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
@@ -163,11 +167,11 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: 'projects/43338454952/locations/global/workloadIdentityPools/ctrl-id-pool/providers/github-provider'
-          service_account: 'ctrl-ci-sa@ctrl-358804.iam.gserviceaccount.com'
+          workload_identity_provider: "projects/43338454952/locations/global/workloadIdentityPools/ctrl-id-pool/providers/github-provider"
+          service_account: "ctrl-ci-sa@ctrl-358804.iam.gserviceaccount.com"
 
       - name: Set up Google Cloud SDK
-        uses: 'google-github-actions/setup-gcloud@v2'
+        uses: "google-github-actions/setup-gcloud@v2"
         with:
           project_id: ctrl-358804
 
