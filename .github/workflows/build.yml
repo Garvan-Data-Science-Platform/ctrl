@@ -3,7 +3,7 @@ name: Build and Push
 on:
   workflow_run:
     workflows: ["Build checks"]
-    branches: ["dev", "rel*"]
+    branches: ["dev", "rel*", "fix*"]
     types: [completed]
   workflow_dispatch:
 
