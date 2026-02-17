@@ -21,7 +21,7 @@ export const TestUsers = {
 export const AppUrls = {
   ADMIN_CLIENT: 'http://localhost:5003',
   USER_CLIENT: 'http://localhost:5002',
-  API: 'http://localhost:5001',
+  API: 'http://localhost:5000',
 }
 
 export const MIME_TYPES: Record<string, string> = {

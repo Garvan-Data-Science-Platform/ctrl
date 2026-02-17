@@ -3,6 +3,10 @@ set -e
 # Parse node version
 NODE_VERSION=$(cat ../../.nvmrc | tr -d 'v')
 E2E_NODE_ENV="e2e"
+VITE_BACKEND_URL="http://localhost:5000"
+
+# Services IMAGE_URLs
+REGISTRY_URL=australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public
 
 # Default mode is 'run' if no argument is provided
 if [ -z "$CYPRESS_MODE" ]; then
@@ -18,29 +22,31 @@ echo "Running tests in cypress $CYPRESS_MODE mode"
 
 
 # Spin-up backend, db, and mailhog
-COMPOSE_FILES="-f ../../docker-compose.yml -f ../../docker-compose.e2e.yml"
-BACKEND_SERVICE="backend-test"
+COMPOSE_FILES=" -f ../../docker-compose.e2e.yml"
 
 if [ -n "$IMAGE_TAG" ]; then
-    echo "IMAGE_TAG detected: $IMAGE_TAG. Using image-based backend."
-    BACKEND_SERVICE="backend"
+    echo "IMAGE_TAG detected: $IMAGE_TAG. Using image-based services."
+    USER_CLIENT_IMAGE_URL=$REGISTRY_URL/ctrl-user-client:$IMAGE_TAG
+    ADMIN_CLIENT_IMAGE_URL=$REGISTRY_URL/ctrl-admin-client:$IMAGE_TAG
+    BACKEND_IMAGE_URL=$REGISTRY_URL/ctrl-backend:$IMAGE_TAG
 else
-    echo "No IMAGE_TAG detected. Using local source backend-test."
+    echo "No IMAGE_TAG detected. Building local source services."
+    IMAGE_TAG="local"
+
+    export BACKEND_IMAGE_URL=backend:$IMAGE_TAG
+    export USER_CLIENT_IMAGE_URL=user-client:$IMAGE_TAG
+    export ADMIN_CLIENT_IMAGE_URL=admin-client:$IMAGE_TAG
+
+    docker buildx build -t $BACKEND_IMAGE_URL --build-arg NODE_VERSION=$NODE_VERSION -D -f ../backend/Dockerfile ../../
+    docker buildx build -t $USER_CLIENT_IMAGE_URL --build-arg NODE_VERSION=$NODE_VERSION --build-arg VITE_BACKEND_URL=$VITE_BACKEND_URL -D -f ../user-client/Dockerfile ../../
+    docker buildx build -t $ADMIN_CLIENT_IMAGE_URL --build-arg NODE_VERSION=$NODE_VERSION --build-arg VITE_BACKEND_URL=$VITE_BACKEND_URL -D -f ../admin-client/Dockerfile ../../
 fi
 
-NODE_VERSION=$NODE_VERSION E2E_NODE_ENV=$E2E_NODE_ENV docker compose $COMPOSE_FILES up --build -d --wait db-test mailhog $BACKEND_SERVICE
+NODE_VERSION=$NODE_VERSION E2E_NODE_ENV=$E2E_NODE_ENV docker compose $COMPOSE_FILES up --build -d
 
-# Generate prisma types
-yarn workspace backend prisma:generate
-
-# Start both clients and run tests
-# user-client on port 5002, admin-client on port 5003
-npx dotenv -e ../backend/.env.test start-server-and-test \
-  "yarn workspace user-client dev --port 5002 --host 0.0.0.0 & yarn workspace admin-client dev --port 5003 --host 0.0.0.0 & wait" \
-  "http://localhost:5002|http://localhost:5003" \
-  "npx cypress $CYPRESS_MODE"
+npx cypress $CYPRESS_MODE
 
 # Tear down
 #   Adding node version to silence a warning
-NODE_VERSION=$NODE_VERSION docker compose $COMPOSE_FILES down db-test mailhog $BACKEND_SERVICE
+NODE_VERSION=$NODE_VERSION docker compose $COMPOSE_FILES down
 
