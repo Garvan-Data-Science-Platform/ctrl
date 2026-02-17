@@ -5,6 +5,7 @@ on:
     workflows: ["Build checks"]
     branches: ["dev", "rel*"]
     types: [completed]
+  workflow_dispatch:
 
 jobs:
   build_push:
@@ -129,13 +130,11 @@ jobs:
 
       - name: Run E2E Tests
         run: |
-          yarn workspace backend prisma:generate
-          npx dotenv -e ./application/backend/.env.test -- npx cypress run --project application/common
+          npx cypress run --project application/common
 
       - name: Tear Down Services
         if: always()
         run: |
-          export IMAGE_TAG=${{ needs.build_push.outputs.image_tag }}
           docker compose -f docker-compose.e2e.yml down
 
       - uses: actions/upload-artifact@v4
