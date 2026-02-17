@@ -81,75 +81,13 @@ jobs:
   e2e-tests:
     needs: build_push
     name: E2E Tests
-    runs-on: ubuntu-latest
+    uses: Garvan-Data-Science-Platform/ctrl/.github/workflows/e2e-tests.yml@main
+    with:
+      image_tag: ${{ needs.build_push.outputs.image_tag }}
+      registry_url: australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public
     permissions:
       contents: "read"
       id-token: "write"
-    env:
-      REGISTRY_URL: australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public
-    steps:
-      - name: Check out repository code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.workflow_run.head_sha }}
-
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          workload_identity_provider: "projects/43338454952/locations/global/workloadIdentityPools/ctrl-id-pool/providers/github-provider"
-          service_account: "ctrl-ci-sa@ctrl-358804.iam.gserviceaccount.com"
-
-      - name: Docker auth
-        run: gcloud auth configure-docker australia-southeast1-docker.pkg.dev
-
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Configure Environment
-        run: cp ./application/backend/.env.dockere2e ./application/backend/.env
-
-      - name: Parse node version
-        id: nvm
-        uses: ./.github/actions/parse-node-version
-
-      - name: Setup Nodejs and npm
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ steps.nvm.outputs.node_version }}
-          cache: "yarn"
-
-      - run: yarn install
-
-      - name: Pull and Start Services
-        run: |
-          export IMAGE_TAG=${{ needs.build_push.outputs.image_tag }}
-          export BACKEND_IMAGE_URL=${{ env.REGISTRY_URL }}/ctrl-backend:$IMAGE_TAG
-          export USER_CLIENT_IMAGE_URL=${{ env.REGISTRY_URL }}/ctrl-user-client:$IMAGE_TAG
-          export ADMIN_CLIENT_IMAGE_URL=${{ env.REGISTRY_URL }}/ctrl-admin-client:$IMAGE_TAG
-          docker compose -f docker-compose.e2e.yml up -d --wait
-
-      - name: Run E2E Tests
-        run: | #DEBUG TODO
-          docker ps
-          yarn workspace backend prisma:generate
-          npx cypress run --project application/common
-
-      - name: Tear Down Services
-        if: always()
-        run: |
-          docker compose -f docker-compose.e2e.yml down
-
-      - uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: cypress-screenshots
-          path: application/common/cypress/screenshots
-
-      - uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: cypress-videos
-          path: application/common/cypress/videos
 
   push_helm_charts:
     name: Push Helm Charts

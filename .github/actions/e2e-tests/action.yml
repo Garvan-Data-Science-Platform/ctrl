@@ -1,0 +1,82 @@
+name: E2E Tests
+description: Run E2E tests
+inputs:
+  image_tag:
+    description: Image tag to pull for E2E tests
+    required: true
+  registry_url:
+    description: Registry URL to pull images from
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check out repository code
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.workflow_run.head_sha }}
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        workload_identity_provider: "projects/43338454952/locations/global/workloadIdentityPools/ctrl-id-pool/providers/github-provider"
+        service_account: "ctrl-ci-sa@ctrl-358804.iam.gserviceaccount.com"
+
+    - name: Docker auth
+      shell: bash
+      run: gcloud auth configure-docker australia-southeast1-docker.pkg.dev
+
+    - name: Enable Corepack
+      shell: bash
+      run: corepack enable
+
+    - name: Configure Environment
+      shell: bash
+      run: cp ./application/backend/.env.dockere2e ./application/backend/.env
+
+    - name: Parse node version
+      id: nvm
+      uses: ./.github/actions/parse-node-version
+
+    - name: Setup Nodejs and npm
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ steps.nvm.outputs.node_version }}
+        cache: "yarn"
+
+    - run: yarn install
+      shell: bash
+
+    - name: Pull and Start Services
+      shell: bash
+      run: |
+        export IMAGE_TAG=${{ inputs.image_tag }}
+        export BACKEND_IMAGE_URL=${{ inputs.registry_url }}/ctrl-backend:$IMAGE_TAG
+        export USER_CLIENT_IMAGE_URL=${{ inputs.registry_url }}/ctrl-user-client:$IMAGE_TAG
+        export ADMIN_CLIENT_IMAGE_URL=${{ inputs.registry_url }}/ctrl-admin-client:$IMAGE_TAG
+        docker compose -f docker-compose.e2e.yml up -d --wait
+
+    - name: Run E2E Tests
+      shell: bash
+      run: |
+        docker ps # DEBUG
+        yarn workspace backend prisma:generate
+        npx cypress run --project application/common
+
+    - name: Tear Down Services
+      shell: bash
+      if: always()
+      run: |
+        docker compose -f docker-compose.e2e.yml down
+
+    - uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: cypress-screenshots
+        path: application/common/cypress/screenshots
+
+    - uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: cypress-videos
+        path: application/common/cypress/videos
