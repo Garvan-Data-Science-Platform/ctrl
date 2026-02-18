@@ -3,7 +3,6 @@ set -e
 # Parse node version
 NODE_VERSION=$(cat ../../.nvmrc | tr -d 'v')
 E2E_NODE_ENV="e2e"
-VITE_BACKEND_URL="http://localhost:5000"
 
 # Services IMAGE_URLs
 REGISTRY_URL=australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public
@@ -38,8 +37,8 @@ else
     export ADMIN_CLIENT_IMAGE_URL=admin-client:$IMAGE_TAG
 
     docker buildx build -t $BACKEND_IMAGE_URL --build-arg NODE_VERSION=$NODE_VERSION -D -f ../backend/Dockerfile ../../
-    docker buildx build -t $USER_CLIENT_IMAGE_URL --build-arg NODE_VERSION=$NODE_VERSION --build-arg VITE_BACKEND_URL=$VITE_BACKEND_URL -D -f ../user-client/Dockerfile ../../
-    docker buildx build -t $ADMIN_CLIENT_IMAGE_URL --build-arg NODE_VERSION=$NODE_VERSION --build-arg VITE_BACKEND_URL=$VITE_BACKEND_URL -D -f ../admin-client/Dockerfile ../../
+    docker buildx build -t $USER_CLIENT_IMAGE_URL --build-arg NODE_VERSION=$NODE_VERSION -D -f ../user-client/Dockerfile ../../
+    docker buildx build -t $ADMIN_CLIENT_IMAGE_URL --build-arg NODE_VERSION=$NODE_VERSION -D -f ../admin-client/Dockerfile ../../
 fi
 
 NODE_VERSION=$NODE_VERSION E2E_NODE_ENV=$E2E_NODE_ENV docker compose $COMPOSE_FILES up --build -d
