@@ -23,6 +23,7 @@ services:
     environment:
       - NODE_ENV=e2e
       - CONFIG_DIR=/app/config
+      - DATABASE_URL=postgres://postgres:password@db-test:5432/ctrl
     volumes:
       - ./application/common/config.e2e.json5:/app/config/config.json5
     healthcheck:
