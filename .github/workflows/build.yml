@@ -92,7 +92,7 @@ jobs:
   push_helm_charts:
     name: Push Helm Charts
     runs-on: ubuntu-latest
-    needs: build_push
+    needs: e2e-tests
     if: ${{ github.event.workflow_run.head_branch == 'dev' }} # Only push updated helm charts if on dev branch
     permissions:
       contents: "read"
