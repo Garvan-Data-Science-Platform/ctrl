@@ -5,13 +5,12 @@ on:
     workflows: ["Build checks"]
     branches: ["dev", "rel*", "fix*"]
     types: [completed]
-  workflow_dispatch: #TODO
 
 jobs:
   build_push:
     name: Build and Push ${{ matrix.name }}
     runs-on: ubuntu-latest
-    # if: ${{ github.event.workflow_run.conclusion == 'success' }} #TODO
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     outputs:
       image_tag: ${{ steps.branch_sha.outputs.sha }}
     permissions:
@@ -31,8 +30,7 @@ jobs:
         id: branch_sha
         run: |
           git fetch origin ${{ github.event.workflow_run.head_branch }}
-          echo "sha=$(git rev-parse origin/fix/e2e-tests)" >> $GITHUB_OUTPUT
-      # ${{ github.event.workflow_run.head_branch }})" >> $GITHUB_OUTPUT #TODO
+          echo "sha=$(git rev-parse ${{ github.event.workflow_run.head_branch }})" >> $GITHUB_OUTPUT
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
