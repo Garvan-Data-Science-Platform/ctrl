@@ -29,8 +29,7 @@ jobs:
       - name: Get latest branch SHA
         id: branch_sha
         run: |
-          git fetch origin ${{ github.event.workflow_run.head_branch }}
-          echo "sha=$(git rev-parse ${{ github.event.workflow_run.head_branch }})" >> $GITHUB_OUTPUT
+          echo "sha=${{ github.event.workflow_run.head_sha }}" >> $GITHUB_OUTPUT
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
