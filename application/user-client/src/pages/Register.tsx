@@ -184,7 +184,7 @@ export default function Register() {
                 Already registered? Log In
               </Button>
             </Box>
-            {Object.keys(errors) && <Typography>{}</Typography>}
+            {Object.keys(errors) && <Typography>{ }</Typography>}
             <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
               <TextField
                 sx={{ m: 1, flexGrow: 1 }}
@@ -363,7 +363,7 @@ export default function Register() {
                       {...field}
                     >
                       {Object.values(ContactMethod).map((val, idx) => (
-                        <MenuItem value={val} key={`contact_${idx}`}>
+                        <MenuItem value={val} key={`contact_${idx}`} data-cy={`reg-contact-method-${val}`}>
                           {val[0] + val.slice(1).toLowerCase()}
                         </MenuItem>
                       ))}

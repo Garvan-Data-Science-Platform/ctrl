@@ -1,10 +1,12 @@
 {
+  oidc: [],
   smtp: {
     host: 'mailhog',
     port: 1025,
     username: 'test',
     password: 'test'
   },
+  disableAdminPasswordLogin: false,
   inviteExpiryDays: 7,
   otp: false
 }
