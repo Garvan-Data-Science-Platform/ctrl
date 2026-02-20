@@ -12,7 +12,7 @@ services:
       retries: 10
 
   backend:
-    image: australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-backend:${IMAGE_TAG}
+    image: ${BACKEND_IMAGE_URL}
     depends_on:
       db-test:
         condition: service_healthy
@@ -23,34 +23,39 @@ services:
     environment:
       - NODE_ENV=e2e
       - CONFIG_DIR=/app/config
+      - DATABASE_URL=postgres://postgres:password@db-test:5432/ctrl
     volumes:
       - ./application/common/config.e2e.json5:/app/config/config.json5
     healthcheck:
-      test: wget --no-verbose --tries=1 --spider http://localhost:5001/
+      test: wget --no-verbose --tries=1 --spider http://localhost:5000/
       interval: 5s
       timeout: 2s
       retries: 10
     ports:
-      - '5001:5001'
+      - '5000:5000'
 
-  # Overlay for local development E2E tests using the build-context backend
-  backend-test:
-    depends_on:
-      mailhog:
-        condition: service_healthy
+  db-test:
+    image: postgres:16-alpine
+    ports:
+      - '5432:5432'
     env_file:
       - ./application/backend/.env.dockere2e
-    environment:
-      - STUB_MAILER=false
-      - NODE_ENV=e2e
-      - CONFIG_DIR=/app/config
-    volumes:
-      - ./application/common/config.e2e.json5:/app/config/config.json5
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -p 5432']
+      interval: 1s
+      timeout: 1s
+      retries: 60
+    command: ['postgres', '-c', 'log_statement=all', '-p', '5432']
 
   user-client:
-    image: australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-user-client:${IMAGE_TAG}
+    image: ${USER_CLIENT_IMAGE_URL}
     ports:
       - '5002:80'
+    volumes:
+      - ./application/common/nginx.e2e.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      backend:
+        condition: service_healthy
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:80']
       interval: 2s
@@ -58,9 +63,14 @@ services:
       retries: 10
 
   admin-client:
-    image: australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl-admin-client:${IMAGE_TAG}
+    image: ${ADMIN_CLIENT_IMAGE_URL}
     ports:
       - '5003:80'
+    volumes:
+      - ./application/common/nginx.e2e.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      backend:
+        condition: service_healthy
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:80']
       interval: 2s

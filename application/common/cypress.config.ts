@@ -10,12 +10,11 @@ import {
 import { defineConfig } from 'cypress'
 
 // MailHog API helpers
-const MAILHOG_API = 'http://localhost:8025/api/v2'
+const MAILHOG_API = 'http://localhost:8025/api/'
 
 async function getMailhogEmails() {
-  const response = await fetch(`${MAILHOG_API}/messages`)
+  const response = await fetch(`${MAILHOG_API}v2/messages`)
   const data = await response.json()
-  console.log(data)
   return data.items || []
 }
 
@@ -27,7 +26,7 @@ async function getEmailsForRecipient(email: string) {
 }
 
 async function clearMailhogEmails() {
-  await fetch('http://localhost:8025/api/v1/messages', { method: 'DELETE' })
+  await fetch(`${MAILHOG_API}v1/messages`, { method: 'DELETE' })
   return null
 }
 

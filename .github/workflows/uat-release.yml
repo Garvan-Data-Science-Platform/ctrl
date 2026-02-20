@@ -28,7 +28,7 @@ jobs:
         run: gcloud auth configure-docker australia-southeast1-docker.pkg.dev
 
       - name: Build Helm dependencies
-        run: helm repo add jetstack https://charts.jetstack.io --force-update && helm repo add stakater https://stakater.github.io/stakater-charts --force-update && helm dependency build .helm/ctrl
+        run: helm repo add stakater https://stakater.github.io/stakater-charts --force-update && helm dependency build .helm/ctrl
 
       - name: Get Chart version
         id: chart_version

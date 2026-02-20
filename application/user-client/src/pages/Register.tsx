@@ -29,6 +29,7 @@ import {
 } from '@common/types/api/users/ParticipantProfile'
 import { AddCircle, Close } from '@mui/icons-material'
 import { useEffect } from 'react'
+import { emailRegex } from '@common/src/regex'
 
 interface FormValues {
   firstName: string
@@ -183,7 +184,7 @@ export default function Register() {
                 Already registered? Log In
               </Button>
             </Box>
-            {Object.keys(errors) && <Typography>{}</Typography>}
+            {Object.keys(errors) && <Typography>{ }</Typography>}
             <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
               <TextField
                 sx={{ m: 1, flexGrow: 1 }}
@@ -218,7 +219,7 @@ export default function Register() {
                 {...register('email', {
                   required: 'This field is required',
                   pattern: {
-                    value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, //eslint-disable-line
+                    value: emailRegex, //eslint-disable-line
                     message: 'Enter a valid email',
                   },
                 })}
@@ -362,7 +363,7 @@ export default function Register() {
                       {...field}
                     >
                       {Object.values(ContactMethod).map((val, idx) => (
-                        <MenuItem value={val} key={`contact_${idx}`}>
+                        <MenuItem value={val} key={`contact_${idx}`} data-cy={`reg-contact-method-${val}`}>
                           {val[0] + val.slice(1).toLowerCase()}
                         </MenuItem>
                       ))}
