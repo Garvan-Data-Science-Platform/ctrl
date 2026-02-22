@@ -6,12 +6,18 @@ on:
     branches: ['dev', 'rel*', 'fix*']
     types: [completed]
   workflow_dispatch:
+    inputs:
+      bypass_checks:
+        description: 'Force run (bypass upstream test verification)'
+        required: true
+        type: boolean
+        default: false
 
 jobs:
   build_push:
     name: Build and Push ${{ matrix.name }}
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' || (github.event_name == 'workflow_dispatch' && inputs.bypass_checks == true) }}
     outputs:
       image_tag: ${{ steps.branch_sha.outputs.sha }}
     permissions:
