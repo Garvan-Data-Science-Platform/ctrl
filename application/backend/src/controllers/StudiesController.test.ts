@@ -28,6 +28,7 @@ describe('StudiesController', () => {
   let studyAdminToken: string
 
   const testStudyId: number = 1
+  const testStudyId2: number = 2
 
   beforeAll(async () => {
     api.run()
@@ -357,6 +358,38 @@ describe('StudiesController', () => {
       expect(alternateLogoHash).toEqual(logoHashes.alternateLogoResizedHash)
       expect(alternateLogoGetResponse.status).toBe(200)
     })
+
+    it("should allow a StudyAdmin to update the logo of a study they are part of", async () => {
+      // Add a logo to be updated
+      const createResponse = await request(app)
+        .post(`/studies/${testStudyId}/logo`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .attach('file', `${fixturesPath}/valid_logo.png`)
+      expect(createResponse.status).toBe(204)
+
+      // Test update
+      const response = await request(app)
+        .post(`/studies/${testStudyId}/logo`)
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+        .attach('file', `${fixturesPath}/alternate_logo.png`)
+      expect(response.status).toBe(204)
+    })
+
+    it("shouldn't allow a StudyAdmin to update the logo of a study they are not part of", async () => {
+      // Add a logo to be updated
+      const createResponse = await request(app)
+        .post(`/studies/${testStudyId2}/logo`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .attach('file', `${fixturesPath}/valid_logo.png`)
+      expect(createResponse.status).toBe(204)
+
+      // Test update
+      const response = await request(app)
+        .post(`/studies/${testStudyId2}/logo`)
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+        .attach('file', `${fixturesPath}/alternate_logo.png`)
+      expect(response.status).toBe(404)
+    })
   })
 
   describe('DELETE /studies/:studyId/logo', () => {
@@ -414,29 +447,19 @@ describe('StudiesController', () => {
       expect(studyWithDeletedLogo?.logo).toBeNull()
     })
 
-    it("shouldn't allow a StudyAdmin to change the logo of a study they are not part of", async () => {
+    it("shouldn't allow a StudyAdmin to delete the logo of a study they are not part of", async () => {
       // Add a logo to be deleted
       const createResponse = await request(app)
-        .post(`/studies/${testStudyId}/logo`)
-        .set({ Authorization: `Bearer ${studyAdminToken}` })
-        .attach('file', `${fixturesPath}/valid_logo.png`)
-      expect(createResponse.status).toBe(403)
-
-    })
-
-    it("shouldn't allow a StudyAdmin to delete a logo of a study they are not part of", async () => {
-      // Add a logo to be deleted
-      const createResponse = await request(app)
-        .post(`/studies/${testStudyId}/logo`)
-        .set({ Authorization: `Bearer ${studyAdminToken}` })
+        .post(`/studies/${testStudyId2}/logo`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
         .attach('file', `${fixturesPath}/valid_logo.png`)
       expect(createResponse.status).toBe(204)
 
       // Test deletion
       const response = await request(app)
-        .delete(`/studies/${testStudyId}/logo`)
+        .delete(`/studies/${testStudyId2}/logo`)
         .set({ Authorization: `Bearer ${studyAdminToken}` })
-      expect(response.status).toBe(403)
+      expect(response.status).toBe(404)
     })
   })
 
@@ -506,6 +529,45 @@ describe('StudiesController', () => {
         where: { id: testStudyId },
       })
       expect(restoredStudy?.deleted).toBe(false)
+    })
+
+    it("shouldn't allow a StudyAdmin to restore a deleted study they are not part of", async () => {
+      const studyBeforeDelete = await prisma.study.findFirst({
+        where: { id: testStudyId2 },
+      })
+
+      expect(studyBeforeDelete?.deleted).toBe(false)
+
+      // Delete the study as OrgAdmin
+      const deleteResponse = await request(app)
+        .delete(`/studies/${testStudyId2}`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(deleteResponse.status).toBe(204)
+
+      // Verify the study is deleted
+      const deletedStudy = await prisma.study.findFirst({
+        where: { id: testStudyId2, deleted: true },
+      })
+
+      expect(deletedStudy?.deleted).toBe(true)
+
+      // Try to restore the study as StudyAdmin
+      const response = await request(app)
+        .patch(`/studies/${testStudyId2}/restore`)
+        .set({ Authorization: `Bearer ${studyAdminToken}` })
+      expect(response.status).toBe(404)
+
+      // Verify the study is still deleted
+      const restoredStudy = await prisma.study.findFirst({
+        where: { id: testStudyId2 },
+      })
+
+      const deletedStudy2 = await prisma.study.findFirst({
+        where: { id: testStudyId2, deleted: true },
+      })
+
+      expect(restoredStudy).toBeNull()
+      expect(deletedStudy2?.deleted).toBe(true)
     })
   })
 })
