@@ -27,9 +27,4 @@ ignore:
         reason: No known upgrade path to resolve.
         expires: 2026-05-14T00:58:38.009Z
         created: 2026-02-12T00:58:38.018Z
-  SNYK-JS-MINIMATCH-15309438:
-    - '*':
-        reason: 'Requires major ESLint upgrade (v8 to v9/10)'
-        expires: 2026-03-25T00:00:00.000Z
-        created: 2026-02-20T00:00:38.018Z
 patch: {}
