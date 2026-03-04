@@ -35,6 +35,7 @@ export const StudyInvitesDialog: React.FC<StudyInvitesDialogProps> = ({
 }) => {
   const queryClient = useQueryClient()
   const [invitesStatus, setInvitesStatus] = useState<any>({})
+  const [userDismissed, setUserDismissed] = useState(false)
 
   const onAccept = async (invite: StudyInvite) => {
     await apiClient.post(`/invites/${invite.id}/accept`)
@@ -46,14 +47,21 @@ export const StudyInvitesDialog: React.FC<StudyInvitesDialogProps> = ({
     setInvitesStatus({ ...invitesStatus, [invite.id]: 'Declined' })
   }
 
+  const handleClose = () => {
+    setUserDismissed(true)
+    onClose()
+  }
+
   useEffect(() => {
     if (invites.length < 1) {
       onClose()
+      // Reset dismissed state when all invites are processed
+      setUserDismissed(false)
     }
   }, [invites])
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open && !userDismissed} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>You've been invited to join a new study</DialogTitle>
       <DialogContent>
         <List>
@@ -96,7 +104,7 @@ export const StudyInvitesDialog: React.FC<StudyInvitesDialogProps> = ({
         </List>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Close</Button>
+        <Button onClick={handleClose}>Close</Button>
       </DialogActions>
     </Dialog>
   )
