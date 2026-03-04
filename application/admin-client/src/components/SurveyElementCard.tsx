@@ -115,7 +115,7 @@ export function SurveyElementCard({
                 label="Mandatory question (user is prompted if they fail to answer)"
               />
             )}
-            <Typography sx={{ fontSize: 15 }}>DUO Codes</Typography>
+            <Typography sx={{ fontSize: 15 }}>Ontology Terms</Typography>
             <Stack direction="row" sx={{ alignItems: 'center' }}>
               {data.duoCodes?.map((duo) => {
                 const duoEntry = duoEntries.find((val) => val.ID == duo.code)
@@ -214,13 +214,13 @@ export function SurveyElementCard({
   }
 
   function renderQuestionChoices(data: SurveyQuestionChoices) {
-    //Removes DUO codes if an answer is changed or removed
+    //Removes Ontologies if an answer is changed or removed
     const checkDuos = (answer: string) => {
       const nonMatchingDUOs = data.duoCodes?.filter((duoVal) => duoVal.relatedAnswer != answer)
       if (nonMatchingDUOs?.length != data.duoCodes?.length) {
         open?.({
           type: 'error',
-          message: 'DUO Codes associated with this answer have been removed.',
+          message: 'Ontologies associated with this answer have been removed.',
         })
         handleUpdateField('duoCodes', nonMatchingDUOs)
       }
