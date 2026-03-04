@@ -161,6 +161,7 @@ export function SurveyElementCard({
   }
 
   function renderSubHeading(data: SurveySubHeading) {
+    const charLimit = 2000
     return (
       <Box sx={{ width: '100%' }}>
         <Typography fontWeight="bold">Subheading</Typography>
@@ -171,6 +172,8 @@ export function SurveyElementCard({
           label="Subheading text"
           value={data.text}
           disabled={disabled}
+          inputProps={{ maxLength: charLimit }}
+          helperText={`${data.text?.length || 0}/${charLimit}`}
           onChange={(e) => {
             handleUpdateField('text', e.target.value)
           }}
