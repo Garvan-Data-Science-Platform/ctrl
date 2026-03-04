@@ -10,6 +10,7 @@ import {
   ListItemText,
   Typography,
   Stack,
+  ListItemAvatar,
 } from '@mui/material'
 import { useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '../apiClient'
@@ -58,6 +59,13 @@ export const StudyInvitesDialog: React.FC<StudyInvitesDialogProps> = ({
         <List>
           {invites.map((invite) => (
             <ListItem key={invite.id} alignItems="flex-start" disableGutters>
+              <ListItemAvatar>
+                <img
+                  src={invite.studyId ? import.meta.env.VITE_BACKEND_URL + `/studies/${invite.studyId}/logo` : ''}
+                  alt=""
+                  style={{ maxWidth: '80px', maxHeight: '80px', width: 'auto', height: 'auto', objectFit: 'contain', marginRight: '16px' }}
+                />
+              </ListItemAvatar>
               <ListItemText primary={invite.studyName} secondary={invite.description} />
 
               {invitesStatus[invite.id] ? (
