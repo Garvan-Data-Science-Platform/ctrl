@@ -139,6 +139,24 @@ export const SurveyEditor = () => {
   return isLoading ? null : (
     <Box sx={{ display: 'flex', flexDirection: 'row' }}>
       <Box sx={{ border: '1px solid lightgrey', height: '100vh', ml: -3, mt: -3 }}>
+        <Box sx={{ p: 2, display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <Button
+            variant="outlined"
+            data-cy="publish-button"
+            disabled={savePending || disabled}
+            onClick={() => setPublishDialogOpen(true)}
+          >
+            Publish
+          </Button>
+          <Button
+            variant="outlined"
+            data-cy="options-button"
+            onClick={handleOptionsClick}
+            disabled={savePending || disabled}
+          >
+            <Settings />
+          </Button>
+        </Box>
         <ListSubheader>Survey Steps</ListSubheader>
         <Divider />
         <List sx={{ width: 250 }} data-cy="step-list">
@@ -172,22 +190,6 @@ export const SurveyEditor = () => {
         <DndProvider backend={HTML5Backend}>
           <Box sx={{ flexGrow: 1, ml: 3 }} data-cy="survey-editor">
             <Box sx={{ mb: 3, display: 'flex', flexDirection: 'row', gap: 1 }}>
-              <Button
-                variant="outlined"
-                data-cy="publish-button"
-                disabled={savePending || disabled}
-                onClick={() => setPublishDialogOpen(true)}
-              >
-                Publish
-              </Button>
-              <Button
-                variant="outlined"
-                data-cy="options-button"
-                onClick={handleOptionsClick}
-                disabled={savePending || disabled}
-              >
-                <Settings />
-              </Button>
               <Box sx={{ flexGrow: 1 }} />
               <Menu
                 id="basic-menu"
