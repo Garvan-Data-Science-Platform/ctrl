@@ -161,7 +161,7 @@ export function SurveyElementCard({
   }
 
   function renderSubHeading(data: SurveySubHeading) {
-    const charLimit = 2000
+    const charLimit = 200
     return (
       <Box sx={{ width: '100%' }}>
         <Typography fontWeight="bold">Subheading</Typography>
