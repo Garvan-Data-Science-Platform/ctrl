@@ -66,6 +66,7 @@ export const ParticipantList = () => {
   const [initialRecipients, setInitialRecipients] = useState<Recipient[]>([])
   const [modalOpen, setModalOpen] = useState(false)
   const [csvModalOpen, setCsvModalOpen] = useState(false)
+  const [noSurveyModalOpen, setNoSurveyModalOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [inviteRowId, setInviteRowId] = useState('')
@@ -301,6 +302,25 @@ export const ParticipantList = () => {
     FAILED_TO_SEND: { label: 'Failed to send', color: 'error.main' },
   }
 
+  const NoSurveyModal = () => (
+    <Box>
+      <Box data-cy="no-published-survey-modal">
+        <Typography sx={{ mb: 1 }}>
+          You need to publish a survey before inviting participants
+        </Typography>
+        <Button
+          fullWidth
+          variant="contained"
+          component={Link}
+          to="/surveys/edit/1"
+          sx={{ textTransform: 'none' }}
+        >
+          Go to surveys
+        </Button>
+      </Box>
+    </Box>
+  )
+
   const inviteCols = React.useMemo<GridColDef[]>(
     () => [
       {
@@ -367,8 +387,9 @@ export const ParticipantList = () => {
           bg: theme.palette.background.default,
           color: theme.palette.text.primary,
         },
-        ".rdg-cell-error": {
-          backgroundColor: theme.palette.mode === 'dark' ? theme.palette.error.dark : theme.palette.error.light
+        '.rdg-cell-error': {
+          backgroundColor:
+            theme.palette.mode === 'dark' ? theme.palette.error.dark : theme.palette.error.light,
         },
       },
     },
@@ -402,7 +423,7 @@ export const ParticipantList = () => {
               bg: theme.palette.divider,
             },
           },
-        }
+        },
       },
       Modal: {
         baseStyle: {
@@ -411,18 +432,24 @@ export const ParticipantList = () => {
           },
           continueButton: {
             color: theme.palette.text.primary,
-            bg: theme.palette.mode === 'dark' ? theme.palette.primary.dark : theme.palette.primary.light,
-          }
+            bg:
+              theme.palette.mode === 'dark'
+                ? theme.palette.primary.dark
+                : theme.palette.primary.light,
+          },
         },
         variants: {
           rsi: {
             footer: {
-              bg: theme.palette.mode === 'dark' ? theme.palette.background.default : theme.palette.background.paper,
-            }
-          }
-        }
-      }
-    }
+              bg:
+                theme.palette.mode === 'dark'
+                  ? theme.palette.background.default
+                  : theme.palette.background.paper,
+            },
+          },
+        },
+      },
+    },
   }
 
   return (
@@ -476,32 +503,30 @@ export const ParticipantList = () => {
             borderRadius: 2,
           }}
         >
-          {publishedSurvey ? (
-            <InviteModal
-              onCancel={() => {
-                setModalOpen(false)
-              }}
-              onSend={sendInvites}
-              initialRecipients={initialRecipients}
-            />
-          ) : (
-            <Box>
-              <Box data-cy="no-published-survey-modal">
-                <Typography sx={{ mb: 1 }}>
-                  You need to publish a survey before inviting participants
-                </Typography>
-                <Button
-                  fullWidth
-                  variant="contained"
-                  component={Link}
-                  to="/surveys/edit/1"
-                  sx={{ textTransform: 'none' }}
-                >
-                  Go to surveys
-                </Button>
-              </Box>
-            </Box>
-          )}
+          <InviteModal
+            onCancel={() => {
+              setModalOpen(false)
+            }}
+            onSend={sendInvites}
+            initialRecipients={initialRecipients}
+          />
+        </Box>
+      </Modal>
+
+      <Modal open={noSurveyModalOpen} onClose={() => setNoSurveyModalOpen(false)}>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            bgcolor: 'background.paper',
+            boxShadow: 24,
+            p: 2,
+            borderRadius: 2,
+          }}
+        >
+          <NoSurveyModal />
         </Box>
       </Modal>
 
@@ -519,7 +544,11 @@ export const ParticipantList = () => {
             <Button
               variant="contained"
               onClick={() => {
-                setCsvModalOpen(true)
+                if (publishedSurvey) {
+                  setCsvModalOpen(true)
+                } else {
+                  setNoSurveyModalOpen(true)
+                }
               }}
               data-cy="csv-button"
             >
@@ -529,7 +558,11 @@ export const ParticipantList = () => {
           <Button
             variant="contained"
             onClick={() => {
-              setModalOpen(true)
+              if (publishedSurvey) {
+                setModalOpen(true)
+              } else {
+                setNoSurveyModalOpen(true)
+              }
             }}
             data-cy="invite-button"
           >
