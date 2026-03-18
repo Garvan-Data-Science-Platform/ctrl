@@ -4,11 +4,24 @@ import { AuthPage } from '@refinedev/mui'
 
 export const UpdatePassword = () => {
   const { params } = useParsed()
+  const token = params?.token
+
+  if (!token) {
+    return (
+      <div>
+        <p>Invalid or missing password reset token.</p>
+        <p>
+          Please <a href="/forgot-password">request a new password reset link</a>.
+        </p>
+      </div>
+    )
+  }
+
   return (
     <AuthPage
       type="updatePassword"
       title={<a href="/">Log in</a>}
-      mutationVariables={{ token: params?.token }}
+      mutationVariables={{ token }}
       formProps={{
         mode: 'onSubmit',
         resolver: async (data) => {
