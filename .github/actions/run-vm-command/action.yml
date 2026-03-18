@@ -43,9 +43,10 @@ runs:
         echo "Running command on VM: ${{ inputs.vm_instance }}"
         echo "Zone: ${{ inputs.vm_zone }}"
         echo "Command: ${{ inputs.command }}"
-        
+
         gcloud --quiet beta compute ssh "${{ inputs.vm_instance }}" \
           --zone="${{ inputs.vm_zone }}" \
+          --tunnel-through-iap \
           --command="${{ inputs.command }}"
 
 branding:

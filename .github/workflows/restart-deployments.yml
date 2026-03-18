@@ -33,7 +33,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Restart deployments on VM
-        uses: Garvan-Data-Science-Platform/ctrl/.github/actions/run-vm-command@main
+        uses: ./.github/actions/run-vm-command
         with:
           project_id: 'ctrl-358804'
           vm_instance: ctrl-${{ inputs.environment }}
