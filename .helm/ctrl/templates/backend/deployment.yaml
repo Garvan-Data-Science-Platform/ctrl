@@ -42,9 +42,9 @@ spec:
             - name: POSTGRES_HOST
               value: ctrl-postgres
             - name: HOSTNAME
-            {{ with .Values.userClient }}
-              value: {{ .hostname | quote }}
-            {{ end }}
+              value: {{ .Values.userClient.hostname | quote }}
+            - name: ADMIN_HOSTNAME
+              value: {{ .Values.adminClient.hostname | quote }}
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:

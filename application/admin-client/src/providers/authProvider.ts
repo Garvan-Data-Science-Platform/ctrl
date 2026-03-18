@@ -1,5 +1,7 @@
 import type { AuthProvider } from '@refinedev/core'
 import { useAuthStore } from '../authStore'
+import { axiosInstance } from './dataProvider'
+import { GeneratePasswordResetLinkRequest, ResetPasswordRequest } from '@common/types/api/users'
 
 export const TOKEN_KEY = 'refine-auth'
 export const ID_KEY = 'userid'
@@ -149,5 +151,47 @@ export const authProvider: AuthProvider = {
     }
 
     return { error }
+  },
+  forgotPassword: async ({ email }) => {
+    const req: GeneratePasswordResetLinkRequest = { email: email }
+    try {
+      await axiosInstance.post('/users/password/generate-reset-link', req)
+    } catch (e) {
+      return {
+        success: false,
+        error: {
+          name: 'Error generating password reset link',
+          message: (e as any).message,
+        },
+      }
+    }
+    return {
+      success: true,
+      redirectTo: '/login',
+      successNotification: { message: 'Password reset link sent to your email address' },
+    }
+  },
+  updatePassword: async ({ password, token }) => {
+    const reqData: ResetPasswordRequest = {
+      newPassword: password,
+      token: token,
+    }
+    try {
+      await axiosInstance.post('/users/password/reset', reqData)
+    } catch (e: any) {
+      const errorMessage = e.response?.data?.message || 'An unknown error occurred'
+      return {
+        success: false,
+        error: {
+          name: 'Error resetting password',
+          message: errorMessage, // Return the message field
+        },
+      }
+    }
+    return {
+      success: true,
+      redirectTo: '/login',
+      successNotification: { message: 'Successfully updated password' },
+    }
   },
 }

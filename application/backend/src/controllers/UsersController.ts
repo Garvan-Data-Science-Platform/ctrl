@@ -374,7 +374,12 @@ export class UsersController extends Controller {
       },
     })
 
-    const resetLink = `${process.env.HOSTNAME}/reset-password?token=${token}`
+    let resetLink
+    if (user.role !== 'Participant') {
+      resetLink = `${process.env.ADMIN_HOSTNAME}/update-password?token=${token}`
+    } else {
+      resetLink = `${process.env.HOSTNAME}/reset-password?token=${token}`
+    }
 
     const { html, text } = generatePasswordResetEmail(resetLink, user.firstName)
 
