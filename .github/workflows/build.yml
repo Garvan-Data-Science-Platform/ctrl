@@ -124,10 +124,12 @@ jobs:
           gcloud --quiet beta compute ssh ctrl-dev \
             --zone=australia-southeast1-a \
             --project=ctrl-358804 \
+            --tunnel-through-iap \
             --command="mkdir -p /opt/ctrl/chart && rm -rf /opt/ctrl/chart/{*,.*} 2>/dev/null || true" && \
           gcloud --quiet beta compute scp --recurse .helm/ctrl/ \
             ctrl-dev:/opt/ctrl/chart/ \
             --zone=australia-southeast1-a \
+            --tunnel-through-iap \
             --project=ctrl-358804
 
   restart-dev-deployments:
