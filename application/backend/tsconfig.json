@@ -33,6 +33,6 @@
     "../common/src/surveys/populateSurveyStepAnswers.ts",
     "../common/src/surveys/extractSurveyStepAnswers.ts",
     "../common/src/surveys/createDefaultAnswers.ts",
-    "../common/src/emails/generateInviteTemplate.ts"
+    "../common/src/emails/generate.ts"
   ]
 }
