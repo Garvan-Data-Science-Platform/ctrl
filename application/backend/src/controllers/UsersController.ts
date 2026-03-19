@@ -356,6 +356,11 @@ export class UsersController extends Controller {
   @SuccessResponse('200', 'OK')
   @NoSecurity()
   @Response<NotFoundErrorResponse>('404', 'Not Found')
+  public async generatePasswordResetLinkRoute(
+    @Body() bodyRequest: GeneratePasswordResetLinkRequest,
+  ): Promise<void> {
+    this.generatePasswordResetLink(bodyRequest)
+  }
   public async generatePasswordResetLink(
     @Body() bodyRequest: GeneratePasswordResetLinkRequest,
     @Header('x-client-type') clientType?: string,
