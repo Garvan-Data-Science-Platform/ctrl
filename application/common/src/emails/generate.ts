@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
+
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -20,6 +22,7 @@ if (!process.env.ESBUILD) {
   adminPasswordInviteTemplate = readFileSync(join(basePath, 'adminPasswordInvite.html'), 'utf8')
   adminInviteTemplate = readFileSync(join(basePath, 'adminInvite.html'), 'utf8')
 } else {
+  //@ts-ignore
   styles = require('./styles.css?raw')
   participantInviteTemplate = require('./participantInvite.html?raw')
   passwordResetTemplate = require('./passwordReset.html?raw')

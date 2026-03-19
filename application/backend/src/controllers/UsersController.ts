@@ -359,7 +359,7 @@ export class UsersController extends Controller {
   public async generatePasswordResetLinkRoute(
     @Body() bodyRequest: GeneratePasswordResetLinkRequest,
   ): Promise<void> {
-    this.generatePasswordResetLink(bodyRequest)
+    await this.generatePasswordResetLink(bodyRequest)
   }
   public async generatePasswordResetLink(
     @Body() bodyRequest: GeneratePasswordResetLinkRequest,
