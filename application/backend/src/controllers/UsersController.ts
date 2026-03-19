@@ -369,18 +369,19 @@ export class UsersController extends Controller {
       return
     }
 
-    // Generate a secure random token
-    const token = crypto.randomBytes(32).toString('hex')
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000) // 15 Minutes expiration
+    const createPasswordResetTokenAndLink = async (): Promise<string> => {
+      // Generate a secure random token
+      const token = crypto.randomBytes(32).toString('hex')
+      const expiresAt = new Date(Date.now() + 15 * 60 * 1000) // 15 Minutes expiration
 
-    // Save token to database
-    await prisma.passwordResetToken.create({
-      data: {
-        token,
-        userId: user.id,
-        expiresAt,
-      },
-    })
+      // Save token to database
+      await prisma.passwordResetToken.create({
+        data: {
+          token,
+          userId: user.id,
+          expiresAt,
+        },
+      })
 
     let resetLink
     if (user.role !== 'Participant') {
@@ -402,9 +403,11 @@ export class UsersController extends Controller {
       if (config.disableAdminPasswordLogin) {
         ;({ html, text } = generateAdminInviteEmail(`${process.env.ADMIN_HOSTNAME}/login`)) // eslint-disable-line no-extra-semi
       } else {
+        const resetLink = await createPasswordResetTokenAndLink()
         ;({ html, text } = generateAdminPasswordInviteEmail(resetLink)) // eslint-disable-line no-extra-semi
       }
     } else {
+      const resetLink = await createPasswordResetTokenAndLink()
       ;({ html, text } = generatePasswordResetEmail(resetLink, user.firstName)) // eslint-disable-line no-extra-semi
       subject = 'CTRL - Password Reset Link'
     }
