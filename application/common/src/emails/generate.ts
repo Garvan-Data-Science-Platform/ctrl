@@ -1,7 +1,33 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-const styles = readFileSync(join(__dirname, 'styles.css'), 'utf8')
+let styles: string
+let participantInviteTemplate: string
+let passwordResetTemplate: string
+let contactUsTemplate: string
+let contactUsConfirmationTemplate: string
+let adminPasswordInviteTemplate: string
+let adminInviteTemplate: string
+
+// Use `readFileSync` in development and esbuild raw imports in production
+if (!process.env.ESBUILD) {
+  const basePath = __dirname
+  styles = readFileSync(join(basePath, 'styles.css'), 'utf8')
+  participantInviteTemplate = readFileSync(join(basePath, 'participantInvite.html'), 'utf8')
+  passwordResetTemplate = readFileSync(join(basePath, 'passwordReset.html'), 'utf8')
+  contactUsTemplate = readFileSync(join(basePath, 'contactUs.html'), 'utf8')
+  contactUsConfirmationTemplate = readFileSync(join(basePath, 'contactUsConfirmation.html'), 'utf8')
+  adminPasswordInviteTemplate = readFileSync(join(basePath, 'adminPasswordInvite.html'), 'utf8')
+  adminInviteTemplate = readFileSync(join(basePath, 'adminInvite.html'), 'utf8')
+} else {
+  styles = require('./styles.css?raw')
+  participantInviteTemplate = require('./participantInvite.html?raw')
+  passwordResetTemplate = require('./passwordReset.html?raw')
+  contactUsTemplate = require('./contactUs.html?raw')
+  contactUsConfirmationTemplate = require('./contactUsConfirmation.html?raw')
+  adminPasswordInviteTemplate = require('./adminPasswordInvite.html?raw')
+  adminInviteTemplate = require('./adminInvite.html?raw')
+}
 
 function escapeHtml(value: string): string {
   return value
@@ -17,7 +43,7 @@ export function generateParticipantInviteEmail(
   title: string,
   explanatoryText: string,
 ): { html: string; text: string } {
-  let html = readFileSync(join(__dirname, 'participantInvite.html'), 'utf8')
+  let html = participantInviteTemplate
 
   html = html
     .replaceAll('${title}', escapeHtml(title))
@@ -32,7 +58,7 @@ export function generatePasswordResetEmail(
   resetLink: string,
   firstName: string,
 ): { html: string; text: string } {
-  let html = readFileSync(join(__dirname, 'passwordReset.html'), 'utf8')
+  let html = passwordResetTemplate
   html = html
     .replaceAll('${resetLink}', escapeHtml(resetLink))
     .replaceAll('${firstName}', escapeHtml(firstName))
@@ -49,7 +75,7 @@ export function generateContactUsEmail(
   email: string,
   content: string,
 ): { html: string; text: string } {
-  let html = readFileSync(join(__dirname, 'contactUs.html'), 'utf8')
+  let html = contactUsTemplate
   html = html
     .replaceAll('${studyName}', escapeHtml(studyName))
     .replaceAll('${firstName}', escapeHtml(firstName))
@@ -71,7 +97,7 @@ export function generateContactUsConfirmationEmail(
   firstName: string,
   content: string,
 ): { html: string; text: string } {
-  let html = readFileSync(join(__dirname, 'contactUsConfirmation.html'), 'utf8')
+  let html = contactUsConfirmationTemplate
   html = html
     .replaceAll('${studyName}', escapeHtml(studyName))
     .replaceAll('${firstName}', escapeHtml(firstName))
@@ -86,7 +112,7 @@ export function generateAdminPasswordInviteEmail(passwordResetLink: string): {
   html: string
   text: string
 } {
-  let html = readFileSync(join(__dirname, 'adminPasswordInvite.html'), 'utf8')
+  let html = adminPasswordInviteTemplate
   html = html
     .replaceAll('${passwordResetLink}', passwordResetLink)
     .replace('<link rel="stylesheet" href="./styles.css" />', `<style>${styles}</style>`)
@@ -98,7 +124,7 @@ export function generateAdminInviteEmail(loginLink: string): {
   html: string
   text: string
 } {
-  let html = readFileSync(join(__dirname, 'adminInvite.html'), 'utf8')
+  let html = adminInviteTemplate
   html = html
     .replaceAll('${loginLink}', loginLink)
     .replace('<link rel="stylesheet" href="./styles.css" />', `<style>${styles}</style>`)
