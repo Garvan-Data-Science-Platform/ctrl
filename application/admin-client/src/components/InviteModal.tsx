@@ -10,7 +10,7 @@ import {
   Typography,
 } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { generateInviteEmail } from '@common/src/generateInviteTemplate'
+import { previewParticipantInviteEmail } from '@common/src/emails/preview'
 import { Recipient } from '@common/types/invite'
 import { axiosInstance } from '../providers/dataProvider'
 import { GetInviteTextResponse } from '@common/types/api/participants'
@@ -91,7 +91,7 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
     })
   }
 
-  const { html: emailPreview } = generateInviteEmail(
+  const { html: emailPreview } = previewParticipantInviteEmail(
     'http://exampleregisterurl',
     emailTitle,
     emailText,
@@ -100,7 +100,9 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
   return (
     <Box sx={{ width: 1000, display: 'flex', flexDirection: 'row' }} data-cy="invite-modal">
       <Box sx={{ flex: 1.3 }}>
-        <Typography variant="h4" sx={{ color: 'text.primary' }}>Invite Participants</Typography>
+        <Typography variant="h4" sx={{ color: 'text.primary' }}>
+          Invite Participants
+        </Typography>
 
         <Box sx={{ display: 'flex', flexDirection: 'row', mt: 2, alignItems: 'center' }}>
           <TextField
@@ -252,7 +254,15 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
         <Typography variant="h5" textAlign="center" sx={{ color: 'text.primary' }}>
           Email Preview
         </Typography>
-        <Box sx={{ overflow: 'auto', height: 600, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+        <Box
+          sx={{
+            overflow: 'auto',
+            height: 600,
+            border: '1px solid',
+            borderColor: 'divider',
+            borderRadius: 1,
+          }}
+        >
           <iframe
             title="Email Preview"
             style={{ width: '100%', height: '100%', border: 'none' }}

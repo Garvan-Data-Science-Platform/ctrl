@@ -13,6 +13,10 @@ import { createMailerTransporter, fromAddress } from '../utils/mailer'
 import nodemailer from 'nodemailer'
 import logger from 'common/src/logger'
 import { auditLog } from '../middlewares/AuditLog'
+import {
+  generateContactUsConfirmationEmail,
+  generateContactUsEmail,
+} from 'common/src/emails/generate'
 
 @Route('mailer')
 @Tags('Mailer')
@@ -73,18 +77,27 @@ export class MailerController extends Controller {
 
     const subjectToAdmin: string = `New Contact Us Request From CTRL Participant: ${user.firstName} ${user.lastName}`
 
-    const bodyToAdmin = `You have received a message via the CTRL 'Contact Us' form.
-    Study: ${study.name}
-    Participant: ${user.firstName} ${user.lastName} (${user.email})
-    Message: ${bodyRequest.content}
-    `
+    const { text: adminText, html: adminHtml } = generateContactUsEmail(
+      study.name,
+      user.firstName,
+      user.lastName,
+      user.email,
+      bodyRequest.content,
+    )
+
+    const { text: participantText, html: participantHtml } = generateContactUsConfirmationEmail(
+      study.name,
+      user.firstName,
+      bodyRequest.content,
+    )
 
     const mailToAdminsOptions: nodemailer.SendMailOptions = {
       from: fromAddress,
       to: recipientEmails,
       replyTo: user.email,
       subject: subjectToAdmin,
-      text: bodyToAdmin,
+      text: adminText,
+      html: adminHtml,
     }
 
     await mailerTransporter.sendMail(mailToAdminsOptions)
@@ -97,7 +110,8 @@ export class MailerController extends Controller {
       from: fromAddress,
       to: user.email,
       subject: subjectToUser,
-      text: `This email is to confirm that CTRL ${study.name} admins have received your contact us message. A copy of the message is provided below: \n ${bodyRequest.content}`,
+      text: participantText,
+      html: participantHtml,
     }
 
     await mailerTransporter.sendMail(mailToUserOptions)

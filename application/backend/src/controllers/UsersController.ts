@@ -44,11 +44,16 @@ import {
 import { hashPassword } from '../authentication'
 import type { RequestWithAuthentication } from '../authentication'
 import { checkPasswordStrength } from 'common/src/PasswordStrength'
-import { generatePasswordResetEmail } from '../utils/passwordResetTemplate'
+import {
+  generateAdminInviteEmail,
+  generateAdminPasswordInviteEmail,
+  generatePasswordResetEmail,
+} from 'common/src/emails/generate'
 import crypto, { randomBytes } from 'crypto'
 import nodemailer from 'nodemailer'
 import { createMailerTransporter, fromAddress } from '../utils/mailer'
 import { auditLog } from '../middlewares/AuditLog'
+import config from '../config'
 
 @Route('users')
 @Tags('Users')
@@ -204,7 +209,7 @@ export class UsersController extends Controller {
     const responseData = {
       id: insertedUser.id,
     }
-    await this.generatePasswordResetLink({ email: bodyRequest.email })
+    await this.generatePasswordResetLink({ email: bodyRequest.email }, true)
     logger.info({ ...responseData })
     return responseData
   }
@@ -354,6 +359,7 @@ export class UsersController extends Controller {
   public async generatePasswordResetLink(
     @Body() bodyRequest: GeneratePasswordResetLinkRequest,
     @Header('x-client-type') clientType?: string,
+    adminInvite = false,
   ): Promise<void> {
     const user = await prisma.user.findUnique({ where: { email: bodyRequest.email } })
 
@@ -389,12 +395,24 @@ export class UsersController extends Controller {
       resetLink = `${process.env.HOSTNAME}/reset-password?token=${token}`
     }
 
-    const { html, text } = generatePasswordResetEmail(resetLink, user.firstName)
+    let html, text, subject
+
+    if (adminInvite) {
+      subject = 'Invitation to CTRL Admin Portal'
+      if (config.disableAdminPasswordLogin) {
+        ;({ html, text } = generateAdminInviteEmail(`${process.env.ADMIN_HOSTNAME}/login`)) // eslint-disable-line no-extra-semi
+      } else {
+        ;({ html, text } = generateAdminPasswordInviteEmail(resetLink)) // eslint-disable-line no-extra-semi
+      }
+    } else {
+      ;({ html, text } = generatePasswordResetEmail(resetLink, user.firstName)) // eslint-disable-line no-extra-semi
+      subject = 'CTRL - Password Reset Link'
+    }
 
     const mailToUserOptions: nodemailer.SendMailOptions = {
       from: fromAddress,
       to: user.email,
-      subject: 'CTRL - Password Reset Link',
+      subject,
       text,
       html,
     }
