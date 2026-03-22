@@ -358,12 +358,13 @@ export class UsersController extends Controller {
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async generatePasswordResetLinkRoute(
     @Body() bodyRequest: GeneratePasswordResetLinkRequest,
+    @Header('x-client-type') clientType?: string,
   ): Promise<void> {
-    await this.generatePasswordResetLink(bodyRequest)
+    await this.generatePasswordResetLink(bodyRequest,clientType)
   }
   public async generatePasswordResetLink(
-    @Body() bodyRequest: GeneratePasswordResetLinkRequest,
-    @Header('x-client-type') clientType?: string,
+    bodyRequest: GeneratePasswordResetLinkRequest,
+    clientType?: string,
     adminInvite = false,
   ): Promise<void> {
     const user = await prisma.user.findUnique({ where: { email: bodyRequest.email } })
