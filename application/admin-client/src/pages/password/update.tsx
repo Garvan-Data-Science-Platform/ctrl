@@ -20,7 +20,7 @@ export const UpdatePassword = () => {
   return (
     <AuthPage
       type="updatePassword"
-      title={<a href="/">Log in</a>}
+      title={<a href="/">Go back</a>}
       mutationVariables={{ token }}
       formProps={{
         mode: 'onSubmit',
