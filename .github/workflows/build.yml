@@ -136,7 +136,7 @@ jobs:
     name: Restart Dev Deployments
     needs: push_helm_charts
     if: ${{ (github.event.workflow_run.head_branch || github.ref_name) == 'dev' }} # Only restart if on dev branch
-    uses: Garvan-Data-Science-Platform/ctrl/.github/workflows/restart-deployments.yml@main
+    uses: ./.github/workflows/restart-deployments.yml
     secrets: inherit
     with:
       environment: dev
