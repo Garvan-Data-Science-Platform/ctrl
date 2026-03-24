@@ -35,7 +35,9 @@ export default function ForgotPassword() {
     setStatus('pending')
 
     apiClient
-      .post('/users/password/generate-reset-link', data)
+      .post('/users/password/generate-reset-link', data, {
+        headers: { 'Content-Type': 'application/json', 'x-client-type': 'user-client' },
+      })
       .then((res) => {
         if (res.status == 200) {
           // Set to sent on successful response

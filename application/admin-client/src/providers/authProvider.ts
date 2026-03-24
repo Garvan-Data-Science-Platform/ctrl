@@ -155,7 +155,9 @@ export const authProvider: AuthProvider = {
   forgotPassword: async ({ email }) => {
     const req: GeneratePasswordResetLinkRequest = { email: email }
     try {
-      await axiosInstance.post('/users/password/generate-reset-link', req)
+      await axiosInstance.post('/users/password/generate-reset-link', req, {
+        headers: { 'Content-Type': 'application/json', 'x-client-type': clientType },
+      })
     } catch (e) {
       return {
         success: false,
