@@ -448,6 +448,32 @@ describe('UsersController', () => {
 
       expect(emailText).toMatch(urlRegex)
     })
+    it('Should not send emails if requested from wrong client or non-existing email address', async () => {
+      const generatePasswordResetLinkResponse = await request(app)
+        .post('/users/password/generate-reset-link')
+        .set('x-client-type', 'user-client')
+        .send({ email: ORG_ADMIN_EMAIL })
+
+      expect(generatePasswordResetLinkResponse.status).toBe(200)
+
+      const generatePasswordResetLinkResponse2 = await request(app)
+        .post('/users/password/generate-reset-link')
+        .set('x-client-type', 'admin-client')
+        .send({ email: userEmail })
+
+      expect(generatePasswordResetLinkResponse2.status).toBe(200)
+
+      const generatePasswordResetLinkResponse3 = await request(app)
+        .post('/users/password/generate-reset-link')
+        .set('x-client-type', 'user-client')
+        .send({ email: 'nonexisting@example.com' })
+
+      expect(generatePasswordResetLinkResponse3.status).toBe(200)
+
+      const sentEmails = mockNodeMailer.mock.getSentMail()
+
+      expect(sentEmails).toHaveLength(0)
+    })
   })
 
   describe('POST /users/password/reset', () => {

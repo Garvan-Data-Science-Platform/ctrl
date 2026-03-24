@@ -15,6 +15,7 @@ import {
   Middlewares,
   NoSecurity,
   Request,
+  Header,
 } from 'tsoa'
 import logger from 'common/src/logger'
 import type {
@@ -352,6 +353,7 @@ export class UsersController extends Controller {
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   public async generatePasswordResetLink(
     @Body() bodyRequest: GeneratePasswordResetLinkRequest,
+    @Header('x-client-type') clientType?: string,
   ): Promise<void> {
     const user = await prisma.user.findUnique({ where: { email: bodyRequest.email } })
 
@@ -376,8 +378,14 @@ export class UsersController extends Controller {
 
     let resetLink
     if (user.role !== 'Participant') {
+      if (clientType === 'user-client') {
+        return
+      }
       resetLink = `${process.env.ADMIN_HOSTNAME}/update-password?token=${token}`
     } else {
+      if (clientType === 'admin-client') {
+        return
+      }
       resetLink = `${process.env.HOSTNAME}/reset-password?token=${token}`
     }
 

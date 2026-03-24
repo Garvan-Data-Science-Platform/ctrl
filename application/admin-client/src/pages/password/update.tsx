@@ -1,5 +1,5 @@
 import { checkPasswordStrength } from '@common/src/PasswordStrength'
-import { Card, Container, Typography } from '@mui/material'
+import { Card, Typography } from '@mui/material'
 import { useParsed } from '@refinedev/core'
 import { AuthPage } from '@refinedev/mui'
 
