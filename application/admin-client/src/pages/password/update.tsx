@@ -1,4 +1,5 @@
 import { checkPasswordStrength } from '@common/src/PasswordStrength'
+import { Card, Container, Typography } from '@mui/material'
 import { useParsed } from '@refinedev/core'
 import { AuthPage } from '@refinedev/mui'
 
@@ -8,12 +9,17 @@ export const UpdatePassword = () => {
 
   if (!token) {
     return (
-      <div>
-        <p>Invalid or missing password reset token.</p>
-        <p>
-          Please <a href="/forgot-password">request a new password reset link</a>.
-        </p>
-      </div>
+      <Card sx={{ p: 2, width: 400, m: 'auto', mt: 20 }}>
+        <Typography fontWeight="bold">Invalid password reset link</Typography>
+        <br />
+        <Typography>
+          <a href="/forgot-password">Request a new password reset link</a>.
+        </Typography>
+        <br />
+        <Typography>
+          <a href="/login">Return to login page</a>
+        </Typography>
+      </Card>
     )
   }
 

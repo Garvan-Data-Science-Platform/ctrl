@@ -23,7 +23,7 @@ describe('Password Reset', () => {
     ).as('requestReset')
     cy.get('button[type="submit"]').click()
     cy.wait('@requestReset')
-    cy.contains('reset link sent').should('exist')
+    cy.url().should('contain', 'login')
   })
 
   it('opens password reset page and enters invalid password - too short', () => {
