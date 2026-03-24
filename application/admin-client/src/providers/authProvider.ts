@@ -168,7 +168,9 @@ export const authProvider: AuthProvider = {
     return {
       success: true,
       redirectTo: '/login',
-      successNotification: { message: 'Password reset link sent to your email address' },
+      successNotification: {
+        message: 'If your email is in our system you will be sent a link to reset your password.',
+      },
     }
   },
   updatePassword: async ({ password, token }) => {

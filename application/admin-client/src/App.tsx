@@ -14,7 +14,7 @@ import {
 import { dataProvider } from './providers/dataProvider'
 import CssBaseline from '@mui/material/CssBaseline'
 import GlobalStyles from '@mui/material/GlobalStyles'
-import { BrowserRouter, Route, Routes, Outlet } from 'react-router-dom'
+import { BrowserRouter, Route, Routes, Outlet, Link } from 'react-router-dom'
 import routerBindings, {
   NavigateToResource,
   CatchAllNavigate,
@@ -261,7 +261,21 @@ function App() {
                       <Route path="/setup" element={<SetupPage />} />
                       <Route
                         path="/forgot-password"
-                        element={<AuthPage type="forgotPassword" title="" />}
+                        element={
+                          <AuthPage
+                            type="forgotPassword"
+                            title=""
+                            loginLink={
+                              <>
+                                <Typography variant="caption">
+                                  If your email is in our system you will be sent a link to reset
+                                  your password. <Link to="/login">Go back</Link>
+                                </Typography>
+                                <br />
+                              </>
+                            }
+                          />
+                        }
                       />
                       <Route path="/update-password" element={<UpdatePassword />} />
                     </Route>
