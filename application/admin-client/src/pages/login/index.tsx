@@ -1,4 +1,4 @@
-import { Box, Link, Tooltip } from '@mui/material'
+import { Box } from '@mui/material'
 import { AuthPage } from '@refinedev/mui'
 import { useEffect } from 'react'
 import { useAuthStore } from '../../authStore'
@@ -34,11 +34,6 @@ export const Login = () => {
         type="login"
         registerLink={false}
         title="CTRL Admin Portal"
-        forgotPasswordLink={
-          <Tooltip title="You need to use the CTRL User Portal to reset your password.">
-            <Link href="#"> Forgot Password </Link>
-          </Tooltip>
-        }
         formProps={{
           defaultValues: {
             email: '',

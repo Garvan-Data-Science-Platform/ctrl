@@ -1306,6 +1306,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsUsersController_generatePasswordResetLink: Record<string, TsoaRoute.ParameterSchema> = {
                 bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"GeneratePasswordResetLinkRequest"},
+                clientType: {"in":"header","name":"x-client-type","dataType":"string"},
         };
         app.post('/users/password/generate-reset-link',
             ...(fetchMiddlewares<RequestHandler>(UsersController)),
