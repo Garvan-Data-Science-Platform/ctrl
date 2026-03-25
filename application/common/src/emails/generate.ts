@@ -119,7 +119,7 @@ export function generateAdminPasswordInviteEmail(passwordResetLink: string): {
   html = html
     .replaceAll('${passwordResetLink}', passwordResetLink)
     .replace('<link rel="stylesheet" href="./styles.css" />', `<style>${styles}</style>`)
-  const text = `Hello,\n\n You have been invited to become a CTRL admin user.\n\nUse the following URL to set your password:\n${passwordResetLink}\n\nIf you have any issues, please contact our support team.`
+  const text = `Hello,\n\n You have been added as a CTRL admin user.\n\nUse the following URL to set your password:\n${passwordResetLink}`
   return { html, text }
 }
 
@@ -131,6 +131,6 @@ export function generateAdminInviteEmail(loginLink: string): {
   html = html
     .replaceAll('${loginLink}', loginLink)
     .replace('<link rel="stylesheet" href="./styles.css" />', `<style>${styles}</style>`)
-  const text = `Hello,\n\n You have been invited to become a CTRL admin user.\n\nUse the following URL to log in:\n${loginLink}\n\nIf you have any issues, please contact our support team.`
+  const text = `Hello,\n\n You have been added as a CTRL admin user.\n\nUse the following URL to log in:\n${loginLink}`
   return { html, text }
 }
