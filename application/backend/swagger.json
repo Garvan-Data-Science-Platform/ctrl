@@ -3432,7 +3432,7 @@
     },
     "/users/password/generate-reset-link": {
       "post": {
-        "operationId": "GeneratePasswordResetLink",
+        "operationId": "GeneratePasswordResetLinkRoute",
         "responses": {
           "200": {
             "description": "OK"

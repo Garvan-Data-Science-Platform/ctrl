@@ -2,7 +2,7 @@
   "name": "backend",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "yarn prisma generate && esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --external:express --external:cors",
+    "build": "yarn prisma generate && esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --external:express --external:cors --loader:.html=text --loader:.css=text --define:process.env.ESBUILD=true",
     "start": "node dist/index.js",
     "type-check": "tsc -b",
     "lint": "eslint .",
