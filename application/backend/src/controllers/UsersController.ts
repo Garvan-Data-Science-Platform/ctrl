@@ -209,7 +209,7 @@ export class UsersController extends Controller {
     const responseData = {
       id: insertedUser.id,
     }
-    await this.generatePasswordResetLink({ email: bodyRequest.email }, true)
+    await this.generatePasswordResetLink({ email: bodyRequest.email }, undefined, true)
     logger.info({ ...responseData })
     return responseData
   }
@@ -360,7 +360,7 @@ export class UsersController extends Controller {
     @Body() bodyRequest: GeneratePasswordResetLinkRequest,
     @Header('x-client-type') clientType?: string,
   ): Promise<void> {
-    await this.generatePasswordResetLink(bodyRequest,clientType)
+    await this.generatePasswordResetLink(bodyRequest, clientType)
   }
   public async generatePasswordResetLink(
     bodyRequest: GeneratePasswordResetLinkRequest,
@@ -369,7 +369,11 @@ export class UsersController extends Controller {
   ): Promise<void> {
     const user = await prisma.user.findUnique({ where: { email: bodyRequest.email } })
 
-    if (!user) {
+    if (
+      !user ||
+      (user.role !== 'Participant' && clientType == 'user-client') ||
+      (user.role == 'Participant' && clientType == 'admin-client')
+    ) {
       // Not throwing here/returning error as a security precaution
       logger.error('User not found')
       return
@@ -389,17 +393,13 @@ export class UsersController extends Controller {
         },
       })
 
-    let resetLink
-    if (user.role !== 'Participant') {
-      if (clientType === 'user-client') {
-        return
+      let resetLink
+      if (user.role !== 'Participant') {
+        resetLink = `${process.env.ADMIN_HOSTNAME}/update-password?token=${token}`
+      } else {
+        resetLink = `${process.env.HOSTNAME}/reset-password?token=${token}`
       }
-      resetLink = `${process.env.ADMIN_HOSTNAME}/update-password?token=${token}`
-    } else {
-      if (clientType === 'admin-client') {
-        return
-      }
-      resetLink = `${process.env.HOSTNAME}/reset-password?token=${token}`
+      return resetLink
     }
 
     let html, text, subject

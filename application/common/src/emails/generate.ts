@@ -53,7 +53,7 @@ export function generateParticipantInviteEmail(
     .replaceAll('${registerLink}', escapeHtml(registerLink))
     .replaceAll('${explanatoryText}', escapeHtml(explanatoryText))
     .replace('<link rel="stylesheet" href="./styles.css" />', `<style>${styles}</style>`)
-  const text = `Hello,\n\n ${explanatoryText}\n\nUse the following URL to register with CTRL:\n${registerLink}\n\nIf you have any issues, please contact our support team.`
+  const text = `Hello,\n\n ${explanatoryText}\n\nUse the following URL to register with CTRL:\n${registerLink}`
   return { html, text }
 }
 
@@ -67,7 +67,7 @@ export function generatePasswordResetEmail(
     .replaceAll('${firstName}', escapeHtml(firstName))
     .replace('<link rel="stylesheet" href="./styles.css" />', `<style>${styles}</style>`)
 
-  const text = `Hello ${firstName},\n\nWe received a request to reset your password. If you did not make this request, you can safely ignore this email.\n\nUse the following URL to reset your password:\n${resetLink}\n\nIf you have any issues, please contact our support team.`
+  const text = `Hello ${firstName},\n\nWe received a request to reset your password. If you did not make this request, you can safely ignore this email.\n\nUse the following URL to reset your password:\n${resetLink}`
   return { html, text }
 }
 
