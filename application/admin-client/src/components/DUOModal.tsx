@@ -64,12 +64,12 @@ export function DUOModal({ open, onClose, onConfirm, answers, questionText }: DU
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>Select Ontologies</DialogTitle>
+      <DialogTitle>Select ontology term</DialogTitle>
       <DialogContent>
         <Box sx={{ mb: 2 }}>
           <TextField
             fullWidth
-            placeholder="Filter Ontologies by ID, Label, Description, or Comment..."
+            placeholder="Filter Ontology terms by ID, Label, Description, or Comment..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             InputProps={{
@@ -133,7 +133,7 @@ export function DUOModal({ open, onClose, onConfirm, answers, questionText }: DU
         </Box>
         <Box sx={{ mb: 2 }}>
           <Typography variant="subtitle1" sx={{ mb: 1, mt: 1 }}>
-            Which answer does this Ontology apply to?
+            Which answer does this Ontology term apply to?
           </Typography>
           <Select
             fullWidth
@@ -166,7 +166,7 @@ export function DUOModal({ open, onClose, onConfirm, answers, questionText }: DU
             }}
             data-cy="confirm-duo"
           >
-            Add Ontology
+            Add Ontology Term
           </Button>
         </Box>
       </DialogContent>

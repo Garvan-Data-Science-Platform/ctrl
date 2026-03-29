@@ -132,7 +132,7 @@ export function SurveyElementCard({
                     }
                   >
                     <Chip
-                      onClick={() => { }}
+                      onClick={() => {}}
                       onDelete={() => {
                         const newDuoCodes = data.duoCodes?.filter((val) => val.code != duoEntry?.ID)
                         handleUpdateField('duoCodes', newDuoCodes)
@@ -220,7 +220,7 @@ export function SurveyElementCard({
       if (nonMatchingDUOs?.length != data.duoCodes?.length) {
         open?.({
           type: 'error',
-          message: 'Ontologies associated with this answer have been removed.',
+          message: 'Ontology terms associated with this answer have been removed.',
         })
         handleUpdateField('duoCodes', nonMatchingDUOs)
       }
