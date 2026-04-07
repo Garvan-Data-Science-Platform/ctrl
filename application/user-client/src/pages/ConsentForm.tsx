@@ -45,6 +45,7 @@ export default function ConsentForm() {
   const [modalAction, setModalAction] = useState<'save' | 'next'>('save')
   const [showError, setShowError] = useState(false)
   const [blankRadios, setBlankRadios] = useState<string[]>([])
+  const [logoLoaded, setLogoLoaded] = useState(true)
 
   const { isPending, data } = useQuery({
     queryKey: ['form_step', currentStep],
@@ -126,7 +127,7 @@ export default function ConsentForm() {
     for (const i in elements) {
       if (elements[i].type == 'subheading') {
         results.push(
-          <Typography key={`sh_${i}`} sx={{ mt: 2, mb: 2, fontWeight: 'bold' }}>
+          <Typography key={`sh_${i}`} sx={{ mt: 2, mb: 2, fontWeight: 'bold', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
             {elements[i].data.text}
           </Typography>,
         )
@@ -164,7 +165,7 @@ export default function ConsentForm() {
           },
         })}
       >
-        {/* 
+        {/*
           // @ts-ignore */}
         <Typography component="label" for={`input_${idx}`} sx={{ flexGrow: 1, textAlign: 'left' }}>
           {data.text}
@@ -268,13 +269,17 @@ export default function ConsentForm() {
         </Card>
       </Modal>
       <Box sx={{ position: 'absolute', top: 10, left: 40 }}>
-        <img
-          src={import.meta.env.VITE_BACKEND_URL + '/settings/logo'}
-          height={30}
-          onClick={() => nav('/')}
-          style={{ marginRight: 20, cursor: 'pointer' }}
-          alt="logo"
-        />
+        {logoLoaded && (
+          <img
+            src={import.meta.env.VITE_BACKEND_URL + '/settings/logo'}
+            height={30}
+            onClick={() => nav('/')}
+            style={{ marginRight: 20, cursor: 'pointer' }}
+            alt="logo"
+            onError={() => setLogoLoaded(false)}
+            onLoad={() => setLogoLoaded(true)}
+          />
+        )}
       </Box>
       <Stepper activeStep={Number(params.step)} sx={{ mt: 6, mb: 4 }}>
         {Array(data?.total_steps)
