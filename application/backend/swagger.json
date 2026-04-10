@@ -990,6 +990,10 @@
           },
           "inviteEmailText": {
             "type": "string"
+          },
+          "contactUsEmail": {
+            "type": "string",
+            "nullable": true
           }
         },
         "required": [
@@ -1000,7 +1004,8 @@
           "redcapURL",
           "redcapToken",
           "inviteEmailSubject",
-          "inviteEmailText"
+          "inviteEmailText",
+          "contactUsEmail"
         ],
         "type": "object",
         "description": "From T, pick a set of properties whose keys are in the union K"
@@ -1042,6 +1047,10 @@
       "Study": {
         "description": "Model Study",
         "properties": {
+          "contactUsEmail": {
+            "type": "string",
+            "nullable": true
+          },
           "inviteEmailText": {
             "type": "string"
           },
@@ -1077,6 +1086,7 @@
           }
         },
         "required": [
+          "contactUsEmail",
           "inviteEmailText",
           "inviteEmailSubject",
           "redcapToken",
@@ -1140,6 +1150,9 @@
             "type": "string"
           },
           "redcapURL": {
+            "type": "string"
+          },
+          "contactUsEmail": {
             "type": "string"
           }
         },
@@ -2211,23 +2224,20 @@
       },
       "ContactUsRequest": {
         "properties": {
-          "subject": {
-            "type": "string"
-          },
           "content": {
             "type": "string"
+          },
+          "studyId": {
+            "type": "number",
+            "format": "double"
           }
         },
         "required": [
-          "subject",
-          "content"
+          "content",
+          "studyId"
         ],
         "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "subject": "Somethings Wrong!",
-          "content": "There was some problem with this thing that I was doing.\nBut I don't know why?\n\nCheers,\nJohn Doe"
-        }
+        "additionalProperties": false
       },
       "UploadRedcapParticipantResponse": {
         "properties": {
@@ -3422,7 +3432,7 @@
     },
     "/users/password/generate-reset-link": {
       "post": {
-        "operationId": "GeneratePasswordResetLink",
+        "operationId": "GeneratePasswordResetLinkRoute",
         "responses": {
           "200": {
             "description": "OK"
@@ -3454,7 +3464,16 @@
           "Users"
         ],
         "security": [],
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-client-type",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {

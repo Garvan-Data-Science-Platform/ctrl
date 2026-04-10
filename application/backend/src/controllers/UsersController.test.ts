@@ -15,6 +15,7 @@ import {
   FE_TEST_STUDY_ID,
   OPERATOR_ADMIN_ID,
   ORG_ADMIN_2_ID,
+  ORG_ADMIN_EMAIL,
   ORG_ADMIN_ID,
   PARTICIPANT_UNANSWERED_ID,
   STUDY_ADMIN_ID,
@@ -421,6 +422,57 @@ describe('UsersController', () => {
       )
 
       expect(emailText).toMatch(urlRegex)
+    })
+    it('should link to admin portal for admin reset', async () => {
+      const generatePasswordResetLinkResponse = await request(app)
+        .post('/users/password/generate-reset-link')
+        .send({ email: ORG_ADMIN_EMAIL })
+
+      expect(generatePasswordResetLinkResponse.status).toBe(200)
+
+      const sentEmails = mockNodeMailer.mock.getSentMail()
+
+      expect(sentEmails).toHaveLength(1)
+      expect(sentEmails[0]).toMatchObject({
+        from: 'CTRL <noreply@ctrl.garvan.org.au>',
+        subject: 'CTRL - Password Reset Link',
+        to: ORG_ADMIN_EMAIL,
+      })
+
+      // Validate the URL structure
+      const emailText = sentEmails[0].text
+      const hostname = process.env.ADMIN_HOSTNAME || 'admin.ctrl.garvan.org.au'
+      const urlRegex = new RegExp(
+        `${hostname.replace(/\./g, '\\.')}/update-password\\?token=[a-f0-9]{64}`,
+      )
+
+      expect(emailText).toMatch(urlRegex)
+    })
+    it('Should not send emails if requested from wrong client or non-existing email address', async () => {
+      const generatePasswordResetLinkResponse = await request(app)
+        .post('/users/password/generate-reset-link')
+        .set('x-client-type', 'user-client')
+        .send({ email: ORG_ADMIN_EMAIL })
+
+      expect(generatePasswordResetLinkResponse.status).toBe(200)
+
+      const generatePasswordResetLinkResponse2 = await request(app)
+        .post('/users/password/generate-reset-link')
+        .set('x-client-type', 'admin-client')
+        .send({ email: userEmail })
+
+      expect(generatePasswordResetLinkResponse2.status).toBe(200)
+
+      const generatePasswordResetLinkResponse3 = await request(app)
+        .post('/users/password/generate-reset-link')
+        .set('x-client-type', 'user-client')
+        .send({ email: 'nonexisting@example.com' })
+
+      expect(generatePasswordResetLinkResponse3.status).toBe(200)
+
+      const sentEmails = mockNodeMailer.mock.getSentMail()
+
+      expect(sentEmails).toHaveLength(0)
     })
   })
 

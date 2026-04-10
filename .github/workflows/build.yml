@@ -124,17 +124,19 @@ jobs:
           gcloud --quiet beta compute ssh ctrl-dev \
             --zone=australia-southeast1-a \
             --project=ctrl-358804 \
+            --tunnel-through-iap \
             --command="mkdir -p /opt/ctrl/chart && rm -rf /opt/ctrl/chart/{*,.*} 2>/dev/null || true" && \
           gcloud --quiet beta compute scp --recurse .helm/ctrl/ \
             ctrl-dev:/opt/ctrl/chart/ \
             --zone=australia-southeast1-a \
+            --tunnel-through-iap \
             --project=ctrl-358804
 
   restart-dev-deployments:
     name: Restart Dev Deployments
     needs: push_helm_charts
     if: ${{ (github.event.workflow_run.head_branch || github.ref_name) == 'dev' }} # Only restart if on dev branch
-    uses: Garvan-Data-Science-Platform/ctrl/.github/workflows/restart-deployments.yml@main
+    uses: ./.github/workflows/restart-deployments.yml
     secrets: inherit
     with:
       environment: dev

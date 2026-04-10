@@ -28,7 +28,7 @@ import {
   StateTerritory,
 } from '@common/types/api/users/ParticipantProfile'
 import { AddCircle, Close } from '@mui/icons-material'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { emailRegex } from '@common/src/regex'
 
 interface FormValues {
@@ -53,6 +53,7 @@ interface FormValues {
 
 export default function Register() {
   const { inviteId } = useParams<{ inviteId: string }>()
+  const [logoLoaded, setLogoLoaded] = useState(true)
 
   const {
     register,
@@ -173,11 +174,15 @@ export default function Register() {
         <Card sx={{ maxWidth: 500, mr: 'auto', ml: 'auto', mt: 10, p: 2 }}>
           <form onSubmit={handleSubmit(onSubmit)}>
             <Box sx={{ mt: 5, mb: 2 }}>
-              <img
-                src={import.meta.env.VITE_BACKEND_URL + '/settings/logo'}
-                height={40}
-                alt="logo"
-              />
+              {logoLoaded && (
+                <img
+                  src={import.meta.env.VITE_BACKEND_URL + '/settings/logo'}
+                  height={40}
+                  alt="logo"
+                  onError={() => setLogoLoaded(false)}
+                  onLoad={() => setLogoLoaded(true)}
+                />
+              )}
             </Box>
             <Box sx={{ mt: 3 }}>
               <Button component={Link} to="/login">

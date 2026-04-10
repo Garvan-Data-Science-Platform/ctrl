@@ -37,7 +37,7 @@ import {
 import { Participant } from 'common/types/api/participants/participant'
 import { createMailerTransporter, fromAddress } from '../utils/mailer'
 import nodemailer from 'nodemailer'
-import { generateInviteEmail } from 'common/src/generateInviteTemplate'
+import { generateParticipantInviteEmail } from 'common/src/emails/generate'
 import { InviteStatus } from 'common/types/api/participants/invite'
 import { BadGatewayError, NotFoundError, UnprocessableError } from '../middlewares/ErrorHandler'
 import {
@@ -1013,7 +1013,11 @@ export class InvitesController extends Controller {
       const explanatoryText = study?.inviteEmailText
       const mailerTransporter = await createMailerTransporter()
 
-      const { html, text } = generateInviteEmail(registerLink, subjectText, explanatoryText)
+      const { html, text } = generateParticipantInviteEmail(
+        registerLink,
+        subjectText,
+        explanatoryText,
+      )
 
       const mailOptions: nodemailer.SendMailOptions = {
         from: fromAddress,

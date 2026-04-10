@@ -3,6 +3,7 @@ import { DevtoolsPanel, DevtoolsProvider } from '@refinedev/devtools'
 import { RefineKbar, RefineKbarProvider } from '@refinedev/kbar'
 
 import {
+  AuthPage,
   ErrorComponent,
   notificationProvider,
   RefineSnackbarProvider,
@@ -13,7 +14,7 @@ import {
 import { dataProvider } from './providers/dataProvider'
 import CssBaseline from '@mui/material/CssBaseline'
 import GlobalStyles from '@mui/material/GlobalStyles'
-import { BrowserRouter, Route, Routes, Outlet } from 'react-router-dom'
+import { BrowserRouter, Route, Routes, Outlet, Link } from 'react-router-dom'
 import routerBindings, {
   NavigateToResource,
   CatchAllNavigate,
@@ -25,7 +26,6 @@ import { SurveyList, SurveyEditor } from './pages/surveys'
 import { ColorModeContextProvider } from './contexts/color-mode'
 import { Header } from './components/header'
 import { Login } from './pages/login'
-import { ForgotPassword } from './pages/forgotPassword'
 import { authProvider } from './providers/authProvider'
 import { ParticipantList, ParticipantShow } from './pages/participants'
 import { SurveyImport, IntegrationsHome, ParticipantImport } from './pages/integrations'
@@ -52,6 +52,7 @@ import OTP from './pages/login/OTP'
 import { Box, Typography } from '@mui/material'
 import RestorePage from './pages/restore'
 import { accessControlProvider } from './providers/accessControlProvider'
+import { UpdatePassword } from './pages/password/update'
 
 function App() {
   return (
@@ -258,7 +259,25 @@ function App() {
                       <Route path="/login/callback" element={<Callback />} />
                       <Route path="/login" element={<Login />} />
                       <Route path="/setup" element={<SetupPage />} />
-                      <Route path="/forgot-password" element={<ForgotPassword />} />
+                      <Route
+                        path="/forgot-password"
+                        element={
+                          <AuthPage
+                            type="forgotPassword"
+                            title=""
+                            loginLink={
+                              <>
+                                <Typography variant="caption">
+                                  If your email is in our system you will be sent a link to reset
+                                  your password. <Link to="/login">Go back</Link>
+                                </Typography>
+                                <br />
+                              </>
+                            }
+                          />
+                        }
+                      />
+                      <Route path="/update-password" element={<UpdatePassword />} />
                     </Route>
                   </Routes>
                   <RefineKbar />
@@ -279,7 +298,8 @@ function App() {
                     }}
                   >
                     <Typography variant="body2">
-                      {import.meta.env['VITE_APP_VERSION']} © 2025 Garvan Institute of Medical Research
+                      {import.meta.env['VITE_APP_VERSION']} © 2025 Garvan Institute of Medical
+                      Research
                     </Typography>
                   </Box>
                 </Refine>

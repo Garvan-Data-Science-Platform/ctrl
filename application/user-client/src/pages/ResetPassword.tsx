@@ -29,6 +29,7 @@ export default function ResetPassword() {
   const token = query.get('token')
 
   const logoPath = import.meta.env.VITE_BACKEND_URL + '/settings/logo'
+  const [logoLoaded, setLogoLoaded] = useState(true)
 
   const {
     register,
@@ -50,7 +51,15 @@ export default function ResetPassword() {
         <Card sx={{ maxWidth: 400, mr: 'auto', ml: 'auto', mt: 10, p: 2 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Box sx={{ mt: 5, mb: 2 }}>
-              <img alt="logo" src={logoPath} height={40} />
+              {logoLoaded && (
+                <img
+                  alt="logo"
+                  src={logoPath}
+                  height={40}
+                  onError={() => setLogoLoaded(false)}
+                  onLoad={() => setLogoLoaded(true)}
+                />
+              )}
             </Box>
             <Alert severity="error">
               Missing token. Please check your reset password email link.
@@ -102,7 +111,15 @@ export default function ResetPassword() {
         {status === 'sent' ? (
           <Box>
             <Box sx={{ mt: 5, mb: 2 }}>
-              <img alt="logo" src={logoPath} height={40} />
+              {logoLoaded && (
+                <img
+                  alt="logo"
+                  src={logoPath}
+                  height={40}
+                  onError={() => setLogoLoaded(false)}
+                  onLoad={() => setLogoLoaded(true)}
+                />
+              )}
             </Box>
             <Typography>Password reset was successful.</Typography>
           </Box>
@@ -115,7 +132,15 @@ export default function ResetPassword() {
           </Box>
         ) : status === 'error' ? (
           <Box sx={{ mt: 5, mb: 2 }}>
-            <img alt="logo" src={logoPath} height={40} />
+            {logoLoaded && (
+              <img
+                alt="logo"
+                src={logoPath}
+                height={40}
+                onError={() => setLogoLoaded(false)}
+                onLoad={() => setLogoLoaded(true)}
+              />
+            )}
             <Alert severity="error">
               Invalid token. Please check your reset password email link.
             </Alert>
@@ -124,7 +149,15 @@ export default function ResetPassword() {
           <form onSubmit={handleSubmit(onSubmit)}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <Box sx={{ mt: 5, mb: 2 }}>
-                <img alt="logo" src={logoPath} height={40} />
+                {logoLoaded && (
+                  <img
+                    alt="logo"
+                    src={logoPath}
+                    height={40}
+                    onError={() => setLogoLoaded(false)}
+                    onLoad={() => setLogoLoaded(true)}
+                  />
+                )}
               </Box>
               <Typography>Please enter and confirm your new password</Typography>
               <TextField

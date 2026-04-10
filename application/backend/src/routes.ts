@@ -1304,25 +1304,26 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsUsersController_generatePasswordResetLink: Record<string, TsoaRoute.ParameterSchema> = {
+        const argsUsersController_generatePasswordResetLinkRoute: Record<string, TsoaRoute.ParameterSchema> = {
                 bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"GeneratePasswordResetLinkRequest"},
+                clientType: {"in":"header","name":"x-client-type","dataType":"string"},
         };
         app.post('/users/password/generate-reset-link',
             ...(fetchMiddlewares<RequestHandler>(UsersController)),
-            ...(fetchMiddlewares<RequestHandler>(UsersController.prototype.generatePasswordResetLink)),
+            ...(fetchMiddlewares<RequestHandler>(UsersController.prototype.generatePasswordResetLinkRoute)),
 
-            async function UsersController_generatePasswordResetLink(request: ExRequest, response: ExResponse, next: any) {
+            async function UsersController_generatePasswordResetLinkRoute(request: ExRequest, response: ExResponse, next: any) {
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsUsersController_generatePasswordResetLink, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args: argsUsersController_generatePasswordResetLinkRoute, request, response });
 
                 const controller = new UsersController();
 
               await templateService.apiHandler({
-                methodName: 'generatePasswordResetLink',
+                methodName: 'generatePasswordResetLinkRoute',
                 controller,
                 response,
                 next,

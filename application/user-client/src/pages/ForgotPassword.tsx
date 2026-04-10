@@ -16,6 +16,7 @@ import { GeneratePasswordResetLinkRequest } from '@common/types/api/users'
 
 export default function ForgotPassword() {
   const logoPath = import.meta.env.VITE_BACKEND_URL + '/settings/logo'
+  const [logoLoaded, setLogoLoaded] = useState(true)
 
   const {
     register,
@@ -35,7 +36,9 @@ export default function ForgotPassword() {
     setStatus('pending')
 
     apiClient
-      .post('/users/password/generate-reset-link', data)
+      .post('/users/password/generate-reset-link', data, {
+        headers: { 'Content-Type': 'application/json', 'x-client-type': 'user-client' },
+      })
       .then((res) => {
         if (res.status == 200) {
           // Set to sent on successful response
@@ -62,7 +65,15 @@ export default function ForgotPassword() {
           {status === 'sent' ? (
             <Box>
               <Box sx={{ mt: 5, mb: 2 }}>
-                <img alt="logo" src={logoPath} height={40} />
+                {logoLoaded && (
+                  <img
+                    alt="logo"
+                    src={logoPath}
+                    height={40}
+                    onError={() => setLogoLoaded(false)}
+                    onLoad={() => setLogoLoaded(true)}
+                  />
+                )}
               </Box>
               <Typography>
                 If your email is in our system you will be sent a link to reset your password.
@@ -78,7 +89,15 @@ export default function ForgotPassword() {
             <form onSubmit={handleSubmit(onSubmit)}>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <Box sx={{ mt: 5, mb: 2 }}>
-                  <img alt="logo" src={logoPath} height={40} />
+                  {logoLoaded && (
+                    <img
+                      alt="logo"
+                      src={logoPath}
+                      height={40}
+                      onError={() => setLogoLoaded(false)}
+                      onLoad={() => setLogoLoaded(true)}
+                    />
+                  )}
                 </Box>
                 <Typography>
                   Please enter the email address you registered with to receive a link to reset your
