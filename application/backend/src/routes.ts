@@ -29,6 +29,8 @@ import { HealthCheckController } from './controllers/HealthCheckController';
 import { FamiliesController } from './controllers/FamiliesController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { AuthController } from './controllers/AuthController';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { AuditLogController } from './controllers/AuditLogController';
 import { expressAuthentication } from './authentication';
 // @ts-ignore - no great way to install types from subpackage
 import type { Request as ExRequest, Response as ExResponse, RequestHandler, Router } from 'express';
@@ -935,6 +937,29 @@ const models: TsoaRoute.Models = {
         "properties": {
             "otp_token": {"dataType":"string","required":true},
             "otp_code": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "_36_Enums.AuditLogOperation": {
+        "dataType": "refAlias",
+        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["CREATE"]},{"dataType":"enum","enums":["UPDATE"]},{"dataType":"enum","enums":["DELETE"]}],"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "DefaultSelection_Prisma._36_AuditLogPayload_": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"requestBody":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"userId":{"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},"timestamp":{"dataType":"datetime","required":true},"success":{"dataType":"boolean","required":true},"operation":{"ref":"_36_Enums.AuditLogOperation","required":true},"resource":{"dataType":"string","required":true},"meta":{"dataType":"any","required":true},"id":{"dataType":"double","required":true}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "AuditLog": {
+        "dataType": "refAlias",
+        "type": {"ref":"DefaultSelection_Prisma._36_AuditLogPayload_","validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GetAllAuditLogsResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "data": {"dataType":"array","array":{"dataType":"refAlias","ref":"AuditLog"},"required":true},
         },
         "additionalProperties": false,
     },
@@ -3833,6 +3858,36 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 next,
                 validatedArgs,
                 successStatus: 302,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsAuditLogController_getAuditLogEntries: Record<string, TsoaRoute.ParameterSchema> = {
+        };
+        app.get('/audit-logs',
+            authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(AuditLogController)),
+            ...(fetchMiddlewares<RequestHandler>(AuditLogController.prototype.getAuditLogEntries)),
+
+            async function AuditLogController_getAuditLogEntries(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsAuditLogController_getAuditLogEntries, request, response });
+
+                const controller = new AuditLogController();
+
+              await templateService.apiHandler({
+                methodName: 'getAuditLogEntries',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);

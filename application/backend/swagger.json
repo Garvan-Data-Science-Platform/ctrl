@@ -2733,6 +2733,72 @@
         ],
         "type": "object",
         "additionalProperties": false
+      },
+      "_36_Enums.AuditLogOperation": {
+        "type": "string",
+        "enum": [
+          "CREATE",
+          "UPDATE",
+          "DELETE"
+        ]
+      },
+      "AuditLog": {
+        "description": "Model AuditLog",
+        "properties": {
+          "requestBody": {
+            "type": "string",
+            "nullable": true
+          },
+          "userId": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "operation": {
+            "$ref": "#/components/schemas/_36_Enums.AuditLogOperation"
+          },
+          "resource": {
+            "type": "string"
+          },
+          "meta": {},
+          "id": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": [
+          "requestBody",
+          "userId",
+          "timestamp",
+          "success",
+          "operation",
+          "resource",
+          "meta",
+          "id"
+        ],
+        "type": "object"
+      },
+      "GetAllAuditLogsResponse": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/AuditLog"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "additionalProperties": false
       }
     },
     "securitySchemes": {
@@ -8654,6 +8720,50 @@
           "Auth"
         ],
         "security": [],
+        "parameters": []
+      }
+    },
+    "/audit-logs": {
+      "get": {
+        "operationId": "GetAuditLogEntries",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllAuditLogsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Get all Audit Log entries",
+        "summary": "Get all Audit Log entries",
+        "tags": [
+          "AuditLogs"
+        ],
+        "security": [
+          {
+            "jwt": [
+              "OrganisationAdmin",
+              "StudyAdmin"
+            ]
+          }
+        ],
         "parameters": []
       }
     }
