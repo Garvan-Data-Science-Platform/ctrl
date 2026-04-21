@@ -1,17 +1,7 @@
-import {
-  Controller,
-  Get,
-  Middlewares,
-  Security,
-  Response,
-  Route,
-  Tags,
-} from 'tsoa'
+import { Controller, Get, Middlewares, Security, Response, Route, Tags } from 'tsoa'
 import prisma from '../PrismaClient'
 import { AuditLog } from '@prisma/client'
-import type {
-  GetAllAuditLogsResponse,
-} from 'common/types/api/audit-logs'
+import type { GetAllAuditLogsResponse } from 'common/types/api/audit-logs'
 import { UnauthorizedErrorResponse } from 'common/types/api/errors'
 import { auditLog } from '../middlewares/AuditLog'
 
@@ -31,8 +21,7 @@ export class AuditLogController extends Controller {
    */
   @Get('/')
   public async getAuditLogEntries(): Promise<GetAllAuditLogsResponse> {
-    const auditLogs: AuditLog[] = await this.auditLogRepo.findMany({
-    })
+    const auditLogs: AuditLog[] = await this.auditLogRepo.findMany({})
     const responseData = { data: auditLogs }
     return responseData
   }

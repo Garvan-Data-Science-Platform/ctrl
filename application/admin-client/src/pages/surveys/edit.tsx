@@ -139,7 +139,16 @@ export const SurveyEditor = () => {
   return isLoading ? null : (
     <Box sx={{ display: 'flex', flexDirection: 'row' }}>
       <Box sx={{ border: '1px solid lightgrey', height: '100vh', ml: -3, mt: -3 }}>
-        <Box sx={{ p: 2, display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Box
+          sx={{
+            p: 2,
+            display: 'flex',
+            flexDirection: 'row',
+            gap: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
           <Button
             variant="outlined"
             data-cy="publish-button"
