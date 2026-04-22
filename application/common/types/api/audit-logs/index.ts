@@ -1,3 +1,3 @@
-import type { GetAllAuditLogsResponse } from './getAllAuditLogs'
+import type { GetAuditLogsResponse } from './getAuditLogs'
 
-export { GetAllAuditLogsResponse }
+export { GetAuditLogsResponse }

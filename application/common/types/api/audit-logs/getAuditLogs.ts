@@ -1,5 +1,6 @@
 import { AuditLog } from '@prisma/client'
 
-export interface GetAllAuditLogsResponse {
+export interface GetAuditLogsResponse {
   data: AuditLog[]
+  total: number
 }

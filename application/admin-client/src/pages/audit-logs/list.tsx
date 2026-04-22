@@ -47,10 +47,14 @@ const ExpandableJsonCell = ({ value }: { value: any }) => {
 export const AuditLogList = () => {
   const { dataGridProps } = useDataGrid({
     syncWithLocation: false,
-    pagination: { mode: 'off' },
+    // Note: By default Refined uses 'server' mode for pagination, sorting and filtering
+    // pagination: { mode: 'off' },
+    // sorters: { mode: 'off' },
     filters: { mode: 'off' },
-    sorters: { mode: 'off' },
     resource: 'audit-logs',
+    sorters: {
+      initial: [{ field: 'timestamp', order: 'desc' }],
+    },
   })
 
   const columns = React.useMemo<GridColDef[]>(

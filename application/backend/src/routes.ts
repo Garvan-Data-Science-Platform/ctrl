@@ -956,10 +956,11 @@ const models: TsoaRoute.Models = {
         "type": {"ref":"DefaultSelection_Prisma._36_AuditLogPayload_","validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "GetAllAuditLogsResponse": {
+    "GetAuditLogsResponse": {
         "dataType": "refObject",
         "properties": {
             "data": {"dataType":"array","array":{"dataType":"refAlias","ref":"AuditLog"},"required":true},
+            "total": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
     },
@@ -3865,6 +3866,10 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsAuditLogController_getAuditLogEntries: Record<string, TsoaRoute.ParameterSchema> = {
+                _start: {"default":0,"in":"query","name":"_start","dataType":"double"},
+                _end: {"default":25,"in":"query","name":"_end","dataType":"double"},
+                sortBy: {"default":"timestamp","in":"query","name":"sortBy","dataType":"string"},
+                sortDirection: {"default":"desc","in":"query","name":"sortDirection","dataType":"union","subSchemas":[{"dataType":"enum","enums":["asc"]},{"dataType":"enum","enums":["desc"]}]},
         };
         app.get('/audit-logs',
             authenticateMiddleware([{"jwt":["OrganisationAdmin","StudyAdmin"]}]),

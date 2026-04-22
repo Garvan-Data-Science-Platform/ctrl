@@ -1,7 +1,6 @@
-import { Controller, Get, Middlewares, Security, Response, Route, Tags } from 'tsoa'
+import { Controller, Get, Middlewares, Query, Security, Response, Route, Tags } from 'tsoa'
 import prisma from '../PrismaClient'
-import { AuditLog } from '@prisma/client'
-import type { GetAllAuditLogsResponse } from 'common/types/api/audit-logs'
+import type { GetAuditLogsResponse } from 'common/types/api/audit-logs'
 import { UnauthorizedErrorResponse } from 'common/types/api/errors'
 import { auditLog } from '../middlewares/AuditLog'
 
@@ -15,14 +14,31 @@ export class AuditLogController extends Controller {
   auditLogRepo = prisma.auditLog
 
   /**
-   * Get all Audit Log entries
+   * Get Audit Log entries (with pagination)
    *
-   * @summary Get all Audit Log entries
+   * @summary Get Audit Log entries (with pagination)
    */
   @Get('/')
-  public async getAuditLogEntries(): Promise<GetAllAuditLogsResponse> {
-    const auditLogs: AuditLog[] = await this.auditLogRepo.findMany({})
-    const responseData = { data: auditLogs }
-    return responseData
+  public async getAuditLogEntries(
+    @Query() _start: number = 0,
+    @Query() _end: number = 25,
+    @Query() sortBy: string = 'timestamp',
+    @Query() sortDirection: 'asc' | 'desc' = 'desc',
+  ): Promise<GetAuditLogsResponse> {
+    const skip = _start
+    const take = _end - _start
+
+    const [auditLogs, total] = await prisma.$transaction([
+      this.auditLogRepo.findMany({
+        skip,
+        take,
+        orderBy: { [sortBy]: sortDirection },
+      }),
+      this.auditLogRepo.count(),
+    ])
+    return {
+      data: auditLogs,
+      total,
+    }
   }
 }

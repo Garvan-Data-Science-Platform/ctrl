@@ -2785,17 +2785,22 @@
         ],
         "type": "object"
       },
-      "GetAllAuditLogsResponse": {
+      "GetAuditLogsResponse": {
         "properties": {
           "data": {
             "items": {
               "$ref": "#/components/schemas/AuditLog"
             },
             "type": "array"
+          },
+          "total": {
+            "type": "number",
+            "format": "double"
           }
         },
         "required": [
-          "data"
+          "data",
+          "total"
         ],
         "type": "object",
         "additionalProperties": false
@@ -8732,7 +8737,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetAllAuditLogsResponse"
+                  "$ref": "#/components/schemas/GetAuditLogsResponse"
                 }
               }
             }
@@ -8751,8 +8756,8 @@
             "description": "Internal Server Error"
           }
         },
-        "description": "Get all Audit Log entries",
-        "summary": "Get all Audit Log entries",
+        "description": "Get Audit Log entries (with pagination)",
+        "summary": "Get Audit Log entries (with pagination)",
         "tags": [
           "AuditLogs"
         ],
@@ -8764,7 +8769,50 @@
             ]
           }
         ],
-        "parameters": []
+        "parameters": [
+          {
+            "in": "query",
+            "name": "_start",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "_end",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sortBy",
+            "required": false,
+            "schema": {
+              "default": "timestamp",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sortDirection",
+            "required": false,
+            "schema": {
+              "default": "desc",
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          }
+        ]
       }
     }
   },
