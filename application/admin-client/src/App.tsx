@@ -160,6 +160,7 @@ function App() {
                       list: '/studies',
                       meta: {
                         icon: <LibraryBooks />,
+                        label: 'Manage Studies',
                         parent: 'admin',
                       },
                     },
@@ -168,6 +169,7 @@ function App() {
                       list: '/audit-logs',
                       meta: {
                         icon: <History />,
+                        label: 'Audit Logs',
                         parent: 'admin',
                       },
                     },
