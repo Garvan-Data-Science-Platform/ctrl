@@ -131,6 +131,7 @@ export const AuditLogList = () => {
       {
         field: 'requestBody',
         headerName: 'RequestBody',
+        sortable: false,
         flex: 2,
         minWidth: 300,
         renderCell: ({ value }) => <ExpandableJsonCell value={value} />,
