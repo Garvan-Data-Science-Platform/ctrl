@@ -151,7 +151,16 @@ export const AuditLogList = () => {
             pagination: { paginationModel: { pageSize: 25 } },
           }}
           slotProps={{ root: { 'data-cy': 'audit-logs-list' } }}
-          disableColumnMenu // Optional: matches your cleaner UI style from the other page
+          disableColumnMenu
+          sx={{
+            '& .MuiDataGrid-columnHeaderTitleContainer': {
+              justifyContent: 'center',
+            },
+            '& .MuiDataGrid-cell': {
+              display: 'flex',
+              alignItems: 'center',
+            },
+          }}
         />
       </List>
     </Box>
