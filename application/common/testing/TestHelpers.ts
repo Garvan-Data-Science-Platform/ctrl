@@ -219,11 +219,12 @@ export async function revokeInvite(inviteId: string) {
 }
 
 // Function to generate N audit log entries
-export async function seedAuditLogs(count: number, userId: number) {
+export async function seedAuditLogs(count: number) {
   if (count <= 0) return
 
   const getRandom = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)]
 
+  const testSeedIdArray = [96, 97, 99, 102, 105, 106] // Array from application/common/testing/seed.ts
   const resources = [
     'studies/surveys/publish',
     'studies/surveys',
@@ -251,7 +252,7 @@ export async function seedAuditLogs(count: number, userId: number) {
         operation: getRandom(operations),
         success: true,
         timestamp: date,
-        userId: userId,
+        userId: getRandom(testSeedIdArray),
         meta: {
           method: getRandom(methods),
           url: `endpoint/test-${index}`,

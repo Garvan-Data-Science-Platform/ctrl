@@ -32,29 +32,6 @@ describe('AuditLogsController', () => {
   })
 
   describe('GET /audit-logs', () => {
-    // it('should return a list of users', async () => {
-    //   const response = await request(app).get('/users')
-    //   // .set({ Authorization: `Bearer ${orgAdminToken}` })
-    //   expect(response.status).toBe(200)
-
-    //   // const body: GetAllUsersResponse = response.body
-    //   // expect(body).toHaveProperty('data')
-    //   // expect(body.data).toHaveLength(8)
-    // })
-
-    // it('should return a 500 error if a database error occurs', async () => {
-    //   jest.spyOn(prisma.user, 'findMany').mockImplementationOnce(() => {
-    //     throw new Error('Internal Server Error')
-    //   })
-    //   const response = await request(app).get('/users')
-    //   // .set({ Authorization: `Bearer ${orgAdminToken}` })
-
-    //   expect(response.status).toBe(500)
-
-    //   // const body: GetAllUsersResponse = response.body
-    //   // expect(body.data).toBe(undefined)
-    // })
-
     describe('Authentication and authorisation', () => {
       it('should not allow unauthorised access', async () => {
         const response = await request(app).get('/audit-logs')
@@ -82,7 +59,7 @@ describe('AuditLogsController', () => {
 
     describe('Default behaviour', () => {
       it('should return default length sorted data and total count when no query params are provided', async () => {
-        await seedAuditLogs(55, 96)
+        await seedAuditLogs(55)
         const response = await request(app)
           .get('/audit-logs')
           .set({ Authorization: `Bearer ${studyAdminToken}` })
@@ -105,7 +82,7 @@ describe('AuditLogsController', () => {
         expect(body.total).toBe(0)
       })
       it('should always return accurate total count regardless of _end param', async () => {
-        await seedAuditLogs(55, 96)
+        await seedAuditLogs(55)
         const response = await request(app)
           .get(`/audit-logs?_end=${defaultAuditLogsPageSize}`)
           .set({ Authorization: `Bearer ${studyAdminToken}` })
@@ -123,7 +100,7 @@ describe('AuditLogsController', () => {
         const seedSize = 55
         const start = 5
         const end = 10
-        await seedAuditLogs(seedSize, 96)
+        await seedAuditLogs(seedSize)
         const response = await request(app)
           .get(`/audit-logs?_start=${start}&_end=${end}`)
           .set({ Authorization: `Bearer ${studyAdminToken}` })
@@ -162,7 +139,7 @@ describe('AuditLogsController', () => {
       })
       it('shout return an empty array if _start is greater than total number of records', async () => {
         const seedSize = 5
-        await seedAuditLogs(seedSize, 96)
+        await seedAuditLogs(seedSize)
         const response = await request(app)
           .get('/audit-logs?_start=50&_end=100')
           .set({ Authorization: `Bearer ${studyAdminToken}` })
@@ -179,7 +156,7 @@ describe('AuditLogsController', () => {
       // it('should accept sorting params and serve correct data (note sorting quirks, like caps)', async () => {
       it('should accept sortDirection asc', async () => {
         const seedSize = 5
-        await seedAuditLogs(seedSize, 96)
+        await seedAuditLogs(seedSize)
         const response = await request(app)
           .get('/audit-logs?sortBy=id&sortDirection=asc')
           .set({ Authorization: `Bearer ${studyAdminToken}` })
@@ -190,7 +167,7 @@ describe('AuditLogsController', () => {
       })
       it('should accept sortDirection desc', async () => {
         const seedSize = 5
-        await seedAuditLogs(seedSize, 96)
+        await seedAuditLogs(seedSize)
         const response = await request(app)
           .get('/audit-logs?sortBy=id&sortDirection=desc')
           .set({ Authorization: `Bearer ${studyAdminToken}` })
@@ -201,7 +178,7 @@ describe('AuditLogsController', () => {
       })
       it('should accept sorting params and handle errors (incorrect field)', async () => {
         const seedSize = 5
-        await seedAuditLogs(seedSize, 96)
+        await seedAuditLogs(seedSize)
         const response = await request(app)
           .get('/audit-logs?sortBy=totallyFakeField')
           .set({ Authorization: `Bearer ${studyAdminToken}` })
@@ -214,7 +191,7 @@ describe('AuditLogsController', () => {
         const seedSize = 55
         const start = 5
         const end = 10
-        await seedAuditLogs(seedSize, 96)
+        await seedAuditLogs(seedSize)
         const response = await request(app)
           .get(`/audit-logs?_start=${start}&_end=${end}&sortBy=id&sortDirection=desc`)
           .set({ Authorization: `Bearer ${studyAdminToken}` })
