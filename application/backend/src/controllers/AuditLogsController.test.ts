@@ -2,6 +2,7 @@ import request from 'supertest'
 import { Api } from '../Api'
 // import prisma from '../PrismaClient'
 import { resetDB, seedAuditLogs } from 'common/testing/TestHelpers'
+import { defaultAuditLogsPageSize } from 'common/src/config'
 import { generateToken } from '../authentication'
 import type { GetAuditLogsResponse } from 'common/types/api/audit-logs'
 // import type { RegisterRequest } from 'common/types/api/auth'
@@ -81,15 +82,16 @@ describe('AuditLogsController', () => {
 
     describe('Default behaviour', () => {
       it('should return default length sorted data and total count when no query params are provided', async () => {
-        seedAuditLogs(111, 96)
+        await seedAuditLogs(55, 96)
         const response = await request(app)
           .get('/audit-logs')
           .set({ Authorization: `Bearer ${studyAdminToken}` })
         expect(response.status).toBe(200)
         const body: GetAuditLogsResponse = response.body
         expect(body).toHaveProperty('data')
-        expect(body.data).toHaveLength(25)
+        expect(body.data).toHaveLength(defaultAuditLogsPageSize)
         expect(body).toHaveProperty('total')
+        expect(body.total).toBe(55)
       })
       it('should handle empty db table gracefully', async () => {
         const response = await request(app)
@@ -102,22 +104,131 @@ describe('AuditLogsController', () => {
         expect(body).toHaveProperty('total')
         expect(body.total).toBe(0)
       })
-      it('should always return accurate total count regardles off _end param', async () => {})
+      it('should always return accurate total count regardless of _end param', async () => {
+        await seedAuditLogs(55, 96)
+        const response = await request(app)
+          .get(`/audit-logs?_end=${defaultAuditLogsPageSize}`)
+          .set({ Authorization: `Bearer ${studyAdminToken}` })
+        expect(response.status).toBe(200)
+        const body: GetAuditLogsResponse = response.body
+        expect(body).toHaveProperty('data')
+        expect(body.data).toHaveLength(defaultAuditLogsPageSize)
+        expect(body).toHaveProperty('total')
+        expect(body.total).toBe(55)
+      })
     })
 
     describe('Pagination', () => {
-      it('should accept pagination params and serve correct data', async () => {})
-      it('should accept pagination params and handle errors (invalid numbers)', async () => {})
-      it('shout return an empty array if _start is greater than total number of records', async () => {})
+      it('should accept pagination params and serve correct data', async () => {
+        const seedSize = 55
+        const start = 5
+        const end = 10
+        await seedAuditLogs(seedSize, 96)
+        const response = await request(app)
+          .get(`/audit-logs?_start=${start}&_end=${end}`)
+          .set({ Authorization: `Bearer ${studyAdminToken}` })
+        expect(response.status).toBe(200)
+        const body: GetAuditLogsResponse = response.body
+        expect(body).toHaveProperty('data')
+        expect(body.data).toHaveLength(end - start)
+        expect(body.data[0].id).toBe(1 + start)
+        expect(
+          body.data[
+            start - 1 // account for 0 index
+          ].id,
+        ).toBe(end)
+      })
+      it('should handle non-numeric params gracefully', async () => {
+        const response = await request(app)
+          .get('/audit-logs?_start=foo&_end=bar')
+          .set({ Authorization: `Bearer ${studyAdminToken}` })
+        expect(response.status).toBe(422)
+      })
+      it('should handle negative params gracefully', async () => {
+        const responseNegativeStart = await request(app)
+          .get('/audit-logs?_start=-10&_end=20')
+          .set({ Authorization: `Bearer ${studyAdminToken}` })
+        expect(responseNegativeStart.status).toBe(422)
+        const responseNegativeEnd = await request(app)
+          .get('/audit-logs?_start=10&_end=-20')
+          .set({ Authorization: `Bearer ${studyAdminToken}` })
+        expect(responseNegativeEnd.status).toBe(422)
+      })
+      it('should handle reversed bounds (_end < _end) gracefully', async () => {
+        const response = await request(app)
+          .get('/audit-logs?_start=30&_end=10')
+          .set({ Authorization: `Bearer ${studyAdminToken}` })
+        expect(response.status).toBe(422)
+      })
+      it('shout return an empty array if _start is greater than total number of records', async () => {
+        const seedSize = 5
+        await seedAuditLogs(seedSize, 96)
+        const response = await request(app)
+          .get('/audit-logs?_start=50&_end=100')
+          .set({ Authorization: `Bearer ${studyAdminToken}` })
+        expect(response.status).toBe(200)
+        const body: GetAuditLogsResponse = response.body
+        expect(body).toHaveProperty('data')
+        expect(body.data).toHaveLength(0)
+        expect(body).toHaveProperty('total')
+        expect(body.total).toBe(seedSize)
+      })
     })
 
-    describe('Soring', () => {
-      it('should accept sorting params and serve correct data (note sorting quirks, like caps)', async () => {})
-      it('should accept sorting params and handle errors (incorrect field)', async () => {})
+    describe('Sorting', () => {
+      // it('should accept sorting params and serve correct data (note sorting quirks, like caps)', async () => {
+      it('should accept sortDirection asc', async () => {
+        const seedSize = 5
+        await seedAuditLogs(seedSize, 96)
+        const response = await request(app)
+          .get('/audit-logs?sortBy=id&sortDirection=asc')
+          .set({ Authorization: `Bearer ${studyAdminToken}` })
+        expect(response.status).toBe(200)
+        const body: GetAuditLogsResponse = response.body
+        expect(body).toHaveProperty('data')
+        expect(body.data[0].id).toBe(1)
+      })
+      it('should accept sortDirection desc', async () => {
+        const seedSize = 5
+        await seedAuditLogs(seedSize, 96)
+        const response = await request(app)
+          .get('/audit-logs?sortBy=id&sortDirection=desc')
+          .set({ Authorization: `Bearer ${studyAdminToken}` })
+        expect(response.status).toBe(200)
+        const body: GetAuditLogsResponse = response.body
+        expect(body).toHaveProperty('data')
+        expect(body.data[0].id).toBe(seedSize)
+      })
+      it('should accept sorting params and handle errors (incorrect field)', async () => {
+        const seedSize = 5
+        await seedAuditLogs(seedSize, 96)
+        const response = await request(app)
+          .get('/audit-logs?sortBy=totallyFakeField')
+          .set({ Authorization: `Bearer ${studyAdminToken}` })
+        expect(response.status).toBe(422)
+      })
     })
 
     describe('Param combinations', () => {
-      it('should accept combinations of sorting and pagination params and apply them', async () => {})
+      it('should accept combinations of sorting and pagination params and apply them', async () => {
+        const seedSize = 55
+        const start = 5
+        const end = 10
+        await seedAuditLogs(seedSize, 96)
+        const response = await request(app)
+          .get(`/audit-logs?_start=${start}&_end=${end}&sortBy=id&sortDirection=desc`)
+          .set({ Authorization: `Bearer ${studyAdminToken}` })
+        expect(response.status).toBe(200)
+        const body: GetAuditLogsResponse = response.body
+        expect(body).toHaveProperty('data')
+        expect(body.data).toHaveLength(end - start)
+        expect(body.data[0].id).toBe(seedSize - start)
+        expect(
+          body.data[
+            start - 1 // account for 0 index
+          ].id,
+        ).toBe(seedSize - end + 1) // account for 0 index
+      })
     })
   })
 })
