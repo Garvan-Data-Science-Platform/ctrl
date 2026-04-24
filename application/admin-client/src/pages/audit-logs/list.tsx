@@ -18,13 +18,14 @@ const ExpandableJsonCell = ({ value }: { value: any }) => {
         size="small"
         variant="outlined"
         color="inherit"
+        data-cy="toggle-payload-view"
         onClick={() => setExpanded((prev) => !prev)}
         sx={{ mb: expanded ? 1 : 0, textTransform: 'none' }}
       >
         {expanded ? 'Hide Payload' : 'View Payload'}
       </Button>
 
-      <Collapse in={expanded} unmountOnExit>
+      <Collapse in={expanded} unmountOnExit data-cy="payload-viewer">
         <Box
           sx={{
             maxHeight: 300,
