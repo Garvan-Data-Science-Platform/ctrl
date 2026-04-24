@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-// import { GetAllAuditLogsResponse } from '@common/types/api/audit-logs'
+import { defaultAuditLogsPageSize } from '@common/src/config'
 import { Box, Button, Chip, Collapse, Typography } from '@mui/material'
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import { DateField, List, useDataGrid } from '@refinedev/mui'
+import { AUDIT_LOG_SORTABLE_FIELDS } from '@common/types/api/audit-logs/getAuditLogs'
 
 const ExpandableJsonCell = ({ value }: { value: any }) => {
   const [expanded, setExpanded] = useState(false)
@@ -57,8 +58,8 @@ export const AuditLogList = () => {
     },
   })
 
-  const columns = React.useMemo<GridColDef[]>(
-    () => [
+  const columns = React.useMemo<GridColDef[]>(() => {
+    const baseColumns: GridColDef[] = [
       {
         field: 'id',
         headerName: 'ID',
@@ -131,14 +132,16 @@ export const AuditLogList = () => {
       {
         field: 'requestBody',
         headerName: 'RequestBody',
-        sortable: false,
         flex: 2,
         minWidth: 300,
         renderCell: ({ value }) => <ExpandableJsonCell value={value} />,
       },
-    ],
-    [],
-  )
+    ]
+    return baseColumns.map((col) => ({
+      ...col,
+      sortable: col.sortable ?? AUDIT_LOG_SORTABLE_FIELDS.includes(col.field as any),
+    }))
+  }, [])
   return (
     <Box>
       <List headerProps={{ title: 'Audit Logs' }}>
@@ -147,9 +150,9 @@ export const AuditLogList = () => {
           columns={columns}
           getRowHeight={() => 'auto'}
           getEstimatedRowHeight={() => 52}
-          pageSizeOptions={[10, 25, 50]}
+          pageSizeOptions={[10, defaultAuditLogsPageSize, 50]}
           initialState={{
-            pagination: { paginationModel: { pageSize: 25 } },
+            pagination: { paginationModel: { pageSize: defaultAuditLogsPageSize } },
           }}
           slotProps={{ root: { 'data-cy': 'audit-logs-list' } }}
           disableColumnMenu
