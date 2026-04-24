@@ -1,3 +1,3 @@
-import type { GetAuditLogsResponse } from './getAuditLogs'
+import type { GetAuditLogsResponse, AllowedAuditLogSortFields } from './getAuditLogs'
 
-export { GetAuditLogsResponse }
+export { GetAuditLogsResponse, AllowedAuditLogSortFields }

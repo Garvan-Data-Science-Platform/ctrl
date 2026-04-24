@@ -2804,6 +2804,19 @@
         ],
         "type": "object",
         "additionalProperties": false
+      },
+      "AllowedAuditLogSortFields": {
+        "type": "string",
+        "enum": [
+          "id",
+          "meta",
+          "resource",
+          "operation",
+          "success",
+          "timestamp",
+          "userId"
+        ],
+        "nullable": false
       }
     },
     "securitySchemes": {
@@ -8795,8 +8808,7 @@
             "name": "sortBy",
             "required": false,
             "schema": {
-              "default": "timestamp",
-              "type": "string"
+              "$ref": "#/components/schemas/AllowedAuditLogSortFields"
             }
           },
           {

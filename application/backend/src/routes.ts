@@ -965,6 +965,11 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "AllowedAuditLogSortFields": {
+        "dataType": "refAlias",
+        "type": {"dataType":"enum","enums":["id","meta","resource","operation","success","timestamp","userId"],"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 };
 const templateService = new ExpressTemplateService(models, {"noImplicitAdditionalProperties":"throw-on-extras","bodyCoercion":true});
 
@@ -3868,7 +3873,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         const argsAuditLogController_getAuditLogEntries: Record<string, TsoaRoute.ParameterSchema> = {
                 _start: {"default":0,"in":"query","name":"_start","dataType":"double"},
                 _end: {"default":25,"in":"query","name":"_end","dataType":"double"},
-                sortBy: {"default":"timestamp","in":"query","name":"sortBy","dataType":"string"},
+                sortBy: {"default":"timestamp","in":"query","name":"sortBy","ref":"AllowedAuditLogSortFields"},
                 sortDirection: {"default":"desc","in":"query","name":"sortDirection","dataType":"union","subSchemas":[{"dataType":"enum","enums":["asc"]},{"dataType":"enum","enums":["desc"]}]},
         };
         app.get('/audit-logs',
