@@ -198,7 +198,6 @@ const SettingsPage = () => {
           </Button>
         </Box>
       </Box>
-
     </Container>
   )
 }

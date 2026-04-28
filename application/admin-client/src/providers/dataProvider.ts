@@ -84,10 +84,21 @@ export const dataProvider = (): DataProvider => {
       }
 
       if (sorters?.at(0)) {
-        params.append(`orderBy[${sorters[0].field}]`, sorters[0].order)
+        if (resource === 'audit-logs') {
+          params.append('sortBy', sorters[0].field)
+          params.append('sortDirection', sorters[0].order)
+        } else {
+          params.append(`orderBy[${sorters[0].field}]`, sorters[0].order)
+        }
       }
 
       if (studyResources.includes(resource)) url = `/studies/${studyId}/${url}?${params.toString()}`
+      else if (resource === 'audit-logs') {
+        const queryString = params.toString()
+        if (queryString) {
+          url = `${url}?${queryString}`
+        }
+      }
       const response = await axiosInstance.get(url)
       const data = response.data.data
 

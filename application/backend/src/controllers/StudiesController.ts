@@ -102,7 +102,6 @@ export class StudiesController extends Controller {
   public async getDeletedStudies(
     @Request() request: RequestWithAuthentication,
   ): Promise<GetAllStudiesResponse> {
-
     let studyQuery = {}
 
     // Constructs StudyAdmins query

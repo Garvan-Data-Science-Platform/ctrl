@@ -116,5 +116,4 @@ Cypress.Commands.add('fillRegistrationForm', (data = {}) => {
   cy.get('[data-cy="terms"] input').click()
 })
 
-
-export { AppUrls };
+export { AppUrls }
