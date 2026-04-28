@@ -359,7 +359,7 @@ describe('StudiesController', () => {
       expect(alternateLogoGetResponse.status).toBe(200)
     })
 
-    it('should allow a StudyAdmin to update the logo of a study they are part of', async () => {
+    it("should allow a StudyAdmin to update the logo of a study they are part of", async () => {
       // Add a logo to be updated
       const createResponse = await request(app)
         .post(`/studies/${testStudyId}/logo`)
@@ -465,6 +465,7 @@ describe('StudiesController', () => {
 
   describe('PATCH /studies/:studyId/restore', () => {
     it('should restore a deleted study', async () => {
+
       const studyBeforeDelete = await prisma.study.findFirst({
         where: { id: testStudyId },
       })

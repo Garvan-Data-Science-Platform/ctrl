@@ -229,7 +229,7 @@ const RestorePage = () => {
           </List>
         </>
       )}
-    </Box>
+    </Box >
   )
 }
 
