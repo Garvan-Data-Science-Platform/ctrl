@@ -1,11 +1,9 @@
 import request from 'supertest'
 import { Api } from '../Api'
-// import prisma from '../PrismaClient'
 import { resetDB, seedAuditLogs } from 'common/testing/TestHelpers'
 import { defaultAuditLogsPageSize } from 'common/src/config'
 import { generateToken } from '../authentication'
 import type { GetAuditLogsResponse } from 'common/types/api/audit-logs'
-// import type { RegisterRequest } from 'common/types/api/auth'
 import { ORG_ADMIN_ID, PARTICIPANT_UNANSWERED_ID, STUDY_ADMIN_ID } from 'common/testing/seed'
 const api = new Api()
 const app = api.app
@@ -131,13 +129,13 @@ describe('AuditLogsController', () => {
           .set({ Authorization: `Bearer ${studyAdminToken}` })
         expect(responseNegativeEnd.status).toBe(422)
       })
-      it('should handle reversed bounds (_end < _end) gracefully', async () => {
+      it('should handle reversed bounds (_end < _start) gracefully', async () => {
         const response = await request(app)
           .get('/audit-logs?_start=30&_end=10')
           .set({ Authorization: `Bearer ${studyAdminToken}` })
         expect(response.status).toBe(422)
       })
-      it('shout return an empty array if _start is greater than total number of records', async () => {
+      it('should return an empty array if _start is greater than total number of records', async () => {
         const seedSize = 5
         await seedAuditLogs(seedSize)
         const response = await request(app)
@@ -153,7 +151,6 @@ describe('AuditLogsController', () => {
     })
 
     describe('Sorting', () => {
-      // it('should accept sorting params and serve correct data (note sorting quirks, like caps)', async () => {
       it('should accept sortDirection asc', async () => {
         const seedSize = 5
         await seedAuditLogs(seedSize)
