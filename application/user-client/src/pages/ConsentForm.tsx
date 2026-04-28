@@ -127,16 +127,7 @@ export default function ConsentForm() {
     for (const i in elements) {
       if (elements[i].type == 'subheading') {
         results.push(
-          <Typography
-            key={`sh_${i}`}
-            sx={{
-              mt: 2,
-              mb: 2,
-              fontWeight: 'bold',
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-word',
-            }}
-          >
+          <Typography key={`sh_${i}`} sx={{ mt: 2, mb: 2, fontWeight: 'bold', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
             {elements[i].data.text}
           </Typography>,
         )
