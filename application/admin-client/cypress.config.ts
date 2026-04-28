@@ -8,6 +8,7 @@ import {
   wipeDB,
   calculateHash,
   readCommonFile,
+  seedAuditLogs,
 } from 'common/testing/TestHelpers'
 import { defineConfig } from 'cypress'
 
@@ -48,6 +49,10 @@ export default defineConfig({
         },
         readCommonFile(fileName: string) {
           return readCommonFile(fileName)
+        },
+        async seedAuditLogs(count: number) {
+          await seedAuditLogs(count)
+          return null
         },
       })
     },
