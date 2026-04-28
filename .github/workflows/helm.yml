@@ -16,11 +16,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           # Use the SHA of the commit that triggered the 'Build and Push' workflow
-          ref: ${{ github.event.workflow_run.head_sha }}
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
       - name: start minikube
         id: minikube
         uses: medyagh/setup-minikube@latest
+        with:
+          cpus: max
+          memory: max
 
       - name: install helm
         id: helm
@@ -30,12 +33,22 @@ jobs:
         run: |
           helm repo add stakater https://stakater.github.io/stakater-charts --force-update
           helm dependency build .helm/ctrl
-          helm install --wait \
+          helm install --wait --timeout 10m \
             --set nginx-ingress.enabled=false \
             --set userClient.image.tag=${{ github.event.workflow_run.head_sha || github.sha }} \
             --set adminClient.image.tag=${{ github.event.workflow_run.head_sha || github.sha }} \
             --set backend.image.tag=${{ github.event.workflow_run.head_sha || github.sha }} \
             ctrl .helm/ctrl
+
+      - name: debug cluster on failure
+        if: failure()
+        run: |
+          echo "=== POD STATUS ==="
+          kubectl get pods -A
+          echo "=== POD DESCRIPTIONS ==="
+          kubectl describe pods
+          echo "=== CLUSTER EVENTS ==="
+          kubectl get events --sort-by='.metadata.creationTimestamp'
 
       - name: test installation
         run: helm test ctrl --logs
@@ -53,11 +66,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           # Use the SHA of the commit that triggered the 'Build and Push' workflow
-          ref: ${{ github.event.workflow_run.head_sha }}
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
       - name: start minikube
         id: minikube
         uses: medyagh/setup-minikube@latest
+        with:
+          cpus: max
+          memory: max
 
       - name: install helm
         id: helm
@@ -67,7 +83,7 @@ jobs:
         run: |
           helm repo add stakater https://stakater.github.io/stakater-charts --force-update
           helm dependency build .helm/ctrl
-          helm install --wait \
+          helm install --wait --timeout 10m \
             --set nginx-ingress.enabled=false \
             ctrl oci://australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl:1.0.0
 
@@ -77,12 +93,22 @@ jobs:
       - name: upgrade
         run: |
           helm dependency build .helm/ctrl
-          helm upgrade --wait \
+          helm upgrade --wait --timeout 10m \
             --set nginx-ingress.enabled=false \
             --set userClient.image.tag=${{ github.event.workflow_run.head_sha || github.sha }} \
             --set adminClient.image.tag=${{ github.event.workflow_run.head_sha || github.sha }} \
             --set backend.image.tag=${{ github.event.workflow_run.head_sha || github.sha }} \
             ctrl .helm/ctrl
+
+      - name: debug cluster on failure
+        if: failure()
+        run: |
+          echo "=== POD STATUS ==="
+          kubectl get pods -A
+          echo "=== POD DESCRIPTIONS ==="
+          kubectl describe pods
+          echo "=== CLUSTER EVENTS ==="
+          kubectl get events --sort-by='.metadata.creationTimestamp'
 
       - name: test installation
         run: helm test ctrl --logs
