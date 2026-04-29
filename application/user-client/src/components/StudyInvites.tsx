@@ -69,9 +69,20 @@ export const StudyInvitesDialog: React.FC<StudyInvitesDialogProps> = ({
             <ListItem key={invite.id} alignItems="flex-start" disableGutters>
               <ListItemAvatar>
                 <img
-                  src={invite.studyId ? import.meta.env.VITE_BACKEND_URL + `/studies/${invite.studyId}/logo` : ''}
+                  src={
+                    invite.studyId
+                      ? import.meta.env.VITE_BACKEND_URL + `/studies/${invite.studyId}/logo`
+                      : ''
+                  }
                   alt=""
-                  style={{ maxWidth: '80px', maxHeight: '80px', width: 'auto', height: 'auto', objectFit: 'contain', marginRight: '16px' }}
+                  style={{
+                    maxWidth: '80px',
+                    maxHeight: '80px',
+                    width: 'auto',
+                    height: 'auto',
+                    objectFit: 'contain',
+                    marginRight: '16px',
+                  }}
                 />
               </ListItemAvatar>
               <ListItemText primary={invite.studyName} secondary={invite.description} />
