@@ -57,6 +57,22 @@ describe('StudiesController', () => {
       expect(body.data.length).toEqual(4)
     })
 
+    it('should not return any token information', async () => {
+      const response = await request(app)
+        .get('/studies')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(response.status).toBe(200)
+
+      const body: GetAllStudiesResponse = response.body
+      expect(Array.isArray(body.data)).toBeTruthy()
+      expect(body.data.length).toBeGreaterThan(0)
+
+      body.data.forEach((study) => {
+        expect(study).not.toHaveProperty('redcapURL')
+        expect(study).not.toHaveProperty('redcapToken')
+      })
+    })
+
     it('should return a 500 error if a database error occurs', async () => {
       jest.spyOn(prisma.study, 'findMany').mockImplementationOnce(() => {
         throw new Error('Internal Server Error')
