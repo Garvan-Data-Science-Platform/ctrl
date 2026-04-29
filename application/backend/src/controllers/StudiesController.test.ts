@@ -111,6 +111,26 @@ describe('StudiesController', () => {
       expect(body.data.length).toEqual(2)
     })
 
+    it('should not return any token information', async () => {
+      const token = await generateToken({
+        userId: PARTICIPANT_UNANSWERED_ID,
+      })
+
+      const response = await request(app)
+        .get('/studies/list')
+        .set({ Authorization: `Bearer ${token}` })
+      expect(response.status).toBe(200)
+
+      const body: GetAllStudiesResponse = response.body
+      expect(Array.isArray(body.data)).toBeTruthy()
+      expect(body.data.length).toBeGreaterThan(0)
+
+      body.data.forEach((study) => {
+        expect(study).not.toHaveProperty('redcapURL')
+        expect(study).not.toHaveProperty('redcapToken')
+      })
+    })
+
     it('should not return anything for org admin', async () => {
       const response = await request(app)
         .get('/studies/list')
@@ -144,6 +164,19 @@ describe('StudiesController', () => {
       const body: GetStudyByIdResponse = response.body
       expect(body.data).not.toBeNull()
       expect(body.data.id).toBe(testStudyId)
+    })
+
+    it('should not return any token information', async () => {
+      const response = await request(app)
+        .get(`/studies/${testStudyId}`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(response.status).toBe(200)
+
+      const body: GetStudyByIdResponse = response.body
+      expect(body.data).not.toBeNull()
+      expect(body.data.id).toBe(testStudyId)
+      expect(body.data).not.toHaveProperty('redcapURL')
+      expect(body.data).not.toHaveProperty('redcapToken')
     })
 
     it('should return a 404 error if the study does not exist', async () => {

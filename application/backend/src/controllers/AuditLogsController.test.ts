@@ -1,10 +1,14 @@
 import request from 'supertest'
 import { Api } from '../Api'
+import prisma from '../PrismaClient'
+import { Role } from '@prisma/client'
 import { resetDB, seedAuditLogs } from 'common/testing/TestHelpers'
 import { defaultAuditLogsPageSize } from 'common/src/config'
 import { generateToken } from '../authentication'
 import type { GetAuditLogsResponse } from 'common/types/api/audit-logs'
 import { ORG_ADMIN_ID, PARTICIPANT_UNANSWERED_ID, STUDY_ADMIN_ID } from 'common/testing/seed'
+import { UpdateStudyRequest } from 'common/types/api/studies'
+import type { RegisterRequest } from 'common/types/api/auth'
 const api = new Api()
 const app = api.app
 
@@ -202,6 +206,94 @@ describe('AuditLogsController', () => {
             start - 1 // account for 0 index
           ].id,
         ).toBe(seedSize - end + 1) // account for 0 index
+      })
+    })
+
+    describe('Sensitive information', () => {
+      it('should not show sensitive token information in payloads', async () => {
+        // Update a redcapToken
+        const studyName: string = 'Test Study'
+        const testStudyId: number = 1
+        // Check test study exists
+        const existingStudy = await prisma.study.findFirst({
+          where: { name: studyName },
+        })
+
+        expect(existingStudy?.name).toBe(studyName)
+
+        const updatedRedcapToken = 'SuperSecretTokenInfo'
+
+        const patchResponse = await request(app)
+          .patch(`/studies/${testStudyId}`)
+          .set({ Authorization: `Bearer ${orgAdminToken}` })
+          .send({ redcapToken: updatedRedcapToken } as UpdateStudyRequest)
+        expect(patchResponse.status).toBe(204)
+
+        // Check Audit Logs
+        const response = await request(app)
+          .get('/audit-logs?sortBy=id&sortDirection=desc')
+          .set({ Authorization: `Bearer ${studyAdminToken}` })
+        expect(response.status).toBe(200)
+        const body: GetAuditLogsResponse = response.body
+        expect(body).toHaveProperty('data')
+        expect(body.data[0].requestBody).not.toContain(updatedRedcapToken)
+      })
+
+      it('should obscure sensitive token information in payloads', async () => {
+        // Update a redcapToken
+        const studyName: string = 'Test Study'
+        const testStudyId: number = 1
+        // Check test study exists
+        const existingStudy = await prisma.study.findFirst({
+          where: { name: studyName },
+        })
+
+        expect(existingStudy?.name).toBe(studyName)
+
+        const updatedRedcapToken = 'SuperSecretTokenInfo'
+        const obscuredRedcapToken = '\"redcapToken\":\"***\"' // eslint-disable-line no-useless-escape
+        const patchResponse = await request(app)
+          .patch(`/studies/${testStudyId}`)
+          .set({ Authorization: `Bearer ${orgAdminToken}` })
+          .send({ redcapToken: updatedRedcapToken } as UpdateStudyRequest)
+        expect(patchResponse.status).toBe(204)
+
+        // Check Audit Logs
+        const response = await request(app)
+          .get('/audit-logs?sortBy=id&sortDirection=desc')
+          .set({ Authorization: `Bearer ${studyAdminToken}` })
+        expect(response.status).toBe(200)
+        const body: GetAuditLogsResponse = response.body
+        expect(body).toHaveProperty('data')
+        expect(body.data[0].requestBody).toContain(obscuredRedcapToken)
+      })
+
+      it('should obscure sensitive password information in payloads', async () => {
+        // Register a user
+        const registerRequest: RegisterRequest = {
+          email: 'johndoe@example.com',
+          firstName: 'John',
+          lastName: 'Doe',
+          password: 'Password1',
+          role: Role.Participant,
+        }
+
+        const postResponse = await request(app)
+          .post('/auth/register')
+          .set({ Authorization: `Bearer ${orgAdminToken}` })
+          .send(registerRequest)
+        expect(postResponse.status).toEqual(201)
+
+        const obscuredPassword = '\"password\":\"***\"' // eslint-disable-line no-useless-escape
+
+        // Check Audit Logs
+        const response = await request(app)
+          .get('/audit-logs?sortBy=id&sortDirection=desc')
+          .set({ Authorization: `Bearer ${studyAdminToken}` })
+        expect(response.status).toBe(200)
+        const body: GetAuditLogsResponse = response.body
+        expect(body).toHaveProperty('data')
+        expect(body.data[0].requestBody).toContain(obscuredPassword)
       })
     })
   })
