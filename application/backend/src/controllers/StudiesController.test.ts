@@ -154,6 +154,29 @@ describe('StudiesController', () => {
     })
   })
 
+  describe('GET /studies/deleted', () => {
+    it('should not return any token information', async () => {
+      const deleteResponse = await request(app)
+        .delete(`/studies/${testStudyId}`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(deleteResponse.status).toBe(204)
+
+      const response = await request(app)
+        .get('/studies/deleted')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(response.status).toBe(200)
+
+      const body: GetAllStudiesResponse = response.body
+      expect(Array.isArray(body.data)).toBeTruthy()
+      expect(body.data.length).toBeGreaterThan(0)
+
+      body.data.forEach((study) => {
+        expect(study).not.toHaveProperty('redcapURL')
+        expect(study).not.toHaveProperty('redcapToken')
+      })
+    })
+  })
+
   describe('GET /studies/:studyId', () => {
     it('should return an study by ID', async () => {
       const response = await request(app)
@@ -166,17 +189,14 @@ describe('StudiesController', () => {
       expect(body.data.id).toBe(testStudyId)
     })
 
-    it('should not return any token information', async () => {
+    it('should not return any token information to participant', async () => {
+      const token = await generateToken({
+        userId: PARTICIPANT_UNANSWERED_ID,
+      })
       const response = await request(app)
         .get(`/studies/${testStudyId}`)
-        .set({ Authorization: `Bearer ${orgAdminToken}` })
-      expect(response.status).toBe(200)
-
-      const body: GetStudyByIdResponse = response.body
-      expect(body.data).not.toBeNull()
-      expect(body.data.id).toBe(testStudyId)
-      expect(body.data).not.toHaveProperty('redcapURL')
-      expect(body.data).not.toHaveProperty('redcapToken')
+        .set({ Authorization: `Bearer ${token}` })
+      expect(response.status).toBe(401)
     })
 
     it('should return a 404 error if the study does not exist', async () => {
