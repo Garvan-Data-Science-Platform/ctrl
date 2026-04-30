@@ -393,6 +393,24 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Pick_Study.Exclude_keyofStudy.logo-or-redcapToken__": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"name":{"dataType":"string","required":true},"id":{"dataType":"double","required":true},"deleted":{"dataType":"boolean","required":true},"description":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"redcapURL":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"inviteEmailSubject":{"dataType":"string","required":true},"inviteEmailText":{"dataType":"string","required":true},"contactUsEmail":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Omit_Study.logo-or-redcapToken_": {
+        "dataType": "refAlias",
+        "type": {"ref":"Pick_Study.Exclude_keyofStudy.logo-or-redcapToken__","validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GetAllStudiesResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "data": {"dataType":"array","array":{"dataType":"intersection","subSchemas":[{"ref":"Omit_Study.logo-or-redcapToken_"},{"dataType":"nestedObjectLiteral","nestedProperties":{"logo":{"dataType":"boolean","required":true},"hasRedcapToken":{"dataType":"boolean","required":true}}}]},"required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Pick_Study.Exclude_keyofStudy.logo-or-redcapURL-or-redcapToken__": {
         "dataType": "refAlias",
         "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"name":{"dataType":"string","required":true},"id":{"dataType":"double","required":true},"deleted":{"dataType":"boolean","required":true},"description":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"inviteEmailSubject":{"dataType":"string","required":true},"inviteEmailText":{"dataType":"string","required":true},"contactUsEmail":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true}},"validators":{}},
@@ -403,28 +421,18 @@ const models: TsoaRoute.Models = {
         "type": {"ref":"Pick_Study.Exclude_keyofStudy.logo-or-redcapURL-or-redcapToken__","validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "GetAllStudiesResponse": {
+    "GetAllStudiesByParticipantResponse": {
         "dataType": "refObject",
         "properties": {
-            "data": {"dataType":"array","array":{"dataType":"intersection","subSchemas":[{"ref":"Omit_Study.logo-or-redcapURL-or-redcapToken_"},{"dataType":"nestedObjectLiteral","nestedProperties":{"logo":{"dataType":"boolean","required":true}}}]},"required":true},
+            "data": {"dataType":"array","array":{"dataType":"refAlias","ref":"Omit_Study.logo-or-redcapURL-or-redcapToken_"},"required":true},
         },
         "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "DefaultSelection_Prisma._36_StudyPayload_": {
-        "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"contactUsEmail":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"inviteEmailText":{"dataType":"string","required":true},"inviteEmailSubject":{"dataType":"string","required":true},"redcapToken":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"redcapURL":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"logo":{"dataType":"union","subSchemas":[{"dataType":"buffer"},{"dataType":"enum","enums":[null]}],"required":true},"description":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"deleted":{"dataType":"boolean","required":true},"id":{"dataType":"double","required":true},"name":{"dataType":"string","required":true}},"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Study": {
-        "dataType": "refAlias",
-        "type": {"ref":"DefaultSelection_Prisma._36_StudyPayload_","validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "GetStudyByIdResponse": {
         "dataType": "refObject",
         "properties": {
-            "data": {"ref":"Study","required":true},
+            "data": {"dataType":"intersection","subSchemas":[{"ref":"Omit_Study.logo-or-redcapToken_"},{"dataType":"nestedObjectLiteral","nestedProperties":{"logo":{"dataType":"boolean","required":true},"hasRedcapToken":{"dataType":"boolean","required":true}}}],"required":true},
         },
         "additionalProperties": false,
     },

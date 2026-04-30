@@ -6,6 +6,7 @@ import {
   GetStudyByIdResponse,
   CreateStudyRequest,
   UpdateStudyRequest,
+  GetAllStudiesByParticipantResponse,
 } from 'common/types/api/studies'
 import {
   PARTICIPANT_UNANSWERED_ID,
@@ -68,7 +69,6 @@ describe('StudiesController', () => {
       expect(body.data.length).toBeGreaterThan(0)
 
       body.data.forEach((study) => {
-        expect(study).not.toHaveProperty('redcapURL')
         expect(study).not.toHaveProperty('redcapToken')
       })
     })
@@ -106,7 +106,7 @@ describe('StudiesController', () => {
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(200)
 
-      const body: GetAllStudiesResponse = response.body
+      const body: GetAllStudiesByParticipantResponse = response.body
       expect(Array.isArray(body.data)).toBeTruthy()
       expect(body.data.length).toEqual(2)
     })
@@ -121,7 +121,7 @@ describe('StudiesController', () => {
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(200)
 
-      const body: GetAllStudiesResponse = response.body
+      const body: GetAllStudiesByParticipantResponse = response.body
       expect(Array.isArray(body.data)).toBeTruthy()
       expect(body.data.length).toBeGreaterThan(0)
 
@@ -148,7 +148,7 @@ describe('StudiesController', () => {
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(200)
 
-      const body: GetAllStudiesResponse = response.body
+      const body: GetAllStudiesByParticipantResponse = response.body
       expect(Array.isArray(body.data)).toBeTruthy()
       expect(body.data.length).toEqual(1)
     })
@@ -171,8 +171,7 @@ describe('StudiesController', () => {
       expect(body.data.length).toBeGreaterThan(0)
 
       body.data.forEach((study) => {
-        expect(study).not.toHaveProperty('redcapURL')
-        expect(study).not.toHaveProperty('redcapToken')
+        expect(study).not.toHaveProperty('redcapToken') // URL is okay for Admins, just not token
       })
     })
   })

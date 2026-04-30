@@ -19,6 +19,7 @@ import {
 import logger from 'common/src/logger'
 import type {
   GetAllStudiesResponse,
+  GetAllStudiesByParticipantResponse,
   GetStudyByIdResponse,
   CreateStudyRequest,
   CreateStudyResponse,
@@ -37,7 +38,16 @@ import { auditLog } from '../middlewares/AuditLog'
 import { Readable } from 'stream'
 import type { RequestWithAuthentication } from 'authentication'
 
-function sanitiseStudy(study: Study) {
+function sanitiseStudyForAdmin(study: Study) {
+  const { redcapToken, ...safeStudyData } = study // eslint-disable-line @typescript-eslint/no-unused-vars
+
+  return {
+    ...safeStudyData,
+    hasRedcapToken: Boolean(study.redcapToken),
+  }
+}
+
+function sanitiseStudyForParticipant(study: Study) {
   const { redcapToken, redcapURL, ...safeStudyData } = study // eslint-disable-line @typescript-eslint/no-unused-vars
 
   return {
@@ -71,7 +81,7 @@ export class StudiesController extends Controller {
     })
     return {
       data: studies.map((study) => ({
-        ...sanitiseStudy(study),
+        ...sanitiseStudyForAdmin(study),
         logo: Boolean(study.logo),
       })),
     } as GetAllStudiesResponse
@@ -86,7 +96,7 @@ export class StudiesController extends Controller {
   @Security('jwt', ['Participant'])
   public async listStudies(
     @Request() request: RequestWithAuthentication,
-  ): Promise<GetAllStudiesResponse> {
+  ): Promise<GetAllStudiesByParticipantResponse> {
     // get profile id from token
     const participantProfile = await this.profileRepo.findFirstOrThrow({
       where: { userId: request.user.userId },
@@ -99,10 +109,9 @@ export class StudiesController extends Controller {
 
     return {
       data: studies.map((val) => ({
-        ...sanitiseStudy(val.study),
-        logo: Boolean(val.study.logo),
+        ...sanitiseStudyForParticipant(val.study),
       })),
-    } as GetAllStudiesResponse
+    } as GetAllStudiesByParticipantResponse
   }
 
   /**
@@ -131,7 +140,7 @@ export class StudiesController extends Controller {
 
     return {
       data: studies.map((study) => ({
-        ...sanitiseStudy(study),
+        ...sanitiseStudyForAdmin(study),
         logo: Boolean(study.logo),
       })),
     } as GetAllStudiesResponse
@@ -150,6 +159,7 @@ export class StudiesController extends Controller {
     })
   }
 
+  // Note: I think this endpoint is not currently used in Admin Portal
   /**
    * Gets a Specific Study by ID
    *
@@ -164,8 +174,12 @@ export class StudiesController extends Controller {
       logger.error({ errorMessage })
       throw new NotFoundError(errorMessage)
     }
-    const responseData = { data: study } // TODO: Obscure token
-    return responseData
+    return {
+      data: {
+        ...sanitiseStudyForAdmin(study),
+        logo: Boolean(study.logo),
+      },
+    } as GetStudyByIdResponse
   }
 
   /**
