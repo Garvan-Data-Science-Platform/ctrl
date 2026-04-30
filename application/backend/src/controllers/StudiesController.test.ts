@@ -199,6 +199,17 @@ describe('StudiesController', () => {
       expect(response.status).toBe(401)
     })
 
+    it('should not return any token information to admin', async () => {
+      const response = await request(app)
+        .get(`/studies/${testStudyId}`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(response.status).toBe(200)
+
+      const body: GetStudyByIdResponse = response.body
+      expect(body.data).not.toBeNull()
+      expect(body.data).not.toHaveProperty('redcapToken') // URL is okay but NOT token
+    })
+
     it('should return a 404 error if the study does not exist', async () => {
       const notExistingStudyId: number = 1234567890
       const response = await request(app)
