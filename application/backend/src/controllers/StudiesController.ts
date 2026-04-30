@@ -37,6 +37,14 @@ import { auditLog } from '../middlewares/AuditLog'
 import { Readable } from 'stream'
 import type { RequestWithAuthentication } from 'authentication'
 
+function sanitiseStudy(study: Study) {
+  const { redcapToken, redcapURL, ...safeStudyData } = study // eslint-disable-line @typescript-eslint/no-unused-vars
+
+  return {
+    ...safeStudyData,
+  }
+}
+
 @Route('studies')
 @Tags('Studies')
 @Response('500', 'Internal Server Error')
@@ -61,9 +69,12 @@ export class StudiesController extends Controller {
       where: { id: { in: request.user.studies } },
       orderBy: { id: 'asc' },
     })
-    const responseData = { data: studies.map((val) => ({ ...val, logo: Boolean(val.logo) })) }
-    logger.info({ ...responseData })
-    return responseData
+    return {
+      data: studies.map((study) => ({
+        ...sanitiseStudy(study),
+        logo: Boolean(study.logo),
+      })),
+    } as GetAllStudiesResponse
   }
 
   /**
@@ -86,11 +97,12 @@ export class StudiesController extends Controller {
       select: { study: true },
     })
 
-    const responseData = {
-      data: studies.map((val) => ({ ...val.study, logo: Boolean(val.study.logo) })),
-    }
-    logger.info({ ...responseData })
-    return responseData
+    return {
+      data: studies.map((val) => ({
+        ...sanitiseStudy(val.study),
+        logo: Boolean(val.study.logo),
+      })),
+    } as GetAllStudiesResponse
   }
 
   /**
@@ -117,8 +129,12 @@ export class StudiesController extends Controller {
       orderBy: { id: 'asc' },
     })
 
-    const responseData = { data: studies.map((val) => ({ ...val, logo: Boolean(val.logo) })) }
-    return responseData
+    return {
+      data: studies.map((study) => ({
+        ...sanitiseStudy(study),
+        logo: Boolean(study.logo),
+      })),
+    } as GetAllStudiesResponse
   }
 
   /**
@@ -148,8 +164,7 @@ export class StudiesController extends Controller {
       logger.error({ errorMessage })
       throw new NotFoundError(errorMessage)
     }
-    const responseData = { data: study }
-    logger.info({ ...responseData })
+    const responseData = { data: study } // TODO: Obscure token
     return responseData
   }
 
@@ -179,7 +194,6 @@ export class StudiesController extends Controller {
     const responseData = {
       id: newStudy.id,
     }
-    logger.info({ ...responseData })
     return responseData
   }
 

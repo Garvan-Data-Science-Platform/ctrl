@@ -393,20 +393,20 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Pick_Study.Exclude_keyofStudy.logo__": {
+    "Pick_Study.Exclude_keyofStudy.logo-or-redcapURL-or-redcapToken__": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"name":{"dataType":"string","required":true},"id":{"dataType":"double","required":true},"deleted":{"dataType":"boolean","required":true},"description":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"redcapURL":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"redcapToken":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"inviteEmailSubject":{"dataType":"string","required":true},"inviteEmailText":{"dataType":"string","required":true},"contactUsEmail":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"name":{"dataType":"string","required":true},"id":{"dataType":"double","required":true},"deleted":{"dataType":"boolean","required":true},"description":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},"inviteEmailSubject":{"dataType":"string","required":true},"inviteEmailText":{"dataType":"string","required":true},"contactUsEmail":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Omit_Study.logo_": {
+    "Omit_Study.logo-or-redcapURL-or-redcapToken_": {
         "dataType": "refAlias",
-        "type": {"ref":"Pick_Study.Exclude_keyofStudy.logo__","validators":{}},
+        "type": {"ref":"Pick_Study.Exclude_keyofStudy.logo-or-redcapURL-or-redcapToken__","validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "GetAllStudiesResponse": {
         "dataType": "refObject",
         "properties": {
-            "data": {"dataType":"array","array":{"dataType":"intersection","subSchemas":[{"ref":"Omit_Study.logo_"},{"dataType":"nestedObjectLiteral","nestedProperties":{"logo":{"dataType":"boolean","required":true}}}]},"required":true},
+            "data": {"dataType":"array","array":{"dataType":"intersection","subSchemas":[{"ref":"Omit_Study.logo-or-redcapURL-or-redcapToken_"},{"dataType":"nestedObjectLiteral","nestedProperties":{"logo":{"dataType":"boolean","required":true}}}]},"required":true},
         },
         "additionalProperties": false,
     },
