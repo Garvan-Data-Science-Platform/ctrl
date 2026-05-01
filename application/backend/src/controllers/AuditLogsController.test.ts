@@ -8,7 +8,7 @@ import { generateToken } from '../authentication'
 import type { GetAuditLogsResponse } from 'common/types/api/audit-logs'
 import { ORG_ADMIN_ID, PARTICIPANT_UNANSWERED_ID, STUDY_ADMIN_ID } from 'common/testing/seed'
 import { UpdateStudyRequest } from 'common/types/api/studies'
-import type { RegisterRequest } from 'common/types/api/auth'
+import type { OTPLoginRequest, RegisterRequest } from 'common/types/api/auth'
 const api = new Api()
 const app = api.app
 
@@ -294,6 +294,36 @@ describe('AuditLogsController', () => {
         const body: GetAuditLogsResponse = response.body
         expect(body).toHaveProperty('data')
         expect(body.data[0].requestBody).toContain(obscuredPassword)
+      })
+
+      it('should obscure sensitive otp information in payloads', async () => {
+        await prisma.oTPToken.create({
+          data: {
+            code: '1223',
+            expiresAt: new Date(new Date().getTime() + 1000 * 60),
+            id: 'abc123',
+            userId: PARTICIPANT_UNANSWERED_ID,
+          },
+        })
+        const loginRequest: OTPLoginRequest = {
+          otp_code: '1223',
+          otp_token: 'abc123',
+        }
+        const loginResponse = await request(app).post('/auth/login/otp').send(loginRequest)
+        expect(loginResponse.ok).toBe(true)
+
+        const obscuredCode = '\"otp_code\":\"***\"' // eslint-disable-line no-useless-escape
+        const obscuredToken = '\"otp_token\":\"***\"' // eslint-disable-line no-useless-escape
+
+        // Check Audit Logs
+        const response = await request(app)
+          .get('/audit-logs?sortBy=id&sortDirection=desc')
+          .set({ Authorization: `Bearer ${studyAdminToken}` })
+        expect(response.status).toBe(200)
+        const body: GetAuditLogsResponse = response.body
+        expect(body).toHaveProperty('data')
+        expect(body.data[0].requestBody).toContain(obscuredCode)
+        expect(body.data[0].requestBody).toContain(obscuredToken)
       })
     })
   })
