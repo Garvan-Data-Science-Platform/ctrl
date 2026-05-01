@@ -46,21 +46,21 @@ const StudyCard = ({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [contactUsEmail, setContactUsEmail] = useState(study.contactUsEmail || '')
   const [redcapURL, setRedcapURL] = useState(study.redcapURL || '')
-  const [redcapToken, setRedcapToken] = useState(study.redcapToken || '')
+  const [redcapToken, setRedcapToken] = useState('')
   const [settingsChanged, setSettingsChanged] = useState(false)
   const [accordionOpen, setAccordionOpen] = useState(advancedOpen)
 
   useEffect(() => {
     setRedcapURL(study.redcapURL || '')
-    setRedcapToken(study.redcapToken || '')
+    setRedcapToken('')
     setSettingsChanged(false)
-  }, [study.redcapURL, study.redcapToken, study.contactUsEmail])
+  }, [study.redcapURL, study.hasRedcapToken, study.contactUsEmail])
 
   useEffect(() => {
     setAccordionOpen(advancedOpen)
   }, [advancedOpen])
 
-  const handleUpdate = (updateData: Partial<StudyEntry>) => {
+  const handleUpdate = (updateData: Partial<StudyEntry> & { redcapToken?: string }) => {
     axiosInstance
       .patch(`/studies/${study.id}`, updateData)
       .then(() => {
@@ -69,8 +69,16 @@ const StudyCard = ({
         }
         queryClient.invalidateQueries(['studies'])
         const newStudies = [...studies]
-        newStudies[studyIdx] = { ...newStudies[studyIdx], ...updateData }
+        // Destructure out the token so that it doesn't go into the store
+        const { redcapToken, ...sanitisedUpdateData } = updateData
+
+        newStudies[studyIdx] = {
+          ...newStudies[studyIdx],
+          ...sanitisedUpdateData,
+          ...(redcapToken ? { hasRedcapToken: true } : {}),
+        }
         setStudies(newStudies)
+        setRedcapToken('')
         open?.({ type: 'success', message: 'Updated successfully' })
       })
       .catch((e) => {
@@ -114,11 +122,15 @@ const StudyCard = ({
       })
       return
     }
-    handleUpdate({
+    const updatePayload: Partial<StudyEntry> & { redcapToken?: string } = {
       redcapURL,
-      redcapToken,
       contactUsEmail,
-    })
+    }
+
+    if (redcapToken) {
+      updatePayload.redcapToken = redcapToken
+    }
+    handleUpdate(updatePayload)
     setSettingsChanged(false)
   }
 
@@ -296,6 +308,12 @@ const StudyCard = ({
                 name="redcapToken"
                 data-cy="redcapToken"
                 value={redcapToken}
+                placeholder={'Enter new token here'}
+                helperText={
+                  study.hasRedcapToken
+                    ? 'A token has been saved. Enter a new value to overwrite it.'
+                    : 'No token has been saved.'
+                }
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setRedcapToken(e.target.value)
                   setSettingsChanged(true)

@@ -5,9 +5,9 @@ export interface StudyEntry {
   id: number
   name: string
   description?: string
-  logo?: SourceBuffer
+  logo?: boolean
   redcapURL?: string
-  redcapToken?: string
+  hasRedcapToken?: boolean
   contactUsEmail?: string
 }
 
