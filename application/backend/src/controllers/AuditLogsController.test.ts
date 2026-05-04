@@ -285,6 +285,7 @@ describe('AuditLogsController', () => {
         expect(postResponse.status).toEqual(201)
 
         const obscuredPassword = '\"password\":\"***\"' // eslint-disable-line no-useless-escape
+        const safeEmail = '\"email\":\"johndoe@example.com\"' // eslint-disable-line no-useless-escape
 
         // Check Audit Logs
         const response = await request(app)
@@ -294,6 +295,7 @@ describe('AuditLogsController', () => {
         const body: GetAuditLogsResponse = response.body
         expect(body).toHaveProperty('data')
         expect(body.data[0].requestBody).toContain(obscuredPassword)
+        expect(body.data[0].requestBody).toContain(safeEmail)
       })
 
       it('should obscure sensitive otp information in payloads', async () => {
