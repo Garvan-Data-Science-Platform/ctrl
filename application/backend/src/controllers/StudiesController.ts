@@ -18,6 +18,8 @@ import {
 } from 'tsoa'
 import logger from 'common/src/logger'
 import type {
+  AdminStudyItem,
+  ParticipantStudyItem,
   GetAllStudiesResponse,
   GetAllStudiesByParticipantResponse,
   GetStudyByIdResponse,
@@ -38,16 +40,17 @@ import { auditLog } from '../middlewares/AuditLog'
 import { Readable } from 'stream'
 import type { RequestWithAuthentication } from 'authentication'
 
-function sanitiseStudyForAdmin(study: Study) {
+function sanitiseStudyForAdmin(study: Study): AdminStudyItem {
   const { redcapToken, ...safeStudyData } = study // eslint-disable-line @typescript-eslint/no-unused-vars
 
   return {
     ...safeStudyData,
     hasRedcapToken: Boolean(study.redcapToken),
+    logo: Boolean(study.logo),
   }
 }
 
-function sanitiseStudyForParticipant(study: Study) {
+function sanitiseStudyForParticipant(study: Study): ParticipantStudyItem {
   const { redcapToken, redcapURL, ...safeStudyData } = study // eslint-disable-line @typescript-eslint/no-unused-vars
 
   return {
@@ -82,7 +85,6 @@ export class StudiesController extends Controller {
     return {
       data: studies.map((study) => ({
         ...sanitiseStudyForAdmin(study),
-        logo: Boolean(study.logo),
       })),
     } as GetAllStudiesResponse
   }
@@ -141,7 +143,6 @@ export class StudiesController extends Controller {
     return {
       data: studies.map((study) => ({
         ...sanitiseStudyForAdmin(study),
-        logo: Boolean(study.logo),
       })),
     } as GetAllStudiesResponse
   }
@@ -177,7 +178,6 @@ export class StudiesController extends Controller {
     return {
       data: {
         ...sanitiseStudyForAdmin(study),
-        logo: Boolean(study.logo),
       },
     } as GetStudyByIdResponse
   }

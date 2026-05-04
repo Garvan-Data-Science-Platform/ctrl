@@ -403,10 +403,15 @@ const models: TsoaRoute.Models = {
         "type": {"ref":"Pick_Study.Exclude_keyofStudy.logo-or-redcapToken__","validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "AdminStudyItem": {
+        "dataType": "refAlias",
+        "type": {"dataType":"intersection","subSchemas":[{"ref":"Omit_Study.logo-or-redcapToken_"},{"dataType":"nestedObjectLiteral","nestedProperties":{"logo":{"dataType":"boolean","required":true},"hasRedcapToken":{"dataType":"boolean","required":true}}}],"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "GetAllStudiesResponse": {
         "dataType": "refObject",
         "properties": {
-            "data": {"dataType":"array","array":{"dataType":"intersection","subSchemas":[{"ref":"Omit_Study.logo-or-redcapToken_"},{"dataType":"nestedObjectLiteral","nestedProperties":{"logo":{"dataType":"boolean","required":true},"hasRedcapToken":{"dataType":"boolean","required":true}}}]},"required":true},
+            "data": {"dataType":"array","array":{"dataType":"refAlias","ref":"AdminStudyItem"},"required":true},
         },
         "additionalProperties": false,
     },
@@ -421,10 +426,15 @@ const models: TsoaRoute.Models = {
         "type": {"ref":"Pick_Study.Exclude_keyofStudy.logo-or-redcapURL-or-redcapToken__","validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ParticipantStudyItem": {
+        "dataType": "refAlias",
+        "type": {"ref":"Omit_Study.logo-or-redcapURL-or-redcapToken_","validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "GetAllStudiesByParticipantResponse": {
         "dataType": "refObject",
         "properties": {
-            "data": {"dataType":"array","array":{"dataType":"refAlias","ref":"Omit_Study.logo-or-redcapURL-or-redcapToken_"},"required":true},
+            "data": {"dataType":"array","array":{"dataType":"refAlias","ref":"ParticipantStudyItem"},"required":true},
         },
         "additionalProperties": false,
     },

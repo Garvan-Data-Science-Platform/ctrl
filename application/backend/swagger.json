@@ -1009,30 +1009,33 @@
         "$ref": "#/components/schemas/Pick_Study.Exclude_keyofStudy.logo-or-redcapToken__",
         "description": "Construct a type with the properties of T except for those in type K."
       },
+      "AdminStudyItem": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Omit_Study.logo-or-redcapToken_"
+          },
+          {
+            "properties": {
+              "logo": {
+                "type": "boolean"
+              },
+              "hasRedcapToken": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "logo",
+              "hasRedcapToken"
+            ],
+            "type": "object"
+          }
+        ]
+      },
       "GetAllStudiesResponse": {
         "properties": {
           "data": {
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/Omit_Study.logo-or-redcapToken_"
-                },
-                {
-                  "properties": {
-                    "logo": {
-                      "type": "boolean"
-                    },
-                    "hasRedcapToken": {
-                      "type": "boolean"
-                    }
-                  },
-                  "required": [
-                    "logo",
-                    "hasRedcapToken"
-                  ],
-                  "type": "object"
-                }
-              ]
+              "$ref": "#/components/schemas/AdminStudyItem"
             },
             "type": "array"
           }
@@ -1086,11 +1089,14 @@
         "$ref": "#/components/schemas/Pick_Study.Exclude_keyofStudy.logo-or-redcapURL-or-redcapToken__",
         "description": "Construct a type with the properties of T except for those in type K."
       },
+      "ParticipantStudyItem": {
+        "$ref": "#/components/schemas/Omit_Study.logo-or-redcapURL-or-redcapToken_"
+      },
       "GetAllStudiesByParticipantResponse": {
         "properties": {
           "data": {
             "items": {
-              "$ref": "#/components/schemas/Omit_Study.logo-or-redcapURL-or-redcapToken_"
+              "$ref": "#/components/schemas/ParticipantStudyItem"
             },
             "type": "array"
           }
