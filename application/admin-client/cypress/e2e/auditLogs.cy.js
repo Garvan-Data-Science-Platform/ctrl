@@ -42,4 +42,31 @@ describe('Audit Logs', () => {
 
     cy.get('[data-cy="payload-viewer"]').should('not.exist')
   })
+
+  it('should obscure password fields in JSON payload', () => {
+    cy.login(UserType.STUDY_ADMIN)
+    cy.visit('/audit-logs')
+
+    // Toggle button to view payload
+    cy.get('[data-cy="toggle-payload-view"]').first().should('contain.text', 'View Payload').click()
+
+    // Ensure password is obscured (double escapes required)
+    cy.get('.MuiCollapse-root').should('contain.text', '\\"password\\":\\"***\\"')
+  })
+
+  it('should obscure redcapToken fields in JSON payload', () => {
+    cy.login(UserType.STUDY_ADMIN)
+    cy.visit('/studies')
+    cy.get('[data-cy="advanced-toggle"]').eq(0).click()
+    cy.get('[data-cy="redcapToken"] input').eq(0).type('abc123')
+    cy.get('[data-cy="settings-apply"]').eq(0).click()
+
+    cy.visit('/audit-logs')
+
+    // Toggle button to view payload
+    cy.get('[data-cy="toggle-payload-view"]').first().should('contain.text', 'View Payload').click()
+
+    // Ensure token is obscured (double escapes required)
+    cy.get('.MuiCollapse-root').should('contain.text', '\\"redcapToken\\":\\"***\\"')
+  })
 })
