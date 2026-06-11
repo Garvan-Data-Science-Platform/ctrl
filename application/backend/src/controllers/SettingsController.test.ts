@@ -76,6 +76,17 @@ describe('SettingsController', () => {
 
       expect(response.status).toBe(422)
     })
+
+    it('should fail to update if newsLink does not match URL Regex', async () => {
+      const reqBody = { newsLink: 'string' }
+
+      const response = await request(app)
+        .patch('/settings')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .send(reqBody)
+
+      expect(response.status).toBe(422)
+    })
   })
 
   describe('GET /settings/userportal', () => {
