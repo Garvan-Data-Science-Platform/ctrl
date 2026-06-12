@@ -812,6 +812,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@braintree/sanitize-url@npm:^7.1.2":
+  version: 7.1.2
+  resolution: "@braintree/sanitize-url@npm:7.1.2"
+  checksum: 10c0/62f2aa0cf58626e3880b2dc1025c42064b4639abd157ae4e1c35f4c2f5031e9273772046a423979845069c814e27ff818e8e669280dc53585e6f033d5b7a59cb
+  languageName: node
+  linkType: hard
+
 "@chakra-ui/anatomy@npm:2.2.2":
   version: 2.2.2
   resolution: "@chakra-ui/anatomy@npm:2.2.2"
@@ -6517,6 +6524,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "backend@workspace:application/backend"
   dependencies:
+    "@braintree/sanitize-url": "npm:^7.1.2"
     "@jest/globals": "npm:^29.7.0"
     "@prisma/client": "npm:^5.20.0"
     "@tsoa/runtime": "npm:^6.6.0"
