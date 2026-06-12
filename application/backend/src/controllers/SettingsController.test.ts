@@ -87,6 +87,17 @@ describe('SettingsController', () => {
 
       expect(response.status).toBe(422)
     })
+
+    it('should fail to update if tcLink does not match URL Regex', async () => {
+      const reqBody = { tcLink: 'string' }
+
+      const response = await request(app)
+        .patch('/settings')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .send(reqBody)
+
+      expect(response.status).toBe(422)
+    })
   })
 
   describe('GET /settings/userportal', () => {
