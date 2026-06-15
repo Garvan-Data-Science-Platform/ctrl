@@ -23,6 +23,7 @@
   },
   "packageManager": "yarn@4.0.2",
   "dependencies": {
+    "@braintree/sanitize-url": "^7.1.2",
     "@prisma/client": "^5.20.0",
     "@tsoa/runtime": "^6.6.0",
     "ajv": "^8.18.0",
