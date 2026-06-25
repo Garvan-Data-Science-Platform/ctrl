@@ -17,6 +17,11 @@ export function checkPasswordStrength(password: string): PasswordStrengthResult 
   if (password.length < 14) {
     fields.Length = { message: 'Password must be at least 14 characters' }
   }
+  if (/password|welcome|changeme/i.test(password)) {
+    fields.CommonBase = {
+      message: 'Password must not contain easily guessable words (i.e Password, Changeme, Welcome)',
+    }
+  }
   if (!/[A-Z]/.test(password)) {
     fields.Uppercase = {
       message: 'Password must contain at least one uppercase letter',
