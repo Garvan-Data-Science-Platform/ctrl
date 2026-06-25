@@ -14,8 +14,8 @@ interface PasswordStrengthResult {
 export function checkPasswordStrength(password: string): PasswordStrengthResult {
   const fields: FieldErrors = {}
 
-  if (password.length < 8) {
-    fields.Length = { message: 'Password must be at least 8 characters' }
+  if (password.length < 14) {
+    fields.Length = { message: 'Password must be at least 14 characters' }
   }
   if (!/[A-Z]/.test(password)) {
     fields.Uppercase = {
