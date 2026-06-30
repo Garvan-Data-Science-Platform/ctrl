@@ -1,21 +1,71 @@
 // Constants shared for all tests
 
-// Test user credentials (from seed data)
+// Test user credentials (for seed data and tests)
 export const TestUsers = {
-  // TODO: Add study admin here
-  ADMIN: {
+  OPERATOR_ADMIN: {
+    email: 'operatoradmin@example.com',
+    password: 'Loginforadmin1',
+    id: 96,
+  },
+  ORG_ADMIN: {
     email: 'admin@example.com',
-    password: 'Testpassword1',
+    password: 'Loginforadmin1',
+    id: 97,
+  },
+  ORG_ADMIN_2: {
+    email: 'admin2@example.com',
+    password: 'Loginforadmin2',
+    id: 101,
   },
   PARTICIPANT_UNANSWERED: {
     email: 'test2@example.com',
-    password: 'Testpassword1',
+    password: 'Loginforuser12',
+    id: 98,
   },
   PARTICIPANT_COMPLETED: {
     email: 'test3@example.com',
-    password: 'Testpassword1',
+    password: 'Loginforuser12',
+    id: 99,
+  },
+  GUARDIAN_2: {
+    email: 'g2@example.com',
+    password: 'loginforparent1',
+    id: 102,
+  },
+  DEPENDENT: {
+    id: 100,
+  },
+  STUDY_ADMIN: {
+    email: 'studyadmin@example.com',
+    password: 'Loginforadmin1',
+    id: 106,
+  },
+  PASSWORD_RESET_USER: {
+    id: 105,
+    email: 'test-reset-password@example.com',
+    password: 'Oldloginforuser1',
   },
 }
+
+export const TestStudies = {
+  TEST_STUDY: {
+    name: 'Test Study',
+    id: 1,
+  },
+  TEST_STUDY_2: {
+    name: 'Study 2',
+    id: 2,
+  },
+  FE_TEST_STUDY: {
+    name: 'Study FE',
+    id: 3,
+  },
+  EMPTY_TEST_STUDY: {
+    name: 'Empty Study',
+  },
+}
+
+// TODO: do we need TestInvites? yest we do for cypress user-client tests
 
 // App URLs
 export const AppUrls = {
