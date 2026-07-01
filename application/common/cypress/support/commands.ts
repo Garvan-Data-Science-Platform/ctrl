@@ -1,14 +1,5 @@
 /// <reference types="cypress" />
 
-// LEAVING THESE HERE TEMPORARILY WHILE MIGRATING TO CONTSANTS FILE
-// TODO: REMOVE THIS AND POINT ALL FILES TO USE CONSTANTS FILE
-export enum UserType {
-  PARTICIPANT_COMPLETED = 'test3@example.com',
-  PARTICIPANT_UNANSWERED = 'test2@example.com',
-  ORG_ADMIN = 'admin@example.com',
-  STUDY_ADMIN = 'studyadmin@example.com',
-}
-
 // Shared Cypress commands
 
 // Import from the SHARED testing folder

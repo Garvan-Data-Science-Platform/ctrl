@@ -357,7 +357,7 @@
         "properties": {
           "newPassword": {
             "type": "string",
-            "minLength": 8
+            "minLength": 14
           },
           "token": {
             "type": "string"
@@ -1514,7 +1514,7 @@
           },
           "password": {
             "type": "string",
-            "minLength": 8
+            "minLength": 14
           },
           "dob": {
             "type": "string"
@@ -2435,7 +2435,7 @@
           },
           "password": {
             "type": "string",
-            "minLength": 8
+            "minLength": 14
           },
           "role": {
             "$ref": "#/components/schemas/Role"
@@ -2521,7 +2521,7 @@
           },
           "password": {
             "type": "string",
-            "minLength": 8
+            "minLength": 14
           }
         },
         "required": [
@@ -2598,7 +2598,7 @@
           },
           "password": {
             "type": "string",
-            "minLength": 8
+            "minLength": 14
           },
           "dob": {
             "type": "string"

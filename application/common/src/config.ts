@@ -1,2 +1,2 @@
-export const backendPort = 5000
-export const defaultAuditLogsPageSize = 25
+export const backendPort: number = 5000
+export const defaultAuditLogsPageSize: number = 25
