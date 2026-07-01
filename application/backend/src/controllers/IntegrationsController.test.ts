@@ -3,12 +3,7 @@ import { resetDB } from 'common/testing/TestHelpers'
 import { Api } from '../Api'
 import { generateToken } from '../authentication'
 import prisma from '../PrismaClient'
-import {
-  FE_TEST_STUDY_ID,
-  ORG_ADMIN_ID,
-  PARTICIPANT_COMPLETED_ID,
-  PARTICIPANT_UNANSWERED_ID,
-} from 'common/testing/seed'
+import { TestUsers, TestStudies } from 'common/testing/constants'
 import { redcapFetch } from '../../tests/__mocks__/RedcapFetch'
 import path from 'path'
 import { SurveysController } from './SurveysController'
@@ -19,7 +14,7 @@ let token: string
 
 describe('IntegrationsController', () => {
   beforeAll(async () => {
-    token = await generateToken({ userId: ORG_ADMIN_ID })
+    token = await generateToken({ userId: TestUsers.ORG_ADMIN.id })
     api.run()
   })
 
@@ -384,7 +379,7 @@ describe('IntegrationsController', () => {
       const res = await request(app)
         .post('/elsa/duos')
         .set({ Authorization: 'Apikey abc123' })
-        .send({ participantIds: [`PID-TEST1-${PARTICIPANT_COMPLETED_ID}`, 'dummy'] })
+        .send({ participantIds: [`PID-TEST1-${TestUsers.PARTICIPANT_COMPLETED.id}`, 'dummy'] })
       expect(res.body.notFoundIds).toEqual(['dummy'])
     })
 
@@ -394,8 +389,8 @@ describe('IntegrationsController', () => {
         .set({ Authorization: 'Apikey abc123' })
         .send({
           participantIds: [
-            `PID-TEST1-${PARTICIPANT_COMPLETED_ID}`,
-            `PID-TEST1-${PARTICIPANT_UNANSWERED_ID}`,
+            `PID-TEST1-${TestUsers.PARTICIPANT_COMPLETED.id}`,
+            `PID-TEST1-${TestUsers.PARTICIPANT_UNANSWERED.id}`,
           ],
         })
 
@@ -409,15 +404,15 @@ describe('IntegrationsController', () => {
       const res = await request(app)
         .post('/elsa/duos')
         .set({ Authorization: 'Apikey abc123' })
-        .send({ participantIds: [`PID-TEST1-${PARTICIPANT_UNANSWERED_ID}`] })
+        .send({ participantIds: [`PID-TEST1-${TestUsers.PARTICIPANT_UNANSWERED.id}`] })
       expect(res.body.data[0].duos).toEqual([])
     })
 
     it('DUO codes work with multi studies', async () => {
       const sva = await prisma.surveyVersionAnswers.findFirstOrThrow({
         where: {
-          version: { studyId: FE_TEST_STUDY_ID },
-          profileId: PARTICIPANT_UNANSWERED_ID,
+          version: { studyId: TestStudies.FE_TEST_STUDY.id },
+          profileId: TestUsers.PARTICIPANT_UNANSWERED.id,
         },
         orderBy: { version: { versionNumber: 'desc' } },
       })
@@ -429,7 +424,7 @@ describe('IntegrationsController', () => {
       const res = await request(app)
         .post('/elsa/duos')
         .set({ Authorization: 'Apikey abc123' })
-        .send({ participantIds: [`PID-TEST2-${PARTICIPANT_UNANSWERED_ID}`] })
+        .send({ participantIds: [`PID-TEST2-${TestUsers.PARTICIPANT_UNANSWERED.id}`] })
       expect(res.body.data[0].duos).toEqual(['DUO:0000004'])
     })
 
@@ -439,7 +434,7 @@ describe('IntegrationsController', () => {
       const res = await request(app)
         .post('/elsa/duos')
         .set({ Authorization: 'Apikey abc123' })
-        .send({ participantIds: [`PID-TEST1-${PARTICIPANT_COMPLETED_ID}`] })
+        .send({ participantIds: [`PID-TEST1-${TestUsers.PARTICIPANT_COMPLETED.id}`] })
       expect(res.body.data[0].duos).toEqual(['DUO:0000006'])
     })
   })
