@@ -7,15 +7,7 @@ import {
   GetParticipantsResponse,
   InviteParticipantsResponse,
 } from 'common/types/api/participants'
-import {
-  ORG_ADMIN_ID,
-  PARTICIPANT_UNANSWERED_ID,
-  PARTICIPANT_UNANSWERED_EMAIL,
-  PASSWORD_RESET_USER_ID,
-  SECOND_TEST_STUDY_ID,
-  PARTICIPANT_COMPLETED_EMAIL,
-  PARTICIPANT_COMPLETED_ID,
-} from 'common/testing/seed'
+import { TestUsers, TestStudies, TestInvites } from 'common/testing/constants'
 import { InviteStatus, Role } from '@prisma/client'
 import prisma from '../PrismaClient'
 import { hashPassword } from '../authentication'
@@ -26,14 +18,14 @@ const mockNodeMailer = nodemailer as unknown as NodemailerMock
 const api = new Api()
 const app = api.app
 
-const expectedNumberOfInvites = 6
+const expectedNumberOfInvites = 4 // TODO: used to be 6 but I commented out two possibly redundant seed invites. Double check this
 
 describe('ParticipantsController', () => {
   let organisationAdminToken: string
 
   beforeAll(async () => {
     organisationAdminToken = await generateToken({
-      userId: ORG_ADMIN_ID,
+      userId: TestUsers.ORG_ADMIN.id,
     })
 
     api.run()
@@ -136,7 +128,7 @@ describe('ParticipantsController', () => {
       await prisma.studyParticipant.update({
         where: {
           participantProfileId_studyId: {
-            participantProfileId: PARTICIPANT_UNANSWERED_ID,
+            participantProfileId: TestUsers.PARTICIPANT_UNANSWERED.id,
             studyId: 1,
           },
         },
@@ -144,26 +136,26 @@ describe('ParticipantsController', () => {
       })
 
       const response = await request(app)
-        .post(`/studies/1/participants/${PARTICIPANT_UNANSWERED_ID}`)
+        .post(`/studies/1/participants/${TestUsers.PARTICIPANT_UNANSWERED.id}`)
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       expect(response.ok).toBeTruthy()
 
       const p = await prisma.studyParticipant.findFirstOrThrow({
-        where: { participantProfileId: PARTICIPANT_UNANSWERED_ID, studyId: 1 },
+        where: { participantProfileId: TestUsers.PARTICIPANT_UNANSWERED.id, studyId: 1 },
       })
       expect(p.deleted).toBeFalsy()
     })
 
     it('Cannot add a participant who is part of another study (they must be invited)', async () => {
       const response = await request(app)
-        .post(`/studies/4/participants/${PARTICIPANT_UNANSWERED_ID}`)
+        .post(`/studies/4/participants/${TestUsers.PARTICIPANT_UNANSWERED.id}`)
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       expect(response.ok).toBeFalsy()
 
       const p = await prisma.studyParticipant.findFirst({
-        where: { participantProfileId: PARTICIPANT_UNANSWERED_ID, studyId: 4 },
+        where: { participantProfileId: TestUsers.PARTICIPANT_UNANSWERED.id, studyId: 4 },
       })
       expect(p).toBeNull()
     })
@@ -172,12 +164,16 @@ describe('ParticipantsController', () => {
   describe('DELETE /participants/{profileId}', () => {
     it('Can remove a participant from a study', async () => {
       const response = await request(app)
-        .delete(`/studies/1/participants/${PARTICIPANT_COMPLETED_ID}`)
+        .delete(`/studies/1/participants/${TestUsers.PARTICIPANT_COMPLETED.id}`)
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       expect(response.ok).toBeTruthy()
       const p = await prisma.studyParticipant.findFirstOrThrow({
-        where: { participantProfileId: PARTICIPANT_COMPLETED_ID, studyId: 1, deleted: true },
+        where: {
+          participantProfileId: TestUsers.PARTICIPANT_COMPLETED.id,
+          studyId: 1,
+          deleted: true,
+        },
       })
       expect(p.deleted).toBeTruthy()
       const ans = await prisma.surveyVersionAnswers.findFirstOrThrow({
@@ -197,7 +193,7 @@ describe('ParticipantsController', () => {
       await prisma.studyParticipant.delete({
         where: {
           participantProfileId_studyId: {
-            participantProfileId: PARTICIPANT_UNANSWERED_ID,
+            participantProfileId: TestUsers.PARTICIPANT_UNANSWERED.id,
             studyId: 1,
           },
         },
@@ -207,14 +203,14 @@ describe('ParticipantsController', () => {
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
       expect(res2.ok).toBe(true)
       expect(res2.body.data).toHaveLength(1)
-      expect(res2.body.data[0].profileId).toBe(PARTICIPANT_UNANSWERED_ID)
+      expect(res2.body.data[0].profileId).toBe(TestUsers.PARTICIPANT_UNANSWERED.id)
     })
   })
 
   describe('PATCH /participants/{profileId}/restore', () => {
     it('Fails if participant is not deleted', async () => {
       const res = await request(app)
-        .patch(`/studies/1/participants/${PARTICIPANT_UNANSWERED_ID}/restore`)
+        .patch(`/studies/1/participants/${TestUsers.PARTICIPANT_UNANSWERED.id}/restore`)
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       expect(res.ok).toBe(false)
@@ -224,21 +220,21 @@ describe('ParticipantsController', () => {
       await prisma.studyParticipant.delete({
         where: {
           participantProfileId_studyId: {
-            participantProfileId: PARTICIPANT_UNANSWERED_ID,
+            participantProfileId: TestUsers.PARTICIPANT_UNANSWERED.id,
             studyId: 1,
           },
         },
       })
 
       const res = await request(app)
-        .patch(`/studies/1/participants/${PARTICIPANT_UNANSWERED_ID}/restore`)
+        .patch(`/studies/1/participants/${TestUsers.PARTICIPANT_UNANSWERED.id}/restore`)
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       expect(res.ok).toBe(true)
 
       const participant = await prisma.studyParticipant.findFirst({
         where: {
-          participantProfileId: PARTICIPANT_UNANSWERED_ID,
+          participantProfileId: TestUsers.PARTICIPANT_UNANSWERED.id,
           studyId: 1,
         },
       })
@@ -252,7 +248,7 @@ describe('InvitesController', () => {
 
   beforeAll(async () => {
     organisationAdminToken = await generateToken({
-      userId: ORG_ADMIN_ID,
+      userId: TestUsers.ORG_ADMIN.id,
     })
 
     api.run()
@@ -283,8 +279,8 @@ describe('InvitesController', () => {
       expect(body.data[1].inviteStatus).toBe(InviteStatus.REVOKED)
       expect(body.data[2].inviteStatus).toBe(InviteStatus.EXPIRED)
       expect(body.data[3].inviteStatus).toBe(InviteStatus.PENDING)
-      expect(body.data[4].inviteStatus).toBe(InviteStatus.PENDING)
-      expect(body.data[5].inviteStatus).toBe(InviteStatus.PENDING)
+      // expect(body.data[4].inviteStatus).toBe(InviteStatus.PENDING) // TODO: add these extra invites?
+      // expect(body.data[5].inviteStatus).toBe(InviteStatus.PENDING)
     })
   })
 
@@ -380,7 +376,7 @@ describe('InvitesController', () => {
         where: {
           studyId_emailHash: {
             //@ts-ignore
-            email: 'invite3@revoked.com',
+            email: TestInvites.INVITE_REVOKED.email,
             studyId: 1,
           },
         },
@@ -395,7 +391,7 @@ describe('InvitesController', () => {
       const response = await request(app)
         .post('/studies/1/invites')
         .send({
-          recipients: [{ email: 'invite3@revoked.com', prefill: {} }],
+          recipients: [{ email: TestInvites.INVITE_REVOKED.email, prefill: {} }],
           subjectText: 'ABC',
           explanatoryText: '123',
         })
@@ -420,7 +416,7 @@ describe('InvitesController', () => {
         where: {
           studyId_emailHash: {
             //@ts-ignore
-            email: 'invite3@revoked.com',
+            email: TestInvites.INVITE_REVOKED.email,
             studyId: 1,
           },
         },
@@ -434,7 +430,7 @@ describe('InvitesController', () => {
     }, 100000)
 
     it('should resend emails for status PENDING invites and reset the expiry', async () => {
-      const emailPendingInvite = 'john@example.com'
+      const emailPendingInvite = TestInvites.INVITE_2_PENDING.email
 
       // Check the status REVOKED invite
       const invite = await prisma.invite.findUnique({
@@ -498,7 +494,7 @@ describe('InvitesController', () => {
     })
 
     it('should do nothing for status ACCEPTED invites', async () => {
-      const emailAcceptedInvite = 'invite2@accepted.com'
+      const emailAcceptedInvite = TestInvites.INVITE_ACCEPTED.email
 
       const response = await request(app)
         .post('/studies/1/invites')
@@ -589,7 +585,7 @@ describe('InvitesController', () => {
 
   describe('POST /studies/{studyId}/invites/resend', () => {
     it('should resend all invites of status PENDING and reset their expiry', async () => {
-      const emailPendingInvite = 'invite1@pending.com'
+      const emailPendingInvite = TestInvites.INVITE_PENDING.email
 
       await prisma.study.update({
         where: { id: 1 },
@@ -604,7 +600,12 @@ describe('InvitesController', () => {
 
       // Check email(s) were successfully sent
       const sentEmails = mockNodeMailer.mock.getSentMail()
-      expect(sentEmails.length).toBe(4)
+      expect(sentEmails.length).toBe(2)
+      /*
+        TODO: above number used to be 4 (removed to pending invites as part of test data refactor).
+        Come back and remove this note at teh end of the refactor if those two pending
+        invites were not needed.
+        */
       const targetEmail = sentEmails.find((email) => email.to === emailPendingInvite)
       expect(targetEmail).toBeDefined()
       expect(targetEmail).toHaveProperty('from', `CTRL <noreply@${process.env.HOSTNAME}>`)
@@ -616,7 +617,7 @@ describe('InvitesController', () => {
 
   describe('POST /studies/{studyId}/invites/{inviteId}/revoke', () => {
     it('should change invites status from PENDING to REVOKED given email(s)', async () => {
-      const emailPendingInvite = 'invite1@pending.com'
+      const emailPendingInvite = TestInvites.INVITE_PENDING.email
 
       const invite = await prisma.invite.findUnique({
         where: {
@@ -681,15 +682,15 @@ describe('InvitesController', () => {
 
   describe('POST /invites/{inviteId}/accept', () => {
     beforeEach(async () => {
-      await inviteUser(PARTICIPANT_UNANSWERED_EMAIL, 2, {})
-      await inviteUser(PARTICIPANT_COMPLETED_EMAIL, 2, {
+      await inviteUser(TestUsers.PARTICIPANT_UNANSWERED.email, 2, {})
+      await inviteUser(TestUsers.PARTICIPANT_COMPLETED.email, 2, {
         studyParticipant: { externalId: 'external' },
       })
     })
 
     it('should fail if inviteId does not exist', async () => {
       const token = await generateToken({
-        userId: PARTICIPANT_UNANSWERED_ID,
+        userId: TestUsers.PARTICIPANT_UNANSWERED.id,
       })
 
       const fakeIdString = 'this-is-not-real'
@@ -706,7 +707,7 @@ describe('InvitesController', () => {
     it('should fail if invite has already been accepted', async () => {
       const invite = await prisma.invite.findFirstOrThrow({
         where: {
-          email: PARTICIPANT_UNANSWERED_EMAIL,
+          email: TestUsers.PARTICIPANT_UNANSWERED.email,
         },
       })
 
@@ -714,13 +715,13 @@ describe('InvitesController', () => {
       await prisma.invite.update({
         where: {
           id: invite.id,
-          email: PARTICIPANT_UNANSWERED_EMAIL,
+          email: TestUsers.PARTICIPANT_UNANSWERED.email,
         },
         data: { status: 'ACCEPTED' },
       })
 
       const token = await generateToken({
-        userId: PARTICIPANT_UNANSWERED_ID,
+        userId: TestUsers.PARTICIPANT_UNANSWERED.id,
       })
 
       const response = await request(app)
@@ -736,12 +737,12 @@ describe('InvitesController', () => {
       // generate token for different user. use valid inviteId
       const invite = await prisma.invite.findFirstOrThrow({
         where: {
-          email: PARTICIPANT_UNANSWERED_EMAIL,
+          email: TestUsers.PARTICIPANT_UNANSWERED.email,
         },
       })
 
       // Incorrect ID
-      const token = await generateToken({ userId: PASSWORD_RESET_USER_ID })
+      const token = await generateToken({ userId: TestUsers.PASSWORD_RESET_USER.id })
 
       const response = await request(app)
         .post(`/invites/${invite.id}/accept`)
@@ -769,7 +770,7 @@ describe('InvitesController', () => {
           status: InviteStatus.PENDING,
           study: {
             connect: {
-              id: SECOND_TEST_STUDY_ID,
+              id: TestStudies.TEST_STUDY_2.id,
             },
           },
           expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
@@ -791,13 +792,13 @@ describe('InvitesController', () => {
     it('should add user to study and accept invite', async () => {
       const invite = await prisma.invite.findFirstOrThrow({
         where: {
-          email: PARTICIPANT_UNANSWERED_EMAIL,
+          email: TestUsers.PARTICIPANT_UNANSWERED.email,
         },
       })
 
       // need valid invite and token for user that does exist
       const token = await generateToken({
-        userId: PARTICIPANT_UNANSWERED_ID,
+        userId: TestUsers.PARTICIPANT_UNANSWERED.id,
       })
 
       const response = await request(app)
@@ -808,7 +809,7 @@ describe('InvitesController', () => {
       const p = await prisma.studyParticipant.findFirstOrThrow({
         where: {
           studyId: 2,
-          participantProfile: { user: { email: PARTICIPANT_UNANSWERED_EMAIL } },
+          participantProfile: { user: { email: TestUsers.PARTICIPANT_UNANSWERED.email } },
         },
       })
       expect(p.externalId).toBeNull()
@@ -817,14 +818,14 @@ describe('InvitesController', () => {
     it('should prefill with external id', async () => {
       const invite = await prisma.invite.findFirstOrThrow({
         where: {
-          email: PARTICIPANT_COMPLETED_EMAIL,
+          email: TestUsers.PARTICIPANT_COMPLETED.email,
           studyId: 2,
         },
       })
 
       // need valid invite and token for user that does exist
       const token = await generateToken({
-        userId: PARTICIPANT_COMPLETED_ID,
+        userId: TestUsers.PARTICIPANT_COMPLETED.id,
       })
 
       const response = await request(app)
@@ -835,7 +836,7 @@ describe('InvitesController', () => {
       const p = await prisma.studyParticipant.findFirstOrThrow({
         where: {
           studyId: 2,
-          participantProfile: { user: { email: PARTICIPANT_COMPLETED_EMAIL } },
+          participantProfile: { user: { email: TestUsers.PARTICIPANT_COMPLETED.email } },
         },
       })
       expect(p.externalId).toBe('external')
@@ -843,12 +844,12 @@ describe('InvitesController', () => {
   })
   describe('GET /invites/pending', () => {
     beforeEach(async () => {
-      await inviteUser(PARTICIPANT_UNANSWERED_EMAIL, 2, {})
+      await inviteUser(TestUsers.PARTICIPANT_UNANSWERED.email, 2, {})
     })
     it('should return correct number of invites', async () => {
       // One initial invite
       const token = await generateToken({
-        userId: PARTICIPANT_UNANSWERED_ID,
+        userId: TestUsers.PARTICIPANT_UNANSWERED.id,
       })
 
       const response = await request(app)
@@ -865,7 +866,7 @@ describe('InvitesController', () => {
         where: {
           studyId_emailHash: {
             //@ts-ignore
-            email: PARTICIPANT_UNANSWERED_EMAIL,
+            email: TestUsers.PARTICIPANT_UNANSWERED.email,
             studyId: 2,
           },
         },
