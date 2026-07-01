@@ -13,13 +13,7 @@ import {
   UpdateSurveyRequest,
   GetSurveyVersionByVersionNumberResponse,
 } from 'common/types/api/surveys'
-import {
-  DEPENDENT_ID,
-  ORG_ADMIN_ID,
-  PARTICIPANT_COMPLETED_ID,
-  PARTICIPANT_UNANSWERED_ID,
-  SECOND_GUARDIAN_ID,
-} from 'common/testing/seed'
+import { TestUsers } from 'common/testing/constants'
 
 const api = new Api()
 const app = api.app
@@ -27,11 +21,11 @@ let token: string, tokenNoAnswers: string, tokenAdmin: string
 
 describe('SurveysController', () => {
   beforeAll(async () => {
-    token = await generateToken({ userId: PARTICIPANT_COMPLETED_ID })
+    token = await generateToken({ userId: TestUsers.PARTICIPANT_COMPLETED.id })
     tokenNoAnswers = await generateToken({
-      userId: PARTICIPANT_UNANSWERED_ID,
+      userId: TestUsers.PARTICIPANT_UNANSWERED.id,
     })
-    tokenAdmin = await generateToken({ userId: ORG_ADMIN_ID })
+    tokenAdmin = await generateToken({ userId: TestUsers.ORG_ADMIN.id })
     api.run()
   })
 
@@ -122,7 +116,7 @@ describe('SurveysController', () => {
       expect(response.status).toBe(204)
       const participant = await prisma.surveyVersionAnswers.findFirst({
         where: {
-          profileId: PARTICIPANT_COMPLETED_ID,
+          profileId: TestUsers.PARTICIPANT_COMPLETED.id,
           version: {
             studyId: 1,
           },
@@ -130,7 +124,7 @@ describe('SurveysController', () => {
       })
       expect(participant?.answers[1].answers).toEqual([true, 'Choice 1'])
       const aLog = await prisma.auditLog.findFirstOrThrow({
-        where: { userId: PARTICIPANT_COMPLETED_ID },
+        where: { userId: TestUsers.PARTICIPANT_COMPLETED.id },
       })
       expect(aLog.resource).toBe('studies/survey-answers')
       expect(aLog.operation).toBe('CREATE')
@@ -183,7 +177,7 @@ describe('SurveysController', () => {
 
     it('participant should inherit answers from both guardians correctly', async () => {
       const secondGuardianToken = generateToken({
-        userId: SECOND_GUARDIAN_ID,
+        userId: TestUsers.GUARDIAN_2.id,
       })
 
       const reqBody: UpdateSurveyAnswersRequest = {
@@ -197,7 +191,7 @@ describe('SurveysController', () => {
       expect(response.status).toBe(204)
       const dependentAnswers = await prisma.surveyVersionAnswers.findFirstOrThrow({
         where: {
-          profileId: DEPENDENT_ID,
+          profileId: TestUsers.DEPENDENT.id,
           version: {
             studyId: 1,
           },
@@ -237,7 +231,7 @@ describe('SurveysController', () => {
       expect(survey?.data[0].elements[1].data.text).toBe('Question 1')
 
       const aLog = await prisma.auditLog.findFirstOrThrow({
-        where: { userId: ORG_ADMIN_ID },
+        where: { userId: TestUsers.ORG_ADMIN.id },
       })
       expect(aLog.resource).toBe('studies/surveys')
       expect(aLog.operation).toBe('UPDATE')
