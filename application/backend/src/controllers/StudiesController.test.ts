@@ -8,15 +8,10 @@ import {
   UpdateStudyRequest,
   GetAllStudiesByParticipantResponse,
 } from 'common/types/api/studies'
-import {
-  PARTICIPANT_UNANSWERED_ID,
-  PARTICIPANT_COMPLETED_ID,
-  STUDY_ADMIN_ID,
-} from 'common/testing/seed'
+import { TestStudies, TestUsers } from 'common/testing/constants'
 import { resetDB, updateLogo } from 'common/testing/TestHelpers'
 import logoHashes from '../../../common/testing/fixtures/logo_hashes.json'
 import { generateToken } from '../authentication'
-import { ORG_ADMIN_ID } from 'common/testing/seed'
 import { createHash } from 'crypto'
 
 const fixturesPath = '../common/testing/fixtures/'
@@ -28,8 +23,8 @@ describe('StudiesController', () => {
   let orgAdminToken: string
   let studyAdminToken: string
 
-  const testStudyId: number = 1
-  const testStudyId2: number = 2
+  const testStudyId: number = TestStudies.TEST_STUDY.id
+  const testStudyId2: number = TestStudies.TEST_STUDY_2.id
 
   beforeAll(async () => {
     api.run()
@@ -38,8 +33,8 @@ describe('StudiesController', () => {
   beforeEach(async () => {
     await resetDB()
 
-    orgAdminToken = await generateToken({ userId: ORG_ADMIN_ID })
-    studyAdminToken = await generateToken({ userId: STUDY_ADMIN_ID })
+    orgAdminToken = await generateToken({ userId: TestUsers.ORG_ADMIN.id })
+    studyAdminToken = await generateToken({ userId: TestUsers.STUDY_ADMIN.id })
   })
 
   afterAll(async () => {
@@ -98,7 +93,7 @@ describe('StudiesController', () => {
   describe('GET /studies/list', () => {
     it('should return a list of studies for logged in user', async () => {
       const token = await generateToken({
-        userId: PARTICIPANT_UNANSWERED_ID,
+        userId: TestUsers.PARTICIPANT_UNANSWERED.id,
       })
 
       const response = await request(app)
@@ -113,7 +108,7 @@ describe('StudiesController', () => {
 
     it('should not return any token information', async () => {
       const token = await generateToken({
-        userId: PARTICIPANT_UNANSWERED_ID,
+        userId: TestUsers.PARTICIPANT_UNANSWERED.id,
       })
 
       const response = await request(app)
@@ -140,7 +135,7 @@ describe('StudiesController', () => {
 
     it('should return a different list of studies for a different logged in user', async () => {
       const token = await generateToken({
-        userId: PARTICIPANT_COMPLETED_ID,
+        userId: TestUsers.PARTICIPANT_COMPLETED.id,
       })
 
       const response = await request(app)
@@ -190,7 +185,7 @@ describe('StudiesController', () => {
 
     it('should not return any token information to participant', async () => {
       const token = await generateToken({
-        userId: PARTICIPANT_UNANSWERED_ID,
+        userId: TestUsers.PARTICIPANT_UNANSWERED.id,
       })
       const response = await request(app)
         .get(`/studies/${testStudyId}`)
@@ -263,11 +258,11 @@ describe('StudiesController', () => {
         select: { name: true, admins: true },
       })
       expect(createdStudy?.name).toBe(newStudyName)
-      expect(createdStudy?.admins.map((val) => val.id)).toContain(STUDY_ADMIN_ID)
+      expect(createdStudy?.admins.map((val) => val.id)).toContain(TestUsers.STUDY_ADMIN.id)
     })
 
     it('should return an error if the study already exists', async () => {
-      const studyNameAlreadyExists = 'Test Study'
+      const studyNameAlreadyExists = TestStudies.TEST_STUDY.name
       const response = await request(app)
         .post('/studies')
         .set({ Authorization: `Bearer ${orgAdminToken}` })
@@ -293,7 +288,7 @@ describe('StudiesController', () => {
 
   describe('PATCH /studies/:studyId', () => {
     it('should update an existing study', async () => {
-      const studyName: string = 'Test Study'
+      const studyName: string = TestStudies.TEST_STUDY.name
       // Check test study exists
       const existingStudy = await prisma.study.findFirst({
         where: { name: studyName },
