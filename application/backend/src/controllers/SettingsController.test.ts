@@ -3,7 +3,7 @@ import { generateToken } from '../authentication'
 import { Api } from '../Api'
 import { resetDB, updateLogo } from 'common/testing/TestHelpers'
 import logoHashes from '../../../common/testing/fixtures/logo_hashes.json'
-import { ORG_ADMIN_ID } from 'common/testing/seed'
+import { TestUsers } from 'common/testing/constants'
 import prisma from '../PrismaClient'
 import { createHash } from 'crypto'
 
@@ -17,7 +17,7 @@ describe('SettingsController', () => {
 
   beforeAll(async () => {
     orgAdminToken = await generateToken({
-      userId: ORG_ADMIN_ID,
+      userId: TestUsers.ORG_ADMIN.id,
     })
 
     api.run()
