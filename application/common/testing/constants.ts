@@ -29,7 +29,7 @@ export const TestUsers = {
   },
   GUARDIAN_2: {
     email: 'g2@example.com',
-    password: 'loginforparent1',
+    password: 'Loginforparent1',
     id: 102,
   },
   DEPENDENT: {
