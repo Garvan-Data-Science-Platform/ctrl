@@ -2,7 +2,7 @@ import { InviteStatus, PrismaClient, Role } from '@prisma/client'
 import '../../backend/src/jsontypes'
 import { SurveyStep } from 'common/types/survey'
 import { hashPassword } from '../../backend/src/authentication'
-import { TestUsers, TestStudies } from './constants'
+import { TestUsers, TestStudies, TestInvites } from './constants'
 
 export async function seedTests(prisma: PrismaClient) {
   const ExampleSurveyStepData = await import('../src/surveys/exampleSurveyStepData.json', {
@@ -420,48 +420,48 @@ export async function seedTests(prisma: PrismaClient) {
   await prisma.invite.createMany({
     data: [
       {
-        email: 'invite1@pending.com',
+        email: TestInvites.INVITE_PENDING.email,
         status: InviteStatus.PENDING,
         studyId: testStudy.id,
         expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
       },
       {
-        email: 'invite2@accepted.com',
+        email: TestInvites.INVITE_ACCEPTED.email,
         status: InviteStatus.ACCEPTED,
         studyId: testStudy.id,
         expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day in the past
       },
       {
-        email: 'invite3@revoked.com',
+        email: TestInvites.INVITE_REVOKED.email,
         status: InviteStatus.REVOKED,
         studyId: testStudy.id,
         expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
       },
       {
-        email: 'invite4@expired.com',
+        email: TestInvites.INVITE_EXPIRED.email,
         status: InviteStatus.EXPIRED,
         studyId: testStudy.id,
         expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day in the past
       },
       // Pending invites for testing
       {
-        email: 'john@example.com',
+        email: TestInvites.INVITE_2_PENDING.email,
         status: InviteStatus.PENDING,
         studyId: testStudy.id,
         expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
       },
-      {
-        email: 'jenny@gmail.com',
-        status: InviteStatus.PENDING,
-        studyId: testStudy.id,
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
-      },
-      {
-        email: 'abcsdfwefijsdf@gjiodsf.com',
-        status: InviteStatus.PENDING,
-        studyId: testStudy.id,
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
-      },
+      // {
+      //   email: 'jenny@gmail.com', //TODO: check if this is needed
+      //   status: InviteStatus.PENDING,
+      //   studyId: testStudy.id,
+      //   expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
+      // },
+      // {
+      //   email: 'abcsdfwefijsdf@gjiodsf.com', //TODO: check if this is needed
+      //   status: InviteStatus.PENDING,
+      //   studyId: testStudy.id,
+      //   expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
+      // },
     ],
   })
 

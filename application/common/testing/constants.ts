@@ -65,7 +65,23 @@ export const TestStudies = {
   },
 }
 
-// TODO: do we need TestInvites? yest we do for cypress user-client tests
+export const TestInvites = {
+  INVITE_PENDING: {
+    email: 'invite1@pending.com',
+  },
+  INVITE_2_PENDING: {
+    email: 'invite2@pending.com',
+  },
+  INVITE_ACCEPTED: {
+    email: 'invite@accepted.com',
+  },
+  INVITE_REVOKED: {
+    email: 'invite@revoked.com',
+  },
+  INVITE_EXPIRED: {
+    email: 'invite@expired.com',
+  },
+}
 
 // App URLs
 export const AppUrls = {
