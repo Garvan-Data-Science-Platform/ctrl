@@ -18,7 +18,7 @@ export interface GeneratePasswordResetLinkRequest {
  */
 export interface ResetPasswordRequest {
   /**
-   * @minLength 8 Password must be at least 8 characters
+   * @minLength 14 Password must be at least 14 characters
    */
   newPassword: string
   token: string

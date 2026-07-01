@@ -19,7 +19,8 @@ export function checkPasswordStrength(password: string): PasswordStrengthResult 
   }
   if (/password|welcome|changeme/i.test(password)) {
     fields.CommonBase = {
-      message: 'Password must not contain easily guessable words (i.e Password, Changeme, Welcome)',
+      message:
+        'Password must not contain easily guessable words (i.e. Password, Changeme, Welcome)',
     }
   }
   if (!/[A-Z]/.test(password)) {

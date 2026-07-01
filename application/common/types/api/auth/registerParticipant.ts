@@ -67,7 +67,7 @@ export interface RegisterParticipantRequest {
   postcode: string
   state: StateTerritory
   /**
-   * @minLength 8 Password must be at least 8 characters
+   * @minLength 14 Password must be at least 14 characters
    */
   password: string
   /**
