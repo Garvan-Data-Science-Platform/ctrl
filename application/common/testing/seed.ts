@@ -450,18 +450,6 @@ export async function seedTests(prisma: PrismaClient) {
         studyId: testStudy.id,
         expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
       },
-      // {
-      //   email: 'jenny@gmail.com', //TODO: check if this is needed
-      //   status: InviteStatus.PENDING,
-      //   studyId: testStudy.id,
-      //   expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
-      // },
-      // {
-      //   email: 'abcsdfwefijsdf@gjiodsf.com', //TODO: check if this is needed
-      //   status: InviteStatus.PENDING,
-      //   studyId: testStudy.id,
-      //   expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
-      // },
     ],
   })
 
