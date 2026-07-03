@@ -1,10 +1,10 @@
 /// <reference types="cypress" />
 
-const { UserType } = require('../../../common/cypress/support/commands')
+const { TestUsers } = require('../../../common/testing/constants')
 
 beforeEach(() => {
   cy.task('reset')
-  cy.login(UserType.ORG_ADMIN)
+  cy.login(TestUsers.ORG_ADMIN.email)
 })
 
 describe('', () => {

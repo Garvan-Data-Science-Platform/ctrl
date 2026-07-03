@@ -1,4 +1,4 @@
-const { UserType } = require('../../../common/cypress/support/commands')
+const { TestUsers } = require('../../../common/testing/constants')
 
 before(() => {
   cy.task('reset')
@@ -9,19 +9,19 @@ before(() => {
 
 describe('Audit Logs', () => {
   it('Organisation Admin can view Audit Log', () => {
-    cy.login(UserType.ORG_ADMIN)
+    cy.login(TestUsers.ORG_ADMIN.email)
     cy.visit('/audit-logs')
     cy.contains('Audit Logs').should('exist')
   })
 
   it('Study Amin can view Audit Log', () => {
-    cy.login(UserType.STUDY_ADMIN)
+    cy.login(TestUsers.STUDY_ADMIN.email)
     cy.visit('/audit-logs')
     cy.contains('Audit Logs').should('exist')
   })
 
   it('should toggle the View Payload cell and display JSON', () => {
-    cy.login(UserType.STUDY_ADMIN)
+    cy.login(TestUsers.STUDY_ADMIN.email)
     cy.visit('/audit-logs')
 
     // Toggle button to view payload
@@ -33,7 +33,9 @@ describe('Audit Logs', () => {
     // Assert JSON appears
     // Note: this works because the most recent action is the Study Admin
     //       logging in at the start of the test :)
-    cy.get('.MuiCollapse-root').should('be.visible').and('contain.text', UserType.STUDY_ADMIN)
+    cy.get('.MuiCollapse-root')
+      .should('be.visible')
+      .and('contain.text', TestUsers.STUDY_ADMIN.email)
 
     // Toggle button to hide payload
     cy.get('[data-cy="toggle-payload-view"]').first().should('contain.text', 'Hide Payload').click()
@@ -44,7 +46,8 @@ describe('Audit Logs', () => {
   })
 
   it('should obscure password fields in JSON payload', () => {
-    cy.login(UserType.STUDY_ADMIN)
+    cy.login(TestUsers.STUDY_ADMIN.email)
+    TestUsers.TestUsers
     cy.visit('/audit-logs')
 
     // Toggle button to view payload
@@ -55,7 +58,7 @@ describe('Audit Logs', () => {
   })
 
   it('should obscure redcapToken fields in JSON payload', () => {
-    cy.login(UserType.STUDY_ADMIN)
+    cy.login(TestUsers.STUDY_ADMIN.email)
     cy.visit('/studies')
     cy.get('[data-cy="advanced-toggle"]').eq(0).click()
     cy.get('[data-cy="redcapToken"] input').eq(0).type('abc123')
