@@ -14,7 +14,7 @@ export const TestUsers = {
   },
   ORG_ADMIN_2: {
     email: 'admin2@example.com',
-    password: 'Loginforadmin2',
+    password: 'Loginforadmin1',
     id: 101,
   },
   PARTICIPANT_UNANSWERED: {
@@ -29,7 +29,7 @@ export const TestUsers = {
   },
   GUARDIAN_2: {
     email: 'g2@example.com',
-    password: 'Loginforparent1',
+    password: 'Loginforuser12',
     id: 102,
   },
   DEPENDENT: {
