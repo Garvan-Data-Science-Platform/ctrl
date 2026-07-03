@@ -17,19 +17,21 @@ import {
 } from 'common/types/api/users/ParticipantProfile'
 import { GetParticipantsResponse } from 'common/types/api/participants'
 import prisma from '../../src/PrismaClient'
-import { ORG_ADMIN_ID } from 'common/testing/seed'
+import { TestInvites, TestStudies, TestUsers } from 'common/testing/constants'
 
 const api = new Api()
 const app = api.app
 let participantToken: string, adminToken: string
 
 describe('Survey tests', () => {
+  const testingUserId: number = 1
+
   beforeAll(async () => {
     api.run()
     await resetDB()
 
-    participantToken = await generateToken({ userId: 1 })
-    adminToken = await generateToken({ userId: ORG_ADMIN_ID })
+    participantToken = await generateToken({ userId: testingUserId })
+    adminToken = await generateToken({ userId: TestUsers.ORG_ADMIN.id })
   })
 
   afterAll(async () => {
@@ -40,13 +42,13 @@ describe('Survey tests', () => {
     const reqBody: RegisterParticipantRequest = {
       addressLine: 'abc',
       dob: '1990-01-01',
-      email: 'abcsdfwefijsdf@gjiodsf.com',
+      email: TestInvites.INVITE_PENDING.email,
       firstName: 'J',
       lastName: 'K',
       mobile: '0412345678',
       nextOfKin: { email: 'nok@gmail.com', firstName: 'N', lastName: 'k' },
       participantType: ParticipantType.STANDARD,
-      password: 'PASS123of2389vNDFS!',
+      password: TestUsers.PARTICIPANT_COMPLETED.password, // Using test data to meet pw requirements
       postcode: '1234',
       preferredContact: ContactMethod.MOBILE,
       state: StateTerritory.ACT,
@@ -59,7 +61,7 @@ describe('Survey tests', () => {
         studyId_emailHash: {
           //@ts-ignore
           email: reqBody.email,
-          studyId: 1,
+          studyId: TestStudies.TEST_STUDY.id,
         },
       },
     })
@@ -95,7 +97,7 @@ describe('Survey tests', () => {
     expect(res.statusCode).toBe(204)
 
     const res2 = await request(app)
-      .get('/studies/1/survey-steps') // Not sure why this was previously study 0
+      .get('/studies/1/survey-steps')
       .set({ authorization: `Bearer ${participantToken}` })
     expect(res2.statusCode).toBe(200)
     const data = res2.body as GetUserSurveyStepsResponse
@@ -105,7 +107,7 @@ describe('Survey tests', () => {
     expect(data.data[1].last_updated).toBeUndefined()
 
     const res3 = await request(app)
-      .get('/studies/1/surveys/1/participants/1/answers') //All the seed ParticipantProfiles have ids like 98,99
+      .get(`/studies/1/surveys/1/participants/${testingUserId}/answers`)
       .set({ authorization: `Bearer ${adminToken}` })
     expect(res3.statusCode).toBe(200)
 
@@ -174,7 +176,7 @@ describe('Survey tests', () => {
     expect(data.data[1].last_updated).toBeUndefined()
 
     const res3 = await request(app)
-      .get('/studies/1/surveys/2/participants/99/answers')
+      .get(`/studies/1/surveys/2/participants/${TestUsers.PARTICIPANT_COMPLETED.id}/answers`)
       .set({ authorization: `Bearer ${adminToken}` })
     expect(res3.statusCode).toBe(200)
 
