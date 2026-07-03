@@ -7,7 +7,7 @@ import {
   RegisterResponse,
 } from 'common/types/api/auth'
 import { resetDB } from 'common/testing/TestHelpers'
-import { ORG_ADMIN_ID, PARTICIPANT_UNANSWERED_EMAIL, TEST_STUDY } from 'common/testing/seed'
+import { TestUsers, TestStudies, TestInvites } from 'common/testing/constants'
 import {
   ContactMethod,
   ParticipantType,
@@ -33,7 +33,7 @@ describe('Auth', () => {
     firstName: 'Test',
     lastName: 'Admin',
     email: 'test@admin.com',
-    password: 'Password123',
+    password: TestUsers.ORG_ADMIN.password, // Note: using test data so it fits password policy
     role: Role.OrganisationAdmin,
   }
 
@@ -41,7 +41,7 @@ describe('Auth', () => {
     firstName: 'Test',
     lastName: 'Participant',
     email: 'test@participant.com',
-    password: 'Password123',
+    password: TestUsers.ORG_ADMIN.password, // Note: using test data so it fits password policy
     role: Role.Participant,
   }
 
@@ -53,7 +53,7 @@ describe('Auth', () => {
     await resetDB()
 
     const orgAdminToken = await generateToken({
-      userId: ORG_ADMIN_ID,
+      userId: TestUsers.ORG_ADMIN.id,
     })
 
     // Register Admin
@@ -122,7 +122,7 @@ describe('Auth', () => {
     const participantRequest: RegisterParticipantRequest = {
       firstName: 'John',
       lastName: 'Doe',
-      email: 'john@example.com',
+      email: TestInvites.INVITE_2_PENDING.email,
       password: 'johnDoesP@ssword123',
       mobile: '+61477777777',
       addressLine: '123 Some Street',
@@ -143,7 +143,7 @@ describe('Auth', () => {
     const participantInviteId = await prisma.invite.findFirstOrThrow({
       where: {
         email: participantRequest.email,
-        study: { name: TEST_STUDY },
+        study: { name: TestStudies.TEST_STUDY.name },
       },
     })
 
@@ -205,8 +205,8 @@ describe('Auth', () => {
   it('Should support OTP based login', async () => {
     jest.replaceProperty(config, 'otp', true)
     const loginRequest: LoginRequest = {
-      email: PARTICIPANT_UNANSWERED_EMAIL,
-      password: 'Testpassword1',
+      email: TestUsers.PARTICIPANT_UNANSWERED.email,
+      password: TestUsers.PARTICIPANT_UNANSWERED.password,
     }
     const res = await request(app).post('/auth/login').send(loginRequest)
     const sentEmails = mockNodeMailer.mock.getSentMail()
