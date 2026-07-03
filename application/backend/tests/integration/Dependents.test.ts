@@ -56,7 +56,7 @@ describe('Survey tests', () => {
       mobile: '0412345678',
       nextOfKin: { email: 'nok@gmail.com', firstName: 'N', lastName: 'k' },
       participantType: ParticipantType.STANDARD,
-      password: 'PASS123of2389vNDFS!',
+      password: TestUsers.PARTICIPANT_COMPLETED.password, // Using test user pw to meet pw requirements
       postcode: '1234',
       preferredContact: ContactMethod.MOBILE,
       state: StateTerritory.ACT,

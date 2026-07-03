@@ -3,8 +3,10 @@ import { hashPassword } from '../../src/authentication'
 import { SurveyStep } from '../../../common/types/survey'
 import { createDefaultAnswers, recalculateAnswers } from '../../src/utils/answers'
 import prisma from '../../src/PrismaClient'
+import { TestUsers } from '../../../common/testing/constants.ts'
 
-const seedUserPassword = 'SDoZBbfxWJFX$4u6aZPd'
+// Using test data pw to ensure pw requirements are met
+const seedUserPassword = TestUsers.PARTICIPANT_COMPLETED.password
 
 const main = async () => {
   await prisma.organisation.upsert({
