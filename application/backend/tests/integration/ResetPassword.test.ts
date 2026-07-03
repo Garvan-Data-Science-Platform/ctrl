@@ -3,6 +3,7 @@ import { Api } from '../../src/Api'
 import { resetDB } from 'common/testing/TestHelpers'
 import { verifyPassword } from '../../src/authentication'
 import prisma from '../../src/PrismaClient'
+import { TestUsers } from 'common/testing/constants'
 import { NodemailerMock } from 'nodemailer-mock'
 import * as nodemailer from 'nodemailer'
 
@@ -13,10 +14,11 @@ const app = api.app
 
 describe('User Password Reset', () => {
   let resetToken: string
-  const userId = 105
-  const userEmail = 'test-reset-password@example.com'
-  const originalPassword = 'OldPassword123'
-  const newPassword = 'New@Password123'
+  const userEmail = TestUsers.PASSWORD_RESET_USER.email
+  const userId = TestUsers.PASSWORD_RESET_USER.id
+  const originalPassword = TestUsers.PASSWORD_RESET_USER.password
+  // Note: using different test data pw to ensure consistency with pw requirements
+  const newPassword = TestUsers.PARTICIPANT_COMPLETED.password
 
   beforeAll(async () => {
     api.run()
