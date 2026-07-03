@@ -1,10 +1,11 @@
 /// <reference types="cypress" />
 
+const { TestUsers } = require('../../../common/testing/constants')
+
 beforeEach(() => {
   cy.task('reset')
 })
 
-const { UserType } = require('../../../common/cypress/support/commands')
 const downloadsPath = 'cypress/downloads/'
 
 const testCases = [
@@ -23,7 +24,7 @@ const testCases = [
 describe('Admin PDF Export', () => {
   testCases.forEach(({ description, selectorIndex, expectedText }) => {
     it(`Show correct information in PDF for ${description}`, () => {
-      cy.login(UserType.ORG_ADMIN)
+      cy.login(TestUsers.ORG_ADMIN.email)
       cy.visit('/participants')
 
       cy.intercept('GET', '/studies/1/participants/*/').as('requestPdf')
