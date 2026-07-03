@@ -4,7 +4,7 @@ import { Api } from '../../src/Api'
 import { resetDB } from 'common/testing/TestHelpers'
 import { UpdateSurveyAnswersRequest } from 'common/types/api/surveys'
 import { CreateStudyRequest } from 'common/types/api/studies'
-import { ORG_ADMIN_ID, PARTICIPANT_UNANSWERED_ID } from 'common/testing/seed'
+import { TestUsers } from 'common/testing/constants'
 import prisma from '../../src/PrismaClient'
 
 const api = new Api()
@@ -20,11 +20,11 @@ describe('Soft Deletion', () => {
     await resetDB()
 
     participantToken = await generateToken({
-      userId: PARTICIPANT_UNANSWERED_ID,
+      userId: TestUsers.PARTICIPANT_UNANSWERED.id,
     })
 
     orgAdminToken = await generateToken({
-      userId: ORG_ADMIN_ID,
+      userId: TestUsers.ORG_ADMIN.id,
     })
   })
 
@@ -40,14 +40,14 @@ describe('Soft Deletion', () => {
       .set({ authorization: `Bearer ${participantToken}` })
       .send(reqBody)
 
-    await prisma.user.delete({ where: { id: PARTICIPANT_UNANSWERED_ID } })
-    const user = await prisma.user.findFirst({ where: { id: PARTICIPANT_UNANSWERED_ID } })
+    await prisma.user.delete({ where: { id: TestUsers.PARTICIPANT_UNANSWERED.id } })
+    const user = await prisma.user.findFirst({ where: { id: TestUsers.PARTICIPANT_UNANSWERED.id } })
     expect(user).toBeNull()
   })
 
   it('Audit log of submitted answer remains', async () => {
     const aLog = await prisma.auditLog.findFirstOrThrow({
-      where: { userId: PARTICIPANT_UNANSWERED_ID },
+      where: { userId: TestUsers.PARTICIPANT_UNANSWERED.id },
     })
     expect(aLog.resource).toBe('studies/survey-answers')
     expect(aLog.operation).toBe('CREATE')
@@ -55,10 +55,10 @@ describe('Soft Deletion', () => {
 
   it('User can be restored', async () => {
     await prisma.user.update({
-      where: { deleted: true, id: PARTICIPANT_UNANSWERED_ID },
+      where: { deleted: true, id: TestUsers.PARTICIPANT_UNANSWERED.id },
       data: { deleted: false },
     })
-    const user = await prisma.user.findFirst({ where: { id: PARTICIPANT_UNANSWERED_ID } })
+    const user = await prisma.user.findFirst({ where: { id: TestUsers.PARTICIPANT_UNANSWERED.id } })
     expect(user).toBeTruthy()
   })
 
@@ -79,7 +79,9 @@ describe('Soft Deletion', () => {
   })
 
   it('Audit log of associated draft survey remains', async () => {
-    const aLog = await prisma.auditLog.findFirstOrThrow({ where: { userId: ORG_ADMIN_ID } })
+    const aLog = await prisma.auditLog.findFirstOrThrow({
+      where: { userId: TestUsers.ORG_ADMIN.id },
+    })
     expect(aLog.resource).toBe('studies')
     expect(aLog.operation).toBe('CREATE')
     expect(JSON.parse(aLog.requestBody as any).name).toBe(`${STUDY_NAME}`)
