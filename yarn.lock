@@ -6198,7 +6198,7 @@ __metadata:
     json5: "npm:^2.2.3"
     jsonwebtoken: "npm:^9.0.2"
     multer: "npm:^2.1.1"
-    nodemailer: "npm:^7.0.11"
+    nodemailer: "npm:^9.0.1"
     nodemailer-mock: "npm:^2.0.6"
     pg: "npm:^8.12.0"
     prisma: "npm:^5.20.0"
@@ -12412,10 +12412,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nodemailer@npm:^7.0.11":
-  version: 7.0.11
-  resolution: "nodemailer@npm:7.0.11"
-  checksum: 10c0/208f108fdb4c5dd0e3a2f013578d53dad505cf1b9c7a084f6d22fc9d6f3912daafb4a23793ca568ff848afc35f15f4eb24382d3f6f9fb8ede4a8410d4ca63618
+"nodemailer@npm:^9.0.1":
+  version: 9.0.3
+  resolution: "nodemailer@npm:9.0.3"
+  checksum: 10c0/9e93516fb9fcc8835b683cdf3b90135648dabf0133ac9b04890303c2e23eef1d7bae58fe98afb0e251ae10428b96f05df483deb78f0b49f47793debbb0383216
   languageName: node
   linkType: hard
 
