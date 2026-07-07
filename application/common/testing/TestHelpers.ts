@@ -1,4 +1,5 @@
 import prisma from '../../backend/src/PrismaClient'
+import { Prisma, AuditLogOperation } from '@prisma/client'
 import { SurveysController } from '../../backend/src/controllers/SurveysController'
 import logger from 'common/src/logger'
 import { PARTICIPANT_UNANSWERED_ID, seedTests } from './seed'
@@ -215,4 +216,51 @@ export async function expireInvite(inviteId: string) {
 export async function revokeInvite(inviteId: string) {
   await prisma.invite.update({ where: { id: inviteId }, data: { status: 'REVOKED' } })
   return null
+}
+
+// Function to generate N audit log entries
+export async function seedAuditLogs(count: number) {
+  if (count <= 0) return
+
+  const getRandom = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)]
+
+  const testSeedIdArray = [96, 97, 99, 102, 105, 106] // Array from application/common/testing/seed.ts
+  const resources = [
+    'studies/surveys/publish',
+    'studies/surveys',
+    'studies',
+    'studies/logo',
+    'users',
+    'users/make-study-admin',
+    'users/remove-study-admin',
+    'auth/login',
+  ]
+  const operations: AuditLogOperation[] = [
+    AuditLogOperation.CREATE,
+    AuditLogOperation.UPDATE,
+    AuditLogOperation.DELETE,
+  ]
+  const methods = ['POST', 'PATCH', '', 'DELETE']
+
+  const logsToCreate: Prisma.AuditLogCreateManyInput[] = Array.from({ length: count }).map(
+    (_, index) => {
+      const date = new Date()
+      date.setMinutes(date.getMinutes() - index)
+
+      return {
+        resource: getRandom(resources),
+        operation: getRandom(operations),
+        success: true,
+        timestamp: date,
+        userId: getRandom(testSeedIdArray),
+        meta: {
+          method: getRandom(methods),
+          url: `endpoint/test-${index}`,
+        } as Prisma.InputJsonObject,
+      }
+    },
+  )
+  await prisma.auditLog.createMany({
+    data: logsToCreate,
+  })
 }

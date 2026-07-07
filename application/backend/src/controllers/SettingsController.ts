@@ -18,8 +18,10 @@ import {
   Post,
   UploadedFile,
   Security,
+  ValidateError,
 } from 'tsoa'
 import { Readable } from 'stream'
+import logger from 'common/src/logger'
 import type {
   GetSettingsResponse,
   GetUserPortalSettingsResponse,
@@ -29,6 +31,17 @@ import { NotFoundErrorResponse } from 'common/types/api/errors'
 import { NotFoundError } from '../middlewares/ErrorHandler'
 import { auditLog } from '../middlewares/AuditLog'
 import { processLogoImage } from 'common/src/imageHelpers'
+import { urlRegex } from 'common/src/regex'
+import { sanitizeUrl } from '@braintree/sanitize-url'
+
+function sanitiseAndValidateUrl(link: string) {
+  const validatedUrl = sanitizeUrl(link)
+  if (urlRegex.test(validatedUrl)) {
+    return validatedUrl
+  } else {
+    throw new Error('urlRegex failed')
+  }
+}
 
 @Route('settings')
 @Tags('Settings')
@@ -71,7 +84,21 @@ export class SettingsController extends Controller {
   @Security('jwt', ['OrganisationAdmin'])
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
   public async updateSettings(@Body() bodyRequest: UpdateSettingsRequest) {
-    await prisma.organisation.update({ where: { id: 1 }, data: bodyRequest })
+    const data = bodyRequest
+    // There is already validation on Admin Portal UI but best to not store unsanitized data
+    Object.keys(data)
+      .filter((urlKey) => urlKey === 'newsLink' || urlKey === 'tcLink')
+      .forEach((key) => {
+        try {
+          data[key] = sanitiseAndValidateUrl(data[key] as string)
+        } catch (err) {
+          const errorMessage: string = `Link is not acceptable URL: ${data.newsLink}`
+          logger.error({ errorMessage, err })
+          throw new ValidateError({}, errorMessage)
+        }
+      })
+
+    await prisma.organisation.update({ where: { id: 1 }, data: data })
   }
 
   @Get('/userportal')

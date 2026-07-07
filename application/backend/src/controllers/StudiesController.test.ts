@@ -6,6 +6,7 @@ import {
   GetStudyByIdResponse,
   CreateStudyRequest,
   UpdateStudyRequest,
+  GetAllStudiesByParticipantResponse,
 } from 'common/types/api/studies'
 import {
   PARTICIPANT_UNANSWERED_ID,
@@ -57,6 +58,21 @@ describe('StudiesController', () => {
       expect(body.data.length).toEqual(4)
     })
 
+    it('should not return any token information', async () => {
+      const response = await request(app)
+        .get('/studies')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(response.status).toBe(200)
+
+      const body: GetAllStudiesResponse = response.body
+      expect(Array.isArray(body.data)).toBeTruthy()
+      expect(body.data.length).toBeGreaterThan(0)
+
+      body.data.forEach((study) => {
+        expect(study).not.toHaveProperty('redcapToken')
+      })
+    })
+
     it('should return a 500 error if a database error occurs', async () => {
       jest.spyOn(prisma.study, 'findMany').mockImplementationOnce(() => {
         throw new Error('Internal Server Error')
@@ -90,9 +106,29 @@ describe('StudiesController', () => {
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(200)
 
-      const body: GetAllStudiesResponse = response.body
+      const body: GetAllStudiesByParticipantResponse = response.body
       expect(Array.isArray(body.data)).toBeTruthy()
       expect(body.data.length).toEqual(2)
+    })
+
+    it('should not return any token information', async () => {
+      const token = await generateToken({
+        userId: PARTICIPANT_UNANSWERED_ID,
+      })
+
+      const response = await request(app)
+        .get('/studies/list')
+        .set({ Authorization: `Bearer ${token}` })
+      expect(response.status).toBe(200)
+
+      const body: GetAllStudiesByParticipantResponse = response.body
+      expect(Array.isArray(body.data)).toBeTruthy()
+      expect(body.data.length).toBeGreaterThan(0)
+
+      body.data.forEach((study) => {
+        expect(study).not.toHaveProperty('redcapURL')
+        expect(study).not.toHaveProperty('redcapToken')
+      })
     })
 
     it('should not return anything for org admin', async () => {
@@ -112,9 +148,31 @@ describe('StudiesController', () => {
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(200)
 
-      const body: GetAllStudiesResponse = response.body
+      const body: GetAllStudiesByParticipantResponse = response.body
       expect(Array.isArray(body.data)).toBeTruthy()
       expect(body.data.length).toEqual(1)
+    })
+  })
+
+  describe('GET /studies/deleted', () => {
+    it('should not return any token information', async () => {
+      const deleteResponse = await request(app)
+        .delete(`/studies/${testStudyId}`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(deleteResponse.status).toBe(204)
+
+      const response = await request(app)
+        .get('/studies/deleted')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(response.status).toBe(200)
+
+      const body: GetAllStudiesResponse = response.body
+      expect(Array.isArray(body.data)).toBeTruthy()
+      expect(body.data.length).toBeGreaterThan(0)
+
+      body.data.forEach((study) => {
+        expect(study).not.toHaveProperty('redcapToken') // URL is okay for Admins, just not token
+      })
     })
   })
 
@@ -128,6 +186,27 @@ describe('StudiesController', () => {
       const body: GetStudyByIdResponse = response.body
       expect(body.data).not.toBeNull()
       expect(body.data.id).toBe(testStudyId)
+    })
+
+    it('should not return any token information to participant', async () => {
+      const token = await generateToken({
+        userId: PARTICIPANT_UNANSWERED_ID,
+      })
+      const response = await request(app)
+        .get(`/studies/${testStudyId}`)
+        .set({ Authorization: `Bearer ${token}` })
+      expect(response.status).toBe(401)
+    })
+
+    it('should not return any token information to admin', async () => {
+      const response = await request(app)
+        .get(`/studies/${testStudyId}`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(response.status).toBe(200)
+
+      const body: GetStudyByIdResponse = response.body
+      expect(body.data).not.toBeNull()
+      expect(body.data).not.toHaveProperty('redcapToken') // URL is okay but NOT token
     })
 
     it('should return a 404 error if the study does not exist', async () => {
@@ -359,7 +438,7 @@ describe('StudiesController', () => {
       expect(alternateLogoGetResponse.status).toBe(200)
     })
 
-    it("should allow a StudyAdmin to update the logo of a study they are part of", async () => {
+    it('should allow a StudyAdmin to update the logo of a study they are part of', async () => {
       // Add a logo to be updated
       const createResponse = await request(app)
         .post(`/studies/${testStudyId}/logo`)
@@ -465,7 +544,6 @@ describe('StudiesController', () => {
 
   describe('PATCH /studies/:studyId/restore', () => {
     it('should restore a deleted study', async () => {
-
       const studyBeforeDelete = await prisma.study.findFirst({
         where: { id: testStudyId },
       })

@@ -138,4 +138,17 @@ describe('multistudy', () => {
         })
     })
   })
+
+  it('should load study infomation from dashboard but not expose token', () => {
+    cy.intercept('GET', '**/studies/list').as('getParticipantStudies')
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
+    cy.visit('/')
+
+    cy.wait('@getParticipantStudies').then((interception) => {
+      const firstStudy = interception.response.body.data[0]
+
+      expect(firstStudy).to.not.have.property('redcapToken')
+      expect(firstStudy).to.not.have.property('redcapURL')
+    })
+  })
 })

@@ -179,4 +179,13 @@ describe('Study management page', () => {
     cy.contains('Deleted logo').should('exist')
     cy.get('[data-cy="logo-preview"]').should('not.exist')
   })
+
+  it('Should not show token information', () => {
+    cy.visit('/studies')
+    cy.get('[data-cy="advanced-toggle"]').eq(1).click()
+    cy.get('[data-cy="redcapToken"] input').eq(1).type('abc123')
+    cy.contains('abc123').should('not.exist') // due to SensitiveTextField
+    cy.get('[data-cy="settings-apply"]').eq(1).click()
+    cy.contains('abc123').should('not.exist')
+  })
 })

@@ -30,6 +30,7 @@ import { authProvider } from './providers/authProvider'
 import { ParticipantList, ParticipantShow } from './pages/participants'
 import { SurveyImport, IntegrationsHome, ParticipantImport } from './pages/integrations'
 import { ResponsesView } from './pages/responses'
+import { AuditLogList } from './pages/audit-logs'
 import {
   ListAlt,
   Person,
@@ -39,6 +40,7 @@ import {
   AdminPanelSettings,
   RestoreFromTrash,
   LibraryBooks,
+  History,
 } from '@mui/icons-material'
 import { ParticipantEdit } from './pages/participants/edit'
 import { SetupPage } from './pages/setup'
@@ -158,6 +160,16 @@ function App() {
                       list: '/studies',
                       meta: {
                         icon: <LibraryBooks />,
+                        label: 'Manage Studies',
+                        parent: 'admin',
+                      },
+                    },
+                    {
+                      name: 'audit-logs',
+                      list: '/audit-logs',
+                      meta: {
+                        icon: <History />,
+                        label: 'Audit Logs',
                         parent: 'admin',
                       },
                     },
@@ -245,6 +257,7 @@ function App() {
                       <Route path="/settings" index element={<SettingsPage />} />
                       <Route path="/restore" index element={<RestorePage />} />
                       <Route path="/studies" index element={<StudiesPage />} />
+                      <Route path="/audit-logs" index element={<AuditLogList />} />
                       <Route path="*" element={<ErrorComponent />} />
                     </Route>
 

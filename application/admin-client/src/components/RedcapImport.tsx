@@ -87,7 +87,7 @@ export const RedcapImport = ({
 
   useEffect(() => {
     const currentStudy = studies.find((val) => val.id == studyId)
-    if (!currentStudy?.redcapToken || !currentStudy?.redcapURL) {
+    if (!currentStudy?.hasRedcapToken || !currentStudy?.redcapURL) {
       setRedcapIsSetup(false)
     } else {
       setRedcapIsSetup(true)
