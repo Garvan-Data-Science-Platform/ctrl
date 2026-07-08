@@ -77,6 +77,22 @@ describe('registration', () => {
     cy.contains('passwords do not match').should('exist')
   })
 
+  it('Input some invalid data and get correct error messages', () => {
+    cy.task('getInviteIdtask', {
+      email: TestInvites.INVITE_PENDING.email,
+      studyId: TestStudies.TEST_STUDY.id,
+    })
+      .as('inviteId')
+      .then((inviteId) => {
+        cy.visit(`/register/${inviteId}`)
+      })
+    cy.get('[data-cy="reg-password"]').type('Testpassword1')
+    cy.get('[data-cy="reg-confirm-password"]').type('Testpassword1')
+    cy.get('[data-cy="reg-button"]').click()
+    cy.contains('Invalid password').should('exist')
+    cy.contains('must not contain easily guessable words').should('exist')
+  })
+
   it('Attempt to register existing email (i.e. no invite) and get correct error message', () => {
     cy.visit('/register/not-a-real-inviteId')
     fillValid()
