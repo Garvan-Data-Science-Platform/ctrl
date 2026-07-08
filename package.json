@@ -76,6 +76,7 @@
     "vite-node/vite": "^7.3.2"
   },
   "dependencies": {
-    "@react-pdf/renderer": "^4.2.2"
+    "@react-pdf/renderer": "^4.2.2",
+    "tsx": "^4.23.0"
   }
 }
