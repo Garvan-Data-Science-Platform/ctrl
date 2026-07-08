@@ -12,7 +12,7 @@ export interface GeneratePasswordResetLinkRequest {
 
 /**
  * @example {
- *  "newPassword": "newPassword123",
+ *  "newPassword": "Newsupersecret123",
  *  "token": "1063e00e4a273e698577"
  * }
  */

@@ -370,7 +370,7 @@
         "type": "object",
         "additionalProperties": false,
         "example": {
-          "newPassword": "newPassword123",
+          "newPassword": "Newsupersecret123",
           "token": "1063e00e4a273e698577"
         }
       },
@@ -1545,7 +1545,7 @@
           "middleName": "James",
           "lastName": "Doe",
           "email": "john.doe@email.com",
-          "password": "Password123",
+          "password": "Supersecret123",
           "dob": "2000-05-21",
           "mobile": "0412341234",
           "addressLine": "123 Sydney Street",
@@ -2454,7 +2454,7 @@
           "firstName": "John",
           "lastName": "Doe",
           "email": "john.doe@email.com",
-          "password": "Password123",
+          "password": "Supersecret123",
           "role": "OrganisationAdmin"
         }
       },
@@ -2532,7 +2532,7 @@
         "additionalProperties": false,
         "example": {
           "email": "john.doe@email.com",
-          "password": "Password123"
+          "password": "Supersecret123"
         }
       },
       "RegisterParticipantResponse": {
@@ -2642,7 +2642,7 @@
           "middleName": "James",
           "lastName": "Doe",
           "email": "john.doe@email.com",
-          "password": "Password123",
+          "password": "Supersecret123",
           "dob": "2000-05-21",
           "mobile": "0412341234",
           "addressLine": "123 Sydney Street",
@@ -2742,7 +2742,7 @@
         "additionalProperties": false,
         "example": {
           "email": "john.doe@email.com",
-          "password": "Password123"
+          "password": "Supersecret123"
         }
       },
       "OTPLoginRequest": {

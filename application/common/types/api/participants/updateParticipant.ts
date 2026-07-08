@@ -8,7 +8,7 @@ import { UpdateProfileRequest } from '../users/updateProfile'
  *  "middleName": "James",
  *  "lastName": "Doe",
  *  "email": "john.doe@email.com",
- *  "password": "Password123",
+ *  "password": "Supersecret123",
  *  "dob": "2000-05-21",
  *  "mobile": "0412341234",
  *  "addressLine": "123 Sydney Street",

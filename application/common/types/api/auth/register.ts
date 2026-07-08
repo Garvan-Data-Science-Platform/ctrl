@@ -4,7 +4,7 @@ import { Role } from '@prisma/client'
  *  "firstName": "John",
  *  "lastName": "Doe",
  *  "email": "john.doe@email.com",
- *  "password": "Password123",
+ *  "password": "Supersecret123",
  *  "role": "OrganisationAdmin"
  * }
  */

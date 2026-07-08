@@ -1,7 +1,7 @@
 /**
  * @example {
  *  "email": "john.doe@email.com",
- *  "password": "Password123"
+ *  "password": "Supersecret123"
  * }
  */
 export interface RegisterSetupRequest {
