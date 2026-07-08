@@ -1,4 +1,5 @@
 /// <reference types="cypress" />
+const { TestUsers, TestStudies } = require('../../../common/testing/constants')
 
 beforeEach(() => {
   cy.task('reset')
@@ -13,11 +14,11 @@ describe('Password Reset', () => {
 
   it('requests password reset with registered email', () => {
     cy.visit('/forgot')
-    cy.get('[data-cy="email"]').type(Cypress.env('PASSWORD_RESET_USER_EMAIL'))
+    cy.get('[data-cy="email"]').type(TestUsers.PASSWORD_RESET_USER.email)
     cy.intercept(
       'POST',
       '/users/password/generate-reset-link',
-      '[{ email: @Cypress.env("PASSWORD_RESET_USER_EMAIL")}]',
+      `[{ email: ${TestUsers.PASSWORD_RESET_USER.email}}]`,
     ).as('requestReset')
     cy.get('[data-cy="request-reset-button"]').click()
     cy.wait('@requestReset')
@@ -30,7 +31,7 @@ describe('Password Reset', () => {
     cy.intercept(
       'POST',
       '/users/password/generate-reset-link',
-      '[{ email: @Cypress.env("PASSWORD_RESET_USER_EMAIL")}]',
+      `[{ email: ${TestUsers.PASSWORD_RESET_USER.email}}]`,
     ).as('requestReset')
     cy.get('[data-cy="request-reset-button"]').click()
     cy.wait('@requestReset')
@@ -39,11 +40,11 @@ describe('Password Reset', () => {
 
   it('requests password reset and returns to login page', () => {
     cy.visit('/forgot')
-    cy.get('[data-cy="email"]').type(Cypress.env('PASSWORD_RESET_USER_EMAIL'))
+    cy.get('[data-cy="email"]').type(TestUsers.PASSWORD_RESET_USER.email)
     cy.intercept(
       'POST',
       '/users/password/generate-reset-link',
-      '[{ email: @Cypress.env("PASSWORD_RESET_USER_EMAIL")}]',
+      `[{ email: ${TestUsers.PASSWORD_RESET_USER.email}}]`,
     ).as('requestReset')
     cy.get('[data-cy="request-reset-button"]').click()
     cy.wait('@requestReset')
@@ -69,20 +70,20 @@ describe('Password Reset', () => {
 
   it('opens password reset page and enters invalid password - no number', () => {
     cy.visit('/reset-password?token=valid-reset-token')
-    cy.get('[data-cy="new-password"]').type('Password{enter}')
+    cy.get('[data-cy="new-password"]').type('Asdfasdfasdfasdf{enter}')
     cy.contains('Invalid password. Password must contain at least one number').should('exist')
   })
 
   it('opens password reset page and enters invalid password - no uppercase', () => {
     cy.visit('/reset-password?token=valid-reset-token')
-    cy.get('[data-cy="new-password"]').type('password1{enter}')
+    cy.get('[data-cy="new-password"]').type('thishasnouppercase1{enter}')
     cy.contains('Invalid password. Password must contain at least one uppercase').should('exist')
   })
 
   it('opens password reset page and enters non-matching passwords', () => {
     cy.visit('/reset-password?token=valid-reset-token')
-    cy.get('[data-cy="new-password"]').type('Password1')
-    cy.get('[data-cy="confirm-password"]').type('Password2{enter}')
+    cy.get('[data-cy="new-password"]').type(TestUsers.PASSWORD_RESET_USER.password)
+    cy.get('[data-cy="confirm-password"]').type('Hereisadifferentone2{enter}')
     cy.contains('Your passwords do not match').should('exist')
   })
 
@@ -97,34 +98,34 @@ describe('Password Reset', () => {
 
   it('requests password reset with invalid token', () => {
     cy.visit('/reset-password?token=invalid-reset-token')
-    cy.get('[data-cy="new-password"]').type('Password1{enter}')
-    cy.get('[data-cy="confirm-password"]').type('Password1{enter}')
+    cy.get('[data-cy="new-password"]').type(`${TestUsers.PASSWORD_RESET_USER.password}{enter}`)
+    cy.get('[data-cy="confirm-password"]').type(`${TestUsers.PASSWORD_RESET_USER.password}{enter}`)
     cy.contains('Invalid token').should('exist')
     cy.get('[data-cy="return-to-login"]').should('exist')
   })
 
   it('requests password reset with already-used token', () => {
     cy.visit('/reset-password?token=valid-reset-token')
-    cy.get('[data-cy="new-password"]').type('Password1{enter}')
-    cy.get('[data-cy="confirm-password"]').type('Password1{enter}')
+    cy.get('[data-cy="new-password"]').type(`${TestUsers.PASSWORD_RESET_USER.password}{enter}`)
+    cy.get('[data-cy="confirm-password"]').type(`${TestUsers.PASSWORD_RESET_USER.password}{enter}`)
     cy.contains('Password reset was successful').should('exist')
     cy.get('[data-cy="return-to-login"]').click()
 
     cy.visit('/reset-password?token=valid-reset-token')
-    cy.get('[data-cy="new-password"]').type('Password1{enter}')
-    cy.get('[data-cy="confirm-password"]').type('Password1{enter}')
+    cy.get('[data-cy="new-password"]').type(`${TestUsers.PASSWORD_RESET_USER.password}{enter}`)
+    cy.get('[data-cy="confirm-password"]').type(`${TestUsers.PASSWORD_RESET_USER.password}{enter}`)
     cy.contains('Invalid token').should('exist')
     cy.get('[data-cy="return-to-login"]').should('exist')
   })
 
   it('resets password and logs in with new password', () => {
-    const newPassword = 'Password1'
+    const newPassword = 'Asdfasdfasdfasdf1'
     cy.visit('/reset-password?token=valid-reset-token')
     cy.get('[data-cy="new-password"]').type(newPassword)
     cy.get('[data-cy="confirm-password"]').type(newPassword)
     cy.get('[data-cy="reset-password"]').click()
     cy.get('[data-cy="return-to-login"]').click()
-    cy.get('[data-cy="login-email"]').type(Cypress.env('PASSWORD_RESET_USER_EMAIL'))
+    cy.get('[data-cy="login-email"]').type(TestUsers.PASSWORD_RESET_USER.email)
     cy.get('[data-cy="login-password"]').type(newPassword)
     cy.get('[data-cy="login"]').click()
     cy.get('[data-cy="log-out"]').should('exist')

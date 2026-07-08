@@ -1,4 +1,5 @@
 /// <reference types="cypress" />
+const { TestUsers, TestInvites, TestStudies } = require('../../../common/testing/constants')
 
 beforeEach(() => {
   cy.task('reset')
@@ -9,7 +10,7 @@ describe('registration', () => {
     cy.wait(500) // wait for form to be fully loaded
     cy.get('[data-cy="reg-first"]').type('FIRST')
     cy.get('[data-cy="reg-last"]').type('LAST')
-    cy.get('[data-cy="reg-email"]').type('invite1@pending.com')
+    cy.get('[data-cy="reg-email"]').type(TestInvites.INVITE_PENDING.email)
     cy.get('[data-cy="reg-password"]').type('Aadsfoswefw1515fd@!')
     cy.get('[data-cy="reg-confirm-password"]').type('Aadsfoswefw1515fd@!')
     cy.get('[data-cy="reg-dob"]').type('1990-01-01')
@@ -28,7 +29,10 @@ describe('registration', () => {
   }
 
   it('open registration page and register a user', () => {
-    cy.task('getInviteIdtask', { email: 'invite1@pending.com', studyId: 1 })
+    cy.task('getInviteIdtask', {
+      email: TestInvites.INVITE_PENDING.email,
+      studyId: TestStudies.TEST_STUDY.id,
+    })
       .as('inviteId')
       .then((inviteId) => {
         cy.visit(`/register/${inviteId}`)
@@ -39,7 +43,10 @@ describe('registration', () => {
   })
 
   it('Enter some fields, try to register and empty field is focused', () => {
-    cy.task('getInviteIdtask', { email: 'invite1@pending.com', studyId: 1 })
+    cy.task('getInviteIdtask', {
+      email: TestInvites.INVITE_PENDING.email,
+      studyId: TestStudies.TEST_STUDY.id,
+    })
       .as('inviteId')
       .then((inviteId) => {
         cy.visit(`/register/${inviteId}`)
@@ -50,7 +57,10 @@ describe('registration', () => {
   })
 
   it('Input some invalid data and get correct error messages', () => {
-    cy.task('getInviteIdtask', { email: 'invite1@pending.com', studyId: 1 })
+    cy.task('getInviteIdtask', {
+      email: TestInvites.INVITE_PENDING.email,
+      studyId: TestStudies.TEST_STUDY.id,
+    })
       .as('inviteId')
       .then((inviteId) => {
         cy.visit(`/register/${inviteId}`)
@@ -63,14 +73,14 @@ describe('registration', () => {
     cy.contains('Invalid password').should('exist')
     cy.contains('Invalid postcode').should('exist')
     cy.contains('Invalid mobile number').should('exist')
-    cy.contains('at least 8 characters').should('exist')
+    cy.contains('at least 14 characters').should('exist')
     cy.contains('passwords do not match').should('exist')
   })
 
   it('Attempt to register existing email (i.e. no invite) and get correct error message', () => {
     cy.visit('/register/not-a-real-inviteId')
     fillValid()
-    const testEmail = 'admin@example.com'
+    const testEmail = TestUsers.STUDY_ADMIN.email
     cy.get('[data-cy="reg-email"]').clear()
     cy.get('[data-cy="reg-email"]').type(testEmail)
     cy.get('[data-cy="reg-button"]').click()
@@ -78,7 +88,10 @@ describe('registration', () => {
   })
 
   it('Add dependents, check errors and valid submission', () => {
-    cy.task('getInviteIdtask', { email: 'invite1@pending.com', studyId: 1 })
+    cy.task('getInviteIdtask', {
+      email: TestInvites.INVITE_PENDING.email,
+      studyId: TestStudies.TEST_STUDY.id,
+    })
       .as('inviteId')
       .then((inviteId) => {
         cy.visit(`/register/${inviteId}`)

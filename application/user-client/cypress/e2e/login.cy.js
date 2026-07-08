@@ -1,5 +1,7 @@
 /// <reference types="cypress" />
 
+const { TestUsers } = require('../../../common/testing/constants')
+
 beforeEach(() => {
   cy.task('reset')
 })
@@ -7,15 +9,15 @@ beforeEach(() => {
 describe('Login', () => {
   it('Can log in', () => {
     cy.visit('/')
-    cy.get('[data-cy="login-email"]').type('test2@example.com')
-    cy.get('[data-cy="login-password"]').type('Testpassword1')
+    cy.get('[data-cy="login-email"]').type(TestUsers.PARTICIPANT_UNANSWERED.email)
+    cy.get('[data-cy="login-password"]').type(TestUsers.PARTICIPANT_UNANSWERED.password)
     cy.contains('Log In').click()
     cy.contains('Welcome').should('exist')
   })
 
   it('Gets correct message if password is incorrect', () => {
     cy.visit('/')
-    cy.get('[data-cy="login-email"]').type('test2@example.com')
+    cy.get('[data-cy="login-email"]').type(TestUsers.PARTICIPANT_UNANSWERED.email)
     cy.get('[data-cy="login-password"]').type('passwordwrong')
     cy.contains('Log In').click()
     cy.contains('Invalid credentials').should('exist')

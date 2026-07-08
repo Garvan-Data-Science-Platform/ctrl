@@ -4,17 +4,16 @@ beforeEach(() => {
   cy.task('reset')
 })
 
-const { TestUsers } = require('../../../common/testing/constants.ts')
+const { TestUsers, TestStudies } = require('../../../common/testing/constants.ts')
 const downloadsPath = 'cypress/downloads/'
 
 // Note: the tests below make heavy use of environment variables
-//   specified in `application/user-client/cypress.config.ts`.
 //   These env vars pull in variables specified in the test seed data
 //   (`application/common/testing/seed.ts`)
-const studyName = Cypress.env('TEST_STUDY')
-const studyId = Cypress.env('TEST_STUDY_ID')
-const feStudyName = Cypress.env('FE_TEST_STUDY')
-const feStudyId = Cypress.env('FE_TEST_STUDY_ID')
+const studyName = TestStudies.TEST_STUDY.name
+const studyId = TestStudies.TEST_STUDY.id
+const feStudyName = TestStudies.FE_TEST_STUDY.name
+const feStudyId = TestStudies.FE_TEST_STUDY.id
 
 describe('viewPdf', () => {
   let hashes

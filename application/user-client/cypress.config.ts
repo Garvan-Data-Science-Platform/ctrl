@@ -13,24 +13,12 @@ import {
 } from 'common/testing/TestHelpers'
 import { formatStudyName } from 'common/src/utils'
 
-import {
-  PASSWORD_RESET_USER_EMAIL,
-  TEST_STUDY,
-  TEST_STUDY_ID,
-  FE_TEST_STUDY,
-  FE_TEST_STUDY_ID,
-} from 'common/testing/seed'
 import { defineConfig } from 'cypress'
 
 export default defineConfig({
   retries: 2,
   env: {
     DATABASE_URL: 'postgres://postgres:password@db-test:5432/ctrl',
-    PASSWORD_RESET_USER_EMAIL: PASSWORD_RESET_USER_EMAIL,
-    TEST_STUDY: TEST_STUDY,
-    TEST_STUDY_ID: TEST_STUDY_ID,
-    FE_TEST_STUDY: FE_TEST_STUDY,
-    FE_TEST_STUDY_ID: FE_TEST_STUDY_ID,
   },
   e2e: {
     defaultCommandTimeout: 8000,
