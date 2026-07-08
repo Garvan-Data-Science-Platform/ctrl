@@ -34,8 +34,8 @@
     "fast-csv": "^5.0.2",
     "json5": "^2.2.3",
     "jsonwebtoken": "^9.0.2",
-    "multer": "^2.1.1",
-    "nodemailer": "^7.0.11",
+    "multer": "^2.2.0",
+    "nodemailer": "^9.0.1",
     "pg": "^8.12.0",
     "prisma-field-encryption": "^1.6.0",
     "sharp": "^0.34.1",
@@ -57,7 +57,7 @@
     "@types/uuid": "^10.0.0",
     "@yarnpkg/pnpify": "^4.1.1",
     "common": "workspace:^",
-    "esbuild": "^0.25.0",
+    "esbuild": "^0.28.1",
     "fetch-mock": "^12.5.3",
     "jest": "^29.7.0",
     "jest-mock-extended": "^3.0.7",
@@ -67,7 +67,7 @@
     "supertest": "^7.0.0",
     "ts-jest": "^29.1.5",
     "ts-node": "^10.9.2",
-    "tsx": "^4.19.4",
+    "tsx": "^4.23.0",
     "typescript": "^5.8.3"
   }
 }
