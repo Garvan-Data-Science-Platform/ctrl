@@ -72,7 +72,7 @@ Cypress.Commands.add('fillRegistrationForm', (data = {}) => {
     firstName: 'Test',
     lastName: 'User',
     email: data.email || 'newuser@example.com',
-    password: 'SecurePassword123!',
+    password: 'Supersecret123!',
     dob: '1990-01-01',
     addressLine: '123 Test Street',
     suburb: 'Testville',

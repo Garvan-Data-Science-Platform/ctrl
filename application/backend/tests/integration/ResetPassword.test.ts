@@ -126,7 +126,7 @@ describe('User Password Reset', () => {
   it('should fail to reset the password with an already used token', async () => {
     const response = await request(app).post('/users/password/reset').send({
       token: resetToken,
-      newPassword: 'Another@Password123',
+      newPassword: newPassword,
     })
 
     expect(response.status).toBe(403)

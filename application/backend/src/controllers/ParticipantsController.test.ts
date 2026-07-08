@@ -759,7 +759,7 @@ describe('InvitesController', () => {
           email: 'usernoprofile@example.com',
           firstName: 'User',
           lastName: 'NoProfile',
-          password: hashPassword('Testpassword1'),
+          password: hashPassword(TestUsers.PARTICIPANT_COMPLETED.password), // Using seed data to conform to pw requirements
           role: Role.Participant,
         },
       })

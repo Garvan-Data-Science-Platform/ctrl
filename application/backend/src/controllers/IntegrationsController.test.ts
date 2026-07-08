@@ -108,7 +108,7 @@ describe('IntegrationsController', () => {
           firstName: 'John',
           lastName: 'Smith',
           email: 'example@example.com',
-          password: 'Testpassword1',
+          password: TestUsers.PARTICIPANT_COMPLETED.password, // Using seed data to meet pw requirements
         },
       })
 

@@ -1,4 +1,5 @@
 import type { RegisterParticipantRequest } from 'common/types/api/auth'
+import { TestUsers } from 'common/testing/constants'
 import {
   ContactMethod,
   ParticipantType,
@@ -30,7 +31,8 @@ export function mapToParticipantRequest(
     suburb: getField('suburb'),
     postcode: getField('postcode'),
     state: Object.values(StateTerritory)[Number(getField('state'))],
-    password: 'temporaryPassword123', // temporary
+    password: TestUsers.PARTICIPANT_COMPLETED.password, // temporary
+    // uses test data to meet pw requirements
     dob: transformDate(getField('dob')),
     participantType: ParticipantType.STANDARD, // temporary
     nextOfKin: {
