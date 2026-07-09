@@ -1,6 +1,7 @@
 generator client {
   provider = "prisma-client-js"
-}
+  previewFeatures = ["omitApi"]
+} 
 
 generator json {
   provider = "prisma-json-types-generator"
