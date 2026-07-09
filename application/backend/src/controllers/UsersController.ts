@@ -19,6 +19,7 @@ import {
 } from 'tsoa'
 import logger from 'common/src/logger'
 import type {
+  UserResponse,
   GetUserByIdResponse,
   GetAllUsersResponse,
   CreateUserRequest,
@@ -28,7 +29,7 @@ import type {
   GeneratePasswordResetLinkRequest,
   ResetPasswordRequest,
 } from 'common/types/api/users'
-import { User } from '@prisma/client'
+// import { User } from '@prisma/client'
 import prisma from '../PrismaClient'
 import {
   InternalErrorResponse,
@@ -72,8 +73,10 @@ export class UsersController extends Controller {
   @Security('jwt', ['OrganisationAdmin'])
   @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
   public async getAllUsers(): Promise<GetAllUsersResponse> {
-    const users: User[] = await this.userRepo.findMany({})
-    const responseData = { data: users }
+    const users: UserResponse[] = await this.userRepo.findMany({
+      omit: { password: true, emailHash: true },
+    })
+    const responseData: GetAllUsersResponse = { data: users }
     logger.info({ ...responseData })
     return responseData
   }
@@ -87,10 +90,11 @@ export class UsersController extends Controller {
   @Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
   @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
   public async getAllAdminUsers(): Promise<GetAllUsersResponse> {
-    const users: User[] = await this.userRepo.findMany({
+    const users: UserResponse[] = await this.userRepo.findMany({
       where: { role: { in: ['OperatorAdmin', 'OrganisationAdmin', 'StudyAdmin'] } },
       include: { adminOfStudies: { select: { id: true, name: true } } },
       orderBy: { id: 'asc' },
+      omit: { password: true, emailHash: true },
     })
     const responseData = { data: users }
     logger.info({ ...responseData })
@@ -114,8 +118,9 @@ export class UsersController extends Controller {
     ) {
       return { data: [] }
     }
-    const users: User[] = await this.userRepo.findMany({
+    const users: UserResponse[] = await this.userRepo.findMany({
       where: { role: { in: ['OperatorAdmin', 'OrganisationAdmin', 'StudyAdmin'] }, deleted: true },
+      omit: { password: true, emailHash: true },
     })
     const responseData = { data: users }
     return responseData
@@ -144,7 +149,7 @@ export class UsersController extends Controller {
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
   public async getUserById(@Path() userId: number): Promise<GetUserByIdResponse> {
-    const user: User | null = await this.userRepo.findUnique({
+    const user: UserResponse | null = await this.userRepo.findUnique({
       where: { id: userId },
       include: { adminOfStudies: { select: { name: true, id: true } } },
     })
