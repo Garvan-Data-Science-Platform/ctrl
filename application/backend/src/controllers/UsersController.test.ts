@@ -268,6 +268,34 @@ describe('UsersController', () => {
       expect(updatedUser?.firstName).toBe(newFirstName)
     })
 
+    it('should not expose information when updating a user', async () => {
+      const userId: number = PARTICIPANT_UNANSWERED_ID
+
+      // Get existing user details
+      const existingUser = await prisma.user.findFirst({ where: { id: userId } })
+
+      const testUser: RegisterRequest = {
+        firstName: 'Test',
+        lastName: 'User',
+        email: 'test2@example.com',
+        password: 'Password123',
+        role: Role.Participant,
+      }
+
+      expect(existingUser?.email).toBe(testUser.email)
+      expect(existingUser?.firstName).toBe(testUser.firstName)
+      expect(existingUser?.lastName).toBe(testUser.lastName)
+      expect(existingUser?.role).toBe(testUser.role)
+
+      const response = await request(app)
+        .patch(`/users/${userId}`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .send({ role: 'ThisIsDefinitelyNotARole' })
+
+      expect(response.status).toBe(422)
+      expect(response.body.details).not.toMatch(/should be one of the following; ['OperatorAdmin']/)
+    })
+
     it('should return an error for a non-existent user', async () => {
       const userId: number = 9999
       const newFirstName: string = 'Updated'
