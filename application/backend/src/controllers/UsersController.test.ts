@@ -87,6 +87,17 @@ describe('UsersController', () => {
       expect(body).toHaveProperty('data')
       expect(body.data[0]).not.toHaveProperty('password')
     })
+
+    it('should not return user emailHash', async () => {
+      const response = await request(app)
+        .get('/users')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(response.status).toBe(200)
+
+      const body: GetAllUsersResponse = response.body
+      expect(body).toHaveProperty('data')
+      expect(body.data[0]).not.toHaveProperty('emailHash')
+    })
   })
 
   describe('GET /users/admin', () => {
@@ -112,6 +123,17 @@ describe('UsersController', () => {
       const body: GetAllUsersResponse = response.body
       expect(body).toHaveProperty('data')
       expect(body.data[0]).not.toHaveProperty('password')
+    })
+
+    it('should not return admin emailHash', async () => {
+      const response = await request(app)
+        .get('/users')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(response.status).toBe(200)
+
+      const body: GetAllUsersResponse = response.body
+      expect(body).toHaveProperty('data')
+      expect(body.data[0]).not.toHaveProperty('emailHash')
     })
   })
 
@@ -150,6 +172,17 @@ describe('UsersController', () => {
       const body: GetAllUsersResponse = response.body
       expect(body).toHaveProperty('data')
       expect(body.data[0]).not.toHaveProperty('password')
+    })
+
+    it('should not return user emailHash', async () => {
+      const response = await request(app)
+        .get('/users')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(response.status).toBe(200)
+
+      const body: GetAllUsersResponse = response.body
+      expect(body).toHaveProperty('data')
+      expect(body.data[0]).not.toHaveProperty('emailHash')
     })
   })
 
@@ -634,6 +667,25 @@ describe('UsersController', () => {
       expect(res2.ok).toBe(true)
       expect(res2.body.data).toHaveLength(1)
       expect(res2.body.data[0]).not.toHaveProperty('password')
+    })
+
+    it('should not return deleted admin emailHash', async () => {
+      const res1 = await request(app)
+        .get('/users/admin/deleted')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(res1.ok).toBe(true)
+      expect(res1.body.data).toHaveLength(0)
+      await prisma.user.delete({
+        where: {
+          id: OPERATOR_ADMIN_ID,
+        },
+      })
+      const res2 = await request(app)
+        .get('/users/admin/deleted')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(res2.ok).toBe(true)
+      expect(res2.body.data).toHaveLength(1)
+      expect(res2.body.data[0]).not.toHaveProperty('emailHash')
     })
   })
 
