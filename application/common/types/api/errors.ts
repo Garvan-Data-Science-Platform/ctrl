@@ -36,7 +36,6 @@ export interface UnauthorizedErrorResponse {
  *  "message": "Validation Failed",
  *  "bodyRequest.firstName": {
  *    "message": "minLength 1",
- *    "value": ""
  *   }
  * }
  */

@@ -110,9 +110,15 @@ export function ErrorHandler(
 
   // Validation Errors
   if (err instanceof ValidateError) {
+    const sanitisedDetails: Record<string, { message: string }> = {}
+    for (const [field] of Object.entries(err.fields)) {
+      sanitisedDetails[field] = {
+        message: 'Invalid value provided',
+      }
+    }
     const errorResponse: ValidateErrorResponse = {
       message: 'Validation Failed',
-      details: err?.fields,
+      details: sanitisedDetails,
     }
     logger.error({ ...errorResponse })
     return res.status(422).json(errorResponse)

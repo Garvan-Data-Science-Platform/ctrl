@@ -92,14 +92,7 @@
           "details"
         ],
         "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "message": "Validation Failed",
-          "bodyRequest.firstName": {
-            "message": "minLength 1",
-            "value": ""
-          }
-        }
+        "additionalProperties": false
       },
       "UnprocessableError": {
         "properties": {
