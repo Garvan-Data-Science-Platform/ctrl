@@ -1,5 +1,5 @@
-import { User } from '@prisma/client'
+import { UserResponse } from './getAllUsers'
 
 export interface GetUserByIdResponse {
-  data: User
+  data: UserResponse
 }
