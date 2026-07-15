@@ -178,8 +178,7 @@ describe('AuthController', () => {
       expect(body.message).toBe('Validation Failed')
       expect(body.details).toEqual({
         'bodyRequest.email': {
-          message: 'Please provide valid email',
-          value: registerRequest.email,
+          message: 'Invalid value provided',
         },
       })
     })
@@ -203,8 +202,7 @@ describe('AuthController', () => {
       expect(body.message).toBe('Validation Failed')
       expect(body.details).toEqual({
         'bodyRequest.password': {
-          message: 'Password must be at least 8 characters',
-          value: 'pass',
+          message: 'Invalid value provided',
         },
       })
     })
@@ -227,10 +225,10 @@ describe('AuthController', () => {
       const body = response.body
       expect(body.message).toBe('Validation Failed')
       expect(body.details).toEqual({
-        'bodyRequest.firstName': { message: 'minLength 1', value: '' },
-        'bodyRequest.lastName': { message: 'minLength 1', value: '' },
-        'bodyRequest.email': { message: 'Please provide valid email', value: '' },
-        'bodyRequest.password': { message: 'Password must be at least 8 characters', value: '' },
+        'bodyRequest.firstName': { message: 'Invalid value provided' },
+        'bodyRequest.lastName': { message: 'Invalid value provided' },
+        'bodyRequest.email': { message: 'Invalid value provided' },
+        'bodyRequest.password': { message: 'Invalid value provided' },
       })
     })
 
@@ -252,8 +250,8 @@ describe('AuthController', () => {
       const body = response.body
       expect(body.message).toBe('Validation Failed')
       expect(body.details).toEqual({
-        Uppercase: { message: 'Password must contain at least one uppercase letter' },
-        Number: { message: 'Password must contain at least one number' },
+        Uppercase: { message: 'Invalid value provided' },
+        Number: { message: 'Invalid value provided' },
       })
     })
   })
@@ -334,8 +332,8 @@ describe('AuthController', () => {
       expect(registerParticipantBody.message).toEqual('Validation Failed')
       expect(registerParticipantBody.token).toBe(undefined)
       expect(registerParticipantBody.details).toEqual({
-        Uppercase: { message: 'Password must contain at least one uppercase letter' },
-        Number: { message: 'Password must contain at least one number' },
+        Uppercase: { message: 'Invalid value provided' },
+        Number: { message: 'Invalid value provided' },
       })
     })
 
@@ -363,12 +361,10 @@ describe('AuthController', () => {
       expect(registerParticipantBody.token).toBe(undefined)
       expect(registerParticipantBody.details).toEqual({
         'bodyRequest.lastName': {
-          message: 'minLength 1',
-          value: '',
+          message: 'Invalid value provided',
         },
         'bodyRequest.mobile': {
-          message: 'please provide valid phone number',
-          value: '12341234',
+          message: 'Invalid value provided',
         },
       })
     })
@@ -565,7 +561,7 @@ describe('AuthController', () => {
       const body = response.body
       expect(body.message).toBe('Validation Failed')
       expect(body.details).toEqual({
-        'bodyRequest.email': { message: 'Please provide valid email', value: '' },
+        'bodyRequest.email': { message: 'Invalid value provided' },
       })
     })
 
@@ -581,7 +577,7 @@ describe('AuthController', () => {
       const body = response.body
       expect(body.message).toBe('Validation Failed')
       expect(body.details).toEqual({
-        'bodyRequest.email': { message: 'Please provide valid email', value: loginRequest.email },
+        'bodyRequest.email': { message: 'Invalid value provided' },
       })
     })
     it('Should return an otp token if otp is enabled', async () => {
