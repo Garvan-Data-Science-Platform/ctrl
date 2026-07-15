@@ -29,7 +29,6 @@ import type {
   GeneratePasswordResetLinkRequest,
   ResetPasswordRequest,
 } from 'common/types/api/users'
-// import { User } from '@prisma/client'
 import prisma from '../PrismaClient'
 import {
   InternalErrorResponse,
