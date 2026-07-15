@@ -47,7 +47,6 @@ describe('Audit Logs', () => {
 
   it('should obscure password fields in JSON payload', () => {
     cy.login(TestUsers.STUDY_ADMIN.email)
-    TestUsers.TestUsers
     cy.visit('/audit-logs')
 
     // Toggle button to view payload
