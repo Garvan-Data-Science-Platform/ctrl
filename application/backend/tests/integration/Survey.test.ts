@@ -24,6 +24,8 @@ const app = api.app
 let participantToken: string, adminToken: string
 
 describe('Survey tests', () => {
+  // Note: this user is not one of the TestUsers
+  //   It is a new user registered as part of these integration tests
   const testingUserId: number = 1
 
   beforeAll(async () => {
