@@ -19,6 +19,7 @@ describe('User Password Reset', () => {
   const originalPassword = TestUsers.PASSWORD_RESET_USER.password
   // Note: using different test data pw to ensure consistency with pw requirements
   const newPassword = TestUsers.PARTICIPANT_COMPLETED.password
+  const invalidPassword = 'password'
 
   beforeAll(async () => {
     api.run()
@@ -78,6 +79,30 @@ describe('User Password Reset', () => {
     }
 
     resetToken = resetTokenMatch[1]
+  })
+
+  it('should not accept an invalid password', async () => {
+    const response = await request(app).post('/users/password/reset').send({
+      token: resetToken,
+      newPassword: invalidPassword,
+    })
+
+    // Check the response
+    expect(response.status).toBe(422)
+
+    const body = response.body
+    expect(body.message).toBe('Validation Failed')
+    expect(body.details).toEqual({
+      'bodyRequest.newPassword': {
+        message: 'Password must be at least 14 characters',
+        value: invalidPassword,
+      },
+    })
+
+    // Check the original password is still in the database
+    const updatedUser = await prisma.user.findUnique({ where: { id: userId } })
+    const isPasswordCorrect = await verifyPassword(updatedUser!.password, originalPassword)
+    expect(isPasswordCorrect).toBe(true)
   })
 
   it('should reset the password successfully', async () => {
