@@ -101,3 +101,5 @@ export const MIME_TYPES: Record<string, string> = {
   // pdf: 'application/pdf',
   // csv: 'text/csv'
 }
+
+export const commonPasswordBaseWords = ['Password', 'Changeme', 'Welcome']

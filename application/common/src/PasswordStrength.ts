@@ -1,3 +1,5 @@
+import { commonPasswordBaseWords } from '../testing/constants'
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface FieldErrors {
   [name: string]: {
@@ -13,14 +15,14 @@ interface PasswordStrengthResult {
 
 export function checkPasswordStrength(password: string): PasswordStrengthResult {
   const fields: FieldErrors = {}
+  const baseWordRegex = new RegExp(commonPasswordBaseWords.join('|'), 'i')
 
   if (password.length < 14) {
     fields.Length = { message: 'Password must be at least 14 characters' }
   }
-  if (/password|welcome|changeme/i.test(password)) {
+  if (baseWordRegex.test(password)) {
     fields.CommonBase = {
-      message:
-        'Password must not contain easily guessable words (i.e. Password, Changeme, Welcome)',
+      message: `Password must not contain easily guessable words (i.e. ${commonPasswordBaseWords.join(', ')})`,
     }
   }
   if (!/[A-Z]/.test(password)) {

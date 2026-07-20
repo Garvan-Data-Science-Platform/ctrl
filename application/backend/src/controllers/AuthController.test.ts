@@ -13,7 +13,12 @@ import type {
 import prisma from '../PrismaClient'
 import { Role } from '@prisma/client'
 import { resetDB, wipeDB } from 'common/testing/TestHelpers'
-import { TestUsers, TestStudies, TestInvites } from 'common/testing/constants'
+import {
+  TestUsers,
+  TestStudies,
+  TestInvites,
+  commonPasswordBaseWords,
+} from 'common/testing/constants'
 import {
   ContactMethod,
   ParticipantType,
@@ -336,8 +341,7 @@ describe('AuthController', () => {
         Uppercase: { message: 'Password must contain at least one uppercase letter' },
         Number: { message: 'Password must contain at least one number' },
         CommonBase: {
-          message:
-            'Password must not contain easily guessable words (i.e. Password, Changeme, Welcome)',
+          message: `Password must not contain easily guessable words (i.e. ${commonPasswordBaseWords.join(', ')})`,
         },
       })
     })
