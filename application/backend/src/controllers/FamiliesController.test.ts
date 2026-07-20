@@ -8,7 +8,7 @@ import { GetFamilyResponse } from 'common/types/api/families'
 
 const api = new Api()
 const app = api.app
-const studyId = 1
+const studyId = TestStudies.TEST_STUDY.id
 
 describe('FamiliesController', () => {
   let registeredUserToken: string
