@@ -18,7 +18,7 @@ const mockNodeMailer = nodemailer as unknown as NodemailerMock
 const api = new Api()
 const app = api.app
 
-const expectedNumberOfInvites = 4 // TODO: used to be 6 but I commented out two possibly redundant seed invites. Double check this
+const expectedNumberOfInvites = 4
 
 describe('ParticipantsController', () => {
   let organisationAdminToken: string
@@ -42,7 +42,7 @@ describe('ParticipantsController', () => {
   describe('GET /participants', () => {
     it('Returns participant list', async () => {
       const response = await request(app)
-        .get('/studies/1/participants')
+        .get(`/studies/${TestStudies.TEST_STUDY.id}/participants`)
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
       const body: GetParticipantsResponse = response.body
       expect(response.status).toBe(200)
@@ -56,7 +56,7 @@ describe('ParticipantsController', () => {
       expect(body.data[1].answers[0].status).toBe('complete')
 
       const res2 = await request(app)
-        .get('/studies/1/participants')
+        .get(`/studies/${TestStudies.TEST_STUDY.id}/participants`)
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
       expect(res2.body.data).toHaveLength(4)
 
@@ -90,13 +90,13 @@ describe('ParticipantsController', () => {
         },
       })
       const response = await request(app)
-        .post('/studies/1/participants/500')
+        .post(`/studies/${TestStudies.TEST_STUDY.id}/participants/500`)
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       expect(response.ok).toBeTruthy()
 
       const p = await prisma.studyParticipant.findFirst({
-        where: { participantProfileId: 500, studyId: 1 },
+        where: { participantProfileId: 500, studyId: TestStudies.TEST_STUDY.id },
       })
       expect(p).not.toBeNull()
     })
@@ -113,13 +113,13 @@ describe('ParticipantsController', () => {
         },
       })
       const response = await request(app)
-        .post('/studies/3/participants/500')
+        .post(`/studies/${TestStudies.FE_TEST_STUDY.id}/participants/500`)
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       expect(response.ok).toBeFalsy()
 
       const p = await prisma.studyParticipant.findFirst({
-        where: { participantProfileId: 500, studyId: 1 },
+        where: { participantProfileId: 500, studyId: TestStudies.TEST_STUDY.id },
       })
       expect(p).toBeNull()
     })
@@ -129,33 +129,46 @@ describe('ParticipantsController', () => {
         where: {
           participantProfileId_studyId: {
             participantProfileId: TestUsers.PARTICIPANT_UNANSWERED.id,
-            studyId: 1,
+            studyId: TestStudies.TEST_STUDY.id,
           },
         },
         data: { deleted: true },
       })
 
       const response = await request(app)
-        .post(`/studies/1/participants/${TestUsers.PARTICIPANT_UNANSWERED.id}`)
+        .post(
+          `/studies/${TestStudies.TEST_STUDY.id}/participants/${TestUsers.PARTICIPANT_UNANSWERED.id}`,
+        )
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       expect(response.ok).toBeTruthy()
 
       const p = await prisma.studyParticipant.findFirstOrThrow({
-        where: { participantProfileId: TestUsers.PARTICIPANT_UNANSWERED.id, studyId: 1 },
+        where: {
+          participantProfileId: TestUsers.PARTICIPANT_UNANSWERED.id,
+          studyId: TestStudies.TEST_STUDY.id,
+        },
       })
       expect(p.deleted).toBeFalsy()
     })
 
     it('Cannot add a participant who is part of another study (they must be invited)', async () => {
       const response = await request(app)
-        .post(`/studies/4/participants/${TestUsers.PARTICIPANT_UNANSWERED.id}`)
+        .post(
+          `/studies/${TestStudies.TEST_STUDY_2.id}/participants/${TestUsers.PARTICIPANT_UNANSWERED.id}`,
+        )
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       expect(response.ok).toBeFalsy()
+      expect(response.body.details).toEqual(
+        'The participant must be invited to join the study via email (via the Participants page)',
+      )
 
       const p = await prisma.studyParticipant.findFirst({
-        where: { participantProfileId: TestUsers.PARTICIPANT_UNANSWERED.id, studyId: 4 },
+        where: {
+          participantProfileId: TestUsers.PARTICIPANT_UNANSWERED.id,
+          studyId: TestStudies.TEST_STUDY_2.id,
+        },
       })
       expect(p).toBeNull()
     })
@@ -164,14 +177,16 @@ describe('ParticipantsController', () => {
   describe('DELETE /participants/{profileId}', () => {
     it('Can remove a participant from a study', async () => {
       const response = await request(app)
-        .delete(`/studies/1/participants/${TestUsers.PARTICIPANT_COMPLETED.id}`)
+        .delete(
+          `/studies/${TestStudies.TEST_STUDY.id}/participants/${TestUsers.PARTICIPANT_COMPLETED.id}`,
+        )
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       expect(response.ok).toBeTruthy()
       const p = await prisma.studyParticipant.findFirstOrThrow({
         where: {
           participantProfileId: TestUsers.PARTICIPANT_COMPLETED.id,
-          studyId: 1,
+          studyId: TestStudies.TEST_STUDY.id,
           deleted: true,
         },
       })
@@ -194,7 +209,7 @@ describe('ParticipantsController', () => {
         where: {
           participantProfileId_studyId: {
             participantProfileId: TestUsers.PARTICIPANT_UNANSWERED.id,
-            studyId: 1,
+            studyId: TestStudies.TEST_STUDY.id,
           },
         },
       })
@@ -210,7 +225,9 @@ describe('ParticipantsController', () => {
   describe('PATCH /participants/{profileId}/restore', () => {
     it('Fails if participant is not deleted', async () => {
       const res = await request(app)
-        .patch(`/studies/1/participants/${TestUsers.PARTICIPANT_UNANSWERED.id}/restore`)
+        .patch(
+          `/studies/${TestStudies.TEST_STUDY.id}/participants/${TestUsers.PARTICIPANT_UNANSWERED.id}/restore`,
+        )
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       expect(res.ok).toBe(false)
@@ -221,13 +238,15 @@ describe('ParticipantsController', () => {
         where: {
           participantProfileId_studyId: {
             participantProfileId: TestUsers.PARTICIPANT_UNANSWERED.id,
-            studyId: 1,
+            studyId: TestStudies.TEST_STUDY.id,
           },
         },
       })
 
       const res = await request(app)
-        .patch(`/studies/1/participants/${TestUsers.PARTICIPANT_UNANSWERED.id}/restore`)
+        .patch(
+          `/studies/${TestStudies.TEST_STUDY.id}/participants/${TestUsers.PARTICIPANT_UNANSWERED.id}/restore`,
+        )
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       expect(res.ok).toBe(true)
@@ -235,7 +254,7 @@ describe('ParticipantsController', () => {
       const participant = await prisma.studyParticipant.findFirst({
         where: {
           participantProfileId: TestUsers.PARTICIPANT_UNANSWERED.id,
-          studyId: 1,
+          studyId: TestStudies.TEST_STUDY.id,
         },
       })
       expect(participant).not.toBeNull()
@@ -269,7 +288,7 @@ describe('InvitesController', () => {
   describe('GET /studies/{studyId}/invites', () => {
     it('should return a list of all existing invites for a study', async () => {
       const response = await request(app)
-        .get('/studies/1/invites')
+        .get(`/studies/${TestStudies.TEST_STUDY.id}/invites`)
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
       expect(response.status).toBe(200)
 
@@ -279,8 +298,6 @@ describe('InvitesController', () => {
       expect(body.data[1].inviteStatus).toBe(InviteStatus.REVOKED)
       expect(body.data[2].inviteStatus).toBe(InviteStatus.EXPIRED)
       expect(body.data[3].inviteStatus).toBe(InviteStatus.PENDING)
-      // expect(body.data[4].inviteStatus).toBe(InviteStatus.PENDING) // TODO: add these extra invites?
-      // expect(body.data[5].inviteStatus).toBe(InviteStatus.PENDING)
     })
   })
 
@@ -290,7 +307,7 @@ describe('InvitesController', () => {
         { email: 'invite5@new.com', prefill: {} },
         { email: 'invite6@new.com', prefill: {} },
       ]
-      const studyId = 2
+      const studyId = TestStudies.TEST_STUDY_2.id
 
       await prisma.surveyVersion.update({
         where: {
@@ -323,7 +340,7 @@ describe('InvitesController', () => {
       ]
 
       const response = await request(app)
-        .post('/studies/1/invites')
+        .post(`/studies/${TestStudies.TEST_STUDY.id}/invites`)
         .send({ recipients, subjectText: 'Subject Text', explanatoryText: 'Explanatory Text' })
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
@@ -343,7 +360,7 @@ describe('InvitesController', () => {
       })
 
       const study = await prisma.study.findFirstOrThrow({
-        where: { id: 1 },
+        where: { id: TestStudies.TEST_STUDY.id },
       })
       expect(study.inviteEmailSubject).toBe('Subject Text')
       expect(study.inviteEmailText).toBe('Explanatory Text')
@@ -355,7 +372,7 @@ describe('InvitesController', () => {
             studyId_emailHash: {
               //@ts-ignore
               email: r.email,
-              studyId: 1,
+              studyId: TestStudies.TEST_STUDY.id,
             },
           },
         })
@@ -377,7 +394,7 @@ describe('InvitesController', () => {
           studyId_emailHash: {
             //@ts-ignore
             email: TestInvites.INVITE_REVOKED.email,
-            studyId: 1,
+            studyId: TestStudies.TEST_STUDY.id,
           },
         },
       })
@@ -389,7 +406,7 @@ describe('InvitesController', () => {
 
       // Create invite for revoked
       const response = await request(app)
-        .post('/studies/1/invites')
+        .post(`/studies/${TestStudies.TEST_STUDY.id}/invites`)
         .send({
           recipients: [{ email: TestInvites.INVITE_REVOKED.email, prefill: {} }],
           subjectText: 'ABC',
@@ -417,7 +434,7 @@ describe('InvitesController', () => {
           studyId_emailHash: {
             //@ts-ignore
             email: TestInvites.INVITE_REVOKED.email,
-            studyId: 1,
+            studyId: TestStudies.TEST_STUDY.id,
           },
         },
       })
@@ -438,7 +455,7 @@ describe('InvitesController', () => {
           studyId_emailHash: {
             //@ts-ignore
             email: emailPendingInvite,
-            studyId: 1,
+            studyId: TestStudies.TEST_STUDY.id,
           },
         },
       })
@@ -449,7 +466,7 @@ describe('InvitesController', () => {
       const oldExpiresAt = invite!.expiresAt
 
       const response = await request(app)
-        .post('/studies/1/invites')
+        .post(`/studies/${TestStudies.TEST_STUDY.id}/invites`)
         .send({
           recipients: [{ email: emailPendingInvite, prefill: {} }],
           subjectText: 'ABC',
@@ -476,7 +493,7 @@ describe('InvitesController', () => {
           studyId_emailHash: {
             //@ts-ignore
             email: emailPendingInvite,
-            studyId: 1,
+            studyId: TestStudies.TEST_STUDY.id,
           },
         },
       })
@@ -497,7 +514,7 @@ describe('InvitesController', () => {
       const emailAcceptedInvite = TestInvites.INVITE_ACCEPTED.email
 
       const response = await request(app)
-        .post('/studies/1/invites')
+        .post(`/studies/${TestStudies.TEST_STUDY.id}/invites`)
         .send({
           recipients: [{ email: emailAcceptedInvite, prefill: {} }],
           subjectText: 'ABC',
@@ -519,7 +536,7 @@ describe('InvitesController', () => {
           studyId_emailHash: {
             //@ts-ignore
             email: emailAcceptedInvite,
-            studyId: 1,
+            studyId: TestStudies.TEST_STUDY.id,
           },
         },
       })
@@ -541,7 +558,7 @@ describe('InvitesController', () => {
       ]
 
       const response = await request(app)
-        .post('/studies/1/invites')
+        .post(`/studies/${TestStudies.TEST_STUDY.id}/invites`)
         .send({
           recipients: emails.map((e) => ({ email: e.email, prefill: {} })),
           subjectText: 'Subject Text',
@@ -570,7 +587,7 @@ describe('InvitesController', () => {
             studyId_emailHash: {
               //@ts-ignore
               email: e.email,
-              studyId: 1,
+              studyId: TestStudies.TEST_STUDY.id,
             },
           },
         })
@@ -588,12 +605,12 @@ describe('InvitesController', () => {
       const emailPendingInvite = TestInvites.INVITE_PENDING.email
 
       await prisma.study.update({
-        where: { id: 1 },
+        where: { id: TestStudies.TEST_STUDY.id },
         data: { inviteEmailSubject: 'New Subject', inviteEmailText: 'New Text' },
       })
 
       const response = await request(app)
-        .post('/studies/1/invites/resend')
+        .post(`/studies/${TestStudies.TEST_STUDY.id}/invites/resend`)
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       expect(response.status).toBe(204)
@@ -601,11 +618,6 @@ describe('InvitesController', () => {
       // Check email(s) were successfully sent
       const sentEmails = mockNodeMailer.mock.getSentMail()
       expect(sentEmails.length).toBe(2)
-      /*
-        TODO: above number used to be 4 (removed to pending invites as part of test data refactor).
-        Come back and remove this note at teh end of the refactor if those two pending
-        invites were not needed.
-        */
       const targetEmail = sentEmails.find((email) => email.to === emailPendingInvite)
       expect(targetEmail).toBeDefined()
       expect(targetEmail).toHaveProperty('from', `CTRL <noreply@${process.env.HOSTNAME}>`)
@@ -624,7 +636,7 @@ describe('InvitesController', () => {
           studyId_emailHash: {
             //@ts-ignore
             email: emailPendingInvite,
-            studyId: 1,
+            studyId: TestStudies.TEST_STUDY.id,
           },
         },
       })
@@ -633,7 +645,7 @@ describe('InvitesController', () => {
       expect(invite!.status).toBe('PENDING')
 
       const response = await request(app)
-        .post(`/studies/1/invites/${invite!.id}/revoke`)
+        .post(`/studies/${TestStudies.TEST_STUDY.id}/invites/${invite!.id}/revoke`)
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       expect(response.status).toBe(204)
@@ -644,7 +656,7 @@ describe('InvitesController', () => {
           studyId_emailHash: {
             //@ts-ignore
             email: emailPendingInvite,
-            studyId: 1,
+            studyId: TestStudies.TEST_STUDY.id,
           },
         },
       })
@@ -655,7 +667,7 @@ describe('InvitesController', () => {
     it('should return error if revoking an invite that does not exist', async () => {
       const fakeInviteId = 'notValidUuid'
       const response = await request(app)
-        .post(`/studies/1/invites/${fakeInviteId}/revoke`)
+        .post(`/studies/${TestStudies.TEST_STUDY.id}/invites/${fakeInviteId}/revoke`)
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       expect(response.status).toBe(404)
@@ -665,12 +677,12 @@ describe('InvitesController', () => {
   describe('GET /studies/{studyId}/invites/text', () => {
     it('should return current invites text', async () => {
       await prisma.study.update({
-        where: { id: 1 },
+        where: { id: TestStudies.TEST_STUDY.id },
         data: { inviteEmailSubject: 'Subject', inviteEmailText: 'Text' },
       })
 
       const response = await request(app)
-        .get('/studies/1/invites/text')
+        .get(`/studies/${TestStudies.TEST_STUDY.id}/invites/text`)
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       expect(response.body).toStrictEqual({
@@ -682,8 +694,8 @@ describe('InvitesController', () => {
 
   describe('POST /invites/{inviteId}/accept', () => {
     beforeEach(async () => {
-      await inviteUser(TestUsers.PARTICIPANT_UNANSWERED.email, 2, {})
-      await inviteUser(TestUsers.PARTICIPANT_COMPLETED.email, 2, {
+      await inviteUser(TestUsers.PARTICIPANT_UNANSWERED.email, TestStudies.TEST_STUDY_2.id, {})
+      await inviteUser(TestUsers.PARTICIPANT_COMPLETED.email, TestStudies.TEST_STUDY_2.id, {
         studyParticipant: { externalId: 'external' },
       })
     })
@@ -808,7 +820,7 @@ describe('InvitesController', () => {
 
       const p = await prisma.studyParticipant.findFirstOrThrow({
         where: {
-          studyId: 2,
+          studyId: TestStudies.TEST_STUDY_2.id,
           participantProfile: { user: { email: TestUsers.PARTICIPANT_UNANSWERED.email } },
         },
       })
@@ -819,7 +831,7 @@ describe('InvitesController', () => {
       const invite = await prisma.invite.findFirstOrThrow({
         where: {
           email: TestUsers.PARTICIPANT_COMPLETED.email,
-          studyId: 2,
+          studyId: TestStudies.TEST_STUDY_2.id,
         },
       })
 
@@ -835,7 +847,7 @@ describe('InvitesController', () => {
 
       const p = await prisma.studyParticipant.findFirstOrThrow({
         where: {
-          studyId: 2,
+          studyId: TestStudies.TEST_STUDY_2.id,
           participantProfile: { user: { email: TestUsers.PARTICIPANT_COMPLETED.email } },
         },
       })
@@ -844,7 +856,7 @@ describe('InvitesController', () => {
   })
   describe('GET /invites/pending', () => {
     beforeEach(async () => {
-      await inviteUser(TestUsers.PARTICIPANT_UNANSWERED.email, 2, {})
+      await inviteUser(TestUsers.PARTICIPANT_UNANSWERED.email, TestStudies.TEST_STUDY_2.id, {})
     })
     it('should return correct number of invites', async () => {
       // One initial invite
@@ -867,7 +879,7 @@ describe('InvitesController', () => {
           studyId_emailHash: {
             //@ts-ignore
             email: TestUsers.PARTICIPANT_UNANSWERED.email,
-            studyId: 2,
+            studyId: TestStudies.TEST_STUDY_2.id,
           },
         },
         data: { status: 'ACCEPTED' },
@@ -932,7 +944,7 @@ describe('InvitesController', () => {
         data: {
           email: 'prefilltest@example.com',
           status: InviteStatus.PENDING,
-          studyId: 1,
+          studyId: TestStudies.TEST_STUDY.id,
           prefill: JSON.stringify({
             profile: { firstName: 'Jane', lastName: 'Doe' },
             studyParticipant: {
@@ -967,7 +979,7 @@ describe('InvitesController', () => {
         data: {
           email: 'noprefill@example.com',
           status: InviteStatus.PENDING,
-          studyId: 1,
+          studyId: TestStudies.TEST_STUDY.id,
           prefill: JSON.stringify({}),
           expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         },
