@@ -409,14 +409,14 @@ describe('UsersController', () => {
 
       expect(sentEmails).toHaveLength(1)
       expect(sentEmails[0]).toMatchObject({
-        from: 'CTRL <noreply@ctrl.garvan.org.au>',
+        from: `CTRL <noreply@${process.env.HOSTNAME}>`,
         subject: 'CTRL - Password Reset Link',
         to: userEmail,
       })
 
       // Validate the URL structure
       const emailText = sentEmails[0].text
-      const hostname = process.env.HOSTNAME || 'ctrl.garvan.org.au' // TODO: when will the alternate condition be used (or correct?)? Is it a default var? if so should be changed
+      const hostname = process.env.HOSTNAME || 'test.hostname.org'
       const urlRegex = new RegExp(
         `${hostname.replace(/\./g, '\\.')}/reset-password\\?token=[a-f0-9]{64}`,
       )
@@ -434,14 +434,14 @@ describe('UsersController', () => {
 
       expect(sentEmails).toHaveLength(1)
       expect(sentEmails[0]).toMatchObject({
-        from: 'CTRL <noreply@ctrl.garvan.org.au>', //TODO: check if Garvan is hardcoded here
+        from: `CTRL <noreply@${process.env.HOSTNAME}>`,
         subject: 'CTRL - Password Reset Link',
         to: TestUsers.ORG_ADMIN.email,
       })
 
       // Validate the URL structure
       const emailText = sentEmails[0].text
-      const hostname = process.env.ADMIN_HOSTNAME || 'admin.ctrl.garvan.org.au' // TODO: Ditto to above ln 410
+      const hostname = process.env.ADMIN_HOSTNAME || 'admin.test.hostname.org'
       const urlRegex = new RegExp(
         `${hostname.replace(/\./g, '\\.')}/update-password\\?token=[a-f0-9]{64}`,
       )

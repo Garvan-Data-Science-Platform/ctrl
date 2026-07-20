@@ -57,14 +57,14 @@ describe('User Password Reset', () => {
     const sentMail = mockNodeMailer.mock.getSentMail()
     expect(sentMail).toHaveLength(1)
     expect(sentMail[0]).toMatchObject({
-      from: 'CTRL <noreply@ctrl.garvan.org.au>',
+      from: `CTRL <noreply@${process.env.HOSTNAME}>`,
       subject: 'CTRL - Password Reset Link',
       to: userEmail,
     })
 
     // Validate the URL structure
     const emailText = sentMail[0].text as string
-    const hostname = process.env.HOSTNAME || 'ctrl.garvan.org.au'
+    const hostname = process.env.HOSTNAME || 'test.hostname.org'
     const urlRegex = new RegExp(
       `${hostname.replace(/\./g, '\\.')}/reset-password\\?token=[a-f0-9]{64}`,
     )
