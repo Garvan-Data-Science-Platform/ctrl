@@ -256,6 +256,36 @@ describe('AuthController', () => {
         Number: { message: 'Password must contain at least one number' },
       })
     })
+
+    it('should save emails as lowercase in DB', async () => {
+      const upperCaseEmail = 'NewUser@Example.Com'
+      const lowerCaseEmail = 'newuser@example.com'
+
+      const registerRequest: RegisterRequest = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: upperCaseEmail,
+        password: 'Password123',
+        role: Role.Participant,
+      }
+
+      // Register user
+      const response = await request(app)
+        .post('/auth/register')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .send(registerRequest)
+      expect(response.status).toEqual(201)
+      const body: RegisterResponse = response.body
+      expect(body.token).not.toBeNull()
+
+      // Attempt to register someone with uppercase version of same email
+      const lowerResponse = await request(app)
+        .post('/auth/register')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .send({ ...registerRequest, email: lowerCaseEmail })
+      expect(lowerResponse.status).toEqual(500) // Not expected to work due to being a duplicate
+      expect(lowerResponse.body.message).toEqual('emailHash already in use')
+    })
   })
 
   describe('POST /auth/register/setup', () => {
@@ -274,6 +304,7 @@ describe('AuthController', () => {
         .post('/auth/register/setup')
         .send({ email: 'testadmin@test.com', password: 'abDFS141@!' })
       expect(res.ok).toBe(false)
+      expect(res.body.details).toEqual('CTRL is already set up')
     })
   })
 
