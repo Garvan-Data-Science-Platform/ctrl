@@ -59,6 +59,34 @@ describe('', () => {
       .should('contain.text', 'email2@g.co')
   })
 
+  it('Uppercase emails are not added when typing', () => {
+    cy.visit('/participants')
+    cy.get('[data-cy="invite-button"]').click()
+    cy.get('[data-cy="send-button"]').should('be.disabled')
+    cy.get('[data-cy="email-field"]').type('tom@example.com').type('{enter}')
+    cy.get('[data-cy="recipients-list"]').should('contain.text', 'tom@example.com')
+    cy.get('[data-cy="email-field"]').clear().type('ToM@ExAmPlE.cOm').type('{enter}')
+    cy.get('[data-cy="recipients-list"]').should('not.contain.text', 'ToM@ExAmPlE.cOm')
+    // try inverse
+    cy.get('[data-cy="remove-button"]').first().click()
+    cy.get('[data-cy="email-field"]').clear().type('ToM@ExAmPlE.cOm').type('{enter}')
+    cy.get('[data-cy="recipients-list"]').should('contain.text', 'tom@example.com')
+    cy.get('[data-cy="recipients-list"]').should('not.contain.text', 'ToM@ExAmPlE.cOm')
+  })
+
+  it('Uppercase emails are not pasted', () => {
+    cy.visit('/participants')
+    cy.get('[data-cy="invite-button"]').click()
+    cy.get('[data-cy="email-field"]').trigger('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: { getData: (type) => 'email1@g.co\nEmAiL1@G.cO' },
+    })
+    cy.get('[data-cy="recipients-list"]')
+      .should('contain.text', 'email1@g.co')
+      .should('not.contain.text', 'EmAiL1@G.cO')
+  })
+
   it('Can paste invites with external ID', () => {
     cy.visit('/participants')
     cy.get('[data-cy="invite-button"]').click()
