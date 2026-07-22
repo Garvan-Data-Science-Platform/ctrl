@@ -188,7 +188,7 @@ const models: TsoaRoute.Models = {
     "ResetPasswordRequest": {
         "dataType": "refObject",
         "properties": {
-            "newPassword": {"dataType":"string","required":true,"validators":{"minLength":{"errorMsg":"Password must be at least 8 characters","value":8}}},
+            "newPassword": {"dataType":"string","required":true,"validators":{"minLength":{"errorMsg":"Password must be at least 14 characters","value":14}}},
             "token": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
@@ -567,7 +567,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Partial_RegisterParticipantRequest_": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"firstName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"middleName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"lastName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"email":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"pattern":{"errorMsg":"please provide valid email","value":"^(.+)@(.+)$"}}},"mobile":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"pattern":{"errorMsg":"please provide valid phone number","value":"^(\\+\\d{1,2}\\s?)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$"}}},"preferredContact":{"dataType":"union","subSchemas":[{"ref":"ContactMethod"},{"dataType":"undefined"}]},"addressLine":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"suburb":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"postcode":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"state":{"dataType":"union","subSchemas":[{"ref":"StateTerritory"},{"dataType":"undefined"}]},"password":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"errorMsg":"Password must be at least 8 characters","value":8}}},"dob":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"isDate":{"errorMsg":"Date of birth must be of date format"}}},"participantType":{"dataType":"union","subSchemas":[{"ref":"ParticipantType"},{"dataType":"undefined"}]},"nextOfKin":{"dataType":"union","subSchemas":[{"ref":"AlternativeContact"},{"dataType":"undefined"}]},"dependents":{"dataType":"union","subSchemas":[{"dataType":"array","array":{"dataType":"refObject","ref":"OnBehalf"}},{"dataType":"undefined"}]},"externalId":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"firstName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"middleName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"lastName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"email":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"pattern":{"errorMsg":"please provide valid email","value":"^(.+)@(.+)$"}}},"mobile":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"pattern":{"errorMsg":"please provide valid phone number","value":"^(\\+\\d{1,2}\\s?)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$"}}},"preferredContact":{"dataType":"union","subSchemas":[{"ref":"ContactMethod"},{"dataType":"undefined"}]},"addressLine":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"suburb":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"postcode":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"state":{"dataType":"union","subSchemas":[{"ref":"StateTerritory"},{"dataType":"undefined"}]},"password":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"errorMsg":"Password must be at least 14 characters","value":14}}},"dob":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"isDate":{"errorMsg":"Date of birth must be of date format"}}},"participantType":{"dataType":"union","subSchemas":[{"ref":"ParticipantType"},{"dataType":"undefined"}]},"nextOfKin":{"dataType":"union","subSchemas":[{"ref":"AlternativeContact"},{"dataType":"undefined"}]},"dependents":{"dataType":"union","subSchemas":[{"dataType":"array","array":{"dataType":"refObject","ref":"OnBehalf"}},{"dataType":"undefined"}]},"externalId":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "UpdateProfileRequest": {
@@ -865,7 +865,7 @@ const models: TsoaRoute.Models = {
             "middleName": {"dataType":"string","validators":{"minLength":{"value":1}}},
             "lastName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
             "email": {"dataType":"string","required":true,"validators":{"pattern":{"errorMsg":"Please provide valid email","value":"^(.+)@(.+)$"}}},
-            "password": {"dataType":"string","required":true,"validators":{"minLength":{"errorMsg":"Password must be at least 8 characters","value":8}}},
+            "password": {"dataType":"string","required":true,"validators":{"minLength":{"errorMsg":"Password must be at least 14 characters","value":14}}},
             "role": {"ref":"Role","required":true},
         },
         "additionalProperties": false,
@@ -885,7 +885,7 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "email": {"dataType":"string","required":true,"validators":{"pattern":{"errorMsg":"Please provide valid email","value":"^(.+)@(.+)$"}}},
-            "password": {"dataType":"string","required":true,"validators":{"minLength":{"errorMsg":"Password must be at least 8 characters","value":8}}},
+            "password": {"dataType":"string","required":true,"validators":{"minLength":{"errorMsg":"Password must be at least 14 characters","value":14}}},
         },
         "additionalProperties": false,
     },
@@ -913,7 +913,7 @@ const models: TsoaRoute.Models = {
             "suburb": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
             "postcode": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
             "state": {"ref":"StateTerritory","required":true},
-            "password": {"dataType":"string","required":true,"validators":{"minLength":{"errorMsg":"Password must be at least 8 characters","value":8}}},
+            "password": {"dataType":"string","required":true,"validators":{"minLength":{"errorMsg":"Password must be at least 14 characters","value":14}}},
             "dob": {"dataType":"string","required":true,"validators":{"isDate":{"errorMsg":"Date of birth must be of date format"}}},
             "participantType": {"ref":"ParticipantType","required":true},
             "nextOfKin": {"ref":"AlternativeContact","required":true},

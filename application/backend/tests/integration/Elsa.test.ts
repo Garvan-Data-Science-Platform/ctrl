@@ -4,7 +4,7 @@ import { resetDB } from 'common/testing/TestHelpers'
 
 import { generateToken } from '../../src/authentication'
 import prisma from '../../src/PrismaClient'
-import { ORG_ADMIN_ID, PARTICIPANT_COMPLETED_ID } from 'common/testing/seed'
+import { TestUsers } from 'common/testing/constants'
 
 const api = new Api()
 const app = api.app
@@ -14,7 +14,7 @@ describe('Elsa Integration', () => {
 
   beforeAll(async () => {
     api.run()
-    orgAdminToken = await generateToken({ userId: ORG_ADMIN_ID })
+    orgAdminToken = await generateToken({ userId: TestUsers.ORG_ADMIN.id })
     await resetDB()
   })
 
@@ -36,7 +36,7 @@ describe('Elsa Integration', () => {
     response = await request(app)
       .post('/elsa/duos')
       .set({ Authorization: `Apikey ${token}` })
-      .send({ participantIds: [`PID-TEST1-${PARTICIPANT_COMPLETED_ID}`] })
+      .send({ participantIds: [`PID-TEST1-${TestUsers.PARTICIPANT_COMPLETED.id}`] })
     expect(response.body.data[0].duos).toEqual(['DUO:0000006'])
   })
   it('Can disable elsa integration', async () => {

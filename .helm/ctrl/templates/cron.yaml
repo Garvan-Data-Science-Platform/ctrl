@@ -25,11 +25,11 @@ spec:
               - name: EXAMPLE_ORG_ADMIN_EMAIL
                 value: admin@example.com
               - name: EXAMPLE_ORG_ADMIN_PASSWORD
-                value: Testpassword1
+                value: Supersecret123
               - name: EXAMPLE_PARTICIPANT_EMAIL
                 value: user@example.com
               - name: EXAMPLE_PARTICIPANT_PASSWORD
-                value: Testpassword2
+                value: Supersecret123
               - name: POSTGRES_PASSWORD
                 valueFrom:
                   secretKeyRef:

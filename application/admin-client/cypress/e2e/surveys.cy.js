@@ -1,14 +1,14 @@
 /// <reference types="cypress" />
 
-const { UserType } = require('../../../common/cypress/support/commands')
+const { TestUsers } = require('../../../common/testing/constants')
 
 beforeEach(() => {
   cy.task('reset')
+  cy.login(TestUsers.ORG_ADMIN.email)
 })
 
 describe('Surveys', () => {
   it('List surveys', () => {
-    cy.login(UserType.ORG_ADMIN)
     cy.visit('/surveys')
     cy.contains('Surveys').should('exist')
     cy.contains('Current Draft').should('exist')
@@ -17,7 +17,6 @@ describe('Surveys', () => {
   })
 
   it('View a survey', () => {
-    cy.login(UserType.ORG_ADMIN)
     cy.visit('/surveys')
     cy.get('[data-cy="view-button"]').click()
 

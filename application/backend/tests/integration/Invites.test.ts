@@ -13,7 +13,7 @@ import { generateToken } from '../../src/authentication'
 import { RegisterParticipantRequest } from 'common/types/api/auth'
 import { GetInvitesResponse, InviteParticipantsResponse } from 'common/types/api/participants'
 import prisma from '../../src/PrismaClient'
-import { ORG_ADMIN_ID } from 'common/testing/seed'
+import { TestUsers } from 'common/testing/constants'
 
 import config from '../../src/config'
 jest.mock('../../src/config')
@@ -31,7 +31,7 @@ describe('Participant Invites', () => {
     middleName: 'James',
     lastName: 'Doe',
     email: 'john.doe@email.com',
-    password: 'Password123',
+    password: TestUsers.PARTICIPANT_COMPLETED.password, // Note: using test users pw to match requirements
     dob: '2000-05-21',
     mobile: '0412341234',
     addressLine: '123 Sydney Street',
@@ -52,7 +52,7 @@ describe('Participant Invites', () => {
 
   beforeAll(async () => {
     api.run()
-    orgAdminToken = await generateToken({ userId: ORG_ADMIN_ID })
+    orgAdminToken = await generateToken({ userId: TestUsers.ORG_ADMIN.id })
     await resetDB()
   })
 

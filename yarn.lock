@@ -7289,6 +7289,7 @@ __metadata:
     json-schema-to-ts: "npm:^3.1.1"
     prettier: "npm:^3.2.4"
     start-server-and-test: "npm:^2.0.9"
+    tsx: "npm:^4.23.0"
     typescript: "npm:^5.8.3"
     vite-node: "npm:^3.2.4"
   languageName: unknown

@@ -355,7 +355,7 @@
         "properties": {
           "newPassword": {
             "type": "string",
-            "minLength": 8
+            "minLength": 14
           },
           "token": {
             "type": "string"
@@ -368,7 +368,7 @@
         "type": "object",
         "additionalProperties": false,
         "example": {
-          "newPassword": "newPassword123",
+          "newPassword": "Newsupersecret123",
           "token": "1063e00e4a273e698577"
         }
       },
@@ -1512,7 +1512,7 @@
           },
           "password": {
             "type": "string",
-            "minLength": 8
+            "minLength": 14
           },
           "dob": {
             "type": "string"
@@ -1543,7 +1543,7 @@
           "middleName": "James",
           "lastName": "Doe",
           "email": "john.doe@email.com",
-          "password": "Password123",
+          "password": "Supersecret123",
           "dob": "2000-05-21",
           "mobile": "0412341234",
           "addressLine": "123 Sydney Street",
@@ -2507,7 +2507,7 @@
           },
           "password": {
             "type": "string",
-            "minLength": 8
+            "minLength": 14
           },
           "role": {
             "$ref": "#/components/schemas/Role"
@@ -2526,7 +2526,7 @@
           "firstName": "John",
           "lastName": "Doe",
           "email": "john.doe@email.com",
-          "password": "Password123",
+          "password": "Supersecret123",
           "role": "OrganisationAdmin"
         }
       },
@@ -2593,7 +2593,7 @@
           },
           "password": {
             "type": "string",
-            "minLength": 8
+            "minLength": 14
           }
         },
         "required": [
@@ -2604,7 +2604,7 @@
         "additionalProperties": false,
         "example": {
           "email": "john.doe@email.com",
-          "password": "Password123"
+          "password": "Supersecret123"
         }
       },
       "RegisterParticipantResponse": {
@@ -2670,7 +2670,7 @@
           },
           "password": {
             "type": "string",
-            "minLength": 8
+            "minLength": 14
           },
           "dob": {
             "type": "string"
@@ -2714,7 +2714,7 @@
           "middleName": "James",
           "lastName": "Doe",
           "email": "john.doe@email.com",
-          "password": "Password123",
+          "password": "Supersecret123",
           "dob": "2000-05-21",
           "mobile": "0412341234",
           "addressLine": "123 Sydney Street",
@@ -2814,7 +2814,7 @@
         "additionalProperties": false,
         "example": {
           "email": "john.doe@email.com",
-          "password": "Password123"
+          "password": "Supersecret123"
         }
       },
       "OTPLoginRequest": {

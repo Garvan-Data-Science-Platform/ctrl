@@ -13,7 +13,7 @@ import { GetAllStudiesResponse } from 'common/types/api/studies'
 
 import prisma from '../../src/PrismaClient'
 
-import { TEST_STUDY, SECOND_TEST_STUDY } from 'common/testing/seed'
+import { TestUsers, TestStudies } from 'common/testing/constants'
 
 const api = new Api()
 const app = api.app
@@ -34,7 +34,7 @@ describe('Studies tests', () => {
   it('Two parents register for study 1, with two dependents. None of them appear in study 2', async () => {
     const testStudy = await prisma.study.findFirstOrThrow({
       where: {
-        name: TEST_STUDY,
+        name: TestStudies.TEST_STUDY.name,
       },
       select: {
         id: true,
@@ -66,7 +66,7 @@ describe('Studies tests', () => {
       mobile: '0412345678',
       nextOfKin: { email: 'nok@gmail.com', firstName: 'N', lastName: 'k' },
       participantType: ParticipantType.STANDARD,
-      password: 'PASS123of2389vNDFS!',
+      password: TestUsers.PARTICIPANT_COMPLETED.password, // Using test data pw to meet requirements
       postcode: '1234',
       preferredContact: ContactMethod.MOBILE,
       state: StateTerritory.ACT,
@@ -130,7 +130,7 @@ describe('Studies tests', () => {
         studies: {
           some: {
             study: {
-              name: TEST_STUDY,
+              name: TestStudies.TEST_STUDY.name,
             },
           },
         },
@@ -149,7 +149,7 @@ describe('Studies tests', () => {
         studies: {
           some: {
             study: {
-              name: SECOND_TEST_STUDY,
+              name: TestStudies.TEST_STUDY_2.name,
             },
           },
         },
@@ -161,7 +161,7 @@ describe('Studies tests', () => {
   it('One of the parents registers for study 2. Study 2 does not show info from the other parent or either dependent', async () => {
     const secondTestStudy = await prisma.study.findFirstOrThrow({
       where: {
-        name: SECOND_TEST_STUDY,
+        name: TestStudies.TEST_STUDY_2.name,
       },
       select: {
         id: true,
@@ -224,7 +224,7 @@ describe('Studies tests', () => {
         studies: {
           some: {
             study: {
-              name: SECOND_TEST_STUDY,
+              name: TestStudies.TEST_STUDY_2.name,
             },
           },
         },
@@ -265,7 +265,7 @@ describe('Studies tests', () => {
     // Answer study2 questions
     const secondTestStudy = await prisma.study.findFirstOrThrow({
       where: {
-        name: SECOND_TEST_STUDY,
+        name: TestStudies.TEST_STUDY_2.name,
       },
       select: {
         id: true,
@@ -301,7 +301,7 @@ describe('Studies tests', () => {
 
     const secondTestStudy = await prisma.study.findFirstOrThrow({
       where: {
-        name: SECOND_TEST_STUDY,
+        name: TestStudies.TEST_STUDY_2.name,
       },
       select: {
         id: true,

@@ -11,7 +11,7 @@ import {
 } from 'common/types/api/organisations'
 import { resetDB } from 'common/testing/TestHelpers'
 import { generateToken } from '../authentication'
-import { ORG_ADMIN_ID, PARTICIPANT_COMPLETED_ID } from 'common/testing/seed'
+import { TestUsers } from 'common/testing/constants'
 
 const api = new Api()
 const app = api.app
@@ -28,7 +28,7 @@ describe('OrganisationsController', () => {
   beforeEach(async () => {
     await resetDB()
 
-    orgAdmintoken = await generateToken({ userId: ORG_ADMIN_ID })
+    orgAdmintoken = await generateToken({ userId: TestUsers.ORG_ADMIN.id })
   })
 
   afterAll(async () => {
@@ -215,7 +215,7 @@ describe('OrganisationsController', () => {
       const body: GetOrganisationUsersResponse = response.body
 
       expect(body.data.length).toBe(4)
-      expect(body.data[0].id).toBe(ORG_ADMIN_ID)
+      expect(body.data[0].id).toBe(TestUsers.ORG_ADMIN.id)
     })
 
     it('should return a 404 error if the organisation is not found', async () => {
@@ -234,7 +234,7 @@ describe('OrganisationsController', () => {
   describe('POST /organisations/:OrgID/users/:UserID', () => {
     it('should add a user to an organisation', async () => {
       const response = await request(app)
-        .post(`/organisations/${testOrganisationId}/users/${PARTICIPANT_COMPLETED_ID}`)
+        .post(`/organisations/${testOrganisationId}/users/${TestUsers.PARTICIPANT_COMPLETED.id}`)
         .set({ Authorization: `Bearer ${orgAdmintoken}` })
       expect(response.status).toBe(204)
     })
@@ -254,7 +254,7 @@ describe('OrganisationsController', () => {
     it('should return a 404 error if the organisation is not found', async () => {
       const notExistingOrganisationId: number = 1234567890
       const response = await request(app)
-        .post(`/organisations/${notExistingOrganisationId}/users/${ORG_ADMIN_ID}`)
+        .post(`/organisations/${notExistingOrganisationId}/users/${TestUsers.ORG_ADMIN.id}`)
         .set({ Authorization: `Bearer ${orgAdmintoken}` })
 
       expect(response.status).toBe(404)
@@ -268,7 +268,7 @@ describe('OrganisationsController', () => {
   describe('DELETE /organisations/:OrgID/users/:UserID', () => {
     it('should remove a user from an organisation', async () => {
       const response = await request(app)
-        .delete(`/organisations/${testOrganisationId}/users/${ORG_ADMIN_ID}`)
+        .delete(`/organisations/${testOrganisationId}/users/${TestUsers.ORG_ADMIN.id}`)
         .set({ Authorization: `Bearer ${orgAdmintoken}` })
 
       expect(response.status).toBe(204)
@@ -288,7 +288,7 @@ describe('OrganisationsController', () => {
     it('should return a 404 error if the organisation is not found', async () => {
       const notExistingOrganisationId: number = 1234567890
       const response = await request(app)
-        .delete(`/organisations/${notExistingOrganisationId}/users/${ORG_ADMIN_ID}`)
+        .delete(`/organisations/${notExistingOrganisationId}/users/${TestUsers.ORG_ADMIN.id}`)
         .set({ Authorization: `Bearer ${orgAdmintoken}` })
 
       expect(response.status).toBe(404)

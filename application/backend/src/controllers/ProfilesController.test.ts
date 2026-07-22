@@ -3,7 +3,7 @@ import { GetParticipantProfileResponse, UpdateProfileRequest } from 'common/type
 import { generateToken } from '../authentication'
 import { Api } from '../Api'
 import { resetDB } from 'common/testing/TestHelpers'
-import { ORG_ADMIN_ID, PARTICIPANT_COMPLETED_ID } from 'common/testing/seed'
+import { TestUsers } from 'common/testing/constants'
 import { StateTerritory } from 'common/types/api/users/ParticipantProfile'
 import prisma from '../PrismaClient'
 
@@ -15,10 +15,10 @@ describe('ProfilesController', () => {
 
   beforeAll(async () => {
     orgAdminToken = await generateToken({
-      userId: ORG_ADMIN_ID,
+      userId: TestUsers.ORG_ADMIN.id,
     })
     registeredParticipantToken = await generateToken({
-      userId: PARTICIPANT_COMPLETED_ID,
+      userId: TestUsers.PARTICIPANT_COMPLETED.id,
     })
     api.run()
   })
@@ -35,7 +35,7 @@ describe('ProfilesController', () => {
     it('should return the profile of a user if they exist', async () => {
       // Get user profile
       const response = await request(app)
-        .get(`/profiles/${PARTICIPANT_COMPLETED_ID}`)
+        .get(`/profiles/${TestUsers.PARTICIPANT_COMPLETED.id}`)
         .set({ Authorization: `Bearer ${orgAdminToken}` })
 
       expect(response.status).toBe(200)
@@ -50,7 +50,7 @@ describe('ProfilesController', () => {
         preferredContact: 'EMAIL',
         state: 'VIC',
         suburb: 'Melbourne',
-        email: 'test3@example.com',
+        email: TestUsers.PARTICIPANT_COMPLETED.email,
         firstName: 'Completed',
         lastName: 'User',
         familyMembers: [
@@ -92,7 +92,7 @@ describe('ProfilesController', () => {
         preferredContact: 'EMAIL',
         state: 'VIC',
         suburb: 'Melbourne',
-        email: 'test3@example.com',
+        email: TestUsers.PARTICIPANT_COMPLETED.email,
         firstName: 'Completed',
         lastName: 'User',
       })
@@ -109,7 +109,7 @@ describe('ProfilesController', () => {
         .set({ Authorization: `Bearer ${registeredParticipantToken}` })
 
       const participantProfileByIDResponse = await request(app)
-        .get(`/profiles/${PARTICIPANT_COMPLETED_ID}`)
+        .get(`/profiles/${TestUsers.PARTICIPANT_COMPLETED.id}`)
         .set({ Authorization: `Bearer ${orgAdminToken}` })
 
       expect(currentParticipantProfileResponse.status).toBe(200)
@@ -139,7 +139,9 @@ describe('ProfilesController', () => {
         .send(reqBody)
       expect(response.status).toBe(204)
 
-      const user = await prisma.user.findUniqueOrThrow({ where: { id: PARTICIPANT_COMPLETED_ID } })
+      const user = await prisma.user.findUniqueOrThrow({
+        where: { id: TestUsers.PARTICIPANT_COMPLETED.id },
+      })
       const profile = await prisma.participantProfile.findFirstOrThrow({
         where: { userId: user.id },
       })

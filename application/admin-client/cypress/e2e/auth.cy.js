@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-const { UserType } = require('../../../common/cypress/support/commands')
+const { TestUsers } = require('../../../common/testing/constants')
 
 beforeEach(() => {
   cy.task('reset')
@@ -15,16 +15,16 @@ describe('auth', () => {
 
   it('can login as admin to the admin portal', () => {
     cy.visit('/')
-    cy.get('input[name="email"]').type(UserType.ORG_ADMIN)
-    cy.get('input[name="password"]').type('Testpassword1')
+    cy.get('input[name="email"]').type(TestUsers.ORG_ADMIN.email)
+    cy.get('input[name="password"]').type(TestUsers.ORG_ADMIN.password)
     cy.get('button[type="submit"]').click()
     cy.url().should('include', '/surveys') // Redirects to /surveys after login
   })
 
   it('cannot login as a participant to the admin portal', () => {
     cy.visit('/')
-    cy.get('input[name="email"]').type(UserType.PARTICIPANT_COMPLETED)
-    cy.get('input[name="password"]').type('Testpassword1')
+    cy.get('input[name="email"]').type(TestUsers.PARTICIPANT_COMPLETED.email)
+    cy.get('input[name="password"]').type(TestUsers.PARTICIPANT_COMPLETED.password)
     cy.get('button[type="submit"]').click()
 
     // Expect to stay on the login page & error message popup

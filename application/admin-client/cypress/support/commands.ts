@@ -18,12 +18,13 @@ import 'cypress-file-upload'
 
 // import common cypress commands
 import '../../../common/cypress/support/commands'
+import { TestUsers } from '../../../common/testing/constants'
 
-Cypress.Commands.add('login', (type: UserType) => {
+Cypress.Commands.add('login', (email: string) => {
   cy.request({
     method: 'POST',
     url: `localhost:5001/auth/login`,
-    body: { email: type, password: 'Testpassword1' },
+    body: { email: email, password: TestUsers.ORG_ADMIN.password },
     headers: {
       'x-client-type': 'admin-client',
     },

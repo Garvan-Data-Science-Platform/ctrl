@@ -13,13 +13,7 @@ import {
   UpdateSurveyRequest,
   GetSurveyVersionByVersionNumberResponse,
 } from 'common/types/api/surveys'
-import {
-  DEPENDENT_ID,
-  ORG_ADMIN_ID,
-  PARTICIPANT_COMPLETED_ID,
-  PARTICIPANT_UNANSWERED_ID,
-  SECOND_GUARDIAN_ID,
-} from 'common/testing/seed'
+import { TestStudies, TestUsers } from 'common/testing/constants'
 
 const api = new Api()
 const app = api.app
@@ -27,11 +21,11 @@ let token: string, tokenNoAnswers: string, tokenAdmin: string
 
 describe('SurveysController', () => {
   beforeAll(async () => {
-    token = await generateToken({ userId: PARTICIPANT_COMPLETED_ID })
+    token = await generateToken({ userId: TestUsers.PARTICIPANT_COMPLETED.id })
     tokenNoAnswers = await generateToken({
-      userId: PARTICIPANT_UNANSWERED_ID,
+      userId: TestUsers.PARTICIPANT_UNANSWERED.id,
     })
-    tokenAdmin = await generateToken({ userId: ORG_ADMIN_ID })
+    tokenAdmin = await generateToken({ userId: TestUsers.ORG_ADMIN.id })
     api.run()
   })
 
@@ -89,7 +83,7 @@ describe('SurveysController', () => {
 
     it('should fail if step does not exist', async () => {
       const response = await request(app)
-        .get('/studies/1/survey-steps/3')
+        .get(`/studies/${TestStudies.TEST_STUDY.id}/survey-steps/3`)
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(422)
     })
@@ -98,7 +92,7 @@ describe('SurveysController', () => {
   describe('GET /studies/{studyId}/survey-steps', () => {
     it('should get a list of survey steps with state and last updated date for current user', async () => {
       const response = await request(app)
-        .get('/studies/1/survey-steps')
+        .get(`/studies/${TestStudies.TEST_STUDY.id}/survey-steps`)
         .set({ Authorization: `Bearer ${token}` })
       const body: GetUserSurveyStepsResponse = response.body
       expect(response.status).toBe(200)
@@ -116,21 +110,21 @@ describe('SurveysController', () => {
         data: [true, 'Choice 1'],
       }
       const response = await request(app)
-        .post('/studies/1/survey-answers')
+        .post(`/studies/${TestStudies.TEST_STUDY.id}/survey-answers`)
         .set({ Authorization: `Bearer ${token}` })
         .send(reqBody)
       expect(response.status).toBe(204)
       const participant = await prisma.surveyVersionAnswers.findFirst({
         where: {
-          profileId: PARTICIPANT_COMPLETED_ID,
+          profileId: TestUsers.PARTICIPANT_COMPLETED.id,
           version: {
-            studyId: 1,
+            studyId: TestStudies.TEST_STUDY.id,
           },
         },
       })
       expect(participant?.answers[1].answers).toEqual([true, 'Choice 1'])
       const aLog = await prisma.auditLog.findFirstOrThrow({
-        where: { userId: PARTICIPANT_COMPLETED_ID },
+        where: { userId: TestUsers.PARTICIPANT_COMPLETED.id },
       })
       expect(aLog.resource).toBe('studies/survey-answers')
       expect(aLog.operation).toBe('CREATE')
@@ -142,7 +136,7 @@ describe('SurveysController', () => {
         where: {
           id: 1,
           version: {
-            studyId: 1,
+            studyId: TestStudies.TEST_STUDY.id,
           },
         },
       })
@@ -153,7 +147,7 @@ describe('SurveysController', () => {
         data: [],
       }
       const response = await request(app)
-        .post('/studies/1/survey-answers')
+        .post(`/studies/${TestStudies.TEST_STUDY.id}/survey-answers`)
         .set({ Authorization: `Bearer ${tokenNoAnswers}` })
         .send(reqBody)
       expect(response.status).toBe(204)
@@ -162,7 +156,7 @@ describe('SurveysController', () => {
         where: {
           id: 1,
           version: {
-            studyId: 1,
+            studyId: TestStudies.TEST_STUDY.id,
           },
         },
       })
@@ -175,7 +169,7 @@ describe('SurveysController', () => {
         data: ['Choic3e', false],
       }
       const response = await request(app)
-        .post('/studies/1/survey-answers')
+        .post(`/studies/${TestStudies.TEST_STUDY.id}/survey-answers`)
         .set({ Authorization: `Bearer ${token}` })
         .send(reqBody)
       expect(response.status).toBe(422)
@@ -183,7 +177,7 @@ describe('SurveysController', () => {
 
     it('participant should inherit answers from both guardians correctly', async () => {
       const secondGuardianToken = generateToken({
-        userId: SECOND_GUARDIAN_ID,
+        userId: TestUsers.GUARDIAN_2.id,
       })
 
       const reqBody: UpdateSurveyAnswersRequest = {
@@ -191,15 +185,15 @@ describe('SurveysController', () => {
         data: [false, 'Choice 1'], //Other parent answer is [false, 'Choice 2']
       }
       const response = await request(app)
-        .post('/studies/1/survey-answers')
+        .post(`/studies/${TestStudies.TEST_STUDY.id}/survey-answers`)
         .set({ Authorization: `Bearer ${secondGuardianToken}` })
         .send(reqBody)
       expect(response.status).toBe(204)
       const dependentAnswers = await prisma.surveyVersionAnswers.findFirstOrThrow({
         where: {
-          profileId: DEPENDENT_ID,
+          profileId: TestUsers.DEPENDENT.id,
           version: {
-            studyId: 1,
+            studyId: TestStudies.TEST_STUDY.id,
           },
         },
       })
@@ -222,14 +216,14 @@ describe('SurveysController', () => {
         ],
       }
       const response = await request(app)
-        .patch('/studies/1/surveys/2')
+        .patch(`/studies/${TestStudies.TEST_STUDY.id}/surveys/2`)
         .set({ Authorization: `Bearer ${tokenAdmin}` })
         .send(reqBody)
       expect(response.status).toBe(204)
       const survey = await prisma.surveyVersion.findUniqueOrThrow({
         where: {
           studyId_versionNumber: {
-            studyId: 1,
+            studyId: TestStudies.TEST_STUDY.id,
             versionNumber: 2,
           },
         },
@@ -237,7 +231,7 @@ describe('SurveysController', () => {
       expect(survey?.data[0].elements[1].data.text).toBe('Question 1')
 
       const aLog = await prisma.auditLog.findFirstOrThrow({
-        where: { userId: ORG_ADMIN_ID },
+        where: { userId: TestUsers.ORG_ADMIN.id },
       })
       expect(aLog.resource).toBe('studies/surveys')
       expect(aLog.operation).toBe('UPDATE')
@@ -247,7 +241,7 @@ describe('SurveysController', () => {
 
     it('should fail to update a published survey', async () => {
       const response = await request(app)
-        .patch('/studies/1/surveys/1')
+        .patch(`/studies/${TestStudies.TEST_STUDY.id}/surveys/1`)
         .set({ Authorization: `Bearer ${tokenAdmin}` })
         .send({ data: [] })
       expect(response.status).toBe(500)
@@ -257,14 +251,14 @@ describe('SurveysController', () => {
   describe('POST /studies/{studyId}/surveys/{versionNumber}/publish', () => {
     it('should successfully publish a draft survey', async () => {
       const response = await request(app)
-        .post('/studies/1/surveys/2/publish')
+        .post(`/studies/${TestStudies.TEST_STUDY.id}/surveys/2/publish`)
         .set({ Authorization: `Bearer ${tokenAdmin}` })
 
       expect(response.status).toBe(204)
       const survey = await prisma.surveyVersion.findUniqueOrThrow({
         where: {
           studyId_versionNumber: {
-            studyId: 1,
+            studyId: TestStudies.TEST_STUDY.id,
             versionNumber: 2,
           },
         },
@@ -274,7 +268,7 @@ describe('SurveysController', () => {
       // Check that version number incremented correctly
       const maxSurveyVersion = await prisma.surveyVersion.findFirstOrThrow({
         where: {
-          studyId: 1,
+          studyId: TestStudies.TEST_STUDY.id,
         },
         orderBy: [
           {
@@ -288,7 +282,7 @@ describe('SurveysController', () => {
 
     it('should fail to publish an already published survey', async () => {
       const response = await request(app)
-        .post('/studies/1/surveys/1/publish')
+        .post(`/studies/${TestStudies.TEST_STUDY.id}/surveys/1/publish`)
         .set({ Authorization: `Bearer ${tokenAdmin}` })
       expect(response.status).toBe(500)
     })
@@ -297,7 +291,7 @@ describe('SurveysController', () => {
       await prisma.surveyVersion.update({
         where: {
           id: 1,
-          studyId: 1,
+          studyId: TestStudies.TEST_STUDY.id,
         },
         data: {
           data: [
@@ -310,7 +304,7 @@ describe('SurveysController', () => {
         },
       })
       const response = await request(app)
-        .post('/studies/1/surveys/2/publish')
+        .post(`/studies/${TestStudies.TEST_STUDY.id}/surveys/2/publish`)
         .set({ Authorization: `Bearer ${tokenAdmin}` })
       expect(response.status).toBe(422)
     })
@@ -318,7 +312,7 @@ describe('SurveysController', () => {
   describe('GET /studies/{studyId}/surveys/{versionNumber}/participants/answers', () => {
     it('Should get a list of all responses', async () => {
       const response = await request(app)
-        .get('/studies/1/surveys/1/participants/answers')
+        .get(`/studies/${TestStudies.TEST_STUDY.id}/surveys/1/participants/answers`)
         .set({ Authorization: `Bearer ${tokenAdmin}` })
 
       expect(response.status).toBe(200)
@@ -342,7 +336,7 @@ describe('SurveysController', () => {
       expect(res1.body.data).toHaveLength(0)
       await prisma.study.delete({
         where: {
-          id: 1,
+          id: TestStudies.TEST_STUDY.id,
         },
       })
       const res2 = await request(app)
@@ -350,14 +344,14 @@ describe('SurveysController', () => {
         .set({ Authorization: `Bearer ${tokenAdmin}` })
       expect(res2.ok).toBe(true)
       expect(res2.body.data).toHaveLength(1)
-      expect(res2.body.data[0].id).toBe(1)
+      expect(res2.body.data[0].id).toBe(TestStudies.TEST_STUDY.id)
     })
   })
 
   describe('PATCH /studies/{studyId}/restore', () => {
     it('Fails if study is not deleted', async () => {
       const res = await request(app)
-        .patch(`/studies/1/restore`)
+        .patch(`/studies/${TestStudies.TEST_STUDY.id}/restore`)
         .set({ Authorization: `Bearer ${tokenAdmin}` })
 
       expect(res.ok).toBe(false)
@@ -366,19 +360,19 @@ describe('SurveysController', () => {
     it('Restores a deleted study', async () => {
       await prisma.study.delete({
         where: {
-          id: 1,
+          id: TestStudies.TEST_STUDY.id,
         },
       })
 
       const res = await request(app)
-        .patch(`/studies/1/restore`)
+        .patch(`/studies/${TestStudies.TEST_STUDY.id}/restore`)
         .set({ Authorization: `Bearer ${tokenAdmin}` })
 
       expect(res.ok).toBe(true)
 
       const study = await prisma.study.findFirst({
         where: {
-          id: 1,
+          id: TestStudies.TEST_STUDY.id,
         },
       })
       expect(study).not.toBeNull()
