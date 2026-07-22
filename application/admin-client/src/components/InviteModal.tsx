@@ -23,6 +23,49 @@ interface InviteModalProps {
   initialRecipients?: Recipient[]
 }
 
+type RecipientInput = { email: string; externalId?: string }
+
+// Parse paste helper
+const parsePastedText = (text: string): RecipientInput[] => {
+  return text
+    .split('\n')
+    .map((line) => {
+      // split by comma if it exists, otherwise fall back to tab
+      const split = line.includes(',') ? line.split(',') : line.split('\t')
+      return {
+        email: split[0],
+        externalId: split[1]?.trim(),
+      }
+    })
+    .filter((entry) => entry.email !== '') // Drop empty lines
+}
+
+// email dedupe and validate helper
+const getUpdatedRecipients = (
+  currentRecipients: Recipient[],
+  newEntries: RecipientInput[],
+  isValidEmail: (email: string) => boolean,
+): { updatedRecipients: Recipient[]; hasInvalidEmails: boolean } => {
+  const updatedRecipients = [...currentRecipients]
+  let hasInvalidEmails = false
+  const seenEmails = new Set(updatedRecipients.map((r) => r.email.toLowerCase()))
+
+  newEntries.forEach((entry) => {
+    const normalisedEmail = (entry.email || '').trim().toLowerCase()
+
+    if (!isValidEmail(normalisedEmail)) {
+      hasInvalidEmails = true
+    } else if (!seenEmails.has(normalisedEmail)) {
+      seenEmails.add(normalisedEmail)
+      updatedRecipients.push({
+        email: normalisedEmail,
+        prefill: { studyParticipant: { externalId: entry.externalId } },
+      })
+    }
+  })
+  return { updatedRecipients, hasInvalidEmails }
+}
+
 export function InviteModal({ onSend, onCancel, initialRecipients = [] }: InviteModalProps) {
   const validateEmail = (email: string) => {
     const r = new RegExp(emailRegex) //eslint-disable-line
@@ -41,17 +84,31 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
   const studyId = useCurrentStudyId()
 
   const handleAdd = () => {
-    if (!validateEmail(fieldValue)) {
+    const { updatedRecipients, hasInvalidEmails } = getUpdatedRecipients(
+      recipients,
+      [{ email: fieldValue, externalId: idFieldValue }],
+      validateEmail,
+    )
+
+    if (hasInvalidEmails) {
       setInvalid(true)
-    } else if (!emails.includes(fieldValue)) {
-      setRecipients((current) => {
-        const c = structuredClone(current)
-        c.push({ email: fieldValue, prefill: { studyParticipant: { externalId: idFieldValue } } })
-        return c
-      })
+    } else {
+      setRecipients(updatedRecipients)
       setFieldValue('')
       setIdFieldValue('')
+      setInvalid(false)
     }
+  }
+
+  const handlePaste = (event: React.ClipboardEvent) => {
+    event.preventDefault()
+    const pastedText = event.clipboardData.getData('Text')
+    const parsedEntries = parsePastedText(pastedText)
+
+    setRecipients((current) => {
+      const { updatedRecipients } = getUpdatedRecipients(current, parsedEntries, validateEmail)
+      return updatedRecipients
+    })
   }
 
   useEffect(() => {
@@ -67,29 +124,6 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
       setInvalid(!validateEmail(fieldValue))
     }
   }, [fieldValue])
-
-  const handlePaste = (event: React.ClipboardEvent) => {
-    event.preventDefault()
-    const pasted = event.clipboardData.getData('Text').split('\n')
-    setRecipients((current) => {
-      const c = structuredClone(current)
-      for (const p of pasted) {
-        let split = p.split(',')
-        if (split.length == 1) {
-          split = split[0].split('\t')
-        }
-        const email = split[0]
-        let id
-        if (split.length > 1) {
-          id = split[1]
-        }
-        if (!emails.includes(email) && validateEmail(email)) {
-          c.push({ email, prefill: { studyParticipant: { externalId: id } } })
-        }
-      }
-      return c
-    })
-  }
 
   const { html: emailPreview } = previewParticipantInviteEmail(
     'http://exampleregisterurl',
