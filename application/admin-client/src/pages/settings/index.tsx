@@ -1,7 +1,7 @@
 import { Box, Button, Container, TextField, Tooltip, Typography } from '@mui/material'
 import { useNotification } from '@refinedev/core'
 import { useForm } from '@refinedev/react-hook-form'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { axiosInstance } from '../../providers/dataProvider'
 import { Info } from '@mui/icons-material'
 import { LogoUploader } from '../../components/LogoUploader'

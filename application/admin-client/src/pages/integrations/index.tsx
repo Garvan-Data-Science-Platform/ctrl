@@ -13,7 +13,7 @@ import {
 } from '@mui/material'
 import GroupAddIcon from '@mui/icons-material/GroupAdd'
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { SensitiveTextField } from '../../components/SensitiveTextField'
 import { useCustom, useGetIdentity } from '@refinedev/core'
 import { GetElsaTokenResponse } from '@common/types/api/integrations/getElsaToken'

@@ -2,7 +2,7 @@ import { Box } from '@mui/material'
 import { AuthPage } from '@refinedev/mui'
 import { useEffect } from 'react'
 import { useAuthStore } from '../../authStore'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router'
 import { SetupResponse } from '@common/types/api/auth'
 
 export const Login = () => {

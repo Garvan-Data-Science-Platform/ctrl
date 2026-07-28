@@ -14,13 +14,13 @@ import {
 import { dataProvider } from './providers/dataProvider'
 import CssBaseline from '@mui/material/CssBaseline'
 import GlobalStyles from '@mui/material/GlobalStyles'
-import { BrowserRouter, Route, Routes, Outlet, Link } from 'react-router-dom'
+import { BrowserRouter, Route, Routes, Outlet, Link } from 'react-router'
 import routerBindings, {
   NavigateToResource,
   CatchAllNavigate,
   UnsavedChangesNotifier,
   DocumentTitleHandler,
-} from '@refinedev/react-router-v6'
+} from '@refinedev/react-router'
 import { UserList, UserCreate, UserEdit, UserShow } from './pages/users'
 import { SurveyList, SurveyEditor } from './pages/surveys'
 import { ColorModeContextProvider } from './contexts/color-mode'

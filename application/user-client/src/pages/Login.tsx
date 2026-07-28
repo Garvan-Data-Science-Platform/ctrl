@@ -10,7 +10,7 @@ import {
   Typography,
 } from '@mui/material'
 import { useForm } from 'react-hook-form'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router'
 import { useAuth } from '../auth'
 import { LoginRequest, LoginResponse, SetupResponse } from '@common/types/api/auth'
 import { useEffect, useState } from 'react'

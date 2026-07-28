@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from 'react'
-import { Outlet, Navigate } from 'react-router-dom'
+import { Outlet, Navigate } from 'react-router'
 import { StudyLoader } from './components/StudyLoader'
 import { LoginSuccessResponse } from '@common/types/api/auth'
 

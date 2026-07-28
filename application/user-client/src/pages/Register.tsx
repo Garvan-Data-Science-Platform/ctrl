@@ -17,7 +17,7 @@ import {
   Link as MLink,
 } from '@mui/material'
 import { useForm, useFieldArray, Controller } from 'react-hook-form'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router'
 import { useAuth } from '../auth'
 import { RegisterParticipantRequest, RegisterParticipantResponse } from '@common/types/api/auth'
 import { checkPasswordStrength } from '@common/src/PasswordStrength'

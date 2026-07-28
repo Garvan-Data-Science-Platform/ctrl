@@ -30,7 +30,7 @@ import { OnBehalf, ParticipantType } from '@common/types/api/users/ParticipantPr
 import { useEffect, useState } from 'react'
 import { ParticipantSearch } from '../../components/ParticipantSearch'
 import { ArrowBack, Delete } from '@mui/icons-material'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router'
 import { GetFamilyResponse } from '@common/types/api/families'
 import { axiosInstance } from '../../providers/dataProvider'
 import { useCurrentStudyId } from '../../studyStore'

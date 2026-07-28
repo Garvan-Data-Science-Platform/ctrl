@@ -4827,13 +4827,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/history@npm:^4.7.11":
-  version: 4.7.11
-  resolution: "@types/history@npm:4.7.11"
-  checksum: 10c0/3facf37c2493d1f92b2e93a22cac7ea70b06351c2ab9aaceaa3c56aa6099fb63516f6c4ec1616deb5c56b4093c026a043ea2d3373e6c0644d55710364d02c934
-  languageName: node
-  linkType: hard
-
 "@types/http-assert@npm:*":
   version: 1.5.6
   resolution: "@types/http-assert@npm:1.5.6"
@@ -5130,53 +5123,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-router-dom@npm:^5.3.0":
-  version: 5.3.3
-  resolution: "@types/react-router-dom@npm:5.3.3"
-  dependencies:
-    "@types/history": "npm:^4.7.11"
-    "@types/react": "npm:*"
-    "@types/react-router": "npm:*"
-  checksum: 10c0/a9231a16afb9ed5142678147eafec9d48582809295754fb60946e29fcd3757a4c7a3180fa94b45763e4c7f6e3f02379e2fcb8dd986db479dcab40eff5fc62a91
-  languageName: node
-  linkType: hard
-
-"@types/react-router-hash-link@npm:^2.4.9":
-  version: 2.4.9
-  resolution: "@types/react-router-hash-link@npm:2.4.9"
-  dependencies:
-    "@types/history": "npm:^4.7.11"
-    "@types/react": "npm:*"
-    "@types/react-router-dom": "npm:^5.3.0"
-  checksum: 10c0/3e650851a5c4f59aceee17ac1ec23ae1945e1de8917f49b6959da282c4f6a3ffbe8eec39c50843ca24f22edf38ee1128c8ba75fc251ebd22a5a97128c56b9569
-  languageName: node
-  linkType: hard
-
-"@types/react-router@npm:*":
-  version: 5.1.20
-  resolution: "@types/react-router@npm:5.1.20"
-  dependencies:
-    "@types/history": "npm:^4.7.11"
-    "@types/react": "npm:*"
-  checksum: 10c0/1f7eee61981d2f807fa01a34a0ef98ebc0774023832b6611a69c7f28fdff01de5a38cabf399f32e376bf8099dcb7afaf724775bea9d38870224492bea4cb5737
-  languageName: node
-  linkType: hard
-
 "@types/react-transition-group@npm:^4.4.0, @types/react-transition-group@npm:^4.4.10, @types/react-transition-group@npm:^4.4.12":
   version: 4.4.12
   resolution: "@types/react-transition-group@npm:4.4.12"
   peerDependencies:
     "@types/react": "*"
   checksum: 10c0/0441b8b47c69312c89ec0760ba477ba1a0808a10ceef8dc1c64b1013ed78517332c30f18681b0ec0b53542731f1ed015169fed1d127cc91222638ed955478ec7
-  languageName: node
-  linkType: hard
-
-"@types/react@npm:*, @types/react@npm:^19.1.1":
-  version: 19.1.9
-  resolution: "@types/react@npm:19.1.9"
-  dependencies:
-    csstype: "npm:^3.0.2"
-  checksum: 10c0/b418da4aaf18fbc6df4f1b7096dda7ee152d697cac00d729ffd855b2b44a3a9cfb2ecb017ed20979ea3a7d98a5ce5fcf01ac1a3614d4a3e4d7069a0c45e49b0f
   languageName: node
   linkType: hard
 
@@ -5187,6 +5139,15 @@ __metadata:
     "@types/prop-types": "npm:*"
     csstype: "npm:^3.0.2"
   checksum: 10c0/49331800b76572eb2992a5c44801dbf8c612a5f99c8f4e4200f06c7de6f3a6e9455c661784a6c5469df96fa45622cb4a9d0982c44e6a0d5719be5f2ef1f545ed
+  languageName: node
+  linkType: hard
+
+"@types/react@npm:^19.1.1":
+  version: 19.1.9
+  resolution: "@types/react@npm:19.1.9"
+  dependencies:
+    csstype: "npm:^3.0.2"
+  checksum: 10c0/b418da4aaf18fbc6df4f1b7096dda7ee152d697cac00d729ffd855b2b44a3a9cfb2ecb017ed20979ea3a7d98a5ce5fcf01ac1a3614d4a3e4d7069a0c45e49b0f
   languageName: node
   linkType: hard
 
@@ -5758,7 +5719,6 @@ __metadata:
     "@types/node": "npm:^18.16.2"
     "@types/react": "npm:^18.0.0"
     "@types/react-dom": "npm:^18.0.0"
-    "@types/react-router-hash-link": "npm:^2.4.9"
     "@typescript-eslint/parser": "npm:^8.31.1"
     "@vitejs/plugin-react": "npm:^4.0.0"
     cypress: "npm:^13.17.0"
@@ -5775,7 +5735,6 @@ __metadata:
     react-hook-form: "npm:^7.30.0"
     react-markdown: "npm:^10.0.1"
     react-router: "npm:^7.18.1"
-    react-router-hash-link: "npm:^2.4.3"
     react-spreadsheet-import: "npm:^4.7.1"
     start-server-and-test: "npm:^2.0.10"
     typescript: "npm:^5.8.3"
@@ -13721,18 +13680,6 @@ __metadata:
     "@types/react":
       optional: true
   checksum: 10c0/7ad8f6ffd3e2aedf9b3d79f0c9088a9a3d7c5332d80c923427a6d97fe0626fb4cb33a6d9174d19fad57d860be69c96f68497a0619c3a8af0e8a5332e49bdde31
-  languageName: node
-  linkType: hard
-
-"react-router-hash-link@npm:^2.4.3":
-  version: 2.4.3
-  resolution: "react-router-hash-link@npm:2.4.3"
-  dependencies:
-    prop-types: "npm:^15.7.2"
-  peerDependencies:
-    react: ">=15"
-    react-router-dom: ">=4"
-  checksum: 10c0/19f400653de2cff6e2bdbebf09c33313579618422b9a746c085df1fd4f89dc7df6e012c4471bc05641d6ccf4e65bb66e1d53731f899dd753cca2d47ce67a3ff5
   languageName: node
   linkType: hard
 

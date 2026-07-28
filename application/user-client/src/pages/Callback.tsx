@@ -1,5 +1,5 @@
 import { Button, CircularProgress, Stack, Typography } from '@mui/material'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router'
 
 import { useEffect, useState } from 'react'
 import { useAuth } from '../auth'

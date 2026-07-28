@@ -9,7 +9,7 @@ import {
   Typography,
 } from '@mui/material'
 import { useForm } from 'react-hook-form'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { apiClient } from '../apiClient'
 import { useEffect, useState } from 'react'
 import { GeneratePasswordResetLinkRequest } from '@common/types/api/users'

@@ -9,7 +9,7 @@ import MenuIcon from '@mui/icons-material/Menu'
 import Container from '@mui/material/Container'
 import MenuItem from '@mui/material/MenuItem'
 import { Button, Tab, Tabs } from '@mui/material'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router'
 import { useAuth } from '../auth'
 import { useAppStore } from '../store'
 
