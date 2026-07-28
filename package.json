@@ -66,7 +66,7 @@
     "postcss": "^8.5.23",
     "qs": "^6.14.2",
     "react-router": "^7.18.1",
-    "react-router-dom": "^6.30.4",
+    "react-router-dom": "^7.18.1",
     "rollup@^4.20.0": "^4.59.0",
     "rollup@^4.43.0": "^4.59.0",
     "router/path-to-regexp": "^8.4.0",
