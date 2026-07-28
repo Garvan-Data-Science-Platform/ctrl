@@ -94,9 +94,11 @@ corepack enable
 
 # Install all project dependencies
 yarn install
+```
 
-# Set up pre-commit hooks
-brew install pre-commit
+Install pre-commit by following <https://pre-commit.com/#installation>, then set up the git hooks in this repo:
+
+```bash
 pre-commit install
 ```
 
