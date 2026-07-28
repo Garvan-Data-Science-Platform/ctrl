@@ -8,7 +8,7 @@ export const StudyLoader: React.FC<PropsWithChildren> = ({ children }) => {
     url: `studies`,
     method: 'get',
     queryOptions: { queryKey: ['studies'] },
-  })
+  }).query
   const { studies, setStudies, activeStudyIndex, setActiveStudyIndex } = useStudyStore()
   const invalidate = useInvalidate()
   const { mutate: logout } = useLogout()

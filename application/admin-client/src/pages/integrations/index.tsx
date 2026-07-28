@@ -30,7 +30,7 @@ export const IntegrationsHome = () => {
   const { data, refetch } = useCustom<GetElsaTokenResponse>({
     url: `elsa/token`,
     method: 'get',
-  })
+  }).query
 
   const enabled = Boolean(data?.data.token)
 

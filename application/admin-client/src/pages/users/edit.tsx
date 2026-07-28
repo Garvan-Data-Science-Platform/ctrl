@@ -26,9 +26,9 @@ export const UserEdit = () => {
     formState: { errors },
   } = useForm<any, any, FieldValues>({ refineCoreProps: { redirect: false } })
 
-  const { queryResult } = useShow()
+  const { query } = useShow()
 
-  const { data } = queryResult
+  const { data } = query
 
   const record = data?.data
 

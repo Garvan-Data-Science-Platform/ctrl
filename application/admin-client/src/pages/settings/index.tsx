@@ -22,7 +22,7 @@ const SettingsPage = () => {
     handleSubmit,
     formState: { errors },
     watch,
-    refineCore: { queryResult },
+    refineCore: { query },
   } = useForm<any, any, FieldValues>({
     refineCoreProps: {
       resource: 'settings',
@@ -34,7 +34,7 @@ const SettingsPage = () => {
   })
 
   const { open } = useNotification()
-  const orgSettingsData = queryResult?.data?.data
+  const orgSettingsData = query?.data?.data
   console.log('SETTINGS DATA:', orgSettingsData)
 
   const handleSave = async (data: FieldValues) => {

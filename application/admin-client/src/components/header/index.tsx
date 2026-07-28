@@ -2,13 +2,13 @@ import { Menu, MenuItem, Button, Divider } from '@mui/material'
 import AppBar from '@mui/material/AppBar'
 import Stack from '@mui/material/Stack'
 import Toolbar from '@mui/material/Toolbar'
-import { HamburgerMenu, RefineThemedLayoutV2HeaderProps } from '@refinedev/mui'
+import { HamburgerMenu, RefineThemedLayoutHeaderProps } from '@refinedev/mui'
 import React, { useState } from 'react'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import { useStudyStore } from '../../studyStore'
 import { Link, useParsed } from '@refinedev/core'
 
-export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({ sticky = true }) => {
+export const Header: React.FC<RefineThemedLayoutHeaderProps> = ({ sticky = true }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const studyMenuOpen = Boolean(anchorEl)
 

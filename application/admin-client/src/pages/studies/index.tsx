@@ -67,7 +67,9 @@ const StudyCard = ({
         if (activeStudyIndex > studies.length) {
           setActiveStudyIndex(0)
         }
-        queryClient.invalidateQueries(['studies'])
+        queryClient.invalidateQueries({
+          queryKey: ['studies'],
+        })
         const newStudies = [...studies]
         // Destructure out the token so that it doesn't go into the store
         const { redcapToken, ...sanitisedUpdateData } = updateData
@@ -97,7 +99,9 @@ const StudyCard = ({
         if (activeStudyIndex == studies.length - 1) {
           setActiveStudyIndex(0)
         }
-        queryClient.invalidateQueries(['studies'])
+        queryClient.invalidateQueries({
+          queryKey: ['studies'],
+        })
       })
       .catch((e) => {
         open?.({ type: 'error', message: `Error deleting study: ${e}` })
@@ -369,7 +373,9 @@ const StudiesPage = () => {
       .post('studies', { name: newStudyName })
       .then(() => {
         handleCloseNewStudyDialog()
-        queryClient.invalidateQueries(['studies'])
+        queryClient.invalidateQueries({
+          queryKey: ['studies'],
+        })
       })
       .catch((e) => {
         open?.({

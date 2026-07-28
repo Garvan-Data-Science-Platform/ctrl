@@ -5,10 +5,10 @@ import { RefineKbar, RefineKbarProvider } from '@refinedev/kbar'
 import {
   AuthPage,
   ErrorComponent,
-  notificationProvider,
+  useNotificationProvider,
   RefineSnackbarProvider,
-  ThemedLayoutV2,
-  ThemedTitleV2,
+  ThemedLayout,
+  ThemedTitle,
 } from '@refinedev/mui'
 
 import { dataProvider } from './providers/dataProvider'
@@ -68,7 +68,7 @@ function App() {
               <DevtoolsProvider>
                 <Refine
                   dataProvider={dataProvider()}
-                  notificationProvider={notificationProvider}
+                  notificationProvider={useNotificationProvider}
                   routerProvider={routerBindings}
                   authProvider={authProvider}
                   accessControlProvider={accessControlProvider}
@@ -186,7 +186,6 @@ function App() {
                   options={{
                     syncWithLocation: true,
                     warnWhenUnsavedChanges: false,
-                    useNewQueryKeys: true,
                     projectId: 'UqrerM-EBDoyv-UEni4Y',
                     reactQuery: {
                       clientConfig: {
@@ -212,14 +211,14 @@ function App() {
                           fallback={<CatchAllNavigate to="/login" />}
                         >
                           <StudyLoader>
-                            <ThemedLayoutV2
+                            <ThemedLayout
                               Header={Header}
                               Title={({ collapsed }) => (
-                                <ThemedTitleV2 collapsed={collapsed} text="CTRL Admin Portal" />
+                                <ThemedTitle collapsed={collapsed} text="CTRL Admin Portal" />
                               )}
                             >
                               <Outlet />
-                            </ThemedLayoutV2>
+                            </ThemedLayout>
                           </StudyLoader>
                         </Authenticated>
                       }

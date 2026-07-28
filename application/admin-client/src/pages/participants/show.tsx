@@ -9,9 +9,9 @@ import { familyMap } from '@common/src/familyMap'
 import { Edit } from '@mui/icons-material'
 
 export const ParticipantShow = () => {
-  const { queryResult } = useShow({})
+  const { query } = useShow({})
 
-  const { data, isLoading } = queryResult
+  const { data, isLoading } = query
 
   const record = data?.data as GetParticipantResponse['data']
 
