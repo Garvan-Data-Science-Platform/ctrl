@@ -92,8 +92,12 @@ nvm use
 # Enable corepack to use "yarn modern"
 corepack enable
 
-# Finally install all project dependencies
+# Install all project dependencies
 yarn install
+
+# Set up pre-commit hooks
+brew install pre-commit
+pre-commit install
 ```
 
 ### Configure environment
