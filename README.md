@@ -96,12 +96,21 @@ corepack enable
 yarn install
 ```
 
-### Run the Database
+### Configure environment
 
 ```bash
 # Copy example env variables and fill out with correct values
 cp application/backend/.env.example application/backend/.env
 
+# Copy example config file
+cp application/backend/config/config.json5.template application/backend/config/config.json5
+```
+
+Open `application/backend/.env` and set `PRISMA_FIELD_ENCRYPTION_KEY` - generate one at <https://cloak.47ng.com/>
+
+### Run the Database
+
+```bash
 # Run db
 make db
 
