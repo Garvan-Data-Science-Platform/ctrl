@@ -111,14 +111,13 @@ Open `application/backend/.env` and set `PRISMA_FIELD_ENCRYPTION_KEY` - generate
 ### Run the Database
 
 ```bash
-# Run db
+# For local development
 make db
+make seed       # runs migrations + seed data
 
-# Run migrations
-yarn prisma:migrate
-
-# Run migrations and seed database (Note: do not seed database in production)
-make seed
+# For production
+make db
+yarn prisma:migrate # migrations only
 ```
 
 > _**Note:** After starting the database you should run `make seed` to apply migrations and seed the database with initial data. This is required for development and testing. **Do not run `make seed` in production environments.**_
