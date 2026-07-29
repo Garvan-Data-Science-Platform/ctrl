@@ -4,17 +4,17 @@
 export const TestUsers = {
   OPERATOR_ADMIN: {
     email: 'operatoradmin@example.com',
-    password: 'Loginforadmin1',
+    password: 'Loginfortests123',
     id: 96,
   },
   ORG_ADMIN: {
     email: 'admin@example.com',
-    password: 'Loginforadmin1',
+    password: 'Loginfortests123',
     id: 97,
   },
   ORG_ADMIN_2: {
     email: 'admin2@example.com',
-    password: 'Loginforadmin1',
+    password: 'Loginfortests123',
     id: 101,
   },
   PARTICIPANT_UNANSWERED: {
@@ -37,7 +37,7 @@ export const TestUsers = {
   },
   STUDY_ADMIN: {
     email: 'studyadmin@example.com',
-    password: 'Loginforadmin1',
+    password: 'Loginfortests123',
     id: 106,
   },
   PASSWORD_RESET_USER: {
