@@ -6,7 +6,7 @@ import { resetDB, seedAuditLogs } from 'common/testing/TestHelpers'
 import { defaultAuditLogsPageSize } from 'common/src/config'
 import { generateToken } from '../authentication'
 import type { GetAuditLogsResponse } from 'common/types/api/audit-logs'
-import { ORG_ADMIN_ID, PARTICIPANT_UNANSWERED_ID, STUDY_ADMIN_ID } from 'common/testing/seed'
+import { TestUsers, TestStudies } from 'common/testing/constants'
 import { UpdateStudyRequest } from 'common/types/api/studies'
 import type { OTPLoginRequest, RegisterRequest } from 'common/types/api/auth'
 const api = new Api()
@@ -17,10 +17,13 @@ describe('AuditLogsController', () => {
   let orgAdminToken: string
   let studyAdminToken: string
 
+  const studyName: string = TestStudies.TEST_STUDY.name
+  const testStudyId: number = TestStudies.TEST_STUDY.id
+
   beforeAll(async () => {
-    participantToken = await generateToken({ userId: PARTICIPANT_UNANSWERED_ID })
-    orgAdminToken = await generateToken({ userId: ORG_ADMIN_ID })
-    studyAdminToken = await generateToken({ userId: STUDY_ADMIN_ID })
+    participantToken = await generateToken({ userId: TestUsers.PARTICIPANT_UNANSWERED.id })
+    orgAdminToken = await generateToken({ userId: TestUsers.ORG_ADMIN.id })
+    studyAdminToken = await generateToken({ userId: TestUsers.STUDY_ADMIN.id })
 
     api.run()
   })
@@ -212,8 +215,6 @@ describe('AuditLogsController', () => {
     describe('Sensitive information', () => {
       it('should not show sensitive token information in payloads', async () => {
         // Update a redcapToken
-        const studyName: string = 'Test Study'
-        const testStudyId: number = 1
         // Check test study exists
         const existingStudy = await prisma.study.findFirst({
           where: { name: studyName },
@@ -241,8 +242,6 @@ describe('AuditLogsController', () => {
 
       it('should obscure sensitive token information in payloads', async () => {
         // Update a redcapToken
-        const studyName: string = 'Test Study'
-        const testStudyId: number = 1
         // Check test study exists
         const existingStudy = await prisma.study.findFirst({
           where: { name: studyName },
@@ -274,7 +273,7 @@ describe('AuditLogsController', () => {
           email: 'johndoe@example.com',
           firstName: 'John',
           lastName: 'Doe',
-          password: 'Password1',
+          password: 'Loginforbogusperson1',
           role: Role.Participant,
         }
 
@@ -304,7 +303,7 @@ describe('AuditLogsController', () => {
             code: '1223',
             expiresAt: new Date(new Date().getTime() + 1000 * 60),
             id: 'abc123',
-            userId: PARTICIPANT_UNANSWERED_ID,
+            userId: TestUsers.PARTICIPANT_UNANSWERED.id,
           },
         })
         const loginRequest: OTPLoginRequest = {

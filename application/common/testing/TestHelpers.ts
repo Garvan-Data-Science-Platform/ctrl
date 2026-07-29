@@ -2,7 +2,8 @@ import prisma from '../../backend/src/PrismaClient'
 import { Prisma, AuditLogOperation } from '@prisma/client'
 import { SurveysController } from '../../backend/src/controllers/SurveysController'
 import logger from 'common/src/logger'
-import { PARTICIPANT_UNANSWERED_ID, seedTests } from './seed'
+import { seedTests } from './seed'
+import { TestUsers } from './constants'
 import { Prefill } from 'common/types/invite'
 import { createHash } from 'crypto'
 import { processLogoImage } from '../src/imageHelpers'
@@ -35,7 +36,7 @@ export async function publishNewVersion() {
 export async function partiallyCompleteSurvey() {
   const sc = new SurveysController()
   await sc.updateSurveyAnswers(
-    { user: { userId: PARTICIPANT_UNANSWERED_ID } },
+    { user: { userId: TestUsers.PARTICIPANT_UNANSWERED.id } },
     1, // StudyId
     { data: [], step: 0 },
   )

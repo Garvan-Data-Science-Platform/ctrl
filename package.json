@@ -79,6 +79,7 @@
     "ws": "^8.21.0"
   },
   "dependencies": {
-    "@react-pdf/renderer": "^4.2.2"
+    "@react-pdf/renderer": "^4.2.2",
+    "tsx": "^4.23.0"
   }
 }

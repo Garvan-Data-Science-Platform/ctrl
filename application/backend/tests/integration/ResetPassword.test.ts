@@ -3,6 +3,7 @@ import { Api } from '../../src/Api'
 import { resetDB } from 'common/testing/TestHelpers'
 import { verifyPassword } from '../../src/authentication'
 import prisma from '../../src/PrismaClient'
+import { TestUsers } from 'common/testing/constants'
 import { NodemailerMock } from 'nodemailer-mock'
 import * as nodemailer from 'nodemailer'
 
@@ -13,10 +14,12 @@ const app = api.app
 
 describe('User Password Reset', () => {
   let resetToken: string
-  const userId = 105
-  const userEmail = 'test-reset-password@example.com'
-  const originalPassword = 'OldPassword123'
-  const newPassword = 'New@Password123'
+  const userEmail = TestUsers.PASSWORD_RESET_USER.email
+  const userId = TestUsers.PASSWORD_RESET_USER.id
+  const originalPassword = TestUsers.PASSWORD_RESET_USER.password
+  // Note: using different test data pw to ensure consistency with pw requirements
+  const newPassword = TestUsers.PARTICIPANT_COMPLETED.password
+  const invalidPassword = 'password'
 
   beforeAll(async () => {
     api.run()
@@ -54,14 +57,14 @@ describe('User Password Reset', () => {
     const sentMail = mockNodeMailer.mock.getSentMail()
     expect(sentMail).toHaveLength(1)
     expect(sentMail[0]).toMatchObject({
-      from: 'CTRL <noreply@ctrl.garvan.org.au>',
+      from: `CTRL <noreply@${process.env.HOSTNAME}>`,
       subject: 'CTRL - Password Reset Link',
       to: userEmail,
     })
 
     // Validate the URL structure
     const emailText = sentMail[0].text as string
-    const hostname = process.env.HOSTNAME || 'ctrl.garvan.org.au'
+    const hostname = process.env.HOSTNAME || 'test.hostname.org'
     const urlRegex = new RegExp(
       `${hostname.replace(/\./g, '\\.')}/reset-password\\?token=[a-f0-9]{64}`,
     )
@@ -76,6 +79,30 @@ describe('User Password Reset', () => {
     }
 
     resetToken = resetTokenMatch[1]
+  })
+
+  it('should not accept an invalid password', async () => {
+    const response = await request(app).post('/users/password/reset').send({
+      token: resetToken,
+      newPassword: invalidPassword,
+    })
+
+    // Check the response
+    expect(response.status).toBe(422)
+
+    const body = response.body
+    expect(body.message).toBe('Validation Failed')
+    expect(body.details).toEqual({
+      'bodyRequest.newPassword': {
+        message: 'Password must be at least 14 characters',
+        value: invalidPassword,
+      },
+    })
+
+    // Check the original password is still in the database
+    const updatedUser = await prisma.user.findUnique({ where: { id: userId } })
+    const isPasswordCorrect = await verifyPassword(updatedUser!.password, originalPassword)
+    expect(isPasswordCorrect).toBe(true)
   })
 
   it('should reset the password successfully', async () => {
@@ -124,7 +151,7 @@ describe('User Password Reset', () => {
   it('should fail to reset the password with an already used token', async () => {
     const response = await request(app).post('/users/password/reset').send({
       token: resetToken,
-      newPassword: 'Another@Password123',
+      newPassword: newPassword,
     })
 
     expect(response.status).toBe(403)

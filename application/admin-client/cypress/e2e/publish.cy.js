@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-const { UserType } = require('../../../common/cypress/support/commands')
+const { TestUsers } = require('../../../common/testing/constants')
 
 beforeEach(() => {
   cy.task('reset')
@@ -8,7 +8,7 @@ beforeEach(() => {
 
 describe('Publish and complete', () => {
   it('Publish', () => {
-    cy.login(UserType.ORG_ADMIN)
+    cy.login(TestUsers.ORG_ADMIN.email)
     cy.visit('/surveys/edit/2')
     cy.contains('Publish').click()
     cy.get('[data-cy="publish-confirm"]').click()

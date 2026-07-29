@@ -3,6 +3,7 @@ import { generateToken } from '../../src/authentication'
 import { Api } from '../../src/Api'
 import { Role } from '@prisma/client'
 import { resetDB } from 'common/testing/TestHelpers'
+import { TestUsers } from 'common/testing/constants'
 
 enum HttpMethod {
   GET = 'get',
@@ -32,9 +33,9 @@ describe('Protected Routes', () => {
 
   const checkProtectedRoutes = async (route: Route): Promise<void> => {
     // Check Role Based Route Protection
-    const opAdminToken = await generateToken({ userId: 96 })
-    const orgAdminToken = await generateToken({ userId: 97 })
-    const participantToken = await generateToken({ userId: 98 })
+    const opAdminToken = await generateToken({ userId: TestUsers.OPERATOR_ADMIN.id })
+    const orgAdminToken = await generateToken({ userId: TestUsers.ORG_ADMIN.id })
+    const participantToken = await generateToken({ userId: TestUsers.PARTICIPANT_UNANSWERED.id })
 
     const authHeaders = (token: string) => ({ Authorization: `Bearer ${token}` })
 

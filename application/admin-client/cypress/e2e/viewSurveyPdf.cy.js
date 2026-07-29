@@ -1,15 +1,16 @@
 /// <reference types="cypress" />
 
+const { TestUsers } = require('../../../common/testing/constants')
+
 beforeEach(() => {
   cy.task('reset')
 })
 
-const { UserType } = require('../../../common/cypress/support/commands')
 const downloadsPath = 'cypress/downloads/'
 
 describe('viewPdf', () => {
   it('Show correct information in PDF', () => {
-    cy.login(UserType.ORG_ADMIN)
+    cy.login(TestUsers.ORG_ADMIN.email)
     cy.visit('/surveys')
     cy.intercept('GET', '/studies/1/surveys/2').as('requestPdf')
     cy.get('[data-cy="pdf-button"]').first().click()

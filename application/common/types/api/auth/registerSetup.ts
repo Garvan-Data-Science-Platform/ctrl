@@ -1,7 +1,7 @@
 /**
  * @example {
  *  "email": "john.doe@email.com",
- *  "password": "Password123"
+ *  "password": "Supersecret123"
  * }
  */
 export interface RegisterSetupRequest {
@@ -10,7 +10,7 @@ export interface RegisterSetupRequest {
    */
   email: string
   /**
-   * @minLength 8 Password must be at least 8 characters
+   * @minLength 14 Password must be at least 14 characters
    */
   password: string
 }

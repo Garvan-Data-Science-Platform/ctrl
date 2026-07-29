@@ -4,7 +4,7 @@ import { generateToken } from '../authentication'
 import { resetDB } from 'common/testing/TestHelpers'
 import { NodemailerMock } from 'nodemailer-mock'
 import * as nodemailer from 'nodemailer'
-import { PARTICIPANT_COMPLETED_ID, SECOND_TEST_STUDY_ID, TEST_STUDY_ID } from 'common/testing/seed'
+import { TestUsers, TestStudies } from 'common/testing/constants'
 const mockNodeMailer = nodemailer as unknown as NodemailerMock
 
 const api = new Api()
@@ -15,7 +15,7 @@ describe('MailerController', () => {
 
   beforeAll(async () => {
     participantToken = await generateToken({
-      userId: PARTICIPANT_COMPLETED_ID,
+      userId: TestUsers.PARTICIPANT_COMPLETED.id,
     })
 
     api.run()
@@ -37,7 +37,7 @@ describe('MailerController', () => {
     it('should successfully send emails', async () => {
       const response = await request(app)
         .post('/mailer/contact-us')
-        .send({ content: 'Test Content', studyId: TEST_STUDY_ID })
+        .send({ content: 'Test Content', studyId: TestStudies.TEST_STUDY.id })
         .set({ Authorization: `Bearer ${participantToken}` })
 
       expect(response.status).toBe(204)
@@ -63,28 +63,31 @@ describe('MailerController', () => {
     it('should send emails to Study specific email if it is set', async () => {
       const response = await request(app)
         .post('/mailer/contact-us')
-        .send({ content: 'Test Content', studyId: TEST_STUDY_ID })
+        .send({ content: 'Test Content', studyId: TestStudies.TEST_STUDY.id })
         .set({ Authorization: `Bearer ${participantToken}` })
 
       expect(response.status).toBe(204)
 
       const sentEmails = mockNodeMailer.mock.getSentMail()
       expect(sentEmails.length).toBe(2) // 1 to admin, 1 to user
-      expect(sentEmails.map((v) => v.to)).toEqual([['test@contactus.com'], 'test3@example.com'])
+      expect(sentEmails.map((v) => v.to)).toEqual([
+        ['test@contactus.com'],
+        TestUsers.PARTICIPANT_COMPLETED.email,
+      ])
     })
 
     it('should send emails to all Admins if Study specific contact email is not set', async () => {
       const response = await request(app)
         .post('/mailer/contact-us')
-        .send({ content: 'Test Content', studyId: SECOND_TEST_STUDY_ID })
+        .send({ content: 'Test Content', studyId: TestStudies.TEST_STUDY_2.id })
         .set({ Authorization: `Bearer ${participantToken}` })
 
       expect(response.status).toBe(204)
       const sentEmails = mockNodeMailer.mock.getSentMail()
       expect(sentEmails.length).toBe(2) // 1 to admin, 1 to user
       expect(sentEmails.map((v) => v.to)).toEqual([
-        ['admin@example.com', 'testOrgAdmin2@example.com'],
-        'test3@example.com',
+        [TestUsers.ORG_ADMIN.email, TestUsers.ORG_ADMIN_2.email],
+        TestUsers.PARTICIPANT_COMPLETED.email,
       ])
     })
   })

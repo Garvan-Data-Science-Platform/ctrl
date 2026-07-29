@@ -11,16 +11,7 @@ import {
   ResetPasswordRequest,
 } from 'common/types/api/users'
 import { Role } from '@prisma/client'
-import {
-  FE_TEST_STUDY_ID,
-  OPERATOR_ADMIN_ID,
-  ORG_ADMIN_2_ID,
-  ORG_ADMIN_EMAIL,
-  ORG_ADMIN_ID,
-  PARTICIPANT_UNANSWERED_ID,
-  STUDY_ADMIN_ID,
-  TEST_STUDY_ID,
-} from 'common/testing/seed'
+import { TestUsers, TestStudies } from 'common/testing/constants'
 import { NodemailerMock } from 'nodemailer-mock'
 import * as nodemailer from 'nodemailer'
 
@@ -35,9 +26,9 @@ describe('UsersController', () => {
   let studyAdminToken: string
 
   beforeAll(async () => {
-    opAdminToken = await generateToken({ userId: OPERATOR_ADMIN_ID })
-    orgAdminToken = await generateToken({ userId: ORG_ADMIN_ID })
-    studyAdminToken = await generateToken({ userId: STUDY_ADMIN_ID })
+    opAdminToken = await generateToken({ userId: TestUsers.OPERATOR_ADMIN.id })
+    orgAdminToken = await generateToken({ userId: TestUsers.ORG_ADMIN.id })
+    studyAdminToken = await generateToken({ userId: TestUsers.STUDY_ADMIN.id })
 
     api.run()
   })
@@ -76,6 +67,28 @@ describe('UsersController', () => {
       const body: GetAllUsersResponse = response.body
       expect(body.data).toBe(undefined)
     })
+
+    it('should not return user password', async () => {
+      const response = await request(app)
+        .get('/users')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(response.status).toBe(200)
+
+      const body: GetAllUsersResponse = response.body
+      expect(body).toHaveProperty('data')
+      expect(body.data[0]).not.toHaveProperty('password')
+    })
+
+    it('should not return user emailHash', async () => {
+      const response = await request(app)
+        .get('/users')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(response.status).toBe(200)
+
+      const body: GetAllUsersResponse = response.body
+      expect(body).toHaveProperty('data')
+      expect(body.data[0]).not.toHaveProperty('emailHash')
+    })
   })
 
   describe('GET /users/admin', () => {
@@ -91,11 +104,33 @@ describe('UsersController', () => {
         expect(user.role).not.toEqual('Participant')
       })
     })
+
+    it('should not return admin password', async () => {
+      const response = await request(app)
+        .get('/users')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(response.status).toBe(200)
+
+      const body: GetAllUsersResponse = response.body
+      expect(body).toHaveProperty('data')
+      expect(body.data[0]).not.toHaveProperty('password')
+    })
+
+    it('should not return admin emailHash', async () => {
+      const response = await request(app)
+        .get('/users')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(response.status).toBe(200)
+
+      const body: GetAllUsersResponse = response.body
+      expect(body).toHaveProperty('data')
+      expect(body.data[0]).not.toHaveProperty('emailHash')
+    })
   })
 
   describe('GET /users/:id', () => {
     it('should return a user by ID', async () => {
-      const userId = PARTICIPANT_UNANSWERED_ID
+      const userId = TestUsers.PARTICIPANT_UNANSWERED.id
       const response = await request(app)
         .get(`/users/${userId}`)
         .set({ Authorization: `Bearer ${orgAdminToken}` })
@@ -117,6 +152,28 @@ describe('UsersController', () => {
       expect(response.status).toBe(404)
 
       expect(response.body.message).toBe(`User with ID: ${userId} not found`)
+    })
+
+    it('should not return user password', async () => {
+      const response = await request(app)
+        .get('/users')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(response.status).toBe(200)
+
+      const body: GetAllUsersResponse = response.body
+      expect(body).toHaveProperty('data')
+      expect(body.data[0]).not.toHaveProperty('password')
+    })
+
+    it('should not return user emailHash', async () => {
+      const response = await request(app)
+        .get('/users')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(response.status).toBe(200)
+
+      const body: GetAllUsersResponse = response.body
+      expect(body).toHaveProperty('data')
+      expect(body.data[0]).not.toHaveProperty('emailHash')
     })
   })
 
@@ -169,7 +226,7 @@ describe('UsersController', () => {
 
   describe('PATCH /users/:id', () => {
     it('should update a user by ID', async () => {
-      const userId: number = PARTICIPANT_UNANSWERED_ID
+      const userId: number = TestUsers.PARTICIPANT_UNANSWERED.id
 
       const newFirstName: string = 'Updated'
 
@@ -179,8 +236,8 @@ describe('UsersController', () => {
       const testUser: RegisterRequest = {
         firstName: 'Test',
         lastName: 'User',
-        email: 'test2@example.com',
-        password: 'Password123',
+        email: TestUsers.PARTICIPANT_UNANSWERED.email,
+        password: TestUsers.PARTICIPANT_UNANSWERED.password,
         role: Role.Participant,
       }
 
@@ -248,7 +305,7 @@ describe('UsersController', () => {
     })
     it('Study Admins can not edit org admins', async () => {
       const response = await request(app)
-        .patch(`/users/${ORG_ADMIN_ID}`)
+        .patch(`/users/${TestUsers.ORG_ADMIN.id}`)
         .set({ Authorization: `Bearer ${studyAdminToken}` })
         .send({ firstName: 'Afijodsjfo' })
       expect(response.ok).toBe(false)
@@ -265,7 +322,7 @@ describe('UsersController', () => {
     })
     it('Study Admins can not edit their own role', async () => {
       const response = await request(app)
-        .patch(`/users/${STUDY_ADMIN_ID}`)
+        .patch(`/users/${TestUsers.STUDY_ADMIN.id}`)
         .set({ Authorization: `Bearer ${studyAdminToken}` })
         .send({ role: Role.OrganisationAdmin })
       expect(response.ok).toBe(false)
@@ -274,21 +331,27 @@ describe('UsersController', () => {
 
   describe('POST /users/:id/make-study-admin/:studyId', () => {
     it('Can make a user a study admin', async () => {
-      await prisma.user.update({ where: { id: ORG_ADMIN_2_ID }, data: { role: Role.StudyAdmin } })
+      await prisma.user.update({
+        where: { id: TestUsers.ORG_ADMIN_2.id },
+        data: { role: Role.StudyAdmin },
+      })
       const response = await request(app)
-        .post(`/users/${ORG_ADMIN_2_ID}/make-study-admin/${TEST_STUDY_ID}`)
+        .post(`/users/${TestUsers.ORG_ADMIN_2.id}/make-study-admin/${TestStudies.TEST_STUDY.id}`)
         .set({ Authorization: `Bearer ${studyAdminToken}` })
       expect(response.ok).toBe(true)
       const updatedUser = await prisma.user.findUniqueOrThrow({
-        where: { id: ORG_ADMIN_2_ID },
+        where: { id: TestUsers.ORG_ADMIN_2.id },
         select: { adminOfStudies: { select: { id: true } } },
       })
       expect(updatedUser.adminOfStudies).toHaveLength(1)
     })
     it('Study admins can only add study admins to their own study', async () => {
-      await prisma.user.update({ where: { id: ORG_ADMIN_2_ID }, data: { role: Role.StudyAdmin } })
+      await prisma.user.update({
+        where: { id: TestUsers.ORG_ADMIN_2.id },
+        data: { role: Role.StudyAdmin },
+      })
       const response = await request(app)
-        .post(`/users/${ORG_ADMIN_2_ID}/make-study-admin/${FE_TEST_STUDY_ID}`)
+        .post(`/users/${TestUsers.ORG_ADMIN_2.id}/make-study-admin/${TestStudies.FE_TEST_STUDY.id}`)
         .set({ Authorization: `Bearer ${studyAdminToken}` })
       expect(response.ok).toBe(false)
     })
@@ -297,11 +360,11 @@ describe('UsersController', () => {
   describe('POST /users/:id/remove-study-admin/:studyId', () => {
     it('Can remove a study admin from a study', async () => {
       const response = await request(app)
-        .post(`/users/${STUDY_ADMIN_ID}/remove-study-admin/${TEST_STUDY_ID}`)
+        .post(`/users/${TestUsers.STUDY_ADMIN.id}/remove-study-admin/${TestStudies.TEST_STUDY.id}`)
         .set({ Authorization: `Bearer ${orgAdminToken}` })
       expect(response.ok).toBe(true)
       const updatedUser = await prisma.user.findUniqueOrThrow({
-        where: { id: STUDY_ADMIN_ID },
+        where: { id: TestUsers.STUDY_ADMIN.id },
         select: { adminOfStudies: { select: { id: true } } },
       })
       expect(updatedUser.adminOfStudies).toHaveLength(0)
@@ -309,16 +372,19 @@ describe('UsersController', () => {
 
     it('Study admins can remove other study admins', async () => {
       await prisma.user.update({
-        where: { id: ORG_ADMIN_2_ID },
-        data: { role: Role.StudyAdmin, adminOfStudies: { connect: { id: TEST_STUDY_ID } } },
+        where: { id: TestUsers.ORG_ADMIN_2.id },
+        data: {
+          role: Role.StudyAdmin,
+          adminOfStudies: { connect: { id: TestStudies.TEST_STUDY.id } },
+        },
       })
 
       const response = await request(app)
-        .post(`/users/${ORG_ADMIN_2_ID}/remove-study-admin/${TEST_STUDY_ID}`)
+        .post(`/users/${TestUsers.ORG_ADMIN_2.id}/remove-study-admin/${TestStudies.TEST_STUDY.id}`)
         .set({ Authorization: `Bearer ${studyAdminToken}` })
       expect(response.ok).toBe(true)
       const updatedUser = await prisma.user.findUniqueOrThrow({
-        where: { id: ORG_ADMIN_2_ID },
+        where: { id: TestUsers.ORG_ADMIN_2.id },
         select: { adminOfStudies: { select: { id: true } } },
       })
       expect(updatedUser.adminOfStudies).toHaveLength(0)
@@ -327,7 +393,7 @@ describe('UsersController', () => {
 
   describe('DELETE /users/:id', () => {
     it('should delete a user by ID', async () => {
-      const userId: number = PARTICIPANT_UNANSWERED_ID
+      const userId: number = TestUsers.PARTICIPANT_UNANSWERED.id
 
       // Check that user exists in db
       const existingUser = await prisma.user.findFirst({ where: { id: userId } })
@@ -362,7 +428,7 @@ describe('UsersController', () => {
 
   describe('PATCH /users/:id/role', () => {
     it('should update a users role to the role provided', async () => {
-      const userID: number = PARTICIPANT_UNANSWERED_ID
+      const userID: number = TestUsers.PARTICIPANT_UNANSWERED.id
 
       // Check user role
       const existingUser = await prisma.user.findFirst({ where: { id: userID } })
@@ -385,7 +451,7 @@ describe('UsersController', () => {
     })
 
     it('should return a Validation Error and keep the same role if the provided role is invalid', async () => {
-      const userID: number = PARTICIPANT_UNANSWERED_ID
+      const userID: number = TestUsers.PARTICIPANT_UNANSWERED.id
 
       // Check user role
       const existingUser = await prisma.user.findFirst({ where: { id: userID } })
@@ -426,7 +492,7 @@ describe('UsersController', () => {
   })
 
   describe('POST /users/password/generate-reset-link', () => {
-    const userEmail: string = 'test2@example.com'
+    const userEmail: string = TestUsers.PARTICIPANT_UNANSWERED.email
 
     it('should generate and send a password reset link to the users email', async () => {
       const generatePasswordResetLinkResponse = await request(app)
@@ -439,14 +505,14 @@ describe('UsersController', () => {
 
       expect(sentEmails).toHaveLength(1)
       expect(sentEmails[0]).toMatchObject({
-        from: 'CTRL <noreply@ctrl.garvan.org.au>',
+        from: `CTRL <noreply@${process.env.HOSTNAME}>`,
         subject: 'CTRL - Password Reset Link',
         to: userEmail,
       })
 
       // Validate the URL structure
       const emailText = sentEmails[0].text
-      const hostname = process.env.HOSTNAME || 'ctrl.garvan.org.au'
+      const hostname = process.env.HOSTNAME || 'test.hostname.org'
       const urlRegex = new RegExp(
         `${hostname.replace(/\./g, '\\.')}/reset-password\\?token=[a-f0-9]{64}`,
       )
@@ -456,7 +522,7 @@ describe('UsersController', () => {
     it('should link to admin portal for admin reset', async () => {
       const generatePasswordResetLinkResponse = await request(app)
         .post('/users/password/generate-reset-link')
-        .send({ email: ORG_ADMIN_EMAIL })
+        .send({ email: TestUsers.ORG_ADMIN.email })
 
       expect(generatePasswordResetLinkResponse.status).toBe(200)
 
@@ -464,14 +530,14 @@ describe('UsersController', () => {
 
       expect(sentEmails).toHaveLength(1)
       expect(sentEmails[0]).toMatchObject({
-        from: 'CTRL <noreply@ctrl.garvan.org.au>',
+        from: `CTRL <noreply@${process.env.HOSTNAME}>`,
         subject: 'CTRL - Password Reset Link',
-        to: ORG_ADMIN_EMAIL,
+        to: TestUsers.ORG_ADMIN.email,
       })
 
       // Validate the URL structure
       const emailText = sentEmails[0].text
-      const hostname = process.env.ADMIN_HOSTNAME || 'admin.ctrl.garvan.org.au'
+      const hostname = process.env.ADMIN_HOSTNAME || 'admin.test.hostname.org'
       const urlRegex = new RegExp(
         `${hostname.replace(/\./g, '\\.')}/update-password\\?token=[a-f0-9]{64}`,
       )
@@ -482,7 +548,7 @@ describe('UsersController', () => {
       const generatePasswordResetLinkResponse = await request(app)
         .post('/users/password/generate-reset-link')
         .set('x-client-type', 'user-client')
-        .send({ email: ORG_ADMIN_EMAIL })
+        .send({ email: TestUsers.ORG_ADMIN.email })
 
       expect(generatePasswordResetLinkResponse.status).toBe(200)
 
@@ -507,7 +573,7 @@ describe('UsersController', () => {
   })
 
   describe('POST /users/password/reset', () => {
-    const userId = 105
+    const userId = TestUsers.PASSWORD_RESET_USER.id
     const resetToken = 'valid-reset-token'
 
     beforeAll(async () => {})
@@ -515,7 +581,7 @@ describe('UsersController', () => {
     it('should reset the password when given a valid reset token and new password', async () => {
       const requestBody: ResetPasswordRequest = {
         token: resetToken,
-        newPassword: 'NewPassword123!',
+        newPassword: TestUsers.GUARDIAN_2.password, // Providing a different test users password
       }
 
       const response = await request(app).post('/users/password/reset').send(requestBody)
@@ -525,7 +591,9 @@ describe('UsersController', () => {
       // Check that the user's password was updated
       const updatedUser = await prisma.user.findUnique({ where: { id: userId } })
       expect(updatedUser).not.toBeNull()
-      expect(await verifyPassword(updatedUser!.password, 'OldPassword123')).toBe(false)
+      expect(
+        await verifyPassword(updatedUser!.password, TestUsers.PASSWORD_RESET_USER.password),
+      ).toBe(false)
       expect(await verifyPassword(updatedUser!.password, requestBody.newPassword)).toBe(true)
 
       // Check that the reset token was marked as used
@@ -540,7 +608,7 @@ describe('UsersController', () => {
 
       const response = await request(app)
         .post('/users/password/reset')
-        .send({ token: invalidToken, newPassword: 'NewPassword123!' })
+        .send({ token: invalidToken, newPassword: TestUsers.GUARDIAN_2.password }) // Using random test user's PW here (to ensure it meets pw requirements)
 
       expect(response.status).toBe(403)
       expect(response.body.message).toBe('Reset token invalid')
@@ -555,7 +623,7 @@ describe('UsersController', () => {
 
       const requestBody: ResetPasswordRequest = {
         token: resetToken,
-        newPassword: 'AnotherPassword123!',
+        newPassword: TestUsers.GUARDIAN_2.password, // Using random test user's PW here (to ensure it meets pw requirements)
       }
 
       const response = await request(app).post('/users/password/reset').send(requestBody)
@@ -573,7 +641,7 @@ describe('UsersController', () => {
 
       const requestBody: ResetPasswordRequest = {
         token: resetToken,
-        newPassword: 'NewPassword123!',
+        newPassword: TestUsers.GUARDIAN_2.password, // Using random test user's PW here (to ensure it meets pw requirements)
       }
 
       const response = await request(app).post('/users/password/reset').send(requestBody)
@@ -603,6 +671,25 @@ describe('UsersController', () => {
       expect(res1.body.data).toHaveLength(0)
       await prisma.user.delete({
         where: {
+          id: TestUsers.OPERATOR_ADMIN.id,
+        },
+      })
+      const res2 = await request(app)
+        .get('/users/admin/deleted')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(res2.ok).toBe(true)
+      expect(res2.body.data).toHaveLength(1)
+      expect(res2.body.data[0].id).toBe(TestUsers.OPERATOR_ADMIN.id)
+    })
+
+    it('should not return deleted admin password', async () => {
+      const res1 = await request(app)
+        .get('/users/admin/deleted')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(res1.ok).toBe(true)
+      expect(res1.body.data).toHaveLength(0)
+      await prisma.user.delete({
+        where: {
           id: OPERATOR_ADMIN_ID,
         },
       })
@@ -611,14 +698,33 @@ describe('UsersController', () => {
         .set({ Authorization: `Bearer ${orgAdminToken}` })
       expect(res2.ok).toBe(true)
       expect(res2.body.data).toHaveLength(1)
-      expect(res2.body.data[0].id).toBe(OPERATOR_ADMIN_ID)
+      expect(res2.body.data[0]).not.toHaveProperty('password')
+    })
+
+    it('should not return deleted admin emailHash', async () => {
+      const res1 = await request(app)
+        .get('/users/admin/deleted')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(res1.ok).toBe(true)
+      expect(res1.body.data).toHaveLength(0)
+      await prisma.user.delete({
+        where: {
+          id: OPERATOR_ADMIN_ID,
+        },
+      })
+      const res2 = await request(app)
+        .get('/users/admin/deleted')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(res2.ok).toBe(true)
+      expect(res2.body.data).toHaveLength(1)
+      expect(res2.body.data[0]).not.toHaveProperty('emailHash')
     })
   })
 
   describe('PATCH /users/{userId}/restore', () => {
     it('Fails if user is not deleted', async () => {
       const res = await request(app)
-        .patch(`/users/${OPERATOR_ADMIN_ID}/restore`)
+        .patch(`/users/${TestUsers.OPERATOR_ADMIN.id}/restore`)
         .set({ Authorization: `Bearer ${orgAdminToken}` })
 
       expect(res.ok).toBe(false)
@@ -627,19 +733,19 @@ describe('UsersController', () => {
     it('Restores a deleted user', async () => {
       await prisma.user.delete({
         where: {
-          id: OPERATOR_ADMIN_ID,
+          id: TestUsers.OPERATOR_ADMIN.id,
         },
       })
 
       const res = await request(app)
-        .patch(`/users/${OPERATOR_ADMIN_ID}/restore`)
+        .patch(`/users/${TestUsers.OPERATOR_ADMIN.id}/restore`)
         .set({ Authorization: `Bearer ${orgAdminToken}` })
 
       expect(res.ok).toBe(true)
 
       const user = await prisma.user.findFirst({
         where: {
-          id: OPERATOR_ADMIN_ID,
+          id: TestUsers.OPERATOR_ADMIN.id,
         },
       })
       expect(user).not.toBeNull()

@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-const { UserType } = require('../../../common/cypress/support/commands')
+const { TestUsers } = require('../../../common/testing/constants.ts')
 
 beforeEach(() => {
   cy.task('reset')
@@ -8,7 +8,7 @@ beforeEach(() => {
 
 describe('Profile Edit', () => {
   it('Marked as reviewed with correct date after page saved', () => {
-    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
     cy.visit('/')
     cy.contains('Intro').should('exist')
     cy.get('[data-cy="step-card-0"]').contains('Requires Review').should('exist')
@@ -19,7 +19,7 @@ describe('Profile Edit', () => {
   })
 
   it('Shows correct messsage when required box is not ticked', () => {
-    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
     cy.visit('/')
     cy.contains('Intro').should('exist')
     cy.get('[data-cy="step-button-1"]').click()
@@ -34,7 +34,7 @@ describe('Profile Edit', () => {
   })
 
   it('Saves answers', () => {
-    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
     cy.visit('/')
     cy.contains('Intro').should('exist')
     cy.get('[data-cy="step-button-1"]').click()
@@ -49,7 +49,7 @@ describe('Profile Edit', () => {
   })
 
   it('Shows error when radio not checked', () => {
-    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
     cy.visit('/')
     cy.contains('Intro').should('exist')
     cy.get('[data-cy="step-button-1"]').click()
@@ -64,7 +64,7 @@ describe('Profile Edit', () => {
   })
 
   it('When a new survey version is published their answers require review', () => {
-    cy.login(UserType.PARTICIPANT_COMPLETED)
+    cy.login(TestUsers.PARTICIPANT_COMPLETED.email)
     cy.visit('/')
     cy.get('[data-cy="step-card-1"]').contains('Reviewed').should('exist')
     cy.task('publish')

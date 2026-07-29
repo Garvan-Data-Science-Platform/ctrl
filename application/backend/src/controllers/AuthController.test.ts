@@ -14,13 +14,11 @@ import prisma from '../PrismaClient'
 import { Role } from '@prisma/client'
 import { resetDB, wipeDB } from 'common/testing/TestHelpers'
 import {
-  ORG_ADMIN_EMAIL,
-  ORG_ADMIN_PASSWORD,
-  ORG_ADMIN_ID,
-  PARTICIPANT_UNANSWERED_EMAIL,
-  PARTICIPANT_UNANSWERED_ID,
-  TEST_STUDY,
-} from 'common/testing/seed'
+  TestUsers,
+  TestStudies,
+  TestInvites,
+  commonPasswordBaseWords,
+} from 'common/testing/constants'
 import {
   ContactMethod,
   ParticipantType,
@@ -36,9 +34,15 @@ const app = api.app
 let orgAdminToken: string
 
 describe('AuthController', () => {
+  const testFirstName = 'John'
+  const testLastName = 'Doe'
+  const testEmail = 'johndoe@example.com'
+  const testPassword = 'Loginfortests123'
+  const testGuardianFirstName = 'Jenny'
+
   beforeAll(async () => {
     orgAdminToken = await generateToken({
-      userId: ORG_ADMIN_ID,
+      userId: TestUsers.ORG_ADMIN.id,
     })
     api.run()
   })
@@ -63,10 +67,10 @@ describe('AuthController', () => {
       expect(getAllUsersBody1.data).toBe(undefined)
 
       const registerRequest: RegisterRequest = {
-        firstName: 'John',
-        lastName: 'Doe',
+        firstName: testFirstName,
+        lastName: testLastName,
         email: 'testregister@example.com',
-        password: 'Password123',
+        password: testPassword,
         role: Role.OrganisationAdmin,
       }
 
@@ -91,10 +95,10 @@ describe('AuthController', () => {
 
     it('should register a new user returning a token', async () => {
       const registerRequest: RegisterRequest = {
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'newUser@example.com',
-        password: 'Password123',
+        firstName: testFirstName,
+        lastName: testLastName,
+        email: testEmail,
+        password: testPassword,
         role: Role.Participant,
       }
 
@@ -120,9 +124,9 @@ describe('AuthController', () => {
 
     it('should return 422 if validation fails', async () => {
       const registerRequest = {
-        firstName: 'John',
-        lastName: 'Doe',
-        password: 'password123',
+        firstName: testFirstName,
+        lastName: testLastName,
+        password: 'password123', //Does not meet minimum password requirements
         role: Role.Participant,
       }
 
@@ -138,10 +142,10 @@ describe('AuthController', () => {
 
     it('should return an error if the user is already registered', async () => {
       const registerRequest: RegisterRequest = {
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'johndoe@example.com',
-        password: 'Password123',
+        firstName: testFirstName,
+        lastName: testLastName,
+        email: testEmail,
+        password: testPassword,
         role: Role.Participant,
       }
 
@@ -162,9 +166,9 @@ describe('AuthController', () => {
     it('should fail validation if provided with an invalid email', async () => {
       const registerRequest: RegisterRequest = {
         email: 'invalid email',
-        firstName: 'John',
-        lastName: 'Doe',
-        password: 'Password123',
+        firstName: testFirstName,
+        lastName: testLastName,
+        password: testPassword,
         role: Role.Participant,
       }
 
@@ -185,9 +189,9 @@ describe('AuthController', () => {
 
     it('should fail validation if provided with an invalid password', async () => {
       const registerRequest: RegisterRequest = {
-        email: 'johndoe@example.com',
-        firstName: 'John',
-        lastName: 'Doe',
+        email: testEmail,
+        firstName: testFirstName,
+        lastName: testLastName,
         password: 'pass',
         role: Role.Participant,
       }
@@ -232,12 +236,12 @@ describe('AuthController', () => {
       })
     })
 
-    it('should fail validation if the password is not strong', async () => {
+    it('should fail validation if the password does not include caps or numbers', async () => {
       const registerRequest: RegisterRequest = {
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'johndoe@example.com',
-        password: 'somepasswordthatsnotstrong',
+        firstName: testFirstName,
+        lastName: testLastName,
+        email: testEmail,
+        password: 'nocapsornumber',
         role: Role.Participant,
       }
 
@@ -261,26 +265,26 @@ describe('AuthController', () => {
       await wipeDB()
       const res = await request(app)
         .post('/auth/register/setup')
-        .send({ email: 'testadmin@test.com', password: 'abDFS141@!' })
+        .send({ email: testEmail, password: testPassword })
       expect(res.status).toEqual(201)
-      const user = await prisma.user.findFirst({ where: { email: 'testadmin@test.com' } })
+      const user = await prisma.user.findFirst({ where: { email: testEmail } })
       expect(user).not.toBeNull()
     })
     it('Should not allow setup registration when a user exists', async () => {
       await resetDB()
       const res = await request(app)
         .post('/auth/register/setup')
-        .send({ email: 'testadmin@test.com', password: 'abDFS141@!' })
+        .send({ email: testEmail, password: testPassword })
       expect(res.ok).toBe(false)
     })
   })
 
   describe('POST /auth/register/participant/{inviteId}', () => {
     const registerParticipantRequestBase: RegisterParticipantRequest = {
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'john@example.com',
-      password: 'johnDoesP@ssword123',
+      firstName: testFirstName,
+      lastName: testLastName,
+      email: TestInvites.INVITE_PENDING.email,
+      password: testPassword,
       mobile: '+61477777777',
       addressLine: '123 Some Street',
       suburb: 'Sydney',
@@ -298,7 +302,7 @@ describe('AuthController', () => {
         where: {
           email: registerParticipantRequestBase.email,
           study: {
-            name: TEST_STUDY,
+            name: TestStudies.TEST_STUDY.name,
           },
         },
       })
@@ -314,7 +318,7 @@ describe('AuthController', () => {
     it('should fail validation if the password is not strong', async () => {
       const registerParticipantRequest: RegisterParticipantRequest = {
         ...registerParticipantRequestBase,
-        password: 'weakpassword',
+        password: 'passwordtester',
       }
       const participantInviteId = await prisma.invite.findFirstOrThrow({
         where: {
@@ -390,7 +394,7 @@ describe('AuthController', () => {
         .send(registerParticipantRequest)
 
       const registered = await prisma.participantProfile.findFirstOrThrow({
-        where: { firstName: 'John', lastName: 'Doe' },
+        where: { firstName: testFirstName, lastName: testLastName },
       })
       const dep1 = await prisma.participantProfile.findFirstOrThrow({
         where: { firstName: 'A', lastName: 'B' },
@@ -420,8 +424,8 @@ describe('AuthController', () => {
 
       const registerParticipantRequest2: RegisterParticipantRequest = {
         ...registerParticipantRequestBase,
-        firstName: 'Jenny',
-        email: 'jenny@gmail.com',
+        firstName: testGuardianFirstName,
+        email: TestInvites.INVITE_2_PENDING.email,
         dependents: [{ firstName: 'A', lastName: 'B', dob: '2020-01-01', permanent: false }],
       }
       const participantInviteId2 = await prisma.invite.findFirstOrThrow({
@@ -439,10 +443,10 @@ describe('AuthController', () => {
         .send(registerParticipantRequest2)
 
       const registered1 = await prisma.participantProfile.findFirstOrThrow({
-        where: { firstName: 'John', lastName: 'Doe' },
+        where: { firstName: testFirstName, lastName: testLastName },
       })
       const registered2 = await prisma.participantProfile.findFirstOrThrow({
-        where: { firstName: 'Jenny', lastName: 'Doe' },
+        where: { firstName: testGuardianFirstName, lastName: testLastName },
       })
 
       const dependents = await prisma.participantProfile.findMany({
@@ -459,10 +463,10 @@ describe('AuthController', () => {
     beforeEach(async () => {
       // Register a user
       const registerRequest: RegisterRequest = {
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'johndoe@email.com',
-        password: 'johnDoesP@ssword123',
+        firstName: testFirstName,
+        lastName: testLastName,
+        email: testEmail,
+        password: testPassword,
         role: Role.OrganisationAdmin,
       }
 
@@ -477,8 +481,8 @@ describe('AuthController', () => {
       jest.replaceProperty(config, 'otp', false)
 
       const loginRequest: LoginRequest = {
-        email: ORG_ADMIN_EMAIL,
-        password: ORG_ADMIN_PASSWORD,
+        email: TestUsers.ORG_ADMIN.email,
+        password: TestUsers.ORG_ADMIN.password,
       }
 
       const loginResponse = await request(app).post('/auth/login').send(loginRequest)
@@ -487,7 +491,7 @@ describe('AuthController', () => {
       const loginBody = loginResponse.body as LoginSuccessResponse
       expect(loginBody.token).toBeDefined()
 
-      expect(loginBody.id).toBe(ORG_ADMIN_ID)
+      expect(loginBody.id).toBe(TestUsers.ORG_ADMIN.id)
       expect(loginBody.role).toBe(Role.OrganisationAdmin)
       expect(loginBody).not.toHaveProperty('otp_token')
     })
@@ -504,8 +508,8 @@ describe('AuthController', () => {
 
       // Login the user
       const loginRequest: LoginRequest = {
-        email: 'johndoe@email.com',
-        password: 'johnDoesP@ssword123',
+        email: testEmail,
+        password: testPassword,
       }
       const loginResponse = await request(app).post('/auth/login').send(loginRequest)
       expect(loginResponse.status).toEqual(200)
@@ -525,7 +529,7 @@ describe('AuthController', () => {
     it("should return 401 and shouldn't allow the user to login with the incorrect password", async () => {
       // Login the user with incorrect password
       const loginRequest: LoginRequest = {
-        email: 'johndoe@email.com',
+        email: testEmail,
         password: 'wrongPassword123',
       }
 
@@ -539,7 +543,7 @@ describe('AuthController', () => {
 
     it('should return 422 if validation fails', async () => {
       const loginRequest = {
-        email: 'johndoe@email.com',
+        email: testEmail,
       }
 
       const response = await request(app).post('/auth/login').send(loginRequest)
@@ -568,7 +572,7 @@ describe('AuthController', () => {
     it('should fail validation if provided with an invalid email', async () => {
       const loginRequest: LoginRequest = {
         email: 'Invalid Email',
-        password: 'SomeGoodPassword123',
+        password: testPassword,
       }
 
       const response = await request(app).post('/auth/login').send(loginRequest)
@@ -583,8 +587,8 @@ describe('AuthController', () => {
     it('Should return an otp token if otp is enabled', async () => {
       jest.replaceProperty(config, 'otp', true)
       const loginRequest: LoginRequest = {
-        email: PARTICIPANT_UNANSWERED_EMAIL,
-        password: 'Testpassword1',
+        email: TestUsers.PARTICIPANT_UNANSWERED.email,
+        password: TestUsers.PARTICIPANT_UNANSWERED.password,
       }
       const loginResponse = await request(app).post('/auth/login').send(loginRequest)
       expect(loginResponse.ok).toBe(true)
@@ -593,47 +597,53 @@ describe('AuthController', () => {
     })
     it('Should lock access for 10 mins if retries exceeded', async () => {
       await prisma.user.update({
-        where: { id: PARTICIPANT_UNANSWERED_ID },
+        where: { id: TestUsers.PARTICIPANT_UNANSWERED.id },
         data: { retriesRemaining: 1 },
       })
       const loginRequest: LoginRequest = {
-        email: PARTICIPANT_UNANSWERED_EMAIL,
+        email: TestUsers.PARTICIPANT_UNANSWERED.email,
         password: 'wrong',
       }
       await request(app).post('/auth/login').send(loginRequest)
-      const user = await prisma.user.findFirstOrThrow({ where: { id: PARTICIPANT_UNANSWERED_ID } })
+      const user = await prisma.user.findFirstOrThrow({
+        where: { id: TestUsers.PARTICIPANT_UNANSWERED.id },
+      })
       expect(user.retriesRemaining).toBe(0)
       const loginResponse = await request(app).post('/auth/login').send(loginRequest)
       expect(loginResponse.body.details).toBe('Retries exceeded, account locked for 10 minutes')
     })
     it('Should lock access for 24 hours if retries exceeded again in 24 hours', async () => {
       await prisma.user.update({
-        where: { id: PARTICIPANT_UNANSWERED_ID },
+        where: { id: TestUsers.PARTICIPANT_UNANSWERED.id },
         data: { retriesRemaining: 0, lockedUntil: new Date(new Date().getTime() - 1000) },
       })
       const loginRequest: LoginRequest = {
-        email: PARTICIPANT_UNANSWERED_EMAIL,
+        email: TestUsers.PARTICIPANT_UNANSWERED.email,
         password: 'wrong',
       }
       const loginResponse = await request(app).post('/auth/login').send(loginRequest)
       expect(loginResponse.body.details).toBe('Retries exceeded, account locked for 24 hours')
-      const user = await prisma.user.findFirstOrThrow({ where: { id: PARTICIPANT_UNANSWERED_ID } })
+      const user = await prisma.user.findFirstOrThrow({
+        where: { id: TestUsers.PARTICIPANT_UNANSWERED.id },
+      })
       expect(user.retriesRemaining).toBe(10)
     })
     it('Should refresh retries after successful login', async () => {
       jest.replaceProperty(config, 'otp', false)
 
       await prisma.user.update({
-        where: { id: PARTICIPANT_UNANSWERED_ID },
+        where: { id: TestUsers.PARTICIPANT_UNANSWERED.id },
         data: { retriesRemaining: 1 },
       })
       const loginRequest: LoginRequest = {
-        email: PARTICIPANT_UNANSWERED_EMAIL,
-        password: 'Testpassword1',
+        email: TestUsers.PARTICIPANT_UNANSWERED.email,
+        password: TestUsers.PARTICIPANT_UNANSWERED.password,
       }
       const loginResponse = await request(app).post('/auth/login').send(loginRequest)
       expect(loginResponse.ok).toBe(true)
-      const user = await prisma.user.findFirstOrThrow({ where: { id: PARTICIPANT_UNANSWERED_ID } })
+      const user = await prisma.user.findFirstOrThrow({
+        where: { id: TestUsers.PARTICIPANT_UNANSWERED.id },
+      })
       expect(user.retriesRemaining).toBe(10)
     })
   })
@@ -644,7 +654,7 @@ describe('AuthController', () => {
           code: '1223',
           expiresAt: new Date(new Date().getTime() + 1000 * 60),
           id: 'abc123',
-          userId: PARTICIPANT_UNANSWERED_ID,
+          userId: TestUsers.PARTICIPANT_UNANSWERED.id,
         },
       })
     })
@@ -656,7 +666,7 @@ describe('AuthController', () => {
       const loginResponse = await request(app).post('/auth/login/otp').send(loginRequest)
       expect(loginResponse.ok).toBe(true)
       expect(loginResponse.body.token).toBeDefined()
-      expect(loginResponse.body.id).toBe(PARTICIPANT_UNANSWERED_ID)
+      expect(loginResponse.body.id).toBe(TestUsers.PARTICIPANT_UNANSWERED.id)
       expect(loginResponse.body.role).toBe(Role.Participant)
     })
     it('Should decrement available retries if code is invalid', async () => {
@@ -667,7 +677,9 @@ describe('AuthController', () => {
       const loginResponse = await request(app).post('/auth/login/otp').send(loginRequest)
       expect(loginResponse.ok).toBe(false)
       expect(loginResponse.body.token).toBeUndefined()
-      const user = await prisma.user.findFirstOrThrow({ where: { id: PARTICIPANT_UNANSWERED_ID } })
+      const user = await prisma.user.findFirstOrThrow({
+        where: { id: TestUsers.PARTICIPANT_UNANSWERED.id },
+      })
       expect(user.retriesRemaining).toBe(9)
     })
     it('Should prevent login if otp is expired', async () => {
@@ -684,7 +696,7 @@ describe('AuthController', () => {
     })
     it('Should not allow login if user is locked out', async () => {
       await prisma.user.update({
-        where: { id: PARTICIPANT_UNANSWERED_ID },
+        where: { id: TestUsers.PARTICIPANT_UNANSWERED.id },
         data: { lockedUntil: new Date(new Date().getTime() + 1000 * 60) },
       })
       const loginRequest: OTPLoginRequest = {
@@ -717,7 +729,7 @@ describe('AuthController', () => {
       })
       fetchMock.mockGlobal().route('http://token', { access_token: '123' })
       fetchMock.mockGlobal().route('http://userinfo', {
-        email: 'admin@example.com',
+        email: TestUsers.ORG_ADMIN.email,
       })
 
       const loginRequest: OIDCLoginRequest = {
@@ -730,7 +742,7 @@ describe('AuthController', () => {
       expect(response.status).toEqual(200)
       expect(response.body.token).toBeDefined()
       expect(response.body.role).toBe(Role.OrganisationAdmin)
-      expect(response.body.id).toBe(ORG_ADMIN_ID)
+      expect(response.body.id).toBe(TestUsers.ORG_ADMIN.id)
     })
 
     it('Should allow oidc login', async () => {
@@ -740,7 +752,7 @@ describe('AuthController', () => {
       })
       fetchMock.mockGlobal().route('http://token', { access_token: '123' })
       fetchMock.mockGlobal().route('http://userinfo', {
-        email: 'admin@example.com',
+        email: TestUsers.ORG_ADMIN.email,
       })
 
       const loginRequest: OIDCLoginRequest = {
@@ -760,7 +772,7 @@ describe('AuthController', () => {
       })
       fetchMock.mockGlobal().route('http://token', { access_token: '123' })
       fetchMock.mockGlobal().route('http://userinfo', {
-        email: 'admin@example.com',
+        email: TestUsers.ORG_ADMIN.email,
       })
 
       const loginRequest: OIDCLoginRequest = {
@@ -781,7 +793,7 @@ describe('AuthController', () => {
       })
       fetchMock.mockGlobal().route('http://token', { access_token: '123' })
       fetchMock.mockGlobal().route('http://userinfo', {
-        email: PARTICIPANT_UNANSWERED_EMAIL,
+        email: TestUsers.PARTICIPANT_UNANSWERED.email,
       })
 
       const loginRequest: OIDCLoginRequest = {
@@ -802,7 +814,7 @@ describe('AuthController', () => {
       const response = await request(app).get('/auth/tcs')
       expect(response.redirect).toBe(true)
       expect(response.headers['location']).toBe(
-        'https://garvan-data-science-platform.github.io/ctrl-docs/docs/terms-and-conditions',
+        'https://garvan-data-science-platform.github.io/ctrl-docs/docs/terms-and-conditions', //TODO: this should not have a default value see issue https://github.com/Garvan-Data-Science-Platform/ctrl/issues/870 Should be populated by seed for tests.
       )
     })
   })

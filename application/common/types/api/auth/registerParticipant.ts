@@ -12,7 +12,7 @@ import type {
  *  "middleName": "James",
  *  "lastName": "Doe",
  *  "email": "john.doe@email.com",
- *  "password": "Password123",
+ *  "password": "Supersecret123",
  *  "dob": "2000-05-21",
  *  "mobile": "0412341234",
  *  "addressLine": "123 Sydney Street",
@@ -67,7 +67,7 @@ export interface RegisterParticipantRequest {
   postcode: string
   state: StateTerritory
   /**
-   * @minLength 8 Password must be at least 8 characters
+   * @minLength 14 Password must be at least 14 characters
    */
   password: string
   /**

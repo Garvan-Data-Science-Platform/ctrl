@@ -3,6 +3,7 @@ import {
   ParticipantType,
   StateTerritory,
 } from 'common/types/api/users/ParticipantProfile'
+import { TestUsers } from 'common/testing/constants'
 
 export const expectedMappedData = {
   externalId: 'external-123',
@@ -15,7 +16,7 @@ export const expectedMappedData = {
   suburb: 'Somewhere',
   postcode: '12345',
   state: Object.values(StateTerritory)[1], // assuming '1' maps to a valid StateTerritory
-  password: 'temporaryPassword123',
+  password: TestUsers.PARTICIPANT_COMPLETED.password, // use test data to meet pw requirements
   dob: '01/01/1990',
   participantType: ParticipantType.STANDARD,
   nextOfKin: {

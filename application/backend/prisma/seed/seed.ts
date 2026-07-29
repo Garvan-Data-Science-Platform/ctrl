@@ -3,6 +3,10 @@ import { hashPassword } from '../../src/authentication'
 import { SurveyStep } from '../../../common/types/survey'
 import { createDefaultAnswers, recalculateAnswers } from '../../src/utils/answers'
 import prisma from '../../src/PrismaClient'
+import { TestUsers } from '../../../common/testing/constants.ts'
+
+// Using test data pw to ensure pw requirements are met
+const seedUserPassword = TestUsers.PARTICIPANT_COMPLETED.password
 
 const main = async () => {
   await prisma.organisation.upsert({
@@ -53,7 +57,7 @@ const main = async () => {
       firstName: 'Michael',
       lastName: 'Wilson',
       role: 'Participant',
-      password: hashPassword('SomePassword123'),
+      password: hashPassword(seedUserPassword),
       profiles: {
         create: [
           {
@@ -104,7 +108,7 @@ const main = async () => {
       firstName: 'Sally',
       lastName: 'Wilson',
       role: 'Participant',
-      password: hashPassword('SomePassword123'),
+      password: hashPassword(seedUserPassword),
       profiles: {
         create: [
           {
@@ -198,7 +202,7 @@ const main = async () => {
       middleName: 'Mary',
       lastName: 'Johnson',
       role: 'Participant',
-      password: hashPassword('SomePassword123'),
+      password: hashPassword(seedUserPassword),
       organisations: {},
       profiles: {
         create: [
@@ -284,7 +288,7 @@ const main = async () => {
       middleName: 'James',
       lastName: 'Doe',
       role: 'OrganisationAdmin',
-      password: hashPassword('SomePassword123'),
+      password: hashPassword(seedUserPassword),
     },
   })
 
@@ -296,7 +300,7 @@ const main = async () => {
       firstName: 'Jane',
       lastName: 'Smith',
       role: 'StudyAdmin',
-      password: hashPassword('SomePassword123'),
+      password: hashPassword(seedUserPassword),
       adminOfStudies: { connect: [{ id: defaultStudy.id }, { id: shortStudy.id }] },
     },
   })
@@ -309,7 +313,7 @@ const main = async () => {
       firstName: 'Bob',
       lastName: 'Brown',
       role: 'OrganisationAdmin',
-      password: hashPassword('SomePassword123'),
+      password: hashPassword(seedUserPassword),
     },
   })
 
@@ -321,7 +325,7 @@ const main = async () => {
       firstName: 'Emily',
       lastName: 'Davis',
       role: 'StudyAdmin',
-      password: hashPassword('SomePassword123'),
+      password: hashPassword(seedUserPassword),
       adminOfStudies: { connect: { id: shortStudy.id } },
     },
   })

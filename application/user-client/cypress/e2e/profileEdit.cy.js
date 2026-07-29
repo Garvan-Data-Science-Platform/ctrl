@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-const { UserType } = require('../../../common/cypress/support/commands')
+const { TestUsers } = require('../../../common/testing/constants')
 
 beforeEach(() => {
   cy.task('reset')
@@ -8,7 +8,7 @@ beforeEach(() => {
 
 describe('Profile Edit', () => {
   function makeChanges() {
-    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
     cy.visit('/profile/update')
     cy.get('[data-cy="update-first"] input').clear()
     cy.get('[data-cy="update-first"]').type('Johnny')
@@ -30,7 +30,7 @@ describe('Profile Edit', () => {
     makeChanges()
   })
   it('Changes to alternative contact are saved', () => {
-    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
     cy.visit('/profile/update')
     cy.get('[data-cy="update-nok-first"] input').clear()
     cy.get('[data-cy="update-nok-first"]').type('AAAB')
@@ -39,7 +39,7 @@ describe('Profile Edit', () => {
     cy.contains('AAAB').should('exist')
   })
   it('Invalid input gets correct error message', () => {
-    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
     cy.visit('/profile/update')
     cy.get('[data-cy="update-mobile"] input').clear()
     cy.get('[data-cy="update-mobile"]').type('0487654a')
@@ -48,10 +48,10 @@ describe('Profile Edit', () => {
   })
 
   it('Shows family members correctly', () => {
-    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
     cy.visit('/profile')
     cy.contains('Family').should('not.exist')
-    cy.login(UserType.PARTICIPANT_COMPLETED)
+    cy.login(TestUsers.PARTICIPANT_COMPLETED.email)
     cy.visit('/profile')
     cy.contains('Family').should('exist')
     cy.contains('Test Dependent').should('exist')
@@ -59,12 +59,12 @@ describe('Profile Edit', () => {
   })
 
   it('Does not allow participant to change their own email address', () => {
-    cy.login(UserType.PARTICIPANT_UNANSWERED)
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
     cy.visit('/profile/update')
     // Wait for data to load
     cy.get('[data-cy="update-nok-first"]', { timeout: 500 }).should('be.visible')
     cy.get('input, textarea, select').each(($el) => {
-      expect($el.val()).to.not.include(UserType.PARTICIPANT_UNANSWERED)
+      expect($el.val()).to.not.include(TestUsers.PARTICIPANT_UNANSWERED.email)
     })
   })
 })

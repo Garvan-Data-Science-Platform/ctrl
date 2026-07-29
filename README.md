@@ -26,12 +26,12 @@ CTRL, developed by [Garvan Institute of Medical Research](https://www.garvan.org
 **User Portal**
 URL: [http://ctrldemo.dsp.garvan.org.au/](http://ctrldemo.dsp.garvan.org.au/)
 Login: `user@example.com`
-Password: `Testpassword2`
+Password: `Supersecret123`
 
 **Admin Portal**
 URL: [http://admin.ctrldemo.dsp.garvan.org.au/](http://admin.ctrldemo.dsp.garvan.org.au/)
 Login: `admin@example.com`
-Password: `Testpassword1`
+Password: `Supersecret123`
 
 ## Features
 

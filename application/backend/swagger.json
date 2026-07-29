@@ -113,85 +113,83 @@
         "type": "object",
         "additionalProperties": false
       },
-      "User": {
-        "description": "Model User",
+      "Pick_User.Exclude_keyofUser.password-or-emailHash__": {
         "properties": {
-          "deleted": {
-            "type": "boolean"
-          },
-          "retriesRemaining": {
+          "id": {
             "type": "number",
             "format": "double"
           },
-          "lockedUntil": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "agreedTermsAt": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "role": {
-            "$ref": "#/components/schemas/_36_Enums.Role"
-          },
-          "password": {
-            "type": "string"
-          },
-          "emailHash": {
-            "type": "string",
-            "nullable": true
-          },
-          "email": {
-            "type": "string"
-          },
-          "lastName": {
+          "firstName": {
             "type": "string"
           },
           "middleName": {
             "type": "string",
             "nullable": true
           },
-          "firstName": {
+          "lastName": {
             "type": "string"
           },
-          "id": {
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/_36_Enums.Role"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "agreedTermsAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "lockedUntil": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "retriesRemaining": {
             "type": "number",
             "format": "double"
+          },
+          "deleted": {
+            "type": "boolean"
           }
         },
         "required": [
-          "deleted",
-          "retriesRemaining",
-          "lockedUntil",
-          "agreedTermsAt",
-          "updatedAt",
-          "createdAt",
-          "role",
-          "password",
-          "emailHash",
-          "email",
-          "lastName",
-          "middleName",
+          "id",
           "firstName",
-          "id"
+          "middleName",
+          "lastName",
+          "email",
+          "role",
+          "createdAt",
+          "updatedAt",
+          "agreedTermsAt",
+          "lockedUntil",
+          "retriesRemaining",
+          "deleted"
         ],
-        "type": "object"
+        "type": "object",
+        "description": "From T, pick a set of properties whose keys are in the union K"
+      },
+      "Omit_User.password-or-emailHash_": {
+        "$ref": "#/components/schemas/Pick_User.Exclude_keyofUser.password-or-emailHash__",
+        "description": "Construct a type with the properties of T except for those in type K."
+      },
+      "UserResponse": {
+        "$ref": "#/components/schemas/Omit_User.password-or-emailHash_"
       },
       "GetAllUsersResponse": {
         "properties": {
           "data": {
             "items": {
-              "$ref": "#/components/schemas/User"
+              "$ref": "#/components/schemas/UserResponse"
             },
             "type": "array"
           }
@@ -224,7 +222,7 @@
       "GetUserByIdResponse": {
         "properties": {
           "data": {
-            "$ref": "#/components/schemas/User"
+            "$ref": "#/components/schemas/UserResponse"
           }
         },
         "required": [
@@ -350,7 +348,7 @@
         "properties": {
           "newPassword": {
             "type": "string",
-            "minLength": 8
+            "minLength": 14
           },
           "token": {
             "type": "string"
@@ -363,7 +361,7 @@
         "type": "object",
         "additionalProperties": false,
         "example": {
-          "newPassword": "newPassword123",
+          "newPassword": "Newsupersecret123",
           "token": "1063e00e4a273e698577"
         }
       },
@@ -1507,7 +1505,7 @@
           },
           "password": {
             "type": "string",
-            "minLength": 8
+            "minLength": 14
           },
           "dob": {
             "type": "string"
@@ -1538,7 +1536,7 @@
           "middleName": "James",
           "lastName": "Doe",
           "email": "john.doe@email.com",
-          "password": "Password123",
+          "password": "Supersecret123",
           "dob": "2000-05-21",
           "mobile": "0412341234",
           "addressLine": "123 Sydney Street",
@@ -2227,6 +2225,80 @@
         "type": "object",
         "additionalProperties": false
       },
+      "User": {
+        "description": "Model User",
+        "properties": {
+          "deleted": {
+            "type": "boolean"
+          },
+          "retriesRemaining": {
+            "type": "number",
+            "format": "double"
+          },
+          "lockedUntil": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "agreedTermsAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "role": {
+            "$ref": "#/components/schemas/_36_Enums.Role"
+          },
+          "password": {
+            "type": "string"
+          },
+          "emailHash": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "middleName": {
+            "type": "string",
+            "nullable": true
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "id": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": [
+          "deleted",
+          "retriesRemaining",
+          "lockedUntil",
+          "agreedTermsAt",
+          "updatedAt",
+          "createdAt",
+          "role",
+          "password",
+          "emailHash",
+          "email",
+          "lastName",
+          "middleName",
+          "firstName",
+          "id"
+        ],
+        "type": "object"
+      },
       "GetOrganisationUsersResponse": {
         "properties": {
           "data": {
@@ -2428,7 +2500,7 @@
           },
           "password": {
             "type": "string",
-            "minLength": 8
+            "minLength": 14
           },
           "role": {
             "$ref": "#/components/schemas/Role"
@@ -2447,7 +2519,7 @@
           "firstName": "John",
           "lastName": "Doe",
           "email": "john.doe@email.com",
-          "password": "Password123",
+          "password": "Supersecret123",
           "role": "OrganisationAdmin"
         }
       },
@@ -2514,7 +2586,7 @@
           },
           "password": {
             "type": "string",
-            "minLength": 8
+            "minLength": 14
           }
         },
         "required": [
@@ -2525,7 +2597,7 @@
         "additionalProperties": false,
         "example": {
           "email": "john.doe@email.com",
-          "password": "Password123"
+          "password": "Supersecret123"
         }
       },
       "RegisterParticipantResponse": {
@@ -2591,7 +2663,7 @@
           },
           "password": {
             "type": "string",
-            "minLength": 8
+            "minLength": 14
           },
           "dob": {
             "type": "string"
@@ -2635,7 +2707,7 @@
           "middleName": "James",
           "lastName": "Doe",
           "email": "john.doe@email.com",
-          "password": "Password123",
+          "password": "Supersecret123",
           "dob": "2000-05-21",
           "mobile": "0412341234",
           "addressLine": "123 Sydney Street",
@@ -2735,7 +2807,7 @@
         "additionalProperties": false,
         "example": {
           "email": "john.doe@email.com",
-          "password": "Password123"
+          "password": "Supersecret123"
         }
       },
       "OTPLoginRequest": {

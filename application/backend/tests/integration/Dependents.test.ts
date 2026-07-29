@@ -11,7 +11,7 @@ import {
 } from 'common/types/api/users/ParticipantProfile'
 
 import prisma from '../../src/PrismaClient'
-import { ORG_ADMIN_ID } from 'common/testing/seed'
+import { TestUsers } from 'common/testing/constants'
 
 const api = new Api()
 const app = api.app
@@ -22,7 +22,7 @@ describe('Survey tests', () => {
   beforeAll(async () => {
     api.run()
     await resetDB()
-    adminToken = await generateToken({ userId: ORG_ADMIN_ID })
+    adminToken = await generateToken({ userId: TestUsers.ORG_ADMIN.id })
   })
 
   afterAll(async () => {
@@ -56,7 +56,7 @@ describe('Survey tests', () => {
       mobile: '0412345678',
       nextOfKin: { email: 'nok@gmail.com', firstName: 'N', lastName: 'k' },
       participantType: ParticipantType.STANDARD,
-      password: 'PASS123of2389vNDFS!',
+      password: TestUsers.PARTICIPANT_COMPLETED.password, // Using test user pw to meet pw requirements
       postcode: '1234',
       preferredContact: ContactMethod.MOBILE,
       state: StateTerritory.ACT,

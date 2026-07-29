@@ -1,14 +1,14 @@
 /// <reference types="cypress" />
 
-const { UserType } = require('../../../common/cypress/support/commands')
+const { TestUsers } = require('../../../common/testing/constants')
 
 beforeEach(() => {
   cy.task('reset')
+  cy.login(TestUsers.ORG_ADMIN.email)
 })
 
 describe('Survey Editor', () => {
   it('Edit title and description', () => {
-    cy.login(UserType.ORG_ADMIN)
     cy.visit('/surveys')
     cy.get('[data-rowindex="0"]').contains('Current Draft').should('exist')
     cy.get('[data-rowindex="0"] button').first().click()
@@ -23,7 +23,6 @@ describe('Survey Editor', () => {
   })
 
   it('Add, delete and rearrange questions', () => {
-    cy.login(UserType.ORG_ADMIN)
     cy.visit('/surveys/edit/2')
     cy.contains('Checkbox').click()
     cy.contains('Mandatory').should('exist')
@@ -64,7 +63,6 @@ describe('Survey Editor', () => {
     cy.get('[data-cy="survey-element"]').eq(1).contains('Subheading').should('exist')
   })
   it('Add, delete and rearrange steps', () => {
-    cy.login(UserType.ORG_ADMIN)
     cy.visit('/surveys/edit/2')
     cy.get('[data-cy="options-button"]').should('not.be.disabled').click()
     cy.contains('step up').should('have.class', 'Mui-disabled')
@@ -79,7 +77,6 @@ describe('Survey Editor', () => {
     cy.get('[data-cy="step-list"]').children().first().contains('New Step').should('exist')
   })
   it('Publish', () => {
-    cy.login(UserType.ORG_ADMIN)
     cy.visit('/surveys/edit/2')
     cy.contains('Publish').click()
     cy.contains('new version').should('exist')
@@ -90,7 +87,6 @@ describe('Survey Editor', () => {
     cy.contains('2').should('exist')
   })
   it('DUO Code Lookup', () => {
-    cy.login(UserType.ORG_ADMIN)
     cy.visit('/surveys/edit/2')
     cy.contains('Step 2').click()
 
