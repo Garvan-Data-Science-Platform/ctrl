@@ -521,14 +521,39 @@ const models: TsoaRoute.Models = {
         "enums": ["STANDARD","GUARDIAN","DEPENDENT_AGE","DEPENDENT_OTHER"],
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "FirstName": {
+        "dataType": "refAlias",
+        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":100},"pattern":{"value":"^[\\p{L}\\s\\-\\'\\.]+$"}}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "MiddleName": {
+        "dataType": "refAlias",
+        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":100},"pattern":{"value":"^[\\p{L}\\s\\-\\'\\.]+$"}}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "LastName": {
+        "dataType": "refAlias",
+        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":100},"pattern":{"value":"^[\\p{L}\\s\\-\\'\\.]+$"}}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Mobile": {
+        "dataType": "refAlias",
+        "type": {"dataType":"string","validators":{"pattern":{"errorMsg":"please provide valid phone number","value":"^(\\+\\d{1,2}\\s?)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$"}}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Email": {
+        "dataType": "refAlias",
+        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":254}}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "AlternativeContact": {
         "dataType": "refObject",
         "properties": {
-            "firstName": {"dataType":"string","required":true},
-            "middleName": {"dataType":"string"},
-            "lastName": {"dataType":"string","required":true},
-            "mobile": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}]},
-            "email": {"dataType":"string","required":true},
+            "firstName": {"ref":"FirstName","required":true},
+            "middleName": {"ref":"MiddleName"},
+            "lastName": {"ref":"LastName","required":true},
+            "mobile": {"dataType":"union","subSchemas":[{"ref":"Mobile"},{"dataType":"enum","enums":[null]}]},
+            "email": {"ref":"Email","required":true},
         },
         "additionalProperties": false,
     },
@@ -554,12 +579,17 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "DoB": {
+        "dataType": "refAlias",
+        "type": {"dataType":"string","validators":{"isDate":{"errorMsg":"Date of birth must be YYYY-MM-DD format"}}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "OnBehalf": {
         "dataType": "refObject",
         "properties": {
-            "firstName": {"dataType":"string","required":true},
-            "lastName": {"dataType":"string","required":true},
-            "dob": {"dataType":"string","required":true},
+            "firstName": {"ref":"FirstName","required":true},
+            "lastName": {"ref":"LastName","required":true},
+            "dob": {"ref":"DoB","required":true},
             "permanent": {"dataType":"boolean","required":true},
         },
         "additionalProperties": false,
@@ -567,7 +597,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Partial_RegisterParticipantRequest_": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"firstName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"middleName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"lastName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"email":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"pattern":{"errorMsg":"please provide valid email","value":"^(.+)@(.+)$"}}},"mobile":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"pattern":{"errorMsg":"please provide valid phone number","value":"^(\\+\\d{1,2}\\s?)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$"}}},"preferredContact":{"dataType":"union","subSchemas":[{"ref":"ContactMethod"},{"dataType":"undefined"}]},"addressLine":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"suburb":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"postcode":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"value":1}}},"state":{"dataType":"union","subSchemas":[{"ref":"StateTerritory"},{"dataType":"undefined"}]},"password":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"minLength":{"errorMsg":"Password must be at least 14 characters","value":14}}},"dob":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"isDate":{"errorMsg":"Date of birth must be of date format"}}},"participantType":{"dataType":"union","subSchemas":[{"ref":"ParticipantType"},{"dataType":"undefined"}]},"nextOfKin":{"dataType":"union","subSchemas":[{"ref":"AlternativeContact"},{"dataType":"undefined"}]},"dependents":{"dataType":"union","subSchemas":[{"dataType":"array","array":{"dataType":"refObject","ref":"OnBehalf"}},{"dataType":"undefined"}]},"externalId":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"firstName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"middleName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"lastName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"email":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"mobile":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"preferredContact":{"dataType":"union","subSchemas":[{"ref":"ContactMethod"},{"dataType":"undefined"}]},"addressLine":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"suburb":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"postcode":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"state":{"dataType":"union","subSchemas":[{"ref":"StateTerritory"},{"dataType":"undefined"}]},"password":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"dob":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"participantType":{"dataType":"union","subSchemas":[{"ref":"ParticipantType"},{"dataType":"undefined"}]},"nextOfKin":{"dataType":"union","subSchemas":[{"ref":"AlternativeContact"},{"dataType":"undefined"}]},"dependents":{"dataType":"union","subSchemas":[{"dataType":"array","array":{"dataType":"refObject","ref":"OnBehalf"}},{"dataType":"undefined"}],"validators":{"maxItems":{"value":15}}},"externalId":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}],"validators":{"maxLength":{"value":255}}}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "UpdateProfileRequest": {
@@ -670,21 +700,21 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Email": {
-        "dataType": "refAlias",
-        "type": {"dataType":"string","validators":{"pattern":{"errorMsg":"Please provide valid email","value":"^(.+)@(.+)$"}}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Partial_GetParticipantProfileResponse-at-data_": {
         "dataType": "refAlias",
         "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"id":{"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"undefined"}]},"firstName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"middleName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"lastName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"dob":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"email":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"mobile":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"addressLine":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"suburb":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"state":{"dataType":"union","subSchemas":[{"ref":"StateTerritory"},{"dataType":"undefined"}]},"postcode":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"preferredContact":{"dataType":"union","subSchemas":[{"ref":"ContactMethod"},{"dataType":"undefined"}]},"participantType":{"dataType":"union","subSchemas":[{"ref":"ParticipantType"},{"dataType":"undefined"}]},"nextOfKin":{"dataType":"union","subSchemas":[{"ref":"AlternativeContact"},{"dataType":"undefined"}]},"familyMembers":{"dataType":"union","subSchemas":[{"dataType":"array","array":{"dataType":"refObject","ref":"FamilyMember"}},{"dataType":"undefined"}]},"familyId":{"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"undefined"}]}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ExternalId": {
+        "dataType": "refAlias",
+        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":128},"pattern":{"value":"^[a-zA-Z0-9\\-_=\\.:]+$"}}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Prefill": {
         "dataType": "refObject",
         "properties": {
             "profile": {"ref":"Partial_GetParticipantProfileResponse-at-data_"},
-            "studyParticipant": {"dataType":"nestedObjectLiteral","nestedProperties":{"externalId":{"dataType":"string"}}},
+            "studyParticipant": {"dataType":"nestedObjectLiteral","nestedProperties":{"externalId":{"ref":"ExternalId"}}},
         },
         "additionalProperties": false,
     },
@@ -858,15 +888,25 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Password": {
+        "dataType": "refAlias",
+        "type": {"dataType":"string","validators":{"minLength":{"value":14},"maxLength":{"value":128}}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "RoleT": {
+        "dataType": "refAlias",
+        "type": {"ref":"Role","validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "RegisterRequest": {
         "dataType": "refObject",
         "properties": {
-            "firstName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
-            "middleName": {"dataType":"string","validators":{"minLength":{"value":1}}},
-            "lastName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
-            "email": {"dataType":"string","required":true,"validators":{"pattern":{"errorMsg":"Please provide valid email","value":"^(.+)@(.+)$"}}},
-            "password": {"dataType":"string","required":true,"validators":{"minLength":{"errorMsg":"Password must be at least 14 characters","value":14}}},
-            "role": {"ref":"Role","required":true},
+            "firstName": {"ref":"FirstName","required":true},
+            "middleName": {"ref":"MiddleName"},
+            "lastName": {"ref":"LastName","required":true},
+            "email": {"ref":"Email","required":true},
+            "password": {"ref":"Password","required":true},
+            "role": {"ref":"RoleT","required":true},
         },
         "additionalProperties": false,
     },
@@ -900,25 +940,40 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "AddressLine": {
+        "dataType": "refAlias",
+        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":128},"pattern":{"value":"^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"}}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Suburb": {
+        "dataType": "refAlias",
+        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":128},"pattern":{"value":"^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"}}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Postcode": {
+        "dataType": "refAlias",
+        "type": {"dataType":"string","validators":{"pattern":{"value":"^\\d{4}$"}}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "RegisterParticipantRequest": {
         "dataType": "refObject",
         "properties": {
-            "firstName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
-            "middleName": {"dataType":"string","validators":{"minLength":{"value":1}}},
-            "lastName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
-            "email": {"dataType":"string","required":true,"validators":{"pattern":{"errorMsg":"please provide valid email","value":"^(.+)@(.+)$"}}},
-            "mobile": {"dataType":"string","required":true,"validators":{"pattern":{"errorMsg":"please provide valid phone number","value":"^(\\+\\d{1,2}\\s?)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$"}}},
+            "firstName": {"ref":"FirstName","required":true},
+            "middleName": {"ref":"MiddleName"},
+            "lastName": {"ref":"LastName","required":true},
+            "email": {"ref":"Email","required":true},
+            "mobile": {"ref":"Mobile","required":true},
             "preferredContact": {"ref":"ContactMethod","required":true},
-            "addressLine": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
-            "suburb": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
-            "postcode": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
+            "addressLine": {"ref":"AddressLine","required":true},
+            "suburb": {"ref":"Suburb","required":true},
+            "postcode": {"ref":"Postcode","required":true},
             "state": {"ref":"StateTerritory","required":true},
-            "password": {"dataType":"string","required":true,"validators":{"minLength":{"errorMsg":"Password must be at least 14 characters","value":14}}},
-            "dob": {"dataType":"string","required":true,"validators":{"isDate":{"errorMsg":"Date of birth must be of date format"}}},
+            "password": {"ref":"Password","required":true},
+            "dob": {"ref":"DoB","required":true},
             "participantType": {"ref":"ParticipantType","required":true},
             "nextOfKin": {"ref":"AlternativeContact","required":true},
-            "dependents": {"dataType":"array","array":{"dataType":"refObject","ref":"OnBehalf"},"required":true},
-            "externalId": {"dataType":"string"},
+            "dependents": {"dataType":"array","array":{"dataType":"refObject","ref":"OnBehalf"},"required":true,"validators":{"maxItems":{"value":15}}},
+            "externalId": {"ref":"ExternalId","validators":{"maxLength":{"value":255}}},
         },
         "additionalProperties": false,
     },
@@ -928,7 +983,7 @@ const models: TsoaRoute.Models = {
         "properties": {
             "token": {"dataType":"string","required":true},
             "id": {"dataType":"double","required":true},
-            "role": {"dataType":"string","required":true},
+            "role": {"ref":"RoleT","required":true},
         },
         "additionalProperties": false,
     },
@@ -959,8 +1014,8 @@ const models: TsoaRoute.Models = {
     "LoginRequest": {
         "dataType": "refObject",
         "properties": {
-            "email": {"dataType":"string","required":true,"validators":{"pattern":{"errorMsg":"Please provide valid email","value":"^(.+)@(.+)$"}}},
-            "password": {"dataType":"string","required":true},
+            "email": {"ref":"Email","required":true},
+            "password": {"ref":"Password","required":true},
         },
         "additionalProperties": false,
     },

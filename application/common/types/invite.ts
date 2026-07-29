@@ -1,14 +1,10 @@
 import { GetParticipantProfileResponse } from './api/users'
-
-/**
- * @pattern ^(.+)@(.+)$ Please provide valid email
- */
-type Email = string
+import { Email, ExternalId } from './commonTypes'
 
 export interface Prefill {
   profile?: Partial<GetParticipantProfileResponse['data']>
   studyParticipant?: {
-    externalId?: string
+    externalId?: ExternalId
   }
 }
 

@@ -1,15 +1,8 @@
-/**
- * @example {
- *  "email": "john.doe@email.com",
- *  "password": "Supersecret123"
- * }
- */
+import { Email, Password, RoleT } from '../../commonTypes'
+
 export interface LoginRequest {
-  /**
-   * @pattern ^(.+)@(.+)$ Please provide valid email
-   */
-  email: string
-  password: string
+  email: Email
+  password: Password
 }
 
 export interface OTPLoginRequest {
@@ -26,7 +19,7 @@ export interface OIDCLoginRequest {
 export interface LoginSuccessResponse {
   token: string
   id: number
-  role: string
+  role: RoleT
 }
 
 export interface LoginChallengeResponse {
