@@ -92,24 +92,38 @@ nvm use
 # Enable corepack to use "yarn modern"
 corepack enable
 
-# Finally install all project dependencies
+# Install all project dependencies
 yarn install
 ```
 
-### Run the Database
+Install pre-commit by following <https://pre-commit.com/#installation>, then set up the git hooks in this repo:
+
+```bash
+pre-commit install
+```
+
+### Configure environment
 
 ```bash
 # Copy example env variables and fill out with correct values
 cp application/backend/.env.example application/backend/.env
 
-# Run db
+# Copy example config file
+cp application/backend/config/config.json5.template application/backend/config/config.json5
+```
+
+Open `application/backend/.env` and set `PRISMA_FIELD_ENCRYPTION_KEY` - generate one at <https://cloak.47ng.com/>
+
+### Run the Database
+
+```bash
+# For local development
 make db
+make seed       # runs migrations + seed data
 
-# Run migrations
-yarn prisma:migrate
-
-# Run migrations and seed database (Note: do not seed database in production)
-make seed
+# For production
+make db
+yarn prisma:migrate # migrations only
 ```
 
 > _**Note:** After starting the database you should run `make seed` to apply migrations and seed the database with initial data. This is required for development and testing. **Do not run `make seed` in production environments.**_
