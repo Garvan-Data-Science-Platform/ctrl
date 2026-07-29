@@ -15,6 +15,8 @@ ENV VITE_BACKEND_URL "/api"
 ENV VITE_APP_VERSION ${APP_VERSION}
 
 COPY package.json .yarnrc.yml yarn.lock ./
+# This line below should be removed when reliance on yarn patch is resolved
+COPY .yarn/patches/* ./.yarn/patches/
 COPY application/admin-client/package.json application/admin-client/
 COPY application/user-client/package.json application/user-client/
 COPY application/backend/package.json application/backend/
