@@ -9,7 +9,7 @@ import {
   Typography,
 } from '@mui/material'
 import { useForm } from 'react-hook-form'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router'
 import { ResetPasswordRequest } from '@common/types/api/users'
 import { checkPasswordStrength } from '@common/src/PasswordStrength'
 import { apiClient } from '../apiClient'

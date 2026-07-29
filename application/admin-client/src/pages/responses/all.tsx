@@ -49,7 +49,7 @@ export const AllResponsesView = () => {
   const { data } = useCustom<GetAllResponsesResponse>({
     url: `studies/${studyId}/surveys/${id}/participants/answers`,
     method: 'get',
-  })
+  }).query
 
   const rows = useMemo(() => {
     return data?.data.data.participants || []

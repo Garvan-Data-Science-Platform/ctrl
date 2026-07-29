@@ -13,7 +13,7 @@ import {
 } from '@mui/material'
 import GroupAddIcon from '@mui/icons-material/GroupAdd'
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { SensitiveTextField } from '../../components/SensitiveTextField'
 import { useCustom, useGetIdentity } from '@refinedev/core'
 import { GetElsaTokenResponse } from '@common/types/api/integrations/getElsaToken'
@@ -30,7 +30,7 @@ export const IntegrationsHome = () => {
   const { data, refetch } = useCustom<GetElsaTokenResponse>({
     url: `elsa/token`,
     method: 'get',
-  })
+  }).query
 
   const enabled = Boolean(data?.data.token)
 

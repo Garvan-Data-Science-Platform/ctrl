@@ -36,7 +36,9 @@ export const LogoUploader = ({
       setLogoVersion(Date.now())
       setLocalHasLogo(true)
 
-      queryClient.invalidateQueries([resource])
+      queryClient.invalidateQueries({
+        queryKey: [resource],
+      })
     } catch (e: any) {
       open?.({
         type: 'error',
@@ -57,7 +59,9 @@ export const LogoUploader = ({
       open?.({ type: 'success', message: 'Deleted logo' })
       setLocalHasLogo(false)
 
-      queryClient.invalidateQueries([resource])
+      queryClient.invalidateQueries({
+        queryKey: [resource],
+      })
     } catch (e: any) {
       open?.({
         type: 'error',

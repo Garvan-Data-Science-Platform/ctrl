@@ -2,7 +2,7 @@
   "name": "backend",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "yarn prisma generate && esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --external:express --external:cors --loader:.html=text --loader:.css=text --define:process.env.ESBUILD=true",
+    "build": "yarn prisma generate && esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --external:sharp --external:@prisma/client --external:express --external:cors --loader:.html=text --loader:.css=text --define:process.env.ESBUILD=true",
     "start": "node dist/index.js",
     "type-check": "tsc -b",
     "lint": "eslint .",
@@ -38,7 +38,7 @@
     "nodemailer": "^9.0.1",
     "pg": "^8.12.0",
     "prisma-field-encryption": "^1.6.0",
-    "sharp": "^0.34.1",
+    "sharp": "^0.35.3",
     "swagger-ui-express": "^5.0.1",
     "tsoa": "^6.6.0",
     "uuid": "^11.1.0",

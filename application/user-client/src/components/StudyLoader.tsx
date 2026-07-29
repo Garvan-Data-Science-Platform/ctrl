@@ -1,7 +1,7 @@
 import React, { PropsWithChildren, useEffect, useRef } from 'react'
 import { useAppStore } from '../store'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router'
 import { apiClient } from '../apiClient'
 import NavBar from '../components/NavBar'
 import { CircularProgress, Container, Typography } from '@mui/material'

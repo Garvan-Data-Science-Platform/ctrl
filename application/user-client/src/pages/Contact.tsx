@@ -9,7 +9,7 @@ import {
 } from '@mui/material'
 import NavBar from '../components/NavBar'
 import EmailIcon from '@mui/icons-material/Email'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router'
 import { useAppStore } from '../store'
 import { useEffect, useState } from 'react'
 import { apiClient } from '../apiClient'

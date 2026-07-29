@@ -1,7 +1,7 @@
 import { Box, Button, Container, TextField, Tooltip, Typography } from '@mui/material'
 import { useNotification } from '@refinedev/core'
 import { useForm } from '@refinedev/react-hook-form'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { axiosInstance } from '../../providers/dataProvider'
 import { Info } from '@mui/icons-material'
 import { LogoUploader } from '../../components/LogoUploader'
@@ -22,7 +22,7 @@ const SettingsPage = () => {
     handleSubmit,
     formState: { errors },
     watch,
-    refineCore: { queryResult },
+    refineCore: { query },
   } = useForm<any, any, FieldValues>({
     refineCoreProps: {
       resource: 'settings',
@@ -34,7 +34,7 @@ const SettingsPage = () => {
   })
 
   const { open } = useNotification()
-  const orgSettingsData = queryResult?.data?.data
+  const orgSettingsData = query?.data?.data
   console.log('SETTINGS DATA:', orgSettingsData)
 
   const handleSave = async (data: FieldValues) => {

@@ -21,7 +21,7 @@ import {
   Typography,
 } from '@mui/material'
 
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { GetUserSurveyStepResponse } from '@common/types/api/surveys'
 import { apiClient } from '../apiClient'

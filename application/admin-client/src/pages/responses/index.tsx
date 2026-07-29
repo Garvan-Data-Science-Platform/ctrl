@@ -11,7 +11,7 @@ export const ResponsesView = () => {
   const { data } = useCustom<GetResponsesByIdResponse>({
     url: `studies/${studyId}/surveys/${params?.versionNumber}/participants/${params?.id}/answers`,
     method: 'get',
-  })
+  }).query
 
   const derived_from = data?.data.data.derived_from
 

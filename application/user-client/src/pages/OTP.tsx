@@ -1,10 +1,10 @@
 import { Button, Card, Container, Stack, Typography } from '@mui/material'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router'
 import { useAuth } from '../auth'
 import { LoginResponse } from '@common/types/api/auth'
 import { FormEvent, useEffect, useState } from 'react'
 import { MuiOtpInput } from 'mui-one-time-password-input'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 
 export default function OTP() {
   const { login } = useAuth()

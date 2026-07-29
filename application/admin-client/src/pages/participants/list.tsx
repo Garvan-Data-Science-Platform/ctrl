@@ -15,7 +15,7 @@ import {
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import { DateField, EditButton, List, ShowButton, useDataGrid } from '@refinedev/mui'
 import React, { useEffect, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router'
 import { InviteModal } from '../../components/InviteModal'
 import { Recipient } from '@common/types/invite'
 import { axiosInstance } from '../../providers/dataProvider'

@@ -22,7 +22,7 @@ import { StudyEntry, useStudyStore } from '../../studyStore'
 import { AddCircle, ArrowDropDown, Delete, Edit, Info } from '@mui/icons-material'
 import { useQueryClient } from '@tanstack/react-query'
 import { SensitiveTextField } from '../../components/SensitiveTextField'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router'
 import { LogoUploader } from '../../components/LogoUploader'
 import { RESOURCES } from '../../constants'
 import { emailRegex } from '@common/src/regex'
@@ -67,7 +67,9 @@ const StudyCard = ({
         if (activeStudyIndex > studies.length) {
           setActiveStudyIndex(0)
         }
-        queryClient.invalidateQueries(['studies'])
+        queryClient.invalidateQueries({
+          queryKey: ['studies'],
+        })
         const newStudies = [...studies]
         // Destructure out the token so that it doesn't go into the store
         const { redcapToken, ...sanitisedUpdateData } = updateData
@@ -97,7 +99,9 @@ const StudyCard = ({
         if (activeStudyIndex == studies.length - 1) {
           setActiveStudyIndex(0)
         }
-        queryClient.invalidateQueries(['studies'])
+        queryClient.invalidateQueries({
+          queryKey: ['studies'],
+        })
       })
       .catch((e) => {
         open?.({ type: 'error', message: `Error deleting study: ${e}` })
@@ -369,7 +373,9 @@ const StudiesPage = () => {
       .post('studies', { name: newStudyName })
       .then(() => {
         handleCloseNewStudyDialog()
-        queryClient.invalidateQueries(['studies'])
+        queryClient.invalidateQueries({
+          queryKey: ['studies'],
+        })
       })
       .catch((e) => {
         open?.({

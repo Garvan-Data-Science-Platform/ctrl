@@ -30,10 +30,11 @@ import { OnBehalf, ParticipantType } from '@common/types/api/users/ParticipantPr
 import { useEffect, useState } from 'react'
 import { ParticipantSearch } from '../../components/ParticipantSearch'
 import { ArrowBack, Delete } from '@mui/icons-material'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router'
 import { GetFamilyResponse } from '@common/types/api/families'
 import { axiosInstance } from '../../providers/dataProvider'
 import { useCurrentStudyId } from '../../studyStore'
+import { useQueryClient } from '@tanstack/react-query'
 
 export const FamilyEdit = () => {
   const studyId = useCurrentStudyId()
@@ -43,7 +44,9 @@ export const FamilyEdit = () => {
   const invalidate = useInvalidate()
   const nav = useNavigate()
 
-  const { data, remove } = useOne<GetFamilyResponse['data']>({ resource: 'families', id })
+  const queryClient = useQueryClient()
+
+  const { data } = useOne<GetFamilyResponse['data']>({ resource: 'families', id }).query
 
   const [action, setAction] = useState<'ADD' | 'REMOVE' | null>(null)
   const [loading, setLoading] = useState(false)
@@ -57,11 +60,12 @@ export const FamilyEdit = () => {
   useEffect(() => {
     if (data) {
       if (data.data.every((val) => !val.inStudy)) {
-        remove()
+        // Clear the cache for this specific familiy so it doesn flash if we come back
+        queryClient.removeQueries({ queryKey: ['families', 'getOne', id] })
         nav('/participants')
       }
     }
-  }, [data])
+  }, [data, id, nav, queryClient])
 
   //Dependents add form
   const { register, handleSubmit, reset } = useForm<OnBehalf>()

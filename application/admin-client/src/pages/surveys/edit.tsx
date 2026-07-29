@@ -24,8 +24,9 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import { SurveyElementCard, SurveyDropSpace } from '../../components/SurveyElementCard'
 import { useSurveyStore } from '../../surveyStore'
 import { axiosInstance } from '../../providers/dataProvider'
-import { useResource, useShow, useUpdate, useNavigation, useNotification } from '@refinedev/core'
+import { useShow, useUpdate, useNavigation, useNotification } from '@refinedev/core'
 import { useCurrentStudyId } from '../../studyStore'
+import { useParams } from 'react-router'
 
 export const SurveyEditor = () => {
   const {
@@ -59,10 +60,8 @@ export const SurveyEditor = () => {
   }
 
   const { list } = useNavigation()
-
-  const { id } = useResource()
-
-  const { queryResult } = useShow({ resource: 'surveys' })
+  const { id: surveyId } = useParams()
+  const { query } = useShow({ resource: 'surveys', id: surveyId })
 
   const { open } = useNotification()
 
@@ -78,7 +77,7 @@ export const SurveyEditor = () => {
     invalidates: ['resourceAll'],
   })
 
-  const { data: queryData, isLoading } = queryResult
+  const { data: queryData, isLoading } = query
 
   const disabled = queryData?.data.status != 'DRAFT'
 
@@ -105,7 +104,7 @@ export const SurveyEditor = () => {
       setSavePending(true)
       clearTimeout(timeoutObject)
       const t = setTimeout(() => {
-        mutate({ id, values: { data: surveyData }, invalidates: [] })
+        mutate({ id: surveyId as string, values: { data: surveyData }, invalidates: [] })
         setSavePending(false)
       }, 2000)
       setTimeoutObject(t as any)
@@ -124,7 +123,7 @@ export const SurveyEditor = () => {
 
   const handlePublish = () => {
     axiosInstance
-      .post(`studies/${studyId}/surveys/${id}/publish`)
+      .post(`studies/${studyId}/surveys/${surveyId}/publish`)
       .then(() => {
         list('surveys')
       })

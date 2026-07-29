@@ -660,7 +660,7 @@ describe('UsersController', () => {
       expect(res1.body.data).toHaveLength(0)
       await prisma.user.delete({
         where: {
-          id: OPERATOR_ADMIN_ID,
+          id: TestUsers.OPERATOR_ADMIN.id,
         },
       })
       const res2 = await request(app)
@@ -679,7 +679,7 @@ describe('UsersController', () => {
       expect(res1.body.data).toHaveLength(0)
       await prisma.user.delete({
         where: {
-          id: OPERATOR_ADMIN_ID,
+          id: TestUsers.OPERATOR_ADMIN.id,
         },
       })
       const res2 = await request(app)
