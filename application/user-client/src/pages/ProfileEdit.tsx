@@ -14,7 +14,7 @@ import {
   Link as MLink,
 } from '@mui/material'
 import { useForm } from 'react-hook-form'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router'
 import { useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { GetParticipantProfileResponse, UpdateProfileRequest } from '@common/types/api/users'

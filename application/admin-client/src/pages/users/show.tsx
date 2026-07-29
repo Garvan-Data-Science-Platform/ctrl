@@ -6,9 +6,9 @@ import { GetUserByIdResponse } from '@common/types/api/users'
 import { useStudyStore } from '../../studyStore'
 
 export const UserShow = () => {
-  const { queryResult } = useShow({})
+  const { query } = useShow({})
 
-  const { data, isLoading } = queryResult
+  const { data, isLoading } = query
 
   const record = data?.data
   const { data: identity } = useGetIdentity<{ role: string; id: number }>()

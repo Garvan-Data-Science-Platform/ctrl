@@ -15,7 +15,7 @@ export function ParticipantSearch({ buttonText, onConfirm, exclude }: Participan
   const [selectedId, setSelectedId] = useState<number>()
   const [participants, setParticipants] = useState<Participant[]>([])
 
-  const { data } = useList<Participant, HttpError>({ resource: 'participants' })
+  const { data } = useList<Participant, HttpError>({ resource: 'participants' }).query
 
   useEffect(() => {
     const filtered = data?.data.filter((val) => {

@@ -2,7 +2,7 @@ import { useInvalidate, useNotification } from '@refinedev/core'
 import { RedcapImport } from '../../components/RedcapImport'
 import { axiosInstance } from '../../providers/dataProvider'
 import { participantUploadCSVDocumentation } from './helpPageRedcap'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { useCurrentStudyId } from '../../studyStore'
 import { Recipient } from '@common/types/invite'
 

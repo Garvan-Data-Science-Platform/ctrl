@@ -27,7 +27,7 @@ export const UserList = () => {
     queryOptions: {
       enabled: !!dataGridProps?.rows,
     },
-  })
+  }).query
 
   const { data: identity } = useGetIdentity<{ role: string; id: number }>()
 
