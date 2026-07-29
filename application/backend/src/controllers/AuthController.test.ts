@@ -13,12 +13,7 @@ import type {
 import prisma from '../PrismaClient'
 import { Role } from '@prisma/client'
 import { resetDB, wipeDB } from 'common/testing/TestHelpers'
-import {
-  TestUsers,
-  TestStudies,
-  TestInvites,
-  commonPasswordBaseWords,
-} from 'common/testing/constants'
+import { TestUsers, TestStudies, TestInvites } from 'common/testing/constants'
 import {
   ContactMethod,
   ParticipantType,
@@ -338,6 +333,7 @@ describe('AuthController', () => {
       expect(registerParticipantBody.details).toEqual({
         Uppercase: { message: 'Invalid value provided' },
         Number: { message: 'Invalid value provided' },
+        CommonBase: { message: 'Invalid value provided' },
       })
     })
 

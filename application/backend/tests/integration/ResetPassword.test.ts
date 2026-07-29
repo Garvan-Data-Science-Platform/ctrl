@@ -94,8 +94,7 @@ describe('User Password Reset', () => {
     expect(body.message).toBe('Validation Failed')
     expect(body.details).toEqual({
       'bodyRequest.newPassword': {
-        message: 'Password must be at least 14 characters',
-        value: invalidPassword,
+        message: 'Invalid value provided',
       },
     })
 

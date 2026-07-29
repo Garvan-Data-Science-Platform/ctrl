@@ -260,7 +260,7 @@ describe('UsersController', () => {
     })
 
     it('should not expose information when updating a user', async () => {
-      const userId: number = PARTICIPANT_UNANSWERED_ID
+      const userId: number = TestUsers.PARTICIPANT_UNANSWERED.id
 
       // Get existing user details
       const existingUser = await prisma.user.findFirst({ where: { id: userId } })
