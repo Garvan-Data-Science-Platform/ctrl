@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { RedcapImport } from '../../components/RedcapImport'
 import { axiosInstance } from '../../providers/dataProvider'
 import { instrumentUploadCSVDocumentation } from './helpPageRedcap'

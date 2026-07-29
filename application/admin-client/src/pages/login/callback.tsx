@@ -1,7 +1,7 @@
 import { Button, CircularProgress, Stack, Typography } from '@mui/material'
 import { useParsed } from '@refinedev/core'
 import { useLogin } from '../../hooks/useLogin'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 
 import { axiosInstance } from '@refinedev/simple-rest'
 import { useEffect, useState } from 'react'

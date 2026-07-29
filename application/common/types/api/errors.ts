@@ -35,8 +35,7 @@ export interface UnauthorizedErrorResponse {
  * @example {
  *  "message": "Validation Failed",
  *  "bodyRequest.firstName": {
- *    "message": "minLength 1",
- *    "value": ""
+ *    "message": "Invalid value provided",
  *   }
  * }
  */

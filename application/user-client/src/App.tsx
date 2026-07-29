@@ -2,7 +2,7 @@ import './App.css'
 import { Box, Theme, ThemeProvider, Typography } from '@mui/material'
 import customTheme from './theme'
 
-import { RouterProvider } from 'react-router-dom'
+import { RouterProvider } from 'react-router'
 import router from './router.tsx'
 import { AuthProvider } from './auth'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'

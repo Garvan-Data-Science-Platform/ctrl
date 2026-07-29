@@ -3,15 +3,15 @@ import { GetParticipantResponse } from '@common/types/api/participants'
 import { Box, Button, IconButton, Stack, Tooltip, Typography } from '@mui/material'
 import { useShow } from '@refinedev/core'
 import { Show, TextFieldComponent as TextField } from '@refinedev/mui'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { statusMap } from './list'
 import { familyMap } from '@common/src/familyMap'
 import { Edit } from '@mui/icons-material'
 
 export const ParticipantShow = () => {
-  const { queryResult } = useShow({})
+  const { query } = useShow({})
 
-  const { data, isLoading } = queryResult
+  const { data, isLoading } = query
 
   const record = data?.data as GetParticipantResponse['data']
 

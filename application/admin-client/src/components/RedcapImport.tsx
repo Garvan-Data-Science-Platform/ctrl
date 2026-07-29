@@ -16,7 +16,7 @@ import { useEffect, useState } from 'react'
 import { Close, ArrowBack } from '@mui/icons-material'
 import ReactMarkdown from 'react-markdown'
 import { useNotification, useBack } from '@refinedev/core'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { useCurrentStudyId, useStudyStore } from '../studyStore'
 import { RedcapLogo } from './RedcapLogo'
 

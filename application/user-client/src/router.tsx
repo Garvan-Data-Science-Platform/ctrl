@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter } from 'react-router'
 import Dashboard from './pages/Dashboard'
 import Profile from './pages/Profile'
 import ProfileEdit from './pages/ProfileEdit'

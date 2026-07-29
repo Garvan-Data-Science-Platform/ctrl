@@ -5,22 +5,22 @@ import { RefineKbar, RefineKbarProvider } from '@refinedev/kbar'
 import {
   AuthPage,
   ErrorComponent,
-  notificationProvider,
+  useNotificationProvider,
   RefineSnackbarProvider,
-  ThemedLayoutV2,
-  ThemedTitleV2,
+  ThemedLayout,
+  ThemedTitle,
 } from '@refinedev/mui'
 
 import { dataProvider } from './providers/dataProvider'
 import CssBaseline from '@mui/material/CssBaseline'
 import GlobalStyles from '@mui/material/GlobalStyles'
-import { BrowserRouter, Route, Routes, Outlet, Link } from 'react-router-dom'
+import { BrowserRouter, Route, Routes, Outlet, Link } from 'react-router'
 import routerBindings, {
   NavigateToResource,
   CatchAllNavigate,
   UnsavedChangesNotifier,
   DocumentTitleHandler,
-} from '@refinedev/react-router-v6'
+} from '@refinedev/react-router'
 import { UserList, UserCreate, UserEdit, UserShow } from './pages/users'
 import { SurveyList, SurveyEditor } from './pages/surveys'
 import { ColorModeContextProvider } from './contexts/color-mode'
@@ -68,7 +68,7 @@ function App() {
               <DevtoolsProvider>
                 <Refine
                   dataProvider={dataProvider()}
-                  notificationProvider={notificationProvider}
+                  notificationProvider={useNotificationProvider}
                   routerProvider={routerBindings}
                   authProvider={authProvider}
                   accessControlProvider={accessControlProvider}
@@ -186,7 +186,6 @@ function App() {
                   options={{
                     syncWithLocation: true,
                     warnWhenUnsavedChanges: false,
-                    useNewQueryKeys: true,
                     projectId: 'UqrerM-EBDoyv-UEni4Y',
                     reactQuery: {
                       clientConfig: {
@@ -212,14 +211,14 @@ function App() {
                           fallback={<CatchAllNavigate to="/login" />}
                         >
                           <StudyLoader>
-                            <ThemedLayoutV2
+                            <ThemedLayout
                               Header={Header}
                               Title={({ collapsed }) => (
-                                <ThemedTitleV2 collapsed={collapsed} text="CTRL Admin Portal" />
+                                <ThemedTitle collapsed={collapsed} text="CTRL Admin Portal" />
                               )}
                             >
                               <Outlet />
-                            </ThemedLayoutV2>
+                            </ThemedLayout>
                           </StudyLoader>
                         </Authenticated>
                       }

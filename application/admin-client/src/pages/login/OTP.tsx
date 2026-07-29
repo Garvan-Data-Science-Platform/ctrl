@@ -1,5 +1,5 @@
 import { Box, Button, Card, Container, Stack, Typography } from '@mui/material'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router'
 import { LoginResponse } from '@common/types/api/auth'
 import { FormEvent, useEffect, useState } from 'react'
 import { MuiOtpInput } from 'mui-one-time-password-input'
