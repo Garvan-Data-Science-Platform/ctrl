@@ -17,9 +17,10 @@ describe('User Password Reset', () => {
   const userEmail = TestUsers.PASSWORD_RESET_USER.email
   const userId = TestUsers.PASSWORD_RESET_USER.id
   const originalPassword = TestUsers.PASSWORD_RESET_USER.password
-  // Note: using a password that doesn't contain the seeded user's name/email for PII check
-  const newPassword = 'BrightMorningStar2026'
+  // Note: using different test data pw to ensure consistency with pw requirements
+  const newPassword = TestUsers.PARTICIPANT_COMPLETED.password
   const invalidPassword = 'password'
+  const piiPassword = 'MyResetLoginPass26' // contains "reset" - the seeded user's firstName
 
   beforeAll(async () => {
     api.run()
@@ -97,6 +98,21 @@ describe('User Password Reset', () => {
         message: 'Invalid value provided',
       },
     })
+
+    // Check the original password is still in the database
+    const updatedUser = await prisma.user.findUnique({ where: { id: userId } })
+    const isPasswordCorrect = await verifyPassword(updatedUser!.password, originalPassword)
+    expect(isPasswordCorrect).toBe(true)
+  })
+
+  it('should reject a new password containing the user personal info', async () => {
+    const response = await request(app).post('/users/password/reset').send({
+      token: resetToken,
+      newPassword: piiPassword,
+    })
+
+    expect(response.status).toBe(422)
+    expect(response.body.details).toHaveProperty('PersonalInfo')
 
     // Check the original password is still in the database
     const updatedUser = await prisma.user.findUnique({ where: { id: userId } })
