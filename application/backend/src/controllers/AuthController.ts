@@ -83,7 +83,12 @@ export class AuthController extends Controller {
   public async registerUser(@Body() bodyRequest: RegisterRequest): Promise<RegisterResponse> {
     const { password, ...userDetails } = bodyRequest
 
-    const { isValid, fields } = await checkPasswordStrength(password)
+    const { isValid, fields } = await checkPasswordStrength(password, {
+      firstName: bodyRequest.firstName,
+      middleName: bodyRequest.middleName,
+      lastName: bodyRequest.lastName,
+      email: bodyRequest.email,
+    })
 
     if (!isValid) {
       throw new ValidateError(fields, 'Password does not meet strength requirements')
@@ -145,7 +150,7 @@ export class AuthController extends Controller {
   ): Promise<RegisterResponse> {
     const { password, email } = bodyRequest
 
-    const { isValid, fields } = await checkPasswordStrength(password)
+    const { isValid, fields } = await checkPasswordStrength(password, { email })
 
     if (!isValid) {
       throw new ValidateError(fields, 'Password does not meet strength requirements')
@@ -214,7 +219,13 @@ export class AuthController extends Controller {
     }
 
     // Check and hash Password
-    const { isValid, fields } = await checkPasswordStrength(password)
+    const { isValid, fields } = await checkPasswordStrength(password, {
+      firstName,
+      middleName,
+      lastName,
+      email,
+      dob: bodyRequest.dob,
+    })
     if (!isValid) {
       throw new ValidateError(fields, 'Password does not meet strength requirements')
     }
