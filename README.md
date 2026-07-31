@@ -47,6 +47,8 @@ Password: `Supersecret123`
 
 ### Prod installation: Helm (CTRL Standalone)
 
+> For a full deployment walkthrough, see [Deploying CTRL](https://garvan-data-science-platform.github.io/ctrl-docs/docs/deploying-ctrl) in the docs site.
+
 We have created a helm chart for quick and easy installation of CTRL and its dependencies. If you have a kubernetes cluster and helm CLI installed, you can use this command to install the latest stable version of CTRL:
 
 `helm install <release-name> oci://australia-southeast1-docker.pkg.dev/dsp-registry-410602/garvan-public/ctrl`
