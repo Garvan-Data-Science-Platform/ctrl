@@ -8,8 +8,10 @@
     "lint": "eslint .",
     "build": "true",
     "dev": "true",
-    "test": "jest",
-    "e2e": "CYPRESS_MODE=open bash scripts/run_e2e_tests.sh"
+    "jest": "jest",
+    "e2e": "CYPRESS_MODE=open bash scripts/run_e2e_tests.sh",
+    "test": "yarn run jest && yarn run e2e",
+    "test:ci": "yarn run jest"
   },
   "devDependencies": {
     "@types/winston": "^2.4.4",
