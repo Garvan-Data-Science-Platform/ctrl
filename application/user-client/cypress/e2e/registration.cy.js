@@ -103,7 +103,7 @@ describe('registration', () => {
         cy.visit(`/register/${inviteId}`)
       })
     cy.wait(500) // wait for form to be fully loaded
-    cy.get('[data-cy="reg-first"]').clear()
+    cy.get('[data-cy="reg-first"] input').clear()
     cy.get('[data-cy="reg-first"]').type('Tanuj')
     cy.get('[data-cy="reg-password"]').type('TanujCorduroy2026')
     cy.get('[data-cy="reg-confirm-password"]').type('TanujCorduroy2026')
