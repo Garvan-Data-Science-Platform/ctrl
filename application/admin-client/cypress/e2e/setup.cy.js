@@ -13,4 +13,15 @@ describe('Setup', () => {
     cy.visit('/surveys')
     cy.contains('Current Draft').should('exist')
   })
+
+  it('Rejects password containing the email local part', () => {
+    cy.task('wipe')
+    cy.visit('/')
+    cy.url().should('contain', '/setup')
+    cy.get('[data-cy="setup-email"]').type('tanuj@example.com')
+    cy.get('[data-cy="setup-password"]').type('MyTanujCorduroy26')
+    cy.get('[data-cy="setup-submit"]').click()
+    cy.contains('Invalid password').should('exist')
+    cy.contains('contains personal information').should('exist')
+  })
 })
