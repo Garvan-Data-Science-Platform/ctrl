@@ -7,6 +7,7 @@
     "type-check": "tsc -b",
     "lint": "eslint .",
     "test": "bash scripts/run_tests.sh",
+    "test:ci": "yarn run test",
     "tsoa:spec": "tsoa spec",
     "tsoa:routes": "tsoa routes",
     "build-docs": "yarn run tsoa:routes && yarn run tsoa:spec && tsx scripts/replace-refs.ts",
