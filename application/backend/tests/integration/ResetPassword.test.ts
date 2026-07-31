@@ -17,8 +17,8 @@ describe('User Password Reset', () => {
   const userEmail = TestUsers.PASSWORD_RESET_USER.email
   const userId = TestUsers.PASSWORD_RESET_USER.id
   const originalPassword = TestUsers.PASSWORD_RESET_USER.password
-  // Note: using different test data pw to ensure consistency with pw requirements
-  const newPassword = TestUsers.PARTICIPANT_COMPLETED.password
+  // Note: using a password that doesn't contain the seeded user's name/email for PII check
+  const newPassword = 'BrightMorningStar2026'
   const invalidPassword = 'password'
 
   beforeAll(async () => {

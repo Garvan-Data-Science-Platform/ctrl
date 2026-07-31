@@ -581,7 +581,7 @@ describe('UsersController', () => {
     it('should reset the password when given a valid reset token and new password', async () => {
       const requestBody: ResetPasswordRequest = {
         token: resetToken,
-        newPassword: TestUsers.GUARDIAN_2.password, // Providing a different test users password
+        newPassword: 'BrightMorningStar2026',
       }
 
       const response = await request(app).post('/users/password/reset').send(requestBody)
