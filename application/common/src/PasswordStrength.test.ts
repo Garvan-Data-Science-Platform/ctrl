@@ -111,9 +111,9 @@ describe('checkPasswordStrength', () => {
       expect(fields).toEqual({})
     })
 
-    it('ignores tokens shorter than 3 characters', () => {
+    it('ignores tokens shorter than 4 characters', () => {
       const { fields } = checkPasswordStrength(strongPassword, {
-        firstName: 'Li',
+        firstName: 'Bob',
       })
       expect(fields.PersonalInfo).toBeUndefined()
     })

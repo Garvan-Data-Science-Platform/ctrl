@@ -28,7 +28,7 @@ function extractPiiTokens(context: PasswordContext): string[] {
     value
       .split(/\s+/)
       .map((token) => token.trim().toLowerCase())
-      .filter((token) => token.length >= 3)
+      .filter((token) => token.length >= 4)
       .forEach((token) => tokens.add(token))
   }
   addTokens(context.firstName)
