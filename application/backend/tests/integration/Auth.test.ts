@@ -123,7 +123,7 @@ describe('Auth', () => {
       firstName: 'John',
       lastName: 'Doe',
       email: TestInvites.INVITE_2_PENDING.email,
-      password: 'johnDoesP@ssword123',
+      password: STRONG_TEST_PASSWORD,
       mobile: '+61477777777',
       addressLine: '123 Some Street',
       suburb: 'Sydney',
