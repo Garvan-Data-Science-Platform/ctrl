@@ -459,8 +459,19 @@ export class UsersController extends Controller {
       throw new PasswordResetTokenInvalidError('Reset token expired')
     }
 
+    // Fetch DOB from ParticipantProfile if this user has one (participants only)
+    const participantProfile = await prisma.participantProfile.findFirst({
+      where: { userId: passwordResetToken.userId },
+    })
+
     // Validate the new password against the strength requirements
-    const { isValid, fields } = await checkPasswordStrength(newPassword)
+    const { isValid, fields } = await checkPasswordStrength(newPassword, {
+      firstName: passwordResetToken.user.firstName,
+      middleName: passwordResetToken.user.middleName ?? undefined,
+      lastName: passwordResetToken.user.lastName,
+      email: passwordResetToken.user.email,
+      dob: participantProfile?.dob ?? undefined,
+    })
 
     if (!isValid) {
       throw new ValidateError(fields, 'New password does not meet strength requirements')
