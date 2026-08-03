@@ -194,7 +194,15 @@ export async function seedTests(prisma: PrismaClient) {
       participantType: 'STANDARD',
     },
   })
-
+  await prisma.invite.create({
+    data: {
+      email: TestUsers.PARTICIPANT_UNANSWERED.email,
+      status: InviteStatus.ACCEPTED,
+      studyId: testStudy.id,
+      expiresAt: new Date('2026-01-01'),
+      sentAt: new Date('2025-12-15'),
+    },
+  })
   await prisma.alternativeContact.create({
     data: {
       participantProfileId: TestUsers.PARTICIPANT_UNANSWERED.id,
@@ -229,6 +237,16 @@ export async function seedTests(prisma: PrismaClient) {
       userId: TestUsers.PARTICIPANT_COMPLETED.id,
       familyId: 100,
       participantType: 'GUARDIAN',
+    },
+  })
+
+  await prisma.invite.create({
+    data: {
+      email: TestUsers.PARTICIPANT_COMPLETED.email,
+      status: InviteStatus.ACCEPTED,
+      studyId: testStudy.id,
+      expiresAt: new Date('2026-01-01'),
+      sentAt: new Date('2025-12-15'),
     },
   })
 
@@ -287,6 +305,16 @@ export async function seedTests(prisma: PrismaClient) {
       familyId: 100,
       userId: TestUsers.GUARDIAN_2.id,
       participantType: 'GUARDIAN',
+    },
+  })
+
+  await prisma.invite.create({
+    data: {
+      email: TestUsers.GUARDIAN_2.email,
+      status: InviteStatus.ACCEPTED,
+      studyId: testStudy.id,
+      expiresAt: new Date('2026-01-01'),
+      sentAt: new Date('2025-12-15'),
     },
   })
 
