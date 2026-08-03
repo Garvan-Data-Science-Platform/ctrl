@@ -523,6 +523,16 @@ export async function seedTests(prisma: PrismaClient) {
     },
   })
 
+  await prisma.invite.create({
+    data: {
+      email: TestUsers.GUARDIAN_2.email,
+      status: InviteStatus.ACCEPTED,
+      studyId: frontendTestStudy.id,
+      expiresAt: new Date('2026-01-01'),
+      sentAt: new Date('2025-12-15'),
+    },
+  })
+
   await prisma.participantProfile.update({
     where: {
       id: participantUnansweredProfile.id,
@@ -538,6 +548,16 @@ export async function seedTests(prisma: PrismaClient) {
           },
         },
       },
+    },
+  })
+
+  await prisma.invite.create({
+    data: {
+      email: TestUsers.PARTICIPANT_UNANSWERED.email,
+      status: InviteStatus.ACCEPTED,
+      studyId: frontendTestStudy.id,
+      expiresAt: new Date('2026-01-01'),
+      sentAt: new Date('2025-12-15'),
     },
   })
 
