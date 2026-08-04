@@ -92,3 +92,33 @@ describe('MailerController', () => {
     })
   })
 })
+
+// Test due to nodemailer moving to more strict sender address parsing
+describe('Mailer Configuration', () => {
+  const originalHostname = process.env.HOSTNAME
+
+  beforeEach(() => {
+    jest.resetModules()
+  })
+
+  afterEach(() => {
+    process.env.HOSTNAME = originalHostname
+  })
+
+  it('should strip http:// and ports from HOSTNAME in fromAddress', async () => {
+    // non RFC-compliant environment variable
+    process.env.HOSTNAME = 'http://localhost:5173'
+
+    const mailerModule = await import('../utils/mailer')
+
+    expect(mailerModule!.fromAddress).toBe('CTRL <noreply@localhost>')
+  })
+
+  it('should handle plain domains without protocols', async () => {
+    process.env.HOSTNAME = 'production-domain.com'
+
+    const mailerModule = await import('../utils/mailer')
+
+    expect(mailerModule!.fromAddress).toBe('CTRL <noreply@production-domain.com>')
+  })
+})
