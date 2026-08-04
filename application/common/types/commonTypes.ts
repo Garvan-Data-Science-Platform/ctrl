@@ -1,7 +1,7 @@
 // Common base types to be defined once here and used in many other places in `api/`
 //
 // Note: see docs for explanation of character class patterns (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Regular_expressions/Unicode_character_class_escape)
-import { Role } from '@prisma/client'
+import { Role, User } from '@prisma/client'
 
 /**
  * @minLength 1
@@ -41,11 +41,6 @@ export type Email = string
  * @example "Supersecret123"
  */
 export type Password = string
-
-/**
- * @example "OrganisationAdmin"
- */
-export type RoleT = Role
 
 /**
  * @pattern ^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$ please provide valid phone number
@@ -88,3 +83,10 @@ export type DoB = string
  * @example "123e4567-e89b-12d3-a456-426614174000"
  */
 export type ExternalId = string
+
+/**
+ * @example "OrganisationAdmin"
+ */
+export type RoleT = Role
+
+export type UserT = User

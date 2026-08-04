@@ -9,6 +9,7 @@ import {
   Mobile,
   Password,
   Postcode,
+  RoleT,
   Suburb,
 } from '../../commonTypes'
 import type {
@@ -47,5 +48,5 @@ export interface RegisterParticipantRequest {
 export interface RegisterParticipantResponse {
   id: number
   token: string
-  role: string
+  role: RoleT
 }

@@ -1,10 +1,5 @@
-import type { Role } from '@prisma/client'
+import { RoleT } from '../../commonTypes'
 
-/**
- * @example {
- *  "newRole": "OperatorAdmin"
- * }
- */
 export interface UpdateUserRoleRequest {
-  newRole: Role
+  newRole: RoleT
 }
