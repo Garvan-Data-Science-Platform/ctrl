@@ -128,196 +128,7 @@ export async function seedTests(prisma: PrismaClient) {
     },
   })
 
-  //User with unanswered survey
-  await prisma.user.create({
-    data: {
-      id: TestUsers.PARTICIPANT_UNANSWERED.id,
-      email: TestUsers.PARTICIPANT_UNANSWERED.email,
-      firstName: 'Test',
-      lastName: 'User',
-      password: hashPassword(TestUsers.PARTICIPANT_UNANSWERED.password),
-      role: Role.Participant,
-      organisations: {
-        connect: {
-          id: 1,
-        },
-      },
-    },
-  })
-
-  //Second guardian user
-  await prisma.user.create({
-    data: {
-      id: TestUsers.GUARDIAN_2.id,
-      email: TestUsers.GUARDIAN_2.email,
-      firstName: 'Second',
-      lastName: 'Guardian',
-      password: hashPassword(TestUsers.GUARDIAN_2.password),
-      role: Role.Participant,
-    },
-  })
-  //User with completed survey
-  await prisma.user.create({
-    data: {
-      id: TestUsers.PARTICIPANT_COMPLETED.id,
-      email: TestUsers.PARTICIPANT_COMPLETED.email,
-      firstName: 'Test',
-      lastName: 'User',
-      password: hashPassword(TestUsers.PARTICIPANT_COMPLETED.password),
-      role: Role.Participant,
-    },
-  })
-
-  const participantUnansweredProfile = await prisma.participantProfile.create({
-    data: {
-      id: TestUsers.PARTICIPANT_UNANSWERED.id,
-      firstName: 'Unanswered',
-      lastName: 'User',
-      addressLine: '123 smith st',
-      dob: '1980-01-24',
-      mobile: '0412345678',
-      postcode: '1234',
-      preferredContact: 'EMAIL',
-      state: 'VIC',
-      suburb: 'M',
-      studies: {
-        create: {
-          participantId: `PID-TEST1-${TestUsers.PARTICIPANT_UNANSWERED.id}`,
-          study: {
-            connect: {
-              id: testStudy.id,
-            },
-          },
-        },
-      },
-      userId: TestUsers.PARTICIPANT_UNANSWERED.id,
-      participantType: 'STANDARD',
-    },
-  })
-  await prisma.invite.create({
-    data: {
-      email: TestUsers.PARTICIPANT_UNANSWERED.email,
-      status: InviteStatus.ACCEPTED,
-      studyId: testStudy.id,
-      expiresAt: new Date('2026-01-01'),
-      sentAt: new Date('2025-12-15'),
-    },
-  })
-  await prisma.alternativeContact.create({
-    data: {
-      participantProfileId: TestUsers.PARTICIPANT_UNANSWERED.id,
-      email: 'alt@email.com',
-      firstName: 'Alt',
-      lastName: 'Cont',
-    },
-  })
-
-  await prisma.participantProfile.create({
-    data: {
-      id: TestUsers.PARTICIPANT_COMPLETED.id,
-      firstName: 'Completed',
-      lastName: 'User',
-      addressLine: '123 smith st',
-      dob: '1980-01-23',
-      mobile: '0412345678',
-      postcode: '1234',
-      preferredContact: 'EMAIL',
-      state: 'VIC',
-      suburb: 'Melbourne',
-      studies: {
-        create: {
-          participantId: `PID-TEST1-${TestUsers.PARTICIPANT_COMPLETED.id}`,
-          study: {
-            connect: {
-              id: testStudy.id,
-            },
-          },
-        },
-      },
-      userId: TestUsers.PARTICIPANT_COMPLETED.id,
-      familyId: 100,
-      participantType: 'GUARDIAN',
-    },
-  })
-
-  await prisma.invite.create({
-    data: {
-      email: TestUsers.PARTICIPANT_COMPLETED.email,
-      status: InviteStatus.ACCEPTED,
-      studyId: testStudy.id,
-      expiresAt: new Date('2026-01-01'),
-      sentAt: new Date('2025-12-15'),
-    },
-  })
-
-  //Dependent Profile (no user)
-  await prisma.participantProfile.create({
-    data: {
-      id: TestUsers.DEPENDENT.id,
-      firstName: 'Test',
-      lastName: 'Dependent',
-      addressLine: '123 smith st',
-      dob: '1990-01-23',
-      mobile: '0412345678',
-      postcode: '1234',
-      preferredContact: 'EMAIL',
-      state: 'VIC',
-      suburb: 'Melbourne',
-      studies: {
-        create: {
-          participantId: `PID-TEST1-${TestUsers.DEPENDENT.id}`,
-          study: {
-            connect: {
-              id: testStudy.id,
-            },
-          },
-        },
-      },
-      familyId: 100,
-      userId: null,
-      participantType: 'DEPENDENT_AGE',
-    },
-  })
-
-  //Second guardian
-  await prisma.participantProfile.create({
-    data: {
-      id: TestUsers.GUARDIAN_2.id,
-      firstName: 'Second',
-      lastName: 'Guardian',
-      addressLine: '123 smith st',
-      dob: '1990-01-23',
-      mobile: '0412345678',
-      postcode: '1234',
-      preferredContact: 'EMAIL',
-      state: 'VIC',
-      suburb: 'Melbourne',
-      studies: {
-        create: {
-          participantId: `PID-TEST1-${TestUsers.GUARDIAN_2.id}`,
-          study: {
-            connect: {
-              id: testStudy.id,
-            },
-          },
-        },
-      },
-      familyId: 100,
-      userId: TestUsers.GUARDIAN_2.id,
-      participantType: 'GUARDIAN',
-    },
-  })
-
-  await prisma.invite.create({
-    data: {
-      email: TestUsers.GUARDIAN_2.email,
-      status: InviteStatus.ACCEPTED,
-      studyId: testStudy.id,
-      expiresAt: new Date('2026-01-01'),
-      sentAt: new Date('2025-12-15'),
-    },
-  })
-
+  // Survey versions - created before participants so they can be nested inside profile creation
   const testSurveyVersion = await prisma.surveyVersion.create({
     data: {
       id: 800,
@@ -336,7 +147,8 @@ export async function seedTests(prisma: PrismaClient) {
       studyId: testStudy.id,
     },
   })
-  // publish a survey for study 2
+
+  // Published survey for study 2
   const study2survey = await prisma.surveyVersion.create({
     data: {
       status: 'PUBLISHED',
@@ -360,66 +172,231 @@ export async function seedTests(prisma: PrismaClient) {
     },
   })
 
-  await prisma.surveyVersionAnswers.create({
-    data: {
-      versionId: testSurveyVersion.id,
-      profileId: TestUsers.PARTICIPANT_UNANSWERED.id,
-      answers: [
-        { status: 'review_required', answers: [] },
-        { status: 'review_required', answers: [null, null] },
-      ],
+  // User with unanswered survey - nested writes for user + profile + study + nextOfKin + surveys
+  // Invite is a separate call after because Invite has no direct relation to User in the schema
+  await prisma.user.upsert({
+    where: { email: TestUsers.PARTICIPANT_UNANSWERED.email },
+    update: {},
+    create: {
+      id: TestUsers.PARTICIPANT_UNANSWERED.id,
+      email: TestUsers.PARTICIPANT_UNANSWERED.email,
+      firstName: 'Test',
+      lastName: 'User',
+      password: hashPassword(TestUsers.PARTICIPANT_UNANSWERED.password),
+      role: Role.Participant,
+      organisations: { connect: { id: 1 } },
+      profiles: {
+        create: [
+          {
+            id: TestUsers.PARTICIPANT_UNANSWERED.id,
+            firstName: 'Unanswered',
+            lastName: 'User',
+            addressLine: '123 smith st',
+            dob: '1980-01-24',
+            mobile: '0412345678',
+            postcode: '1234',
+            preferredContact: 'EMAIL',
+            state: 'VIC',
+            suburb: 'M',
+            participantType: 'STANDARD',
+            studies: {
+              create: {
+                participantId: `PID-TEST1-${TestUsers.PARTICIPANT_UNANSWERED.id}`,
+                study: { connect: { id: testStudy.id } },
+              },
+            },
+            nextOfKin: {
+              create: {
+                email: 'alt@email.com',
+                firstName: 'Alt',
+                lastName: 'Cont',
+              },
+            },
+            surveys: {
+              create: [
+                {
+                  versionId: testSurveyVersion.id,
+                  answers: [
+                    { status: 'review_required', answers: [] },
+                    { status: 'review_required', answers: [null, null] },
+                  ],
+                },
+                {
+                  versionId: study2survey.id,
+                  answers: [{ status: 'review_required', answers: [null] }],
+                },
+              ],
+            },
+          },
+        ],
+      },
     },
   })
-  await prisma.surveyVersionAnswers.create({
+  await prisma.invite.create({
     data: {
-      versionId: study2survey.id,
-      profileId: TestUsers.PARTICIPANT_UNANSWERED.id,
-      answers: [{ status: 'review_required', answers: [null] }],
+      email: TestUsers.PARTICIPANT_UNANSWERED.email,
+      status: InviteStatus.ACCEPTED,
+      studyId: testStudy.id,
+      expiresAt: new Date('2026-01-01'),
+      sentAt: new Date('2025-12-15'),
     },
   })
 
-  await prisma.surveyVersionAnswers.create({
+  // User with completed survey
+  await prisma.user.upsert({
+    where: { email: TestUsers.PARTICIPANT_COMPLETED.email },
+    update: {},
+    create: {
+      id: TestUsers.PARTICIPANT_COMPLETED.id,
+      email: TestUsers.PARTICIPANT_COMPLETED.email,
+      firstName: 'Test',
+      lastName: 'User',
+      password: hashPassword(TestUsers.PARTICIPANT_COMPLETED.password),
+      role: Role.Participant,
+      profiles: {
+        create: [
+          {
+            id: TestUsers.PARTICIPANT_COMPLETED.id,
+            firstName: 'Completed',
+            lastName: 'User',
+            addressLine: '123 smith st',
+            dob: '1980-01-23',
+            mobile: '0412345678',
+            postcode: '1234',
+            preferredContact: 'EMAIL',
+            state: 'VIC',
+            suburb: 'Melbourne',
+            familyId: 100,
+            participantType: 'GUARDIAN',
+            studies: {
+              create: {
+                participantId: `PID-TEST1-${TestUsers.PARTICIPANT_COMPLETED.id}`,
+                study: { connect: { id: testStudy.id } },
+              },
+            },
+            surveys: {
+              create: {
+                versionId: testSurveyVersion.id,
+                answers: [
+                  { status: 'viewed', answers: [] },
+                  {
+                    status: 'completed',
+                    answers: [false, 'Choice 2'],
+                    last_updated: '2024-12-02T23:45:27.815Z',
+                  },
+                ],
+              },
+            },
+          },
+        ],
+      },
+    },
+  })
+  await prisma.invite.create({
     data: {
-      versionId: testSurveyVersion.id,
-      profileId: TestUsers.PARTICIPANT_COMPLETED.id,
-      answers: [
-        { status: 'viewed', answers: [] },
-        {
-          status: 'completed',
-          answers: [false, 'Choice 2'],
-          last_updated: '2024-12-02T23:45:27.815Z',
-        },
-      ],
+      email: TestUsers.PARTICIPANT_COMPLETED.email,
+      status: InviteStatus.ACCEPTED,
+      studyId: testStudy.id,
+      expiresAt: new Date('2026-01-01'),
+      sentAt: new Date('2025-12-15'),
     },
   })
 
-  await prisma.surveyVersionAnswers.create({
+  // Dependent Profile (no user - so profile.create with nested studies + surveys)
+  await prisma.participantProfile.create({
     data: {
-      versionId: testSurveyVersion.id,
-      profileId: TestUsers.DEPENDENT.id,
-      answers: [
-        { status: 'viewed', answers: [] },
-        {
-          status: 'review_required',
-          answers: [null, null],
-          last_updated: '2024-12-02T23:45:27.815Z',
+      id: TestUsers.DEPENDENT.id,
+      firstName: 'Test',
+      lastName: 'Dependent',
+      addressLine: '123 smith st',
+      dob: '1990-01-23',
+      mobile: '0412345678',
+      postcode: '1234',
+      preferredContact: 'EMAIL',
+      state: 'VIC',
+      suburb: 'Melbourne',
+      familyId: 100,
+      userId: null,
+      participantType: 'DEPENDENT_AGE',
+      studies: {
+        create: {
+          participantId: `PID-TEST1-${TestUsers.DEPENDENT.id}`,
+          study: { connect: { id: testStudy.id } },
         },
-      ],
+      },
+      surveys: {
+        create: {
+          versionId: testSurveyVersion.id,
+          answers: [
+            { status: 'viewed', answers: [] },
+            {
+              status: 'review_required',
+              answers: [null, null],
+              last_updated: '2024-12-02T23:45:27.815Z',
+            },
+          ],
+        },
+      },
     },
   })
 
-  await prisma.surveyVersionAnswers.create({
+  // Second guardian user
+  await prisma.user.upsert({
+    where: { email: TestUsers.GUARDIAN_2.email },
+    update: {},
+    create: {
+      id: TestUsers.GUARDIAN_2.id,
+      email: TestUsers.GUARDIAN_2.email,
+      firstName: 'Second',
+      lastName: 'Guardian',
+      password: hashPassword(TestUsers.GUARDIAN_2.password),
+      role: Role.Participant,
+      profiles: {
+        create: [
+          {
+            id: TestUsers.GUARDIAN_2.id,
+            firstName: 'Second',
+            lastName: 'Guardian',
+            addressLine: '123 smith st',
+            dob: '1990-01-23',
+            mobile: '0412345678',
+            postcode: '1234',
+            preferredContact: 'EMAIL',
+            state: 'VIC',
+            suburb: 'Melbourne',
+            familyId: 100,
+            participantType: 'GUARDIAN',
+            studies: {
+              create: {
+                participantId: `PID-TEST1-${TestUsers.GUARDIAN_2.id}`,
+                study: { connect: { id: testStudy.id } },
+              },
+            },
+            surveys: {
+              create: {
+                versionId: testSurveyVersion.id,
+                answers: [
+                  { status: 'viewed', answers: [] },
+                  {
+                    status: 'review_required',
+                    answers: [null, null],
+                    last_updated: '2024-12-02T23:45:27.815Z',
+                  },
+                ],
+              },
+            },
+          },
+        ],
+      },
+    },
+  })
+  await prisma.invite.create({
     data: {
-      versionId: testSurveyVersion.id,
-      profileId: TestUsers.GUARDIAN_2.id,
-      answers: [
-        { status: 'viewed', answers: [] },
-        {
-          status: 'review_required',
-          answers: [null, null],
-          last_updated: '2024-12-02T23:45:27.815Z',
-        },
-      ],
+      email: TestUsers.GUARDIAN_2.email,
+      status: InviteStatus.ACCEPTED,
+      studyId: testStudy.id,
+      expiresAt: new Date('2026-01-01'),
+      sentAt: new Date('2025-12-15'),
     },
   })
 
@@ -535,7 +512,7 @@ export async function seedTests(prisma: PrismaClient) {
 
   await prisma.participantProfile.update({
     where: {
-      id: participantUnansweredProfile.id,
+      id: TestUsers.PARTICIPANT_UNANSWERED.id,
     },
     data: {
       studies: {

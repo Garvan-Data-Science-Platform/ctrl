@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { InviteStatus, PrismaClient } from '@prisma/client'
 import { hashPassword } from '../../src/authentication'
 import { SurveyStep } from '../../../common/types/survey'
 import { createDefaultAnswers, recalculateAnswers } from '../../src/utils/answers'
@@ -99,6 +99,16 @@ const main = async () => {
       },
     },
   })
+  // Invite for Michael (kept separate because Invite has no direct relation to User in the schema)
+  await prisma.invite.create({
+    data: {
+      email: 'michaelwilson@example.com',
+      status: InviteStatus.ACCEPTED,
+      studyId: shortStudy.id,
+      expiresAt: new Date('2026-01-01'),
+      sentAt: new Date('2025-12-15'),
+    },
+  })
 
   await prisma.user.upsert({
     where: { email: 'sallywilson@example.com' },
@@ -148,6 +158,15 @@ const main = async () => {
           },
         ],
       },
+    },
+  })
+  await prisma.invite.create({
+    data: {
+      email: 'sallywilson@example.com',
+      status: InviteStatus.ACCEPTED,
+      studyId: shortStudy.id,
+      expiresAt: new Date('2026-01-01'),
+      sentAt: new Date('2025-12-15'),
     },
   })
 
@@ -243,6 +262,15 @@ const main = async () => {
           },
         ],
       },
+    },
+  })
+  await prisma.invite.create({
+    data: {
+      email: 'alicejohnson@example.com',
+      status: InviteStatus.ACCEPTED,
+      studyId: shortStudy.id,
+      expiresAt: new Date('2026-01-01'),
+      sentAt: new Date('2025-12-15'),
     },
   })
 
@@ -409,6 +437,24 @@ const main = async () => {
           },
         ],
       },
+    },
+  })
+  await prisma.invite.create({
+    data: {
+      email: String(process.env.EXAMPLE_PARTICIPANT_EMAIL),
+      status: InviteStatus.ACCEPTED,
+      studyId: defaultStudy.id,
+      expiresAt: new Date('2026-01-01'),
+      sentAt: new Date('2025-12-15'),
+    },
+  })
+  await prisma.invite.create({
+    data: {
+      email: String(process.env.EXAMPLE_PARTICIPANT_EMAIL),
+      status: InviteStatus.ACCEPTED,
+      studyId: shortStudy.id,
+      expiresAt: new Date('2026-01-01'),
+      sentAt: new Date('2025-12-15'),
     },
   })
   console.log('Added the following users:', exampleUser)
