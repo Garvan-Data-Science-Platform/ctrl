@@ -23,6 +23,7 @@ export async function seedTests(prisma: PrismaClient) {
   await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"Organisation"', 'id'), 2, false) FROM "Organisation";`
 
   // Create four studies
+  // Test Study - nested ACCEPTED invites for the three participants below (UNANSWERED, COMPLETED, GUARDIAN_2), plus fixture invites in various states for testing invite lifecycle
   const testStudy = await prisma.study.create({
     data: {
       name: TestStudies.TEST_STUDY.name,
@@ -30,6 +31,53 @@ export async function seedTests(prisma: PrismaClient) {
       redcapToken: 'ABC',
       redcapURL: 'http://redcaptest.com',
       contactUsEmail: 'test@contactus.com',
+      invites: {
+        create: [
+          {
+            email: TestUsers.PARTICIPANT_UNANSWERED.email,
+            status: InviteStatus.ACCEPTED,
+            expiresAt: new Date('2026-01-01'),
+            sentAt: new Date('2025-12-15'),
+          },
+          {
+            email: TestUsers.PARTICIPANT_COMPLETED.email,
+            status: InviteStatus.ACCEPTED,
+            expiresAt: new Date('2026-01-01'),
+            sentAt: new Date('2025-12-15'),
+          },
+          {
+            email: TestUsers.GUARDIAN_2.email,
+            status: InviteStatus.ACCEPTED,
+            expiresAt: new Date('2026-01-01'),
+            sentAt: new Date('2025-12-15'),
+          },
+          {
+            email: TestInvites.INVITE_PENDING.email,
+            status: InviteStatus.PENDING,
+            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
+          },
+          {
+            email: TestInvites.INVITE_ACCEPTED.email,
+            status: InviteStatus.ACCEPTED,
+            expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day in the past
+          },
+          {
+            email: TestInvites.INVITE_REVOKED.email,
+            status: InviteStatus.REVOKED,
+            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
+          },
+          {
+            email: TestInvites.INVITE_EXPIRED.email,
+            status: InviteStatus.EXPIRED,
+            expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day in the past
+          },
+          {
+            email: TestInvites.INVITE_2_PENDING.email,
+            status: InviteStatus.PENDING,
+            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
+          },
+        ],
+      },
     },
   })
 
@@ -43,10 +91,27 @@ export async function seedTests(prisma: PrismaClient) {
   })
 
   // This study will have a survey, a participant user and draft answers (mostly for frontend multistudy testing)
+  // Nested ACCEPTED invites for GUARDIAN_2 and PARTICIPANT_UNANSWERED (both linked to this study below)
   const frontendTestStudy = await prisma.study.create({
     data: {
       name: TestStudies.FE_TEST_STUDY.name,
       id: TestStudies.FE_TEST_STUDY.id,
+      invites: {
+        create: [
+          {
+            email: TestUsers.GUARDIAN_2.email,
+            status: InviteStatus.ACCEPTED,
+            expiresAt: new Date('2026-01-01'),
+            sentAt: new Date('2025-12-15'),
+          },
+          {
+            email: TestUsers.PARTICIPANT_UNANSWERED.email,
+            status: InviteStatus.ACCEPTED,
+            expiresAt: new Date('2026-01-01'),
+            sentAt: new Date('2025-12-15'),
+          },
+        ],
+      },
     },
   })
 
@@ -173,7 +238,6 @@ export async function seedTests(prisma: PrismaClient) {
   })
 
   // User with unanswered survey - nested writes for user + profile + study + nextOfKin + surveys
-  // Invite is a separate call after because Invite has no direct relation to User in the schema
   await prisma.user.upsert({
     where: { email: TestUsers.PARTICIPANT_UNANSWERED.email },
     update: {},
@@ -232,16 +296,6 @@ export async function seedTests(prisma: PrismaClient) {
       },
     },
   })
-  await prisma.invite.create({
-    data: {
-      email: TestUsers.PARTICIPANT_UNANSWERED.email,
-      status: InviteStatus.ACCEPTED,
-      studyId: testStudy.id,
-      expiresAt: new Date('2026-01-01'),
-      sentAt: new Date('2025-12-15'),
-    },
-  })
-
   // User with completed survey
   await prisma.user.upsert({
     where: { email: TestUsers.PARTICIPANT_COMPLETED.email },
@@ -292,16 +346,6 @@ export async function seedTests(prisma: PrismaClient) {
       },
     },
   })
-  await prisma.invite.create({
-    data: {
-      email: TestUsers.PARTICIPANT_COMPLETED.email,
-      status: InviteStatus.ACCEPTED,
-      studyId: testStudy.id,
-      expiresAt: new Date('2026-01-01'),
-      sentAt: new Date('2025-12-15'),
-    },
-  })
-
   // Dependent Profile (no user - so profile.create with nested studies + surveys)
   await prisma.participantProfile.create({
     data: {
@@ -390,16 +434,6 @@ export async function seedTests(prisma: PrismaClient) {
       },
     },
   })
-  await prisma.invite.create({
-    data: {
-      email: TestUsers.GUARDIAN_2.email,
-      status: InviteStatus.ACCEPTED,
-      studyId: testStudy.id,
-      expiresAt: new Date('2026-01-01'),
-      sentAt: new Date('2025-12-15'),
-    },
-  })
-
   // Seed a user and password reset token
   await prisma.user.create({
     data: {
@@ -419,43 +453,6 @@ export async function seedTests(prisma: PrismaClient) {
       expiresAt: new Date(Date.now() + 2 * 60 * 1000), // 2 minutes in the future
       used: false,
     },
-  })
-
-  // Setup invites
-  await prisma.invite.createMany({
-    data: [
-      {
-        email: TestInvites.INVITE_PENDING.email,
-        status: InviteStatus.PENDING,
-        studyId: testStudy.id,
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
-      },
-      {
-        email: TestInvites.INVITE_ACCEPTED.email,
-        status: InviteStatus.ACCEPTED,
-        studyId: testStudy.id,
-        expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day in the past
-      },
-      {
-        email: TestInvites.INVITE_REVOKED.email,
-        status: InviteStatus.REVOKED,
-        studyId: testStudy.id,
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
-      },
-      {
-        email: TestInvites.INVITE_EXPIRED.email,
-        status: InviteStatus.EXPIRED,
-        studyId: testStudy.id,
-        expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day in the past
-      },
-      // Pending invites for testing
-      {
-        email: TestInvites.INVITE_2_PENDING.email,
-        status: InviteStatus.PENDING,
-        studyId: testStudy.id,
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
-      },
-    ],
   })
 
   // Frontend multistudy test seed data
@@ -500,16 +497,6 @@ export async function seedTests(prisma: PrismaClient) {
     },
   })
 
-  await prisma.invite.create({
-    data: {
-      email: TestUsers.GUARDIAN_2.email,
-      status: InviteStatus.ACCEPTED,
-      studyId: frontendTestStudy.id,
-      expiresAt: new Date('2026-01-01'),
-      sentAt: new Date('2025-12-15'),
-    },
-  })
-
   await prisma.participantProfile.update({
     where: {
       id: TestUsers.PARTICIPANT_UNANSWERED.id,
@@ -525,16 +512,6 @@ export async function seedTests(prisma: PrismaClient) {
           },
         },
       },
-    },
-  })
-
-  await prisma.invite.create({
-    data: {
-      email: TestUsers.PARTICIPANT_UNANSWERED.email,
-      status: InviteStatus.ACCEPTED,
-      studyId: frontendTestStudy.id,
-      expiresAt: new Date('2026-01-01'),
-      sentAt: new Date('2025-12-15'),
     },
   })
 
