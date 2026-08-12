@@ -441,7 +441,8 @@ export class UsersController extends Controller {
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   @Response<UnauthorizedErrorResponse>('403', 'Forbidden')
   public async resetPassword(@Body() bodyRequest: ResetPasswordRequest): Promise<void> {
-    const { token, newPassword } = bodyRequest
+    const { token, newPassword: rawNewPassword } = bodyRequest
+    const newPassword = rawNewPassword.trim()
     const passwordResetToken = await this.passwordResetTokenRepo.findUnique({
       where: { token },
       include: { user: true },

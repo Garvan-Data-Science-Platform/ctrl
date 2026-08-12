@@ -81,7 +81,8 @@ export class AuthController extends Controller {
   @Security('jwt', ['OrganisationAdmin'])
   @SuccessResponse('201', 'User Created')
   public async registerUser(@Body() bodyRequest: RegisterRequest): Promise<RegisterResponse> {
-    const { password, ...userDetails } = bodyRequest
+    const { password: rawPassword, ...userDetails } = bodyRequest
+    const password = rawPassword.trim()
 
     const { isValid, fields } = await checkPasswordStrength(password)
 
@@ -143,7 +144,8 @@ export class AuthController extends Controller {
   public async registerInitialUser(
     @Body() bodyRequest: RegisterSetupRequest,
   ): Promise<RegisterResponse> {
-    const { password, email } = bodyRequest
+    const { password: rawPassword, email } = bodyRequest
+    const password = rawPassword.trim()
 
     const { isValid, fields } = await checkPasswordStrength(password)
 
@@ -205,7 +207,15 @@ export class AuthController extends Controller {
     @Body() bodyRequest: RegisterParticipantRequest,
   ): Promise<RegisterParticipantResponse> {
     // Extract info for user creation
-    const { firstName, middleName, lastName, email, password, ...participantInfo } = bodyRequest
+    const {
+      firstName,
+      middleName,
+      lastName,
+      email,
+      password: rawPassword,
+      ...participantInfo
+    } = bodyRequest
+    const password = rawPassword.trim()
 
     // Check that the Participant has an invitation
     const invite = await this.inviteRepo.findFirst({ where: { id: inviteId, email } })
@@ -353,8 +363,10 @@ export class AuthController extends Controller {
     @Body() bodyRequest: LoginRequest,
     @Header('x-client-type') clientType?: string,
   ): Promise<LoginResponse> {
+    const { email, password: rawPassword } = bodyRequest
+    const password = rawPassword.trim()
     // Check if user exists and password matches
-    const user = await this.userRepo.findUnique({ where: { email: bodyRequest.email } })
+    const user = await this.userRepo.findUnique({ where: { email } })
 
     if (!user) {
       throw new InvalidCredentialsError('User not found')
@@ -380,7 +392,7 @@ export class AuthController extends Controller {
       throw new IncorrectPermissionsError('User is not a participant')
     }
 
-    if (!(await verifyPassword(user.password, bodyRequest.password))) {
+    if (!(await verifyPassword(user.password, password))) {
       await this.userRepo.update({
         where: { id: user.id },
         data: { retriesRemaining: user.retriesRemaining - 1 },
