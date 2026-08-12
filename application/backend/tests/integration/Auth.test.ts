@@ -84,6 +84,137 @@ describe('Auth', () => {
     expect(protectedRouteResponse.body.message).toBe('No token provided')
   })
 
+  it('trims leading whitespace on participant register so subsequent login without the space succeeds', async () => {
+    const email = 'ws-lead@example.com'
+    const rawPassword = ' Constellation-battery-24!'
+
+    const invite = await prisma.invite.create({
+      data: {
+        email,
+        status: 'PENDING',
+        studyId: TestStudies.TEST_STUDY.id,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      },
+    })
+
+    const participantRequest: RegisterParticipantRequest = {
+      firstName: 'John',
+      lastName: 'Doe',
+      email,
+      password: rawPassword,
+      mobile: '+61477777777',
+      addressLine: '123 Some Street',
+      suburb: 'Sydney',
+      postcode: '2000',
+      state: StateTerritory.NSW,
+      preferredContact: ContactMethod.MOBILE,
+      dob: '1990-01-01',
+      participantType: ParticipantType.STANDARD,
+      nextOfKin: {
+        firstName: 'JOHN',
+        lastName: 'SMITH',
+        email: 'jonny@smith.com',
+      },
+      dependents: [],
+    }
+
+    await request(app)
+      .post(`/auth/register/participants/${invite.id}`)
+      .send(participantRequest)
+      .expect(201)
+
+    const loginRes = await request(app)
+      .post('/auth/login')
+      .set('x-client-type', 'user-client')
+      .send({ email, password: rawPassword.trim() })
+    expect(loginRes.status).toBe(200)
+  })
+
+  it('trims trailing whitespace on participant register so subsequent login without the space succeeds', async () => {
+    const email = 'ws-trail@example.com'
+    const rawPassword = 'Constellation-battery-24! '
+
+    const invite = await prisma.invite.create({
+      data: {
+        email,
+        status: 'PENDING',
+        studyId: TestStudies.TEST_STUDY.id,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      },
+    })
+
+    const participantRequest: RegisterParticipantRequest = {
+      firstName: 'Jane',
+      lastName: 'Doe',
+      email,
+      password: rawPassword,
+      mobile: '+61477777778',
+      addressLine: '124 Some Street',
+      suburb: 'Sydney',
+      postcode: '2000',
+      state: StateTerritory.NSW,
+      preferredContact: ContactMethod.MOBILE,
+      dob: '1990-01-02',
+      participantType: ParticipantType.STANDARD,
+      nextOfKin: {
+        firstName: 'JOHN',
+        lastName: 'SMITH',
+        email: 'jonny@smith.com',
+      },
+      dependents: [],
+    }
+
+    await request(app)
+      .post(`/auth/register/participants/${invite.id}`)
+      .send(participantRequest)
+      .expect(201)
+
+    const loginRes = await request(app)
+      .post('/auth/login')
+      .set('x-client-type', 'user-client')
+      .send({ email, password: rawPassword.trim() })
+    expect(loginRes.status).toBe(200)
+  })
+
+  it('rejects an all-whitespace password on participant register (fails length after trim)', async () => {
+    const email = 'ws-empty@example.com'
+
+    const invite = await prisma.invite.create({
+      data: {
+        email,
+        status: 'PENDING',
+        studyId: TestStudies.TEST_STUDY.id,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      },
+    })
+
+    const participantRequest: RegisterParticipantRequest = {
+      firstName: 'Bob',
+      lastName: 'Doe',
+      email,
+      password: '              ',
+      mobile: '+61477777779',
+      addressLine: '125 Some Street',
+      suburb: 'Sydney',
+      postcode: '2000',
+      state: StateTerritory.NSW,
+      preferredContact: ContactMethod.MOBILE,
+      dob: '1990-01-03',
+      participantType: ParticipantType.STANDARD,
+      nextOfKin: {
+        firstName: 'JOHN',
+        lastName: 'SMITH',
+        email: 'jonny@smith.com',
+      },
+      dependents: [],
+    }
+
+    const res = await request(app)
+      .post(`/auth/register/participants/${invite.id}`)
+      .send(participantRequest)
+    expect(res.status).toBe(422)
+  })
+
   it('should return a 401 unauthorized error when accessing protected routes when using an expired token', async () => {
     // Set JWT expiry to 1 second
     process.env.JWT_EXPIRY = '0s'
