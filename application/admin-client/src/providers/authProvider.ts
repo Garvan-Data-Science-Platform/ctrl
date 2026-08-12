@@ -64,7 +64,8 @@ export const authProvider: AuthProvider = {
 
       // EMAIL / PASSWORD CREDENTIALS
       case 'Password': {
-        const { email, password } = params
+        const { email, password: rawPassword } = params
+        const password = rawPassword.trim()
 
         const res = await fetch(BACKEND_URL + '/auth/login', {
           method: 'POST',
@@ -175,7 +176,8 @@ export const authProvider: AuthProvider = {
       },
     }
   },
-  updatePassword: async ({ password, token }) => {
+  updatePassword: async ({ password: rawPassword, token }) => {
+    const password = rawPassword.trim()
     const reqData: ResetPasswordRequest = {
       newPassword: password,
       token: token,

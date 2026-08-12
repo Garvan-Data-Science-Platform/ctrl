@@ -38,14 +38,16 @@ export const UpdatePassword = () => {
             }
           }
 
-          if (data.password !== data.confirmPassword) {
+          const password = data.password.trim()
+
+          if (password !== data.confirmPassword?.trim()) {
             return {
               values: {},
               errors: { password: { type: 'validate', message: "Passwords don't match" } },
             }
           }
 
-          const { isValid, fields } = checkPasswordStrength(data.password)
+          const { isValid, fields } = checkPasswordStrength(password)
           if (!isValid) {
             return {
               values: {},
@@ -58,7 +60,7 @@ export const UpdatePassword = () => {
             }
           }
           return {
-            values: data,
+            values: { ...data, password },
             errors: {},
           }
         },

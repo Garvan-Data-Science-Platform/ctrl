@@ -16,10 +16,12 @@ export const SetupPage = () => {
   const { mutate: login } = useLogin()
 
   const onSubmit = (data: any) => {
+    const password = data.password.trim()
+    const payload = { ...data, password }
     fetch(import.meta.env.VITE_BACKEND_URL + '/auth/register/setup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      body: JSON.stringify(payload),
     })
       .then((res) => {
         if (res.ok) {
@@ -28,7 +30,7 @@ export const SetupPage = () => {
             login({
               loginType: 'Password',
               email: data.email,
-              password: data.password,
+              password,
             })
           })
         } else {
@@ -87,7 +89,7 @@ export const SetupPage = () => {
               {...register('password', {
                 required: true,
                 validate: (val) => {
-                  const { isValid, fields } = checkPasswordStrength(val)
+                  const { isValid, fields } = checkPasswordStrength(val.trim())
                   if (!isValid) {
                     return `Invalid password. ${Object.values(fields).map((f) => ' ' + f.message)}`
                   }
