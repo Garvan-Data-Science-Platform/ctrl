@@ -186,7 +186,8 @@ export class ProfilesController extends Controller {
         studies: { select: { studyId: true } },
       },
     })
-    const { nextOfKin, email, ...updateData } = { ...bodyRequest }
+    const { nextOfKin, email: rawEmail, ...updateData } = { ...bodyRequest }
+    const email = rawEmail?.trim()
 
     const hasNok = Boolean(nextOfKin)
 

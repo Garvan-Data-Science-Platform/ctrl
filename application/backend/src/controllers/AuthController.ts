@@ -81,8 +81,9 @@ export class AuthController extends Controller {
   @Security('jwt', ['OrganisationAdmin'])
   @SuccessResponse('201', 'User Created')
   public async registerUser(@Body() bodyRequest: RegisterRequest): Promise<RegisterResponse> {
-    const { password: rawPassword, ...userDetails } = bodyRequest
+    const { password: rawPassword, email: rawEmail, ...userDetails } = bodyRequest
     const password = rawPassword.trim()
+    const email = rawEmail.trim()
 
     const { isValid, fields } = await checkPasswordStrength(password)
 
@@ -94,6 +95,7 @@ export class AuthController extends Controller {
     const insertedUser: User = await this.userRepo.create({
       data: {
         ...userDetails,
+        email,
         password: hashedPassword,
       },
     })
@@ -144,8 +146,9 @@ export class AuthController extends Controller {
   public async registerInitialUser(
     @Body() bodyRequest: RegisterSetupRequest,
   ): Promise<RegisterResponse> {
-    const { password: rawPassword, email } = bodyRequest
+    const { password: rawPassword, email: rawEmail } = bodyRequest
     const password = rawPassword.trim()
+    const email = rawEmail.trim()
 
     const { isValid, fields } = await checkPasswordStrength(password)
 
@@ -211,11 +214,12 @@ export class AuthController extends Controller {
       firstName,
       middleName,
       lastName,
-      email,
+      email: rawEmail,
       password: rawPassword,
       ...participantInfo
     } = bodyRequest
     const password = rawPassword.trim()
+    const email = rawEmail.trim()
 
     // Check that the Participant has an invitation
     const invite = await this.inviteRepo.findFirst({ where: { id: inviteId, email } })
@@ -363,7 +367,8 @@ export class AuthController extends Controller {
     @Body() bodyRequest: LoginRequest,
     @Header('x-client-type') clientType?: string,
   ): Promise<LoginResponse> {
-    const { email, password: rawPassword } = bodyRequest
+    const { email: rawEmail, password: rawPassword } = bodyRequest
+    const email = rawEmail.trim()
     const password = rawPassword.trim()
     // Check if user exists and password matches
     const user = await this.userRepo.findUnique({ where: { email } })
