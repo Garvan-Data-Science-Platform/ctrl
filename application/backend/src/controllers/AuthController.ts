@@ -333,7 +333,8 @@ export class AuthController extends Controller {
         method: 'POST',
       })
 
-      const { email } = await userinfo_res.json()
+      const { email: rawEmail } = await userinfo_res.json()
+      const email = rawEmail?.trim()
       user = await this.userRepo.findFirst({ where: { email } })
     } catch {
       throw new Error('Error authenticating with OIDC')
