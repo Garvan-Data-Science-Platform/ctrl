@@ -141,7 +141,7 @@ export default function Register() {
       nextOfKin: {
         firstName: data['nok_first'],
         lastName: data['nok_surname'],
-        email: data['nok_email'],
+        email: data['nok_email'].trim(),
       },
       dependents: data['dependents'],
     }

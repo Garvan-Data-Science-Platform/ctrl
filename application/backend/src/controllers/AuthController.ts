@@ -555,6 +555,9 @@ export class AuthController extends Controller {
     // Extract user and profile data
     const { firstName, lastName, dob, externalId, ...profileData } = participantData
     const { nextOfKin, dependents, ...noNextOfKinProfileData } = profileData
+    if (nextOfKin?.email) {
+      nextOfKin.email = nextOfKin.email.trim()
+    }
     const nextOfKinCreateData = { nextOfKin: { create: { ...nextOfKin } } }
 
     // Check for existing dependents

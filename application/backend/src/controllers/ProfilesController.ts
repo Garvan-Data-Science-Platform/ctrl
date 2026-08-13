@@ -155,6 +155,9 @@ export class ProfilesController extends Controller {
       where: { userId: request.user?.userId },
     })
     const { nextOfKin, ...updateData } = { ...bodyRequest }
+    if (nextOfKin?.email) {
+      nextOfKin.email = nextOfKin.email.trim()
+    }
 
     const hasNok = Boolean(nextOfKin)
 
@@ -188,6 +191,9 @@ export class ProfilesController extends Controller {
     })
     const { nextOfKin, email: rawEmail, ...updateData } = { ...bodyRequest }
     const email = rawEmail?.trim()
+    if (nextOfKin?.email) {
+      nextOfKin.email = nextOfKin.email.trim()
+    }
 
     const hasNok = Boolean(nextOfKin)
 
