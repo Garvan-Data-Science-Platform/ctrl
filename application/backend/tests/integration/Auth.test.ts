@@ -215,6 +215,107 @@ describe('Auth', () => {
     expect(res.status).toBe(422)
   })
 
+  it('trims whitespace on admin register so subsequent login without the space succeeds', async () => {
+    const orgAdminToken = await generateToken({ userId: TestUsers.ORG_ADMIN.id })
+    const rawEmail = ' ws-admin-lead@example.com'
+    const password = 'Constellation-battery-24!'
+
+    await request(app)
+      .post('/auth/register')
+      .set({ Authorization: `Bearer ${orgAdminToken}` })
+      .send({
+        firstName: 'WS',
+        lastName: 'Admin',
+        email: rawEmail,
+        password,
+        role: Role.OrganisationAdmin,
+      })
+      .expect(201)
+
+    const loginRes = await request(app)
+      .post('/auth/login')
+      .send({ email: rawEmail.trim(), password })
+    expect(loginRes.status).toBe(200)
+  })
+
+  it('rejects re-registering with a clean version of a padded email as duplicate', async () => {
+    const orgAdminToken = await generateToken({ userId: TestUsers.ORG_ADMIN.id })
+    const paddedEmail = ' ws-admin-dup@example.com'
+    const password = 'Constellation-battery-24!'
+
+    await request(app)
+      .post('/auth/register')
+      .set({ Authorization: `Bearer ${orgAdminToken}` })
+      .send({
+        firstName: 'First',
+        lastName: 'Admin',
+        email: paddedEmail,
+        password,
+        role: Role.OrganisationAdmin,
+      })
+      .expect(201)
+
+    const dupRes = await request(app)
+      .post('/auth/register')
+      .set({ Authorization: `Bearer ${orgAdminToken}` })
+      .send({
+        firstName: 'Second',
+        lastName: 'Admin',
+        email: paddedEmail.trim(),
+        password,
+        role: Role.OrganisationAdmin,
+      })
+    expect(dupRes.status).not.toBe(201)
+    expect(dupRes.body.message).toBe('emailHash already in use')
+  })
+
+  it('trims whitespace on next-of-kin email during participant register', async () => {
+    const email = 'ws-nok@example.com'
+    const paddedNokEmail = ' nok-trim@example.com '
+    const password = 'Constellation-battery-24!'
+
+    const invite = await prisma.invite.create({
+      data: {
+        email,
+        status: 'PENDING',
+        studyId: TestStudies.TEST_STUDY.id,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      },
+    })
+
+    const participantRequest: RegisterParticipantRequest = {
+      firstName: 'Ned',
+      lastName: 'Kelly',
+      email,
+      password,
+      mobile: '+61477777780',
+      addressLine: '126 Some Street',
+      suburb: 'Sydney',
+      postcode: '2000',
+      state: StateTerritory.NSW,
+      preferredContact: ContactMethod.MOBILE,
+      dob: '1990-01-04',
+      participantType: ParticipantType.STANDARD,
+      nextOfKin: {
+        firstName: 'NOK',
+        lastName: 'PERSON',
+        email: paddedNokEmail,
+      },
+      dependents: [],
+    }
+
+    await request(app)
+      .post(`/auth/register/participants/${invite.id}`)
+      .send(participantRequest)
+      .expect(201)
+
+    const profile = await prisma.participantProfile.findFirst({
+      where: { user: { email } },
+      include: { nextOfKin: true },
+    })
+    expect(profile?.nextOfKin?.email).toBe(paddedNokEmail.trim())
+  })
+
   it('should return a 401 unauthorized error when accessing protected routes when using an expired token', async () => {
     // Set JWT expiry to 1 second
     process.env.JWT_EXPIRY = '0s'

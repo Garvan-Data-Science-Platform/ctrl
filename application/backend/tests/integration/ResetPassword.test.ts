@@ -157,6 +157,19 @@ describe('User Password Reset', () => {
     expect(response.body.message).toBe('Reset token has already been used')
   })
 
+  it('trims whitespace on generate-reset-link so a padded email still finds the user and sends the reset email', async () => {
+    const paddedEmail = ` ${TestUsers.PARTICIPANT_COMPLETED.email} `
+    const response = await request(app)
+      .post('/users/password/generate-reset-link')
+      .send({ email: paddedEmail })
+
+    expect(response.status).toBe(200)
+
+    const sentMail = mockNodeMailer.mock.getSentMail()
+    expect(sentMail).toHaveLength(1)
+    expect(sentMail[0].to).toBe(TestUsers.PARTICIPANT_COMPLETED.email)
+  })
+
   it('trims whitespace on password reset so subsequent login without the space succeeds', async () => {
     const email = TestUsers.PARTICIPANT_UNANSWERED.email
     const rawPassword = ' Constellation-battery-24! '
