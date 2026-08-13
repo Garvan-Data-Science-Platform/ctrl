@@ -124,10 +124,11 @@ export default function Register() {
 
   const onSubmit = (data: FormValues) => {
     const password = data.password.trim()
+    const email = data.email.trim()
     const reqData: RegisterParticipantRequest = {
       firstName: data.firstName,
       lastName: data.lastName,
-      email: data.email,
+      email,
       password,
       dob: data.dob,
       addressLine: data.addressLine,

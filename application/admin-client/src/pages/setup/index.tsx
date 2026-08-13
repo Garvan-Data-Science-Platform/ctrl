@@ -17,7 +17,8 @@ export const SetupPage = () => {
 
   const onSubmit = (data: any) => {
     const password = data.password.trim()
-    const payload = { ...data, password }
+    const email = data.email.trim()
+    const payload = { ...data, email, password }
     fetch(import.meta.env.VITE_BACKEND_URL + '/auth/register/setup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -29,7 +30,7 @@ export const SetupPage = () => {
             if (!rdata.token) throw new Error('No token provided')
             login({
               loginType: 'Password',
-              email: data.email,
+              email,
               password,
             })
           })
