@@ -1,6 +1,6 @@
-# Guidance for contributing to `ctrl-next`
+# Guidance for contributing to `ctrl`
 
-- [Guidance for contributing to `ctrl-next`](#guidance-for-contributing-to-ctrl-next)
+- [Guidance for contributing to `ctrl`](#guidance-for-contributing-to-ctrl)
   - [Welcome](#welcome)
   - [Development Tooling](#development-tooling)
   - [Git + GitHub](#git--github)
@@ -38,7 +38,7 @@ Commits in `feature` branches will be squashed when merged into the `dev` branch
 Code review helps improve code quality and performance.
 
 ## Node.js
-ctrl-next uses a recent Node.js version as specified in `.nvmrc` in combination with the yarn modern package manager through corepack.
+ctrl uses a recent Node.js version as specified in `.nvmrc` in combination with the yarn modern package manager through corepack.
 
 This `.nvmrc` is the single source of truth through out this app to specify the Node Version.
 For example: Dockerfiles, `run_tests.sh` scripts, the Makefile and multiple CI workflows all parse the node version from the `.nvmrc`.

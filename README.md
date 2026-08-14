@@ -4,7 +4,7 @@
 
   Dynamic Consent Management Platform
 
-  [![Build checks](https://github.com/Garvan-Data-Science-Platform/ctrl-next/actions/workflows/check.yml/badge.svg)](https://github.com/Garvan-Data-Science-Platform/ctrl-next/actions/workflows/check.yml)
+  [![Build checks](https://github.com/Garvan-Data-Science-Platform/ctrl/actions/workflows/check.yml/badge.svg)](https://github.com/Garvan-Data-Science-Platform/ctrl/actions/workflows/check.yml)
 
   <div>
     <a href="https://ctrldemo.dsp.garvan.org.au/login"><b>Participant Portal Demo</b></a>
@@ -82,7 +82,7 @@ The use of `nvm` to manage node versions is highly recommended. Install `nvm` us
 
 Docker is required to run this project locally to containerise and manage the application's services, including the frontend clients (user-client, admin-client), backend API, and supporting services like PostgreSQL. Each main component has its own Dockerfile for building optimised images, and docker-compose.yml is used to orchestrate local environments, making it easy to spin up, test, and manage dependencies consistently across different setups.
 
-Then from the root of the `ctrl-next` repository run the following commands:
+Then from the root of the `ctrl` repository run the following commands:
 
 ```bash
 # Install the required node version, will do nothing if already installed.
@@ -213,6 +213,6 @@ CTRL is also partially funded through [GUARDIANS](https://www.biocommons.org.au/
 
 ## Want to contribute?
 
-Have a look through existing [issues](https://github.com/Garvan-Data-Science-Platform/ctrl-next/issues) for anything that you could help with. If you'd like to request a feature or report a bug, please create a GitHub Issue using one of the templates provided.
+Have a look through existing [issues](https://github.com/Garvan-Data-Science-Platform/ctrl/issues) for anything that you could help with. If you'd like to request a feature or report a bug, please create a GitHub Issue using one of the templates provided.
 
-[See contribution guide &rarr;](https://github.com/Garvan-Data-Science-Platform/ctrl-next/blob/main/docs/CONTRIBUTING.md)
+[See contribution guide &rarr;](https://github.com/Garvan-Data-Science-Platform/ctrl/blob/main/docs/CONTRIBUTING.md)
