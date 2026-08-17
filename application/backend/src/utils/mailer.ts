@@ -1,7 +1,24 @@
 import nodemailer from 'nodemailer'
 import config from '../config'
 
-export const fromAddress = `CTRL <noreply@${process.env.HOSTNAME}>`
+if (!process.env.HOSTNAME) {
+  throw new Error('process.env.HOSTNAME is required but was not provided.')
+}
+
+const hostnameEnvVar = process.env.HOSTNAME
+let mailDomain: string
+
+if (/^https?:\/\//i.test(hostnameEnvVar)) {
+  try {
+    mailDomain = new URL(hostnameEnvVar).hostname
+  } catch (err: any) {
+    throw new Error(`HOSTNAME deployment variable not configured. ${err}`)
+  }
+} else {
+  mailDomain = hostnameEnvVar
+}
+
+export const fromAddress = `CTRL <noreply@${mailDomain}>`
 
 export async function createMailerTransporter() {
   if (process.env.STUB_MAILER == 'true') {
