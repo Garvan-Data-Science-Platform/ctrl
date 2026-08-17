@@ -155,25 +155,27 @@ describe('UsersController', () => {
     })
 
     it('should not return user password', async () => {
+      const userId = TestUsers.PARTICIPANT_UNANSWERED.id
       const response = await request(app)
-        .get('/users')
+        .get(`/users/${userId}`)
         .set({ Authorization: `Bearer ${orgAdminToken}` })
       expect(response.status).toBe(200)
 
-      const body: GetAllUsersResponse = response.body
+      const body: GetUserByIdResponse = response.body
       expect(body).toHaveProperty('data')
-      expect(body.data[0]).not.toHaveProperty('password')
+      expect(body.data).not.toHaveProperty('password')
     })
 
     it('should not return user emailHash', async () => {
+      const userId = TestUsers.PARTICIPANT_UNANSWERED.id
       const response = await request(app)
-        .get('/users')
+        .get(`/users/${userId}`)
         .set({ Authorization: `Bearer ${orgAdminToken}` })
       expect(response.status).toBe(200)
 
-      const body: GetAllUsersResponse = response.body
+      const body: GetUserByIdResponse = response.body
       expect(body).toHaveProperty('data')
-      expect(body.data[0]).not.toHaveProperty('emailHash')
+      expect(body.data).not.toHaveProperty('emailHash')
     })
   })
 
