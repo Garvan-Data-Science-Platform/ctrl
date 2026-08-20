@@ -103,6 +103,62 @@ describe('registration', () => {
     cy.contains(`Invite for ${testEmail} not found`).should('exist')
   })
 
+  it('trims whitespace on register password so subsequent login without the space succeeds', () => {
+    const rawPassword = ' Constellation-battery-24!'
+    const trimmedPassword = rawPassword.trim()
+
+    cy.task('getInviteIdtask', {
+      email: TestInvites.INVITE_PENDING.email,
+      studyId: TestStudies.TEST_STUDY.id,
+    })
+      .as('inviteId')
+      .then((inviteId) => {
+        cy.visit(`/register/${inviteId}`)
+      })
+    fillValid()
+    // Override the password fields with a leading-whitespace value
+    cy.get('[data-cy="reg-password"]').clear().type(rawPassword)
+    cy.get('[data-cy="reg-confirm-password"]').clear().type(rawPassword)
+    cy.get('[data-cy="reg-button"]').click()
+    cy.contains('Welcome FIRST').should('exist')
+
+    // Log out and log back in without the leading space
+    cy.clearAllLocalStorage()
+    cy.visit('/login')
+    cy.get('[data-cy="login-email"]').type(TestInvites.INVITE_PENDING.email)
+    cy.get('[data-cy="login-password"]').type(trimmedPassword)
+    cy.get('[data-cy="login"]').click()
+    cy.contains('Welcome FIRST').should('exist')
+  })
+
+  it('trims whitespace on register email so subsequent login without the space succeeds', () => {
+    const cleanEmail = TestInvites.INVITE_PENDING.email
+    const paddedEmail = ` ${cleanEmail}`
+    const password = 'Aadsfoswefw1515fd@!'
+
+    cy.task('getInviteIdtask', {
+      email: cleanEmail,
+      studyId: TestStudies.TEST_STUDY.id,
+    })
+      .as('inviteId')
+      .then((inviteId) => {
+        cy.visit(`/register/${inviteId}`)
+      })
+    fillValid()
+    // Override the email field with a leading-whitespace value
+    cy.get('[data-cy="reg-email"]').clear().type(paddedEmail)
+    cy.get('[data-cy="reg-button"]').click()
+    cy.contains('Welcome FIRST').should('exist')
+
+    // Log out and log back in with the clean email
+    cy.clearAllLocalStorage()
+    cy.visit('/login')
+    cy.get('[data-cy="login-email"]').type(cleanEmail)
+    cy.get('[data-cy="login-password"]').type(password)
+    cy.get('[data-cy="login"]').click()
+    cy.contains('Welcome FIRST').should('exist')
+  })
+
   it('Add dependents, check errors and valid submission', () => {
     cy.task('getInviteIdtask', {
       email: TestInvites.INVITE_PENDING.email,

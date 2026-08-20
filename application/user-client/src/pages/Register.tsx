@@ -123,11 +123,13 @@ export default function Register() {
   }, [inviteId, reset])
 
   const onSubmit = (data: FormValues) => {
+    const password = data.password.trim()
+    const email = data.email.trim()
     const reqData: RegisterParticipantRequest = {
       firstName: data.firstName,
       lastName: data.lastName,
-      email: data.email,
-      password: data.password,
+      email,
+      password,
       dob: data.dob,
       addressLine: data.addressLine,
       suburb: data.suburb,
@@ -139,7 +141,7 @@ export default function Register() {
       nextOfKin: {
         firstName: data['nok_first'],
         lastName: data['nok_surname'],
-        email: data['nok_email'],
+        email: data['nok_email'].trim(),
       },
       dependents: data['dependents'],
     }
@@ -240,7 +242,7 @@ export default function Register() {
                 {...register('password', {
                   required: 'This field is required',
                   validate: (val) => {
-                    const { isValid, fields } = checkPasswordStrength(val)
+                    const { isValid, fields } = checkPasswordStrength(val.trim())
                     if (!isValid) {
                       return `Invalid password. ${Object.values(fields).map((f) => ' ' + f.message)}`
                     }
@@ -258,7 +260,7 @@ export default function Register() {
                 {...register('confirm_password', {
                   required: 'This field is required',
                   validate: (val: string) => {
-                    if (watch('password') != val) {
+                    if (watch('password')?.trim() !== val.trim()) {
                       return 'Your passwords do not match'
                     }
                   },

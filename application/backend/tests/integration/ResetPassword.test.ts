@@ -156,4 +156,50 @@ describe('User Password Reset', () => {
     expect(response.status).toBe(403)
     expect(response.body.message).toBe('Reset token has already been used')
   })
+
+  it('trims whitespace on generate-reset-link so a padded email still finds the user and sends the reset email', async () => {
+    const paddedEmail = ` ${TestUsers.PARTICIPANT_COMPLETED.email} `
+    const response = await request(app)
+      .post('/users/password/generate-reset-link')
+      .send({ email: paddedEmail })
+
+    expect(response.status).toBe(200)
+
+    const sentMail = mockNodeMailer.mock.getSentMail()
+    expect(sentMail).toHaveLength(1)
+    expect(sentMail[0].to).toBe(TestUsers.PARTICIPANT_COMPLETED.email)
+  })
+
+  it('trims whitespace on password reset so subsequent login without the space succeeds', async () => {
+    const email = TestUsers.PARTICIPANT_UNANSWERED.email
+    const rawPassword = ' Constellation-battery-24! '
+
+    // Generate a fresh reset link for PARTICIPANT_UNANSWERED
+    const linkResponse = await request(app)
+      .post('/users/password/generate-reset-link')
+      .send({ email })
+    expect(linkResponse.status).toBe(200)
+
+    // Extract the reset token from the email
+    const sentMail = mockNodeMailer.mock.getSentMail()
+    const emailText = sentMail[0].text as string
+    const tokenMatch = emailText.match(/reset-password\?token=(\w+)/)
+    if (!tokenMatch || !tokenMatch[1]) {
+      throw new Error('Reset token not found in the email text')
+    }
+    const token = tokenMatch[1]
+
+    // Reset the password with leading + trailing whitespace
+    await request(app)
+      .post('/users/password/reset')
+      .send({ token, newPassword: rawPassword })
+      .expect(200)
+
+    // Log in using the trimmed password
+    const loginRes = await request(app)
+      .post('/auth/login')
+      .set('x-client-type', 'user-client')
+      .send({ email, password: rawPassword.trim() })
+    expect(loginRes.status).toBe(200)
+  })
 })

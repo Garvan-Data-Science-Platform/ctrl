@@ -64,7 +64,9 @@ export const authProvider: AuthProvider = {
 
       // EMAIL / PASSWORD CREDENTIALS
       case 'Password': {
-        const { email, password } = params
+        const { email: rawEmail, password: rawPassword } = params
+        const email = rawEmail.trim()
+        const password = rawPassword.trim()
 
         const res = await fetch(BACKEND_URL + '/auth/login', {
           method: 'POST',
@@ -153,7 +155,7 @@ export const authProvider: AuthProvider = {
     return { error }
   },
   forgotPassword: async ({ email }) => {
-    const req: GeneratePasswordResetLinkRequest = { email: email }
+    const req: GeneratePasswordResetLinkRequest = { email: email.trim() }
     try {
       await axiosInstance.post('/users/password/generate-reset-link', req, {
         headers: { 'Content-Type': 'application/json', 'x-client-type': clientType },
@@ -175,7 +177,8 @@ export const authProvider: AuthProvider = {
       },
     }
   },
-  updatePassword: async ({ password, token }) => {
+  updatePassword: async ({ password: rawPassword, token }) => {
+    const password = rawPassword.trim()
     const reqData: ResetPasswordRequest = {
       newPassword: password,
       token: token,
