@@ -38,7 +38,7 @@ describe('Password Reset', () => {
     cy.get('input[id="password"]').type('Testpassword1')
     cy.get('input[id="confirmPassword"]').type('Testpassword1{enter}')
     cy.contains('Invalid password').should('exist')
-    cy.contains('must not contain easily guessable').should('exist')
+    cy.contains('commonly used weak pattern').should('exist')
   })
 
   it('opens password reset page and enters non-matching passwords', () => {
