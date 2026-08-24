@@ -2361,12 +2361,17 @@
         "type": "object",
         "additionalProperties": false
       },
+      "RedcapFormName": {
+        "type": "string",
+        "example": "Name of REDCap instrument (from Column B of data dictionary)",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
+      },
       "UploadRedcapInstrumentAPIRequest": {
-        "description": "This is the name of the redcap instrument you are importing from.\nNOTE: These 'forms' are not the form label values that are seen on the webpages,\nbut instead they are the unique form names seen in Column B of the data dictionary.",
         "properties": {
           "formName": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/RedcapFormName"
           }
         },
         "required": [

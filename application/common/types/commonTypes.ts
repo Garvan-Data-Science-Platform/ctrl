@@ -116,6 +116,18 @@ export type StudyDescription = string
  */
 export type RedcapToken = string
 
+// This is the name of the redcap instrument you are importing from.
+// NOTE: These 'forms' are not the form label values that are seen on the webpages,
+// but instead they are the unique form names seen in Column B of the data dictionary.
+
+/**
+ * @minLength 1
+ * @maxLength 128 // TODO: align this with the maxLength of the field
+ * @pattern ^[a-zA-ZÀ-ÿ0-9\s\,\.\-\/\#]+$
+ * @example "Name of REDCap instrument (from Column B of data dictionary)"
+ */
+export type RedcapFormName = string
+
 /**
  * @minLength 1
  * @maxLength 128 // TODO: verify max length
