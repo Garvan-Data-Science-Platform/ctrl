@@ -113,7 +113,7 @@
         "type": "object",
         "additionalProperties": false
       },
-      "Pick_User.Exclude_keyofUser.password-or-emailHash__": {
+      "Pick_UserT.Exclude_keyofUserT.password-or-emailHash__": {
         "properties": {
           "id": {
             "type": "number",
@@ -178,12 +178,12 @@
         "type": "object",
         "description": "From T, pick a set of properties whose keys are in the union K"
       },
-      "Omit_User.password-or-emailHash_": {
-        "$ref": "#/components/schemas/Pick_User.Exclude_keyofUser.password-or-emailHash__",
+      "Omit_UserT.password-or-emailHash_": {
+        "$ref": "#/components/schemas/Pick_UserT.Exclude_keyofUserT.password-or-emailHash__",
         "description": "Construct a type with the properties of T except for those in type K."
       },
       "UserResponse": {
-        "$ref": "#/components/schemas/Omit_User.password-or-emailHash_"
+        "$ref": "#/components/schemas/Omit_UserT.password-or-emailHash_"
       },
       "GetAllUsersResponse": {
         "properties": {
@@ -244,6 +244,26 @@
         "type": "object",
         "additionalProperties": false
       },
+      "FirstName": {
+        "type": "string",
+        "example": "John",
+        "minLength": 1,
+        "maxLength": 100,
+        "pattern": "^[\\p{L}\\s\\-\\'\\.]+$"
+      },
+      "LastName": {
+        "type": "string",
+        "example": "Doe",
+        "minLength": 1,
+        "maxLength": 100,
+        "pattern": "^[\\p{L}\\s\\-\\'\\.]+$"
+      },
+      "Email": {
+        "type": "string",
+        "example": "john.doe@email.com",
+        "minLength": 1,
+        "maxLength": 254
+      },
       "Role": {
         "type": "string",
         "enum": [
@@ -253,22 +273,23 @@
           "StudyAdmin"
         ]
       },
+      "RoleT": {
+        "$ref": "#/components/schemas/Role",
+        "example": "OrganisationAdmin"
+      },
       "CreateUserRequest": {
         "properties": {
           "firstName": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/FirstName"
           },
           "lastName": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/LastName"
           },
           "email": {
-            "type": "string",
-            "pattern": "^(.+)@(.+)$"
+            "$ref": "#/components/schemas/Email"
           },
           "role": {
-            "$ref": "#/components/schemas/Role"
+            "$ref": "#/components/schemas/RoleT"
           }
         },
         "required": [
@@ -278,77 +299,60 @@
           "role"
         ],
         "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "firstName": "John",
-          "lastName": "Doe",
-          "email": "john.doe@email.com",
-          "role": "Participant"
-        }
+        "additionalProperties": false
       },
       "UpdateUserRequest": {
         "properties": {
           "firstName": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/FirstName"
           },
           "lastName": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/LastName"
           },
           "email": {
-            "type": "string",
-            "pattern": "^(.+)@(.+)$"
+            "$ref": "#/components/schemas/Email"
           },
           "role": {
-            "$ref": "#/components/schemas/Role"
+            "$ref": "#/components/schemas/RoleT"
           }
         },
         "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "firstName": "John",
-          "lastName": "Doe",
-          "email": "john.doe@email.com",
-          "role": "User"
-        }
+        "additionalProperties": false
       },
       "UpdateUserRoleRequest": {
         "properties": {
           "newRole": {
-            "$ref": "#/components/schemas/Role"
+            "$ref": "#/components/schemas/RoleT"
           }
         },
         "required": [
           "newRole"
         ],
         "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "newRole": "OperatorAdmin"
-        }
+        "additionalProperties": false
       },
       "GeneratePasswordResetLinkRequest": {
         "properties": {
           "email": {
-            "type": "string",
-            "pattern": "^(.+)@(.+)$"
+            "$ref": "#/components/schemas/Email"
           }
         },
         "required": [
           "email"
         ],
         "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "email": "john.doe@email.com"
-        }
+        "additionalProperties": false
+      },
+      "Password": {
+        "type": "string",
+        "example": "Supersecret123",
+        "minLength": 14,
+        "maxLength": 128
       },
       "ResetPasswordRequest": {
         "properties": {
           "newPassword": {
-            "type": "string",
-            "minLength": 14
+            "$ref": "#/components/schemas/Password"
           },
           "token": {
             "type": "string"
@@ -359,11 +363,7 @@
           "token"
         ],
         "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "newPassword": "Newsupersecret123",
-          "token": "1063e00e4a273e698577"
-        }
+        "additionalProperties": false
       },
       "SurveyVersionStatus": {
         "type": "string",
@@ -798,6 +798,10 @@
         "type": "object",
         "additionalProperties": false
       },
+      "DoB": {
+        "type": "string",
+        "example": "2000-05-21"
+      },
       "SurveyStepAnswerArray": {
         "items": {
           "anyOf": [
@@ -840,13 +844,13 @@
                 "format": "double"
               },
               "dob": {
-                "type": "string"
+                "$ref": "#/components/schemas/DoB"
               },
               "lastName": {
-                "type": "string"
+                "$ref": "#/components/schemas/LastName"
               },
               "firstName": {
-                "type": "string"
+                "$ref": "#/components/schemas/FirstName"
               }
             },
             "required": [
@@ -1142,11 +1146,17 @@
         "type": "object",
         "additionalProperties": false
       },
+      "StudyName": {
+        "type": "string",
+        "example": "Acme Genomics Study",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
+      },
       "CreateStudyRequest": {
         "properties": {
           "name": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/StudyName"
           }
         },
         "required": [
@@ -1155,23 +1165,42 @@
         "type": "object",
         "additionalProperties": false
       },
+      "StudyDescription": {
+        "type": "string",
+        "example": "This is a short description of the study",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
+      },
+      "RedcapToken": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^[a-zA-Z0-9\\-_=\\.:]+$"
+      },
+      "Url": {
+        "type": "string",
+        "example": "https://redcap.orgname.com/api/",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^[a-zA-Z0-9\\-_=\\.:]+$"
+      },
       "UpdateStudyRequest": {
         "properties": {
           "name": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/StudyName"
           },
           "description": {
-            "type": "string"
+            "$ref": "#/components/schemas/StudyDescription"
           },
           "redcapToken": {
-            "type": "string"
+            "$ref": "#/components/schemas/RedcapToken"
           },
           "redcapURL": {
-            "type": "string"
+            "$ref": "#/components/schemas/Url"
           },
           "contactUsEmail": {
-            "type": "string"
+            "$ref": "#/components/schemas/Email"
           }
         },
         "type": "object",
@@ -1272,6 +1301,32 @@
         "type": "object",
         "additionalProperties": false
       },
+      "MiddleName": {
+        "type": "string",
+        "example": "William",
+        "minLength": 1,
+        "maxLength": 100,
+        "pattern": "^[\\p{L}\\s\\-\\'\\.]+$"
+      },
+      "Mobile": {
+        "type": "string",
+        "example": "0412341432",
+        "pattern": "^(\\+\\d{1,2}\\s?)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$"
+      },
+      "AddressLine": {
+        "type": "string",
+        "example": "123 Sydney Street",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
+      },
+      "Suburb": {
+        "type": "string",
+        "example": "Darlinghurst",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
+      },
       "StateTerritory": {
         "enum": [
           "ACT",
@@ -1284,6 +1339,11 @@
           "WA"
         ],
         "type": "string"
+      },
+      "Postcode": {
+        "type": "string",
+        "example": "1234",
+        "pattern": "^\\d{4}$"
       },
       "ContactMethod": {
         "enum": [
@@ -1301,38 +1361,6 @@
           "DEPENDENT_OTHER"
         ],
         "type": "string"
-      },
-      "FirstName": {
-        "type": "string",
-        "example": "John",
-        "minLength": 1,
-        "maxLength": 100,
-        "pattern": "^[\\p{L}\\s\\-\\'\\.]+$"
-      },
-      "MiddleName": {
-        "type": "string",
-        "example": "William",
-        "minLength": 1,
-        "maxLength": 100,
-        "pattern": "^[\\p{L}\\s\\-\\'\\.]+$"
-      },
-      "LastName": {
-        "type": "string",
-        "example": "Doe",
-        "minLength": 1,
-        "maxLength": 100,
-        "pattern": "^[\\p{L}\\s\\-\\'\\.]+$"
-      },
-      "Mobile": {
-        "type": "string",
-        "example": "0412341432",
-        "pattern": "^(\\+\\d{1,2}\\s?)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$"
-      },
-      "Email": {
-        "type": "string",
-        "example": "john.doe@email.com",
-        "minLength": 1,
-        "maxLength": 254
       },
       "AlternativeContact": {
         "properties": {
@@ -1368,16 +1396,16 @@
       "FamilyMember": {
         "properties": {
           "firstName": {
-            "type": "string"
+            "$ref": "#/components/schemas/FirstName"
           },
           "middleName": {
-            "type": "string"
+            "$ref": "#/components/schemas/MiddleName"
           },
           "lastName": {
-            "type": "string"
+            "$ref": "#/components/schemas/LastName"
           },
           "dob": {
-            "type": "string"
+            "$ref": "#/components/schemas/DoB"
           },
           "id": {
             "type": "number",
@@ -1421,34 +1449,34 @@
                 "$ref": "#/components/schemas/ContactMethod"
               },
               "postcode": {
-                "type": "string"
+                "$ref": "#/components/schemas/Postcode"
               },
               "state": {
                 "$ref": "#/components/schemas/StateTerritory"
               },
               "suburb": {
-                "type": "string"
+                "$ref": "#/components/schemas/Suburb"
               },
               "addressLine": {
-                "type": "string"
+                "$ref": "#/components/schemas/AddressLine"
               },
               "mobile": {
-                "type": "string"
+                "$ref": "#/components/schemas/Mobile"
               },
               "email": {
-                "type": "string"
+                "$ref": "#/components/schemas/Email"
               },
               "dob": {
-                "type": "string"
+                "$ref": "#/components/schemas/DoB"
               },
               "lastName": {
-                "type": "string"
+                "$ref": "#/components/schemas/LastName"
               },
               "middleName": {
-                "type": "string"
+                "$ref": "#/components/schemas/MiddleName"
               },
               "firstName": {
-                "type": "string"
+                "$ref": "#/components/schemas/FirstName"
               },
               "id": {
                 "type": "number",
@@ -1474,10 +1502,6 @@
         ],
         "type": "object",
         "additionalProperties": false
-      },
-      "DoB": {
-        "type": "string",
-        "example": "2000-05-21"
       },
       "OnBehalf": {
         "properties": {
@@ -1563,29 +1587,7 @@
         "description": "Make all properties in T optional"
       },
       "UpdateProfileRequest": {
-        "$ref": "#/components/schemas/Partial_RegisterParticipantRequest_",
-        "example": {
-          "firstName": "John",
-          "middleName": "James",
-          "lastName": "Doe",
-          "email": "john.doe@email.com",
-          "password": "Supersecret123",
-          "dob": "2000-05-21",
-          "mobile": "0412341234",
-          "addressLine": "123 Sydney Street",
-          "suburb": "Sydney",
-          "postcode": "2000",
-          "state": "NSW",
-          "participantType": "STANDARD",
-          "preferredContact": "MOBILE",
-          "nextOfKin": {
-            "firstName": "Jeremy",
-            "middleName": "Jimmy",
-            "lastName": "Doe",
-            "mobile": "0412341432",
-            "email": "jeremydoe@email.com"
-          }
-        }
+        "$ref": "#/components/schemas/Partial_RegisterParticipantRequest_"
       },
       "ParticipantAnswerStatus": {
         "properties": {
@@ -1758,34 +1760,34 @@
                     "$ref": "#/components/schemas/ContactMethod"
                   },
                   "postcode": {
-                    "type": "string"
+                    "$ref": "#/components/schemas/Postcode"
                   },
                   "state": {
                     "$ref": "#/components/schemas/StateTerritory"
                   },
                   "suburb": {
-                    "type": "string"
+                    "$ref": "#/components/schemas/Suburb"
                   },
                   "addressLine": {
-                    "type": "string"
+                    "$ref": "#/components/schemas/AddressLine"
                   },
                   "mobile": {
-                    "type": "string"
+                    "$ref": "#/components/schemas/Mobile"
                   },
                   "email": {
-                    "type": "string"
+                    "$ref": "#/components/schemas/Email"
                   },
                   "dob": {
-                    "type": "string"
+                    "$ref": "#/components/schemas/DoB"
                   },
                   "lastName": {
-                    "type": "string"
+                    "$ref": "#/components/schemas/LastName"
                   },
                   "middleName": {
-                    "type": "string"
+                    "$ref": "#/components/schemas/MiddleName"
                   },
                   "firstName": {
-                    "type": "string"
+                    "$ref": "#/components/schemas/FirstName"
                   },
                   "id": {
                     "type": "number",
@@ -2516,16 +2518,6 @@
         "type": "object",
         "additionalProperties": false
       },
-      "Password": {
-        "type": "string",
-        "example": "Supersecret123",
-        "minLength": 14,
-        "maxLength": 128
-      },
-      "RoleT": {
-        "$ref": "#/components/schemas/Role",
-        "example": "OrganisationAdmin"
-      },
       "RegisterRequest": {
         "properties": {
           "firstName": {
@@ -2644,7 +2636,7 @@
             "type": "string"
           },
           "role": {
-            "type": "string"
+            "$ref": "#/components/schemas/RoleT"
           }
         },
         "required": [
@@ -2654,25 +2646,6 @@
         ],
         "type": "object",
         "additionalProperties": false
-      },
-      "AddressLine": {
-        "type": "string",
-        "example": "123 Sydney Street",
-        "minLength": 1,
-        "maxLength": 128,
-        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
-      },
-      "Suburb": {
-        "type": "string",
-        "example": "Darlinghurst",
-        "minLength": 1,
-        "maxLength": 128,
-        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
-      },
-      "Postcode": {
-        "type": "string",
-        "example": "1234",
-        "pattern": "^\\d{4}$"
       },
       "RegisterParticipantRequest": {
         "properties": {

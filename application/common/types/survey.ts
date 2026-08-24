@@ -1,5 +1,5 @@
 export interface DuoCode {
-  code: string
+  code: string // List used codes?
   relatedAnswer: string | boolean
 }
 

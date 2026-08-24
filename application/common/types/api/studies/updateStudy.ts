@@ -1,15 +1,9 @@
-/**
- * @example {
- *  "name": "UpdatedStudyName",
- * }
- */
+import { Email, RedcapToken, StudyDescription, StudyName, Url } from '../../commonTypes'
+
 export interface UpdateStudyRequest {
-  /**
-   * @minLength 1
-   */
-  name?: string
-  description?: string
-  redcapToken?: string
-  redcapURL?: string
-  contactUsEmail?: string
+  name?: StudyName
+  description?: StudyDescription
+  redcapToken?: RedcapToken
+  redcapURL?: Url
+  contactUsEmail?: Email
 }

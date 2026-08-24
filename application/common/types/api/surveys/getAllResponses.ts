@@ -1,7 +1,8 @@
+import { DoB, FirstName, LastName } from '../../commonTypes'
 import { SurveyStep, UserSurveyStepState } from '../../survey'
 
 export interface ParticipantData {
-  profile: { firstName: string; lastName: string; dob: string; familyId: number }
+  profile: { firstName: FirstName; lastName: LastName; dob: DoB; familyId: number }
   answers: UserSurveyStepState[]
   versionId: number
   participantId: string

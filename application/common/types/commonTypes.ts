@@ -90,3 +90,35 @@ export type ExternalId = string
 export type RoleT = Role
 
 export type UserT = User
+
+/**
+ * @minLength 1
+ * @maxLength 128
+ * @pattern ^[a-zA-ZÀ-ÿ0-9\s\,\.\-\/\#]+$
+ * @example "Acme Genomics Study"
+ */
+export type StudyName = string
+
+/**
+ * @minLength 1
+ * @maxLength 128 // TODO: align this with the maxLength of the field
+ * @pattern ^[a-zA-ZÀ-ÿ0-9\s\,\.\-\/\#]+$
+ * @example "This is a short description of the study"
+ */
+export type StudyDescription = string
+
+/**
+ * @minLength 1
+ * @maxLength 128 // TODO: verify max length
+ * @pattern ^[a-zA-Z0-9\-_=\.:]+$
+ * @example "123e4567-e89b-12d3-a456-426614174000" // TODO: improve example
+ */
+export type RedcapToken = string
+
+/**
+ * @minLength 1
+ * @maxLength 128 // TODO: verify max length
+ * @pattern ^[a-zA-Z0-9\-_=\.:]+$
+ * @example "https://redcap.orgname.com/api/"
+ */
+export type Url = string
