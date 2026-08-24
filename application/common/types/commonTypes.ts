@@ -6,7 +6,7 @@ import { Role, User } from '@prisma/client'
 /**
  * @minLength 1
  * @maxLength 100
- * @pattern ^[\p{L}\s\-\'\.]+$
+ * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ\s\-'.]+$
  * @example "John"
  */
 export type FirstName = string
@@ -14,7 +14,7 @@ export type FirstName = string
 /**
  * @minLength 1
  * @maxLength 100
- * @pattern ^[\p{L}\s\-\'\.]+$
+ * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ\s\-'.]+$
  * @example "William"
  */
 export type MiddleName = string
@@ -22,7 +22,7 @@ export type MiddleName = string
 /**
  * @minLength 1
  * @maxLength 100
- * @pattern ^[\p{L}\s\-\'\.]+$
+ * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ\s\-'.]+$
  * @example "Doe"
  */
 export type LastName = string
@@ -51,7 +51,7 @@ export type Mobile = string
 /**
  * @minLength 1
  * @maxLength 128
- * @pattern ^[a-zA-ZÀ-ÿ0-9\s\,\.\-\/\#]+$
+ * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
  * @example "123 Sydney Street"
  */
 export type AddressLine = string
@@ -59,7 +59,7 @@ export type AddressLine = string
 /**
  * @minLength 1
  * @maxLength 128
- * @pattern ^[a-zA-ZÀ-ÿ0-9\s\,\.\-\/\#]+$
+ * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
  * @example "Darlinghurst"
  */
 export type Suburb = string
@@ -79,7 +79,7 @@ export type DoB = string
 /**
  * @minLength 1
  * @maxLength 128
- * @pattern ^[a-zA-Z0-9\-_=\.:]+$
+ * @pattern ^[a-zA-Z0-9\-_=.:]+$
  * @example "123e4567-e89b-12d3-a456-426614174000"
  */
 export type ExternalId = string
@@ -95,15 +95,15 @@ export type UserT = User
 /**
  * @minLength 1
  * @maxLength 128
- * @pattern ^[a-zA-ZÀ-ÿ0-9\s\,\.\-\/\#]+$
+ * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
  * @example "Acme Genomics Study"
  */
 export type StudyName = string
 
 /**
  * @minLength 1
- * @maxLength 128 // TODO: align this with the maxLength of the field
- * @pattern ^[a-zA-ZÀ-ÿ0-9\s\,\.\-\/\#]+$
+ * @maxLength 900 // TODO: align this with the maxLength of the field
+ * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
  * @example "This is a short description of the study"
  */
 export type StudyDescription = string
@@ -111,7 +111,7 @@ export type StudyDescription = string
 /**
  * @minLength 1
  * @maxLength 128 // TODO: verify max length
- * @pattern ^[a-zA-Z0-9\-_=\.:]+$
+ * @pattern ^[a-zA-Z0-9\-_=.:]+$
  * @example "123e4567-e89b-12d3-a456-426614174000" // TODO: improve example
  */
 export type RedcapToken = string
@@ -123,7 +123,7 @@ export type RedcapToken = string
 /**
  * @minLength 1
  * @maxLength 128 // TODO: align this with the maxLength of the field
- * @pattern ^[a-zA-ZÀ-ÿ0-9\s\,\.\-\/\#]+$
+ * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
  * @example "Name of REDCap instrument (from Column B of data dictionary)"
  */
 export type RedcapFormName = string
@@ -131,7 +131,7 @@ export type RedcapFormName = string
 /**
  * @minLength 1
  * @maxLength 128 // TODO: verify max length
- * @pattern ^[a-zA-Z0-9\-_=\.:]+$
+ * @pattern ^https?:\/\/[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]+$
  * @example "https://redcap.orgname.com/api/"
  */
 export type Url = string
@@ -139,7 +139,7 @@ export type Url = string
 /**
  * @minLength 1
  * @maxLength 128 // TODO: align this with the maxLength of the field
- * @pattern ^[a-zA-ZÀ-ÿ0-9\s\,\.\-\/\#]+$
+ * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
  * @example "Invitation to CTRL - Dynamic Consent Platform"
  */
 export type InviteEmailSubject = string
@@ -147,7 +147,7 @@ export type InviteEmailSubject = string
 /**
  * @minLength 1
  * @maxLength 900 // TODO: align this with the maxLength of the field
- * @pattern ^[a-zA-ZÀ-ÿ0-9\s\,\.\-\/\#]+$
+ * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
  * @example "You have been invited to register with CTRL dynamic consent platform"
  */
 export type InviteEmailText = string
@@ -155,7 +155,7 @@ export type InviteEmailText = string
 /**
  * @minLength 1
  * @maxLength 128 // TODO: align this with the maxLength of the field
- * @pattern ^[a-zA-ZÀ-ÿ0-9\s\,\.\-\/\#]+$
+ * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
  * @example "Acme Medical Research Institute"
  */
 export type OrganisationName = string
@@ -163,7 +163,7 @@ export type OrganisationName = string
 /**
  * @minLength 1
  * @maxLength 900 // TODO: align this with the maxLength of the field
- * @pattern ^[a-zA-ZÀ-ÿ0-9\s\,\.\-\/\#]+$
+ * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
  * @example "There was some problem with this thing that I was doing.\nBut I don't know why?\n\nCheers,\nJohn Doe"
  */
 export type ContactUsText = string
@@ -171,7 +171,7 @@ export type ContactUsText = string
 /**
  * @minLength 1
  * @maxLength 128 // TODO: align this with the maxLength of the field
- * @pattern ^[a-zA-ZÀ-ÿ0-9\s\,\.\-\/\#]+$
+ * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
  * @example "Introduction to CTRL"
  */
 export type SurveyStepTitle = string
@@ -179,7 +179,7 @@ export type SurveyStepTitle = string
 /**
  * @minLength 1
  * @maxLength 900 // TODO: align this with the maxLength of the field
- * @pattern ^[a-zA-ZÀ-ÿ0-9\s\,\.\-\/\#]+$
+ * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
  * @example "Watch our short video about the consent process for taking part in medical research."
  */
 export type SurveyStepDescription = string
@@ -187,7 +187,7 @@ export type SurveyStepDescription = string
 /**
  * @minLength 1
  * @maxLength 900 // TODO: align this with the maxLength of the field
- * @pattern ^[a-zA-ZÀ-ÿ0-9\s\,\.\-\/\#]+$
+ * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
  * @example "Do you consent to the genomic test?"
  */
 export type SurveyQuestionText = string
@@ -195,7 +195,7 @@ export type SurveyQuestionText = string
 /**
  * @minLength 1
  * @maxLength 900 // TODO: align this with the maxLength of the field
- * @pattern ^[a-zA-ZÀ-ÿ0-9\s\,\.\-\/\#]+$
+ * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
  * @example "Here is an explanation of what genomic means"
  */
 export type SurveyQuestionTooltip = string
@@ -203,7 +203,7 @@ export type SurveyQuestionTooltip = string
 /**
  * @minLength 1
  * @maxLength 900 // TODO: align this with the maxLength of the field
- * @pattern ^[a-zA-ZÀ-ÿ0-9\s\,\.\-\/\#]+$
+ * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
  * @example "Section with questions about consent"
  */
 export type SurveySubHeadingText = string

@@ -249,14 +249,14 @@
         "example": "John",
         "minLength": 1,
         "maxLength": 100,
-        "pattern": "^[\\p{L}\\s\\-\\'\\.]+$"
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ\\s\\-'.]+$"
       },
       "LastName": {
         "type": "string",
         "example": "Doe",
         "minLength": 1,
         "maxLength": 100,
-        "pattern": "^[\\p{L}\\s\\-\\'\\.]+$"
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ\\s\\-'.]+$"
       },
       "Email": {
         "type": "string",
@@ -424,28 +424,28 @@
         "example": "Introduction to CTRL",
         "minLength": 1,
         "maxLength": 128,
-        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
       },
       "SurveyStepDescription": {
         "type": "string",
         "example": "Watch our short video about the consent process for taking part in medical research.",
         "minLength": 1,
         "maxLength": 900,
-        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
       },
       "SurveyQuestionText": {
         "type": "string",
         "example": "Do you consent to the genomic test?",
         "minLength": 1,
         "maxLength": 900,
-        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
       },
       "SurveyQuestionTooltip": {
         "type": "string",
         "example": "Here is an explanation of what genomic means",
         "minLength": 1,
         "maxLength": 900,
-        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
       },
       "DuoCode": {
         "properties": {
@@ -532,7 +532,7 @@
         "example": "https://redcap.orgname.com/api/",
         "minLength": 1,
         "maxLength": 128,
-        "pattern": "^[a-zA-Z0-9\\-_=\\.:]+$"
+        "pattern": "^https?:\\/\\/[a-zA-Z0-9\\-._~:/?#[\\]@!$&'()*+,;=%]+$"
       },
       "SurveyVideo": {
         "properties": {
@@ -551,7 +551,7 @@
         "example": "Section with questions about consent",
         "minLength": 1,
         "maxLength": 900,
-        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
       },
       "SurveySubHeading": {
         "properties": {
@@ -1193,7 +1193,7 @@
         "example": "Acme Genomics Study",
         "minLength": 1,
         "maxLength": 128,
-        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
       },
       "CreateStudyRequest": {
         "properties": {
@@ -1211,14 +1211,14 @@
         "type": "string",
         "example": "This is a short description of the study",
         "minLength": 1,
-        "maxLength": 128,
-        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
+        "maxLength": 900,
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
       },
       "RedcapToken": {
         "type": "string",
         "minLength": 1,
         "maxLength": 128,
-        "pattern": "^[a-zA-Z0-9\\-_=\\.:]+$"
+        "pattern": "^[a-zA-Z0-9\\-_=.:]+$"
       },
       "UpdateStudyRequest": {
         "properties": {
@@ -1349,7 +1349,7 @@
         "example": "William",
         "minLength": 1,
         "maxLength": 100,
-        "pattern": "^[\\p{L}\\s\\-\\'\\.]+$"
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ\\s\\-'.]+$"
       },
       "Mobile": {
         "type": "string",
@@ -1361,14 +1361,14 @@
         "example": "123 Sydney Street",
         "minLength": 1,
         "maxLength": 128,
-        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
       },
       "Suburb": {
         "type": "string",
         "example": "Darlinghurst",
         "minLength": 1,
         "maxLength": 128,
-        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
       },
       "StateTerritory": {
         "enum": [
@@ -2104,7 +2104,7 @@
         "example": "123e4567-e89b-12d3-a456-426614174000",
         "minLength": 1,
         "maxLength": 128,
-        "pattern": "^[a-zA-Z0-9\\-_=\\.:]+$"
+        "pattern": "^[a-zA-Z0-9\\-_=.:]+$"
       },
       "Prefill": {
         "properties": {
@@ -2144,14 +2144,14 @@
         "example": "Invitation to CTRL - Dynamic Consent Platform",
         "minLength": 1,
         "maxLength": 128,
-        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
       },
       "InviteEmailText": {
         "type": "string",
         "example": "You have been invited to register with CTRL dynamic consent platform",
         "minLength": 1,
         "maxLength": 900,
-        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
       },
       "InviteParticipantsRequest": {
         "properties": {
@@ -2294,7 +2294,7 @@
         "example": "Acme Medical Research Institute",
         "minLength": 1,
         "maxLength": 128,
-        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
       },
       "CreateOrganisationRequest": {
         "properties": {
@@ -2337,7 +2337,7 @@
         "example": "There was some problem with this thing that I was doing.\nBut I don't know why?\n\nCheers,\nJohn Doe",
         "minLength": 1,
         "maxLength": 900,
-        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
       },
       "ContactUsRequest": {
         "properties": {
@@ -2401,7 +2401,7 @@
         "example": "Name of REDCap instrument (from Column B of data dictionary)",
         "minLength": 1,
         "maxLength": 128,
-        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
       },
       "UploadRedcapInstrumentAPIRequest": {
         "properties": {
