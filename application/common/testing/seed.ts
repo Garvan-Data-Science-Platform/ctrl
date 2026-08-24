@@ -400,8 +400,8 @@ export async function seedTests(prisma: PrismaClient) {
     data: {
       id: TestUsers.PASSWORD_RESET_USER.id,
       email: TestUsers.PASSWORD_RESET_USER.email,
-      firstName: 'Test',
-      lastName: 'User',
+      firstName: 'Reset',
+      lastName: 'Recipient',
       password: hashPassword(TestUsers.PASSWORD_RESET_USER.password),
       role: Role.Participant,
     },

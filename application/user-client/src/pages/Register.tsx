@@ -62,6 +62,7 @@ export default function Register() {
     setError,
     watch,
     reset,
+    getValues,
     formState: { errors },
   } = useForm<FormValues>({
     defaultValues: { preferredContact: '' as ContactMethod, state: '' as StateTerritory },
@@ -240,7 +241,12 @@ export default function Register() {
                 {...register('password', {
                   required: 'This field is required',
                   validate: (val) => {
-                    const { isValid, fields } = checkPasswordStrength(val)
+                    const { isValid, fields } = checkPasswordStrength(val, {
+                      firstName: getValues('firstName'),
+                      lastName: getValues('lastName'),
+                      email: getValues('email'),
+                      dob: getValues('dob'),
+                    })
                     if (!isValid) {
                       return `Invalid password. ${Object.values(fields).map((f) => ' ' + f.message)}`
                     }

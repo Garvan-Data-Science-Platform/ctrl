@@ -7,7 +7,7 @@ import {
   RegisterResponse,
 } from 'common/types/api/auth'
 import { resetDB } from 'common/testing/TestHelpers'
-import { TestUsers, TestStudies, TestInvites } from 'common/testing/constants'
+import { STRONG_TEST_PASSWORD, TestUsers, TestStudies, TestInvites } from 'common/testing/constants'
 import {
   ContactMethod,
   ParticipantType,
@@ -33,7 +33,7 @@ describe('Auth', () => {
     firstName: 'Test',
     lastName: 'Admin',
     email: 'test@admin.com',
-    password: TestUsers.ORG_ADMIN.password, // Note: using test data so it fits password policy
+    password: STRONG_TEST_PASSWORD,
     role: Role.OrganisationAdmin,
   }
 
@@ -41,7 +41,7 @@ describe('Auth', () => {
     firstName: 'Test',
     lastName: 'Participant',
     email: 'test@participant.com',
-    password: TestUsers.ORG_ADMIN.password, // Note: using test data so it fits password policy
+    password: STRONG_TEST_PASSWORD,
     role: Role.Participant,
   }
 
@@ -123,7 +123,7 @@ describe('Auth', () => {
       firstName: 'John',
       lastName: 'Doe',
       email: TestInvites.INVITE_2_PENDING.email,
-      password: 'johnDoesP@ssword123',
+      password: STRONG_TEST_PASSWORD,
       mobile: '+61477777777',
       addressLine: '123 Some Street',
       suburb: 'Sydney',
