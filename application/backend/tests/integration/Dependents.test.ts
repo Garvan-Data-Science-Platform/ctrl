@@ -62,8 +62,8 @@ describe('Survey tests', () => {
       state: StateTerritory.ACT,
       suburb: 'ABCKDF',
       dependents: [
-        { firstName: 'Child1', lastName: 'K', dob: '2020-01-01', permanent: true },
-        { firstName: 'Child2', lastName: 'K', dob: '2020-01-02', permanent: false },
+        { firstName: 'ChildA', lastName: 'K', dob: '2020-01-01', permanent: true },
+        { firstName: 'ChildB', lastName: 'K', dob: '2020-01-02', permanent: false },
       ],
     }
     const reqBody2 = { ...reqBody, email: 'parent2@gmail.com', firstName: 'X' }
@@ -77,7 +77,7 @@ describe('Survey tests', () => {
       .send(reqBody2)
     expect(regRes.statusCode).toBe(201)
 
-    const deps1 = await prisma.participantProfile.findMany({ where: { firstName: 'Child1' } })
+    const deps1 = await prisma.participantProfile.findMany({ where: { firstName: 'ChildA' } })
     console.log('FAMILY', deps1[0].familyId)
     expect(deps1).toHaveLength(1)
   })
@@ -98,7 +98,7 @@ describe('Survey tests', () => {
     expect(
       (
         await prisma.surveyVersionAnswers.findFirstOrThrow({
-          where: { profile: { firstName: 'Child1' } },
+          where: { profile: { firstName: 'ChildA' } },
         })
       ).answers[1].answers,
     ).toEqual([true, 'Choice 1'])
@@ -106,7 +106,7 @@ describe('Survey tests', () => {
     expect(
       (
         await prisma.surveyVersionAnswers.findFirstOrThrow({
-          where: { profile: { firstName: 'Child2' } },
+          where: { profile: { firstName: 'ChildB' } },
         })
       ).answers[1].answers,
     ).toEqual([true, 'Choice 1'])
@@ -130,7 +130,7 @@ describe('Survey tests', () => {
         await prisma.surveyVersionAnswers.findFirstOrThrow({
           where: {
             profile: {
-              firstName: 'Child1',
+              firstName: 'ChildA',
             },
             version: {
               studyId: 1,
@@ -143,7 +143,7 @@ describe('Survey tests', () => {
     expect(
       (
         await prisma.surveyVersionAnswers.findFirstOrThrow({
-          where: { profile: { firstName: 'Child2' } },
+          where: { profile: { firstName: 'ChildB' } },
         })
       ).answers[1].answers,
     ).toEqual([null, 'Choice 1'])
@@ -182,13 +182,13 @@ describe('Survey tests', () => {
       .set({ Authorization: `Bearer ${adminToken}` })
       .send({
         firstName: 'New',
-        lastName: 'Dependent2',
+        lastName: 'DependentB',
         dob: '1990-01-02',
         permanent: true,
       })
 
     const prof = await prisma.participantProfile.findFirstOrThrow({
-      where: { firstName: 'New', lastName: 'Dependent2' },
+      where: { firstName: 'New', lastName: 'DependentB' },
     })
 
     let part = await prisma.surveyVersionAnswers.findFirstOrThrow({
@@ -220,7 +220,7 @@ describe('Survey tests', () => {
     expect(res.status).toBe(204)
 
     const depProfile = await prisma.participantProfile.findFirstOrThrow({
-      where: { firstName: 'New', lastName: 'Dependent2' },
+      where: { firstName: 'New', lastName: 'DependentB' },
     })
 
     let part = await prisma.surveyVersionAnswers.findFirstOrThrow({
@@ -252,7 +252,7 @@ describe('Survey tests', () => {
       .set({ Authorization: `Bearer ${adminToken}` })
 
     const depProfile = await prisma.participantProfile.findFirstOrThrow({
-      where: { firstName: 'New', lastName: 'Dependent2' },
+      where: { firstName: 'New', lastName: 'DependentB' },
     })
 
     const part = await prisma.surveyVersionAnswers.findFirstOrThrow({
