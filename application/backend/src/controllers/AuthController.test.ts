@@ -562,6 +562,7 @@ describe('AuthController', () => {
       expect(body.message).toBe('Validation Failed')
       expect(body.details).toEqual({
         'bodyRequest.email': { message: 'Invalid value provided' },
+        'bodyRequest.password': { message: 'Invalid value provided' },
       })
     })
 
@@ -598,7 +599,7 @@ describe('AuthController', () => {
       })
       const loginRequest: LoginRequest = {
         email: TestUsers.PARTICIPANT_UNANSWERED.email,
-        password: 'wrong',
+        password: 'wrong123412345',
       }
       await request(app).post('/auth/login').send(loginRequest)
       const user = await prisma.user.findFirstOrThrow({
@@ -615,7 +616,7 @@ describe('AuthController', () => {
       })
       const loginRequest: LoginRequest = {
         email: TestUsers.PARTICIPANT_UNANSWERED.email,
-        password: 'wrong',
+        password: 'wrong1234124312',
       }
       const loginResponse = await request(app).post('/auth/login').send(loginRequest)
       expect(loginResponse.body.details).toBe('Retries exceeded, account locked for 24 hours')

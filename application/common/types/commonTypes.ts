@@ -30,7 +30,7 @@ export type LastName = string
 /**
  * @minLength 1
  * @maxLength 254
- * @isEmail
+ * @pattern ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$
  * @example "john.doe@email.com"
  */
 export type Email = string
@@ -43,7 +43,7 @@ export type Email = string
 export type Password = string
 
 /**
- * @pattern ^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$ please provide valid phone number
+ * @pattern ^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$
  * @example "0412341432"
  */
 export type Mobile = string
@@ -71,7 +71,7 @@ export type Suburb = string
 export type Postcode = string
 
 /**
- * @isDate Date of birth must be YYYY-MM-DD format
+ * @pattern ^\d{4}-\d{2}-\d{2}$
  * @example "2000-05-21"
  */
 export type DoB = string
@@ -123,7 +123,7 @@ export type RedcapToken = string
 /**
  * @minLength 1
  * @maxLength 128 // TODO: align this with the maxLength of the field
- * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
+ * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€_+]+$
  * @example "Name of REDCap instrument (from Column B of data dictionary)"
  */
 export type RedcapFormName = string
