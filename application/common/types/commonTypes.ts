@@ -167,3 +167,43 @@ export type OrganisationName = string
  * @example "There was some problem with this thing that I was doing.\nBut I don't know why?\n\nCheers,\nJohn Doe"
  */
 export type ContactUsText = string
+
+/**
+ * @minLength 1
+ * @maxLength 128 // TODO: align this with the maxLength of the field
+ * @pattern ^[a-zA-ZÀ-ÿ0-9\s\,\.\-\/\#]+$
+ * @example "Introduction to CTRL"
+ */
+export type SurveyStepTitle = string
+
+/**
+ * @minLength 1
+ * @maxLength 900 // TODO: align this with the maxLength of the field
+ * @pattern ^[a-zA-ZÀ-ÿ0-9\s\,\.\-\/\#]+$
+ * @example "Watch our short video about the consent process for taking part in medical research."
+ */
+export type SurveyStepDescription = string
+
+/**
+ * @minLength 1
+ * @maxLength 900 // TODO: align this with the maxLength of the field
+ * @pattern ^[a-zA-ZÀ-ÿ0-9\s\,\.\-\/\#]+$
+ * @example "Do you consent to the genomic test?"
+ */
+export type SurveyQuestionText = string
+
+/**
+ * @minLength 1
+ * @maxLength 900 // TODO: align this with the maxLength of the field
+ * @pattern ^[a-zA-ZÀ-ÿ0-9\s\,\.\-\/\#]+$
+ * @example "Here is an explanation of what genomic means"
+ */
+export type SurveyQuestionTooltip = string
+
+/**
+ * @minLength 1
+ * @maxLength 900 // TODO: align this with the maxLength of the field
+ * @pattern ^[a-zA-ZÀ-ÿ0-9\s\,\.\-\/\#]+$
+ * @example "Section with questions about consent"
+ */
+export type SurveySubHeadingText = string

@@ -419,6 +419,34 @@
         "type": "object",
         "additionalProperties": false
       },
+      "SurveyStepTitle": {
+        "type": "string",
+        "example": "Introduction to CTRL",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
+      },
+      "SurveyStepDescription": {
+        "type": "string",
+        "example": "Watch our short video about the consent process for taking part in medical research.",
+        "minLength": 1,
+        "maxLength": 900,
+        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
+      },
+      "SurveyQuestionText": {
+        "type": "string",
+        "example": "Do you consent to the genomic test?",
+        "minLength": 1,
+        "maxLength": 900,
+        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
+      },
+      "SurveyQuestionTooltip": {
+        "type": "string",
+        "example": "Here is an explanation of what genomic means",
+        "minLength": 1,
+        "maxLength": 900,
+        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
+      },
       "DuoCode": {
         "properties": {
           "code": {
@@ -445,10 +473,10 @@
       "SurveyQuestionChoices": {
         "properties": {
           "text": {
-            "type": "string"
+            "$ref": "#/components/schemas/SurveyQuestionText"
           },
           "tooltip": {
-            "type": "string"
+            "$ref": "#/components/schemas/SurveyQuestionTooltip"
           },
           "required": {
             "type": "boolean"
@@ -477,10 +505,10 @@
       "SurveyQuestionCheckbox": {
         "properties": {
           "text": {
-            "type": "string"
+            "$ref": "#/components/schemas/SurveyQuestionText"
           },
           "tooltip": {
-            "type": "string"
+            "$ref": "#/components/schemas/SurveyQuestionTooltip"
           },
           "required": {
             "type": "boolean"
@@ -499,10 +527,17 @@
         "type": "object",
         "additionalProperties": false
       },
+      "Url": {
+        "type": "string",
+        "example": "https://redcap.orgname.com/api/",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^[a-zA-Z0-9\\-_=\\.:]+$"
+      },
       "SurveyVideo": {
         "properties": {
           "link": {
-            "type": "string"
+            "$ref": "#/components/schemas/Url"
           }
         },
         "required": [
@@ -511,10 +546,17 @@
         "type": "object",
         "additionalProperties": false
       },
+      "SurveySubHeadingText": {
+        "type": "string",
+        "example": "Section with questions about consent",
+        "minLength": 1,
+        "maxLength": 900,
+        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
+      },
       "SurveySubHeading": {
         "properties": {
           "text": {
-            "type": "string"
+            "$ref": "#/components/schemas/SurveySubHeadingText"
           }
         },
         "required": [
@@ -628,10 +670,10 @@
       "SurveyStep": {
         "properties": {
           "title": {
-            "type": "string"
+            "$ref": "#/components/schemas/SurveyStepTitle"
           },
           "text": {
-            "type": "string"
+            "$ref": "#/components/schemas/SurveyStepDescription"
           },
           "last_updated": {
             "type": "string"
@@ -1174,13 +1216,6 @@
       },
       "RedcapToken": {
         "type": "string",
-        "minLength": 1,
-        "maxLength": 128,
-        "pattern": "^[a-zA-Z0-9\\-_=\\.:]+$"
-      },
-      "Url": {
-        "type": "string",
-        "example": "https://redcap.orgname.com/api/",
         "minLength": 1,
         "maxLength": 128,
         "pattern": "^[a-zA-Z0-9\\-_=\\.:]+$"
