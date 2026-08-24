@@ -50,8 +50,7 @@ import {
   generatePasswordResetEmail,
 } from 'common/src/emails/generate'
 import crypto, { randomBytes } from 'crypto'
-import nodemailer from 'nodemailer'
-import { createMailerTransporter, fromAddress } from '../utils/mailer'
+import { sendEmail } from '../mailer'
 import { auditLog } from '../middlewares/AuditLog'
 import config from '../config'
 
@@ -422,17 +421,12 @@ export class UsersController extends Controller {
       subject = 'CTRL - Password Reset Link'
     }
 
-    const mailToUserOptions: nodemailer.SendMailOptions = {
-      from: fromAddress,
+    await sendEmail({
       to: user.email,
       subject,
       text,
       html,
-    }
-
-    const mailerTransporter = await createMailerTransporter()
-
-    await mailerTransporter.sendMail(mailToUserOptions)
+    })
   }
 
   @Post('/password/reset')
