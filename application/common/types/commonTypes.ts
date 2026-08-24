@@ -122,3 +122,19 @@ export type RedcapToken = string
  * @example "https://redcap.orgname.com/api/"
  */
 export type Url = string
+
+/**
+ * @minLength 1
+ * @maxLength 128 // TODO: align this with the maxLength of the field
+ * @pattern ^[a-zA-ZÀ-ÿ0-9\s\,\.\-\/\#]+$
+ * @example "Invitation to CTRL - Dynamic Consent Platform"
+ */
+export type InviteEmailSubject = string
+
+/**
+ * @minLength 1
+ * @maxLength 900 // TODO: align this with the maxLength of the field
+ * @pattern ^[a-zA-ZÀ-ÿ0-9\s\,\.\-\/\#]+$
+ * @example "You have been invited to register with CTRL dynamic consent platform"
+ */
+export type InviteEmailText = string

@@ -1,4 +1,6 @@
+import { InviteEmailSubject, InviteEmailText } from '../../commonTypes'
+
 export interface GetInviteTextResponse {
-  inviteEmailSubject: string
-  inviteEmailText: string
+  inviteEmailSubject: InviteEmailSubject
+  inviteEmailText: InviteEmailText
 }

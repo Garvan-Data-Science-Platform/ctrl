@@ -666,9 +666,9 @@ const models: TsoaRoute.Models = {
             "id": {"dataType":"double","required":true},
             "participantId": {"dataType":"string","required":true},
             "externalId": {"dataType":"string"},
-            "email": {"dataType":"string"},
-            "firstName": {"dataType":"string","required":true},
-            "lastName": {"dataType":"string","required":true},
+            "email": {"ref":"Email"},
+            "firstName": {"ref":"FirstName","required":true},
+            "lastName": {"ref":"LastName","required":true},
             "familyId": {"dataType":"double","required":true},
             "answers": {"dataType":"array","array":{"dataType":"refObject","ref":"ParticipantAnswerStatus"},"required":true},
             "lastUpdated": {"dataType":"string"},
@@ -688,7 +688,7 @@ const models: TsoaRoute.Models = {
     "GetDeletedParticipantsResponse": {
         "dataType": "refObject",
         "properties": {
-            "data": {"dataType":"array","array":{"dataType":"nestedObjectLiteral","nestedProperties":{"studyId":{"dataType":"double","required":true},"study":{"dataType":"string","required":true},"dob":{"dataType":"string","required":true},"lastName":{"dataType":"string","required":true},"firstName":{"dataType":"string","required":true},"profileId":{"dataType":"double","required":true},"id":{"dataType":"string","required":true}}},"required":true},
+            "data": {"dataType":"array","array":{"dataType":"nestedObjectLiteral","nestedProperties":{"studyId":{"dataType":"double","required":true},"study":{"ref":"StudyName","required":true},"dob":{"ref":"DoB","required":true},"lastName":{"ref":"LastName","required":true},"firstName":{"ref":"FirstName","required":true},"profileId":{"dataType":"double","required":true},"id":{"dataType":"string","required":true}}},"required":true},
         },
         "additionalProperties": false,
     },
@@ -714,7 +714,7 @@ const models: TsoaRoute.Models = {
     "GetUserInvitesResponse": {
         "dataType": "refObject",
         "properties": {
-            "data": {"dataType":"nestedObjectLiteral","nestedProperties":{"invites":{"dataType":"array","array":{"dataType":"nestedObjectLiteral","nestedProperties":{"description":{"dataType":"string"},"studyName":{"dataType":"string","required":true},"sentAt":{"dataType":"string"},"expiresAt":{"dataType":"string","required":true},"createdAt":{"dataType":"string","required":true},"studyId":{"dataType":"double","required":true},"email":{"dataType":"string","required":true},"id":{"dataType":"string","required":true}}},"required":true}},"required":true},
+            "data": {"dataType":"nestedObjectLiteral","nestedProperties":{"invites":{"dataType":"array","array":{"dataType":"nestedObjectLiteral","nestedProperties":{"description":{"ref":"StudyDescription"},"studyName":{"ref":"StudyName","required":true},"sentAt":{"dataType":"string"},"expiresAt":{"dataType":"string","required":true},"createdAt":{"dataType":"string","required":true},"studyId":{"dataType":"double","required":true},"email":{"ref":"Email","required":true},"id":{"dataType":"string","required":true}}},"required":true}},"required":true},
         },
         "additionalProperties": false,
     },
@@ -727,7 +727,7 @@ const models: TsoaRoute.Models = {
     "GetInvitesResponse": {
         "dataType": "refObject",
         "properties": {
-            "data": {"dataType":"array","array":{"dataType":"nestedObjectLiteral","nestedProperties":{"inviteStatus":{"ref":"InviteStatus","required":true},"sentAt":{"dataType":"string"},"expiresAt":{"dataType":"string","required":true},"createdAt":{"dataType":"string","required":true},"studyId":{"dataType":"double","required":true},"email":{"dataType":"string","required":true},"id":{"dataType":"string","required":true}}},"required":true},
+            "data": {"dataType":"array","array":{"dataType":"nestedObjectLiteral","nestedProperties":{"inviteStatus":{"ref":"InviteStatus","required":true},"sentAt":{"dataType":"string"},"expiresAt":{"dataType":"string","required":true},"createdAt":{"dataType":"string","required":true},"studyId":{"dataType":"double","required":true},"email":{"ref":"Email","required":true},"id":{"dataType":"string","required":true}}},"required":true},
         },
         "additionalProperties": false,
     },
@@ -773,12 +773,22 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "InviteEmailSubject": {
+        "dataType": "refAlias",
+        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"errorMsg":"// TODO: align this with the maxLength of the field","value":128},"pattern":{"value":"^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"}}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "InviteEmailText": {
+        "dataType": "refAlias",
+        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"errorMsg":"// TODO: align this with the maxLength of the field","value":900},"pattern":{"value":"^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"}}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "InviteParticipantsRequest": {
         "dataType": "refObject",
         "properties": {
             "recipients": {"dataType":"array","array":{"dataType":"refObject","ref":"Recipient"},"required":true},
-            "subjectText": {"dataType":"string","required":true},
-            "explanatoryText": {"dataType":"string","required":true},
+            "subjectText": {"ref":"InviteEmailSubject","required":true},
+            "explanatoryText": {"ref":"InviteEmailText","required":true},
         },
         "additionalProperties": false,
     },
@@ -786,8 +796,8 @@ const models: TsoaRoute.Models = {
     "GetInviteTextResponse": {
         "dataType": "refObject",
         "properties": {
-            "inviteEmailSubject": {"dataType":"string","required":true},
-            "inviteEmailText": {"dataType":"string","required":true},
+            "inviteEmailSubject": {"ref":"InviteEmailSubject","required":true},
+            "inviteEmailText": {"ref":"InviteEmailText","required":true},
         },
         "additionalProperties": false,
     },

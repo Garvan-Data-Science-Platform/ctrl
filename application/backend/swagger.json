@@ -1637,13 +1637,13 @@
             "type": "string"
           },
           "email": {
-            "type": "string"
+            "$ref": "#/components/schemas/Email"
           },
           "firstName": {
-            "type": "string"
+            "$ref": "#/components/schemas/FirstName"
           },
           "lastName": {
-            "type": "string"
+            "$ref": "#/components/schemas/LastName"
           },
           "familyId": {
             "type": "number",
@@ -1700,16 +1700,16 @@
                   "format": "double"
                 },
                 "study": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/StudyName"
                 },
                 "dob": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/DoB"
                 },
                 "lastName": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/LastName"
                 },
                 "firstName": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/FirstName"
                 },
                 "profileId": {
                   "type": "number",
@@ -1858,10 +1858,10 @@
                 "items": {
                   "properties": {
                     "description": {
-                      "type": "string"
+                      "$ref": "#/components/schemas/StudyDescription"
                     },
                     "studyName": {
-                      "type": "string"
+                      "$ref": "#/components/schemas/StudyName"
                     },
                     "sentAt": {
                       "type": "string"
@@ -1877,7 +1877,7 @@
                       "format": "double"
                     },
                     "email": {
-                      "type": "string"
+                      "$ref": "#/components/schemas/Email"
                     },
                     "id": {
                       "type": "string"
@@ -1940,7 +1940,7 @@
                   "format": "double"
                 },
                 "email": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/Email"
                 },
                 "id": {
                   "type": "string"
@@ -2104,6 +2104,20 @@
         "type": "object",
         "additionalProperties": false
       },
+      "InviteEmailSubject": {
+        "type": "string",
+        "example": "Invitation to CTRL - Dynamic Consent Platform",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
+      },
+      "InviteEmailText": {
+        "type": "string",
+        "example": "You have been invited to register with CTRL dynamic consent platform",
+        "minLength": 1,
+        "maxLength": 900,
+        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
+      },
       "InviteParticipantsRequest": {
         "properties": {
           "recipients": {
@@ -2113,10 +2127,10 @@
             "type": "array"
           },
           "subjectText": {
-            "type": "string"
+            "$ref": "#/components/schemas/InviteEmailSubject"
           },
           "explanatoryText": {
-            "type": "string"
+            "$ref": "#/components/schemas/InviteEmailText"
           }
         },
         "required": [
@@ -2125,23 +2139,15 @@
           "explanatoryText"
         ],
         "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "emails": [
-            "john.doe@email.com",
-            "jane@email.com"
-          ],
-          "subjectText": "Invitation to Study",
-          "explanatoryText": "You have been invited to participate in this Study. Please click this link to provide consent."
-        }
+        "additionalProperties": false
       },
       "GetInviteTextResponse": {
         "properties": {
           "inviteEmailSubject": {
-            "type": "string"
+            "$ref": "#/components/schemas/InviteEmailSubject"
           },
           "inviteEmailText": {
-            "type": "string"
+            "$ref": "#/components/schemas/InviteEmailText"
           }
         },
         "required": [
