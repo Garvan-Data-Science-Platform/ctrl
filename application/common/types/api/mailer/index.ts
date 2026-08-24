@@ -1,10 +1,6 @@
-/**
- * @example {
- *  "content": "There was some problem with this thing that I was doing.\nBut I don't know why?\n\nCheers,\nJohn Doe"
- *  "studyId": 1
- * }
- */
+import { ContactUsText } from '../../commonTypes'
+
 export interface ContactUsRequest {
-  content: string
+  content: ContactUsText
   studyId: number
 }

@@ -2297,10 +2297,17 @@
         "type": "object",
         "additionalProperties": false
       },
+      "ContactUsText": {
+        "type": "string",
+        "example": "There was some problem with this thing that I was doing.\nBut I don't know why?\n\nCheers,\nJohn Doe",
+        "minLength": 1,
+        "maxLength": 900,
+        "pattern": "^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"
+      },
       "ContactUsRequest": {
         "properties": {
           "content": {
-            "type": "string"
+            "$ref": "#/components/schemas/ContactUsText"
           },
           "studyId": {
             "type": "number",

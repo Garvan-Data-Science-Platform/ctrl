@@ -147,3 +147,11 @@ export type InviteEmailText = string
  * @example "Acme Medical Research Institute"
  */
 export type OrganisationName = string
+
+/**
+ * @minLength 1
+ * @maxLength 900 // TODO: align this with the maxLength of the field
+ * @pattern ^[a-zA-ZÀ-ÿ0-9\s\,\.\-\/\#]+$
+ * @example "There was some problem with this thing that I was doing.\nBut I don't know why?\n\nCheers,\nJohn Doe"
+ */
+export type ContactUsText = string

@@ -865,10 +865,15 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ContactUsText": {
+        "dataType": "refAlias",
+        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"errorMsg":"// TODO: align this with the maxLength of the field","value":900},"pattern":{"value":"^[a-zA-ZÀ-ÿ0-9\\s\\,\\.\\-\\/\\#]+$"}}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "ContactUsRequest": {
         "dataType": "refObject",
         "properties": {
-            "content": {"dataType":"string","required":true},
+            "content": {"ref":"ContactUsText","required":true},
             "studyId": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
