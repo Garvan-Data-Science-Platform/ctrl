@@ -89,6 +89,7 @@ export type ExternalId = string
  */
 export type RoleT = Role
 
+// TODO: add annotations?
 export type UserT = User
 
 /**
@@ -138,3 +139,11 @@ export type InviteEmailSubject = string
  * @example "You have been invited to register with CTRL dynamic consent platform"
  */
 export type InviteEmailText = string
+
+/**
+ * @minLength 1
+ * @maxLength 128 // TODO: align this with the maxLength of the field
+ * @pattern ^[a-zA-ZÀ-ÿ0-9\s\,\.\-\/\#]+$
+ * @example "Acme Medical Research Institute"
+ */
+export type OrganisationName = string
