@@ -1211,11 +1211,15 @@
           "data": {
             "properties": {
               "newsLink": {
-                "type": "string",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Url"
+                  }
+                ],
                 "nullable": true
               },
               "tcLink": {
-                "type": "string"
+                "$ref": "#/components/schemas/Url"
               },
               "secondaryColour": {
                 "type": "string",
@@ -1275,7 +1279,11 @@
           "data": {
             "properties": {
               "newsLink": {
-                "type": "string",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Url"
+                  }
+                ],
                 "nullable": true
               },
               "secondaryColour": {
