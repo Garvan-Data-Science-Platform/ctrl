@@ -53,8 +53,7 @@ import { createDefaultAnswers } from '../utils/answers'
 import { auditLog } from '../middlewares/AuditLog'
 import config from '../config'
 import { randomInt } from 'node:crypto'
-import nodemailer from 'nodemailer'
-import { createMailerTransporter, fromAddress } from '../utils/mailer'
+import { sendEmail } from '../mailer'
 import { genId, genIndId } from '../utils/genId'
 import { Prefill } from 'common/types/invite'
 
@@ -405,16 +404,11 @@ export class AuthController extends Controller {
 
       responseData = challenge
 
-      const mailToUserOptions: nodemailer.SendMailOptions = {
-        from: fromAddress,
+      sendEmail({
         to: user.email,
         subject: 'CTRL - One Time Password',
         text: `Your CTRL login code is: ${code}`,
-      }
-
-      const mailerTransporter = await createMailerTransporter()
-
-      mailerTransporter.sendMail(mailToUserOptions)
+      }).catch((err) => logger.error({ err, message: 'OTP email send failed' }))
     } else {
       await this.userRepo.update({ where: { id: user.id }, data: { retriesRemaining: 10 } })
       const token = await generateToken({ userId: user.id })
