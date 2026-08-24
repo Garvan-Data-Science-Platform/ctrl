@@ -92,16 +92,16 @@ export type RoleT = Role
 // TODO: add annotations?
 export type UserT = User
 
+// * @minLength 1 //TODO: check if we want minLength for study name
 /**
- * @minLength 1
  * @maxLength 128
  * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
  * @example "Acme Genomics Study"
  */
 export type StudyName = string
 
+// * @minLength 1 //TODO: check if we want minLength for study description
 /**
- * @minLength 1
  * @maxLength 900 // TODO: align this with the maxLength of the field
  * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
  * @example "This is a short description of the study"
@@ -168,18 +168,20 @@ export type OrganisationName = string
  */
 export type ContactUsText = string
 
+// * @minLength 1 TODO: confirm that an empty title is okay
+// * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
 /**
- * @minLength 1
  * @maxLength 128 // TODO: align this with the maxLength of the field
- * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
+ * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]*$
  * @example "Introduction to CTRL"
  */
 export type SurveyStepTitle = string
 
+// * @minLength 1 TODO: confirm that an empty description is okay
+// * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
 /**
- * @minLength 1
  * @maxLength 900 // TODO: align this with the maxLength of the field
- * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
+ * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]*$
  * @example "Watch our short video about the consent process for taking part in medical research."
  */
 export type SurveyStepDescription = string
