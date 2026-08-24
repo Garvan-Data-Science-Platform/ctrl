@@ -974,8 +974,8 @@ const models: TsoaRoute.Models = {
     "RegisterSetupRequest": {
         "dataType": "refObject",
         "properties": {
-            "email": {"dataType":"string","required":true,"validators":{"pattern":{"errorMsg":"Please provide valid email","value":"^(.+)@(.+)$"}}},
-            "password": {"dataType":"string","required":true,"validators":{"minLength":{"errorMsg":"Password must be at least 14 characters","value":14}}},
+            "email": {"ref":"Email","required":true},
+            "password": {"ref":"Password","required":true},
         },
         "additionalProperties": false,
     },

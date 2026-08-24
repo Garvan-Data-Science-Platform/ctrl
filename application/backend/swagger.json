@@ -2564,12 +2564,10 @@
       "RegisterSetupRequest": {
         "properties": {
           "email": {
-            "type": "string",
-            "pattern": "^(.+)@(.+)$"
+            "$ref": "#/components/schemas/Email"
           },
           "password": {
-            "type": "string",
-            "minLength": 14
+            "$ref": "#/components/schemas/Password"
           }
         },
         "required": [
@@ -2577,11 +2575,7 @@
           "password"
         ],
         "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "email": "john.doe@email.com",
-          "password": "Supersecret123"
-        }
+        "additionalProperties": false
       },
       "RegisterParticipantResponse": {
         "properties": {
