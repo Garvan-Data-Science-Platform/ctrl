@@ -9,8 +9,7 @@ import * as express from 'express'
 import prisma from '../PrismaClient'
 import { Role } from '@prisma/client'
 import { NotFoundError } from '../middlewares/ErrorHandler'
-import { createMailerTransporter, fromAddress } from '../utils/mailer'
-import nodemailer from 'nodemailer'
+import { sendEmail } from '../mailer'
 import logger from 'common/src/logger'
 import { auditLog } from '../middlewares/AuditLog'
 import {
@@ -50,10 +49,6 @@ export class MailerController extends Controller {
       select: { email: true, firstName: true, lastName: true },
     })
 
-    const mailerTransporter = await createMailerTransporter()
-
-    await mailerTransporter.verify()
-
     // Get the organisation admins email(s)
     const orgAdminEmails = (
       await prisma.user.findMany({
@@ -91,32 +86,31 @@ export class MailerController extends Controller {
       bodyRequest.content,
     )
 
-    const mailToAdminsOptions: nodemailer.SendMailOptions = {
-      from: fromAddress,
+    await sendEmail({
       to: recipientEmails,
       replyTo: user.email,
       subject: subjectToAdmin,
       text: adminText,
       html: adminHtml,
-    }
-
-    await mailerTransporter.sendMail(mailToAdminsOptions)
-    logger.info(`Email sent to ${mailToAdminsOptions.to}`, mailToAdminsOptions)
+    })
+    logger.info(`Contact-us email sent to admins`, {
+      to: recipientEmails,
+      subject: subjectToAdmin,
+    })
 
     // Send the email to the user
     const subjectToUser: string = `CTRL Message Confirmation`
 
-    const mailToUserOptions: nodemailer.SendMailOptions = {
-      from: fromAddress,
+    await sendEmail({
       to: user.email,
       subject: subjectToUser,
       text: participantText,
       html: participantHtml,
-    }
-
-    await mailerTransporter.sendMail(mailToUserOptions)
-
-    logger.info(`Email sent to ${mailToUserOptions.to}`, mailToUserOptions)
+    })
+    logger.info(`Contact-us confirmation email sent to participant`, {
+      to: user.email,
+      subject: subjectToUser,
+    })
     return
   }
 }
