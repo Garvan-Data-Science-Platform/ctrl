@@ -18,11 +18,23 @@ config:
   disableAdminPasswordLogin: false
   otp: true
   inviteExpiryDays: 7
-  smtp:
+  # Mail provider. Supported: 'smtp-basic' (any SMTP server with username/password auth), 'm365-oauth' (Microsoft 365 OAuth 2 SMTP via MSAL).
+  # See docs/email.md for the deployer guide.
+  mailer:
+    provider: smtp-basic
     host: ''
     port: 587
     username: ''
     password: ''
+    sender: ''
+    # For m365-oauth, replace the block above with:
+    #   provider: m365-oauth
+    #   tenantId: '<garvan-tenant-id>'
+    #   clientId: '<entra-app-client-id>'
+    #   clientSecret: '<entra-app-client-secret>'
+    #   host: smtp.office365.com
+    #   port: 587
+    #   sender: 'CTRL <ctrl-noreply@garvan.org.au>'
 
 userClient:
   hostname: ctrlhost
