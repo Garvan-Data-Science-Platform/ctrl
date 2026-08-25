@@ -25,13 +25,13 @@ describe('sendEmail', () => {
     })
   })
 
-  it('uses fromAddress as the default from', async () => {
+  it('uses config.mailer.sender as the default from', async () => {
     await sendEmail({
       to: 'user@example.com',
       subject: 'Hello',
       text: 'World',
     })
-    expect(mockNodeMailer.mock.getSentMail()[0].from).toBe(`CTRL <noreply@${process.env.HOSTNAME}>`)
+    expect(mockNodeMailer.mock.getSentMail()[0].from).toBe('CTRL <test@example.com>')
   })
 
   it('honours opts.from override when provided', async () => {

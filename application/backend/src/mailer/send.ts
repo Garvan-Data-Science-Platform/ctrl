@@ -1,5 +1,4 @@
 import config from '../config'
-import { fromAddress } from '../utils/mailer'
 import type { MailOpts, MailProvider } from './provider'
 import { SmtpBasicProvider } from './SmtpBasicProvider'
 import { M365OAuthProvider } from './M365OAuthProvider'
@@ -45,7 +44,7 @@ function getProvider(): MailProvider {
 
 export async function sendEmail(opts: MailOpts): Promise<void> {
   const provider = getProvider()
-  const from = opts.from ?? fromAddress
+  const from = opts.from ?? config.mailer.sender
   await provider.sendMail({ ...opts, from })
 }
 

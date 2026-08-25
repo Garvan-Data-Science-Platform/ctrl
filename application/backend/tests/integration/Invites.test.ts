@@ -99,7 +99,7 @@ describe('Participant Invites', () => {
     const sentEmails = mockNodeMailer.mock.getSentMail()
     expect(sentEmails.length).toBe(1)
     expect(sentEmails[0].to).toBe(participantRegisterRequestBody.email)
-    expect(sentEmails[0].from).toBe(`CTRL <noreply@${process.env.HOSTNAME}>`)
+    expect(sentEmails[0].from).toBe('CTRL <noreply@ctrl.garvan.org.au>')
 
     // Check invites were created
     const createdInvite = await prisma.invite.findUnique({
@@ -168,7 +168,7 @@ describe('Participant Invites', () => {
     )
 
     expect(sentEmail1?.to).toBe(participantRegisterRequestBody.email)
-    expect(sentEmail1?.from).toBe(`CTRL <noreply@${process.env.HOSTNAME}>`)
+    expect(sentEmail1?.from).toBe('CTRL <noreply@ctrl.garvan.org.au>')
     expect(sentEmail1?.subject).toBe('Subject')
     expect(sentEmail1?.text).toContain('Text')
   })
