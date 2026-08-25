@@ -1,4 +1,4 @@
-import { emailRegex } from '@common/src/regex'
+import { REGEX } from '@common/types/commonTypes'
 import { Box, MenuItem, TextField } from '@mui/material'
 import { useGetIdentity } from '@refinedev/core'
 import { Create } from '@refinedev/mui'
@@ -49,7 +49,7 @@ export const UserCreate = () => {
         <TextField
           {...register('email', {
             required: 'This field is required',
-            validate: (email: string) => emailRegex.test(email) || 'Invalid email address',
+            validate: (email: string) => REGEX.EMAIL.test(email) || 'Invalid email address',
           })}
           error={!!(errors as any)?.email}
           helperText={(errors as any)?.email?.message}

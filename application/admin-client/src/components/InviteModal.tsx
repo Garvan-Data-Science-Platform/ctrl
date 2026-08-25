@@ -15,7 +15,7 @@ import { Recipient } from '@common/types/invite'
 import { axiosInstance } from '../providers/dataProvider'
 import { GetInviteTextResponse } from '@common/types/api/participants'
 import { useCurrentStudyId } from '../studyStore'
-import { emailRegex } from '@common/src/regex'
+import { REGEX } from '@common/types/commonTypes'
 
 interface InviteModalProps {
   onSend: (recipients: Recipient[], subjectText: string, explanatoryText: string) => void
@@ -25,7 +25,7 @@ interface InviteModalProps {
 
 export function InviteModal({ onSend, onCancel, initialRecipients = [] }: InviteModalProps) {
   const validateEmail = (email: string) => {
-    const r = new RegExp(emailRegex) //eslint-disable-line
+    const r = new RegExp(REGEX.EMAIL) //eslint-disable-line
     return r.test(email)
   }
 

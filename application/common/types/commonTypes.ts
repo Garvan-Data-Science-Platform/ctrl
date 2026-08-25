@@ -3,6 +3,18 @@
 // Note: see docs for explanation of character class patterns (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Regular_expressions/Unicode_character_class_escape)
 import { Role, User } from '@prisma/client'
 
+// @common/types/commonTypes.ts
+
+// Specifying these here, so that they can be defined in one place (even though its not DRY)
+export const REGEX = {
+  NAME: /^[a-zA-ZÀ-ÖØ-öø-ɏ\s\-'.]+$/,
+  ADDRESS: /^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$/,
+  MOBILE: /^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/,
+  POSTCODE: /^\d{4}$/,
+  EMAIL: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+  URL: /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/,
+}
+
 /**
  * @minLength 1
  * @maxLength 100

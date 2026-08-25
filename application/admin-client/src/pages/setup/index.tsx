@@ -3,7 +3,7 @@ import { Alert, Box, Button, Card, Container, TextField, Typography } from '@mui
 import { useLogin } from '../../hooks/useLogin'
 import { useForm } from 'react-hook-form'
 import { checkPasswordStrength } from '@common/src/PasswordStrength'
-import { emailRegex } from '@common/src/regex'
+import { REGEX } from '@common/types/commonTypes'
 
 export const SetupPage = () => {
   const {
@@ -72,7 +72,7 @@ export const SetupPage = () => {
               {...register('email', {
                 required: true,
                 pattern: {
-                  value: emailRegex,
+                  value: REGEX.EMAIL,
                   message: 'Enter a valid email',
                 },
               })}

@@ -25,7 +25,7 @@ import { SensitiveTextField } from '../../components/SensitiveTextField'
 import { useSearchParams } from 'react-router'
 import { LogoUploader } from '../../components/LogoUploader'
 import { RESOURCES } from '../../constants'
-import { emailRegex } from '@common/src/regex'
+import { REGEX } from '@common/types/commonTypes'
 
 const StudyCard = ({
   studyIdx,
@@ -110,16 +110,14 @@ const StudyCard = ({
   }
 
   const handleSettingsApply = () => {
-    const urlRegex =
-      /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/
-    if (redcapURL && !urlRegex.test(redcapURL)) {
+    if (redcapURL && !REGEX.URL.test(redcapURL)) {
       open?.({
         type: 'error',
         message: "Invalid Redcap API URL format. Must start with 'http(s)://'",
       })
       return
     }
-    if (contactUsEmail && !emailRegex.test(contactUsEmail)) {
+    if (contactUsEmail && !REGEX.EMAIL.test(contactUsEmail)) {
       open?.({
         type: 'error',
         message: 'Invalid Email Address.',

@@ -13,7 +13,7 @@ import { useForm } from '@refinedev/react-hook-form'
 import { Controller } from 'react-hook-form'
 import { ContactMethod, StateTerritory } from '@common/types/api/users/ParticipantProfile'
 import { GetParticipantResponse, UpdateParticipantRequest } from '@common/types/api/participants'
-import { emailRegex } from '@common/src/regex'
+import { REGEX } from '@common/types/commonTypes'
 
 export const ParticipantEdit = () => {
   const { id } = useParsed()
@@ -79,7 +79,7 @@ export const ParticipantEdit = () => {
           {...register('profile.email', {
             required: 'This field is required',
             pattern: {
-              value: emailRegex,
+              value: REGEX.EMAIL,
               message: 'Invalid email',
             },
           })}
@@ -263,7 +263,7 @@ export const ParticipantEdit = () => {
           {...register('profile.nextOfKin.email', {
             required: 'This field is required',
             pattern: {
-              value: emailRegex,
+              value: REGEX.EMAIL,
               message: 'Invalid email',
             },
           })}

@@ -29,7 +29,7 @@ import {
 } from '@common/types/api/users/ParticipantProfile'
 import { AddCircle, Close } from '@mui/icons-material'
 import { useEffect, useState } from 'react'
-import { emailRegex } from '@common/src/regex'
+import { REGEX } from '@common/types/commonTypes'
 
 interface FormValues {
   firstName: string
@@ -224,7 +224,7 @@ export default function Register() {
                 {...register('email', {
                   required: 'This field is required',
                   pattern: {
-                    value: emailRegex, //eslint-disable-line
+                    value: REGEX.EMAIL, //eslint-disable-line
                     message: 'Enter a valid email',
                   },
                 })}
