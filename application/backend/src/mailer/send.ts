@@ -16,13 +16,18 @@ function getProvider(): MailProvider {
     return providerInstance
   }
 
-  providerInstance = new SmtpBasicProvider({
-    host: config.smtp.host,
-    port: config.smtp.port,
-    username: config.smtp.username,
-    password: config.smtp.password,
-  })
-  return providerInstance
+  const cfg = config.mailer
+  if (cfg.provider === 'smtp-basic') {
+    providerInstance = new SmtpBasicProvider({
+      host: cfg.host,
+      port: cfg.port,
+      username: cfg.username,
+      password: cfg.password,
+    })
+    return providerInstance
+  }
+
+  throw new Error(`Unknown mailer provider: ${(cfg as { provider: string }).provider}`)
 }
 
 export async function sendEmail(opts: MailOpts): Promise<void> {

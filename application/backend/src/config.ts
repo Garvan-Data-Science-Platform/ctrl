@@ -41,27 +41,25 @@ const schema = {
     inviteExpiryDays: {
       type: 'number',
     },
-    smtp: {
-      type: 'object',
-      properties: {
-        host: {
-          type: 'string',
+    mailer: {
+      oneOf: [
+        {
+          type: 'object',
+          properties: {
+            provider: { const: 'smtp-basic' },
+            host: { type: 'string' },
+            port: { type: 'number' },
+            username: { type: 'string' },
+            password: { type: 'string' },
+            sender: { type: 'string' },
+          },
+          required: ['provider', 'host', 'port', 'username', 'password', 'sender'],
+          additionalProperties: false,
         },
-        port: {
-          type: 'number',
-        },
-        username: {
-          type: 'string',
-        },
-        password: {
-          type: 'string',
-        },
-      },
-      required: ['host', 'port', 'username', 'password'],
-      additionalProperties: false,
+      ],
     },
   },
-  required: ['smtp'],
+  required: ['mailer'],
   additionalProperties: false,
 } as const
 
@@ -85,7 +83,16 @@ if (process.env.NODE_ENV !== 'test') {
     throw new Error(`Invalid config ${JSON.stringify(validate.errors)}`)
   }
 } else {
-  config = { smtp: { host: 'x', port: 1, username: 'x', password: 'x' } }
+  config = {
+    mailer: {
+      provider: 'smtp-basic',
+      host: 'x',
+      port: 1,
+      username: 'x',
+      password: 'x',
+      sender: 'CTRL <test@example.com>',
+    },
+  }
 }
 
 if (process.env.NODE_ENV !== 'production') {
