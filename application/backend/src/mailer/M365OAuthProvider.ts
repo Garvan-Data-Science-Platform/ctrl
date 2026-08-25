@@ -36,14 +36,18 @@ export class M365OAuthProvider implements MailProvider {
 
   async sendMail(opts: MailOpts): Promise<void> {
     const transporter = this.getTransporter()
-    await transporter.sendMail({
-      from: this.config.sender,
-      to: opts.to,
-      subject: opts.subject,
-      html: opts.html,
-      text: opts.text,
-      replyTo: opts.replyTo,
-    })
+    try {
+      await transporter.sendMail({
+        from: this.config.sender,
+        to: opts.to,
+        subject: opts.subject,
+        html: opts.html,
+        text: opts.text,
+        replyTo: opts.replyTo,
+      })
+    } catch (err) {
+      throw wrapSmtpError(err)
+    }
   }
 
   async verify(): Promise<void> {
@@ -94,11 +98,48 @@ export function extractAddress(sender: string): string {
   return match ? match[1] : sender
 }
 
-export function redactSecrets(err: unknown): Error {
-  const raw = err instanceof Error ? err.message : String(err)
-  const redacted = raw
+function redactString(str: string): string {
+  return str
     .replace(/"access_token"\s*:\s*"[^"]*"/g, '"access_token":"[REDACTED]"')
     .replace(/"client_secret"\s*:\s*"[^"]*"/g, '"client_secret":"[REDACTED]"')
     .replace(/Bearer\s+[A-Za-z0-9._-]+/g, 'Bearer [REDACTED]')
-  return new Error(redacted)
+}
+
+export function redactSecrets(err: unknown): Error {
+  const raw = err instanceof Error ? err.message : String(err)
+  return new Error(redactString(raw))
+}
+
+export function wrapSmtpError(err: unknown): Error {
+  const errObj = err as { code?: string; response?: string; message?: string }
+  const rawMessage = errObj.message ?? String(err)
+  const response = errObj.response ?? ''
+  const code = errObj.code ?? ''
+  const combined = `${rawMessage} ${response}`.trim()
+  const safe = redactString(combined)
+
+  if (
+    ['ETIMEDOUT', 'ENOTFOUND', 'ECONNREFUSED', 'ECONNRESET', 'ESOCKET'].includes(code) ||
+    combined.includes('login.microsoftonline.com')
+  ) {
+    return new Error(`M365 network error: ${safe}`)
+  }
+
+  if (combined.includes('535 5.7.139')) {
+    return new Error(
+      `M365 authentication failed (535 5.7.139). Tenant-side setup likely incomplete. ` +
+        `Check ITHELP-27087 checklist: SMTP.SendAsApp on app registration, ` +
+        `Application Access Policy or RBAC scoping for the mailbox, ` +
+        `Enterprise Application Object ID used in Add-MailboxPermission, ` +
+        `SmtpClientAuthenticationDisabled=false on the sender mailbox, ` +
+        `Security Defaults or Conditional Access exceptions. ` +
+        `Original: ${safe}`,
+    )
+  }
+
+  if (code === 'EAUTH' || combined.includes('EAUTH')) {
+    return new Error(`M365 XOAUTH2 rejected by server. Original: ${safe}`)
+  }
+
+  return new Error(safe)
 }

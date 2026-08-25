@@ -1,7 +1,12 @@
 import * as nodemailer from 'nodemailer'
 import type { NodemailerMock } from 'nodemailer-mock'
 import { ConfidentialClientApplication } from '@azure/msal-node'
-import { M365OAuthProvider, extractAddress, redactSecrets } from './M365OAuthProvider'
+import {
+  M365OAuthProvider,
+  extractAddress,
+  redactSecrets,
+  wrapSmtpError,
+} from './M365OAuthProvider'
 
 jest.mock('@azure/msal-node')
 
@@ -181,5 +186,89 @@ describe('redactSecrets', () => {
     expect(output.message).toContain('tenant xyz')
     expect(output.message).toContain('network unreachable')
     expect(output.message).not.toContain('secret')
+  })
+})
+
+describe('wrapSmtpError', () => {
+  it('wraps 535 5.7.139 with tenant-config diagnostic pointing at ITHELP-27087', () => {
+    const err = Object.assign(new Error('535 5.7.139 Authentication unsuccessful'), {
+      code: 'EAUTH',
+      response: '535 5.7.139 Authentication unsuccessful, user or tenant not allowed',
+    })
+    const wrapped = wrapSmtpError(err)
+    expect(wrapped.message).toContain('535 5.7.139')
+    expect(wrapped.message).toContain('ITHELP-27087')
+    expect(wrapped.message).toContain('SMTP.SendAsApp')
+    expect(wrapped.message).toContain('Application Access Policy')
+    expect(wrapped.message).toContain('Enterprise Application Object ID')
+    expect(wrapped.message).toContain('SmtpClientAuthenticationDisabled')
+    expect(wrapped.message).toContain('Security Defaults')
+  })
+
+  it('wraps generic EAUTH with an XOAUTH2 rejection message', () => {
+    const err = Object.assign(new Error('auth failed'), { code: 'EAUTH' })
+    const wrapped = wrapSmtpError(err)
+    expect(wrapped.message).toContain('XOAUTH2 rejected')
+  })
+
+  it('wraps ETIMEDOUT as an M365 network error', () => {
+    const err = Object.assign(new Error('connect ETIMEDOUT'), { code: 'ETIMEDOUT' })
+    const wrapped = wrapSmtpError(err)
+    expect(wrapped.message).toContain('M365 network error')
+  })
+
+  it('wraps errors mentioning login.microsoftonline.com as network errors', () => {
+    const err = new Error(
+      'failed to fetch https://login.microsoftonline.com/tenant/oauth2/v2.0/token',
+    )
+    const wrapped = wrapSmtpError(err)
+    expect(wrapped.message).toContain('M365 network error')
+  })
+
+  it('preserves secret redaction in wrapped errors', () => {
+    const secretToken = 'abc123.def456.ghi789'
+    const err = Object.assign(new Error(`auth failed: Bearer ${secretToken}`), {
+      code: 'EAUTH',
+    })
+    const wrapped = wrapSmtpError(err)
+    expect(wrapped.message).not.toContain(secretToken)
+    expect(wrapped.message).toContain('[REDACTED]')
+  })
+})
+
+describe('sendMail error wrapping integration', () => {
+  const validConfig = {
+    tenantId: 'tenant-123',
+    clientId: 'client-456',
+    clientSecret: 'secret-789',
+    host: 'smtp.office365.com',
+    port: 587,
+    sender: 'CTRL <ctrl-noreply@garvan.org.au>',
+  }
+
+  let mockAcquireToken: jest.Mock
+
+  beforeEach(() => {
+    mockNodeMailer.mock.reset()
+    mockAcquireToken = jest.fn()
+    MockedCCA.mockImplementation(() => ({
+      acquireTokenByClientCredential: mockAcquireToken,
+    }))
+  })
+
+  it('propagates a thrown error out of sendMail when nodemailer fails', async () => {
+    mockAcquireToken.mockResolvedValue({
+      accessToken: 'valid',
+      expiresOn: new Date(Date.now() + 3600 * 1000),
+    })
+    mockNodeMailer.mock.setShouldFail(true)
+    const provider = new M365OAuthProvider(validConfig)
+    await expect(
+      provider.sendMail({
+        to: 'recipient@example.com',
+        subject: 'Test',
+        text: 'Hello',
+      }),
+    ).rejects.toThrow()
   })
 })
