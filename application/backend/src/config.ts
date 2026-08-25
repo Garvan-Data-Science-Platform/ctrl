@@ -5,7 +5,7 @@ import Ajv from 'ajv'
 import { FromSchema } from 'json-schema-to-ts'
 
 //Validate
-const schema = {
+export const schema = {
   type: 'object',
   properties: {
     oidc: {
@@ -54,7 +54,19 @@ const schema = {
             sender: { type: 'string' },
           },
           required: ['provider', 'host', 'port', 'username', 'password', 'sender'],
-          additionalProperties: false,
+        },
+        {
+          type: 'object',
+          properties: {
+            provider: { const: 'm365-oauth' },
+            tenantId: { type: 'string' },
+            clientId: { type: 'string' },
+            clientSecret: { type: 'string' },
+            host: { type: 'string' },
+            port: { type: 'number' },
+            sender: { type: 'string' },
+          },
+          required: ['provider', 'tenantId', 'clientId', 'clientSecret', 'host', 'port', 'sender'],
         },
       ],
     },

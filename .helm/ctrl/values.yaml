@@ -27,14 +27,14 @@ config:
     username: ''
     password: ''
     sender: ''
-    # For m365-oauth, replace the block above with:
-    #   provider: m365-oauth
+    # For m365-oauth, set provider to m365-oauth in your own values file and add:
     #   tenantId: '<garvan-tenant-id>'
     #   clientId: '<entra-app-client-id>'
     #   clientSecret: '<entra-app-client-secret>'
     #   host: smtp.office365.com
     #   port: 587
     #   sender: 'CTRL <ctrl-noreply@garvan.org.au>'
+    # Leave username and password as empty strings, they are ignored on this path.
 
 userClient:
   hostname: ctrlhost
