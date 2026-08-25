@@ -312,15 +312,21 @@ export class AuthController extends Controller {
         method: 'POST',
       })
 
-      const { access_token } = await token_res.json()
+      const { access_token, id_token } = await token_res.json()
+
+      if (id_token) {
+        const [, payload] = id_token.split('.')
+        const decodedIdToken = JSON.parse(Buffer.from(payload, 'base64').toString())
+        console.log('Auth Claims', decodedIdToken)
+      }
 
       const userinfo_res = await fetch(userinfo_endpoint, {
         body: new URLSearchParams({ access_token }),
         method: 'POST',
       })
 
-      const { email } = await userinfo_res.json()
-      user = await this.userRepo.findFirst({ where: { email } })
+      const userinfo = await userinfo_res.json()
+      user = await this.userRepo.findFirst({ where: { email: userinfo.email } })
     } catch {
       throw new Error('Error authenticating with OIDC')
     }
