@@ -2,6 +2,7 @@ import config from '../config'
 import { fromAddress } from '../utils/mailer'
 import type { MailOpts, MailProvider } from './provider'
 import { SmtpBasicProvider } from './SmtpBasicProvider'
+import { M365OAuthProvider } from './M365OAuthProvider'
 
 let providerInstance: MailProvider | null = null
 
@@ -23,6 +24,18 @@ function getProvider(): MailProvider {
       port: cfg.port,
       username: cfg.username,
       password: cfg.password,
+    })
+    return providerInstance
+  }
+
+  if (cfg.provider === 'm365-oauth') {
+    providerInstance = new M365OAuthProvider({
+      tenantId: cfg.tenantId,
+      clientId: cfg.clientId,
+      clientSecret: cfg.clientSecret,
+      host: cfg.host,
+      port: cfg.port,
+      sender: cfg.sender,
     })
     return providerInstance
   }
