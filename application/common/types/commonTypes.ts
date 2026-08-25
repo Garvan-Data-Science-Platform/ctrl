@@ -9,7 +9,7 @@ import { Role, User } from '@prisma/client'
 export const REGEX = {
   NAME: /^[a-zA-ZÀ-ÖØ-öø-ɏ\s\-'.]+$/,
   ADDRESS: /^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$/,
-  MOBILE: /^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/,
+  MOBILE: /^04\d{8}$/,
   POSTCODE: /^\d{4}$/,
   EMAIL: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
   URL: /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/,
@@ -55,7 +55,7 @@ export type Email = string
 export type Password = string
 
 /**
- * @pattern ^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$
+ * @pattern ^04\d{8}$
  * @example "0412341432"
  */
 export type Mobile = string

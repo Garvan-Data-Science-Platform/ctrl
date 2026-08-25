@@ -1352,7 +1352,7 @@
       "Mobile": {
         "type": "string",
         "example": "0412341432",
-        "pattern": "^(\\+\\d{1,2}\\s?)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$"
+        "pattern": "^04\\d{8}$"
       },
       "AddressLine": {
         "type": "string",
