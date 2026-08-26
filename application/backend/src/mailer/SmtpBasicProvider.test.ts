@@ -74,24 +74,6 @@ describe('SmtpBasicProvider', () => {
     expect(() => new SmtpBasicProvider({ ...validConfig, sender: '' })).toThrow(/sender is empty/)
   })
 
-  it('throws when sender is not an address', () => {
-    expect(() => new SmtpBasicProvider({ ...validConfig, sender: 'CTRL' })).toThrow(
-      /not a usable address/,
-    )
-  })
-
-  it('throws when sender has empty angle brackets', () => {
-    expect(() => new SmtpBasicProvider({ ...validConfig, sender: 'CTRL <>' })).toThrow(
-      /not a usable address/,
-    )
-  })
-
-  it('accepts a dotless domain so MailHog setups keep working', () => {
-    expect(
-      () => new SmtpBasicProvider({ ...validConfig, sender: 'CTRL <noreply@localhost>' }),
-    ).not.toThrow()
-  })
-
   it('verify calls nodemailer verify without throwing', async () => {
     const provider = new SmtpBasicProvider(validConfig)
     await expect(provider.verify()).resolves.not.toThrow()

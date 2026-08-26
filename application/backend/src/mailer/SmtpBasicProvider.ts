@@ -1,5 +1,5 @@
 import nodemailer, { type Transporter } from 'nodemailer'
-import { assertSender, type MailOpts, type MailProvider } from './provider'
+import type { MailOpts, MailProvider } from './provider'
 
 interface SmtpBasicConfig {
   host: string
@@ -17,7 +17,7 @@ export class SmtpBasicProvider implements MailProvider {
     if (!config.port) throw new Error('smtp-basic: port is empty')
     if (!config.username) throw new Error('smtp-basic: username is empty')
     if (!config.password) throw new Error('smtp-basic: password is empty')
-    assertSender('smtp-basic', config.sender)
+    if (!config.sender) throw new Error('smtp-basic: sender is empty')
   }
 
   async sendMail(opts: MailOpts): Promise<void> {

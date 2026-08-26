@@ -1,8 +1,12 @@
 import * as nodemailer from 'nodemailer'
 import type { NodemailerMock } from 'nodemailer-mock'
 import { ConfidentialClientApplication } from '@azure/msal-node'
-import { M365OAuthProvider, redactSecrets, wrapSmtpError } from './M365OAuthProvider'
-import { extractAddress } from './provider'
+import {
+  M365OAuthProvider,
+  extractAddress,
+  redactSecrets,
+  wrapSmtpError,
+} from './M365OAuthProvider'
 
 jest.mock('@azure/msal-node')
 

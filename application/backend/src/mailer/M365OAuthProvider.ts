@@ -1,6 +1,6 @@
 import { ConfidentialClientApplication } from '@azure/msal-node'
 import nodemailer, { type Transporter } from 'nodemailer'
-import { assertSender, type MailOpts, type MailProvider } from './provider'
+import type { MailOpts, MailProvider } from './provider'
 
 const TOKEN_FAILURE = 'M365 token acquisition failed'
 
@@ -24,7 +24,14 @@ export class M365OAuthProvider implements MailProvider {
     if (!config.clientSecret) throw new Error('m365-oauth: clientSecret is empty')
     if (!config.host) throw new Error('m365-oauth: host is empty')
     if (!config.port) throw new Error('m365-oauth: port is empty')
-    this.user = assertSender('m365-oauth', config.sender)
+    if (!config.sender) throw new Error('m365-oauth: sender is empty')
+
+    // sender doubles as the SMTP AUTH username on this path, so a malformed one
+    // fails AUTH rather than just producing an odd From header
+    this.user = extractAddress(config.sender)
+    if (!this.user.includes('@') || /\s/.test(this.user)) {
+      throw new Error(`m365-oauth: sender is not a usable address: ${config.sender}`)
+    }
 
     this.cca = new ConfidentialClientApplication({
       auth: {
@@ -87,6 +94,11 @@ export class M365OAuthProvider implements MailProvider {
       throw new Error(`${TOKEN_FAILURE}: ${redactSecrets(err).message}`)
     }
   }
+}
+
+export function extractAddress(sender: string): string {
+  const match = sender.match(/<([^>]+)>/)
+  return match ? match[1] : sender
 }
 
 function redactString(str: string): string {
