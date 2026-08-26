@@ -14,7 +14,7 @@ import { useStudyStore } from '../../studyStore'
 import { useGetIdentity, useInvalidate, useNotification, useParsed, useShow } from '@refinedev/core'
 import { Controller } from 'react-hook-form'
 import { axiosInstance } from '../../providers/dataProvider'
-import { REGEX } from '@common/types/commonTypes'
+import { emailRules, nameRules } from '@common/src/validation'
 
 export const UserEdit = () => {
   type FieldValues = UpdateUserRequest
@@ -84,9 +84,7 @@ export const UserEdit = () => {
           autoComplete="off"
         >
           <TextField
-            {...register('firstName', {
-              required: 'This field is required',
-            })}
+            {...register('firstName', nameRules())}
             error={!!(errors as any)?.firstName}
             helperText={(errors as any)?.firstName?.message}
             margin="normal"
@@ -99,9 +97,7 @@ export const UserEdit = () => {
             data-cy="first"
           />
           <TextField
-            {...register('lastName', {
-              required: 'This field is required',
-            })}
+            {...register('lastName', nameRules())}
             error={!!(errors as any)?.lastName}
             helperText={(errors as any)?.lastName?.message}
             margin="normal"
@@ -113,11 +109,7 @@ export const UserEdit = () => {
             disabled={editingDisabled}
           />
           <TextField
-            {...register('email', {
-              required: 'This field is required',
-              validate: (email: string | undefined) =>
-                REGEX.EMAIL.test(email || '') || 'Invalid email address',
-            })}
+            {...register('email', emailRules())}
             error={!!(errors as any)?.email}
             helperText={(errors as any)?.email?.message}
             margin="normal"

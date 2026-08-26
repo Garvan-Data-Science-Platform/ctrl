@@ -42,3 +42,12 @@ export const mobileRules = (required = true) => ({
     message: 'Mobile number contains invalid characters (no spaces or country code allowed)',
   },
 })
+
+// Default is not required
+export const externalIdRules = (required = false) => ({
+  required: required ? 'This field is required' : false,
+  pattern: {
+    value: REGEX.EXTERNALID,
+    message: 'External ID can only consist of alpha numeric characters and -_=.:',
+  },
+})
