@@ -1,6 +1,7 @@
 /// <reference types="cypress" />
 
 const { TestUsers } = require('../../../common/testing/constants')
+const { VALIDATION_MESSAGES } = require('../../../common/src/validation')
 
 beforeEach(() => {
   cy.task('reset')
@@ -44,7 +45,7 @@ describe('Profile Edit', () => {
     cy.get('[data-cy="update-mobile"] input').clear()
     cy.get('[data-cy="update-mobile"]').type('0487654a')
     cy.get('[data-cy="update-button"]').click()
-    cy.contains('Mobile number contains invalid characters').should('exist')
+    cy.contains(VALIDATION_MESSAGES.MOBILE_INVALID).should('exist')
   })
 
   it('Shows family members correctly', () => {
@@ -80,7 +81,7 @@ describe('Profile Edit', () => {
       .type('{enter}')
 
     cy.get('[data-cy="update-button"]').click()
-    cy.contains('Name contains invalid characters').should('exist')
+    cy.contains(VALIDATION_MESSAGES.NAME_INVALID).should('exist')
   })
 
   it('Invalid xss lastName input gets correct error message', () => {
@@ -93,7 +94,7 @@ describe('Profile Edit', () => {
     })
 
     cy.get('[data-cy="update-button"]').click()
-    cy.contains('Name contains invalid characters').should('exist')
+    cy.contains(VALIDATION_MESSAGES.NAME_INVALID).should('exist')
   })
 
   it('Invalid xss address input gets correct error message', () => {
@@ -106,7 +107,7 @@ describe('Profile Edit', () => {
     })
 
     cy.get('[data-cy="update-button"]').click()
-    cy.contains('Address contains invalid characters').should('exist')
+    cy.contains(VALIDATION_MESSAGES.ADDRESS_INVALID).should('exist')
   })
 
   it('Invalid xss postcode input gets correct error message', () => {
@@ -122,7 +123,7 @@ describe('Profile Edit', () => {
     )
 
     cy.get('[data-cy="update-button"]').click()
-    cy.contains('Invalid postcode').should('exist')
+    cy.contains(VALIDATION_MESSAGES.POSTCODE_INVALID).should('exist')
   })
 
   it('Invalid xss mobile input gets correct error message', () => {
@@ -135,7 +136,7 @@ describe('Profile Edit', () => {
     })
 
     cy.get('[data-cy="update-button"]').click()
-    cy.contains('Mobile number contains invalid characters').should('exist')
+    cy.contains(VALIDATION_MESSAGES.MOBILE_INVALID).should('exist')
   })
 
   it('Invalid xss next-of-kin firstname input gets correct error message', () => {
@@ -151,7 +152,7 @@ describe('Profile Edit', () => {
     )
 
     cy.get('[data-cy="update-button"]').click()
-    cy.contains('Name contains invalid characters').should('exist')
+    cy.contains(VALIDATION_MESSAGES.NAME_INVALID).should('exist')
   })
 
   it('Invalid xss next-of-kin lastname input gets correct error message', () => {
@@ -167,7 +168,7 @@ describe('Profile Edit', () => {
     )
 
     cy.get('[data-cy="update-button"]').click()
-    cy.contains('Name contains invalid characters').should('exist')
+    cy.contains(VALIDATION_MESSAGES.NAME_INVALID).should('exist')
   })
-  // nok email validation is handled by electron
+  // nok email validation is handled by electron/browser
 })

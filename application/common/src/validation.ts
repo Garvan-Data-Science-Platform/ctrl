@@ -1,26 +1,35 @@
 import { REGEX } from '../types/commonTypes'
 
+export const VALIDATION_MESSAGES = {
+  REQUIRED: 'This field is required',
+  NAME_INVALID: 'Name contains invalid characters (only letters, spaces, hyphens allowed)',
+  EMAIL_INVALID: 'Enter a valid email',
+  ADDRESS_INVALID: 'Address contains invalid characters',
+  POSTCODE_INVALID: 'Invalid postcode',
+  MOBILE_INVALID: 'Mobile number contains invalid characters (no spaces or country code allowed)',
+  EXTERNALID_INVALID: 'External ID can only consist of alpha numeric characters and -_=.:',
+}
 export const nameRules = (required = true) => ({
-  required: required ? 'This field is required' : false,
+  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
   pattern: {
     value: REGEX.NAME,
-    message: 'Name contains invalid characters (only letters, spaces, hyphens allowed)',
+    message: VALIDATION_MESSAGES.NAME_INVALID,
   },
 })
 
 export const emailRules = (required = true) => ({
-  required: required ? 'This field is required' : false,
+  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
   pattern: {
     value: REGEX.EMAIL,
-    message: 'Enter a valid email',
+    message: VALIDATION_MESSAGES.EMAIL_INVALID,
   },
 })
 
 export const addressRules = (required = true) => ({
-  required: required ? 'This field is required' : false,
+  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
   pattern: {
     value: REGEX.ADDRESS,
-    message: 'Address contains invalid characters',
+    message: VALIDATION_MESSAGES.ADDRESS_INVALID,
   },
 })
 
@@ -28,26 +37,26 @@ export const addressRules = (required = true) => ({
 // State is handled by drop down
 
 export const postcodeRules = (required = true) => ({
-  required: required ? 'This field is required' : false,
+  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
   pattern: {
     value: REGEX.POSTCODE,
-    message: 'Invalid postcode',
+    message: VALIDATION_MESSAGES.POSTCODE_INVALID,
   },
 })
 
 export const mobileRules = (required = true) => ({
-  required: required ? 'This field is required' : false,
+  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
   pattern: {
     value: REGEX.MOBILE,
-    message: 'Mobile number contains invalid characters (no spaces or country code allowed)',
+    message: VALIDATION_MESSAGES.MOBILE_INVALID,
   },
 })
 
 // Default is not required
 export const externalIdRules = (required = false) => ({
-  required: required ? 'This field is required' : false,
+  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
   pattern: {
     value: REGEX.EXTERNALID,
-    message: 'External ID can only consist of alpha numeric characters and -_=.:',
+    message: VALIDATION_MESSAGES.EXTERNALID_INVALID,
   },
 })
