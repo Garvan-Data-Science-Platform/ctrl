@@ -1,5 +1,6 @@
 /// <reference types="cypress" />
 const { TestUsers, TestInvites, TestStudies } = require('../../../common/testing/constants')
+const { VALIDATION_MESSAGES } = require('../../../common/src/validation')
 
 beforeEach(() => {
   cy.task('reset')
@@ -71,8 +72,8 @@ describe('registration', () => {
     cy.get('[data-cy="reg-mobile"]').type('04123')
     cy.get('[data-cy="reg-button"]').click()
     cy.contains('Invalid password').should('exist')
-    cy.contains('Invalid postcode').should('exist')
-    cy.contains('Mobile number contains invalid characters').should('exist')
+    cy.contains(VALIDATION_MESSAGES.POSTCODE_INVALID).should('exist')
+    cy.contains(VALIDATION_MESSAGES.MOBILE_INVALID).should('exist')
     cy.contains('at least 14 characters').should('exist')
     cy.contains('passwords do not match').should('exist')
   })
@@ -130,17 +131,17 @@ describe('registration', () => {
       parseSpecialCharSequences: false,
     })
     // hit enter after the last form field
-    // NOK email seems to have it's own xss protection in electron
+    // NOK email seems to have it's own xss protection in electron/browser
     cy.get('[data-cy="nok-surname"]')
       .type("{{7*7}}<script>alert('xss-nok-surname')</script>$#", {
         parseSpecialCharSequences: false,
       })
       .type('{enter}')
 
-    cy.contains('Name contains invalid characters').should('exist')
-    cy.contains('Address contains invalid characters').should('exist')
-    cy.contains('Mobile number contains invalid characters').should('exist')
-    cy.contains('Invalid postcode').should('exist')
+    cy.contains(VALIDATION_MESSAGES.NAME_INVALID).should('exist')
+    cy.contains(VALIDATION_MESSAGES.ADDRESS_INVALID).should('exist')
+    cy.contains(VALIDATION_MESSAGES.MOBILE_INVALID).should('exist')
+    cy.contains(VALIDATION_MESSAGES.POSTCODE_INVALID).should('exist')
   })
 
   it('Attempt to register existing email (i.e. no invite) and get correct error message', () => {
@@ -165,7 +166,7 @@ describe('registration', () => {
     fillValid()
     cy.get('[data-cy="add-dependent"]').click()
     cy.get('[data-cy="reg-button"]').click()
-    cy.contains('This field is required').should('exist')
+    cy.contains(VALIDATION_MESSAGES.REQUIRED).should('exist')
     cy.get('[data-cy="add-dependent"]').click()
     cy.get('[data-cy=dep-first]').eq(1).type('JNR')
     cy.get('[data-cy=dep-surname]').eq(1).type('LAST')
@@ -196,6 +197,6 @@ describe('registration', () => {
         parseSpecialCharSequences: false,
       })
       .type('{enter}')
-    cy.contains('Name contains invalid characters').should('exist')
+    cy.contains(VALIDATION_MESSAGES.NAME_INVALID).should('exist')
   })
 })
