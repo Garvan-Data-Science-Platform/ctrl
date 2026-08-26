@@ -24,10 +24,6 @@ export class SmtpBasicProvider implements MailProvider {
     await this.getTransporter().sendMail(opts)
   }
 
-  async verify(): Promise<void> {
-    await this.getTransporter().verify()
-  }
-
   private getTransporter(): Transporter {
     if (this.transporter) return this.transporter
     this.transporter = nodemailer.createTransport({

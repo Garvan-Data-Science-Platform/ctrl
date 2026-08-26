@@ -73,9 +73,4 @@ describe('SmtpBasicProvider', () => {
   it('throws when sender is empty', () => {
     expect(() => new SmtpBasicProvider({ ...validConfig, sender: '' })).toThrow(/sender is empty/)
   })
-
-  it('verify calls nodemailer verify without throwing', async () => {
-    const provider = new SmtpBasicProvider(validConfig)
-    await expect(provider.verify()).resolves.not.toThrow()
-  })
 })

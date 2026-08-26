@@ -9,5 +9,4 @@ export interface MailOpts {
 
 export interface MailProvider {
   sendMail(opts: MailOpts): Promise<void>
-  verify?(): Promise<void>
 }

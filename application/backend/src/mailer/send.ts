@@ -10,10 +10,7 @@ function getProvider(): MailProvider {
   if (providerInstance) return providerInstance
 
   if (process.env.STUB_MAILER === 'true') {
-    providerInstance = {
-      sendMail: async () => {},
-      verify: async () => {},
-    }
+    providerInstance = { sendMail: async () => {} }
     return providerInstance
   }
 
