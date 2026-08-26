@@ -1,3 +1,4 @@
+import logger from 'common/src/logger'
 import config from '../config'
 import type { MailOpts, MailProvider } from './provider'
 import { SmtpBasicProvider } from './SmtpBasicProvider'
@@ -46,7 +47,24 @@ function getProvider(): MailProvider {
 export async function sendEmail(opts: MailOpts): Promise<void> {
   const provider = getProvider()
   const from = opts.from ?? config.mailer.sender
-  await provider.sendMail({ ...opts, from })
+  const started = Date.now()
+  // never log text, html, from, or anything token shaped
+  const meta = {
+    provider: config.mailer.provider,
+    toCount: Array.isArray(opts.to) ? opts.to.length : 1,
+    subject: opts.subject,
+  }
+  try {
+    await provider.sendMail({ ...opts, from })
+    logger.info('sendEmail', { ...meta, durationMs: Date.now() - started })
+  } catch (err) {
+    logger.error('sendEmail', {
+      ...meta,
+      durationMs: Date.now() - started,
+      errorClass: err instanceof Error ? err.constructor.name : typeof err,
+    })
+    throw err
+  }
 }
 
 export function _resetProviderForTests(): void {

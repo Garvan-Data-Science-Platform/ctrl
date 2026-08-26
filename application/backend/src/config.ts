@@ -108,7 +108,9 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 if (process.env.NODE_ENV !== 'production') {
-  console.log('CONFIG', config)
+  const redact = (key: string, value: unknown) =>
+    ['password', 'clientSecret'].includes(key) ? '[REDACTED]' : value
+  console.log('CONFIG', JSON.stringify(config, redact, 2))
 }
 
 export default config as Config

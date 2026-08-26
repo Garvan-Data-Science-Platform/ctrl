@@ -93,7 +93,7 @@ export class MailerController extends Controller {
       text: adminText,
       html: adminHtml,
     })
-    logger.info(`Contact-us email sent to admins`, {
+    logger.info('Contact-us email sent to admins', {
       to: recipientEmails,
       subject: subjectToAdmin,
     })
@@ -107,7 +107,7 @@ export class MailerController extends Controller {
       text: participantText,
       html: participantHtml,
     })
-    logger.info(`Contact-us confirmation email sent to participant`, {
+    logger.info('Contact-us confirmation email sent to participant', {
       to: user.email,
       subject: subjectToUser,
     })

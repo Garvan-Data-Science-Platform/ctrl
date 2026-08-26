@@ -82,6 +82,14 @@ describe('sendEmail', () => {
     expect(mockNodeMailer.mock.getSentMail()[0].to).toEqual(['a@example.com', 'b@example.com'])
   })
 
+  it('rethrows a send failure after logging it', async () => {
+    mockNodeMailer.mock.setShouldFail(true)
+    await expect(
+      sendEmail({ to: 'user@example.com', subject: 'Hello', text: 'World' }),
+    ).rejects.toThrow()
+    mockNodeMailer.mock.setShouldFail(false)
+  })
+
   it('shares one provider across concurrent sends', async () => {
     // ParticipantsController fans invites out over Promise.all, so the singleton
     // has to survive a burst rather than build a transporter per send
