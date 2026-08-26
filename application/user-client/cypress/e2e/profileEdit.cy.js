@@ -44,7 +44,7 @@ describe('Profile Edit', () => {
     cy.get('[data-cy="update-mobile"] input').clear()
     cy.get('[data-cy="update-mobile"]').type('0487654a')
     cy.get('[data-cy="update-button"]').click()
-    cy.contains('Invalid mobile').should('exist')
+    cy.contains('Mobile number contains invalid characters').should('exist')
   })
 
   it('Shows family members correctly', () => {
@@ -124,4 +124,50 @@ describe('Profile Edit', () => {
     cy.get('[data-cy="update-button"]').click()
     cy.contains('Invalid postcode').should('exist')
   })
+
+  it('Invalid xss mobile input gets correct error message', () => {
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
+    cy.visit('/profile/update')
+
+    cy.get('[data-cy="update-mobile"] input').clear()
+    cy.get('[data-cy="update-mobile"]').type("\{\{7*7}}<script>alert('xss-mobile')</script>$#", {
+      parseSpecialCharSequences: false,
+    })
+
+    cy.get('[data-cy="update-button"]').click()
+    cy.contains('Mobile number contains invalid characters').should('exist')
+  })
+
+  it('Invalid xss next-of-kin firstname input gets correct error message', () => {
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
+    cy.visit('/profile/update')
+
+    cy.get('[data-cy="update-nok-first"] input').clear()
+    cy.get('[data-cy="update-nok-first"]').type(
+      "\{\{7*7}}<script>alert('xss-nok-first')</script>$#",
+      {
+        parseSpecialCharSequences: false,
+      },
+    )
+
+    cy.get('[data-cy="update-button"]').click()
+    cy.contains('Name contains invalid characters').should('exist')
+  })
+
+  it('Invalid xss next-of-kin lastname input gets correct error message', () => {
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
+    cy.visit('/profile/update')
+
+    cy.get('[data-cy="update-nok-last"] input').clear()
+    cy.get('[data-cy="update-nok-last"]').type(
+      "\{\{7*7}}<script>alert('xss-nok-last')</script>$#",
+      {
+        parseSpecialCharSequences: false,
+      },
+    )
+
+    cy.get('[data-cy="update-button"]').click()
+    cy.contains('Name contains invalid characters').should('exist')
+  })
+  // nok email validation is handled by electron
 })

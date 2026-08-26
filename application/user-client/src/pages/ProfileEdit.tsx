@@ -21,7 +21,13 @@ import { GetParticipantProfileResponse, UpdateProfileRequest } from '@common/typ
 import NavBar from '../components/NavBar'
 import { apiClient } from '../apiClient'
 import { ContactMethod, StateTerritory } from '@common/types/api/users/ParticipantProfile'
-import { addressRules, nameRules, postcodeRules } from '@common/src/validation'
+import {
+  addressRules,
+  emailRules,
+  mobileRules,
+  nameRules,
+  postcodeRules,
+} from '@common/src/validation'
 
 interface FormValues {
   firstName: string
@@ -209,14 +215,7 @@ export default function ProfileEdit() {
                   helperText={errors.mobile?.message}
                   data-cy="update-mobile"
                   disabled={isPending}
-                  {...register('mobile', {
-                    required: true,
-                    value: data?.mobile,
-                    pattern: {
-                      value: /04\d{8}$/,
-                      message: 'Invalid mobile number',
-                    },
-                  })}
+                  {...register('mobile', { ...mobileRules(), value: data?.mobile })}
                 />
                 <FormControl sx={{ m: 1, flexGrow: 1, minWidth: 240 }}>
                   <InputLabel id="pref-select-label">Preferred Contact Method</InputLabel>
@@ -253,7 +252,7 @@ export default function ProfileEdit() {
                   data-cy="update-nok-first"
                   disabled={isPending}
                   {...register('nok_first', {
-                    required: true,
+                    ...nameRules(),
                     value: data?.nextOfKin?.firstName,
                   })}
                 />
@@ -267,7 +266,7 @@ export default function ProfileEdit() {
                   disabled={isPending}
                   key="nok_surname"
                   {...register('nok_surname', {
-                    required: true,
+                    ...nameRules(),
                     value: data?.nextOfKin?.lastName,
                   })}
                 />
@@ -283,7 +282,7 @@ export default function ProfileEdit() {
                   disabled={isPending}
                   key="nok_email"
                   {...register('nok_email', {
-                    required: true,
+                    ...emailRules(),
                     value: data?.nextOfKin?.email,
                   })}
                 />
