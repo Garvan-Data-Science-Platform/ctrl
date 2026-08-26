@@ -89,9 +89,8 @@ export type Postcode = string
 export type DoB = string
 
 /**
- * @minLength 1
  * @maxLength 128
- * @pattern ^[a-zA-Z0-9\-_=.:]+$
+ * @pattern ^[a-zA-Z0-9\-_=.:]*$
  * @example "123e4567-e89b-12d3-a456-426614174000"
  */
 export type ExternalId = string
