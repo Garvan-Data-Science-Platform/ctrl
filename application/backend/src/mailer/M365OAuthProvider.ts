@@ -1,6 +1,6 @@
 import { ConfidentialClientApplication } from '@azure/msal-node'
 import nodemailer, { type Transporter } from 'nodemailer'
-import type { MailOpts, MailProvider } from './provider'
+import { assertSender, type MailOpts, type MailProvider } from './provider'
 
 interface M365OAuthConfig {
   tenantId: string
@@ -22,7 +22,7 @@ export class M365OAuthProvider implements MailProvider {
     if (!config.clientSecret) throw new Error('m365-oauth: clientSecret is empty')
     if (!config.host) throw new Error('m365-oauth: host is empty')
     if (!config.port) throw new Error('m365-oauth: port is empty')
-    if (!config.sender) throw new Error('m365-oauth: sender is empty')
+    this.user = assertSender('m365-oauth', config.sender)
 
     this.cca = new ConfidentialClientApplication({
       auth: {
@@ -31,7 +31,6 @@ export class M365OAuthProvider implements MailProvider {
         authority: `https://login.microsoftonline.com/${config.tenantId}`,
       },
     })
-    this.user = extractAddress(config.sender)
   }
 
   async sendMail(opts: MailOpts): Promise<void> {
@@ -91,11 +90,6 @@ export class M365OAuthProvider implements MailProvider {
       throw redactSecrets(err)
     }
   }
-}
-
-export function extractAddress(sender: string): string {
-  const match = sender.match(/<([^>]+)>/)
-  return match ? match[1] : sender
 }
 
 function redactString(str: string): string {

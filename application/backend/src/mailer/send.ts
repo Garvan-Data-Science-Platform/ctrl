@@ -23,6 +23,7 @@ function getProvider(): MailProvider {
       port: cfg.port,
       username: cfg.username,
       password: cfg.password,
+      sender: cfg.sender,
     })
     return providerInstance
   }

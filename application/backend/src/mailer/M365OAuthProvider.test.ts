@@ -1,12 +1,8 @@
 import * as nodemailer from 'nodemailer'
 import type { NodemailerMock } from 'nodemailer-mock'
 import { ConfidentialClientApplication } from '@azure/msal-node'
-import {
-  M365OAuthProvider,
-  extractAddress,
-  redactSecrets,
-  wrapSmtpError,
-} from './M365OAuthProvider'
+import { M365OAuthProvider, redactSecrets, wrapSmtpError } from './M365OAuthProvider'
+import { extractAddress } from './provider'
 
 jest.mock('@azure/msal-node')
 
@@ -58,6 +54,19 @@ describe('M365OAuthProvider', () => {
 
     it('throws when sender is empty', () => {
       expect(() => new M365OAuthProvider({ ...validConfig, sender: '' })).toThrow(/sender is empty/)
+    })
+
+    it('throws when sender is not an address', () => {
+      // sender doubles as the SMTP AUTH username on this path, so a bad one fails auth
+      expect(() => new M365OAuthProvider({ ...validConfig, sender: 'CTRL' })).toThrow(
+        /not a usable address/,
+      )
+    })
+
+    it('throws when sender has empty angle brackets', () => {
+      expect(() => new M365OAuthProvider({ ...validConfig, sender: 'CTRL <>' })).toThrow(
+        /not a usable address/,
+      )
     })
   })
 

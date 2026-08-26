@@ -10,6 +10,7 @@ describe('SmtpBasicProvider', () => {
     port: 587,
     username: 'test-user',
     password: 'test-pass',
+    sender: 'CTRL <noreply@example.com>',
   }
 
   afterEach(() => {
@@ -67,6 +68,28 @@ describe('SmtpBasicProvider', () => {
     expect(() => new SmtpBasicProvider({ ...validConfig, password: '' })).toThrow(
       /password is empty/,
     )
+  })
+
+  it('throws when sender is empty', () => {
+    expect(() => new SmtpBasicProvider({ ...validConfig, sender: '' })).toThrow(/sender is empty/)
+  })
+
+  it('throws when sender is not an address', () => {
+    expect(() => new SmtpBasicProvider({ ...validConfig, sender: 'CTRL' })).toThrow(
+      /not a usable address/,
+    )
+  })
+
+  it('throws when sender has empty angle brackets', () => {
+    expect(() => new SmtpBasicProvider({ ...validConfig, sender: 'CTRL <>' })).toThrow(
+      /not a usable address/,
+    )
+  })
+
+  it('accepts a dotless domain so MailHog setups keep working', () => {
+    expect(
+      () => new SmtpBasicProvider({ ...validConfig, sender: 'CTRL <noreply@localhost>' }),
+    ).not.toThrow()
   })
 
   it('verify calls nodemailer verify without throwing', async () => {
