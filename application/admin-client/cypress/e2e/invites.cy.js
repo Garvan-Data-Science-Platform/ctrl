@@ -84,7 +84,8 @@ describe('', () => {
   it('Sent invites appear in invites list', () => {
     cy.visit('/participants')
     cy.get('[data-cy="invite-button"]').click()
-    cy.get('[data-cy="email-field"]').clear().type('valid1@g.co').type('{enter}')
+    cy.get('[data-cy="email-field"]').clear().type('valid1@g.co')
+    cy.get('[data-cy="id-field"]').clear().type('1').type('{enter}')
     cy.get('[data-cy="send-button"]').click()
     cy.get('[data-cy="pending-list"]', { timeout: 10000 }).should('contain.text', 'valid1@g.co')
   })
