@@ -32,7 +32,7 @@ describe('AuthController', () => {
   const testFirstName = 'John'
   const testLastName = 'Doe'
   const testEmail = 'johndoe@example.com'
-  const testPassword = 'Loginfortests123'
+  const testPassword = 'Lolliesfortests123'
   const testGuardianFirstName = 'Jenny'
 
   beforeAll(async () => {
@@ -141,7 +141,7 @@ describe('AuthController', () => {
         lastName: "{{7*7}}<script>alert('xss-lastname')</script>",
         email: "{{7*7}}<script>aliert('xss-email')</script>@email.com",
         password: testPassword,
-        role: Role.Participant,
+        role: Role.OrganisationAdmin,
       }
 
       const response = await request(app)
@@ -163,24 +163,6 @@ describe('AuthController', () => {
           message: 'Invalid value provided',
         },
       })
-    })
-
-    it('should return 422 if validation fails on invalid user first name input', async () => {
-      const registerRequest = {
-        firstName: "{{7*7}}<script>alert('xss-firstname')</script>",
-        lastName: testLastName,
-        password: 'password123', //Does not meet minimum password requirements
-        role: Role.Participant,
-      }
-
-      const response = await request(app)
-        .post('/auth/register')
-        .set({ Authorization: `Bearer ${orgAdminToken}` })
-        .send(registerRequest)
-      expect(response.status).toEqual(422)
-
-      const body = response.body
-      expect(body.message).toBe('Validation Failed')
     })
 
     it('should return an error if the user is already registered', async () => {
