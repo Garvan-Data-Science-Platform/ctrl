@@ -41,6 +41,22 @@ describe('Family Editing', () => {
     cy.get('[data-cy="in-study-checkbox"] input').last().should('be.checked')
   })
 
+  it('Cannot use xss when adding new dependent to family', () => {
+    cy.visit('/participants/family/edit/100')
+    cy.get('[data-cy="add-member-button"]').click()
+    cy.get('[data-cy="registered-no"]').click()
+    cy.get('[data-cy="new-dependent"]').click()
+    cy.get('[data-cy=dep-first]').type("{{7*7}}<script>alert('xss-dep-first')</script>$#", {
+      parseSpecialCharSequences: false,
+    })
+    cy.get('[data-cy=dep-surname]').type("{{7*7}}<script>alert('xss-dep-surname')</script>$#", {
+      parseSpecialCharSequences: false,
+    })
+    cy.get('[data-cy="dep-dob"]').type('2020-01-01')
+    cy.get('[data-cy="add-dep-button"]').click()
+    cy.contains('Name contains invalid characters').should('exist')
+  })
+
   it('Remove member from family', () => {
     cy.visit('/participants/family/edit/100')
     cy.get('[data-cy="remove-member-button"]').click()
