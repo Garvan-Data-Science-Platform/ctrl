@@ -19,7 +19,6 @@ config:
   otp: true
   inviteExpiryDays: 7
   # Mail provider. Supported: 'smtp-basic' (any SMTP server with username/password auth), 'm365-oauth' (Microsoft 365 OAuth 2 SMTP via MSAL).
-  # See docs/email.md for the deployer guide.
   mailer:
     provider: smtp-basic
     host: ''
