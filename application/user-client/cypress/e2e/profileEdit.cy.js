@@ -67,4 +67,61 @@ describe('Profile Edit', () => {
       expect($el.val()).to.not.include(TestUsers.PARTICIPANT_UNANSWERED.email)
     })
   })
+
+  it('Invalid xss firstName input gets correct error message', () => {
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
+    cy.visit('/profile/update')
+
+    cy.get('[data-cy="update-first"] input').clear()
+    cy.get('[data-cy="update-first"]')
+      .type("\{\{7*7}}<script>alert('xss-firstname')</script>$#", {
+        parseSpecialCharSequences: false,
+      })
+      .type('{enter}')
+
+    cy.get('[data-cy="update-button"]').click()
+    cy.contains('Name contains invalid characters').should('exist')
+  })
+
+  it('Invalid xss lastName input gets correct error message', () => {
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
+    cy.visit('/profile/update')
+
+    cy.get('[data-cy="update-last"] input').clear()
+    cy.get('[data-cy="update-last"]').type("\{\{7*7}}<script>alert('xss-lastname')</script>$#", {
+      parseSpecialCharSequences: false,
+    })
+
+    cy.get('[data-cy="update-button"]').click()
+    cy.contains('Name contains invalid characters').should('exist')
+  })
+
+  it('Invalid xss address input gets correct error message', () => {
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
+    cy.visit('/profile/update')
+
+    cy.get('[data-cy="update-address"] input').clear()
+    cy.get('[data-cy="update-address"]').type("\{\{7*7}}<script>alert('xss-address')</script>$#", {
+      parseSpecialCharSequences: false,
+    })
+
+    cy.get('[data-cy="update-button"]').click()
+    cy.contains('Address contains invalid characters').should('exist')
+  })
+
+  it('Invalid xss postcode input gets correct error message', () => {
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
+    cy.visit('/profile/update')
+
+    cy.get('[data-cy="update-postcode"] input').clear()
+    cy.get('[data-cy="update-postcode"]').type(
+      "\{\{7*7}}<script>alert('xss-postcode')</script>$#",
+      {
+        parseSpecialCharSequences: false,
+      },
+    )
+
+    cy.get('[data-cy="update-button"]').click()
+    cy.contains('Invalid postcode').should('exist')
+  })
 })

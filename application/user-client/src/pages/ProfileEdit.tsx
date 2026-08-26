@@ -21,6 +21,7 @@ import { GetParticipantProfileResponse, UpdateProfileRequest } from '@common/typ
 import NavBar from '../components/NavBar'
 import { apiClient } from '../apiClient'
 import { ContactMethod, StateTerritory } from '@common/types/api/users/ParticipantProfile'
+import { addressRules, nameRules, postcodeRules } from '@common/src/validation'
 
 interface FormValues {
   firstName: string
@@ -126,7 +127,7 @@ export default function ProfileEdit() {
                   helperText={errors.firstName?.message}
                   data-cy="update-first"
                   disabled={isPending}
-                  {...register('firstName', { required: true, value: data?.firstName })}
+                  {...register('firstName', { ...nameRules(), value: data?.firstName })}
                 />
                 <TextField
                   sx={{ m: 1, flexGrow: 1 }}
@@ -134,7 +135,9 @@ export default function ProfileEdit() {
                   defaultValue="."
                   error={Boolean(errors.lastName)}
                   helperText={errors.lastName?.message}
-                  {...register('lastName', { required: true, value: data?.lastName })}
+                  data-cy="update-last"
+                  disabled={isPending}
+                  {...register('lastName', { ...nameRules(), value: data?.lastName })}
                 />
 
                 <TextField
@@ -155,7 +158,9 @@ export default function ProfileEdit() {
                   defaultValue="."
                   error={Boolean(errors.addressLine)}
                   helperText={errors.addressLine?.message}
-                  {...register('addressLine', { required: true, value: data.addressLine })}
+                  data-cy="update-address"
+                  disabled={isPending}
+                  {...register('addressLine', { ...addressRules(), value: data?.addressLine })}
                 />
                 <TextField
                   sx={{ m: 1 }}
@@ -163,7 +168,9 @@ export default function ProfileEdit() {
                   defaultValue="."
                   error={Boolean(errors.suburb)}
                   helperText={errors.suburb?.message}
-                  {...register('suburb', { required: true, value: data.suburb })}
+                  data-cy="update-suburb"
+                  disabled={isPending}
+                  {...register('suburb', { ...addressRules(), value: data?.suburb })}
                 />
                 <FormControl sx={{ m: 1, flexGrow: 1 }}>
                   <InputLabel id="state-select-label">State</InputLabel>
@@ -190,14 +197,9 @@ export default function ProfileEdit() {
                   defaultValue="."
                   error={Boolean(errors.postcode)}
                   helperText={errors.postcode?.message}
-                  {...register('postcode', {
-                    required: true,
-                    value: data?.postcode,
-                    pattern: {
-                      value: /^\d{4}$/,
-                      message: 'Invalid postcode',
-                    },
-                  })}
+                  data-cy="update-postcode"
+                  disabled={isPending}
+                  {...register('postcode', { ...postcodeRules(), value: data?.postcode })}
                 />
                 <TextField
                   sx={{ m: 1, flexGrow: 1 }}
@@ -206,6 +208,7 @@ export default function ProfileEdit() {
                   error={Boolean(errors.mobile)}
                   helperText={errors.mobile?.message}
                   data-cy="update-mobile"
+                  disabled={isPending}
                   {...register('mobile', {
                     required: true,
                     value: data?.mobile,
@@ -248,6 +251,7 @@ export default function ProfileEdit() {
                   error={Boolean(errors.nok_first)}
                   helperText={errors.nok_first?.message}
                   data-cy="update-nok-first"
+                  disabled={isPending}
                   {...register('nok_first', {
                     required: true,
                     value: data?.nextOfKin?.firstName,
@@ -259,6 +263,8 @@ export default function ProfileEdit() {
                   defaultValue="."
                   error={Boolean(errors.nok_surname)}
                   helperText={errors.nok_surname?.message}
+                  data-cy="update-nok-last"
+                  disabled={isPending}
                   key="nok_surname"
                   {...register('nok_surname', {
                     required: true,
@@ -273,6 +279,8 @@ export default function ProfileEdit() {
                   defaultValue="."
                   error={Boolean(errors.nok_email)}
                   helperText={errors.nok_email?.message}
+                  data-cy="update-nok-email"
+                  disabled={isPending}
                   key="nok_email"
                   {...register('nok_email', {
                     required: true,
