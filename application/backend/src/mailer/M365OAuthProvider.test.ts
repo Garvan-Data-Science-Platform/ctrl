@@ -94,6 +94,21 @@ describe('M365OAuthProvider', () => {
       })
     })
 
+    it('honours opts.from override when provided', async () => {
+      mockAcquireToken.mockResolvedValue({
+        accessToken: 'fake',
+        expiresOn: new Date(Date.now() + 3600 * 1000),
+      })
+      const provider = new M365OAuthProvider(validConfig)
+      await provider.sendMail({
+        to: 'recipient@example.com',
+        subject: 'Test',
+        text: 'Hello',
+        from: 'Study <study@example.com>',
+      })
+      expect(mockNodeMailer.mock.getSentMail()[0].from).toBe('Study <study@example.com>')
+    })
+
     it('passes replyTo through', async () => {
       mockAcquireToken.mockResolvedValue({
         accessToken: 'fake',
@@ -122,6 +137,22 @@ describe('M365OAuthProvider', () => {
       ).acquireToken()
       expect(token.accessToken).toBe('valid-token')
       expect(token.expiresOn).toBe(expiresOn)
+    })
+
+    it('leaves MSAL caching alone on a normal acquisition', async () => {
+      mockAcquireToken.mockResolvedValue({ accessToken: 't', expiresOn: new Date() })
+      const provider = new M365OAuthProvider(validConfig)
+      await (provider as unknown as { acquireToken: () => Promise<unknown> }).acquireToken()
+      expect(mockAcquireToken).toHaveBeenCalledWith(expect.objectContaining({ skipCache: false }))
+    })
+
+    it('bypasses the MSAL cache when nodemailer asks for a renewal', async () => {
+      mockAcquireToken.mockResolvedValue({ accessToken: 't', expiresOn: new Date() })
+      const provider = new M365OAuthProvider(validConfig)
+      await (
+        provider as unknown as { acquireToken: (skipCache: boolean) => Promise<unknown> }
+      ).acquireToken(true)
+      expect(mockAcquireToken).toHaveBeenCalledWith(expect.objectContaining({ skipCache: true }))
     })
 
     it('throws when MSAL returns null', async () => {
@@ -212,6 +243,17 @@ describe('wrapSmtpError', () => {
     expect(wrapped.message).toContain('Enterprise Application Object ID')
     expect(wrapped.message).toContain('SmtpClientAuthenticationDisabled')
     expect(wrapped.message).toContain('Security Defaults')
+  })
+
+  it('reports a token acquisition failure as such, not as an XOAUTH2 rejection', () => {
+    // nodemailer stamps EAUTH on whatever the provision callback throws, so a bad
+    // clientSecret would otherwise be reported as a tenant mailbox problem
+    const err = Object.assign(new Error('M365 token acquisition failed: invalid_client'), {
+      code: 'EAUTH',
+    })
+    const wrapped = wrapSmtpError(err)
+    expect(wrapped.message).toContain('M365 token acquisition failed')
+    expect(wrapped.message).not.toContain('XOAUTH2 rejected')
   })
 
   it('wraps generic EAUTH with an XOAUTH2 rejection message', () => {

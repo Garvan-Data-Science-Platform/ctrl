@@ -2,6 +2,8 @@ import { ConfidentialClientApplication } from '@azure/msal-node'
 import nodemailer, { type Transporter } from 'nodemailer'
 import { assertSender, type MailOpts, type MailProvider } from './provider'
 
+const TOKEN_FAILURE = 'M365 token acquisition failed'
+
 interface M365OAuthConfig {
   tenantId: string
   clientId: string
@@ -36,14 +38,7 @@ export class M365OAuthProvider implements MailProvider {
   async sendMail(opts: MailOpts): Promise<void> {
     const transporter = this.getTransporter()
     try {
-      await transporter.sendMail({
-        from: this.config.sender,
-        to: opts.to,
-        subject: opts.subject,
-        html: opts.html,
-        text: opts.text,
-        replyTo: opts.replyTo,
-      })
+      await transporter.sendMail({ ...opts, from: opts.from ?? this.config.sender })
     } catch (err) {
       throw wrapSmtpError(err)
     }
@@ -60,15 +55,16 @@ export class M365OAuthProvider implements MailProvider {
       pool: true,
       host: this.config.host,
       port: this.config.port,
-      secure: false,
+      requireTLS: true,
       auth: {
         type: 'OAuth2',
         user: this.user,
       },
     })
-    this.transporter.set('oauth2_provision_cb', async (_user, _renew, cb) => {
+    this.transporter.set('oauth2_provision_cb', async (_user, renew, cb) => {
       try {
-        const token = await this.acquireToken()
+        // renew means nodemailer's token was rejected, so go past MSAL's cache
+        const token = await this.acquireToken(renew)
         cb(null, token.accessToken, token.expiresOn.getTime())
       } catch (err) {
         cb(err instanceof Error ? err : new Error(String(err)))
@@ -77,17 +73,18 @@ export class M365OAuthProvider implements MailProvider {
     return this.transporter
   }
 
-  private async acquireToken(): Promise<{ accessToken: string; expiresOn: Date }> {
+  private async acquireToken(skipCache = false): Promise<{ accessToken: string; expiresOn: Date }> {
     try {
       const result = await this.cca.acquireTokenByClientCredential({
         scopes: ['https://outlook.office.com/.default'],
+        skipCache,
       })
       if (!result || !result.accessToken || !result.expiresOn) {
         throw new Error('MSAL returned no token')
       }
       return { accessToken: result.accessToken, expiresOn: result.expiresOn }
     } catch (err) {
-      throw redactSecrets(err)
+      throw new Error(`${TOKEN_FAILURE}: ${redactSecrets(err).message}`)
     }
   }
 }
@@ -111,6 +108,12 @@ export function wrapSmtpError(err: unknown): Error {
   const code = errObj.code ?? ''
   const combined = `${rawMessage} ${response}`.trim()
   const safe = redactString(combined)
+
+  // Nodemailer stamps EAUTH on anything the provision callback throws, so this
+  // check has to come first or a token failure reads as an XOAUTH2 rejection.
+  if (combined.includes(TOKEN_FAILURE)) {
+    return new Error(safe)
+  }
 
   if (
     ['ETIMEDOUT', 'ENOTFOUND', 'ECONNREFUSED', 'ECONNRESET', 'ESOCKET'].includes(code) ||
