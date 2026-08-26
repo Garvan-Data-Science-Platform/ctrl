@@ -1,5 +1,6 @@
 /// <reference types="cypress" />
 const { TestUsers } = require('../../../common/testing/constants')
+const { VALIDATION_MESSAGES } = require('../../../common/src/validation')
 
 describe('Setup', () => {
   it('Redirects to setup page if database empty, can register', () => {
@@ -26,7 +27,7 @@ describe('Setup', () => {
     )
     cy.get('[data-cy="setup-password"]').type(TestUsers.ORG_ADMIN.password) // Using test data to conform to pr requirements
     cy.get('[data-cy="setup-submit"]').click()
-    cy.contains('Enter a valid email').should('exist')
+    cy.contains(VALIDATION_MESSAGES.EMAIL_INVALID).should('exist')
   })
 
   it('Cannot register with weak password', () => {

@@ -1,6 +1,7 @@
 /// <reference types="cypress" />
 
 const { TestUsers } = require('../../../common/testing/constants')
+const { VALIDATION_MESSAGES } = require('../../../common/src/validation')
 
 beforeEach(() => {
   cy.task('reset')
@@ -34,11 +35,11 @@ describe('Participants', () => {
     cy.get('input[name="profile.postcode"]').clear().type('222a')
     cy.get('input[name="externalId"]').clear().type('extID')
     cy.contains('Save').click()
-    cy.contains('Invalid postcode').should('exist')
+    cy.contains(VALIDATION_MESSAGES.POSTCODE_INVALID).should('exist')
     cy.get('input[name="profile.postcode"]').clear().type('2222')
     cy.get('input[name="profile.nextOfKin.email"]').clear().type('invalid')
     cy.contains('Save').click()
-    cy.contains('Enter a valid email').should('exist')
+    cy.contains(VALIDATION_MESSAGES.EMAIL_INVALID).should('exist')
     cy.get('input[name="profile.nextOfKin.email"]').clear().type('valid@email.com')
     cy.contains('Save').click()
     cy.url().should('contain', `participants/${TestUsers.PARTICIPANT_UNANSWERED.id}`)
@@ -79,7 +80,7 @@ describe('Participants', () => {
         parseSpecialCharSequences: false,
       })
     cy.contains('Save').click()
-    cy.contains('Name contains invalid characters').should('exist')
+    cy.contains(VALIDATION_MESSAGES.NAME_INVALID).should('exist')
   })
 
   it('Edit participant, validate xss last name', () => {
@@ -92,7 +93,7 @@ describe('Participants', () => {
         parseSpecialCharSequences: false,
       })
     cy.contains('Save').click()
-    cy.contains('Name contains invalid characters').should('exist')
+    cy.contains(VALIDATION_MESSAGES.NAME_INVALID).should('exist')
   })
 
   it('Edit participant, validate xss email', () => {
@@ -105,7 +106,7 @@ describe('Participants', () => {
         parseSpecialCharSequences: false,
       })
     cy.contains('Save').click()
-    cy.contains('Enter a valid email').should('exist')
+    cy.contains(VALIDATION_MESSAGES.EMAIL_INVALID).should('exist')
   })
 
   it('Edit participant, validate xss externalId', () => {
@@ -118,7 +119,7 @@ describe('Participants', () => {
         parseSpecialCharSequences: false,
       })
     cy.contains('Save').click()
-    cy.contains('External ID can only consist of').should('exist')
+    cy.contains(VALIDATION_MESSAGES.EXTERNALID_INVALID).should('exist')
   })
 
   it('Edit participant, validate xss address', () => {
@@ -131,7 +132,7 @@ describe('Participants', () => {
         parseSpecialCharSequences: false,
       })
     cy.contains('Save').click()
-    cy.contains('Address contains invalid characters').should('exist')
+    cy.contains(VALIDATION_MESSAGES.ADDRESS_INVALID).should('exist')
   })
 
   it('Edit participant, validate xss suburb', () => {
@@ -144,7 +145,7 @@ describe('Participants', () => {
         parseSpecialCharSequences: false,
       })
     cy.contains('Save').click()
-    cy.contains('Address contains invalid characters').should('exist')
+    cy.contains(VALIDATION_MESSAGES.ADDRESS_INVALID).should('exist')
   })
 
   it('Edit participant, validate xss postcode', () => {
@@ -157,7 +158,7 @@ describe('Participants', () => {
         parseSpecialCharSequences: false,
       })
     cy.contains('Save').click()
-    cy.contains('Invalid postcode').should('exist')
+    cy.contains(VALIDATION_MESSAGES.POSTCODE_INVALID).should('exist')
   })
 
   it('Edit participant, validate xss mobile', () => {
@@ -170,7 +171,7 @@ describe('Participants', () => {
         parseSpecialCharSequences: false,
       })
     cy.contains('Save').click()
-    cy.contains('Mobile number contains invalid characters').should('exist')
+    cy.contains(VALIDATION_MESSAGES.MOBILE_INVALID).should('exist')
   })
 
   it('Edit participant, validate xss nok first name', () => {
@@ -183,7 +184,7 @@ describe('Participants', () => {
         parseSpecialCharSequences: false,
       })
     cy.contains('Save').click()
-    cy.contains('Name contains invalid characters').should('exist')
+    cy.contains(VALIDATION_MESSAGES.NAME_INVALID).should('exist')
   })
 
   it('Edit participant, validate xss nok last name', () => {
@@ -196,7 +197,7 @@ describe('Participants', () => {
         parseSpecialCharSequences: false,
       })
     cy.contains('Save').click()
-    cy.contains('Name contains invalid characters').should('exist')
+    cy.contains(VALIDATION_MESSAGES.NAME_INVALID).should('exist')
   })
 
   it('Edit participant, validate xss nok email', () => {
@@ -209,7 +210,7 @@ describe('Participants', () => {
         parseSpecialCharSequences: false,
       })
     cy.contains('Save').click()
-    cy.contains('Enter a valid email').should('exist')
+    cy.contains(VALIDATION_MESSAGES.EMAIL_INVALID).should('exist')
   })
 
   it('Edit participant, validate xss nok mobile', () => {
@@ -222,6 +223,6 @@ describe('Participants', () => {
         parseSpecialCharSequences: false,
       })
     cy.contains('Save').click()
-    cy.contains('Mobile number contains invalid characters').should('exist')
+    cy.contains(VALIDATION_MESSAGES.MOBILE_INVALID).should('exist')
   })
 })
