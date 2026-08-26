@@ -291,6 +291,83 @@ describe('wrapSmtpError', () => {
   })
 })
 
+// The provision callback is what actually hands MSAL's token to nodemailer for
+// SMTP AUTH. nodemailer-mock never opens a connection so it never fires the
+// callback on its own, which means this is the only coverage it gets.
+describe('provisionCallback', () => {
+  const validConfig = {
+    tenantId: 'tenant-123',
+    clientId: 'client-456',
+    clientSecret: 'secret-789',
+    host: 'smtp.office365.com',
+    port: 587,
+    sender: 'CTRL <ctrl-noreply@garvan.org.au>',
+  }
+
+  type ProvisionCallback = (
+    user: string,
+    renew: boolean,
+    cb: (err: Error | null, accessToken?: string, expires?: number) => void,
+  ) => Promise<void>
+
+  let mockAcquireToken: jest.Mock
+
+  beforeEach(() => {
+    mockNodeMailer.mock.reset()
+    mockAcquireToken = jest.fn()
+    MockedCCA.mockImplementation(() => ({
+      acquireTokenByClientCredential: mockAcquireToken,
+    }))
+  })
+
+  const registeredCallback = async (provider: M365OAuthProvider): Promise<ProvisionCallback> => {
+    await provider.sendMail({ to: 'a@example.com', subject: 'S', text: 'T' })
+    // mock.reset() does not clear accumulated transporters, so take the newest
+    const transporters = mockNodeMailer.mock.getTransporters()
+    return transporters[transporters.length - 1].get('oauth2_provision_cb') as ProvisionCallback
+  }
+
+  it('is registered on the transporter', async () => {
+    mockAcquireToken.mockResolvedValue({ accessToken: 't', expiresOn: new Date() })
+    const cb = await registeredCallback(new M365OAuthProvider(validConfig))
+    expect(typeof cb).toBe('function')
+  })
+
+  it('hands nodemailer the access token and an absolute expiry in milliseconds', async () => {
+    const expiresOn = new Date(Date.now() + 3600 * 1000)
+    mockAcquireToken.mockResolvedValue({ accessToken: 'real-token', expiresOn })
+    const cb = await registeredCallback(new M365OAuthProvider(validConfig))
+
+    const done = jest.fn()
+    await cb('ctrl-noreply@garvan.org.au', false, done)
+
+    // nodemailer compares this against Date.now(), so it must be absolute ms
+    expect(done).toHaveBeenCalledWith(null, 'real-token', expiresOn.getTime())
+  })
+
+  it('forwards nodemailer renewal requests past the MSAL cache', async () => {
+    mockAcquireToken.mockResolvedValue({ accessToken: 't', expiresOn: new Date() })
+    const cb = await registeredCallback(new M365OAuthProvider(validConfig))
+
+    await cb('ctrl-noreply@garvan.org.au', true, jest.fn())
+
+    expect(mockAcquireToken).toHaveBeenLastCalledWith(expect.objectContaining({ skipCache: true }))
+  })
+
+  it('passes an acquisition failure to nodemailer instead of throwing', async () => {
+    mockAcquireToken.mockResolvedValue({ accessToken: 't', expiresOn: new Date() })
+    const cb = await registeredCallback(new M365OAuthProvider(validConfig))
+
+    mockAcquireToken.mockRejectedValue(new Error('invalid_client'))
+    const done = jest.fn()
+    await expect(cb('ctrl-noreply@garvan.org.au', false, done)).resolves.not.toThrow()
+
+    const err = done.mock.calls[0][0]
+    expect(err).toBeInstanceOf(Error)
+    expect(err.message).toContain('M365 token acquisition failed')
+  })
+})
+
 describe('sendMail error wrapping integration', () => {
   const validConfig = {
     tenantId: 'tenant-123',
