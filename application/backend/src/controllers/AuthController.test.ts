@@ -411,6 +411,14 @@ describe('AuthController', () => {
           lastName: '<script>Smith</script>',
           email: '<script>john</script>@smith.com',
         },
+        dependents: [
+          {
+            firstName: 'John{7*7}',
+            lastName: '<script>Smith</script>',
+            dob: '2020-01-01',
+            permanent: false,
+          },
+        ],
       }
 
       const participantInviteId = await prisma.invite.findFirstOrThrow({
@@ -448,6 +456,12 @@ describe('AuthController', () => {
           message: 'Invalid value provided',
         },
         'bodyRequest.nextOfKin.email': {
+          message: 'Invalid value provided',
+        },
+        'dependents.$0.firstName': {
+          message: 'Invalid value provided',
+        },
+        'dependents.$0.lastName': {
           message: 'Invalid value provided',
         },
       })

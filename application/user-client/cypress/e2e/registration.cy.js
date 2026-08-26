@@ -175,4 +175,27 @@ describe('registration', () => {
     cy.contains('Welcome FIRST').should('exist')
     cy.contains('Step 2').should('exist')
   })
+
+  it('Add dependents with xss, check errors', () => {
+    cy.task('getInviteIdtask', {
+      email: TestInvites.INVITE_PENDING.email,
+      studyId: TestStudies.TEST_STUDY.id,
+    })
+      .as('inviteId')
+      .then((inviteId) => {
+        cy.visit(`/register/${inviteId}`)
+      })
+    fillValid()
+    cy.get('[data-cy="add-dependent"]').click()
+    cy.get('[data-cy=dep-first]').type("{{7*7}}<script>alert('xss-dep-first')</script>$#", {
+      parseSpecialCharSequences: false,
+    })
+    cy.get('[data-cy="dep-dob"]').type('2020-01-01')
+    cy.get('[data-cy=dep-surname]')
+      .type("{{7*7}}<script>alert('xss-dep-surname')</script>$#", {
+        parseSpecialCharSequences: false,
+      })
+      .type('{enter}')
+    cy.contains('Name contains invalid characters').should('exist')
+  })
 })
