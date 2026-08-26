@@ -280,7 +280,7 @@ describe('AuthController', () => {
       lastName: testLastName,
       email: TestInvites.INVITE_PENDING.email,
       password: testPassword,
-      mobile: '+61477777777',
+      mobile: '0477777777',
       addressLine: '123 Some Street',
       suburb: 'Sydney',
       postcode: '2000',

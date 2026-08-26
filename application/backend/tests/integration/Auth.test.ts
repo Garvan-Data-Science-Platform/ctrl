@@ -124,7 +124,7 @@ describe('Auth', () => {
       lastName: 'Doe',
       email: TestInvites.INVITE_2_PENDING.email,
       password: 'johnDoesP@ssword123',
-      mobile: '+61477777777',
+      mobile: '0477777777',
       addressLine: '123 Some Street',
       suburb: 'Sydney',
       postcode: '2000',
