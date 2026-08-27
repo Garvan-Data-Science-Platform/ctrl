@@ -135,9 +135,14 @@ export function wrapSmtpError(err: unknown): Error {
     return new Error(`M365 network error: ${safe}`)
   }
 
-  // 5.7.3 is the one a wrong permission or unscoped mailbox produces, 5.7.139 is
-  // SMTP AUTH being switched off. Same tenant-side checklist for both.
-  if (combined.includes('535 5.7.139') || combined.includes('535 5.7.3')) {
+  // 5.7.139 is the tenant refusing the request, 5.7.144 is invalid API permissions, and
+  // 5.7.3 is the generic XOAUTH2 rejection Microsoft prints with no cause attached. Same
+  // tenant-side checklist for all three.
+  if (
+    combined.includes('535 5.7.139') ||
+    combined.includes('535 5.7.3') ||
+    combined.includes('535 5.7.144')
+  ) {
     return new Error(
       `M365 authentication failed. Tenant-side setup likely incomplete. ` +
         `Check ITHELP-27087. The two mailbox authorisation routes are mutually exclusive, ` +
@@ -165,8 +170,13 @@ export function wrapSmtpError(err: unknown): Error {
     )
   }
 
-  // Repeated send-as failures are one of the triggers for the throttling above.
-  if (combined.includes('5.2.252') || combined.includes('5.7.60')) {
+  // Repeated send-as failures are one of the triggers for the throttling above. Match the
+  // 554 form and the exception name, since a bare 5.2.252 also appears in the 550 throttle.
+  if (
+    /554 5\.2\.252/.test(combined) ||
+    combined.includes('5.7.60') ||
+    combined.includes('SendAsDenied')
+  ) {
     return new Error(
       `M365 refused the sender address. The mailbox we authenticate as is not permitted to send ` +
         `as this From address. Either make them the same address, or grant SendAs with ` +
@@ -174,17 +184,20 @@ export function wrapSmtpError(err: unknown): Error {
     )
   }
 
-  if (combined.includes('432 4.3.2')) {
+  // 432 4.3.2 also carries a recipient thread limit, which has nothing to do with our pool.
+  if (combined.includes('432 4.3.2') && /concurrent connections?/i.test(combined)) {
     return new Error(
       `M365 concurrent connection limit exceeded. Exchange allows three, check maxConnections ` +
         `on the transport. Original: ${safe}`,
     )
   }
 
-  if (combined.includes('SubmissionQuotaExceededException') || combined.includes('554 5.2.0')) {
+  // 554 5.2.0 on its own is a generic submission envelope, the exception name carries the
+  // meaning, so send-as denials and spam verdicts arrive under the same status code.
+  if (combined.includes('SubmissionQuotaExceededException')) {
     return new Error(
-      `M365 daily recipient limit reached, 10,000 recipients in a rolling 24 hours for this ` +
-        `mailbox. Sending resumes as the window rolls forward. Original: ${safe}`,
+      `M365 daily recipient limit reached, 10,000 recipients per day for this mailbox. ` +
+        `Sending resumes as the window rolls forward. Original: ${safe}`,
     )
   }
 

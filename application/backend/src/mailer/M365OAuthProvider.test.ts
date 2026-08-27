@@ -328,6 +328,43 @@ describe('wrapSmtpError', () => {
     expect(wrapped.message).toContain('daily recipient limit')
   })
 
+  it('does not read a send-as denial as a quota failure', () => {
+    // 554 5.2.0 is a generic submission envelope, so matching the status code alone told
+    // the operator to wait out a 24 hour window that was never going to clear
+    const err = Object.assign(new Error('Message failed'), {
+      response:
+        '554 5.2.0 STOREDRV.Submission.Exception:SendAsDeniedException.MapiExceptionSendAsDenied',
+    })
+    const wrapped = wrapSmtpError(err)
+    expect(wrapped.message).toContain('not permitted to send')
+    expect(wrapped.message).not.toContain('daily recipient limit')
+  })
+
+  it('leaves an unrecognised 554 5.2.0 exception unclassified', () => {
+    const err = Object.assign(new Error('Message failed'), {
+      response: '554 5.2.0 STOREDRV.Submission.Exception:OutboundSpamException',
+    })
+    expect(wrapSmtpError(err).message).not.toContain('daily recipient limit')
+  })
+
+  it('does not blame the connection pool for a recipient thread limit', () => {
+    // same status code, but this one is the recipient mailbox being flooded
+    const err = Object.assign(new Error('Message failed'), {
+      response: '432 4.3.2 STOREDRV.Deliver; recipient thread limit exceeded',
+    })
+    expect(wrapSmtpError(err).message).not.toContain('concurrent connection limit')
+  })
+
+  it('gives 535 5.7.144 the same tenant-config diagnostic', () => {
+    // 5.7.144 is the code Microsoft documents for invalid API permissions, which is the
+    // likeliest result of a half-finished grant
+    const err = Object.assign(new Error('auth failed'), {
+      code: 'EAUTH',
+      response: '535 5.7.144 XOAUTH2 authentication failed. Invalid API permissions.',
+    })
+    expect(wrapSmtpError(err).message).not.toContain('XOAUTH2 rejected')
+  })
+
   it('wraps generic EAUTH with an XOAUTH2 rejection message', () => {
     const err = Object.assign(new Error('auth failed'), { code: 'EAUTH' })
     const wrapped = wrapSmtpError(err)
