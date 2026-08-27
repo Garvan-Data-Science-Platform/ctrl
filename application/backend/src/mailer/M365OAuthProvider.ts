@@ -144,15 +144,9 @@ export function wrapSmtpError(err: unknown): Error {
     combined.includes('535 5.7.144')
   ) {
     return new Error(
-      `M365 authentication failed. Tenant-side setup likely incomplete. ` +
-        `Check ITHELP-27087. The two mailbox authorisation routes are mutually exclusive, ` +
-        `running both produces this error with no further explanation. ` +
-        `RBAC for Applications: grant no Entra API permissions at all, then New-ServicePrincipal, ` +
-        `New-ManagementScope and New-ManagementRoleAssignment with the Application SMTP.SendAsApp role. ` +
-        `Classic Application Access Policy: SMTP.SendAsApp granted and consented in Entra, then ` +
-        `New-ServicePrincipal and Add-MailboxPermission with the Enterprise Application Object ID. ` +
-        `Both need SmtpClientAuthenticationDisabled=false on the sender mailbox and a ` +
-        `Security Defaults or Conditional Access exception. ` +
+      `M365 rejected the credential for this mailbox. Tenant-side authorisation is the likely ` +
+        `cause: the role assignment on the app, the management scope the sender mailbox falls ` +
+        `in, or SMTP AUTH on that mailbox. See the M365 section of the deployment docs. ` +
         `Original: ${safe}`,
     )
   }

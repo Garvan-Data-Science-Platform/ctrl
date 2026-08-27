@@ -234,19 +234,14 @@ describe('redactSecrets', () => {
 })
 
 describe('wrapSmtpError', () => {
-  it('wraps 535 5.7.139 with tenant-config diagnostic pointing at ITHELP-27087', () => {
+  it('wraps 535 5.7.139 with the tenant-config diagnostic', () => {
     const err = Object.assign(new Error('535 5.7.139 Authentication unsuccessful'), {
       code: 'EAUTH',
       response: '535 5.7.139 Authentication unsuccessful, user or tenant not allowed',
     })
     const wrapped = wrapSmtpError(err)
     expect(wrapped.message).toContain('535 5.7.139')
-    expect(wrapped.message).toContain('ITHELP-27087')
-    expect(wrapped.message).toContain('SMTP.SendAsApp')
-    expect(wrapped.message).toContain('Application Access Policy')
-    expect(wrapped.message).toContain('Enterprise Application Object ID')
-    expect(wrapped.message).toContain('SmtpClientAuthenticationDisabled')
-    expect(wrapped.message).toContain('Security Defaults')
+    expect(wrapped.message).not.toContain('XOAUTH2 rejected')
   })
 
   it('reports a token acquisition failure as such, not as an XOAUTH2 rejection', () => {
@@ -268,17 +263,8 @@ describe('wrapSmtpError', () => {
       response: '535 5.7.3 Authentication unsuccessful',
     })
     const wrapped = wrapSmtpError(err)
-    expect(wrapped.message).toContain('ITHELP-27087')
+    expect(wrapped.message).toContain('535 5.7.3')
     expect(wrapped.message).not.toContain('XOAUTH2 rejected')
-  })
-
-  it('presents the two authorisation routes as alternatives, not a single list', () => {
-    // granting SMTP.SendAsApp alongside an RBAC assignment is what produces 5.7.3
-    const err = Object.assign(new Error('535 5.7.3'), { code: 'EAUTH' })
-    const wrapped = wrapSmtpError(err)
-    expect(wrapped.message).toContain('mutually exclusive')
-    expect(wrapped.message).toContain('RBAC for Applications')
-    expect(wrapped.message).toContain('Application Access Policy')
   })
 
   it('names the sender address as the cause on a SendAs rejection', () => {
