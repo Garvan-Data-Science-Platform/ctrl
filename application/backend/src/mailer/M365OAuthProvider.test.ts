@@ -432,8 +432,9 @@ describe('provisionCallback', () => {
     const done = jest.fn()
     await cb('ctrl-noreply@garvan.org.au', false, done)
 
-    // nodemailer compares this against Date.now(), so it must be absolute ms
-    expect(done).toHaveBeenCalledWith(null, 'real-token', expiresOn.getTime())
+    // nodemailer compares this against Date.now(), so it must be absolute ms, brought
+    // forward by the same margin MSAL uses so the two caches agree on stale
+    expect(done).toHaveBeenCalledWith(null, 'real-token', expiresOn.getTime() - 300_000)
   })
 
   it('forwards nodemailer renewal requests past the MSAL cache', async () => {

@@ -3,6 +3,10 @@ import nodemailer, { type Transporter } from 'nodemailer'
 import type { MailOpts, MailProvider } from './provider'
 
 const TOKEN_FAILURE = 'M365 token acquisition failed'
+// MSAL treats a cached token as expired five minutes early. Nodemailer renews only once the
+// expiry it was handed has passed, with no margin, so match MSAL rather than presenting a
+// token that dies mid-handshake.
+const TOKEN_RENEWAL_MARGIN_MS = 300_000
 
 interface M365OAuthConfig {
   tenantId: string
@@ -70,7 +74,7 @@ export class M365OAuthProvider implements MailProvider {
       try {
         // renew means nodemailer's token was rejected, so go past MSAL's cache
         const token = await this.acquireToken(renew)
-        cb(null, token.accessToken, token.expiresOn.getTime())
+        cb(null, token.accessToken, token.expiresOn.getTime() - TOKEN_RENEWAL_MARGIN_MS)
       } catch (err) {
         cb(err instanceof Error ? err : new Error(String(err)))
       }
