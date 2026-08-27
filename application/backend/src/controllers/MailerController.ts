@@ -94,7 +94,7 @@ export class MailerController extends Controller {
       html: adminHtml,
     })
     logger.info('Contact-us email sent to admins', {
-      to: recipientEmails,
+      toCount: recipientEmails.length,
       subject: subjectToAdmin,
     })
 
@@ -108,7 +108,6 @@ export class MailerController extends Controller {
       html: participantHtml,
     })
     logger.info('Contact-us confirmation email sent to participant', {
-      to: user.email,
       subject: subjectToUser,
     })
     return
