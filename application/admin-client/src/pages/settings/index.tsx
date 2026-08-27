@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router'
 import { axiosInstance } from '../../providers/dataProvider'
 import { Info } from '@mui/icons-material'
 import { LogoUploader } from '../../components/LogoUploader'
-import { REGEX } from '@common/types/commonTypes'
+import { urlRules } from '@common/src/validation'
 import { RESOURCES } from '../../constants'
 
 const SettingsPage = () => {
@@ -87,12 +87,7 @@ const SettingsPage = () => {
           </Box>
         </Box>
         <TextField
-          {...register('tcLink', {
-            pattern: {
-              value: REGEX.URL, //eslint-disable-line
-              message: 'Invalid url, must include http(s)://...',
-            },
-          })}
+          {...register('tcLink', urlRules())}
           error={!!(errors as any)?.tcLink}
           helperText={(errors as any)?.tcLink?.message}
           margin="normal"
@@ -103,12 +98,7 @@ const SettingsPage = () => {
           data-cy="tcLink"
         />
         <TextField
-          {...register('newsLink', {
-            pattern: {
-              value: REGEX.URL, //eslint-disable-line
-              message: 'Invalid url, must include http(s)://...',
-            },
-          })}
+          {...register('newsLink', urlRules())}
           error={!!(errors as any)?.newsLink}
           helperText={(errors as any)?.newsLink?.message}
           margin="normal"

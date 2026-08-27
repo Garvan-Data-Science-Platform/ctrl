@@ -8,6 +8,7 @@ export const VALIDATION_MESSAGES = {
   POSTCODE_INVALID: 'Invalid postcode',
   MOBILE_INVALID: 'Mobile number contains invalid characters (no spaces or country code allowed)',
   EXTERNALID_INVALID: 'External ID can only consist of alpha numeric characters and -_=.:',
+  URL_INVALID: 'Invalid URL, must include http(s)://...',
 }
 export const nameRules = (required = true) => ({
   required: required ? VALIDATION_MESSAGES.REQUIRED : false,
@@ -58,5 +59,14 @@ export const externalIdRules = (required = false) => ({
   pattern: {
     value: REGEX.EXTERNALID,
     message: VALIDATION_MESSAGES.EXTERNALID_INVALID,
+  },
+})
+
+// Default is not required
+export const urlRules = (required = false) => ({
+  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
+  pattern: {
+    value: REGEX.URL,
+    message: VALIDATION_MESSAGES.URL_INVALID,
   },
 })
