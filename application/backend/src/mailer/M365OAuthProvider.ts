@@ -55,6 +55,9 @@ export class M365OAuthProvider implements MailProvider {
     if (this.transporter) return this.transporter
     this.transporter = nodemailer.createTransport({
       pool: true,
+      // Exchange allows three concurrent SMTP AUTH connections and returns
+      // 432 4.3.2 above that. Nodemailer defaults to five.
+      maxConnections: 3,
       host: this.config.host,
       port: this.config.port,
       requireTLS: true,
@@ -78,7 +81,10 @@ export class M365OAuthProvider implements MailProvider {
   private async acquireToken(skipCache = false): Promise<{ accessToken: string; expiresOn: Date }> {
     try {
       const result = await this.cca.acquireTokenByClientCredential({
-        scopes: ['https://outlook.office.com/.default'],
+        // Microsoft's SMTP client-credentials guidance specifies this resource.
+        // The outlook.office.com value is from the HVE doc, which pairs with a
+        // different endpoint.
+        scopes: ['https://outlook.office365.com/.default'],
         skipCache,
       })
       if (!result || !result.accessToken || !result.expiresOn) {
