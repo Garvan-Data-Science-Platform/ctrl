@@ -20,6 +20,6 @@
     port: 587,
     username: '',
     password: '',
-    sender: ''
+    sender: 'CTRL <noreply@example.com>' //the From address on every email CTRL sends
   }
 }
