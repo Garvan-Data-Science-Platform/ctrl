@@ -149,9 +149,12 @@ describe('getProvider variant selection', () => {
       default: { mailer: { provider: 'graph-api', sender: 'CTRL <a@b.com>' } },
     }))
     const { sendEmail: send } = await import('./send')
+    const nm = await freshMock()
 
+    // the specific reason goes to the log, the caller gets the terse message
     await expect(send({ to: 'user@example.com', subject: 'Hello', text: 'World' })).rejects.toThrow(
-      /Unknown mailer provider: graph-api/,
+      /Failed to send email/,
     )
+    expect(nm.mock.getSentMail()).toHaveLength(0)
   })
 })

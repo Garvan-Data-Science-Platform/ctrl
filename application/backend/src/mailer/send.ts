@@ -42,7 +42,6 @@ function getProvider(): MailProvider {
 }
 
 export async function sendEmail(opts: MailOpts): Promise<void> {
-  const provider = getProvider()
   const from = opts.from ?? config.mailer.sender
   const started = Date.now()
   // never log text, html, from, or anything token shaped
@@ -52,15 +51,20 @@ export async function sendEmail(opts: MailOpts): Promise<void> {
     subject: opts.subject,
   }
   try {
-    await provider.sendMail({ ...opts, from })
+    // inside the try so a bad provider config is logged here rather than
+    // escaping as a raw message
+    await getProvider().sendMail({ ...opts, from })
     logger.info('sendEmail', { ...meta, durationMs: Date.now() - started })
   } catch (err) {
     logger.error('sendEmail', {
       ...meta,
       durationMs: Date.now() - started,
       errorClass: err instanceof Error ? err.constructor.name : typeof err,
+      reason: err instanceof Error ? err.message : String(err),
     })
-    throw err
+    // provider messages carry tenant setup detail and ErrorHandler puts err.message
+    // in the 500 body, so callers get the terse one
+    throw new Error('Failed to send email')
   }
 }
 
