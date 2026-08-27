@@ -260,6 +260,74 @@ describe('wrapSmtpError', () => {
     expect(wrapped.message).not.toContain('XOAUTH2 rejected')
   })
 
+  it('gives 535 5.7.3 the same tenant-config diagnostic as 5.7.139', () => {
+    // 5.7.3 is what a wrong permission or an unscoped mailbox returns, and it is the
+    // likelier first result once IT provisions, so it must not fall through to EAUTH
+    const err = Object.assign(new Error('535 5.7.3 Authentication unsuccessful'), {
+      code: 'EAUTH',
+      response: '535 5.7.3 Authentication unsuccessful',
+    })
+    const wrapped = wrapSmtpError(err)
+    expect(wrapped.message).toContain('ITHELP-27087')
+    expect(wrapped.message).not.toContain('XOAUTH2 rejected')
+  })
+
+  it('presents the two authorisation routes as alternatives, not a single list', () => {
+    // granting SMTP.SendAsApp alongside an RBAC assignment is what produces 5.7.3
+    const err = Object.assign(new Error('535 5.7.3'), { code: 'EAUTH' })
+    const wrapped = wrapSmtpError(err)
+    expect(wrapped.message).toContain('mutually exclusive')
+    expect(wrapped.message).toContain('RBAC for Applications')
+    expect(wrapped.message).toContain('Application Access Policy')
+  })
+
+  it('names the sender address as the cause on a SendAs rejection', () => {
+    const err = Object.assign(new Error('Message failed'), {
+      response: '554 5.2.252 SendAsDenied',
+    })
+    const wrapped = wrapSmtpError(err)
+    expect(wrapped.message).toContain('not permitted to send')
+    expect(wrapped.message).toContain('Add-RecipientPermission')
+    expect(wrapped.message).toContain('Do not retry')
+  })
+
+  it('names the connection cap on 432 4.3.2', () => {
+    const err = Object.assign(new Error('Concurrent connections limit exceeded'), {
+      response: '432 4.3.2 Concurrent connections limit exceeded',
+    })
+    const wrapped = wrapSmtpError(err)
+    expect(wrapped.message).toContain('concurrent connection limit')
+  })
+
+  it('reports a throttled mailbox as throttled, not as a single SendAs refusal', () => {
+    // 554 5.2.252 is one refusal, 550 5.2.252 is the mailbox being blocked. They share
+    // a number, so a substring match on 5.2.252 alone reports the block as the refusal.
+    const err = Object.assign(new Error('Message failed'), {
+      response: '550 5.2.252 Sender throttled due to continuous send as denied errors',
+    })
+    const wrapped = wrapSmtpError(err)
+    expect(wrapped.message).toContain('throttled this mailbox')
+    expect(wrapped.message).toContain('Stop sending')
+    expect(wrapped.message).not.toContain('Add-RecipientPermission')
+  })
+
+  it('covers the whole 550 5.2.25x throttle family', () => {
+    for (const code of ['5.2.251', '5.2.252', '5.2.253', '5.2.254', '5.2.255']) {
+      const err = Object.assign(new Error('Message failed'), {
+        response: `550 ${code} Sender throttled`,
+      })
+      expect(wrapSmtpError(err).message).toContain('throttled this mailbox')
+    }
+  })
+
+  it('names the daily recipient limit on a submission quota error', () => {
+    const err = Object.assign(new Error('Message failed'), {
+      response: '554 5.2.0 STOREDRV.Submission.Exception:SubmissionQuotaExceededException',
+    })
+    const wrapped = wrapSmtpError(err)
+    expect(wrapped.message).toContain('daily recipient limit')
+  })
+
   it('wraps generic EAUTH with an XOAUTH2 rejection message', () => {
     const err = Object.assign(new Error('auth failed'), { code: 'EAUTH' })
     const wrapped = wrapSmtpError(err)

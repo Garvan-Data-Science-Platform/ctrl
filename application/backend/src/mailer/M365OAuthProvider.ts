@@ -135,15 +135,56 @@ export function wrapSmtpError(err: unknown): Error {
     return new Error(`M365 network error: ${safe}`)
   }
 
-  if (combined.includes('535 5.7.139')) {
+  // 5.7.3 is the one a wrong permission or unscoped mailbox produces, 5.7.139 is
+  // SMTP AUTH being switched off. Same tenant-side checklist for both.
+  if (combined.includes('535 5.7.139') || combined.includes('535 5.7.3')) {
     return new Error(
-      `M365 authentication failed (535 5.7.139). Tenant-side setup likely incomplete. ` +
-        `Check ITHELP-27087 checklist: SMTP.SendAsApp on app registration, ` +
-        `Application Access Policy or RBAC scoping for the mailbox, ` +
-        `Enterprise Application Object ID used in Add-MailboxPermission, ` +
-        `SmtpClientAuthenticationDisabled=false on the sender mailbox, ` +
-        `Security Defaults or Conditional Access exceptions. ` +
+      `M365 authentication failed. Tenant-side setup likely incomplete. ` +
+        `Check ITHELP-27087. The two mailbox authorisation routes are mutually exclusive, ` +
+        `running both produces this error with no further explanation. ` +
+        `RBAC for Applications: grant no Entra API permissions at all, then New-ServicePrincipal, ` +
+        `New-ManagementScope and New-ManagementRoleAssignment with the Application SMTP.SendAsApp role. ` +
+        `Classic Application Access Policy: SMTP.SendAsApp granted and consented in Entra, then ` +
+        `New-ServicePrincipal and Add-MailboxPermission with the Enterprise Application Object ID. ` +
+        `Both need SmtpClientAuthenticationDisabled=false on the sender mailbox and a ` +
+        `Security Defaults or Conditional Access exception. ` +
         `Original: ${safe}`,
+    )
+  }
+
+  // 550 5.2.251 to 5.2.255 mean the mailbox is already throttled, not that one send
+  // failed. Must sit above the SendAs branch, since 550 5.2.252 and 554 5.2.252 share
+  // a number and mean very different things.
+  if (/550 5\.2\.25[1-5]/.test(combined)) {
+    return new Error(
+      `M365 has throttled this mailbox from SMTP AUTH after repeated failures of the same kind. ` +
+        `Stop sending. Retrying extends it, Microsoft support cannot lift it, and the messages ` +
+        `never reach Microsoft 365 so Message Trace will not show them. Fix the underlying cause, ` +
+        `then wait for the period to expire, which Microsoft does not publish. The only faster ` +
+        `route is a different sender mailbox. Original: ${safe}`,
+    )
+  }
+
+  // Repeated send-as failures are one of the triggers for the throttling above.
+  if (combined.includes('5.2.252') || combined.includes('5.7.60')) {
+    return new Error(
+      `M365 refused the sender address. The mailbox we authenticate as is not permitted to send ` +
+        `as this From address. Either make them the same address, or grant SendAs with ` +
+        `Add-RecipientPermission. Do not retry this one. Original: ${safe}`,
+    )
+  }
+
+  if (combined.includes('432 4.3.2')) {
+    return new Error(
+      `M365 concurrent connection limit exceeded. Exchange allows three, check maxConnections ` +
+        `on the transport. Original: ${safe}`,
+    )
+  }
+
+  if (combined.includes('SubmissionQuotaExceededException') || combined.includes('554 5.2.0')) {
+    return new Error(
+      `M365 daily recipient limit reached, 10,000 recipients in a rolling 24 hours for this ` +
+        `mailbox. Sending resumes as the window rolls forward. Original: ${safe}`,
     )
   }
 
