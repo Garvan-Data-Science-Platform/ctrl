@@ -59,6 +59,14 @@ describe('mailer config schema', () => {
     expect(validator()({ mailer: { ...m365, provider: 'ms365-oauth' } })).toBe(false)
   })
 
+  it('rejects an m365-oauth block left blank', () => {
+    // nobody selects m365-oauth to try the app out, so a blank field is a deploy mistake
+    // and boot is a better place to find it than the first participant invite
+    expect(validator()({ mailer: { ...m365, host: '' } })).toBe(false)
+    expect(validator()({ mailer: { ...m365, sender: '' } })).toBe(false)
+    expect(validator()({ mailer: { ...m365, clientSecret: '' } })).toBe(false)
+  })
+
   it('rejects m365-oauth missing clientSecret', () => {
     const noSecret = {
       provider: 'm365-oauth',
