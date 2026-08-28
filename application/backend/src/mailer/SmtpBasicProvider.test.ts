@@ -73,4 +73,13 @@ describe('SmtpBasicProvider', () => {
   it('throws when sender is empty', () => {
     expect(() => new SmtpBasicProvider({ ...validConfig, sender: '' })).toThrow(/sender is empty/)
   })
+
+  it('throws when port is empty', () => {
+    expect(() => new SmtpBasicProvider({ ...validConfig, port: 0 })).toThrow(/port is empty/)
+  })
+
+  // requireTLS defaults to true and is only turned off by config. Not unit tested, because
+  // asserting it means reaching through nodemailer-mock into the real transport it wraps.
+  // The MailHog e2e covers it instead: mailhog speaks no TLS, so config.e2e.json5 sets
+  // requireTLS false and that suite fails outright if the option stops being plumbed through.
 })

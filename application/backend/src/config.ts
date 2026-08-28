@@ -52,6 +52,9 @@ export const schema = {
             username: { type: 'string' },
             password: { type: 'string' },
             sender: { type: 'string' },
+            // STARTTLS is required unless this is explicitly false. Only set it false for
+            // a relay that genuinely has no TLS, such as a local mail catcher.
+            requireTLS: { type: 'boolean' },
           },
           required: ['provider', 'host', 'port', 'username', 'password', 'sender'],
         },

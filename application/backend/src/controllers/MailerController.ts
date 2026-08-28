@@ -70,7 +70,10 @@ export class MailerController extends Controller {
       ? [study.contactUsEmail]
       : [...orgAdminEmails, ...studyAdminEmails]
 
-    const subjectToAdmin: string = `New Contact Us Request From CTRL Participant: ${user.firstName} ${user.lastName}`
+    // the participant's name stays out of the subject. firstName and lastName are
+    // /// @encrypted, and a subject reaches our logs, the mail server's, and Message
+    // Trace. The body still names them, see generateContactUsEmail below.
+    const subjectToAdmin: string = 'New Contact Us Request From a CTRL Participant'
 
     const { text: adminText, html: adminHtml } = generateContactUsEmail(
       study.name,
@@ -95,7 +98,7 @@ export class MailerController extends Controller {
     })
     logger.info('Contact-us email sent to admins', {
       toCount: recipientEmails.length,
-      subject: subjectToAdmin,
+      studyId: bodyRequest.studyId,
     })
 
     // Send the email to the user

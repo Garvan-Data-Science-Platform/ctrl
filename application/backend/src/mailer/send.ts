@@ -1,6 +1,7 @@
 import logger from 'common/src/logger'
 import config from '../config'
 import type { MailOpts, MailProvider } from './provider'
+import { redactString } from './redact'
 import { SmtpBasicProvider } from './SmtpBasicProvider'
 import { M365OAuthProvider } from './M365OAuthProvider'
 
@@ -22,6 +23,7 @@ function getProvider(): MailProvider {
       username: cfg.username,
       password: cfg.password,
       sender: cfg.sender,
+      requireTLS: cfg.requireTLS,
     })
     return providerInstance
   }
@@ -60,7 +62,9 @@ export async function sendEmail(opts: MailOpts): Promise<void> {
       ...meta,
       durationMs: Date.now() - started,
       errorClass: err instanceof Error ? err.constructor.name : typeof err,
-      reason: err instanceof Error ? err.message : String(err),
+      // smtp-basic errors are raw nodemailer, so the SMTP reply can carry a recipient
+      // address. The M365 path is already redacted, running it twice is harmless.
+      reason: redactString(err instanceof Error ? err.message : String(err)),
     })
     // provider messages carry tenant setup detail and ErrorHandler puts err.message
     // in the 500 body, so callers get the terse one

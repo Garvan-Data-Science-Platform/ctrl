@@ -1,6 +1,7 @@
 import { ConfidentialClientApplication } from '@azure/msal-node'
 import nodemailer, { type Transporter } from 'nodemailer'
 import type { MailOpts, MailProvider } from './provider'
+import { redactString } from './redact'
 
 const TOKEN_FAILURE = 'M365 token acquisition failed'
 // MSAL treats a cached token as expired five minutes early. Nodemailer renews only once the
@@ -62,6 +63,11 @@ export class M365OAuthProvider implements MailProvider {
       // Exchange allows three concurrent SMTP AUTH connections and returns
       // 432 4.3.2 above that. Nodemailer defaults to five.
       maxConnections: 3,
+      // and 30 messages a minute, which an invite batch will hit. Nodemailer queues
+      // above this rather than letting Exchange reject them, and repeated rejections
+      // are what get a mailbox throttled from SMTP AUTH for an unpublished period.
+      rateDelta: 60_000,
+      rateLimit: 30,
       host: this.config.host,
       port: this.config.port,
       requireTLS: true,
@@ -104,13 +110,6 @@ export class M365OAuthProvider implements MailProvider {
 export function extractAddress(sender: string): string {
   const match = sender.match(/<([^>]+)>/)
   return match ? match[1] : sender
-}
-
-function redactString(str: string): string {
-  return str
-    .replace(/"access_token"\s*:\s*"[^"]*"/g, '"access_token":"[REDACTED]"')
-    .replace(/"client_secret"\s*:\s*"[^"]*"/g, '"client_secret":"[REDACTED]"')
-    .replace(/Bearer\s+[A-Za-z0-9._-]+/g, 'Bearer [REDACTED]')
 }
 
 export function redactSecrets(err: unknown): Error {
@@ -176,9 +175,9 @@ export function wrapSmtpError(err: unknown): Error {
     combined.includes('SendAsDenied')
   ) {
     return new Error(
-      `M365 refused the sender address. The mailbox we authenticate as is not permitted to send ` +
-        `as this From address. Either make them the same address, or grant SendAs with ` +
-        `Add-RecipientPermission. Do not retry this one. Original: ${safe}`,
+      `M365 refused the sender address. The mailbox we authenticate as is not permitted to ` +
+        `send as this From address. Make them the same address, or see the M365 section of ` +
+        `the deployment docs on granting Send As. Do not retry this one. Original: ${safe}`,
     )
   }
 

@@ -16,7 +16,7 @@ const config = {
     port: 587,
     username: 'piper.gorczany60@ethereal.email',
     password: 'FK1DCrQYv2BzFYNf4k',
-    sender: 'CTRL <noreply@ctrl.garvan.org.au>',
+    sender: 'CTRL <test@example.com>',
   },
 }
 

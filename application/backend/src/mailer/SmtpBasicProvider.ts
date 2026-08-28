@@ -7,6 +7,7 @@ interface SmtpBasicConfig {
   username: string
   password: string
   sender: string
+  requireTLS?: boolean
 }
 
 export class SmtpBasicProvider implements MailProvider {
@@ -30,6 +31,9 @@ export class SmtpBasicProvider implements MailProvider {
       pool: true,
       host: this.config.host,
       port: this.config.port,
+      // without this nodemailer only upgrades when the server advertises STARTTLS, and
+      // silently sends the password in the clear when it does not
+      requireTLS: this.config.requireTLS ?? true,
       auth: {
         user: this.config.username,
         pass: this.config.password,

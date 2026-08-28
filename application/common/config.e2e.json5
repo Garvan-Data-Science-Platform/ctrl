@@ -6,7 +6,8 @@
     port: 1025,
     username: 'test',
     password: 'test',
-    sender: 'CTRL <noreply@ctrl.garvan.org.au>'
+    sender: 'CTRL <noreply@ctrl.garvan.org.au>',
+    requireTLS: false //mailhog speaks no TLS
   },
   disableAdminPasswordLogin: false,
   inviteExpiryDays: 7,

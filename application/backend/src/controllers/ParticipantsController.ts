@@ -1024,7 +1024,7 @@ export class InvitesController extends Controller {
       })
       return true
     } catch (error) {
-      logger.error(`Failed to send email to ${email}:`, error)
+      logger.error({ errorMessage: 'Failed to send participant invite', studyId, inviteId, error })
       return false
     }
   }

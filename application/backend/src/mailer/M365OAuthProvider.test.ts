@@ -241,6 +241,7 @@ describe('wrapSmtpError', () => {
     })
     const wrapped = wrapSmtpError(err)
     expect(wrapped.message).toContain('535 5.7.139')
+    expect(wrapped.message).toContain('Tenant-side authorisation')
     expect(wrapped.message).not.toContain('XOAUTH2 rejected')
   })
 
@@ -252,6 +253,7 @@ describe('wrapSmtpError', () => {
     })
     const wrapped = wrapSmtpError(err)
     expect(wrapped.message).toContain('M365 token acquisition failed')
+    expect(wrapped.message).not.toContain('Tenant-side authorisation')
     expect(wrapped.message).not.toContain('XOAUTH2 rejected')
   })
 
@@ -264,6 +266,7 @@ describe('wrapSmtpError', () => {
     })
     const wrapped = wrapSmtpError(err)
     expect(wrapped.message).toContain('535 5.7.3')
+    expect(wrapped.message).toContain('Tenant-side authorisation')
     expect(wrapped.message).not.toContain('XOAUTH2 rejected')
   })
 
@@ -273,7 +276,7 @@ describe('wrapSmtpError', () => {
     })
     const wrapped = wrapSmtpError(err)
     expect(wrapped.message).toContain('not permitted to send')
-    expect(wrapped.message).toContain('Add-RecipientPermission')
+    expect(wrapped.message).toContain('granting Send As')
     expect(wrapped.message).toContain('Do not retry')
   })
 
