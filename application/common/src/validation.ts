@@ -9,6 +9,8 @@ export const VALIDATION_MESSAGES = {
   MOBILE_INVALID: 'Mobile number contains invalid characters (no spaces or country code allowed)',
   EXTERNALID_INVALID: 'External ID can only consist of alpha numeric characters and -_=.:',
   URL_INVALID: 'Invalid URL, must include http(s)://...',
+  STUDY_NAME_INVALID: 'Study name contains invalid characters',
+  STUDY_DESCRIPTION_INVALID: 'Study description contains invalid characters',
 }
 export const nameRules = (required = true) => ({
   required: required ? VALIDATION_MESSAGES.REQUIRED : false,
@@ -68,5 +70,21 @@ export const urlRules = (required = false) => ({
   pattern: {
     value: REGEX.URL,
     message: VALIDATION_MESSAGES.URL_INVALID,
+  },
+})
+
+export const studyNameRules = (required = true) => ({
+  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
+  pattern: {
+    value: REGEX.STUDY_NAME,
+    message: VALIDATION_MESSAGES.STUDY_NAME_INVALID,
+  },
+})
+
+export const studyDescriptionRules = (required = true) => ({
+  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
+  pattern: {
+    value: REGEX.STUDY_DESCRIPTION,
+    message: VALIDATION_MESSAGES.STUDY_DESCRIPTION_INVALID,
   },
 })

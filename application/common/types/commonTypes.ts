@@ -14,6 +14,14 @@ export const REGEX = {
   EMAIL: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
   EXTERNALID: /^[a-zA-Z0-9\-_=.:]*$/,
   URL: /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/,
+  STUDY_NAME: /^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$/,
+  STUDY_DESCRIPTION: /^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$/,
+
+  // * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€_+]+$
+  // * @example "Name of REDCap instrument (from Column B of data dictionary)"
+
+  // * @pattern ^[a-zA-Z0-9\-_=.:]+$
+  // * @example "123e4567-e89b-12d3-a456-426614174000" // TODO: improve example
 }
 
 /**

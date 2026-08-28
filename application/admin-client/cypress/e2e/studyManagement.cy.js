@@ -1,6 +1,7 @@
 /// <reference types="cypress" />
 
 const { TestUsers } = require('../../../common/testing/constants')
+const { VALIDATION_MESSAGES } = require('../../../common/src/validation')
 
 beforeEach(() => {
   cy.task('reset')
@@ -51,12 +52,12 @@ describe('Study management page', () => {
     cy.get('[data-cy="advanced-toggle"]').eq(1).click()
     cy.get('[data-cy="redcapURL"] input').eq(1).type('abc')
     cy.get('[data-cy="redcapToken"] input').eq(1).type('abc123')
-    cy.get('[data-cy="settings-apply"]').eq(1).click()
-    cy.contains('Invalid Redcap').should('exist')
+    cy.get('[data-cy="settings-apply"]').eq(1).should('be.disabled')
+    cy.contains(VALIDATION_MESSAGES.URL_INVALID).should('exist')
     cy.get('[data-cy="redcapURL"] input').eq(1).clear().type('https://abc.com')
     cy.get('[data-cy="contactUsEmail"] input').eq(1).clear().type('a')
-    cy.get('[data-cy="settings-apply"]').eq(1).click()
-    cy.contains('Invalid Email').should('exist')
+    cy.get('[data-cy="settings-apply"]').eq(1).should('be.disabled')
+    cy.contains(VALIDATION_MESSAGES.EMAIL_INVALID).should('exist')
     cy.get('[data-cy="contactUsEmail"] input').eq(1).clear().type('a@b.com')
     cy.get('[data-cy="settings-apply"]').eq(1).click()
     cy.contains('Updated').should('exist')
@@ -188,4 +189,53 @@ describe('Study management page', () => {
     cy.get('[data-cy="settings-apply"]').eq(1).click()
     cy.contains('abc123').should('not.exist')
   })
+
+  it('Validates xss study name in advanced settings', () => {
+    cy.visit('/studies')
+    cy.get('[data-cy="edit-name"]').eq(1).click()
+    cy.get('[data-cy="edit-name-field"] input')
+      .clear()
+      .type("{{7*7}}<script>alert('xss-study-name')</script>", {
+        parseSpecialCharSequences: false,
+      })
+    cy.contains(VALIDATION_MESSAGES.STUDY_NAME_INVALID).should('exist')
+    cy.get('[data-cy="edit-name-save"]').should('be.disabled')
+  })
+
+  it('Validates xss study description in advanced settings', () => {
+    cy.visit('/studies')
+    cy.get('[data-cy="edit-description"]').eq(1).click()
+    cy.get('[data-cy="edit-description-field"] textarea:visible')
+      .clear()
+      .type("{{7*7}}<script>alert('xss-description')</script>", {
+        parseSpecialCharSequences: false,
+      })
+    cy.contains(VALIDATION_MESSAGES.STUDY_DESCRIPTION_INVALID).should('exist')
+    cy.get('[data-cy="edit-description-save"]').should('be.disabled')
+  })
+
+  it('Validates xss email in advanced settings', () => {
+    cy.visit('/studies')
+    cy.get('[data-cy="advanced-toggle"]').eq(1).click()
+    cy.get('[data-cy="contactUsEmail"] input')
+      .eq(1)
+      .clear()
+      .type("{{7*7}}<script>alert('xss-email')</script>", {
+        parseSpecialCharSequences: false,
+      })
+    cy.contains(VALIDATION_MESSAGES.EMAIL_INVALID).should('exist')
+    cy.get('[data-cy="settings-apply"]').eq(1).should('be.disabled')
+  })
+
+  it('Validates xss URL in advanced settings', () => {
+    cy.visit('/studies')
+    cy.get('[data-cy="advanced-toggle"]').eq(1).click()
+    cy.get('[data-cy="redcapURL"] input').eq(1).type("{{7*7}}<script>alert('xss-url')</script>", {
+      parseSpecialCharSequences: false,
+    })
+    cy.contains(VALIDATION_MESSAGES.URL_INVALID).should('exist')
+    cy.get('[data-cy="settings-apply"]').eq(1).should('be.disabled')
+  })
+
+  // token?
 })

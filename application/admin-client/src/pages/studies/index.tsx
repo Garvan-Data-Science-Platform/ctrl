@@ -25,7 +25,7 @@ import { SensitiveTextField } from '../../components/SensitiveTextField'
 import { useSearchParams } from 'react-router'
 import { LogoUploader } from '../../components/LogoUploader'
 import { RESOURCES } from '../../constants'
-import { REGEX } from '@common/types/commonTypes'
+import { emailRules, urlRules, studyNameRules, studyDescriptionRules } from '@common/src/validation'
 
 const StudyCard = ({
   studyIdx,
@@ -109,18 +109,38 @@ const StudyCard = ({
     setDeleteDialogOpen(false)
   }
 
+  const urlRule = urlRules(false)
+  const isUrlInvalid = Boolean(
+    redcapURL && urlRule.pattern && !urlRule.pattern.value.test(redcapURL),
+  )
+
+  const emailRule = emailRules(false)
+  const isEmailInvalid = Boolean(
+    contactUsEmail && emailRule.pattern && !emailRule.pattern.value.test(contactUsEmail),
+  )
+
+  const studyNameRule = studyNameRules(false)
+  const isStudyNameInvalid = Boolean(
+    newName && studyNameRule.pattern && !studyNameRule.pattern.value.test(newName),
+  )
+
+  const studyDescriptionRule = studyDescriptionRules(false)
+  const isStudyDescriptionInvalid = Boolean(
+    newDesc && studyDescriptionRule.pattern && !studyDescriptionRule.pattern.value.test(newDesc),
+  )
+
   const handleSettingsApply = () => {
-    if (redcapURL && !REGEX.URL.test(redcapURL)) {
+    if (isUrlInvalid) {
       open?.({
         type: 'error',
-        message: "Invalid Redcap API URL format. Must start with 'http(s)://'",
+        message: urlRule.pattern.message as string,
       })
       return
     }
-    if (contactUsEmail && !REGEX.EMAIL.test(contactUsEmail)) {
+    if (isEmailInvalid) {
       open?.({
         type: 'error',
-        message: 'Invalid Email Address.',
+        message: emailRule.pattern.message as string,
       })
       return
     }
@@ -191,8 +211,12 @@ const StudyCard = ({
                 setNewName(e.target.value)
               }}
               data-cy="edit-name-field"
+              error={isStudyNameInvalid}
+              helperText={isStudyNameInvalid ? (studyNameRule.pattern?.message as string) : ''}
             ></TextField>
             <Button
+              disabled={isStudyNameInvalid}
+              data-cy="edit-name-save"
               onClick={() => {
                 handleUpdate({ name: newName })
               }}
@@ -226,8 +250,14 @@ const StudyCard = ({
                 setNewDesc(e.target.value)
               }}
               data-cy="edit-description-field"
+              error={isStudyDescriptionInvalid}
+              helperText={
+                isStudyDescriptionInvalid ? (studyDescriptionRule.pattern?.message as string) : ''
+              }
             ></TextField>
             <Button
+              disabled={isStudyDescriptionInvalid}
+              data-cy="edit-description-save"
               onClick={() => {
                 handleUpdate({ description: newDesc || '' })
               }}
@@ -281,6 +311,8 @@ const StudyCard = ({
               }
               name="contactUsEmail"
               data-cy="contactUsEmail"
+              error={isEmailInvalid}
+              helperText={isEmailInvalid ? (emailRule.pattern?.message as string) : ''}
               value={contactUsEmail}
               onChange={(e) => {
                 setContactUsEmail(e.target.value)
@@ -296,6 +328,8 @@ const StudyCard = ({
                 label={'Redcap API URL'}
                 name="redcapURL"
                 data-cy="redcapURL"
+                error={isUrlInvalid}
+                helperText={isUrlInvalid ? (urlRule.pattern?.message as string) : ''}
                 value={redcapURL}
                 onChange={(e) => {
                   setRedcapURL(e.target.value)
@@ -325,7 +359,7 @@ const StudyCard = ({
                 sx={{ mt: 1, alignSelf: 'flex-start' }}
                 variant="contained"
                 size="small"
-                disabled={!settingsChanged}
+                disabled={!settingsChanged || isEmailInvalid || isUrlInvalid}
                 onClick={handleSettingsApply}
                 data-cy="settings-apply"
               >
