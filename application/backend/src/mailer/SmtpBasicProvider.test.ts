@@ -78,6 +78,25 @@ describe('SmtpBasicProvider', () => {
     expect(() => new SmtpBasicProvider({ ...validConfig, port: 0 })).toThrow(/port is empty/)
   })
 
+  it('throws when sender is not an address', () => {
+    // #909 was a sender the server rejected at MAIL FROM with a bare 501
+    expect(() => new SmtpBasicProvider({ ...validConfig, sender: 'CTRL' })).toThrow(
+      /not a usable address/,
+    )
+  })
+
+  it('throws when sender has empty angle brackets', () => {
+    expect(() => new SmtpBasicProvider({ ...validConfig, sender: 'CTRL <>' })).toThrow(
+      /not a usable address/,
+    )
+  })
+
+  it('accepts a dotless domain so MailHog setups keep working', () => {
+    expect(
+      () => new SmtpBasicProvider({ ...validConfig, sender: 'CTRL <noreply@localhost>' }),
+    ).not.toThrow()
+  })
+
   // requireTLS defaults to true and is only turned off by config. Not unit tested, because
   // asserting it means reaching through nodemailer-mock into the real transport it wraps.
   // The MailHog e2e covers it instead: mailhog speaks no TLS, so config.e2e.json5 sets

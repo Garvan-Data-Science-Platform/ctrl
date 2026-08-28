@@ -19,6 +19,13 @@ export class SmtpBasicProvider implements MailProvider {
     if (!config.username) throw new Error('smtp-basic: username is empty')
     if (!config.password) throw new Error('smtp-basic: password is empty')
     if (!config.sender) throw new Error('smtp-basic: sender is empty')
+
+    // a malformed sender is what #909 was. The server rejects it at MAIL FROM with a bare
+    // 501 that names nothing, so fail here instead, where the config field has a name.
+    const address = config.sender.match(/<([^>]+)>/)?.[1] ?? config.sender
+    if (!address.includes('@') || /\s/.test(address)) {
+      throw new Error(`smtp-basic: sender is not a usable address: ${config.sender}`)
+    }
   }
 
   async sendMail(opts: MailOpts): Promise<void> {
