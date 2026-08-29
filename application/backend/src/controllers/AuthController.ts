@@ -404,6 +404,10 @@ export class AuthController extends Controller {
 
       responseData = challenge
 
+      // Not awaited, so the challenge reaches the client without waiting on the mail.
+      // The catch is not optional. There is no unhandledRejection handler in this app,
+      // so without it a send failure takes the whole process down, which is the crash
+      // reported in 719.
       sendEmail({
         to: user.email,
         subject: 'CTRL - One Time Password',

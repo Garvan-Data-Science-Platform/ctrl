@@ -76,6 +76,22 @@ describe('MailerController', () => {
       ])
     })
 
+    it('should keep the participant name out of the admin subject but not out of the body', async () => {
+      const response = await request(app)
+        .post('/mailer/contact-us')
+        .send({ content: 'Test Content', studyId: TestStudies.TEST_STUDY.id })
+        .set({ Authorization: `Bearer ${participantToken}` })
+
+      expect(response.status).toBe(204)
+
+      // User.firstName and User.lastName are `/// @encrypted` in schema.prisma, and a
+      // subject reaches our logs, the mail server's, and Message Trace. The body still
+      // names them so admins can still tell requests apart.
+      const [toAdmin] = mockNodeMailer.mock.getSentMail()
+      expect(toAdmin.subject).toBe('New Contact Us Request From a CTRL Participant')
+      expect(toAdmin.text).toContain('Participant: Test User')
+    })
+
     it('should send emails to all Admins if Study specific contact email is not set', async () => {
       const response = await request(app)
         .post('/mailer/contact-us')

@@ -46,6 +46,12 @@ describe('mailer config schema', () => {
     expect(validator()({ mailer: empty })).toBe(true)
   })
 
+  it('rejects a typo in an smtp-basic key rather than ignoring it', () => {
+    // dev's smtp block had additionalProperties: false and the union dropped it. The
+    // m365-oauth variant cannot have it back, see the test above, but this one can.
+    expect(validator()({ mailer: { ...smtpBasic, senderr: 'oops' } })).toBe(false)
+  })
+
   it('rejects a config with no mailer block', () => {
     expect(validator()({ otp: false })).toBe(false)
   })

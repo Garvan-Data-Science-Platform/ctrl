@@ -56,6 +56,14 @@ describe('M365OAuthProvider', () => {
       )
     })
 
+    it('throws when host is empty', () => {
+      expect(() => new M365OAuthProvider({ ...validConfig, host: '' })).toThrow(/host is empty/)
+    })
+
+    it('throws when port is empty', () => {
+      expect(() => new M365OAuthProvider({ ...validConfig, port: 0 })).toThrow(/port is empty/)
+    })
+
     it('throws when sender is empty', () => {
       expect(() => new M365OAuthProvider({ ...validConfig, sender: '' })).toThrow(/sender is empty/)
     })
@@ -201,35 +209,14 @@ describe('extractAddress', () => {
   })
 })
 
+// The patterns themselves are covered in redact.test.ts. This only proves the wrapper
+// runs them and hands back an Error rather than a string.
 describe('redactSecrets', () => {
-  it('redacts access_token JSON field', () => {
-    const input = new Error('{"access_token": "eyJ0eXAiOiJKV1Q-token-should-not-leak"}')
-    const output = redactSecrets(input)
-    expect(output.message).toContain('[REDACTED]')
-    expect(output.message).not.toContain('eyJ0eXAiOiJKV1Q-token-should-not-leak')
-  })
-
-  it('redacts client_secret JSON field', () => {
-    const input = new Error('{"client_secret": "SUPER-SECRET-VALUE"}')
-    const output = redactSecrets(input)
-    expect(output.message).toContain('[REDACTED]')
+  it('returns an Error with the secrets stripped', () => {
+    const output = redactSecrets(new Error('Auth failed {"client_secret": "SUPER-SECRET-VALUE"}'))
+    expect(output).toBeInstanceOf(Error)
+    expect(output.message).toContain('Auth failed')
     expect(output.message).not.toContain('SUPER-SECRET-VALUE')
-  })
-
-  it('redacts Bearer tokens in prose', () => {
-    const input = new Error('Rejected: Bearer abc123.def456.ghi789')
-    const output = redactSecrets(input)
-    expect(output.message).toContain('Bearer [REDACTED]')
-    expect(output.message).not.toContain('abc123.def456.ghi789')
-  })
-
-  it('preserves non-secret parts of the message', () => {
-    const input = new Error('Error 401 tenant xyz {"access_token":"secret"} network unreachable')
-    const output = redactSecrets(input)
-    expect(output.message).toContain('Error 401')
-    expect(output.message).toContain('tenant xyz')
-    expect(output.message).toContain('network unreachable')
-    expect(output.message).not.toContain('secret')
   })
 })
 
@@ -270,7 +257,7 @@ describe('wrapSmtpError', () => {
     expect(wrapped.message).not.toContain('XOAUTH2 rejected')
   })
 
-  it('names the sender address as the cause on a SendAs rejection', () => {
+  it('blames the sender address, not the recipient, on a SendAs rejection', () => {
     const err = Object.assign(new Error('Message failed'), {
       response: '554 5.2.252 SendAsDenied',
     })

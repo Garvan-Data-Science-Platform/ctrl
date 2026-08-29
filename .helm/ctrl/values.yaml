@@ -25,7 +25,12 @@ config:
     port: 587
     username: ''
     password: ''
+    # The From address on every email CTRL sends, as 'Display Name <address@domain>'.
+    # Blank on purpose, a deployment that sends mail has to name its own sender.
     sender: ''
+    # Set false only for a relay that genuinely has no TLS, such as a local mail catcher.
+    # Anything else leaves the SMTP password readable on the wire.
+    requireTLS: true
     # For m365-oauth, set provider to m365-oauth in your own values file and add:
     #   tenantId: '<garvan-tenant-id>'
     #   clientId: '<entra-app-client-id>'
@@ -33,7 +38,7 @@ config:
     #   host: smtp.office365.com
     #   port: 587
     #   sender: 'CTRL <ctrl-noreply@garvan.org.au>'
-    # Leave username and password as empty strings, they are ignored on this path.
+    # Leave username, password and requireTLS as they are, they are ignored on that path.
 
 userClient:
   hostname: ctrlhost

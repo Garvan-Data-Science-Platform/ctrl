@@ -70,9 +70,9 @@ export class MailerController extends Controller {
       ? [study.contactUsEmail]
       : [...orgAdminEmails, ...studyAdminEmails]
 
-    // the participant's name stays out of the subject. firstName and lastName are
-    // /// @encrypted, and a subject reaches our logs, the mail server's, and Message
-    // Trace. The body still names them, see generateContactUsEmail below.
+    // the participant's name stays out of the subject. firstName and lastName carry
+    // `/// @encrypted` in schema.prisma, and a subject reaches our logs, the mail
+    // server's, and Message Trace. The body still names them, see generateContactUsEmail.
     const subjectToAdmin: string = 'New Contact Us Request From a CTRL Participant'
 
     const { text: adminText, html: adminHtml } = generateContactUsEmail(
@@ -96,13 +96,9 @@ export class MailerController extends Controller {
       text: adminText,
       html: adminHtml,
     })
-    logger.info('Contact-us email sent to admins', {
-      toCount: recipientEmails.length,
-      studyId: bodyRequest.studyId,
-    })
 
     // Send the email to the user
-    const subjectToUser: string = `CTRL Message Confirmation`
+    const subjectToUser: string = 'CTRL Message Confirmation'
 
     await sendEmail({
       to: user.email,
@@ -110,9 +106,10 @@ export class MailerController extends Controller {
       text: participantText,
       html: participantHtml,
     })
-    logger.info('Contact-us confirmation email sent to participant', {
-      subject: subjectToUser,
-    })
+
+    // sendEmail logs each send with its provider, recipient count, subject and duration.
+    // studyId is the one thing it cannot know, so it is all this line carries.
+    logger.info('Contact-us request handled', { studyId: bodyRequest.studyId })
     return
   }
 }

@@ -20,6 +20,7 @@
     port: 587,
     username: '',
     password: '',
-    sender: 'CTRL <noreply@example.com>' //the From address on every email CTRL sends
+    sender: 'CTRL <noreply@example.com>', //the From address on every email CTRL sends
+    //requireTLS: false //only for a local mail catcher with no TLS, such as mailhog
   }
 }
