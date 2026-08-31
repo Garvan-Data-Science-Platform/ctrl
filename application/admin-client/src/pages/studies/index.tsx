@@ -397,6 +397,10 @@ const StudiesPage = () => {
   const [newStudyDialogOpen, setNewStudyDialogOpen] = useState(false)
   const [newStudyName, setNewStudyName] = useState('')
 
+  const studyNameRule = studyNameRules(true)
+  const isNewStudyNameInvalid = Boolean(
+    newStudyName && studyNameRule.pattern && !studyNameRule.pattern.value.test(newStudyName),
+  )
   const queryClient = useQueryClient()
 
   const handleCreateNewStudy = (e: React.FormEvent) => {
@@ -433,9 +437,16 @@ const StudiesPage = () => {
               value={newStudyName}
               onChange={(e) => setNewStudyName(e.target.value)}
               data-cy="study-name"
+              error={isNewStudyNameInvalid}
+              helperText={isNewStudyNameInvalid ? (studyNameRule.pattern?.message as string) : ''}
             />
             <Stack direction="row" justifyContent="space-between">
-              <Button variant="contained" type="submit" data-cy="study-create">
+              <Button
+                variant="contained"
+                type="submit"
+                data-cy="study-create"
+                disabled={isNewStudyNameInvalid || !newStudyName}
+              >
                 Create
               </Button>
               <Button onClick={handleCloseNewStudyDialog}>Cancel</Button>

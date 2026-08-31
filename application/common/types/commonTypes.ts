@@ -5,7 +5,7 @@ import { Role, User } from '@prisma/client'
 
 // @common/types/commonTypes.ts
 
-// Specifying these here, so that they can be defined in one place (even though its not DRY)
+// Specifying these here, so that they can be defined in one file (even though its not DRY within the file as regex are defined here and in TSOA annotations)
 export const REGEX = {
   NAME: /^[a-zA-ZÀ-ÖØ-öø-ɏ\s\-'.]+$/,
   ADDRESS: /^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$/,

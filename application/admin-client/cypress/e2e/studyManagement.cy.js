@@ -18,8 +18,7 @@ describe('Study management page', () => {
   it('Can create a new study', () => {
     cy.visit('/studies')
     cy.get('[data-cy="new-study-button"]').click()
-    cy.get('[data-cy="study-create"]').click()
-    cy.get('[data-cy="study-name"] input').should('be.focused').type('TEST')
+    cy.get('[data-cy="study-name"] input').type('TEST')
     cy.get('[data-cy="study-create"]').click()
     cy.get('[data-cy="study-create"]').should('not.exist')
     cy.contains('TEST').should('exist')
@@ -188,6 +187,16 @@ describe('Study management page', () => {
     cy.contains('abc123').should('not.exist') // due to SensitiveTextField
     cy.get('[data-cy="settings-apply"]').eq(1).click()
     cy.contains('abc123').should('not.exist')
+  })
+
+  it('validates xss when creating a new study', () => {
+    cy.visit('/studies')
+    cy.get('[data-cy="new-study-button"]').click()
+    cy.get('[data-cy="study-name"] input').type("{{7*7}}<script>alert('xss-study-name')</script>", {
+      parseSpecialCharSequences: false,
+    })
+    cy.contains(VALIDATION_MESSAGES.STUDY_NAME_INVALID).should('exist')
+    cy.get('[data-cy="study-create"]').should('be.disabled')
   })
 
   it('Validates xss study name in advanced settings', () => {
