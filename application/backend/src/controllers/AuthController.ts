@@ -209,7 +209,9 @@ export class AuthController extends Controller {
     // Check that the Participant has an invitation
     const invite = await this.inviteRepo.findFirst({ where: { id: inviteId, email } })
     if (!invite || invite.status !== 'PENDING') {
-      throw new NotFoundError(`Invite for ${email} not found`)
+      // ErrorHandler logs err.message, so the address stays out of it. The caller supplied
+      // both the inviteId and the email, so neither tells them anything they did not send.
+      throw new NotFoundError('Invite not found')
     }
 
     // Check and hash Password
@@ -260,8 +262,9 @@ export class AuthController extends Controller {
     })
 
     if (!res) {
-      logger.error('No invitation found for email: ', email)
-      throw new NotFoundError(`Invite for ${email} not found`)
+      // inviteId rather than email, the address is `/// @encrypted` and a log line is not
+      logger.error({ message: 'No invitation found', inviteId })
+      throw new NotFoundError(`Invite ${inviteId} not found`)
     }
 
     return responseData

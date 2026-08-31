@@ -76,9 +76,7 @@ describe('Participant Invites', () => {
       .post(`/auth/register/participants/${missingInviteId}`)
       .send(participantRegisterRequestBody)
     expect(response.status).toBe(404)
-    expect(response.body.message).toBe(
-      `Invite for ${participantRegisterRequestBody.email} not found`,
-    )
+    expect(response.body.message).toBe('Invite not found')
   })
 
   it('should allow an OrganisationAdmin user to create and send invites to new participants', async () => {
@@ -275,9 +273,7 @@ describe('Participant Invites', () => {
       .send(participantRegisterRequestBody)
 
     expect(response.status).toBe(404)
-    expect(response.body.message).toBe(
-      `Invite for ${participantRegisterRequestBody.email} not found`,
-    )
+    expect(response.body.message).toBe('Invite not found')
   })
 
   it('should not allow participants to register using an EXPIRED invite', async () => {
@@ -334,9 +330,7 @@ describe('Participant Invites', () => {
       .send(participantRegisterRequestBody)
 
     expect(response.status).toBe(404)
-    expect(response.body.message).toBe(
-      `Invite for ${participantRegisterRequestBody.email} not found`,
-    )
+    expect(response.body.message).toBe('Invite not found')
   })
 
   it('should allow participants to register using a PENDING invite', async () => {

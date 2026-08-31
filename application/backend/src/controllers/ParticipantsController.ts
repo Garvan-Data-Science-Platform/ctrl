@@ -730,7 +730,7 @@ export class InvitesController extends Controller {
 
           const emailSent = await this.sendInvite(invite.email, studyId, invite.id)
           if (!emailSent) {
-            logger.error(`Failed to send email to ${invite.email}`)
+            // sendInvite already logs the failure with studyId and inviteId
             await this.invitesRepo.update({
               where: { id: invite.id },
               data: {
@@ -741,7 +741,7 @@ export class InvitesController extends Controller {
             return
           }
 
-          logger.info(`Resent email to existing invite ${invite.email}`)
+          logger.info({ message: 'Resent invite', studyId, inviteId: invite.id })
           emailsResent.push(invite.email)
 
           if (
@@ -777,7 +777,7 @@ export class InvitesController extends Controller {
           const inviteId: string = generateInviteId()
           const success = await this.sendInvite(r.email, studyId, inviteId)
           if (!success) {
-            logger.error(`Failed to send email to ${r.email}`)
+            // sendInvite already logs the failure with studyId and inviteId
             failedEmails.push(r.email)
           }
           return { recipient: r, id: inviteId, success }
@@ -823,8 +823,16 @@ export class InvitesController extends Controller {
       failedEmails,
     })
 
-    // Log the result
-    logger.info(responseData)
+    // responseData carries failedEmails for the caller, so log the counts rather than the object
+    logger.info({
+      message: 'Invite request handled',
+      studyId,
+      resendEmailRequestCount: responseData.resendEmailRequestCount,
+      newInvitesCount: responseData.newInvitesCount,
+      emailsResentCount: responseData.emailsResentCount,
+      alreadyAcceptedCount: responseData.alreadyAcceptedCount,
+      failedEmailsCount: responseData.failedEmailsCount,
+    })
     return responseData
   }
 
@@ -859,10 +867,12 @@ export class InvitesController extends Controller {
           status: InviteStatus.FAILED_TO_SEND,
         },
       })
-      throw new BadGatewayError(`Failed to send email to ${pendingInvite.email}`)
+      // ErrorHandler logs err.message, so the address stays out of it. The caller passed
+      // the inviteId in the path, so they already know which invite this is.
+      throw new BadGatewayError('Failed to send invite email')
     }
 
-    logger.info(`Resent email to pending invite ${pendingInvite.email}`)
+    logger.info({ message: 'Resent invite', studyId, inviteId })
 
     await this.invitesRepo.update({
       where: {
@@ -892,10 +902,8 @@ export class InvitesController extends Controller {
     // Send emails
     const emailResults = await Promise.all(
       pendingInvites.map(async (invite) => {
+        // sendInvite already logs the failure with studyId and inviteId
         const success = await this.sendInvite(invite.email, studyId, invite.id)
-        if (!success) {
-          logger.error(`Failed to send email to ${invite.email} for ${studyId}`)
-        }
         return { email: invite.email, success }
       }),
     )
