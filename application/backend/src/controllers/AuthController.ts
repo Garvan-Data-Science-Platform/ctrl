@@ -90,6 +90,7 @@ export class AuthController extends Controller {
     }
 
     const hashedPassword = await hashPassword(password)
+    // Note: email is stored as lowercase (see User model in `application/backend/prisma/schema.prisma`)
     const insertedUser: User = await this.userRepo.create({
       data: {
         ...userDetails,

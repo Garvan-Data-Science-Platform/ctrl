@@ -598,6 +598,44 @@ describe('InvitesController', () => {
       // Reset mock for other tests
       mockNodeMailer.mock.reset()
     })
+
+    it('should not create new study invites for uppercase and lowercase versions of the same email', async () => {
+      const lowerCaseEmail = 'invite5@new.com'
+      const upperCaseEmail = 'iNvItE5@NeW.cOm'
+
+      const recipients = [
+        { email: lowerCaseEmail, prefill: {} },
+        { email: upperCaseEmail, prefill: {} },
+      ]
+
+      const response = await request(app)
+        .post('/studies/1/invites')
+        .send({ recipients, subjectText: 'Subject Text', explanatoryText: 'Explanatory Text' })
+        .set({ Authorization: `Bearer ${organisationAdminToken}` })
+
+      const body: InviteParticipantsResponse = response.body
+      expect(response.status).toBe(200)
+
+      expect(body.newInvitesCount).toBe(1) // NOT TWO!!
+
+      // Check emails were successfully sent
+      const sentEmails = mockNodeMailer.mock.getSentMail()
+      expect(sentEmails.length).toBe(1) // NOT TWO!!
+
+      const sentEmail = sentEmails[0]
+      expect(sentEmail.from).toBe(`CTRL <noreply@${process.env.HOSTNAME}>`)
+      expect(sentEmail.subject).toBe('Subject Text')
+      expect(sentEmail.html).toContain('Explanatory Text')
+      expect(sentEmail.to).toBe(lowerCaseEmail)
+
+      const allCreatedInvites = await prisma.invite.findMany({
+        where: {
+          studyId: 1,
+          email: lowerCaseEmail,
+        },
+      })
+      expect(allCreatedInvites.length).toBe(1)
+    }, 100000)
   })
 
   describe('POST /studies/{studyId}/invites/resend', () => {
