@@ -528,7 +528,7 @@
       },
       "Url": {
         "type": "string",
-        "example": "https://redcap.orgname.com/api/",
+        "example": "https://orgname.com/tcLink/",
         "minLength": 1,
         "maxLength": 128,
         "pattern": "^https?:\\/\\/[a-zA-Z0-9\\-._~:/?#[\\]@!$&'()*+,;=%]+$"
@@ -1214,9 +1214,21 @@
       },
       "RedcapToken": {
         "type": "string",
-        "minLength": 1,
+        "example": "2F86C2FA2FE1D119C1872A89AB309ABB",
+        "maxLength": 32,
+        "pattern": "^[a-fA-F0-9]{32}$"
+      },
+      "OptionalUrl": {
+        "type": "string",
+        "example": "https://redcap.orgname.com/api/",
         "maxLength": 128,
-        "pattern": "^[a-zA-Z0-9\\-_=.:]+$"
+        "pattern": "^(https?:\\/\\/[a-zA-Z0-9\\-._~:/?#[\\]@!$&'()*+,;=%]+)?$"
+      },
+      "OptionalEmail": {
+        "type": "string",
+        "example": "contact.us@email.com",
+        "maxLength": 254,
+        "pattern": "^([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,})?$"
       },
       "UpdateStudyRequest": {
         "properties": {
@@ -1230,10 +1242,10 @@
             "$ref": "#/components/schemas/RedcapToken"
           },
           "redcapURL": {
-            "$ref": "#/components/schemas/Url"
+            "$ref": "#/components/schemas/OptionalUrl"
           },
           "contactUsEmail": {
-            "$ref": "#/components/schemas/Email"
+            "$ref": "#/components/schemas/OptionalEmail"
           }
         },
         "type": "object",

@@ -103,3 +103,5 @@ export const MIME_TYPES: Record<string, string> = {
 }
 
 export const commonPasswordBaseWords = ['Password', 'Changeme', 'Welcome']
+
+export const TestRedcapToken = '2F86C2FA2FE1D119C1872A89AB309ABB'

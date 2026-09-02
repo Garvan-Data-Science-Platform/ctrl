@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-const { TestUsers } = require('../../../common/testing/constants')
+const { TestUsers, TestRedcapToken } = require('../../../common/testing/constants')
 const { VALIDATION_MESSAGES } = require('../../../common/src/validation')
 
 beforeEach(() => {
@@ -50,7 +50,7 @@ describe('Study management page', () => {
     cy.visit('/studies')
     cy.get('[data-cy="advanced-toggle"]').eq(1).click()
     cy.get('[data-cy="redcapURL"] input').eq(1).type('abc')
-    cy.get('[data-cy="redcapToken"] input').eq(1).type('abc123')
+    cy.get('[data-cy="redcapToken"] input').eq(1).type(TestRedcapToken)
     cy.get('[data-cy="settings-apply"]').eq(1).should('be.disabled')
     cy.contains(VALIDATION_MESSAGES.URL_INVALID).should('exist')
     cy.get('[data-cy="redcapURL"] input').eq(1).clear().type('https://abc.com')
@@ -183,10 +183,10 @@ describe('Study management page', () => {
   it('Should not show token information', () => {
     cy.visit('/studies')
     cy.get('[data-cy="advanced-toggle"]').eq(1).click()
-    cy.get('[data-cy="redcapToken"] input').eq(1).type('abc123')
-    cy.contains('abc123').should('not.exist') // due to SensitiveTextField
+    cy.get('[data-cy="redcapToken"] input').eq(1).type(TestRedcapToken)
+    cy.contains(TestRedcapToken).should('not.exist') // due to SensitiveTextField
     cy.get('[data-cy="settings-apply"]').eq(1).click()
-    cy.contains('abc123').should('not.exist')
+    cy.contains(TestRedcapToken).should('not.exist')
   })
 
   it('validates xss when creating a new study', () => {
@@ -246,5 +246,16 @@ describe('Study management page', () => {
     cy.get('[data-cy="settings-apply"]').eq(1).should('be.disabled')
   })
 
-  // token?
+  it('Validates REDCap token characters', () => {
+    cy.visit('/studies')
+    cy.get('[data-cy="advanced-toggle"]').eq(1).click()
+    cy.get('[data-cy="redcapToken"] input').eq(1).type('a1b2c3')
+    // too short therefore cannot apply
+    cy.get('[data-cy="settings-apply"]').eq(1).should('be.disabled')
+    cy.contains(VALIDATION_MESSAGES.REDCAP_TOKEN_INVALID).should('exist')
+    cy.get('[data-cy="redcapToken"] input').eq(1).clear().type(TestRedcapToken)
+    // cy.get('[data-cy="settings-apply"]').eq(1).should('be.disabled')
+    cy.get('[data-cy="settings-apply"]').eq(1).click()
+    cy.contains('Updated').should('exist')
+  })
 })

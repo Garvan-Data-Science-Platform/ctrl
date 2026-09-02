@@ -1,9 +1,15 @@
-import { Email, RedcapToken, StudyDescription, StudyName, Url } from '../../commonTypes'
+import {
+  RedcapToken,
+  StudyDescription,
+  StudyName,
+  OptionalUrl,
+  OptionalEmail,
+} from '../../commonTypes'
 
 export interface UpdateStudyRequest {
   name?: StudyName
   description?: StudyDescription
   redcapToken?: RedcapToken
-  redcapURL?: Url
-  contactUsEmail?: Email
+  redcapURL?: OptionalUrl
+  contactUsEmail?: OptionalEmail
 }

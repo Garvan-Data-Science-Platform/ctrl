@@ -25,7 +25,13 @@ import { SensitiveTextField } from '../../components/SensitiveTextField'
 import { useSearchParams } from 'react-router'
 import { LogoUploader } from '../../components/LogoUploader'
 import { RESOURCES } from '../../constants'
-import { emailRules, urlRules, studyNameRules, studyDescriptionRules } from '@common/src/validation'
+import {
+  emailRules,
+  urlRules,
+  studyNameRules,
+  studyDescriptionRules,
+  redcapTokenRules,
+} from '@common/src/validation'
 
 const StudyCard = ({
   studyIdx,
@@ -127,6 +133,11 @@ const StudyCard = ({
   const studyDescriptionRule = studyDescriptionRules(false)
   const isStudyDescriptionInvalid = Boolean(
     newDesc && studyDescriptionRule.pattern && !studyDescriptionRule.pattern.value.test(newDesc),
+  )
+
+  const redcapTokenRule = redcapTokenRules(false)
+  const isRedcapTokenInvalid = Boolean(
+    redcapToken && redcapTokenRule.pattern && !redcapTokenRule.pattern.value.test(redcapToken),
   )
 
   const handleSettingsApply = () => {
@@ -345,10 +356,13 @@ const StudyCard = ({
                 data-cy="redcapToken"
                 value={redcapToken}
                 placeholder={'Enter new token here'}
+                error={isRedcapTokenInvalid}
                 helperText={
-                  study.hasRedcapToken
-                    ? 'A token has been saved. Enter a new value to overwrite it.'
-                    : 'No token has been saved.'
+                  isRedcapTokenInvalid
+                    ? (redcapTokenRule.pattern?.message as string)
+                    : study.hasRedcapToken
+                      ? 'A token has been saved. Enter a new value to overwrite it.'
+                      : 'No token has been saved.'
                 }
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setRedcapToken(e.target.value)
@@ -359,7 +373,13 @@ const StudyCard = ({
                 sx={{ mt: 1, alignSelf: 'flex-start' }}
                 variant="contained"
                 size="small"
-                disabled={!settingsChanged || isEmailInvalid || isUrlInvalid}
+                disabled={
+                  !settingsChanged ||
+                  isEmailInvalid ||
+                  isUrlInvalid ||
+                  isRedcapTokenInvalid ||
+                  (redcapToken.length > 0 && redcapToken.length !== 32)
+                }
                 onClick={handleSettingsApply}
                 data-cy="settings-apply"
               >

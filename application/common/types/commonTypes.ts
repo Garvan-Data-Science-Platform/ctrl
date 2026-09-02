@@ -16,12 +16,8 @@ export const REGEX = {
   URL: /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/,
   STUDY_NAME: /^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$/,
   STUDY_DESCRIPTION: /^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$/,
-
-  // * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€_+]+$
-  // * @example "Name of REDCap instrument (from Column B of data dictionary)"
-
-  // * @pattern ^[a-zA-Z0-9\-_=.:]+$
-  // * @example "123e4567-e89b-12d3-a456-426614174000" // TODO: improve example
+  REDCAP_TOKEN: /^[a-fA-F0-9]{32}$/,
+  REDCAP_FORM: /^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€_+]+$/,
 }
 
 /**
@@ -55,6 +51,13 @@ export type LastName = string
  * @example "john.doe@email.com"
  */
 export type Email = string
+
+/**
+ * @maxLength 254
+ * @pattern ^([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})?$
+ * @example "contact.us@email.com"
+ */
+export type OptionalEmail = string
 
 /**
  * @minLength 14
@@ -120,7 +123,6 @@ export type UserT = User
  */
 export type StudyName = string
 
-// * @minLength 1 //TODO: check if we want minLength for study description
 /**
  * @maxLength 900 // TODO: align this with the maxLength of the field
  * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
@@ -129,10 +131,10 @@ export type StudyName = string
 export type StudyDescription = string
 
 /**
- * @minLength 1
- * @maxLength 128 // TODO: verify max length
- * @pattern ^[a-zA-Z0-9\-_=.:]+$
- * @example "123e4567-e89b-12d3-a456-426614174000" // TODO: improve example
+ * @minLength 32
+ * @maxLength 32
+ * @pattern ^[a-fA-F0-9]{32}$
+ * @example "2F86C2FA2FE1D119C1872A89AB309ABB"
  */
 export type RedcapToken = string
 
@@ -152,9 +154,16 @@ export type RedcapFormName = string
  * @minLength 1
  * @maxLength 128 // TODO: verify max length
  * @pattern ^https?:\/\/[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]+$
- * @example "https://redcap.orgname.com/api/"
+ * @example "https://orgname.com/tcLink/"
  */
 export type Url = string
+
+/**
+ * @maxLength 128 // TODO: verify max length
+ * @pattern ^(https?:\/\/[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]+)?$
+ * @example "https://redcap.orgname.com/api/"
+ */
+export type OptionalUrl = string
 
 /**
  * @minLength 1

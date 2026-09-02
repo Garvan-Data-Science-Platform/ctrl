@@ -11,6 +11,8 @@ export const VALIDATION_MESSAGES = {
   URL_INVALID: 'Invalid URL, must include http(s)://...',
   STUDY_NAME_INVALID: 'Study name contains invalid characters',
   STUDY_DESCRIPTION_INVALID: 'Study description contains invalid characters',
+  REDCAP_TOKEN_INVALID: 'REDCap token contains invalid characters or is incorrect length',
+  REDCAP_FORM_INVALID: 'REDCap form contains invalid characters',
 }
 export const nameRules = (required = true) => ({
   required: required ? VALIDATION_MESSAGES.REQUIRED : false,
@@ -64,8 +66,7 @@ export const externalIdRules = (required = false) => ({
   },
 })
 
-// Default is not required
-export const urlRules = (required = false) => ({
+export const urlRules = (required = true) => ({
   required: required ? VALIDATION_MESSAGES.REQUIRED : false,
   pattern: {
     value: REGEX.URL,
@@ -86,5 +87,13 @@ export const studyDescriptionRules = (required = true) => ({
   pattern: {
     value: REGEX.STUDY_DESCRIPTION,
     message: VALIDATION_MESSAGES.STUDY_DESCRIPTION_INVALID,
+  },
+})
+
+export const redcapTokenRules = (required = true) => ({
+  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
+  pattern: {
+    value: REGEX.REDCAP_TOKEN,
+    message: VALIDATION_MESSAGES.REDCAP_TOKEN_INVALID,
   },
 })
