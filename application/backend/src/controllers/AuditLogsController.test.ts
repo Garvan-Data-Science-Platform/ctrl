@@ -6,7 +6,7 @@ import { resetDB, seedAuditLogs } from 'common/testing/TestHelpers'
 import { defaultAuditLogsPageSize } from 'common/src/config'
 import { generateToken } from '../authentication'
 import type { GetAuditLogsResponse } from 'common/types/api/audit-logs'
-import { TestUsers, TestStudies } from 'common/testing/constants'
+import { TestUsers, TestStudies, TestRedcapToken } from 'common/testing/constants'
 import { UpdateStudyRequest } from 'common/types/api/studies'
 import type { OTPLoginRequest, RegisterRequest } from 'common/types/api/auth'
 const api = new Api()
@@ -222,12 +222,10 @@ describe('AuditLogsController', () => {
 
         expect(existingStudy?.name).toBe(studyName)
 
-        const updatedRedcapToken = 'SuperSecretTokenInfo'
-
         const patchResponse = await request(app)
           .patch(`/studies/${testStudyId}`)
           .set({ Authorization: `Bearer ${orgAdminToken}` })
-          .send({ redcapToken: updatedRedcapToken } as UpdateStudyRequest)
+          .send({ redcapToken: TestRedcapToken } as UpdateStudyRequest)
         expect(patchResponse.status).toBe(204)
 
         // Check Audit Logs
@@ -237,7 +235,7 @@ describe('AuditLogsController', () => {
         expect(response.status).toBe(200)
         const body: GetAuditLogsResponse = response.body
         expect(body).toHaveProperty('data')
-        expect(body.data[0].requestBody).not.toContain(updatedRedcapToken)
+        expect(body.data[0].requestBody).not.toContain(TestRedcapToken)
       })
 
       it('should obscure sensitive token information in payloads', async () => {
@@ -249,12 +247,11 @@ describe('AuditLogsController', () => {
 
         expect(existingStudy?.name).toBe(studyName)
 
-        const updatedRedcapToken = 'SuperSecretTokenInfo'
         const obscuredRedcapToken = '\"redcapToken\":\"***\"' // eslint-disable-line no-useless-escape
         const patchResponse = await request(app)
           .patch(`/studies/${testStudyId}`)
           .set({ Authorization: `Bearer ${orgAdminToken}` })
-          .send({ redcapToken: updatedRedcapToken } as UpdateStudyRequest)
+          .send({ redcapToken: TestRedcapToken } as UpdateStudyRequest)
         expect(patchResponse.status).toBe(204)
 
         // Check Audit Logs
