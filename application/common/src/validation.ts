@@ -97,3 +97,11 @@ export const redcapTokenRules = (required = true) => ({
     message: VALIDATION_MESSAGES.REDCAP_TOKEN_INVALID,
   },
 })
+
+export const redcapFormRules = (required = true) => ({
+  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
+  pattern: {
+    value: REGEX.REDCAP_FORM,
+    message: VALIDATION_MESSAGES.REDCAP_FORM_INVALID,
+  },
+})
