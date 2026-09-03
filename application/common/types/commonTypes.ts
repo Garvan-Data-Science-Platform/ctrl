@@ -18,6 +18,8 @@ export const REGEX = {
   STUDY_DESCRIPTION: /^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$/,
   REDCAP_TOKEN: /^[a-fA-F0-9]{32}$/,
   REDCAP_FORM: /^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€_+]+$/,
+  // Same REGEX For invite email subject and body text
+  INVITE_EMAIL: /^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$/,
 }
 
 /**

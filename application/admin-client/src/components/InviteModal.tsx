@@ -15,7 +15,13 @@ import { Recipient } from '@common/types/invite'
 import { axiosInstance } from '../providers/dataProvider'
 import { GetInviteTextResponse } from '@common/types/api/participants'
 import { useCurrentStudyId } from '../studyStore'
-import { REGEX } from '@common/types/commonTypes'
+import {
+  emailRules,
+  externalIdRules,
+  inviteEmailSubjectRules,
+  inviteEmailTextRules,
+} from '@common/src/validation'
+import { useNotification } from '@refinedev/core'
 
 interface InviteModalProps {
   onSend: (recipients: Recipient[], subjectText: string, explanatoryText: string) => void
@@ -24,26 +30,45 @@ interface InviteModalProps {
 }
 
 export function InviteModal({ onSend, onCancel, initialRecipients = [] }: InviteModalProps) {
-  const validateEmail = (email: string) => {
-    const r = new RegExp(REGEX.EMAIL) //eslint-disable-line
-    return r.test(email)
-  }
+  const emailRule = emailRules(true)
+  const externalIdRule = externalIdRules(false)
+  const inviteEmailSubjectRule = inviteEmailSubjectRules(true)
+  const inviteEmailTextRule = inviteEmailTextRules(true)
+
+  // helper for filtering arrays and pasting
+  const isEmailValidHelper = (email: string) =>
+    emailRule.pattern ? emailRule.pattern.value.test(email) : false
+
+  const { open } = useNotification()
 
   const [recipients, setRecipients] = useState<Recipient[]>(
-    initialRecipients.filter((r) => validateEmail(r.email)),
+    initialRecipients.filter((r) => isEmailValidHelper(r.email)),
   )
   const emails = recipients.map((val) => val.email)
   const [fieldValue, setFieldValue] = useState<string>('')
   const [idFieldValue, setIdFieldValue] = useState<string>('')
-  const [invalid, setInvalid] = useState(false)
   const [emailText, setEmailText] = useState('')
   const [emailTitle, setEmailTitle] = useState('')
   const studyId = useCurrentStudyId()
 
+  const isEmailInvalid = Boolean(
+    fieldValue && emailRule.pattern && !emailRule.pattern.value.test(fieldValue),
+  )
+  const isExternalIdInvalid = Boolean(
+    idFieldValue && externalIdRule.pattern && !externalIdRule.pattern.value.test(idFieldValue),
+  )
+  const isInviteEmailSubjectInvalid = Boolean(
+    emailTitle &&
+      inviteEmailSubjectRule.pattern &&
+      !inviteEmailSubjectRule.pattern.value.test(emailTitle),
+  )
+  const isInviteEmailTextInvalid = Boolean(
+    emailText && inviteEmailTextRule.pattern && !inviteEmailTextRule.pattern.value.test(emailText),
+  )
+
   const handleAdd = () => {
-    if (!validateEmail(fieldValue)) {
-      setInvalid(true)
-    } else if (!emails.includes(fieldValue)) {
+    if (!fieldValue || isEmailInvalid || isExternalIdInvalid) return
+    if (!emails.includes(fieldValue)) {
       setRecipients((current) => {
         const c = structuredClone(current)
         c.push({ email: fieldValue, prefill: { studyParticipant: { externalId: idFieldValue } } })
@@ -62,33 +87,56 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
     })
   }, [])
 
-  useEffect(() => {
-    if (invalid) {
-      setInvalid(!validateEmail(fieldValue))
-    }
-  }, [fieldValue])
-
   const handlePaste = (event: React.ClipboardEvent) => {
     event.preventDefault()
-    const pasted = event.clipboardData.getData('Text').split('\n')
+    const pasted = event.clipboardData.getData('Text')
+    // handle windows carriage returns '\r'
+    const rows = pasted.replace(/r/g, '').split('\n')
+    let skippedCount = 0
+
     setRecipients((current) => {
-      const c = structuredClone(current)
-      for (const p of pasted) {
-        let split = p.split(',')
-        if (split.length == 1) {
-          split = split[0].split('\t')
+      const newRecipients = structuredClone(current)
+
+      const currentEmails = [...emails]
+
+      for (const row of rows) {
+        // skip empty lines
+        if (!row.trim()) continue
+
+        // handle comma- and tab-separated
+        let split = row.split(',')
+        if (split.length === 1) {
+          split = row.split('\t')
         }
-        const email = split[0]
-        let id
-        if (split.length > 1) {
-          id = split[1]
-        }
-        if (!emails.includes(email) && validateEmail(email)) {
-          c.push({ email, prefill: { studyParticipant: { externalId: id } } })
+
+        const email = split[0]?.trim()
+
+        const id = split.length > 1 ? split[1]?.trim() : undefined
+
+        const isPastedEmailValid = isEmailValidHelper(email)
+        const isPastedIdValid = id
+          ? externalIdRule.pattern
+            ? externalIdRule.pattern.value.test(id)
+            : true
+          : true
+
+        const isDuplicate = currentEmails.includes(email)
+
+        if (email && isPastedEmailValid && isPastedIdValid && !isDuplicate) {
+          newRecipients.push({ email, prefill: { studyParticipant: { externalId: id } } })
+        } else {
+          // increment skipped count if errors or duplicates
+          skippedCount++
         }
       }
-      return c
+      return newRecipients
     })
+    if (skippedCount > 0) {
+      open?.({
+        type: 'error',
+        message: `Skipped ${skippedCount} entry(s) due to invalid formatting or duplicates.`,
+      })
+    }
   }
 
   const { html: emailPreview } = previewParticipantInviteEmail(
@@ -108,7 +156,8 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
           <TextField
             fullWidth
             placeholder="tom@example.com"
-            error={invalid}
+            error={isEmailInvalid}
+            helperText={isEmailInvalid ? (emailRule.pattern?.message as string) : ''}
             onKeyUp={(event) => {
               if (event.key == 'Enter') {
                 handleAdd()
@@ -124,6 +173,8 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
           <TextField
             label="ID (optional)"
             value={idFieldValue}
+            error={isExternalIdInvalid}
+            helperText={isExternalIdInvalid ? (externalIdRule.pattern?.message as string) : ''}
             onChange={(e) => setIdFieldValue(e.target.value)}
             onKeyUp={(event) => {
               if (event.key == 'Enter') {
@@ -140,11 +191,6 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
             </IconButton>
           </Box>
         </Box>
-        {invalid && (
-          <Typography variant="caption" color="error">
-            Invalid email <br />
-          </Typography>
-        )}
         <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           Enter manually or paste from spreadsheet.{' '}
           <Tooltip title="The ID field is for providing an external participant ID (e.g. from REDCap) that will be stored alongside the CTRL generated Participant ID, for reference purposes only.">
@@ -199,6 +245,10 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
           value={emailTitle}
           onChange={(e) => setEmailTitle(e.target.value)}
           data-cy="email-subject"
+          error={isInviteEmailSubjectInvalid}
+          helperText={
+            isInviteEmailSubjectInvalid ? (inviteEmailSubjectRule.pattern?.message as string) : ''
+          }
         />
         <TextField
           label="Email text"
@@ -210,28 +260,34 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
           value={emailText}
           onChange={(e) => setEmailText(e.target.value)}
           data-cy="email-text"
+          error={isInviteEmailTextInvalid}
+          helperText={
+            isInviteEmailTextInvalid ? (inviteEmailTextRule.pattern?.message as string) : ''
+          }
         />
         <Box sx={{ mt: 2, justifyContent: 'space-between', display: 'flex', flexDirection: 'row' }}>
           <Button
             variant="contained"
-            disabled={!(emails.length > 0 || fieldValue)}
+            disabled={
+              !(emails.length > 0 || fieldValue) ||
+              isEmailInvalid ||
+              isExternalIdInvalid ||
+              isInviteEmailSubjectInvalid ||
+              isInviteEmailTextInvalid
+            }
             onClick={() => {
               if (fieldValue) {
-                if (!validateEmail(fieldValue)) {
-                  setInvalid(true)
-                } else {
-                  onSend(
-                    [
-                      ...recipients,
-                      {
-                        email: fieldValue,
-                        prefill: { studyParticipant: { externalId: idFieldValue } },
-                      },
-                    ],
-                    emailTitle,
-                    emailText,
-                  )
-                }
+                onSend(
+                  [
+                    ...recipients,
+                    {
+                      email: fieldValue,
+                      prefill: { studyParticipant: { externalId: idFieldValue } },
+                    },
+                  ],
+                  emailTitle,
+                  emailText,
+                )
               } else {
                 onSend(recipients, emailTitle, emailText)
               }

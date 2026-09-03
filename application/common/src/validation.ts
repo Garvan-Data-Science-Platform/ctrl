@@ -13,6 +13,8 @@ export const VALIDATION_MESSAGES = {
   STUDY_DESCRIPTION_INVALID: 'Study description contains invalid characters',
   REDCAP_TOKEN_INVALID: 'REDCap token contains invalid characters or is incorrect length',
   REDCAP_FORM_INVALID: 'REDCap form contains invalid characters',
+  INVITE_EMAIL_SUBJECT_INVALID: 'Invite email subject contains invalid characters',
+  INVITE_EMAIL_TEXT_INVALID: 'Invite email text contains invalid characters',
 }
 export const nameRules = (required = true) => ({
   required: required ? VALIDATION_MESSAGES.REQUIRED : false,
@@ -57,8 +59,7 @@ export const mobileRules = (required = true) => ({
   },
 })
 
-// Default is not required
-export const externalIdRules = (required = false) => ({
+export const externalIdRules = (required = true) => ({
   required: required ? VALIDATION_MESSAGES.REQUIRED : false,
   pattern: {
     value: REGEX.EXTERNALID,
@@ -103,5 +104,21 @@ export const redcapFormRules = (required = true) => ({
   pattern: {
     value: REGEX.REDCAP_FORM,
     message: VALIDATION_MESSAGES.REDCAP_FORM_INVALID,
+  },
+})
+
+export const inviteEmailSubjectRules = (required = true) => ({
+  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
+  pattern: {
+    value: REGEX.INVITE_EMAIL,
+    message: VALIDATION_MESSAGES.INVITE_EMAIL_SUBJECT_INVALID,
+  },
+})
+
+export const inviteEmailTextRules = (required = true) => ({
+  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
+  pattern: {
+    value: REGEX.INVITE_EMAIL,
+    message: VALIDATION_MESSAGES.INVITE_EMAIL_TEXT_INVALID,
   },
 })
