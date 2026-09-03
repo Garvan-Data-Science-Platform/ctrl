@@ -1215,6 +1215,7 @@
       "RedcapToken": {
         "type": "string",
         "example": "2F86C2FA2FE1D119C1872A89AB309ABB",
+        "minLength": 32,
         "maxLength": 32,
         "pattern": "^[a-fA-F0-9]{32}$"
       },
@@ -1251,51 +1252,7 @@
         "type": "object",
         "additionalProperties": false
       },
-      "GetSettingsResponse": {
-        "properties": {
-          "data": {
-            "properties": {
-              "newsLink": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Url"
-                  }
-                ],
-                "nullable": true
-              },
-              "tcLink": {
-                "$ref": "#/components/schemas/Url"
-              },
-              "secondaryColour": {
-                "type": "string",
-                "nullable": true
-              },
-              "primaryColour": {
-                "type": "string",
-                "nullable": true
-              },
-              "logoSet": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "required": [
-              "newsLink",
-              "tcLink",
-              "secondaryColour",
-              "primaryColour",
-              "logoSet"
-            ],
-            "type": "object"
-          }
-        },
-        "required": [
-          "data"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "Partial_Omit_SettingsData.logoSet__": {
+      "SettingsBase": {
         "properties": {
           "primaryColour": {
             "type": "string",
@@ -1306,18 +1263,73 @@
             "nullable": true
           },
           "tcLink": {
-            "type": "string"
+            "$ref": "#/components/schemas/Url"
           },
           "newsLink": {
-            "type": "string",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Url"
+              }
+            ],
             "nullable": true
           }
         },
+        "required": [
+          "primaryColour",
+          "secondaryColour",
+          "tcLink",
+          "newsLink"
+        ],
         "type": "object",
-        "description": "Make all properties in T optional"
+        "additionalProperties": false
+      },
+      "GetSettingsResponse": {
+        "properties": {
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SettingsBase"
+              },
+              {
+                "properties": {
+                  "logoSet": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "logoSet"
+                ],
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "additionalProperties": false
       },
       "UpdateSettingsRequest": {
-        "$ref": "#/components/schemas/Partial_Omit_SettingsData.logoSet__"
+        "properties": {
+          "primaryColour": {
+            "type": "string",
+            "nullable": true
+          },
+          "secondaryColour": {
+            "type": "string",
+            "nullable": true
+          },
+          "tcLink": {
+            "$ref": "#/components/schemas/Url"
+          },
+          "newsLink": {
+            "$ref": "#/components/schemas/Url"
+          }
+        },
+        "type": "object",
+        "additionalProperties": false
       },
       "GetUserPortalSettingsResponse": {
         "properties": {
@@ -2200,16 +2212,16 @@
       "Organisation": {
         "description": "Model Organisation",
         "properties": {
-          "elsaToken": {
-            "type": "string",
-            "nullable": true
-          },
           "newsLink": {
             "type": "string",
             "nullable": true
           },
           "tcLink": {
             "type": "string"
+          },
+          "elsaToken": {
+            "type": "string",
+            "nullable": true
           },
           "secondaryColour": {
             "type": "string",
@@ -2241,9 +2253,9 @@
           }
         },
         "required": [
-          "elsaToken",
           "newsLink",
           "tcLink",
+          "elsaToken",
           "secondaryColour",
           "primaryColour",
           "logo",
