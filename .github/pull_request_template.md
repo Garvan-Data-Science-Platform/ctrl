@@ -12,7 +12,10 @@
 ## Checklist
 
 - [ ] Changes are covered by tests (or reason why not)
-- [ ] Documentation updated (README / API docs / ctrl-docs)
+- [ ] Documentation updates:
+  - [ ] README.md
+  - [ ] [TSOA Annotations](https://tsoa-community.github.io/docs/annotations.html)
+  - [ ] [ctrl-docs](https://github.com/Garvan-Data-Science-Platform/ctrl-docs)
 - [ ] Secrets/config changes noted for deployment
 - [ ] Passing CI
 
