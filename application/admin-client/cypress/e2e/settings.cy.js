@@ -173,13 +173,13 @@ describe('Settings page', () => {
     }
     cy.get('[data-cy="save-button"]').click()
 
-    cy.contains('Invalid colour').should('exist')
+    cy.contains('Not a recognised CSS colour').should('exist')
 
     for (const [key, value] of Object.entries(fieldMap)) {
       cy.get(`[data-cy="${key}"] input`).clear().type(value)
     }
 
-    cy.contains('Invalid colour').should('not.exist')
+    cy.contains('Not a recognised CSS colour').should('not.exist')
   })
 
   it('Invalid xss primary colour prevent saving and show appropriate error messages', () => {
@@ -197,7 +197,7 @@ describe('Settings page', () => {
     }
     cy.get('[data-cy="save-button"]').click()
 
-    cy.contains('Invalid colour').should('exist') //TODO: move to common?
+    cy.contains(VALIDATION_MESSAGES.CSS_COLOUR_INVALID).should('exist')
   })
 
   it('Invalid xss secondary colour prevent saving and show appropriate error messages', () => {
@@ -215,6 +215,6 @@ describe('Settings page', () => {
     }
     cy.get('[data-cy="save-button"]').click()
 
-    cy.contains('Invalid colour').should('exist') //TODO: move to common?
+    cy.contains(VALIDATION_MESSAGES.CSS_COLOUR_INVALID).should('exist')
   })
 })

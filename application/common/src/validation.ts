@@ -15,6 +15,8 @@ export const VALIDATION_MESSAGES = {
   REDCAP_FORM_INVALID: 'REDCap form contains invalid characters',
   INVITE_EMAIL_SUBJECT_INVALID: 'Invite email subject contains invalid characters',
   INVITE_EMAIL_TEXT_INVALID: 'Invite email text contains invalid characters',
+  CSS_COLOUR_INVALID:
+    'Use HEX ("#a1b2c3"), RGB ("rgb(10,20,30)"), or a valid CSS colour name ("blue")',
 }
 export const nameRules = (required = true) => ({
   required: required ? VALIDATION_MESSAGES.REQUIRED : false,
@@ -120,5 +122,14 @@ export const inviteEmailTextRules = (required = true) => ({
   pattern: {
     value: REGEX.INVITE_EMAIL,
     message: VALIDATION_MESSAGES.INVITE_EMAIL_TEXT_INVALID,
+  },
+})
+
+// default not required
+export const cssColourRules = (required = false) => ({
+  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
+  pattern: {
+    value: REGEX.CSS_COLOUR,
+    message: VALIDATION_MESSAGES.CSS_COLOUR_INVALID,
   },
 })
