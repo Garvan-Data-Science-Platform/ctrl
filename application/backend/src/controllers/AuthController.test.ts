@@ -32,7 +32,7 @@ describe('AuthController', () => {
   const testFirstName = 'John'
   const testLastName = 'Doe'
   const testEmail = 'johndoe@example.com'
-  const testPassword = 'Loginfortests123'
+  const testPassword = 'Lolliesfortests123'
   const testGuardianFirstName = 'Jenny'
 
   beforeAll(async () => {
@@ -133,6 +133,36 @@ describe('AuthController', () => {
 
       const body = response.body
       expect(body.message).toBe('Validation Failed')
+    })
+
+    it('should return 422 if validation fails on invalid user input', async () => {
+      const registerRequest = {
+        firstName: "{{7*7}}<script>alert('xss-firstname')</script>",
+        lastName: "{{7*7}}<script>alert('xss-lastname')</script>",
+        email: "{{7*7}}<script>alert('xss-email')</script>@email.com",
+        password: testPassword,
+        role: Role.OrganisationAdmin,
+      }
+
+      const response = await request(app)
+        .post('/auth/register')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .send(registerRequest)
+      expect(response.status).toEqual(422)
+
+      const body = response.body
+      expect(body.message).toBe('Validation Failed')
+      expect(body.details).toEqual({
+        'bodyRequest.email': {
+          message: 'Invalid value provided',
+        },
+        'bodyRequest.firstName': {
+          message: 'Invalid value provided',
+        },
+        'bodyRequest.lastName': {
+          message: 'Invalid value provided',
+        },
+      })
     })
 
     it('should return an error if the user is already registered', async () => {
@@ -280,7 +310,7 @@ describe('AuthController', () => {
       lastName: testLastName,
       email: TestInvites.INVITE_PENDING.email,
       password: testPassword,
-      mobile: '+61477777777',
+      mobile: '0477777777',
       addressLine: '123 Some Street',
       suburb: 'Sydney',
       postcode: '2000',
@@ -364,6 +394,74 @@ describe('AuthController', () => {
           message: 'Invalid value provided',
         },
         'bodyRequest.mobile': {
+          message: 'Invalid value provided',
+        },
+      })
+    })
+
+    it('should fail validation if provided with illegal values', async () => {
+      const registerParticipantRequest: RegisterParticipantRequest = {
+        ...registerParticipantRequestBase,
+        firstName: "{{7*7}}<script>alert('xss-firstname')</script>${{7*7}}#{7*7}<%= 7*7 %>",
+        lastName: '<script>',
+        addressLine: "<script>alert('xss-address')</script>",
+        suburb: "<img src=x onerror=alert('xss-suburb-img')>",
+        nextOfKin: {
+          firstName: 'John{7*7}',
+          lastName: '<script>Smith</script>',
+          email: '<script>john</script>@smith.com',
+        },
+        dependents: [
+          {
+            firstName: 'John{7*7}',
+            lastName: '<script>Smith</script>',
+            dob: '2020-01-01',
+            permanent: false,
+          },
+        ],
+      }
+
+      const participantInviteId = await prisma.invite.findFirstOrThrow({
+        where: {
+          email: registerParticipantRequestBase.email,
+          studyId: 1,
+        },
+      })
+
+      const registerParticipantResponse = await request(app)
+        .post(`/auth/register/participants/${participantInviteId.id}`)
+        .send(registerParticipantRequest)
+      expect(registerParticipantResponse.status).toEqual(422)
+
+      const registerParticipantBody = registerParticipantResponse.body
+      expect(registerParticipantBody.message).toEqual('Validation Failed')
+      expect(registerParticipantBody.token).toBe(undefined)
+      expect(registerParticipantBody.details).toEqual({
+        'bodyRequest.firstName': {
+          message: 'Invalid value provided',
+        },
+        'bodyRequest.lastName': {
+          message: 'Invalid value provided',
+        },
+        'bodyRequest.addressLine': {
+          message: 'Invalid value provided',
+        },
+        'bodyRequest.suburb': {
+          message: 'Invalid value provided',
+        },
+        'bodyRequest.nextOfKin.firstName': {
+          message: 'Invalid value provided',
+        },
+        'bodyRequest.nextOfKin.lastName': {
+          message: 'Invalid value provided',
+        },
+        'bodyRequest.nextOfKin.email': {
+          message: 'Invalid value provided',
+        },
+        'dependents.$0.firstName': {
+          message: 'Invalid value provided',
+        },
+        'dependents.$0.lastName': {
           message: 'Invalid value provided',
         },
       })
@@ -562,6 +660,7 @@ describe('AuthController', () => {
       expect(body.message).toBe('Validation Failed')
       expect(body.details).toEqual({
         'bodyRequest.email': { message: 'Invalid value provided' },
+        'bodyRequest.password': { message: 'Invalid value provided' },
       })
     })
 
@@ -598,7 +697,7 @@ describe('AuthController', () => {
       })
       const loginRequest: LoginRequest = {
         email: TestUsers.PARTICIPANT_UNANSWERED.email,
-        password: 'wrong',
+        password: 'wrong123412345',
       }
       await request(app).post('/auth/login').send(loginRequest)
       const user = await prisma.user.findFirstOrThrow({
@@ -615,7 +714,7 @@ describe('AuthController', () => {
       })
       const loginRequest: LoginRequest = {
         email: TestUsers.PARTICIPANT_UNANSWERED.email,
-        password: 'wrong',
+        password: 'wrong1234124312',
       }
       const loginResponse = await request(app).post('/auth/login').send(loginRequest)
       expect(loginResponse.body.details).toBe('Retries exceeded, account locked for 24 hours')

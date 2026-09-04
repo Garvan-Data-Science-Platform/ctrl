@@ -1,4 +1,16 @@
 import {
+  AddressLine,
+  DoB,
+  Email,
+  FirstName,
+  LastName,
+  MiddleName,
+  Mobile,
+  Postcode,
+  Suburb,
+} from '../../commonTypes'
+
+import {
   AlternativeContact,
   ContactMethod,
   ParticipantType,
@@ -6,10 +18,10 @@ import {
 } from './ParticipantProfile'
 
 export interface FamilyMember {
-  firstName: string
-  middleName?: string
-  lastName: string
-  dob: string
+  firstName: FirstName
+  middleName?: MiddleName
+  lastName: LastName
+  dob: DoB
   id: number
   participantType: ParticipantType
 }
@@ -17,16 +29,16 @@ export interface FamilyMember {
 export interface GetParticipantProfileResponse {
   data: {
     id: number
-    firstName: string
-    middleName?: string
-    lastName: string
-    dob: string
-    email?: string
-    mobile: string
-    addressLine?: string
-    suburb?: string
+    firstName: FirstName
+    middleName?: MiddleName
+    lastName: LastName
+    dob: DoB
+    email?: Email
+    mobile: Mobile
+    addressLine?: AddressLine
+    suburb?: Suburb
     state?: StateTerritory
-    postcode?: string
+    postcode?: Postcode
     preferredContact: ContactMethod
     participantType: ParticipantType
     nextOfKin?: AlternativeContact

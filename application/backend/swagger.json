@@ -113,7 +113,7 @@
         "type": "object",
         "additionalProperties": false
       },
-      "Pick_User.Exclude_keyofUser.password-or-emailHash__": {
+      "Pick_UserT.Exclude_keyofUserT.password-or-emailHash__": {
         "properties": {
           "id": {
             "type": "number",
@@ -178,12 +178,12 @@
         "type": "object",
         "description": "From T, pick a set of properties whose keys are in the union K"
       },
-      "Omit_User.password-or-emailHash_": {
-        "$ref": "#/components/schemas/Pick_User.Exclude_keyofUser.password-or-emailHash__",
+      "Omit_UserT.password-or-emailHash_": {
+        "$ref": "#/components/schemas/Pick_UserT.Exclude_keyofUserT.password-or-emailHash__",
         "description": "Construct a type with the properties of T except for those in type K."
       },
       "UserResponse": {
-        "$ref": "#/components/schemas/Omit_User.password-or-emailHash_"
+        "$ref": "#/components/schemas/Omit_UserT.password-or-emailHash_"
       },
       "GetAllUsersResponse": {
         "properties": {
@@ -244,6 +244,27 @@
         "type": "object",
         "additionalProperties": false
       },
+      "FirstName": {
+        "type": "string",
+        "example": "John",
+        "minLength": 1,
+        "maxLength": 100,
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ\\s\\-'.]+$"
+      },
+      "LastName": {
+        "type": "string",
+        "example": "Doe",
+        "minLength": 1,
+        "maxLength": 100,
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ\\s\\-'.]+$"
+      },
+      "Email": {
+        "type": "string",
+        "example": "john.doe@email.com",
+        "minLength": 1,
+        "maxLength": 254,
+        "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+      },
       "Role": {
         "type": "string",
         "enum": [
@@ -253,22 +274,23 @@
           "StudyAdmin"
         ]
       },
+      "RoleT": {
+        "$ref": "#/components/schemas/Role",
+        "example": "OrganisationAdmin"
+      },
       "CreateUserRequest": {
         "properties": {
           "firstName": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/FirstName"
           },
           "lastName": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/LastName"
           },
           "email": {
-            "type": "string",
-            "pattern": "^(.+)@(.+)$"
+            "$ref": "#/components/schemas/Email"
           },
           "role": {
-            "$ref": "#/components/schemas/Role"
+            "$ref": "#/components/schemas/RoleT"
           }
         },
         "required": [
@@ -278,77 +300,60 @@
           "role"
         ],
         "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "firstName": "John",
-          "lastName": "Doe",
-          "email": "john.doe@email.com",
-          "role": "Participant"
-        }
+        "additionalProperties": false
       },
       "UpdateUserRequest": {
         "properties": {
           "firstName": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/FirstName"
           },
           "lastName": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/LastName"
           },
           "email": {
-            "type": "string",
-            "pattern": "^(.+)@(.+)$"
+            "$ref": "#/components/schemas/Email"
           },
           "role": {
-            "$ref": "#/components/schemas/Role"
+            "$ref": "#/components/schemas/RoleT"
           }
         },
         "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "firstName": "John",
-          "lastName": "Doe",
-          "email": "john.doe@email.com",
-          "role": "User"
-        }
+        "additionalProperties": false
       },
       "UpdateUserRoleRequest": {
         "properties": {
           "newRole": {
-            "$ref": "#/components/schemas/Role"
+            "$ref": "#/components/schemas/RoleT"
           }
         },
         "required": [
           "newRole"
         ],
         "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "newRole": "OperatorAdmin"
-        }
+        "additionalProperties": false
       },
       "GeneratePasswordResetLinkRequest": {
         "properties": {
           "email": {
-            "type": "string",
-            "pattern": "^(.+)@(.+)$"
+            "$ref": "#/components/schemas/Email"
           }
         },
         "required": [
           "email"
         ],
         "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "email": "john.doe@email.com"
-        }
+        "additionalProperties": false
+      },
+      "Password": {
+        "type": "string",
+        "example": "Supersecret123",
+        "minLength": 14,
+        "maxLength": 128
       },
       "ResetPasswordRequest": {
         "properties": {
           "newPassword": {
-            "type": "string",
-            "minLength": 14
+            "$ref": "#/components/schemas/Password"
           },
           "token": {
             "type": "string"
@@ -359,11 +364,7 @@
           "token"
         ],
         "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "newPassword": "Newsupersecret123",
-          "token": "1063e00e4a273e698577"
-        }
+        "additionalProperties": false
       },
       "SurveyVersionStatus": {
         "type": "string",
@@ -419,6 +420,32 @@
         "type": "object",
         "additionalProperties": false
       },
+      "SurveyStepTitle": {
+        "type": "string",
+        "example": "Introduction to CTRL",
+        "maxLength": 128,
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]*$"
+      },
+      "SurveyStepDescription": {
+        "type": "string",
+        "example": "Watch our short video about the consent process for taking part in medical research.",
+        "maxLength": 900,
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]*$"
+      },
+      "SurveyQuestionText": {
+        "type": "string",
+        "example": "Do you consent to the genomic test?",
+        "minLength": 1,
+        "maxLength": 900,
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
+      },
+      "SurveyQuestionTooltip": {
+        "type": "string",
+        "example": "Here is an explanation of what genomic means",
+        "minLength": 1,
+        "maxLength": 900,
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
+      },
       "DuoCode": {
         "properties": {
           "code": {
@@ -445,10 +472,10 @@
       "SurveyQuestionChoices": {
         "properties": {
           "text": {
-            "type": "string"
+            "$ref": "#/components/schemas/SurveyQuestionText"
           },
           "tooltip": {
-            "type": "string"
+            "$ref": "#/components/schemas/SurveyQuestionTooltip"
           },
           "required": {
             "type": "boolean"
@@ -477,10 +504,10 @@
       "SurveyQuestionCheckbox": {
         "properties": {
           "text": {
-            "type": "string"
+            "$ref": "#/components/schemas/SurveyQuestionText"
           },
           "tooltip": {
-            "type": "string"
+            "$ref": "#/components/schemas/SurveyQuestionTooltip"
           },
           "required": {
             "type": "boolean"
@@ -499,10 +526,17 @@
         "type": "object",
         "additionalProperties": false
       },
+      "Url": {
+        "type": "string",
+        "example": "https://orgname.com/tcLink/",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^https?:\\/\\/[a-zA-Z0-9\\-._~:/?#[\\]@!$&'()*+,;=%]+$"
+      },
       "SurveyVideo": {
         "properties": {
           "link": {
-            "type": "string"
+            "$ref": "#/components/schemas/Url"
           }
         },
         "required": [
@@ -511,10 +545,17 @@
         "type": "object",
         "additionalProperties": false
       },
+      "SurveySubHeadingText": {
+        "type": "string",
+        "example": "Section with questions about consent",
+        "minLength": 1,
+        "maxLength": 900,
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
+      },
       "SurveySubHeading": {
         "properties": {
           "text": {
-            "type": "string"
+            "$ref": "#/components/schemas/SurveySubHeadingText"
           }
         },
         "required": [
@@ -628,10 +669,10 @@
       "SurveyStep": {
         "properties": {
           "title": {
-            "type": "string"
+            "$ref": "#/components/schemas/SurveyStepTitle"
           },
           "text": {
-            "type": "string"
+            "$ref": "#/components/schemas/SurveyStepDescription"
           },
           "last_updated": {
             "type": "string"
@@ -798,6 +839,11 @@
         "type": "object",
         "additionalProperties": false
       },
+      "DoB": {
+        "type": "string",
+        "example": "2000-05-21",
+        "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+      },
       "SurveyStepAnswerArray": {
         "items": {
           "anyOf": [
@@ -840,13 +886,13 @@
                 "format": "double"
               },
               "dob": {
-                "type": "string"
+                "$ref": "#/components/schemas/DoB"
               },
               "lastName": {
-                "type": "string"
+                "$ref": "#/components/schemas/LastName"
               },
               "firstName": {
-                "type": "string"
+                "$ref": "#/components/schemas/FirstName"
               }
             },
             "required": [
@@ -1142,11 +1188,16 @@
         "type": "object",
         "additionalProperties": false
       },
+      "StudyName": {
+        "type": "string",
+        "example": "Acme Genomics Study",
+        "maxLength": 128,
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
+      },
       "CreateStudyRequest": {
         "properties": {
           "name": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/StudyName"
           }
         },
         "required": [
@@ -1155,60 +1206,117 @@
         "type": "object",
         "additionalProperties": false
       },
+      "StudyDescription": {
+        "type": "string",
+        "example": "This is a short description of the study",
+        "maxLength": 900,
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
+      },
+      "RedcapToken": {
+        "type": "string",
+        "example": "2F86C2FA2FE1D119C1872A89AB309ABB",
+        "minLength": 32,
+        "maxLength": 32,
+        "pattern": "^[a-fA-F0-9]{32}$"
+      },
+      "OptionalUrl": {
+        "type": "string",
+        "example": "https://redcap.orgname.com/api/",
+        "maxLength": 128,
+        "pattern": "^(https?:\\/\\/[a-zA-Z0-9\\-._~:/?#[\\]@!$&'()*+,;=%]+)?$"
+      },
+      "OptionalEmail": {
+        "type": "string",
+        "example": "contact.us@email.com",
+        "maxLength": 254,
+        "pattern": "^([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,})?$"
+      },
       "UpdateStudyRequest": {
         "properties": {
           "name": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/StudyName"
           },
           "description": {
-            "type": "string"
+            "$ref": "#/components/schemas/StudyDescription"
           },
           "redcapToken": {
-            "type": "string"
+            "$ref": "#/components/schemas/RedcapToken"
           },
           "redcapURL": {
-            "type": "string"
+            "$ref": "#/components/schemas/OptionalUrl"
           },
           "contactUsEmail": {
-            "type": "string"
+            "$ref": "#/components/schemas/OptionalEmail"
           }
         },
+        "type": "object",
+        "additionalProperties": false
+      },
+      "CssColour": {
+        "type": "string",
+        "example": "#a1b2c3",
+        "maxLength": 30,
+        "pattern": "^(#(?:[0-9a-fA-F]{3,4}){1,2}|rgba?\\(\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*(?:,\\s*[0-9.]+\\s*)?\\)|[a-zA-Z]{3,30})?$"
+      },
+      "SettingsBase": {
+        "properties": {
+          "primaryColour": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CssColour"
+              }
+            ],
+            "nullable": true
+          },
+          "secondaryColour": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CssColour"
+              }
+            ],
+            "nullable": true
+          },
+          "tcLink": {
+            "$ref": "#/components/schemas/Url"
+          },
+          "newsLink": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Url"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "required": [
+          "primaryColour",
+          "secondaryColour",
+          "tcLink",
+          "newsLink"
+        ],
         "type": "object",
         "additionalProperties": false
       },
       "GetSettingsResponse": {
         "properties": {
           "data": {
-            "properties": {
-              "newsLink": {
-                "type": "string",
-                "nullable": true
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SettingsBase"
               },
-              "tcLink": {
-                "type": "string"
-              },
-              "secondaryColour": {
-                "type": "string",
-                "nullable": true
-              },
-              "primaryColour": {
-                "type": "string",
-                "nullable": true
-              },
-              "logoSet": {
-                "type": "string",
-                "nullable": true
+              {
+                "properties": {
+                  "logoSet": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "logoSet"
+                ],
+                "type": "object"
               }
-            },
-            "required": [
-              "newsLink",
-              "tcLink",
-              "secondaryColour",
-              "primaryColour",
-              "logoSet"
-            ],
-            "type": "object"
+            ]
           }
         },
         "required": [
@@ -1217,36 +1325,44 @@
         "type": "object",
         "additionalProperties": false
       },
-      "Partial_Omit_SettingsData.logoSet__": {
+      "UpdateSettingsRequest": {
         "properties": {
           "primaryColour": {
-            "type": "string",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CssColour"
+              }
+            ],
             "nullable": true
           },
           "secondaryColour": {
-            "type": "string",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CssColour"
+              }
+            ],
             "nullable": true
           },
           "tcLink": {
-            "type": "string"
+            "$ref": "#/components/schemas/Url"
           },
           "newsLink": {
-            "type": "string",
-            "nullable": true
+            "$ref": "#/components/schemas/Url"
           }
         },
         "type": "object",
-        "description": "Make all properties in T optional"
-      },
-      "UpdateSettingsRequest": {
-        "$ref": "#/components/schemas/Partial_Omit_SettingsData.logoSet__"
+        "additionalProperties": false
       },
       "GetUserPortalSettingsResponse": {
         "properties": {
           "data": {
             "properties": {
               "newsLink": {
-                "type": "string",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Url"
+                  }
+                ],
                 "nullable": true
               },
               "secondaryColour": {
@@ -1272,6 +1388,32 @@
         "type": "object",
         "additionalProperties": false
       },
+      "MiddleName": {
+        "type": "string",
+        "example": "William",
+        "minLength": 1,
+        "maxLength": 100,
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ\\s\\-'.]+$"
+      },
+      "Mobile": {
+        "type": "string",
+        "example": "0412341432",
+        "pattern": "^04\\d{8}$"
+      },
+      "AddressLine": {
+        "type": "string",
+        "example": "123 Sydney Street",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
+      },
+      "Suburb": {
+        "type": "string",
+        "example": "Darlinghurst",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
+      },
       "StateTerritory": {
         "enum": [
           "ACT",
@@ -1284,6 +1426,11 @@
           "WA"
         ],
         "type": "string"
+      },
+      "Postcode": {
+        "type": "string",
+        "example": "1234",
+        "pattern": "^\\d{4}$"
       },
       "ContactMethod": {
         "enum": [
@@ -1305,20 +1452,24 @@
       "AlternativeContact": {
         "properties": {
           "firstName": {
-            "type": "string"
+            "$ref": "#/components/schemas/FirstName"
           },
           "middleName": {
-            "type": "string"
+            "$ref": "#/components/schemas/MiddleName"
           },
           "lastName": {
-            "type": "string"
+            "$ref": "#/components/schemas/LastName"
           },
           "mobile": {
-            "type": "string",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Mobile"
+              }
+            ],
             "nullable": true
           },
           "email": {
-            "type": "string"
+            "$ref": "#/components/schemas/Email"
           }
         },
         "required": [
@@ -1332,16 +1483,16 @@
       "FamilyMember": {
         "properties": {
           "firstName": {
-            "type": "string"
+            "$ref": "#/components/schemas/FirstName"
           },
           "middleName": {
-            "type": "string"
+            "$ref": "#/components/schemas/MiddleName"
           },
           "lastName": {
-            "type": "string"
+            "$ref": "#/components/schemas/LastName"
           },
           "dob": {
-            "type": "string"
+            "$ref": "#/components/schemas/DoB"
           },
           "id": {
             "type": "number",
@@ -1385,34 +1536,34 @@
                 "$ref": "#/components/schemas/ContactMethod"
               },
               "postcode": {
-                "type": "string"
+                "$ref": "#/components/schemas/Postcode"
               },
               "state": {
                 "$ref": "#/components/schemas/StateTerritory"
               },
               "suburb": {
-                "type": "string"
+                "$ref": "#/components/schemas/Suburb"
               },
               "addressLine": {
-                "type": "string"
+                "$ref": "#/components/schemas/AddressLine"
               },
               "mobile": {
-                "type": "string"
+                "$ref": "#/components/schemas/Mobile"
               },
               "email": {
-                "type": "string"
+                "$ref": "#/components/schemas/Email"
               },
               "dob": {
-                "type": "string"
+                "$ref": "#/components/schemas/DoB"
               },
               "lastName": {
-                "type": "string"
+                "$ref": "#/components/schemas/LastName"
               },
               "middleName": {
-                "type": "string"
+                "$ref": "#/components/schemas/MiddleName"
               },
               "firstName": {
-                "type": "string"
+                "$ref": "#/components/schemas/FirstName"
               },
               "id": {
                 "type": "number",
@@ -1442,13 +1593,13 @@
       "OnBehalf": {
         "properties": {
           "firstName": {
-            "type": "string"
+            "$ref": "#/components/schemas/FirstName"
           },
           "lastName": {
-            "type": "string"
+            "$ref": "#/components/schemas/LastName"
           },
           "dob": {
-            "type": "string"
+            "$ref": "#/components/schemas/DoB"
           },
           "permanent": {
             "type": "boolean"
@@ -1463,52 +1614,49 @@
         "type": "object",
         "additionalProperties": false
       },
-      "Partial_RegisterParticipantRequest_": {
+      "ExternalId": {
+        "type": "string",
+        "example": "123e4567-e89b-12d3-a456-426614174000",
+        "maxLength": 128,
+        "pattern": "^[a-zA-Z0-9\\-_=.:]*$"
+      },
+      "UpdateProfileRequest": {
         "properties": {
           "firstName": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/FirstName"
           },
           "middleName": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/MiddleName"
           },
           "lastName": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/LastName"
           },
           "email": {
-            "type": "string",
-            "pattern": "^(.+)@(.+)$"
+            "$ref": "#/components/schemas/Email"
           },
           "mobile": {
-            "type": "string",
-            "pattern": "^(\\+\\d{1,2}\\s?)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$"
+            "$ref": "#/components/schemas/Mobile"
           },
           "preferredContact": {
             "$ref": "#/components/schemas/ContactMethod"
           },
           "addressLine": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/AddressLine"
           },
           "suburb": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/Suburb"
           },
           "postcode": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/Postcode"
           },
           "state": {
             "$ref": "#/components/schemas/StateTerritory"
           },
           "password": {
-            "type": "string",
-            "minLength": 14
+            "$ref": "#/components/schemas/Password"
           },
           "dob": {
-            "type": "string"
+            "$ref": "#/components/schemas/DoB"
           },
           "participantType": {
             "$ref": "#/components/schemas/ParticipantType"
@@ -1520,39 +1668,15 @@
             "items": {
               "$ref": "#/components/schemas/OnBehalf"
             },
-            "type": "array"
+            "type": "array",
+            "maxItems": 15
           },
           "externalId": {
-            "type": "string"
+            "$ref": "#/components/schemas/ExternalId"
           }
         },
         "type": "object",
-        "description": "Make all properties in T optional"
-      },
-      "UpdateProfileRequest": {
-        "$ref": "#/components/schemas/Partial_RegisterParticipantRequest_",
-        "example": {
-          "firstName": "John",
-          "middleName": "James",
-          "lastName": "Doe",
-          "email": "john.doe@email.com",
-          "password": "Supersecret123",
-          "dob": "2000-05-21",
-          "mobile": "0412341234",
-          "addressLine": "123 Sydney Street",
-          "suburb": "Sydney",
-          "postcode": "2000",
-          "state": "NSW",
-          "participantType": "STANDARD",
-          "preferredContact": "MOBILE",
-          "nextOfKin": {
-            "firstName": "Jeremy",
-            "middleName": "Jimmy",
-            "lastName": "Doe",
-            "mobile": "0412341432",
-            "email": "jeremydoe@email.com"
-          }
-        }
+        "additionalProperties": false
       },
       "ParticipantAnswerStatus": {
         "properties": {
@@ -1594,13 +1718,13 @@
             "type": "string"
           },
           "email": {
-            "type": "string"
+            "$ref": "#/components/schemas/Email"
           },
           "firstName": {
-            "type": "string"
+            "$ref": "#/components/schemas/FirstName"
           },
           "lastName": {
-            "type": "string"
+            "$ref": "#/components/schemas/LastName"
           },
           "familyId": {
             "type": "number",
@@ -1657,16 +1781,16 @@
                   "format": "double"
                 },
                 "study": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/StudyName"
                 },
                 "dob": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/DoB"
                 },
                 "lastName": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/LastName"
                 },
                 "firstName": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/FirstName"
                 },
                 "profileId": {
                   "type": "number",
@@ -1725,34 +1849,34 @@
                     "$ref": "#/components/schemas/ContactMethod"
                   },
                   "postcode": {
-                    "type": "string"
+                    "$ref": "#/components/schemas/Postcode"
                   },
                   "state": {
                     "$ref": "#/components/schemas/StateTerritory"
                   },
                   "suburb": {
-                    "type": "string"
+                    "$ref": "#/components/schemas/Suburb"
                   },
                   "addressLine": {
-                    "type": "string"
+                    "$ref": "#/components/schemas/AddressLine"
                   },
                   "mobile": {
-                    "type": "string"
+                    "$ref": "#/components/schemas/Mobile"
                   },
                   "email": {
-                    "type": "string"
+                    "$ref": "#/components/schemas/Email"
                   },
                   "dob": {
-                    "type": "string"
+                    "$ref": "#/components/schemas/DoB"
                   },
                   "lastName": {
-                    "type": "string"
+                    "$ref": "#/components/schemas/LastName"
                   },
                   "middleName": {
-                    "type": "string"
+                    "$ref": "#/components/schemas/MiddleName"
                   },
                   "firstName": {
-                    "type": "string"
+                    "$ref": "#/components/schemas/FirstName"
                   },
                   "id": {
                     "type": "number",
@@ -1815,10 +1939,10 @@
                 "items": {
                   "properties": {
                     "description": {
-                      "type": "string"
+                      "$ref": "#/components/schemas/StudyDescription"
                     },
                     "studyName": {
-                      "type": "string"
+                      "$ref": "#/components/schemas/StudyName"
                     },
                     "sentAt": {
                       "type": "string"
@@ -1834,7 +1958,7 @@
                       "format": "double"
                     },
                     "email": {
-                      "type": "string"
+                      "$ref": "#/components/schemas/Email"
                     },
                     "id": {
                       "type": "string"
@@ -1897,7 +2021,7 @@
                   "format": "double"
                 },
                 "email": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/Email"
                 },
                 "id": {
                   "type": "string"
@@ -1961,10 +2085,6 @@
         ],
         "type": "object",
         "additionalProperties": false
-      },
-      "Email": {
-        "type": "string",
-        "pattern": "^(.+)@(.+)$"
       },
       "Partial_GetParticipantProfileResponse-at-data_": {
         "properties": {
@@ -2033,7 +2153,7 @@
           "studyParticipant": {
             "properties": {
               "externalId": {
-                "type": "string"
+                "$ref": "#/components/schemas/ExternalId"
               }
             },
             "type": "object"
@@ -2058,6 +2178,20 @@
         "type": "object",
         "additionalProperties": false
       },
+      "InviteEmailSubject": {
+        "type": "string",
+        "example": "Invitation to CTRL - Dynamic Consent Platform",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
+      },
+      "InviteEmailText": {
+        "type": "string",
+        "example": "You have been invited to register with CTRL dynamic consent platform",
+        "minLength": 1,
+        "maxLength": 900,
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
+      },
       "InviteParticipantsRequest": {
         "properties": {
           "recipients": {
@@ -2067,10 +2201,10 @@
             "type": "array"
           },
           "subjectText": {
-            "type": "string"
+            "$ref": "#/components/schemas/InviteEmailSubject"
           },
           "explanatoryText": {
-            "type": "string"
+            "$ref": "#/components/schemas/InviteEmailText"
           }
         },
         "required": [
@@ -2079,23 +2213,15 @@
           "explanatoryText"
         ],
         "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "emails": [
-            "john.doe@email.com",
-            "jane@email.com"
-          ],
-          "subjectText": "Invitation to Study",
-          "explanatoryText": "You have been invited to participate in this Study. Please click this link to provide consent."
-        }
+        "additionalProperties": false
       },
       "GetInviteTextResponse": {
         "properties": {
           "inviteEmailSubject": {
-            "type": "string"
+            "$ref": "#/components/schemas/InviteEmailSubject"
           },
           "inviteEmailText": {
-            "type": "string"
+            "$ref": "#/components/schemas/InviteEmailText"
           }
         },
         "required": [
@@ -2108,16 +2234,16 @@
       "Organisation": {
         "description": "Model Organisation",
         "properties": {
-          "elsaToken": {
-            "type": "string",
-            "nullable": true
-          },
           "newsLink": {
             "type": "string",
             "nullable": true
           },
           "tcLink": {
             "type": "string"
+          },
+          "elsaToken": {
+            "type": "string",
+            "nullable": true
           },
           "secondaryColour": {
             "type": "string",
@@ -2149,9 +2275,9 @@
           }
         },
         "required": [
-          "elsaToken",
           "newsLink",
           "tcLink",
+          "elsaToken",
           "secondaryColour",
           "primaryColour",
           "logo",
@@ -2202,11 +2328,17 @@
         "type": "object",
         "additionalProperties": false
       },
+      "OrganisationName": {
+        "type": "string",
+        "example": "Acme Medical Research Institute",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
+      },
       "CreateOrganisationRequest": {
         "properties": {
           "name": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/OrganisationName"
           }
         },
         "required": [
@@ -2218,92 +2350,17 @@
       "UpdateOrganisationRequest": {
         "properties": {
           "name": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/OrganisationName"
           }
         },
         "type": "object",
         "additionalProperties": false
       },
-      "User": {
-        "description": "Model User",
-        "properties": {
-          "deleted": {
-            "type": "boolean"
-          },
-          "retriesRemaining": {
-            "type": "number",
-            "format": "double"
-          },
-          "lockedUntil": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "agreedTermsAt": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "role": {
-            "$ref": "#/components/schemas/_36_Enums.Role"
-          },
-          "password": {
-            "type": "string"
-          },
-          "emailHash": {
-            "type": "string",
-            "nullable": true
-          },
-          "email": {
-            "type": "string"
-          },
-          "lastName": {
-            "type": "string"
-          },
-          "middleName": {
-            "type": "string",
-            "nullable": true
-          },
-          "firstName": {
-            "type": "string"
-          },
-          "id": {
-            "type": "number",
-            "format": "double"
-          }
-        },
-        "required": [
-          "deleted",
-          "retriesRemaining",
-          "lockedUntil",
-          "agreedTermsAt",
-          "updatedAt",
-          "createdAt",
-          "role",
-          "password",
-          "emailHash",
-          "email",
-          "lastName",
-          "middleName",
-          "firstName",
-          "id"
-        ],
-        "type": "object"
-      },
       "GetOrganisationUsersResponse": {
         "properties": {
           "data": {
             "items": {
-              "$ref": "#/components/schemas/User"
+              "$ref": "#/components/schemas/UserResponse"
             },
             "type": "array"
           }
@@ -2314,10 +2371,17 @@
         "type": "object",
         "additionalProperties": false
       },
+      "ContactUsText": {
+        "type": "string",
+        "example": "There was some problem with this thing that I was doing.\nBut I don't know why?\n\nCheers,\nJohn Doe",
+        "minLength": 1,
+        "maxLength": 900,
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
+      },
       "ContactUsRequest": {
         "properties": {
           "content": {
-            "type": "string"
+            "$ref": "#/components/schemas/ContactUsText"
           },
           "studyId": {
             "type": "number",
@@ -2371,12 +2435,17 @@
         "type": "object",
         "additionalProperties": false
       },
+      "RedcapFormName": {
+        "type": "string",
+        "example": "Name of REDCap instrument (from Column B of data dictionary)",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€_+]+$"
+      },
       "UploadRedcapInstrumentAPIRequest": {
-        "description": "This is the name of the redcap instrument you are importing from.\nNOTE: These 'forms' are not the form label values that are seen on the webpages,\nbut instead they are the unique form names seen in Column B of the data dictionary.",
         "properties": {
           "formName": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/RedcapFormName"
           }
         },
         "required": [
@@ -2483,27 +2552,22 @@
       "RegisterRequest": {
         "properties": {
           "firstName": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/FirstName"
           },
           "middleName": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/MiddleName"
           },
           "lastName": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/LastName"
           },
           "email": {
-            "type": "string",
-            "pattern": "^(.+)@(.+)$"
+            "$ref": "#/components/schemas/Email"
           },
           "password": {
-            "type": "string",
-            "minLength": 14
+            "$ref": "#/components/schemas/Password"
           },
           "role": {
-            "$ref": "#/components/schemas/Role"
+            "$ref": "#/components/schemas/RoleT"
           }
         },
         "required": [
@@ -2514,14 +2578,7 @@
           "role"
         ],
         "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "firstName": "John",
-          "lastName": "Doe",
-          "email": "john.doe@email.com",
-          "password": "Supersecret123",
-          "role": "OrganisationAdmin"
-        }
+        "additionalProperties": false
       },
       "SetupResponse": {
         "properties": {
@@ -2581,12 +2638,10 @@
       "RegisterSetupRequest": {
         "properties": {
           "email": {
-            "type": "string",
-            "pattern": "^(.+)@(.+)$"
+            "$ref": "#/components/schemas/Email"
           },
           "password": {
-            "type": "string",
-            "minLength": 14
+            "$ref": "#/components/schemas/Password"
           }
         },
         "required": [
@@ -2594,11 +2649,7 @@
           "password"
         ],
         "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "email": "john.doe@email.com",
-          "password": "Supersecret123"
-        }
+        "additionalProperties": false
       },
       "RegisterParticipantResponse": {
         "properties": {
@@ -2610,7 +2661,7 @@
             "type": "string"
           },
           "role": {
-            "type": "string"
+            "$ref": "#/components/schemas/RoleT"
           }
         },
         "required": [
@@ -2624,49 +2675,40 @@
       "RegisterParticipantRequest": {
         "properties": {
           "firstName": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/FirstName"
           },
           "middleName": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/MiddleName"
           },
           "lastName": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/LastName"
           },
           "email": {
-            "type": "string",
-            "pattern": "^(.+)@(.+)$"
+            "$ref": "#/components/schemas/Email"
           },
           "mobile": {
-            "type": "string",
-            "pattern": "^(\\+\\d{1,2}\\s?)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$"
+            "$ref": "#/components/schemas/Mobile"
           },
           "preferredContact": {
             "$ref": "#/components/schemas/ContactMethod"
           },
           "addressLine": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/AddressLine"
           },
           "suburb": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/Suburb"
           },
           "postcode": {
-            "type": "string",
-            "minLength": 1
+            "$ref": "#/components/schemas/Postcode"
           },
           "state": {
             "$ref": "#/components/schemas/StateTerritory"
           },
           "password": {
-            "type": "string",
-            "minLength": 14
+            "$ref": "#/components/schemas/Password"
           },
           "dob": {
-            "type": "string"
+            "$ref": "#/components/schemas/DoB"
           },
           "participantType": {
             "$ref": "#/components/schemas/ParticipantType"
@@ -2678,10 +2720,11 @@
             "items": {
               "$ref": "#/components/schemas/OnBehalf"
             },
-            "type": "array"
+            "type": "array",
+            "maxItems": 15
           },
           "externalId": {
-            "type": "string"
+            "$ref": "#/components/schemas/ExternalId"
           }
         },
         "required": [
@@ -2701,30 +2744,7 @@
           "dependents"
         ],
         "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "firstName": "John",
-          "middleName": "James",
-          "lastName": "Doe",
-          "email": "john.doe@email.com",
-          "password": "Supersecret123",
-          "dob": "2000-05-21",
-          "mobile": "0412341234",
-          "addressLine": "123 Sydney Street",
-          "suburb": "Sydney",
-          "postcode": "2000",
-          "state": "NSW",
-          "participantType": "STANDARD",
-          "preferredContact": "MOBILE",
-          "nextOfKin": {
-            "firstName": "Jeremy",
-            "middleName": "Jimmy",
-            "lastName": "Doe",
-            "mobile": "0412341432",
-            "email": "jeremydoe@email.com"
-          },
-          "dependents": []
-        }
+        "additionalProperties": false
       },
       "LoginSuccessResponse": {
         "properties": {
@@ -2736,7 +2756,7 @@
             "format": "double"
           },
           "role": {
-            "type": "string"
+            "$ref": "#/components/schemas/RoleT"
           }
         },
         "required": [
@@ -2792,11 +2812,10 @@
       "LoginRequest": {
         "properties": {
           "email": {
-            "type": "string",
-            "pattern": "^(.+)@(.+)$"
+            "$ref": "#/components/schemas/Email"
           },
           "password": {
-            "type": "string"
+            "$ref": "#/components/schemas/Password"
           }
         },
         "required": [
@@ -2804,11 +2823,7 @@
           "password"
         ],
         "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "email": "john.doe@email.com",
-          "password": "Supersecret123"
-        }
+        "additionalProperties": false
       },
       "OTPLoginRequest": {
         "properties": {

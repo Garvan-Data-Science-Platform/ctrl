@@ -1,13 +1,7 @@
-/**
- * @example {
- *  "name": "Acme Genomics Study",
- * }
- */
+import { StudyName } from '../../commonTypes'
+
 export interface CreateStudyRequest {
-  /**
-   * @minLength 1
-   */
-  name: string
+  name: StudyName
 }
 
 export interface CreateStudyResponse {

@@ -1,35 +1,38 @@
+import {
+  SurveyQuestionText,
+  SurveyQuestionTooltip,
+  SurveyStepDescription,
+  SurveyStepTitle,
+  SurveySubHeadingText,
+  Url,
+} from './commonTypes'
+
 export interface DuoCode {
-  code: string
+  code: string // List used codes?
   relatedAnswer: string | boolean
 }
 
 export interface SurveyQuestionCheckbox {
-  text: string
-  tooltip?: string
+  text: SurveyQuestionText
+  tooltip?: SurveyQuestionTooltip
   required: boolean
   duoCodes?: DuoCode[]
 }
 
 export interface SurveyQuestionChoices {
-  text: string
-  tooltip?: string
+  text: SurveyQuestionText
+  tooltip?: SurveyQuestionTooltip
   required: boolean
   choices: string[]
   duoCodes?: DuoCode[]
 }
 
 export interface SurveySubHeading {
-  text: string
+  text: SurveySubHeadingText
 }
 
 export interface SurveyVideo {
-  link: string
-}
-
-export interface RefusalText {
-  title: string
-  text: string
-  button_text: string
+  link: Url
 }
 
 export type SurveyElementType = 'question-choices' | 'question-checkbox' | 'subheading' | 'video'
@@ -45,11 +48,10 @@ export type SurveyElement =
   | { type: SurveyElementType; data: any }
 
 export interface SurveyStep {
-  title: string
-  text: string
-  last_updated?: string
+  title: SurveyStepTitle
+  text: SurveyStepDescription
+  last_updated?: string // TODO: Why is this a string? Should be omitted for the update survey response
   elements: SurveyElement[]
-  //refusal_text: RefusalText
 }
 
 export type SurveyVersionStatus = 'PUBLISHED' | 'DRAFT'

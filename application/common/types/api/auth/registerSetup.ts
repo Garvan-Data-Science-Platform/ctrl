@@ -1,16 +1,6 @@
-/**
- * @example {
- *  "email": "john.doe@email.com",
- *  "password": "Supersecret123"
- * }
- */
+import { Email, Password } from '../../commonTypes'
+
 export interface RegisterSetupRequest {
-  /**
-   * @pattern ^(.+)@(.+)$ Please provide valid email
-   */
-  email: string
-  /**
-   * @minLength 14 Password must be at least 14 characters
-   */
-  password: string
+  email: Email
+  password: Password
 }

@@ -1,4 +1,4 @@
-const { TestUsers } = require('../../../common/testing/constants')
+const { TestUsers, TestRedcapToken } = require('../../../common/testing/constants')
 
 before(() => {
   cy.task('reset')
@@ -60,7 +60,7 @@ describe('Audit Logs', () => {
     cy.login(TestUsers.STUDY_ADMIN.email)
     cy.visit('/studies')
     cy.get('[data-cy="advanced-toggle"]').eq(0).click()
-    cy.get('[data-cy="redcapToken"] input').eq(0).type('abc123')
+    cy.get('[data-cy="redcapToken"] input').eq(0).type(TestRedcapToken)
     cy.get('[data-cy="settings-apply"]').eq(0).click()
 
     cy.visit('/audit-logs')

@@ -1,9 +1,9 @@
-import { emailRegex } from '@common/src/regex'
 import { Box, MenuItem, TextField } from '@mui/material'
 import { useGetIdentity } from '@refinedev/core'
 import { Create } from '@refinedev/mui'
 import { useForm } from '@refinedev/react-hook-form'
 import { Controller } from 'react-hook-form'
+import { emailRules, nameRules } from '@common/src/validation'
 
 export const UserCreate = () => {
   const {
@@ -20,9 +20,7 @@ export const UserCreate = () => {
     <Create isLoading={formLoading} saveButtonProps={saveButtonProps}>
       <Box component="form" sx={{ display: 'flex', flexDirection: 'column' }} autoComplete="off">
         <TextField
-          {...register('firstName', {
-            required: 'This field is required',
-          })}
+          {...register('firstName', nameRules())}
           error={!!(errors as any)?.firstName}
           helperText={(errors as any)?.firstName?.message}
           margin="normal"
@@ -34,9 +32,7 @@ export const UserCreate = () => {
           name="firstName"
         />
         <TextField
-          {...register('lastName', {
-            required: 'This field is required',
-          })}
+          {...register('lastName', nameRules())}
           error={!!(errors as any)?.lastName}
           helperText={(errors as any)?.lastName?.message}
           margin="normal"
@@ -47,10 +43,7 @@ export const UserCreate = () => {
           name="lastName"
         />
         <TextField
-          {...register('email', {
-            required: 'This field is required',
-            validate: (email: string) => emailRegex.test(email) || 'Invalid email address',
-          })}
+          {...register('email', emailRules())}
           error={!!(errors as any)?.email}
           helperText={(errors as any)?.email?.message}
           margin="normal"

@@ -166,5 +166,101 @@ describe('ProfilesController', () => {
         expect(response.body.message).toBe('Validation Failed')
       }
     })
+
+    it('should fail validation if provided with illegal xss values', async () => {
+      const updateProfileRequest: UpdateProfileRequest = {
+        firstName: "{{7*7}}<script>alert('xss-firstname')</script>${{7*7}}#{7*7}<%= 7*7 %>",
+        lastName: '<script>',
+        addressLine: "<script>alert('xss-address')</script>",
+        suburb: "<img src=x onerror=alert('xss-suburb-img')>",
+        nextOfKin: {
+          firstName: 'John{7*7}',
+          lastName: '<script>Smith</script>',
+          email: '<script>john</script>@smith.com',
+        },
+      }
+
+      const updateProfileResponse = await request(app)
+        .patch('/profiles/current')
+        .set({ authorization: `Bearer ${registeredParticipantToken}` })
+        .send(updateProfileRequest)
+      expect(updateProfileResponse.status).toEqual(422)
+
+      const updateProfileBody = updateProfileResponse.body
+      expect(updateProfileBody.message).toEqual('Validation Failed')
+      expect(updateProfileBody.token).toBe(undefined)
+      expect(updateProfileBody.details).toEqual({
+        'bodyRequest.firstName': {
+          message: 'Invalid value provided',
+        },
+        'bodyRequest.lastName': {
+          message: 'Invalid value provided',
+        },
+        'bodyRequest.addressLine': {
+          message: 'Invalid value provided',
+        },
+        'bodyRequest.suburb': {
+          message: 'Invalid value provided',
+        },
+        'bodyRequest.nextOfKin.firstName': {
+          message: 'Invalid value provided',
+        },
+        'bodyRequest.nextOfKin.lastName': {
+          message: 'Invalid value provided',
+        },
+        'bodyRequest.nextOfKin.email': {
+          message: 'Invalid value provided',
+        },
+      })
+    })
+  })
+
+  describe('PATCH /profiles/:userId', () => {
+    it('should fail validation if provided with illegal xss values', async () => {
+      const updateProfileRequest: UpdateProfileRequest = {
+        firstName: "{{7*7}}<script>alert('xss-firstname')</script>${{7*7}}#{7*7}<%= 7*7 %>",
+        lastName: '<script>',
+        addressLine: "<script>alert('xss-address')</script>",
+        suburb: "<img src=x onerror=alert('xss-suburb-img')>",
+        nextOfKin: {
+          firstName: 'John{7*7}',
+          lastName: '<script>Smith</script>',
+          email: '<script>john</script>@smith.com',
+        },
+      }
+
+      const updateProfileResponse = await request(app)
+        .patch(`/profiles/${TestUsers.PARTICIPANT_COMPLETED.id}`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .send(updateProfileRequest)
+      expect(updateProfileResponse.status).toEqual(422)
+
+      const updateProfileBody = updateProfileResponse.body
+      expect(updateProfileBody.message).toEqual('Validation Failed')
+      expect(updateProfileBody.token).toBe(undefined)
+      expect(updateProfileBody.details).toEqual({
+        'bodyRequest.firstName': {
+          message: 'Invalid value provided',
+        },
+        'bodyRequest.lastName': {
+          message: 'Invalid value provided',
+        },
+        'bodyRequest.addressLine': {
+          message: 'Invalid value provided',
+        },
+        'bodyRequest.suburb': {
+          message: 'Invalid value provided',
+        },
+        'bodyRequest.nextOfKin.firstName': {
+          message: 'Invalid value provided',
+        },
+        'bodyRequest.nextOfKin.lastName': {
+          message: 'Invalid value provided',
+        },
+        'bodyRequest.nextOfKin.email': {
+          message: 'Invalid value provided',
+        },
+      })
+    })
   })
 })

@@ -1,13 +1,7 @@
-/**
- * @example {
- *  "name": "ABC. Corp",
- * }
- */
+import { OrganisationName } from '../../commonTypes'
+
 export interface CreateOrganisationRequest {
-  /**
-   * @minLength 1
-   */
-  name: string
+  name: OrganisationName
 }
 
 export interface CreateOrganisationResponse {

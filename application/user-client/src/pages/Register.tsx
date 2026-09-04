@@ -29,7 +29,13 @@ import {
 } from '@common/types/api/users/ParticipantProfile'
 import { AddCircle, Close } from '@mui/icons-material'
 import { useEffect, useState } from 'react'
-import { emailRegex } from '@common/src/regex'
+import {
+  addressRules,
+  emailRules,
+  mobileRules,
+  nameRules,
+  postcodeRules,
+} from '@common/src/validation'
 
 interface FormValues {
   firstName: string
@@ -199,7 +205,7 @@ export default function Register() {
                 helperText={errors.firstName?.message}
                 data-cy="reg-first"
                 slotProps={{ inputLabel: { shrink: Boolean(watch('firstName')) } }}
-                {...register('firstName', { required: 'This field is required' })}
+                {...register('firstName', nameRules())}
               />
               <TextField
                 sx={{ m: 1, flexGrow: 1 }}
@@ -209,7 +215,7 @@ export default function Register() {
                 helperText={errors.lastName?.message}
                 data-cy="reg-last"
                 slotProps={{ inputLabel: { shrink: Boolean(watch('lastName')) } }}
-                {...register('lastName', { required: 'This field is required' })}
+                {...register('lastName', nameRules())}
               />
               <TextField
                 type="email"
@@ -221,13 +227,7 @@ export default function Register() {
                 helperText={errors.email?.message}
                 data-cy="reg-email"
                 slotProps={{ inputLabel: { shrink: Boolean(watch('email')) } }}
-                {...register('email', {
-                  required: 'This field is required',
-                  pattern: {
-                    value: emailRegex, //eslint-disable-line
-                    message: 'Enter a valid email',
-                  },
-                })}
+                {...register('email', emailRules())}
               />
               <TextField
                 sx={{ m: 1, flexGrow: 1 }}
@@ -284,7 +284,7 @@ export default function Register() {
                 helperText={errors.addressLine?.message}
                 data-cy="reg-address-line"
                 slotProps={{ inputLabel: { shrink: Boolean(watch('addressLine')) } }}
-                {...register('addressLine', { required: 'This field is required' })}
+                {...register('addressLine', addressRules())}
               />
               <TextField
                 sx={{ m: 1 }}
@@ -294,7 +294,7 @@ export default function Register() {
                 error={Boolean(errors.suburb)}
                 helperText={errors.suburb?.message}
                 slotProps={{ inputLabel: { shrink: Boolean(watch('suburb')) } }}
-                {...register('suburb', { required: 'This field is required' })}
+                {...register('suburb', addressRules())}
               />
               <FormControl sx={{ m: 1, flexGrow: 1 }}>
                 <InputLabel id="state-select-label">State</InputLabel>
@@ -329,13 +329,7 @@ export default function Register() {
                 helperText={errors.postcode?.message}
                 data-cy="reg-postcode"
                 slotProps={{ inputLabel: { shrink: Boolean(watch('postcode')) } }}
-                {...register('postcode', {
-                  required: 'This field is required',
-                  pattern: {
-                    value: /^\d{4}$/,
-                    message: 'Invalid postcode',
-                  },
-                })}
+                {...register('postcode', postcodeRules())}
               />
               <TextField
                 sx={{ m: 1, flexGrow: 1 }}
@@ -345,13 +339,7 @@ export default function Register() {
                 helperText={errors.mobile?.message}
                 data-cy="reg-mobile"
                 slotProps={{ inputLabel: { shrink: Boolean(watch('mobile')) } }}
-                {...register('mobile', {
-                  required: 'This field is required',
-                  pattern: {
-                    value: /04\d{8}$/,
-                    message: 'Invalid mobile number',
-                  },
-                })}
+                {...register('mobile', mobileRules())}
               />
               <FormControl sx={{ m: 1, flexGrow: 1, minWidth: 240 }}>
                 <InputLabel id="pref-select-label">Preferred Contact Method</InputLabel>
@@ -395,7 +383,7 @@ export default function Register() {
                   helperText={errors.nok_first?.message}
                   data-cy="nok-first"
                   slotProps={{ inputLabel: { shrink: Boolean(watch('nok_first')) } }}
-                  {...register('nok_first', { required: 'This field is required' })}
+                  {...register('nok_first', nameRules())}
                 />
                 <TextField
                   sx={{ m: 1, flexGrow: 1 }}
@@ -404,7 +392,7 @@ export default function Register() {
                   helperText={errors.nok_surname?.message}
                   data-cy="nok-surname"
                   slotProps={{ inputLabel: { shrink: Boolean(watch('nok_surname')) } }}
-                  {...register('nok_surname', { required: 'This field is required' })}
+                  {...register('nok_surname', nameRules())}
                 />
                 <TextField
                   type="email"
@@ -415,9 +403,7 @@ export default function Register() {
                   helperText={errors.nok_email?.message}
                   data-cy="nok-email"
                   slotProps={{ inputLabel: { shrink: Boolean(watch('nok_email')) } }}
-                  {...register('nok_email', {
-                    required: 'This field is required',
-                  })}
+                  {...register('nok_email', emailRules())}
                 />
               </>
               <>
@@ -458,9 +444,7 @@ export default function Register() {
                       slotProps={{
                         inputLabel: { shrink: Boolean(watch(`dependents.${idx}.firstName`)) },
                       }}
-                      {...register(`dependents.${idx}.firstName`, {
-                        required: 'This field is required',
-                      })}
+                      {...register(`dependents.${idx}.firstName`, nameRules())}
                     />
                     <TextField
                       sx={{ m: 1, flexGrow: 1 }}
@@ -471,9 +455,7 @@ export default function Register() {
                       slotProps={{
                         inputLabel: { shrink: Boolean(watch(`dependents.${idx}.lastName`)) },
                       }}
-                      {...register(`dependents.${idx}.lastName`, {
-                        required: 'This field is required',
-                      })}
+                      {...register(`dependents.${idx}.lastName`, nameRules())}
                     />
                     <TextField
                       type="date"
