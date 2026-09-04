@@ -9,6 +9,8 @@
   <!-- e.g. adds tests, fixes a bug, refactor with no interface change,
        dependency bump, docs-only, config tweak -->
 
+[ADR Formatting](https://intranet.gimr.garvan.org.au/spaces/DSE/pages/580387974/Architecture+Decision+Records+ADR)
+
 ## Checklist
 
 - [ ] Changes are covered by tests (or reason why not)
