@@ -565,11 +565,16 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "CssColour": {
+        "dataType": "refAlias",
+        "type": {"dataType":"string","validators":{"maxLength":{"value":30},"pattern":{"value":"^(#(?:[0-9a-fA-F]{3,4}){1,2}|rgba?\\(\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*(?:,\\s*[0-9.]+\\s*)?\\)|[a-zA-Z]{3,30})?$"}}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "SettingsBase": {
         "dataType": "refObject",
         "properties": {
-            "primaryColour": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},
-            "secondaryColour": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},
+            "primaryColour": {"dataType":"union","subSchemas":[{"ref":"CssColour"},{"dataType":"enum","enums":[null]}],"required":true},
+            "secondaryColour": {"dataType":"union","subSchemas":[{"ref":"CssColour"},{"dataType":"enum","enums":[null]}],"required":true},
             "tcLink": {"ref":"Url","required":true},
             "newsLink": {"dataType":"union","subSchemas":[{"ref":"Url"},{"dataType":"enum","enums":[null]}],"required":true},
         },
@@ -587,8 +592,8 @@ const models: TsoaRoute.Models = {
     "UpdateSettingsRequest": {
         "dataType": "refObject",
         "properties": {
-            "primaryColour": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}]},
-            "secondaryColour": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}]},
+            "primaryColour": {"dataType":"union","subSchemas":[{"ref":"CssColour"},{"dataType":"enum","enums":[null]}]},
+            "secondaryColour": {"dataType":"union","subSchemas":[{"ref":"CssColour"},{"dataType":"enum","enums":[null]}]},
             "tcLink": {"ref":"Url"},
             "newsLink": {"ref":"Url"},
         },

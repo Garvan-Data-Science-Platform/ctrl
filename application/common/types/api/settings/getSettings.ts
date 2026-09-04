@@ -1,8 +1,8 @@
-import { Url } from '../../commonTypes'
+import { CssColour, Url } from '../../commonTypes'
 
 export interface SettingsBase {
-  primaryColour: string | null // TODO: add type?
-  secondaryColour: string | null // TODO: add type?
+  primaryColour: CssColour | null
+  secondaryColour: CssColour | null
   tcLink: Url
   newsLink: Url | null
 }

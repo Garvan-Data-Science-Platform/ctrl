@@ -1252,14 +1252,28 @@
         "type": "object",
         "additionalProperties": false
       },
+      "CssColour": {
+        "type": "string",
+        "example": "#a1b2c3",
+        "maxLength": 30,
+        "pattern": "^(#(?:[0-9a-fA-F]{3,4}){1,2}|rgba?\\(\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*(?:,\\s*[0-9.]+\\s*)?\\)|[a-zA-Z]{3,30})?$"
+      },
       "SettingsBase": {
         "properties": {
           "primaryColour": {
-            "type": "string",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CssColour"
+              }
+            ],
             "nullable": true
           },
           "secondaryColour": {
-            "type": "string",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CssColour"
+              }
+            ],
             "nullable": true
           },
           "tcLink": {
@@ -1314,11 +1328,19 @@
       "UpdateSettingsRequest": {
         "properties": {
           "primaryColour": {
-            "type": "string",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CssColour"
+              }
+            ],
             "nullable": true
           },
           "secondaryColour": {
-            "type": "string",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CssColour"
+              }
+            ],
             "nullable": true
           },
           "tcLink": {

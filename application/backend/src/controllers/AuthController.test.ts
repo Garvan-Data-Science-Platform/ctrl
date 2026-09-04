@@ -139,7 +139,7 @@ describe('AuthController', () => {
       const registerRequest = {
         firstName: "{{7*7}}<script>alert('xss-firstname')</script>",
         lastName: "{{7*7}}<script>alert('xss-lastname')</script>",
-        email: "{{7*7}}<script>aliert('xss-email')</script>@email.com",
+        email: "{{7*7}}<script>alert('xss-email')</script>@email.com",
         password: testPassword,
         role: Role.OrganisationAdmin,
       }

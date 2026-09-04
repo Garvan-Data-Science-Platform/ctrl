@@ -20,6 +20,8 @@ export const REGEX = {
   REDCAP_FORM: /^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€_+]+$/,
   // Same REGEX For invite email subject and body text
   INVITE_EMAIL: /^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$/,
+  CSS_COLOUR:
+    /^(#(?:[0-9a-fA-F]{3,4}){1,2}|rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*(?:,\s*[0-9.]+\s*)?\)|[a-zA-Z]{3,30})?$/,
 }
 
 /**
@@ -240,3 +242,10 @@ export type SurveyQuestionTooltip = string
  * @example "Section with questions about consent"
  */
 export type SurveySubHeadingText = string
+
+/**
+ * @maxLength 30
+ * @pattern ^(#(?:[0-9a-fA-F]{3,4}){1,2}|rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*(?:,\s*[0-9.]+\s*)?\)|[a-zA-Z]{3,30})?$
+ * @example "#a1b2c3"
+ */
+export type CssColour = string
