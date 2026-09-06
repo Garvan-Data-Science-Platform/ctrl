@@ -51,6 +51,14 @@ describe('redactString', () => {
     expect(out).toContain('550 5.1.1')
   })
 
+  it('redacts a dotless-domain address so MailHog and internal hosts do not leak', () => {
+    // SmtpBasicProvider accepts noreply@localhost for MailHog setups, so the redactor
+    // has to scrub the same shape from any error surfacing it
+    const out = redactString('550 5.1.1 <participant@localhost> recipient rejected')
+    expect(out).not.toContain('participant@localhost')
+    expect(out).toContain('550 5.1.1')
+  })
+
   it('keeps the diagnostic parts that are not secrets', () => {
     const out = redactString('Error 401 tenant xyz {"access_token":"secret"} network unreachable')
     expect(out).toContain('Error 401')

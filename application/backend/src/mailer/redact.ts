@@ -11,6 +11,6 @@ export function redactString(str: string): string {
       .replace(/\beyJ[A-Za-z0-9._-]{10,}/g, '[REDACTED]')
       // recipient addresses are PII and User.email is encrypted at rest, so it should not
       // arrive in a log via an SMTP rejection either
-      .replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\.[A-Za-z0-9.-]+/g, '[REDACTED-ADDRESS]')
+      .replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+/g, '[REDACTED-ADDRESS]')
   )
 }
