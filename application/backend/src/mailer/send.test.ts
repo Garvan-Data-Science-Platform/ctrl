@@ -59,7 +59,10 @@ describe('sendEmail', () => {
       await sendEmail({ to: 'user@example.com', subject: 'Hello', text: 'World' })
       expect(mockNodeMailer.mock.getSentMail()).toHaveLength(0)
     } finally {
-      process.env.STUB_MAILER = original
+      // process.env coerces undefined to the literal string 'undefined', so restore
+      // by delete when the var was unset originally
+      if (original === undefined) delete process.env.STUB_MAILER
+      else process.env.STUB_MAILER = original
       _resetProviderForTests()
     }
   })
