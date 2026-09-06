@@ -1,12 +1,7 @@
 import * as nodemailer from 'nodemailer'
 import type { NodemailerMock } from 'nodemailer-mock'
 import { ConfidentialClientApplication } from '@azure/msal-node'
-import {
-  M365OAuthProvider,
-  extractAddress,
-  redactSecrets,
-  wrapSmtpError,
-} from './M365OAuthProvider'
+import { M365OAuthProvider, redactSecrets, wrapSmtpError } from './M365OAuthProvider'
 
 jest.mock('@azure/msal-node')
 
@@ -196,16 +191,6 @@ describe('M365OAuthProvider', () => {
       expect((err as Error).message).toContain('[REDACTED]')
       expect((err as Error).message).not.toContain(secretToken)
     })
-  })
-})
-
-describe('extractAddress', () => {
-  it('extracts email from display-name-plus-brackets format', () => {
-    expect(extractAddress('CTRL <ctrl-noreply@garvan.org.au>')).toBe('ctrl-noreply@garvan.org.au')
-  })
-
-  it('returns input unchanged for a bare email', () => {
-    expect(extractAddress('noreply@example.com')).toBe('noreply@example.com')
   })
 })
 

@@ -2,6 +2,7 @@ import { ConfidentialClientApplication } from '@azure/msal-node'
 import nodemailer, { type Transporter } from 'nodemailer'
 import type { MailOpts, MailProvider } from './provider'
 import { redactString } from './redact'
+import { extractAddress } from './sender'
 
 const TOKEN_FAILURE = 'M365 token acquisition failed'
 // MSAL treats a cached token as expired five minutes early. Nodemailer renews only once the
@@ -104,11 +105,6 @@ export class M365OAuthProvider implements MailProvider {
       throw new Error(`${TOKEN_FAILURE}: ${redactSecrets(err).message}`)
     }
   }
-}
-
-export function extractAddress(sender: string): string {
-  const match = sender.match(/<([^>]+)>/)
-  return match ? match[1] : sender
 }
 
 export function redactSecrets(err: unknown): Error {

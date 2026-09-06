@@ -1,5 +1,6 @@
 import nodemailer, { type Transporter } from 'nodemailer'
 import type { MailOpts, MailProvider } from './provider'
+import { extractAddress } from './sender'
 
 interface SmtpBasicConfig {
   host: string
@@ -22,7 +23,7 @@ export class SmtpBasicProvider implements MailProvider {
 
     // a malformed sender is what #909 was. The server rejects it at MAIL FROM with a bare
     // 501 that names nothing, so fail here instead, where the config field has a name.
-    const address = config.sender.match(/<([^>]+)>/)?.[1] ?? config.sender
+    const address = extractAddress(config.sender)
     if (!address.includes('@') || /\s/.test(address)) {
       throw new Error(`smtp-basic: sender is not a usable address: ${config.sender}`)
     }
