@@ -45,6 +45,17 @@ describe('sendEmail', () => {
     expect(mockNodeMailer.mock.getSentMail()[0].from).toBe('Custom <custom@example.com>')
   })
 
+  it('falls back to config.mailer.sender when opts.from is an empty string', async () => {
+    // `??` would pass '' through and produce MAIL FROM:<>, rejected as a bare 501
+    await sendEmail({
+      to: 'user@example.com',
+      subject: 'Hello',
+      text: 'World',
+      from: '',
+    })
+    expect(mockNodeMailer.mock.getSentMail()[0].from).toBe('CTRL <test@example.com>')
+  })
+
   it('reuses the same provider instance across calls', async () => {
     await sendEmail({ to: 'a@example.com', subject: 'A', text: 'a' })
     await sendEmail({ to: 'b@example.com', subject: 'B', text: 'b' })

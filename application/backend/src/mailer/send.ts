@@ -44,7 +44,9 @@ function getProvider(): MailProvider {
 }
 
 export async function sendEmail(opts: MailOpts): Promise<void> {
-  const from = opts.from ?? config.mailer.sender
+  // || not ?? so an empty-string from a caller falls back to the configured sender
+  // rather than reaching nodemailer as MAIL FROM:<> and being rejected with a bare 501
+  const from = opts.from || config.mailer.sender
   const started = Date.now()
   // never log text, html, from, or anything token shaped
   const meta = {
