@@ -28,6 +28,13 @@ describe('redactString', () => {
     )
   })
 
+  it('redacts an opaque Bearer token containing base64 padding and slashes', () => {
+    // Non-JWT bearers use standard base64 (+ / =); the character class must cover them
+    // or the token gets chopped at the first + and the tail leaks.
+    const opaque = 'AB+CD/EF=GH1234abcdef=='
+    expect(redactString(`Rejected: Bearer ${opaque}`)).toBe('Rejected: Bearer [REDACTED]')
+  })
+
   it('redacts a bare JWT that is not behind a Bearer prefix', () => {
     // a token loses its JSON field and its Bearer prefix as soon as something
     // interpolates it into a sentence, which is exactly when it reaches a log
