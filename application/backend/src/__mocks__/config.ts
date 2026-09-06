@@ -10,11 +10,13 @@ const config = {
   ],
   otp: false,
   inviteExpiryDays: 7,
-  smtp: {
+  mailer: {
+    provider: 'smtp-basic' as const,
     host: 'smtp.ethereal.email',
     port: 587,
     username: 'piper.gorczany60@ethereal.email',
     password: 'FK1DCrQYv2BzFYNf4k',
+    sender: 'CTRL <test@example.com>',
   },
 }
 

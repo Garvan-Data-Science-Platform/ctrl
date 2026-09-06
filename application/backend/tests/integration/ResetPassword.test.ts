@@ -57,7 +57,7 @@ describe('User Password Reset', () => {
     const sentMail = mockNodeMailer.mock.getSentMail()
     expect(sentMail).toHaveLength(1)
     expect(sentMail[0]).toMatchObject({
-      from: `CTRL <noreply@${process.env.HOSTNAME}>`,
+      from: 'CTRL <test@example.com>',
       subject: 'CTRL - Password Reset Link',
       to: userEmail,
     })

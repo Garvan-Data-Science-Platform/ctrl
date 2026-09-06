@@ -353,7 +353,7 @@ describe('InvitesController', () => {
       const sentEmails = mockNodeMailer.mock.getSentMail()
       expect(sentEmails.length).toBe(2)
       sentEmails.forEach((email) => {
-        expect(email.from).toBe(`CTRL <noreply@${process.env.HOSTNAME}>`)
+        expect(email.from).toBe('CTRL <test@example.com>')
         expect(recipients.map((r) => r.email)).toContain(email.to)
         expect(email.subject).toBe('Subject Text')
         expect(email.html).toContain('Explanatory Text')
@@ -426,7 +426,7 @@ describe('InvitesController', () => {
       const sentEmails = mockNodeMailer.mock.getSentMail()
       expect(sentEmails.length).toBe(1)
       expect(sentEmails[0]).toHaveProperty('to')
-      expect(sentEmails[0]).toHaveProperty('from', `CTRL <noreply@${process.env.HOSTNAME}>`)
+      expect(sentEmails[0]).toHaveProperty('from', 'CTRL <test@example.com>')
 
       // Check invite status was changed to PENDING
       const updatedInvite = await prisma.invite.findUnique({
@@ -485,7 +485,7 @@ describe('InvitesController', () => {
       const sentEmails = mockNodeMailer.mock.getSentMail()
       expect(sentEmails.length).toBe(1)
       expect(sentEmails[0]).toHaveProperty('to', emailPendingInvite)
-      expect(sentEmails[0]).toHaveProperty('from', `CTRL <noreply@${process.env.HOSTNAME}>`)
+      expect(sentEmails[0]).toHaveProperty('from', 'CTRL <test@example.com>')
 
       // Check invite status was is still PENDING
       const updatedInvite = await prisma.invite.findUnique({
@@ -620,7 +620,7 @@ describe('InvitesController', () => {
       expect(sentEmails.length).toBe(2)
       const targetEmail = sentEmails.find((email) => email.to === emailPendingInvite)
       expect(targetEmail).toBeDefined()
-      expect(targetEmail).toHaveProperty('from', `CTRL <noreply@${process.env.HOSTNAME}>`)
+      expect(targetEmail).toHaveProperty('from', 'CTRL <test@example.com>')
       expect(targetEmail!.subject).toBe('New Subject')
       expect(targetEmail!.html).toContain('New Text')
       expect(targetEmail!.text).toContain('New Text')

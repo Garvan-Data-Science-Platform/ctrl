@@ -14,10 +14,13 @@
   disableAdminPasswordLogin: false,
   otp: false,
   inviteExpiryDays: 7,
-  smtp: {
+  mailer: {
+    provider: 'smtp-basic',
     host: '',
     port: 587,
     username: '',
-    password: ''
+    password: '',
+    sender: 'CTRL <noreply@example.com>', //the From address on every email CTRL sends
+    //requireTLS: false //only for a local mail catcher with no TLS, such as mailhog
   }
 }

@@ -24,6 +24,7 @@
   },
   "packageManager": "yarn@4.0.2",
   "dependencies": {
+    "@azure/msal-node": "^5.6.0",
     "@braintree/sanitize-url": "^7.1.2",
     "@prisma/client": "^5.20.0",
     "@tsoa/runtime": "^6.6.0",

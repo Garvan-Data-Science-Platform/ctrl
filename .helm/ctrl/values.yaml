@@ -18,11 +18,27 @@ config:
   disableAdminPasswordLogin: false
   otp: true
   inviteExpiryDays: 7
-  smtp:
+  # Mail provider. Supported: 'smtp-basic' (any SMTP server with username/password auth), 'm365-oauth' (Microsoft 365 OAuth 2 SMTP via MSAL).
+  mailer:
+    provider: smtp-basic
     host: ''
     port: 587
     username: ''
     password: ''
+    # The From address on every email CTRL sends, as 'Display Name <address@domain>'.
+    # Blank on purpose, a deployment that sends mail has to name its own sender.
+    sender: ''
+    # Set false only for a relay that genuinely has no TLS, such as a local mail catcher.
+    # Anything else leaves the SMTP password readable on the wire.
+    requireTLS: true
+    # For m365-oauth, set provider to m365-oauth in your own values file and add:
+    #   tenantId: '<garvan-tenant-id>'
+    #   clientId: '<entra-app-client-id>'
+    #   clientSecret: '<entra-app-client-secret>'
+    #   host: smtp.office365.com
+    #   port: 587
+    #   sender: 'CTRL <ctrl-noreply@garvan.org.au>'
+    # Leave username, password and requireTLS as they are, they are ignored on that path.
 
 userClient:
   hostname: ctrlhost

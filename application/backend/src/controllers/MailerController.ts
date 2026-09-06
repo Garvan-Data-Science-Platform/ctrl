@@ -9,8 +9,7 @@ import * as express from 'express'
 import prisma from '../PrismaClient'
 import { Role } from '@prisma/client'
 import { NotFoundError } from '../middlewares/ErrorHandler'
-import { createMailerTransporter, fromAddress } from '../utils/mailer'
-import nodemailer from 'nodemailer'
+import { sendEmail } from '../mailer'
 import logger from 'common/src/logger'
 import { auditLog } from '../middlewares/AuditLog'
 import {
@@ -50,10 +49,6 @@ export class MailerController extends Controller {
       select: { email: true, firstName: true, lastName: true },
     })
 
-    const mailerTransporter = await createMailerTransporter()
-
-    await mailerTransporter.verify()
-
     // Get the organisation admins email(s)
     const orgAdminEmails = (
       await prisma.user.findMany({
@@ -75,7 +70,10 @@ export class MailerController extends Controller {
       ? [study.contactUsEmail]
       : [...orgAdminEmails, ...studyAdminEmails]
 
-    const subjectToAdmin: string = `New Contact Us Request From CTRL Participant: ${user.firstName} ${user.lastName}`
+    // the participant's name stays out of the subject. firstName and lastName carry
+    // `/// @encrypted` in schema.prisma, and a subject reaches our logs, the mail
+    // server's, and Message Trace. The body still names them, see generateContactUsEmail.
+    const subjectToAdmin: string = 'New Contact Us Request From a CTRL Participant'
 
     const { text: adminText, html: adminHtml } = generateContactUsEmail(
       study.name,
@@ -91,32 +89,27 @@ export class MailerController extends Controller {
       bodyRequest.content,
     )
 
-    const mailToAdminsOptions: nodemailer.SendMailOptions = {
-      from: fromAddress,
+    await sendEmail({
       to: recipientEmails,
       replyTo: user.email,
       subject: subjectToAdmin,
       text: adminText,
       html: adminHtml,
-    }
-
-    await mailerTransporter.sendMail(mailToAdminsOptions)
-    logger.info(`Email sent to ${mailToAdminsOptions.to}`, mailToAdminsOptions)
+    })
 
     // Send the email to the user
-    const subjectToUser: string = `CTRL Message Confirmation`
+    const subjectToUser: string = 'CTRL Message Confirmation'
 
-    const mailToUserOptions: nodemailer.SendMailOptions = {
-      from: fromAddress,
+    await sendEmail({
       to: user.email,
       subject: subjectToUser,
       text: participantText,
       html: participantHtml,
-    }
+    })
 
-    await mailerTransporter.sendMail(mailToUserOptions)
-
-    logger.info(`Email sent to ${mailToUserOptions.to}`, mailToUserOptions)
+    // sendEmail logs each send with its provider, recipient count, subject and duration.
+    // studyId is the one thing it cannot know, so it is all this line carries.
+    logger.info('Contact-us request handled', { studyId: bodyRequest.studyId })
     return
   }
 }

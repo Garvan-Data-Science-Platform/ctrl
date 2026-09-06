@@ -76,9 +76,7 @@ describe('Participant Invites', () => {
       .post(`/auth/register/participants/${missingInviteId}`)
       .send(participantRegisterRequestBody)
     expect(response.status).toBe(404)
-    expect(response.body.message).toBe(
-      `Invite for ${participantRegisterRequestBody.email} not found`,
-    )
+    expect(response.body.message).toBe('Invite not found')
   })
 
   it('should allow an OrganisationAdmin user to create and send invites to new participants', async () => {
@@ -99,7 +97,7 @@ describe('Participant Invites', () => {
     const sentEmails = mockNodeMailer.mock.getSentMail()
     expect(sentEmails.length).toBe(1)
     expect(sentEmails[0].to).toBe(participantRegisterRequestBody.email)
-    expect(sentEmails[0].from).toBe(`CTRL <noreply@${process.env.HOSTNAME}>`)
+    expect(sentEmails[0].from).toBe('CTRL <test@example.com>')
 
     // Check invites were created
     const createdInvite = await prisma.invite.findUnique({
@@ -168,7 +166,7 @@ describe('Participant Invites', () => {
     )
 
     expect(sentEmail1?.to).toBe(participantRegisterRequestBody.email)
-    expect(sentEmail1?.from).toBe(`CTRL <noreply@${process.env.HOSTNAME}>`)
+    expect(sentEmail1?.from).toBe('CTRL <test@example.com>')
     expect(sentEmail1?.subject).toBe('Subject')
     expect(sentEmail1?.text).toContain('Text')
   })
@@ -275,9 +273,7 @@ describe('Participant Invites', () => {
       .send(participantRegisterRequestBody)
 
     expect(response.status).toBe(404)
-    expect(response.body.message).toBe(
-      `Invite for ${participantRegisterRequestBody.email} not found`,
-    )
+    expect(response.body.message).toBe('Invite not found')
   })
 
   it('should not allow participants to register using an EXPIRED invite', async () => {
@@ -334,9 +330,7 @@ describe('Participant Invites', () => {
       .send(participantRegisterRequestBody)
 
     expect(response.status).toBe(404)
-    expect(response.body.message).toBe(
-      `Invite for ${participantRegisterRequestBody.email} not found`,
-    )
+    expect(response.body.message).toBe('Invite not found')
   })
 
   it('should allow participants to register using a PENDING invite', async () => {

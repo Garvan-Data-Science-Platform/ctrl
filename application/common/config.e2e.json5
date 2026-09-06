@@ -1,10 +1,13 @@
 {
   oidc: [],
-  smtp: {
+  mailer: {
+    provider: 'smtp-basic',
     host: 'mailhog',
     port: 1025,
     username: 'test',
-    password: 'test'
+    password: 'test',
+    sender: 'CTRL <noreply@ctrl.garvan.org.au>',
+    requireTLS: false //mailhog speaks no TLS
   },
   disableAdminPasswordLogin: false,
   inviteExpiryDays: 7,
