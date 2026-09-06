@@ -16,6 +16,7 @@ describe('M365OAuthProvider', () => {
     host: 'smtp.office365.com',
     port: 587,
     sender: 'CTRL <ctrl-noreply@garvan.org.au>',
+    maxConnections: 3,
   }
 
   let mockAcquireToken: jest.Mock
@@ -368,6 +369,7 @@ describe('provisionCallback', () => {
     host: 'smtp.office365.com',
     port: 587,
     sender: 'CTRL <ctrl-noreply@garvan.org.au>',
+    maxConnections: 3,
   }
 
   type ProvisionCallback = (
@@ -443,6 +445,7 @@ describe('sendMail error wrapping integration', () => {
     host: 'smtp.office365.com',
     port: 587,
     sender: 'CTRL <ctrl-noreply@garvan.org.au>',
+    maxConnections: 3,
   }
 
   let mockAcquireToken: jest.Mock

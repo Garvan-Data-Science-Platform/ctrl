@@ -36,6 +36,9 @@ config:
     # Set false only for a relay that genuinely has no TLS, such as a local mail catcher.
     # Anything else leaves the SMTP password readable on the wire.
     requireTLS: true
+    # Max concurrent SMTP connections from this pod to the mail server. Exchange caps
+    # m365-oauth at 3 per mailbox and returns 432 4.3.2 above that; other relays vary.
+    maxConnections: 3
     # For m365-oauth, set provider to m365-oauth in your own values file and add:
     #   tenantId: '<garvan-tenant-id>'
     #   clientId: '<entra-app-client-id>'

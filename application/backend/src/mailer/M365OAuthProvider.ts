@@ -17,6 +17,7 @@ interface M365OAuthConfig {
   host: string
   port: number
   sender: string
+  maxConnections: number
 }
 
 export class M365OAuthProvider implements MailProvider {
@@ -62,12 +63,7 @@ export class M365OAuthProvider implements MailProvider {
     this.transporter = nodemailer.createTransport({
       pool: true,
       // Exchange allows three concurrent SMTP AUTH connections; nodemailer defaults to five.
-      maxConnections: 3,
-      // and 30 messages a minute, which an invite batch will hit. Nodemailer queues
-      // above this rather than letting Exchange reject them, and repeated rejections
-      // are what get a mailbox throttled from SMTP AUTH for an unpublished period.
-      rateDelta: 60_000,
-      rateLimit: 30,
+      maxConnections: this.config.maxConnections,
       host: this.config.host,
       port: this.config.port,
       requireTLS: true,

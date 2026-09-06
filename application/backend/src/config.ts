@@ -55,8 +55,17 @@ export const schema = {
             // STARTTLS is required unless this is explicitly false. Only set it false for
             // a relay that genuinely has no TLS, such as a local mail catcher.
             requireTLS: { type: 'boolean' },
+            maxConnections: { type: 'number' },
           },
-          required: ['provider', 'host', 'port', 'username', 'password', 'sender'],
+          required: [
+            'provider',
+            'host',
+            'port',
+            'username',
+            'password',
+            'sender',
+            'maxConnections',
+          ],
           // Helm merges the chart's username and password into every mailer block, so the
           // m365-oauth variant cannot forbid extras. smtp-basic can, and a typo here should
           // fail at boot.
@@ -72,8 +81,18 @@ export const schema = {
             host: { type: 'string', minLength: 1 },
             port: { type: 'number' },
             sender: { type: 'string', minLength: 1 },
+            maxConnections: { type: 'number' },
           },
-          required: ['provider', 'tenantId', 'clientId', 'clientSecret', 'host', 'port', 'sender'],
+          required: [
+            'provider',
+            'tenantId',
+            'clientId',
+            'clientSecret',
+            'host',
+            'port',
+            'sender',
+            'maxConnections',
+          ],
         },
       ],
     },
@@ -110,6 +129,7 @@ if (process.env.NODE_ENV !== 'test') {
       username: 'x',
       password: 'x',
       sender: 'CTRL <test@example.com>',
+      maxConnections: 3,
     },
   }
 }

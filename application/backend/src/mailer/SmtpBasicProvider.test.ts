@@ -11,6 +11,7 @@ describe('SmtpBasicProvider', () => {
     username: 'test-user',
     password: 'test-pass',
     sender: 'CTRL <noreply@example.com>',
+    maxConnections: 3,
   }
 
   afterEach(() => {

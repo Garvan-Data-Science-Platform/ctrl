@@ -24,6 +24,7 @@ function getProvider(): MailProvider {
       password: cfg.password,
       sender: cfg.sender,
       requireTLS: cfg.requireTLS,
+      maxConnections: cfg.maxConnections,
     })
     return providerInstance
   }
@@ -36,6 +37,7 @@ function getProvider(): MailProvider {
       host: cfg.host,
       port: cfg.port,
       sender: cfg.sender,
+      maxConnections: cfg.maxConnections,
     })
     return providerInstance
   }

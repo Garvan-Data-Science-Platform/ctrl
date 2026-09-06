@@ -9,6 +9,7 @@ interface SmtpBasicConfig {
   password: string
   sender: string
   requireTLS?: boolean
+  maxConnections: number
 }
 
 export class SmtpBasicProvider implements MailProvider {
@@ -37,6 +38,7 @@ export class SmtpBasicProvider implements MailProvider {
     if (this.transporter) return this.transporter
     this.transporter = nodemailer.createTransport({
       pool: true,
+      maxConnections: this.config.maxConnections,
       host: this.config.host,
       port: this.config.port,
       // without this nodemailer only upgrades when the server advertises STARTTLS, and

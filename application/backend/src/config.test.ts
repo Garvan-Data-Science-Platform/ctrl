@@ -10,6 +10,7 @@ const smtpBasic = {
   username: 'user',
   password: 'pass',
   sender: 'CTRL <noreply@example.com>',
+  maxConnections: 3,
 }
 
 const m365 = {
@@ -20,6 +21,7 @@ const m365 = {
   host: 'smtp.office365.com',
   port: 587,
   sender: 'CTRL <ctrl-noreply@garvan.org.au>',
+  maxConnections: 3,
 }
 
 describe('mailer config schema', () => {

@@ -7,7 +7,8 @@
     username: 'test',
     password: 'test',
     sender: 'CTRL <noreply@ctrl.garvan.org.au>',
-    requireTLS: false //mailhog speaks no TLS
+    requireTLS: false, //mailhog speaks no TLS
+    maxConnections: 3
   },
   disableAdminPasswordLogin: false,
   inviteExpiryDays: 7,
