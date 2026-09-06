@@ -1,6 +1,4 @@
-// Anything that reaches a log line or an error message goes through here first. The M365
-// path can surface tokens from MSAL or from an Exchange response, and the smtp-basic path
-// can surface a recipient address in an SMTP reply. Both end up in logger.error.
+// Anything that reaches a log line or an error message goes through here first.
 export function redactString(str: string): string {
   return (
     str

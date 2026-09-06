@@ -84,9 +84,8 @@ describe('MailerController', () => {
 
       expect(response.status).toBe(204)
 
-      // User.firstName and User.lastName are `/// @encrypted` in schema.prisma, and a
-      // subject reaches our logs, the mail server's, and Message Trace. The body still
-      // names them so admins can still tell requests apart.
+      // Encrypted-name scrub — see MailerController.ts. Body still names them so
+      // admins can tell requests apart.
       const [toAdmin] = mockNodeMailer.mock.getSentMail()
       expect(toAdmin.subject).toBe('New Contact Us Request From a CTRL Participant')
       expect(toAdmin.text).toContain('Participant: Test User')

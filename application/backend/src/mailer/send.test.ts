@@ -1,5 +1,6 @@
 import * as nodemailer from 'nodemailer'
 import type { NodemailerMock } from 'nodemailer-mock'
+import logger from 'common/src/logger'
 import { sendEmail, _resetProviderForTests } from './send'
 
 const mockNodeMailer = nodemailer as unknown as NodemailerMock
@@ -88,6 +89,33 @@ describe('sendEmail', () => {
       sendEmail({ to: 'user@example.com', subject: 'Hello', text: 'World' }),
     ).rejects.toThrow()
     mockNodeMailer.mock.setShouldFail(false)
+  })
+
+  it('redacts recipient addresses out of the failure log', async () => {
+    // smtp-basic errors reach the log as raw nodemailer text, so the SMTP reply's
+    // recipient address has to be scrubbed here or User.email leaks despite being
+    // `/// @encrypted` at rest. Pins the wiring in send.ts; redact.test.ts covers
+    // the pure function.
+    mockNodeMailer.mock.setShouldFail(true)
+    mockNodeMailer.mock.setFailResponse(
+      new Error('550 5.1.1 <participant@example.org> recipient rejected'),
+    )
+    const errorSpy = jest.spyOn(logger, 'error').mockImplementation(() => logger)
+    try {
+      await expect(
+        sendEmail({ to: 'user@example.com', subject: 'Hello', text: 'World' }),
+      ).rejects.toThrow()
+
+      expect(errorSpy).toHaveBeenCalledTimes(1)
+      // winston's error() type only exposes the single-object overload; send.ts uses the
+      // (message, meta) overload so grab the meta positionally via unknown
+      const [, meta] = errorSpy.mock.calls[0] as unknown as [string, { reason: string }]
+      expect(meta.reason).not.toContain('participant@example.org')
+      expect(meta.reason).toContain('[REDACTED-ADDRESS]')
+    } finally {
+      errorSpy.mockRestore()
+      mockNodeMailer.mock.setShouldFail(false)
+    }
   })
 
   it('shares one provider across concurrent sends', async () => {

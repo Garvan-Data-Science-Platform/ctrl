@@ -47,8 +47,8 @@ describe('mailer config schema', () => {
   })
 
   it('rejects a typo in an smtp-basic key rather than ignoring it', () => {
-    // dev's smtp block had additionalProperties: false and the union dropped it. The
-    // m365-oauth variant cannot have it back, see the test above, but this one can.
+    // dev's smtp block had additionalProperties: false; keep the smtp-basic variant
+    // strict so typos still fail at boot.
     expect(validator()({ mailer: { ...smtpBasic, senderr: 'oops' } })).toBe(false)
   })
 

@@ -70,9 +70,9 @@ export class MailerController extends Controller {
       ? [study.contactUsEmail]
       : [...orgAdminEmails, ...studyAdminEmails]
 
-    // the participant's name stays out of the subject. firstName and lastName carry
-    // `/// @encrypted` in schema.prisma, and a subject reaches our logs, the mail
-    // server's, and Message Trace. The body still names them, see generateContactUsEmail.
+    // Keep firstName/lastName out of the subject — they're `/// @encrypted` in
+    // schema.prisma and a subject reaches our logs, the mail server's and Message Trace.
+    // The body still names them (generateContactUsEmail).
     const subjectToAdmin: string = 'New Contact Us Request From a CTRL Participant'
 
     const { text: adminText, html: adminHtml } = generateContactUsEmail(
@@ -107,8 +107,8 @@ export class MailerController extends Controller {
       html: participantHtml,
     })
 
-    // sendEmail logs each send with its provider, recipient count, subject and duration.
-    // studyId is the one thing it cannot know, so it is all this line carries.
+    // sendEmail already logs provider, recipient count, subject and duration;
+    // studyId is the extra it can't infer.
     logger.info('Contact-us request handled', { studyId: bodyRequest.studyId })
     return
   }

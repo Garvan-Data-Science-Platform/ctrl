@@ -97,8 +97,7 @@ describe('SmtpBasicProvider', () => {
     ).not.toThrow()
   })
 
-  // requireTLS defaults to true and is only turned off by config. Not unit tested, because
-  // asserting it means reaching through nodemailer-mock into the real transport it wraps.
-  // The MailHog e2e covers it instead: mailhog speaks no TLS, so config.e2e.json5 sets
-  // requireTLS false and that suite fails outright if the option stops being plumbed through.
+  // requireTLS is covered by the MailHog e2e (requireTLS: false in config.e2e.json5),
+  // not unit tested — asserting it means reaching through nodemailer-mock into the real
+  // transport.
 })

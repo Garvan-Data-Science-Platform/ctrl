@@ -57,9 +57,9 @@ export const schema = {
             requireTLS: { type: 'boolean' },
           },
           required: ['provider', 'host', 'port', 'username', 'password', 'sender'],
-          // Helm forces the chart's username and password into an m365-oauth block, which is
-          // why the other variant cannot have this. An smtp-basic block carries only the keys
-          // the chart declares, so a typo here should fail at boot rather than be ignored.
+          // Helm merges the chart's username and password into every mailer block, so the
+          // m365-oauth variant cannot forbid extras. smtp-basic can, and a typo here should
+          // fail at boot.
           additionalProperties: false,
         },
         {

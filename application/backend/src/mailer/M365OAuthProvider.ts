@@ -60,8 +60,7 @@ export class M365OAuthProvider implements MailProvider {
     if (this.transporter) return this.transporter
     this.transporter = nodemailer.createTransport({
       pool: true,
-      // Exchange allows three concurrent SMTP AUTH connections and returns
-      // 432 4.3.2 above that. Nodemailer defaults to five.
+      // Exchange allows three concurrent SMTP AUTH connections; nodemailer defaults to five.
       maxConnections: 3,
       // and 30 messages a minute, which an invite batch will hit. Nodemailer queues
       // above this rather than letting Exchange reject them, and repeated rejections
@@ -138,9 +137,8 @@ export function wrapSmtpError(err: unknown): Error {
     return new Error(`M365 network error: ${safe}`)
   }
 
-  // 5.7.139 is the tenant refusing the request, 5.7.144 is invalid API permissions, and
-  // 5.7.3 is the generic XOAUTH2 rejection Microsoft prints with no cause attached. Same
-  // tenant-side checklist for all three.
+  // 5.7.139 (tenant refused), 5.7.144 (invalid API permissions) and 5.7.3 (generic
+  // XOAUTH2 rejection) all point at the same tenant-side checklist.
   if (
     combined.includes('535 5.7.139') ||
     combined.includes('535 5.7.3') ||
@@ -189,8 +187,7 @@ export function wrapSmtpError(err: unknown): Error {
     )
   }
 
-  // 554 5.2.0 on its own is a generic submission envelope, the exception name carries the
-  // meaning, so send-as denials and spam verdicts arrive under the same status code.
+  // 554 5.2.0 is a generic envelope; the exception name is what disambiguates.
   if (combined.includes('SubmissionQuotaExceededException')) {
     return new Error(
       `M365 daily recipient limit reached, 10,000 recipients per day for this mailbox. ` +
