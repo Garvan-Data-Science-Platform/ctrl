@@ -86,4 +86,16 @@ describe('mailer config schema', () => {
     }
     expect(validator()({ mailer: noSecret })).toBe(false)
   })
+
+  it('rejects smtp-basic missing maxConnections', () => {
+    const withoutMax: Partial<typeof smtpBasic> = { ...smtpBasic }
+    delete withoutMax.maxConnections
+    expect(validator()({ mailer: withoutMax })).toBe(false)
+  })
+
+  it('rejects m365-oauth missing maxConnections', () => {
+    const withoutMax: Partial<typeof m365> = { ...m365 }
+    delete withoutMax.maxConnections
+    expect(validator()({ mailer: withoutMax })).toBe(false)
+  })
 })
