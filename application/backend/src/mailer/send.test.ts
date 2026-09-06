@@ -92,10 +92,9 @@ describe('sendEmail', () => {
   })
 
   it('redacts recipient addresses out of the failure log', async () => {
+    // Pins the redact wiring in send.ts (redact.test.ts covers the pattern) —
     // smtp-basic errors reach the log as raw nodemailer text, so the SMTP reply's
-    // recipient address has to be scrubbed here or User.email leaks despite being
-    // `/// @encrypted` at rest. Pins the wiring in send.ts; redact.test.ts covers
-    // the pure function.
+    // address must be scrubbed or User.email leaks despite `/// @encrypted`.
     mockNodeMailer.mock.setShouldFail(true)
     mockNodeMailer.mock.setFailResponse(
       new Error('550 5.1.1 <participant@example.org> recipient rejected'),
