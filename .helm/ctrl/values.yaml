@@ -2,6 +2,11 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# Keep at 1 if config.mailer.provider is m365-oauth. Exchange meters the 30
+# messages/minute and 3 concurrent SMTP AUTH connection budgets per MAILBOX,
+# not per pod, so more than one backend replica exceeds the rate against the
+# same mailbox and Exchange defers or throttles the surplus. See the mailer
+# section of the deployment docs for details.
 replicaCount: 1
 
 demoMode:
@@ -172,6 +177,12 @@ readinessProbe:
     path: /
     port: http
 
+# Keep enabled: false if config.mailer.provider is m365-oauth. Scaling the
+# backend past one replica breaks the m365 mailer: Exchange meters the 30
+# messages/minute and 3 concurrent SMTP AUTH connection budgets per MAILBOX,
+# not per pod, so multiple pods sending through the same mailbox exceed the
+# rate and Exchange defers or throttles the surplus. See the mailer section
+# of the deployment docs for the setup guide.
 autoscaling:
   enabled: false
   minReplicas: 1
