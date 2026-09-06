@@ -22,6 +22,14 @@ describe('redactString', () => {
     expect(out).toContain('grant_type=client_credentials')
   })
 
+  it('redacts an id_token form field', () => {
+    // JSON pattern already covers id_token; the form-body list also needs it or opaque
+    // (non-eyJ-prefixed) id_tokens slip past the bare-JWT catch-all
+    const out = redactString('response_mode=form_post&id_token=OPAQUE-token-abc&scope=x')
+    expect(out).toContain('id_token=[REDACTED]')
+    expect(out).not.toContain('OPAQUE-token-abc')
+  })
+
   it('redacts a Bearer token', () => {
     expect(redactString('Rejected: Bearer abc123.def456.ghi789')).toBe(
       'Rejected: Bearer [REDACTED]',

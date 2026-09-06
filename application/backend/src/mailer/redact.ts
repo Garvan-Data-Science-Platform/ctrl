@@ -5,7 +5,10 @@ export function redactString(str: string): string {
       .replace(/"access_token"\s*:\s*"[^"]*"/g, '"access_token":"[REDACTED]"')
       .replace(/"client_secret"\s*:\s*"[^"]*"/g, '"client_secret":"[REDACTED]"')
       .replace(/"(refresh_token|id_token|assertion)"\s*:\s*"[^"]*"/g, '"$1":"[REDACTED]"')
-      .replace(/\b(client_secret|access_token|refresh_token|assertion)=[^&\s]+/g, '$1=[REDACTED]')
+      .replace(
+        /\b(client_secret|access_token|refresh_token|id_token|assertion)=[^&\s]+/g,
+        '$1=[REDACTED]',
+      )
       .replace(/Bearer\s+[A-Za-z0-9._\-+/=]+/g, 'Bearer [REDACTED]')
       // a bare JWT, which is what a token looks like once it is out of its JSON field
       .replace(/\beyJ[A-Za-z0-9._-]{10,}/g, '[REDACTED]')
