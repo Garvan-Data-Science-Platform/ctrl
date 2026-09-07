@@ -15,11 +15,10 @@
 
 - [ ] Changes are covered by tests (or reason why not)
 - [ ] Documentation updates:
-  - [ ] README.md
-  - [ ] [TSOA Annotations](https://tsoa-community.github.io/docs/annotations.html) in the `application/common/types/api/` type definitions
-  - [ ] [ctrl-docs](https://github.com/Garvan-Data-Science-Platform/ctrl-docs)
+  - [ ] README.md _(if required)_
+  - [ ] [TSOA Annotations](https://tsoa-community.github.io/docs/annotations.html) in the `application/common/types/api/` type definitions _(if required)_
+  - [ ] Issue created in [ctrl-docs](https://github.com/Garvan-Data-Science-Platform/ctrl-docs) for Architectural Docs, ERD, User Guides, Deployment Guides etc. _(if required)_
 - [ ] Secrets/config changes noted for deployment
-- [ ] Passing CI
 
 ## Breaking changes / migration notes
 
