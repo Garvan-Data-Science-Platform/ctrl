@@ -22,6 +22,6 @@
     password: '',
     sender: 'CTRL <noreply@example.com>', //the From address on every email CTRL sends
     //requireTLS: false, //only for a local mail catcher with no TLS, such as mailhog
-    maxConnections: 3 //max concurrent SMTP connections; m365-oauth caps at 3
+    maxConnections: 3 //max concurrent SMTP sockets. m365-oauth caps at 3 (schema enforces); smtp-basic can go higher based on what the relay allows
   }
 }

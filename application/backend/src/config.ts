@@ -55,7 +55,9 @@ export const schema = {
             // STARTTLS is required unless this is explicitly false. Only set it false for
             // a relay that genuinely has no TLS, such as a local mail catcher.
             requireTLS: { type: 'boolean' },
-            maxConnections: { type: 'number' },
+            // nodemailer treats 0 as unlimited, which nothing here wants. No upper bound
+            // on smtp-basic because it depends entirely on the relay.
+            maxConnections: { type: 'number', minimum: 1 },
           },
           required: [
             'provider',
@@ -81,7 +83,10 @@ export const schema = {
             host: { type: 'string', minLength: 1 },
             port: { type: 'number' },
             sender: { type: 'string', minLength: 1 },
-            maxConnections: { type: 'number' },
+            // Exchange caps SMTP AUTH at 3 concurrent connections per mailbox and returns
+            // 432 4.3.2 above that. Caught at boot so a mistake fails here rather than on
+            // the first burst.
+            maxConnections: { type: 'number', minimum: 1, maximum: 3 },
           },
           required: [
             'provider',

@@ -98,4 +98,21 @@ describe('mailer config schema', () => {
     delete withoutMax.maxConnections
     expect(validator()({ mailer: withoutMax })).toBe(false)
   })
+
+  it('rejects m365-oauth with maxConnections above 3', () => {
+    // Exchange caps SMTP AUTH at 3 concurrent connections per mailbox and answers 432 4.3.2
+    // above that. Enforced at boot so the mistake is caught here rather than on the burst.
+    expect(validator()({ mailer: { ...m365, maxConnections: 4 } })).toBe(false)
+  })
+
+  it('rejects maxConnections of 0 on both variants', () => {
+    // nodemailer treats 0 as unlimited, which nothing here wants.
+    expect(validator()({ mailer: { ...smtpBasic, maxConnections: 0 } })).toBe(false)
+    expect(validator()({ mailer: { ...m365, maxConnections: 0 } })).toBe(false)
+  })
+
+  it('accepts smtp-basic with maxConnections above 3', () => {
+    // No upper bound on smtp-basic — the ceiling depends on what the relay allows.
+    expect(validator()({ mailer: { ...smtpBasic, maxConnections: 50 } })).toBe(true)
+  })
 })

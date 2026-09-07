@@ -2,13 +2,6 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-# Keep at 1 if config.mailer.provider is m365-oauth. Exchange meters the 30
-# messages/minute and 3 concurrent SMTP AUTH connection budgets per MAILBOX,
-# not per pod, so more than one backend replica exceeds the rate against the
-# same mailbox and Exchange defers or throttles the surplus. The backend
-# Deployment uses `strategy: Recreate` for the same reason: a RollingUpdate
-# briefly runs two pods during every deploy regardless of this value.
-# https://learn.microsoft.com/en-us/office365/servicedescriptions/exchange-online-service-description/exchange-online-limits
 replicaCount: 1
 
 demoMode:
@@ -41,8 +34,10 @@ config:
     # Set false only for a relay that genuinely has no TLS, such as a local mail catcher.
     # Anything else leaves the SMTP password readable on the wire.
     requireTLS: true
-    # Max concurrent SMTP connections from this pod to the mail server. Exchange caps
-    # m365-oauth at 3 per mailbox and returns 432 4.3.2 above that; other relays vary.
+    # Max concurrent SMTP sockets from this pod to the mail server. This default is
+    # Exchange's per-mailbox cap on the m365-oauth path; raising it there returns
+    # 432 4.3.2 (the schema enforces max 3 for that provider). On smtp-basic, set it to
+    # whatever your relay allows — most support far more than 3.
     maxConnections: 3
     # For m365-oauth, set provider to m365-oauth in your own values file and add:
     #   tenantId: '<garvan-tenant-id>'
@@ -187,8 +182,6 @@ readinessProbe:
     path: /
     port: http
 
-# Must stay disabled if config.mailer.provider is m365-oauth. See the note on
-# replicaCount above.
 autoscaling:
   enabled: false
   minReplicas: 1

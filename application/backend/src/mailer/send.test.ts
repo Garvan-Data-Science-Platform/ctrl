@@ -157,6 +157,7 @@ describe('getProvider variant selection', () => {
       host: 'smtp.office365.com',
       port: 587,
       sender: 'CTRL <ctrl-noreply@garvan.org.au>',
+      maxConnections: 3,
     },
   }
 
