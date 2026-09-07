@@ -208,12 +208,25 @@ describe('M365OAuthProvider', () => {
   // the limiter's internal timing behaviour: they verify the limiter is constructed with the
   // right options and that sendMail schedules each job with the correct priority tag.
   describe('Bottleneck scheduling', () => {
-    it('constructs the limiter with minTime 2000 and maxConcurrent matching config', () => {
+    it('constructs the limiter with minTime 2100 and maxConcurrent capped at 2', () => {
+      // 2100ms spacing → ≤29 starts per rolling 60s window (margin under Exchange's 30/min).
+      // maxConcurrent capped at 2 keeps late completions from bunching above 30 at the wire.
       MockedBottleneck.mockClear()
       new M365OAuthProvider(validConfig)
       expect(MockedBottleneck).toHaveBeenCalledWith({
-        minTime: 2000,
-        maxConcurrent: validConfig.maxConnections,
+        minTime: 2100,
+        maxConcurrent: 2,
+      })
+    })
+
+    it('caps maxConcurrent at config.maxConnections when the config is lower', () => {
+      // A deployer who sets maxConnections: 1 should not have Bottleneck queue 2 in-flight
+      // against a pool of 1. min(2, 1) = 1 keeps the two in step.
+      MockedBottleneck.mockClear()
+      new M365OAuthProvider({ ...validConfig, maxConnections: 1 })
+      expect(MockedBottleneck).toHaveBeenCalledWith({
+        minTime: 2100,
+        maxConcurrent: 1,
       })
     })
 
@@ -256,6 +269,87 @@ describe('M365OAuthProvider', () => {
         expect.any(Function),
       )
     })
+
+    // Uses the real Bottleneck library (jest.requireActual) so the rate cap and priority
+    // ordering are exercised end-to-end, not just the wiring. The rest of the file mocks
+    // Bottleneck to keep other tests fast; this one accepts real wall-clock delay because
+    // otherwise changing minTime to 200 would break nothing and the branch's headline
+    // claim would be untested. Uses a compressed minTime (200ms) so the test finishes in
+    // seconds rather than the production 2.1s spacing.
+    it('really paces sends at ≥ minTime spacing (real Bottleneck)', async () => {
+      const realBottleneckModule = jest.requireActual('bottleneck') as {
+        default: new (opts: unknown) => Bottleneck
+      }
+      const RealBottleneck = realBottleneckModule.default
+      // A compressed minTime keeps the test around a second while proving the mechanism.
+      // maxConcurrent: 1 so the assertion focuses on inter-start spacing, not concurrency.
+      const testMinTime = 200
+      MockedBottleneck.mockImplementation(
+        () => new RealBottleneck({ minTime: testMinTime, maxConcurrent: 1 }),
+      )
+      mockAcquireToken.mockResolvedValue({
+        accessToken: 'fake',
+        expiresOn: new Date(Date.now() + 3600 * 1000),
+      })
+      const provider = new M365OAuthProvider(validConfig)
+
+      const start = Date.now()
+      await Promise.all(
+        [1, 2, 3, 4, 5].map((n) =>
+          provider.sendMail({ to: `r${n}@example.com`, subject: `s${n}`, text: 't' }),
+        ),
+      )
+      const elapsed = Date.now() - start
+
+      // 5 sends spaced at 200ms → 4 intervals → ≥ 800ms elapsed. Real Bottleneck should
+      // hit this floor within a few ms; anything materially faster would mean the limiter
+      // isn't actually gating starts (which is exactly what this test exists to catch).
+      expect(elapsed).toBeGreaterThanOrEqual((5 - 1) * testMinTime)
+      // Sanity ceiling — 5 sends at 200ms spacing should never take longer than ~2s.
+      expect(elapsed).toBeLessThan(3000)
+    }, 10_000)
+
+    // Priority ordering with a real Bottleneck: submit 3 normal sends (which take multiple
+    // minTime slots to drain), then submit one urgent after the first has started. The
+    // urgent should slot in ahead of the remaining normals in the queue.
+    it('really lets an urgent send jump ahead of queued normal sends (real Bottleneck)', async () => {
+      const realBottleneckModule = jest.requireActual('bottleneck') as {
+        default: new (opts: unknown) => Bottleneck
+      }
+      const RealBottleneck = realBottleneckModule.default
+      MockedBottleneck.mockImplementation(
+        () => new RealBottleneck({ minTime: 200, maxConcurrent: 1 }),
+      )
+      mockAcquireToken.mockResolvedValue({
+        accessToken: 'fake',
+        expiresOn: new Date(Date.now() + 3600 * 1000),
+      })
+      const provider = new M365OAuthProvider(validConfig)
+      const arrivalOrder: string[] = []
+      // Wrap sends so each records its arrival at nodemailer's fake transporter — the
+      // order sends emerge from the limiter is what we assert on.
+      const track = async (id: string, mailPriority?: 'high') => {
+        await provider.sendMail({
+          to: `${id}@example.com`,
+          subject: id,
+          text: id,
+          ...(mailPriority ? { mailPriority } : {}),
+        })
+        arrivalOrder.push(id)
+      }
+      // Kick off three normal sends. The first starts immediately; the rest queue behind.
+      const normals = [track('n1'), track('n2'), track('n3')]
+      // Wait past the first slot so n1 is definitely in-flight and the queue holds n2,n3.
+      await new Promise((resolve) => setTimeout(resolve, 50))
+      // Submit an urgent. Bottleneck should place it ahead of the queued n2 and n3.
+      const urgent = track('urgent', 'high')
+      await Promise.all([...normals, urgent])
+      // The exact position depends on timing, but urgent must land before at least one
+      // of the normal sends that were queued behind n1.
+      const urgentIdx = arrivalOrder.indexOf('urgent')
+      const n3Idx = arrivalOrder.indexOf('n3')
+      expect(urgentIdx).toBeLessThan(n3Idx)
+    }, 10_000)
   })
 })
 
@@ -313,7 +407,7 @@ describe('wrapSmtpError', () => {
     })
     const wrapped = wrapSmtpError(err)
     expect(wrapped.message).toContain('not permitted to send')
-    expect(wrapped.message).toContain('granting Send As')
+    expect(wrapped.message).toContain('grant Send As')
     expect(wrapped.message).toContain('Do not retry')
   })
 

@@ -34,11 +34,12 @@ export class M365OAuthProvider implements MailProvider {
   private readonly cca: ConfidentialClientApplication
   private transporter: Transporter | null = null
   private readonly user: string
-  // One Bottleneck limiter fronts every send. minTime enforces strict 2s spacing between
-  // job starts, so ≤30 starts per any 60s window regardless of window alignment — matches
-  // Exchange's 30/min per-mailbox cap. maxConcurrent matches the pool's connection cap so
-  // never more than that many sends are in-flight at once. Priority ordering happens
-  // through Bottleneck's built-in priority queue (opts.mailPriority = 'high' → priority 1).
+  // One Bottleneck limiter fronts every send. minTime enforces 2.1s spacing between job
+  // starts, giving ≤29 starts per any rolling 60s window — a one-slot margin under
+  // Exchange's 30/min per-mailbox cap. maxConcurrent caps in-flight sends at 2 so late
+  // completions can't briefly stack with fresh starts and push the mailbox above 30.
+  // Priority ordering uses Bottleneck's built-in priority queue (mailPriority = 'high'
+  // → priority 1, otherwise 5). See the limiter construction below for the full rationale.
   private readonly limiter: Bottleneck
 
   constructor(private readonly config: M365OAuthConfig) {
@@ -57,8 +58,16 @@ export class M365OAuthProvider implements MailProvider {
     }
 
     this.limiter = new Bottleneck({
-      minTime: 2000,
-      maxConcurrent: config.maxConnections,
+      // 2100ms spacing yields at most 29 starts in any rolling 60s window (60_000 / 2100),
+      // leaving one-slot margin under Exchange's 30/min mailbox cap. 2000ms puts starts at
+      // t=0,2,…,60 — 31 points in a 60s window — and slow sends completing late can bunch
+      // subsequent starts a few messages higher again. Cost: ~5% throughput vs the ceiling,
+      // for insurance against the un-liftable 5.2.25x throttle that repeated overruns feed.
+      minTime: 2100,
+      // Cap at 2 rather than the pool's 3 so completions can't stack with a fresh start
+      // and briefly push the mailbox above 30/min. Also stays under config.maxConnections
+      // in case a deployer sets it to 1.
+      maxConcurrent: Math.min(2, config.maxConnections),
     })
 
     this.cca = new ConfidentialClientApplication({
@@ -169,8 +178,7 @@ export function wrapSmtpError(err: unknown): Error {
     return new Error(
       `M365 rejected the credential for this mailbox. Tenant-side authorisation is the likely ` +
         `cause: the role assignment on the app, the management scope the sender mailbox falls ` +
-        `in, or SMTP AUTH on that mailbox. See the M365 section of the deployment docs. ` +
-        `Original: ${safe}`,
+        `in, or SMTP AUTH on that mailbox. Original: ${safe}`,
     )
   }
 
@@ -189,15 +197,18 @@ export function wrapSmtpError(err: unknown): Error {
 
   // Repeated send-as failures are one of the triggers for the throttling above. Match the
   // 554 form and the exception name, since a bare 5.2.252 also appears in the 550 throttle.
+  // Anchor 5.7.60 with word boundaries — an unanchored substring collides with the
+  // 550 5.7.606-649 "banned sending IP" family (a real Exchange egress-IP block code),
+  // which would misroute the operator to audit mailbox permissions instead of egress IPs.
   if (
     /554 5\.2\.252/.test(combined) ||
-    combined.includes('5.7.60') ||
+    /\b5\.7\.60\b/.test(combined) ||
     combined.includes('SendAsDenied')
   ) {
     return new Error(
       `M365 refused the sender address. The mailbox we authenticate as is not permitted to ` +
-        `send as this From address. Make them the same address, or see the M365 section of ` +
-        `the deployment docs on granting Send As. Do not retry this one. Original: ${safe}`,
+        `send as this From address. Make them the same address, or grant Send As on the ` +
+        `sending mailbox in Exchange admin. Do not retry this one. Original: ${safe}`,
     )
   }
 
