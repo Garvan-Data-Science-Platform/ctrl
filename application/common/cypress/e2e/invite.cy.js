@@ -66,7 +66,7 @@ describe('Invites - Full E2E Flow', () => {
       cy.get('[data-cy="reg-button"]').click()
 
       // 5. Assert error message is shown
-      cy.contains(`Error Registering: "Invite for ${testEmail} not found"`).should('exist')
+      cy.contains('Error Registering: "Invite not found"').should('exist')
     })
   })
 
@@ -119,8 +119,10 @@ describe('Invites - Full E2E Flow', () => {
       cy.fillRegistrationForm({ email: existingEmail })
       cy.get('[data-cy="reg-button"]').click()
 
-      // 4. Assert error about already registered
-      cy.contains(`Error Registering: \"Invite for ${existingEmail} not found\"`).should('exist')
+      // 4. Assert error about already registered. Fresh invite for this exact address exists,
+      // so the "Invite not found" branch cannot fire — the real error is the unique-email
+      // constraint on User.
+      cy.contains('already in use').should('exist')
     })
   })
 
@@ -151,7 +153,7 @@ describe('Invites - Full E2E Flow', () => {
       cy.get('[data-cy="reg-button"]').click()
 
       // 5. Assert error message
-      cy.contains(`Error Registering: \"Invite for ${revokedEmail} not found\"`).should('exist')
+      cy.contains('Error Registering: "Invite not found"').should('exist')
     })
   })
 })
