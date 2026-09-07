@@ -16,7 +16,7 @@
 - [ ] Changes are covered by tests (or reason why not)
 - [ ] Documentation updates:
   - [ ] README.md
-  - [ ] [TSOA Annotations](https://tsoa-community.github.io/docs/annotations.html)
+  - [ ] [TSOA Annotations](https://tsoa-community.github.io/docs/annotations.html) in the `application/common/types/api/` type definitions
   - [ ] [ctrl-docs](https://github.com/Garvan-Data-Science-Platform/ctrl-docs)
 - [ ] Secrets/config changes noted for deployment
 - [ ] Passing CI
