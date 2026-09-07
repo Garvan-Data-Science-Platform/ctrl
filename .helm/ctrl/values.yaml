@@ -26,6 +26,9 @@ config:
   otp: true
   inviteExpiryDays: 7
   # Mail provider. Supported: 'smtp-basic' (any SMTP server with username/password auth), 'm365-oauth' (Microsoft 365 OAuth 2 SMTP via MSAL).
+  # An smtp-basic block with empty host/username/password/sender is accepted at boot so
+  # a deployment that doesn't need mail yet can still start; the first actual send throws
+  # `smtp-basic: host is empty`. m365-oauth is stricter — empty fields there fail at boot.
   mailer:
     provider: smtp-basic
     host: ''
@@ -49,6 +52,8 @@ config:
     #   port: 587
     #   sender: 'CTRL <ctrl-noreply@garvan.org.au>'
     # Leave username, password and requireTLS as they are, they are ignored on that path.
+    # If application code ever passes opts.from with a different address, Exchange rejects
+    # with 554 5.2.252 (SendAsDenied) unless the Entra app has Send As on that mailbox.
 
 userClient:
   hostname: ctrlhost
