@@ -45,9 +45,15 @@ function getProvider(): MailProvider {
   throw new Error(`Unknown mailer provider: ${(cfg as { provider: string }).provider}`)
 }
 
+// The single entry point for outbound mail. New callers should route through here rather
+// than constructing a nodemailer transporter directly, so provider selection, sender
+// validation, redaction and error classification all stay in one place.
 export async function sendEmail(opts: MailOpts): Promise<void> {
   // || not ?? so an empty-string from a caller falls back to the configured sender
-  // rather than reaching nodemailer as MAIL FROM:<> and being rejected with a bare 501
+  // rather than reaching nodemailer as MAIL FROM:<> and being rejected with a bare 501.
+  // On the m365-oauth path, an opts.from that differs from config.mailer.sender only
+  // works if the Entra app has Send As on that mailbox — otherwise Exchange returns
+  // 554 5.2.252 / 5.7.60 SendAsDenied. See wrapSmtpError in M365OAuthProvider.
   const from = opts.from || config.mailer.sender
   const started = Date.now()
   // never log text, html, from, or anything token shaped
