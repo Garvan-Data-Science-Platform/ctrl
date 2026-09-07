@@ -4,7 +4,7 @@
 
 ## Architecture Decision Record
 
-- [ ] This change **required** an ADR addition/update (link it here: `docs/adr/NNNN-*.md`)
+- [ ] This change **required** an ADR addition/update (link it here: `docs/adr/ADR-NNN-*.md`)
 - [ ] This change **did not** require an ADR — reason:
   <!-- e.g. adds tests, fixes a bug, refactor with no interface change,
        dependency bump, docs-only, config tweak -->
