@@ -1,4 +1,5 @@
 import { ConfidentialClientApplication } from '@azure/msal-node'
+import Bottleneck from 'bottleneck'
 import nodemailer, { type Transporter } from 'nodemailer'
 import type { MailOpts, MailProvider } from './provider'
 import { redactString } from './redact'
@@ -33,6 +34,12 @@ export class M365OAuthProvider implements MailProvider {
   private readonly cca: ConfidentialClientApplication
   private transporter: Transporter | null = null
   private readonly user: string
+  // One Bottleneck limiter fronts every send. minTime enforces strict 2s spacing between
+  // job starts, so ≤30 starts per any 60s window regardless of window alignment — matches
+  // Exchange's 30/min per-mailbox cap. maxConcurrent matches the pool's connection cap so
+  // never more than that many sends are in-flight at once. Priority ordering happens
+  // through Bottleneck's built-in priority queue (opts.mailPriority = 'high' → priority 1).
+  private readonly limiter: Bottleneck
 
   constructor(private readonly config: M365OAuthConfig) {
     if (!config.tenantId) throw new Error('m365-oauth: tenantId is empty')
@@ -49,6 +56,11 @@ export class M365OAuthProvider implements MailProvider {
       throw new Error(`m365-oauth: sender is not a usable address: ${config.sender}`)
     }
 
+    this.limiter = new Bottleneck({
+      minTime: 2000,
+      maxConcurrent: config.maxConnections,
+    })
+
     this.cca = new ConfidentialClientApplication({
       auth: {
         clientId: config.clientId,
@@ -59,6 +71,14 @@ export class M365OAuthProvider implements MailProvider {
   }
 
   async sendMail(opts: MailOpts): Promise<void> {
+    // Lower Bottleneck priority number = higher scheduling priority. 'high' hint jumps
+    // ahead of queued normal sends; unhinted sends default to 5.
+    return this.limiter.schedule({ priority: opts.mailPriority === 'high' ? 1 : 5 }, () =>
+      this.doSend(opts),
+    )
+  }
+
+  private async doSend(opts: MailOpts): Promise<void> {
     const transporter = this.getTransporter()
     try {
       await transporter.sendMail({ ...opts, from: opts.from ?? this.config.sender })

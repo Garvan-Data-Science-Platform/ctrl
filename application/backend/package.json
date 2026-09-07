@@ -29,6 +29,7 @@
     "@prisma/client": "^5.20.0",
     "@tsoa/runtime": "^6.6.0",
     "ajv": "^8.18.0",
+    "bottleneck": "^2.19.5",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "dotenv-cli": "^8.0.0",

@@ -426,6 +426,10 @@ export class UsersController extends Controller {
       subject,
       text,
       html,
+      // A password reset is a user sitting at a login screen holding a 15-minute token, so
+      // it takes the priority lane on the m365-oauth path. An admin invite reuses this same
+      // helper but the admin isn't waiting on the mail synchronously, so it stays default.
+      ...(adminInvite ? {} : { mailPriority: 'high' as const }),
     })
   }
 

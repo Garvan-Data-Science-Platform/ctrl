@@ -1,12 +1,18 @@
 import * as nodemailer from 'nodemailer'
 import type { NodemailerMock } from 'nodemailer-mock'
 import { ConfidentialClientApplication } from '@azure/msal-node'
+import Bottleneck from 'bottleneck'
 import { M365OAuthProvider, redactSecrets, wrapSmtpError } from './M365OAuthProvider'
 
 jest.mock('@azure/msal-node')
+// Bottleneck is mocked so its 2s spacing doesn't slow tests. Each beforeEach reinstates a
+// passthrough impl (schedule just runs the passed fn); tests that need to inspect scheduling
+// override the impl with a spy.
+jest.mock('bottleneck')
 
 const mockNodeMailer = nodemailer as unknown as NodemailerMock
 const MockedCCA = ConfidentialClientApplication as unknown as jest.Mock
+const MockedBottleneck = Bottleneck as unknown as jest.Mock
 
 describe('M365OAuthProvider', () => {
   const validConfig = {
@@ -26,6 +32,10 @@ describe('M365OAuthProvider', () => {
     mockAcquireToken = jest.fn()
     MockedCCA.mockImplementation(() => ({
       acquireTokenByClientCredential: mockAcquireToken,
+    }))
+    // Default passthrough: schedule runs the passed fn immediately.
+    MockedBottleneck.mockImplementation(() => ({
+      schedule: (_options: unknown, fn: () => Promise<void>) => fn(),
     }))
   })
 
@@ -191,6 +201,60 @@ describe('M365OAuthProvider', () => {
       expect(err).toBeInstanceOf(Error)
       expect((err as Error).message).toContain('[REDACTED]')
       expect((err as Error).message).not.toContain(secretToken)
+    })
+  })
+
+  // Bottleneck itself is a well-tested library, so these tests pin the wiring rather than
+  // the limiter's internal timing behaviour: they verify the limiter is constructed with the
+  // right options and that sendMail schedules each job with the correct priority tag.
+  describe('Bottleneck scheduling', () => {
+    it('constructs the limiter with minTime 2000 and maxConcurrent matching config', () => {
+      MockedBottleneck.mockClear()
+      new M365OAuthProvider(validConfig)
+      expect(MockedBottleneck).toHaveBeenCalledWith({
+        minTime: 2000,
+        maxConcurrent: validConfig.maxConnections,
+      })
+    })
+
+    it('schedules with Bottleneck priority 1 when mailPriority is high', async () => {
+      // Lower Bottleneck priority number = higher scheduling priority; 1 jumps ahead of 5.
+      const scheduleSpy = jest.fn(async (_options: unknown, fn: () => Promise<void>) => fn())
+      MockedBottleneck.mockImplementation(() => ({ schedule: scheduleSpy }))
+      mockAcquireToken.mockResolvedValue({
+        accessToken: 'fake',
+        expiresOn: new Date(Date.now() + 3600 * 1000),
+      })
+      const provider = new M365OAuthProvider(validConfig)
+      await provider.sendMail({
+        to: 'recipient@example.com',
+        subject: 'Test',
+        text: 'Hello',
+        mailPriority: 'high',
+      })
+      expect(scheduleSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ priority: 1 }),
+        expect.any(Function),
+      )
+    })
+
+    it('schedules with Bottleneck priority 5 when mailPriority is absent', async () => {
+      const scheduleSpy = jest.fn(async (_options: unknown, fn: () => Promise<void>) => fn())
+      MockedBottleneck.mockImplementation(() => ({ schedule: scheduleSpy }))
+      mockAcquireToken.mockResolvedValue({
+        accessToken: 'fake',
+        expiresOn: new Date(Date.now() + 3600 * 1000),
+      })
+      const provider = new M365OAuthProvider(validConfig)
+      await provider.sendMail({
+        to: 'recipient@example.com',
+        subject: 'Test',
+        text: 'Hello',
+      })
+      expect(scheduleSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ priority: 5 }),
+        expect.any(Function),
+      )
     })
   })
 })
@@ -386,6 +450,10 @@ describe('provisionCallback', () => {
     MockedCCA.mockImplementation(() => ({
       acquireTokenByClientCredential: mockAcquireToken,
     }))
+    // Default passthrough: schedule runs the passed fn immediately.
+    MockedBottleneck.mockImplementation(() => ({
+      schedule: (_options: unknown, fn: () => Promise<void>) => fn(),
+    }))
   })
 
   const registeredCallback = async (provider: M365OAuthProvider): Promise<ProvisionCallback> => {
@@ -458,6 +526,10 @@ describe('sendMail error wrapping integration', () => {
     mockAcquireToken = jest.fn()
     MockedCCA.mockImplementation(() => ({
       acquireTokenByClientCredential: mockAcquireToken,
+    }))
+    // Default passthrough: schedule runs the passed fn immediately.
+    MockedBottleneck.mockImplementation(() => ({
+      schedule: (_options: unknown, fn: () => Promise<void>) => fn(),
     }))
   })
 

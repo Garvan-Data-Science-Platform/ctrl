@@ -97,6 +97,20 @@ describe('sendEmail', () => {
     expect(mockNodeMailer.mock.getSentMail()[0].to).toEqual(['a@example.com', 'b@example.com'])
   })
 
+  it('accepts mailPriority in opts without error (smtp-basic ignores it)', async () => {
+    // Pass-through wiring: send.ts imposes no restriction on opts.mailPriority. On the
+    // m365-oauth path it drives Bottleneck's priority queue (covered in the M365 provider
+    // tests); on the smtp-basic path used here, the provider doesn't inspect it and
+    // nodemailer ignores unknown top-level options, so the send completes normally.
+    await sendEmail({
+      to: 'user@example.com',
+      subject: 'Hello',
+      text: 'World',
+      mailPriority: 'high',
+    })
+    expect(mockNodeMailer.mock.getSentMail()).toHaveLength(1)
+  })
+
   it('rethrows a send failure after logging it', async () => {
     mockNodeMailer.mock.setShouldFail(true)
     await expect(

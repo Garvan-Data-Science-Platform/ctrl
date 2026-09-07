@@ -414,6 +414,9 @@ export class AuthController extends Controller {
         to: user.email,
         subject: 'CTRL - One Time Password',
         text: `Your CTRL login code is: ${code}`,
+        // OTP has a 10-minute expiry with the user actively waiting on the code entry screen;
+        // the M365 provider queues at Bottleneck priority 1 so this jumps any pending bulk.
+        mailPriority: 'high',
       }).catch(() =>
         // sendEmail already logged the redacted provider-side reason; this line just
         // pins the correlation ids so a log search on the failure joins to the token.
