@@ -414,9 +414,10 @@ export class AuthController extends Controller {
         to: user.email,
         subject: 'CTRL - One Time Password',
         text: `Your CTRL login code is: ${code}`,
-      }).catch((err) =>
+      }).catch(() =>
+        // sendEmail already logged the redacted provider-side reason; this line just
+        // pins the correlation ids so a log search on the failure joins to the token.
         logger.error({
-          err,
           message: 'OTP email send failed',
           otpTokenId: otp.id,
           userId: user.id,
