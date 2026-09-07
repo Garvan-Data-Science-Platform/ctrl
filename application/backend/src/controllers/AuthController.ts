@@ -414,7 +414,14 @@ export class AuthController extends Controller {
         to: user.email,
         subject: 'CTRL - One Time Password',
         text: `Your CTRL login code is: ${code}`,
-      }).catch((err) => logger.error({ err, message: 'OTP email send failed', otpTokenId: otp.id }))
+      }).catch((err) =>
+        logger.error({
+          err,
+          message: 'OTP email send failed',
+          otpTokenId: otp.id,
+          userId: user.id,
+        }),
+      )
     } else {
       await this.userRepo.update({ where: { id: user.id }, data: { retriesRemaining: 10 } })
       const token = await generateToken({ userId: user.id })
