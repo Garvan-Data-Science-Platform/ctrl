@@ -410,8 +410,11 @@ describe('provisionCallback', () => {
     await cb('ctrl-noreply@garvan.org.au', false, done)
 
     // nodemailer compares this against Date.now(), so it must be absolute ms, brought
-    // forward by the same margin MSAL uses so the two caches agree on stale
-    expect(done).toHaveBeenCalledWith(null, 'real-token', expiresOn.getTime() - 300_000)
+    // forward past MSAL's own 300s freshness boundary so the two caches don't agree on
+    // "still fresh" and hand back the same token again
+    const expectedExpiry = expiresOn.getTime() - 240_000
+    expect(done).toHaveBeenCalledWith(null, 'real-token', expectedExpiry)
+    expect(expectedExpiry).toBeGreaterThan(Date.now())
   })
 
   it('forwards nodemailer renewal requests past the MSAL cache', async () => {

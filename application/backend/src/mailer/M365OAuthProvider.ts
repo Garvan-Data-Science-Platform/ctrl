@@ -5,10 +5,19 @@ import { redactString } from './redact'
 import { extractAddress } from './sender'
 
 const TOKEN_FAILURE = 'M365 token acquisition failed'
-// MSAL treats a cached token as expired five minutes early. Nodemailer renews only once the
-// expiry it was handed has passed, with no margin, so match MSAL rather than presenting a
-// token that dies mid-handshake.
-const TOKEN_RENEWAL_MARGIN_MS = 300_000
+// MSAL treats a cached token as expired five minutes early. Matching that boundary at 300s
+// would land on it, and MSAL would still rule the token fresh, handing back the same one.
+// 240s puts the ask past that boundary so a real fetch happens instead.
+const TOKEN_RENEWAL_MARGIN_MS = 240_000
+
+// Nodemailer defaults these to 2 min / 30 s / 10 min. A stalled connection holds one of
+// only three Exchange SMTP AUTH slots for that entire window; keep them tight so a hung
+// socket doesn't drown out the other two slots.
+const SMTP_TIMEOUTS = {
+  connectionTimeout: 30_000,
+  greetingTimeout: 15_000,
+  socketTimeout: 120_000,
+}
 
 interface M365OAuthConfig {
   tenantId: string
@@ -62,6 +71,7 @@ export class M365OAuthProvider implements MailProvider {
     if (this.transporter) return this.transporter
     this.transporter = nodemailer.createTransport({
       pool: true,
+      ...SMTP_TIMEOUTS,
       // Exchange allows three concurrent SMTP AUTH connections; nodemailer defaults to five.
       maxConnections: this.config.maxConnections,
       host: this.config.host,

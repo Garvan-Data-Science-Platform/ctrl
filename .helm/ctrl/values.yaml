@@ -5,8 +5,10 @@
 # Keep at 1 if config.mailer.provider is m365-oauth. Exchange meters the 30
 # messages/minute and 3 concurrent SMTP AUTH connection budgets per MAILBOX,
 # not per pod, so more than one backend replica exceeds the rate against the
-# same mailbox and Exchange defers or throttles the surplus. See the mailer
-# section of the deployment docs for details.
+# same mailbox and Exchange defers or throttles the surplus. The backend
+# Deployment uses `strategy: Recreate` for the same reason: a RollingUpdate
+# briefly runs two pods during every deploy regardless of this value.
+# https://learn.microsoft.com/en-us/office365/servicedescriptions/exchange-online-service-description/exchange-online-limits
 replicaCount: 1
 
 demoMode:

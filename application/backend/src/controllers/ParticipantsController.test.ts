@@ -548,6 +548,30 @@ describe('InvitesController', () => {
       // Check expiry(s) were not reset (TODO: FIX)
     })
 
+    it('should not reduce alreadyAcceptedCount when a new invite fails to send', async () => {
+      // Regression: alreadyAcceptedCount used to be derived as existingInvites.length -
+      // emailsResent.length - failedEmails.length, but failedEmails is shared with the
+      // new-recipient loop, so a new-recipient failure silently reduced the accepted count.
+      mockNodeMailer.mock.setShouldFail(true)
+
+      const response = await request(app)
+        .post(`/studies/${TestStudies.TEST_STUDY.id}/invites`)
+        .send({
+          recipients: [
+            { email: TestInvites.INVITE_ACCEPTED.email, prefill: {} },
+            { email: 'will.fail@example.com', prefill: {} },
+          ],
+          subjectText: 'S',
+          explanatoryText: 'E',
+        })
+        .set({ Authorization: `Bearer ${organisationAdminToken}` })
+
+      const body: InviteParticipantsResponse = response.body
+      expect(response.status).toBe(200)
+      expect(body.alreadyAcceptedCount).toBe(1)
+      expect(body.failedEmailsCount).toBe(1)
+    })
+
     it('should handle failed email sends correctly', async () => {
       mockNodeMailer.mock.setShouldFail(true)
       const emails = [
@@ -624,6 +648,25 @@ describe('InvitesController', () => {
       expect(targetEmail!.subject).toBe('New Subject')
       expect(targetEmail!.html).toContain('New Text')
       expect(targetEmail!.text).toContain('New Text')
+    })
+
+    it('should persist sentAt on the invites it resends', async () => {
+      // Regression: Invite.email is `/// @encrypted`. The old updateMany filtered on
+      // `email: { in: [...] }`, which compares plaintext against ciphertext and matches
+      // zero rows silently — mails still sent but sentAt never updated.
+      const pendingInvite = await prisma.invite.findFirstOrThrow({
+        where: { studyId: TestStudies.TEST_STUDY.id, status: 'PENDING' },
+      })
+      const originalSentAt = pendingInvite.sentAt
+
+      const response = await request(app)
+        .post(`/studies/${TestStudies.TEST_STUDY.id}/invites/resend`)
+        .set({ Authorization: `Bearer ${organisationAdminToken}` })
+      expect(response.status).toBe(204)
+
+      const after = await prisma.invite.findUniqueOrThrow({ where: { id: pendingInvite.id } })
+      expect(after.sentAt).not.toBeNull()
+      expect(after.sentAt!.getTime()).toBeGreaterThan(originalSentAt?.getTime() ?? 0)
     })
   })
 

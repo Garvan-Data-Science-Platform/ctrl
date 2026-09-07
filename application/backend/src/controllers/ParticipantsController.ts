@@ -815,10 +815,12 @@ export class InvitesController extends Controller {
 
     Object.assign(responseData, {
       emailsResentCount: emailsResent.length,
-      alreadyAcceptedCount: Math.max(
-        0,
-        existingInvites.length - emailsResent.length - failedEmails.length,
-      ),
+      // Count accepted directly. Deriving it as existingInvites − emailsResent − failedEmails
+      // silently reduces the count when a new-recipient send fails, since `failedEmails` is
+      // shared with the new-recipient loop below.
+      alreadyAcceptedCount: existingInvites.filter(
+        (invite) => invite.status === InviteStatus.ACCEPTED,
+      ).length,
       failedEmailsCount: failedEmails.length,
       failedEmails,
     })
@@ -846,12 +848,13 @@ export class InvitesController extends Controller {
     @Path() studyId: number,
     @Path() inviteId: string, // String because this is uuid
   ): Promise<void> {
-    // Get all pending invitations
+    // Get all pending invitations. Exclude REVOKED as well as ACCEPTED so an admin who
+    // revokes an invite cannot have that intent silently reversed by a stale resend click.
     const pendingInvite = await this.invitesRepo.findUniqueOrThrow({
       where: {
         id: inviteId,
         studyId: studyId,
-        status: { not: InviteStatus.ACCEPTED },
+        status: { notIn: [InviteStatus.ACCEPTED, InviteStatus.REVOKED] },
       },
       select: { id: true, email: true },
     })
@@ -904,23 +907,22 @@ export class InvitesController extends Controller {
       pendingInvites.map(async (invite) => {
         // sendInvite already logs the failure with studyId and inviteId
         const success = await this.sendInvite(invite.email, studyId, invite.id)
-        return { email: invite.email, success }
+        return { id: invite.id, success }
       }),
     )
 
-    const successfulEmails = emailResults
-      .filter((result) => result.success)
-      .map((result) => result.email)
+    const successfulIds = emailResults.filter((result) => result.success).map((result) => result.id)
 
-    const failedEmails = emailResults
-      .filter((result) => !result.success)
-      .map((result) => result.email)
+    const failedIds = emailResults.filter((result) => !result.success).map((result) => result.id)
 
-    // Update invites with appropriate status
+    // Filter on id, not email. Invite.email is `/// @encrypted` and the encryption
+    // extension only rewrites `equals`/`set`/`not` on string values, so an `in` array
+    // of plaintext addresses compares against ciphertext and matches nothing silently
+    // — the mails go out but sentAt / FAILED_TO_SEND never persist.
     await this.invitesRepo.updateMany({
       where: {
         studyId: studyId,
-        email: { in: successfulEmails },
+        id: { in: successfulIds },
         status: InviteStatus.PENDING,
       },
       data: {
@@ -932,7 +934,7 @@ export class InvitesController extends Controller {
     await this.invitesRepo.updateMany({
       where: {
         studyId: studyId,
-        email: { in: failedEmails },
+        id: { in: failedIds },
         status: InviteStatus.PENDING,
       },
       data: {
@@ -941,11 +943,9 @@ export class InvitesController extends Controller {
     })
 
     // Log sent emails
+    logger.info(`Resent ${successfulIds.length} emails to pending invites for studyId: ${studyId}`)
     logger.info(
-      `Resent ${successfulEmails.length} emails to pending invites for studyId: ${studyId}`,
-    )
-    logger.info(
-      `Failed to send ${failedEmails.length} emails to pending invites for studyId: ${studyId}`,
+      `Failed to send ${failedIds.length} emails to pending invites for studyId: ${studyId}`,
     )
   }
 

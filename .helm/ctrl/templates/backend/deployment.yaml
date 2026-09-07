@@ -8,6 +8,8 @@ spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: BACKEND
@@ -25,6 +27,7 @@ spec:
         {{- end }}
         app: BACKEND
     spec:
+      terminationGracePeriodSeconds: 45
       {{- with .Values.backend.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
