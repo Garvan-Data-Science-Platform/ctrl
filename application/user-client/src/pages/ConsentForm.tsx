@@ -72,21 +72,30 @@ export default function ConsentForm() {
 
   const checkRadios = () => {
     const blankRadiosTmp: string[] = []
-    for (const i in data?.elements || []) {
-      if (data?.elements[i].type == 'question-choices' && !data?.elements[i].data.value) {
-        blankRadiosTmp.push(i)
+    const elements = data?.elements || []
+
+    elements.forEach((el, idx) => {
+      if (el.type === 'question-choices' && !el.data.value) {
+        blankRadiosTmp.push(String(idx))
       }
-    }
+    })
+
     setBlankRadios(blankRadiosTmp)
     return blankRadiosTmp.length > 0
   }
 
   const saveForm = async (action: 'save' | 'next', isModal?: boolean) => {
-    for (const i in data?.elements || []) {
-      if (!isModal && data?.elements[i].data.required && !data?.elements[i].data.value) {
-        setModalOpen(true)
-        setModalAction(action)
-        return
+    const elements = data?.elements || []
+
+    for (let i = 0; i < elements.length; i++) {
+      const el = elements[i]
+
+      if (!isModal && (el.type === 'question-checkbox' || el.type === 'question-choices')) {
+        if (el.data.required && !el.data.value) {
+          setModalOpen(true)
+          setModalAction(action)
+          return
+        }
       }
     }
 
@@ -123,12 +132,11 @@ export default function ConsentForm() {
   }, [data])
 
   const renderElements = (elements: SurveyElement[]) => {
-    const results = []
-    for (const i in elements) {
-      if (elements[i].type == 'subheading') {
-        results.push(
+    return elements.map((element, idx) => {
+      if (element.type == 'subheading') {
+        return (
           <Typography
-            key={`sh_${i}`}
+            key={`sh_${idx}`}
             sx={{
               mt: 2,
               mb: 2,
@@ -137,26 +145,29 @@ export default function ConsentForm() {
               wordBreak: 'break-word',
             }}
           >
-            {elements[i].data.text}
-          </Typography>,
+            {element.data.text}
+          </Typography>
         )
-      } else if (elements[i].type == 'video') {
-        results.push(
+      } else if (element.type == 'video') {
+        return (
           <iframe
-            key={`if_${i}`}
+            key={`if_${idx}`}
             width="100%"
             height="500"
-            src={`https://${elements[i].data.link.replace('https://', '')}`}
-          />,
+            src={`https://${element.data.link?.replace('https://', '')}`}
+          />
         )
       } else {
-        results.push(renderQuestion(elements[i], Number(i)))
+        return renderQuestion(element, idx)
       }
-    }
-    return results
+    })
   }
 
-  const renderQuestion = ({ type, data }: SurveyElement, idx: number) => {
+  const renderQuestion = (element: SurveyElement, idx: number) => {
+    if (element.type === 'video' || element.type === 'subheading') {
+      return null
+    }
+
     return (
       <Card
         key={idx}
@@ -174,13 +185,15 @@ export default function ConsentForm() {
           },
         })}
       >
-        {/*
-          // @ts-ignore */}
-        <Typography component="label" for={`input_${idx}`} sx={{ flexGrow: 1, textAlign: 'left' }}>
-          {data.text}
+        <Typography
+          component="label"
+          htmlFor={`input_${idx}`}
+          sx={{ flexGrow: 1, textAlign: 'left' }}
+        >
+          {element.data.text}
         </Typography>
-        {data.tooltip ? (
-          <Tooltip title={<Typography fontSize={13}>{data.tooltip}</Typography>}>
+        {element.data.tooltip ? (
+          <Tooltip title={<Typography fontSize={13}>{element.data.tooltip}</Typography>}>
             <IconButton>
               <Info />
             </IconButton>
@@ -188,25 +201,28 @@ export default function ConsentForm() {
         ) : (
           <Box width={10} />
         )}
-        {type == 'question-checkbox' && (
+        {element.type === 'question-checkbox' && (
           <Checkbox
             id={`input_${idx}`}
-            checked={formState[idx].data.value}
+            checked={Boolean((formState[idx] as any)?.data?.value)}
             data-cy={`checkbox-${idx}`}
             onClick={() =>
               setFormState((state) => {
                 const s = [...state]
-                s[idx].data.value = !s[idx].data.value
+                const target = s[idx]
+                if (target.type === 'question-checkbox') {
+                  target.data.value = !target.data.value
+                }
                 return s
               })
             }
           />
         )}
-        {type == 'question-choices' && (
+        {element.type === 'question-choices' && (
           <Box>
             <FormControl error={blankRadios.includes(String(idx))}>
-              <RadioGroup value={formState[idx].data.value}>
-                {data.choices?.map((val: string, i: number) => {
+              <RadioGroup value={(formState[idx] as any)?.data?.value ?? ''}>
+                {element.data.choices?.map((val: string, i: number) => {
                   return (
                     <FormControlLabel
                       key={`choice_${idx}_${i}`}
@@ -217,7 +233,10 @@ export default function ConsentForm() {
                       onChange={() => {
                         setFormState((state) => {
                           const s = [...state]
-                          s[idx].data.value = val
+                          const target = s[idx]
+                          if (target.type === 'question-choices') {
+                            target.data.value = val
+                          }
                           return s
                         })
                       }}

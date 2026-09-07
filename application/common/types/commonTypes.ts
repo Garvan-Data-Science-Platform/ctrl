@@ -201,8 +201,6 @@ export type OrganisationName = string
  */
 export type ContactUsText = string
 
-// * @minLength 1 TODO: confirm that an empty title is okay
-// * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
 /**
  * @maxLength 128 // TODO: align this with the maxLength of the field
  * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]*$
@@ -210,8 +208,6 @@ export type ContactUsText = string
  */
 export type SurveyStepTitle = string
 
-// * @minLength 1 TODO: confirm that an empty description is okay
-// * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
 /**
  * @maxLength 900 // TODO: align this with the maxLength of the field
  * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]*$
@@ -220,25 +216,22 @@ export type SurveyStepTitle = string
 export type SurveyStepDescription = string
 
 /**
- * @minLength 1
  * @maxLength 900 // TODO: align this with the maxLength of the field
- * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
+ * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]*$
  * @example "Do you consent to the genomic test?"
  */
 export type SurveyQuestionText = string
 
 /**
- * @minLength 1
  * @maxLength 900 // TODO: align this with the maxLength of the field
- * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
+ * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]*$
  * @example "Here is an explanation of what genomic means"
  */
 export type SurveyQuestionTooltip = string
 
 /**
- * @minLength 1
- * @maxLength 900 // TODO: align this with the maxLength of the field
- * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
+ * @maxLength 200
+ * @pattern ^([a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+)?$
  * @example "Section with questions about consent"
  */
 export type SurveySubHeadingText = string

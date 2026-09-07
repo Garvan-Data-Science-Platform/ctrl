@@ -7,8 +7,12 @@ export function populateSurveyStepAnswers(
   const populated = { ...surveyStep }
   let counter = 0
   for (const element of populated.elements) {
-    if (['question-checkbox', 'question-choices'].includes(element.type)) {
-      element.data.value = answers[counter]
+    if (element.type === 'question-choices') {
+      element.data.value = answers[counter] as string | undefined
+      counter++
+    }
+    if (element.type === 'question-checkbox') {
+      element.data.value = answers[counter] as boolean | undefined
       counter++
     }
   }

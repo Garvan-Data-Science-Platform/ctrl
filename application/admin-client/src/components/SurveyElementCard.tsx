@@ -1,6 +1,5 @@
 import {
   SurveyElement,
-  SurveyElementType,
   SurveyQuestionCheckbox,
   SurveyQuestionChoices,
   SurveySubHeading,
@@ -318,15 +317,19 @@ export function SurveyElementCard({
     )
   }
 
-  type ContentRenderer = {
-    [key in SurveyElementType]: () => JSX.Element | null
-  }
-
-  const contentRenderer: ContentRenderer = {
-    'question-choices': () => renderQuestionChoices(element.data),
-    'question-checkbox': () => renderQuestionCheckbox(element.data),
-    video: () => renderVideo(element.data),
-    subheading: () => renderSubHeading(element.data),
+  const renderElementContent = () => {
+    switch (element.type) {
+      case 'question-choices':
+        return renderQuestionChoices(element.data)
+      case 'question-checkbox':
+        return renderQuestionCheckbox(element.data)
+      case 'video':
+        return renderVideo(element.data)
+      case 'subheading':
+        return renderSubHeading(element.data)
+      default:
+        return null
+    }
   }
   return (
     <Box
@@ -350,7 +353,7 @@ export function SurveyElementCard({
           <DragIndicator />
         </Box>
       )}
-      {contentRenderer[element.type]()}
+      {renderElementContent()}
       <Box sx={{ flexGrow: 1 }} />
       <IconButton disabled={disabled} sx={{ width: 50, height: 50 }} onClick={handleDelete}>
         <Delete />

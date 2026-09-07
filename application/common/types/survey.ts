@@ -4,27 +4,29 @@ import {
   SurveyStepDescription,
   SurveyStepTitle,
   SurveySubHeadingText,
-  Url,
+  OptionalUrl,
 } from './commonTypes'
 
 export interface DuoCode {
-  code: string // List used codes?
-  relatedAnswer: string | boolean
+  code: string // added via dropdown not form
+  relatedAnswer: SurveyQuestionText | boolean
 }
 
 export interface SurveyQuestionCheckbox {
   text: SurveyQuestionText
   tooltip?: SurveyQuestionTooltip
-  required: boolean
+  required?: boolean
   duoCodes?: DuoCode[]
+  value?: boolean | null
 }
 
 export interface SurveyQuestionChoices {
   text: SurveyQuestionText
   tooltip?: SurveyQuestionTooltip
-  required: boolean
-  choices: string[]
+  required?: boolean
+  choices: SurveyQuestionText[]
   duoCodes?: DuoCode[]
+  value?: SurveyQuestionText | null
 }
 
 export interface SurveySubHeading {
@@ -32,11 +34,14 @@ export interface SurveySubHeading {
 }
 
 export interface SurveyVideo {
-  link: Url
+  link?: OptionalUrl
 }
 
 export type SurveyElementType = 'question-choices' | 'question-checkbox' | 'subheading' | 'video'
 
+/**
+ * @discriminator type
+ */
 export type SurveyElement =
   | {
       type: 'question-choices'
@@ -45,12 +50,11 @@ export type SurveyElement =
   | { type: 'question-checkbox'; data: SurveyQuestionCheckbox }
   | { type: 'video'; data: SurveyVideo }
   | { type: 'subheading'; data: SurveySubHeading }
-  | { type: SurveyElementType; data: any }
 
 export interface SurveyStep {
   title: SurveyStepTitle
   text: SurveyStepDescription
-  last_updated?: string // TODO: Why is this a string? Should be omitted for the update survey response
+  last_updated?: string // Added by frontend but not by form field
   elements: SurveyElement[]
 }
 
@@ -66,7 +70,7 @@ export interface SurveyVersion {
 
 export type SurveyStepStatus = 'completed' | 'review_required' | 'viewed'
 
-export type SurveyStepAnswerArray = (string | boolean | null)[]
+export type SurveyStepAnswerArray = (SurveyQuestionText | boolean | null)[]
 
 export interface UserSurveyStepState {
   status: SurveyStepStatus

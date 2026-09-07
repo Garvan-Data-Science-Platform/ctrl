@@ -1,6 +1,11 @@
 import { SurveyVersion } from '@prisma/client'
 import { answersFromPreviousSurvey, combineGuardianAnswers, createDefaultAnswers } from './answers'
-import { SurveyStep, UserSurveyStepState } from 'common/types/survey'
+import {
+  SurveyQuestionCheckbox,
+  SurveyQuestionChoices,
+  SurveyStep,
+  UserSurveyStepState,
+} from 'common/types/survey'
 import ExampleSurveyVersion from 'common/src/surveys/exampleSurveyStepData.json'
 
 describe('Answer functions', () => {
@@ -70,14 +75,19 @@ describe('Answer functions', () => {
 
     it('Does not carry across when question text changes', () => {
       const currentVersion = structuredClone(prevVersion)
-      currentVersion.data[0].elements[1].data.text = 'CHECKBOX 1A'
+      // Note the leading ';' to prevent Automatic semicolon insertion failure
+      ;(currentVersion.data[0].elements[1].data as SurveyQuestionCheckbox).text = 'CHECKBOX 1A'
       const newAnswers = answersFromPreviousSurvey(prevVersion, currentVersion, prevAnswers)
       expect(newAnswers[0].answers).toEqual([null, 'choice1'])
     })
 
     it('Does not carry across when choices change', () => {
       const currentVersion = structuredClone(prevVersion)
-      currentVersion.data[0].elements[3].data.choices = ['choice1a', 'choice1b']
+      // Note the leading ';' to prevent Automatic semicolon insertion failure
+      ;(currentVersion.data[0].elements[3].data as SurveyQuestionChoices).choices = [
+        'choice1a',
+        'choice1b',
+      ]
       const newAnswers = answersFromPreviousSurvey(prevVersion, currentVersion, prevAnswers)
       expect(newAnswers[0].answers).toEqual([true, null])
     })

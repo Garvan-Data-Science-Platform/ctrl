@@ -50,23 +50,37 @@ function getPreviousAnswer(
   currentQuestionElement: SurveyElement,
   previousAnswers: PrismaJson.SurveyAnswerData,
 ): string | boolean | null {
-  let answer = null
+  if (currentQuestionElement.type === 'video' || currentQuestionElement.type === 'subheading')
+    return null
+
+  let answer: string | boolean | null | undefined = null
+
   for (const i in previousSteps) {
     const populated = populateSurveyStepAnswers(previousSteps[i], previousAnswers[i].answers)
     for (const el of populated.elements) {
-      if (el.data.text == currentQuestionElement.data.text) {
-        if (el.type == 'question-choices') {
+      // handle checkbox questions
+      if (el.type === 'question-checkbox' && currentQuestionElement.type === 'question-checkbox') {
+        if (el.data.text == currentQuestionElement.data.text) {
+          answer = el.data.value
+        }
+      }
+
+      // handle choice questions
+      else if (
+        el.type === 'question-choices' &&
+        currentQuestionElement.type === 'question-choices'
+      ) {
+        if (el.data.text == currentQuestionElement.data.text) {
           if (
             JSON.stringify(el.data.choices) === JSON.stringify(currentQuestionElement.data.choices)
-          )
+          ) {
             answer = el.data.value
-        } else {
-          answer = el.data.value
+          }
         }
       }
     }
   }
-  return answer
+  return answer ?? null
 }
 
 export function answersFromPreviousSurvey(

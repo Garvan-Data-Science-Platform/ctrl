@@ -435,16 +435,14 @@
       "SurveyQuestionText": {
         "type": "string",
         "example": "Do you consent to the genomic test?",
-        "minLength": 1,
         "maxLength": 900,
-        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]*$"
       },
       "SurveyQuestionTooltip": {
         "type": "string",
         "example": "Here is an explanation of what genomic means",
-        "minLength": 1,
         "maxLength": 900,
-        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
+        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]*$"
       },
       "DuoCode": {
         "properties": {
@@ -454,7 +452,7 @@
           "relatedAnswer": {
             "anyOf": [
               {
-                "type": "string"
+                "$ref": "#/components/schemas/SurveyQuestionText"
               },
               {
                 "type": "boolean"
@@ -482,7 +480,7 @@
           },
           "choices": {
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/SurveyQuestionText"
             },
             "type": "array"
           },
@@ -491,11 +489,18 @@
               "$ref": "#/components/schemas/DuoCode"
             },
             "type": "array"
+          },
+          "value": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SurveyQuestionText"
+              }
+            ],
+            "nullable": true
           }
         },
         "required": [
           "text",
-          "required",
           "choices"
         ],
         "type": "object",
@@ -517,40 +522,38 @@
               "$ref": "#/components/schemas/DuoCode"
             },
             "type": "array"
+          },
+          "value": {
+            "type": "boolean",
+            "nullable": true
           }
         },
         "required": [
-          "text",
-          "required"
+          "text"
         ],
         "type": "object",
         "additionalProperties": false
       },
-      "Url": {
+      "OptionalUrl": {
         "type": "string",
-        "example": "https://orgname.com/tcLink/",
-        "minLength": 1,
+        "example": "https://redcap.orgname.com/api/",
         "maxLength": 128,
-        "pattern": "^https?:\\/\\/[a-zA-Z0-9\\-._~:/?#[\\]@!$&'()*+,;=%]+$"
+        "pattern": "^(https?:\\/\\/[a-zA-Z0-9\\-._~:/?#[\\]@!$&'()*+,;=%]+)?$"
       },
       "SurveyVideo": {
         "properties": {
           "link": {
-            "$ref": "#/components/schemas/Url"
+            "$ref": "#/components/schemas/OptionalUrl"
           }
         },
-        "required": [
-          "link"
-        ],
         "type": "object",
         "additionalProperties": false
       },
       "SurveySubHeadingText": {
         "type": "string",
         "example": "Section with questions about consent",
-        "minLength": 1,
-        "maxLength": 900,
-        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
+        "maxLength": 200,
+        "pattern": "^([a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+)?$"
       },
       "SurveySubHeading": {
         "properties": {
@@ -563,15 +566,6 @@
         ],
         "type": "object",
         "additionalProperties": false
-      },
-      "SurveyElementType": {
-        "type": "string",
-        "enum": [
-          "question-choices",
-          "question-checkbox",
-          "subheading",
-          "video"
-        ]
       },
       "SurveyElement": {
         "anyOf": [
@@ -643,19 +637,6 @@
                   "subheading"
                 ],
                 "nullable": false
-              }
-            },
-            "required": [
-              "data",
-              "type"
-            ],
-            "type": "object"
-          },
-          {
-            "properties": {
-              "data": {},
-              "type": {
-                "$ref": "#/components/schemas/SurveyElementType"
               }
             },
             "required": [
@@ -848,7 +829,7 @@
         "items": {
           "anyOf": [
             {
-              "type": "string"
+              "$ref": "#/components/schemas/SurveyQuestionText"
             },
             {
               "type": "boolean"
@@ -1219,12 +1200,6 @@
         "maxLength": 32,
         "pattern": "^[a-fA-F0-9]{32}$"
       },
-      "OptionalUrl": {
-        "type": "string",
-        "example": "https://redcap.orgname.com/api/",
-        "maxLength": 128,
-        "pattern": "^(https?:\\/\\/[a-zA-Z0-9\\-._~:/?#[\\]@!$&'()*+,;=%]+)?$"
-      },
       "OptionalEmail": {
         "type": "string",
         "example": "contact.us@email.com",
@@ -1257,6 +1232,13 @@
         "example": "#a1b2c3",
         "maxLength": 30,
         "pattern": "^(#(?:[0-9a-fA-F]{3,4}){1,2}|rgba?\\(\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*(?:,\\s*[0-9.]+\\s*)?\\)|[a-zA-Z]{3,30})?$"
+      },
+      "Url": {
+        "type": "string",
+        "example": "https://orgname.com/tcLink/",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^https?:\\/\\/[a-zA-Z0-9\\-._~:/?#[\\]@!$&'()*+,;=%]+$"
       },
       "SettingsBase": {
         "properties": {
