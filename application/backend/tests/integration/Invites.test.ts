@@ -392,6 +392,44 @@ describe('Participant Invites', () => {
     expect(count).toEqual(1)
   })
 
+  it('should allow participants to register using a QUEUED invite', async () => {
+    // A recipient can click their /register/{id} link the instant the mail lands, which on
+    // the m365 path can be before the drain has flipped the row from QUEUED to PENDING.
+    // REGISTERABLE_INVITE_STATUSES has to include QUEUED for this to work.
+    const response = await request(app)
+      .post('/studies/1/invites')
+      .send({
+        recipients: [{ prefill: {}, email: participantRegisterRequestBody.email }],
+        subjectText: 'Subject',
+        explanatoryText: 'Text',
+      })
+      .set({ Authorization: `Bearer ${orgAdminToken}` })
+    expect(response.status).toBe(202)
+
+    await waitForInviteDrain(1)
+
+    const invite = await prisma.invite.findUniqueOrThrow({
+      where: {
+        studyId_emailHash: { email: participantRegisterRequestBody.email, studyId: 1 },
+      },
+    })
+
+    // Put it back to QUEUED after the drain has settled, so the state under test isn't
+    // racing the drain mid-assertion. This is the state a recipient genuinely arrives in
+    // when they click before their own send has resolved.
+    await prisma.invite.update({
+      where: { id: invite.id },
+      data: { status: InviteStatus.QUEUED },
+    })
+
+    const registerResponse = await request(app)
+      .post(`/auth/register/participants/${invite.id}`)
+      .send(participantRegisterRequestBody)
+
+    expect(registerResponse.status).toBe(201)
+    expect(registerResponse.body.token).not.toBeUndefined()
+  })
+
   // Invite expiry should be configurable
   it('should allow configuring invite expiry duration', async () => {
     const sendInviteResponse = await request(app)

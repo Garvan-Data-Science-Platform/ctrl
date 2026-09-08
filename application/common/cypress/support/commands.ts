@@ -64,6 +64,19 @@ Cypress.Commands.add('sendInviteUI', (email) => {
 })
 
 /**
+ * Poll MailHog until an email for `email` arrives, then resolve with the messages.
+ * cy.task has no built-in retry, and the invite drain runs after the HTTP response, so
+ * the mail may not have landed by the time the button's request resolves.
+ */
+Cypress.Commands.add('waitForEmail', (email, attemptsLeft = 40) => {
+  return cy.task('getEmailsFor', email).then((emails) => {
+    if (Array.isArray(emails) && emails.length > 0) return cy.wrap(emails, { log: false })
+    if (attemptsLeft <= 0) throw new Error(`No email arrived for ${email}`)
+    return cy.wait(250, { log: false }).then(() => cy.waitForEmail(email, attemptsLeft - 1))
+  })
+})
+
+/**
  * Fill the participant registration form
  * @param {Object} data - Registration data (uses defaults if not provided)
  */

@@ -13,6 +13,7 @@ import prisma from '../PrismaClient'
 import { hashPassword } from '../authentication'
 import * as nodemailer from 'nodemailer'
 import { NodemailerMock } from 'nodemailer-mock'
+import * as mailer from '../mailer'
 const mockNodeMailer = nodemailer as unknown as NodemailerMock
 
 const api = new Api()
@@ -702,6 +703,44 @@ describe('InvitesController', () => {
       })
       expect(settled.status).toBe('PENDING')
     })
+
+    it('should write every invite row before its email is sent', async () => {
+      // Stronger version of the write-first check: spies on sendEmail to record how many
+      // rows exist at each send, proving the createMany completed before any send fired.
+      const before = await prisma.invite.count({
+        where: { studyId: TestStudies.TEST_STUDY.id },
+      })
+      const realSendEmail = mailer.sendEmail
+      const rowsAtSendTime: number[] = []
+      const spy = jest
+        .spyOn(mailer, 'sendEmail')
+        .mockImplementation(async (...args: Parameters<typeof realSendEmail>) => {
+          rowsAtSendTime.push(
+            await prisma.invite.count({ where: { studyId: TestStudies.TEST_STUDY.id } }),
+          )
+          return realSendEmail(...args)
+        })
+
+      await request(app)
+        .post(`/studies/${TestStudies.TEST_STUDY.id}/invites`)
+        .send({
+          recipients: [
+            { email: 'order1@email.com', prefill: {} },
+            { email: 'order2@email.com', prefill: {} },
+          ],
+          subjectText: 'S',
+          explanatoryText: 'E',
+        })
+        .set({ Authorization: `Bearer ${organisationAdminToken}` })
+        .expect(202)
+
+      await waitForInviteDrain(TestStudies.TEST_STUDY.id)
+
+      expect(rowsAtSendTime).toHaveLength(2)
+      rowsAtSendTime.forEach((count) => expect(count).toBe(before + 2))
+
+      spy.mockRestore()
+    })
   })
 
   describe('POST /studies/{studyId}/invites/resend', () => {
@@ -751,6 +790,31 @@ describe('InvitesController', () => {
       const after = await prisma.invite.findUniqueOrThrow({ where: { id: pendingInvite.id } })
       expect(after.sentAt).not.toBeNull()
       expect(after.sentAt!.getTime()).toBeGreaterThan(originalSentAt?.getTime() ?? 0)
+    })
+
+    it('should resend invites left QUEUED by an interrupted drain', async () => {
+      // What a deploy or pod restart mid-drain leaves behind: the row exists because
+      // write-first, but its send was never confirmed. Recovery is bulk resend, which is
+      // why RESENDABLE_INVITE_STATUSES has to include QUEUED and not only PENDING (F1).
+      const stranded = await prisma.invite.findFirstOrThrow({
+        where: { studyId: TestStudies.TEST_STUDY.id, status: InviteStatus.PENDING },
+      })
+      await prisma.invite.update({
+        where: { id: stranded.id },
+        data: { status: InviteStatus.QUEUED, sentAt: null },
+      })
+      mockNodeMailer.mock.reset()
+
+      const response = await request(app)
+        .post(`/studies/${TestStudies.TEST_STUDY.id}/invites/resend`)
+        .set({ Authorization: `Bearer ${organisationAdminToken}` })
+      expect(response.status).toBe(202)
+
+      await waitForInviteDrain(TestStudies.TEST_STUDY.id)
+
+      const recovered = await prisma.invite.findUniqueOrThrow({ where: { id: stranded.id } })
+      expect(recovered.status).toBe('PENDING')
+      expect(recovered.sentAt).not.toBeNull()
     })
   })
 
