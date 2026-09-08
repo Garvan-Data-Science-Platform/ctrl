@@ -12,6 +12,8 @@ export function redactString(str: string): string {
       .replace(/Bearer\s+[A-Za-z0-9._\-+/=]+/g, 'Bearer [REDACTED]')
       // bare JWT (token outside its JSON field)
       .replace(/\beyJ[A-Za-z0-9._-]{10,}/g, '[REDACTED]')
+      // MSAL refresh tokens (don't fit JWT shape)
+      .replace(/\b(0\.[A-Za-z0-9_-]{20,}|OAQABA[A-Za-z0-9_-]{20,})\b/g, '[REDACTED]')
       // recipient addresses are PII; User.email is encrypted at rest
       .replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+/g, '[REDACTED-ADDRESS]')
   )

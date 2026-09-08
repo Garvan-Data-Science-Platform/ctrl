@@ -52,6 +52,15 @@ describe('redactString', () => {
     expect(out).toContain('token was [REDACTED] and it failed')
   })
 
+  it('redacts an MSAL refresh token in free-text AADSTS errors', () => {
+    // MSAL refresh tokens don't fit the JWT shape and were only scrubbed behind a
+    // 'refresh_token=' key; inline in error prose they leaked through.
+    const token = '0.AXoAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+    const out = redactString(`AADSTS70008: refresh token ${token} has expired`)
+    expect(out).not.toContain(token)
+    expect(out).toContain('[REDACTED]')
+  })
+
   it('redacts a recipient address out of an SMTP rejection', () => {
     // User.email is encrypted at rest, so it should not arrive in a log via a 550 either
     const out = redactString('550 5.1.1 <participant@example.org> recipient rejected')

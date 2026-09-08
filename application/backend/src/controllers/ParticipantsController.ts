@@ -47,7 +47,7 @@ import {
 } from '../utils/answers'
 import { ProfilesController } from './ProfilesController'
 import { auditLog } from '../middlewares/AuditLog'
-import { Role } from '@prisma/client'
+import { Prisma, Role } from '@prisma/client'
 import { genId } from '../utils/genId'
 import { generateInviteId, inviteExpiresAt, ACTIVE_INVITE_STATUSES } from '../utils/invite'
 import { Prefill } from 'common/types/invite'
@@ -530,22 +530,19 @@ export class InvitesController extends Controller {
       orderBy: { versionNumber: 'desc' },
     })
 
-    await this.profileRepo.update({
-      where: {
-        id: existingProfile.id,
-      },
-      data: {
-        studies: {
-          create: {
-            study: {
-              connect: {
-                id: invite.studyId,
-              },
-            },
-          },
-        },
-      },
-    })
+    try {
+      await this.profileRepo.update({
+        where: { id: existingProfile.id },
+        data: { studies: { create: { study: { connect: { id: invite.studyId } } } } },
+      })
+    } catch (err) {
+      // Concurrent double-accept: winner already created the StudyParticipant row;
+      // loser hits the [participantProfileId, studyId] unique constraint. Idempotent.
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+        return { acceptedInvite: invite.id }
+      }
+      throw err
+    }
 
     if (invitePrefill.studyParticipant) {
       await prisma.studyParticipant.update({
@@ -582,6 +579,7 @@ export class InvitesController extends Controller {
         inviteId,
         userId: user.id,
       })
+      throw new NotFoundError('Invite is no longer acceptable')
     }
     return {
       acceptedInvite: invite.id,

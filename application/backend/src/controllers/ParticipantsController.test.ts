@@ -1034,6 +1034,54 @@ describe('InvitesController', () => {
       })
       expect(p.externalId).toBe('external')
     })
+
+    it('treats concurrent double-accept as idempotent', async () => {
+      // Two requests for the same invite land in parallel: one wins the
+      // participantProfileId_studyId unique constraint, the other hits P2002.
+      // Loser catches and returns 201 (same as winner), one StudyParticipant row.
+      const invite = await prisma.invite.findFirstOrThrow({
+        where: { email: TestUsers.PARTICIPANT_UNANSWERED.email },
+      })
+      const token = await generateToken({ userId: TestUsers.PARTICIPANT_UNANSWERED.id })
+
+      const [r1, r2] = await Promise.all([
+        request(app)
+          .post(`/invites/${invite.id}/accept`)
+          .set({ Authorization: `Bearer ${token}` }),
+        request(app)
+          .post(`/invites/${invite.id}/accept`)
+          .set({ Authorization: `Bearer ${token}` }),
+      ])
+      expect([r1.status, r2.status].sort()).toEqual([201, 201])
+
+      const rows = await prisma.studyParticipant.count({
+        where: {
+          studyId: TestStudies.TEST_STUDY_2.id,
+          participantProfile: { user: { email: TestUsers.PARTICIPANT_UNANSWERED.email } },
+        },
+      })
+      expect(rows).toBe(1)
+    })
+
+    it('returns 404 when the invite is revoked mid-accept', async () => {
+      // Simulate a concurrent revoke landing between the register-time check and
+      // the final invite update. The guarded updateMany sees no matching row and
+      // the caller must be told the accept did not land.
+      const invite = await prisma.invite.findFirstOrThrow({
+        where: { email: TestUsers.PARTICIPANT_UNANSWERED.email },
+      })
+      await prisma.invite.update({
+        where: { id: invite.id },
+        data: { status: 'REVOKED' },
+      })
+
+      const token = await generateToken({ userId: TestUsers.PARTICIPANT_UNANSWERED.id })
+      const res = await request(app)
+        .post(`/invites/${invite.id}/accept`)
+        .set({ Authorization: `Bearer ${token}` })
+
+      expect(res.status).toBe(404)
+    })
   })
   describe('GET /invites/pending', () => {
     beforeEach(async () => {
