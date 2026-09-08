@@ -257,16 +257,19 @@ export class AuthController extends Controller {
       role: insertedUser.role,
     }
 
-    // Once a participant has been registered, we need
-    // to update their invitation status to ACCEPTED
-    const res = await this.inviteRepo.update({
-      where: { id: inviteId },
+    // Guarded so a concurrent revoke isn't silently reversed. Note the user rows are
+    // already created above; on a lost race we log rather than roll back (would require
+    // cross-table transaction). The user still has study access via StudyParticipant.
+    const { count } = await this.inviteRepo.updateMany({
+      where: { id: inviteId, status: { in: ACTIVE_INVITE_STATUSES } },
       data: { status: 'ACCEPTED' },
     })
-
-    if (!res) {
-      logger.error({ message: 'No invitation found', inviteId })
-      throw new NotFoundError(`Invite ${inviteId} not found`)
+    if (count === 0) {
+      logger.error({
+        message: 'Invite changed status during registration; user created without valid invite',
+        inviteId,
+        userId: insertedUser.id,
+      })
     }
 
     return responseData
@@ -410,16 +413,17 @@ export class AuthController extends Controller {
       responseData = challenge
 
       // fire-and-forget so the challenge returns without waiting on the send
-      sendEmail({
+      void sendEmail({
         to: user.email,
         subject: 'CTRL - One Time Password',
         text: `Your CTRL login code is: ${code}`,
         mailPriority: 'high',
-      }).catch(() =>
+      }).catch((err) =>
         logger.error({
           message: 'OTP email send failed',
           otpTokenId: otp.id,
           userId: user.id,
+          err,
         }),
       )
     } else {

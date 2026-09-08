@@ -459,40 +459,6 @@ export class InvitesController extends Controller {
       },
     })
 
-    // NOTE: I've left this code in below, but commented out.
-    // I have not implemented the endpoint for users to add dependents to studies
-    //  Not sure if this functionality is what study managers would want (and is complicated by ID question).
-
-    // const userProfile = await this.profileRepo.findFirstOrThrow({
-    //   where: { userId: user.id },
-    //   select: { familyId: true },
-    // })
-
-    // // Get dependents info (if any) to the response so frontend can show this to choose which dependents can be included
-    // const dependents = await this.profileRepo.findMany({
-    //   where: {
-    //     OR: [
-    //       {
-    //         familyId: userProfile.familyId,
-    //         participantType: ParticipantType.DEPENDENT_AGE,
-    //       },
-    //       {
-    //         familyId: userProfile.familyId,
-    //         participantType: ParticipantType.DEPENDENT_OTHER,
-    //       },
-    //     ],
-    //   },
-    //   select: {
-    //     firstName: true,
-    //     middleName: true,
-    //     lastName: true,
-    //     dob: true,
-    //     id: true,
-    //     participantType: true,
-    //   },
-    // })
-
-    // Map to response
     const formattedInvites = invites.map((invite) => ({
       id: invite.id,
       email: invite.email,
@@ -504,19 +470,9 @@ export class InvitesController extends Controller {
       description: invite.study.description || undefined,
     }))
 
-    // const formattedDependents = dependents.map((dependent) => ({
-    //   firstName: dependent.firstName,
-    //   middleName: dependent.middleName ? dependent.middleName : undefined,
-    //   lastName: dependent.lastName,
-    //   dob: dependent.dob.toISOString(),
-    //   id: dependent.id,
-    //   participantType: dependent.participantType as ParticipantType,
-    // })) as FamilyMember[]
-
     return {
       data: {
         invites: formattedInvites,
-        // dependents: formattedDependents,
       },
     }
   }
@@ -613,13 +569,19 @@ export class InvitesController extends Controller {
       },
     })
 
-    // accept invite
-    const res = await this.invitesRepo.update({
-      where: { id: inviteId },
+    // Guarded so a concurrent revoke isn't silently reversed. StudyParticipant is
+    // already created above; on lost race we log rather than roll back (would need
+    // cross-table transaction).
+    const { count } = await this.invitesRepo.updateMany({
+      where: { id: inviteId, status: { in: ACTIVE_INVITE_STATUSES } },
       data: { status: 'ACCEPTED' },
     })
-    if (!res) {
-      throw new NotFoundError(`Error accepting invite`)
+    if (count === 0) {
+      logger.error({
+        message: 'Invite changed status during accept; profile linked without valid invite',
+        inviteId,
+        userId: user.id,
+      })
     }
     return {
       acceptedInvite: invite.id,
@@ -885,13 +847,19 @@ export class InvitesController extends Controller {
       throw new NotFoundError('Invite not found')
     }
 
-    await this.invitesRepo.update({
+    // Guard on ACTIVE statuses so a race with acceptInvite doesn't overwrite an
+    // ACCEPTED row (StudyParticipant would already exist, revoke would corrupt state).
+    const { count } = await this.invitesRepo.updateMany({
       where: {
         id: invite.id,
-        studyId: studyId,
+        studyId,
+        status: { in: ACTIVE_INVITE_STATUSES },
       },
       data: { status: InviteStatus.REVOKED },
     })
+    if (count === 0) {
+      throw new NotFoundError('Invite is no longer revocable')
+    }
   }
 
   /**
@@ -961,10 +929,6 @@ export class InvitesController extends Controller {
       stillQueued.map(async ({ id, email }) => {
         try {
           await this.sendInviteMail(email, id, study)
-          await this.invitesRepo.updateMany({
-            where: { id, status: InviteStatus.QUEUED },
-            data: { status: InviteStatus.PENDING, sentAt: new Date() },
-          })
         } catch (err) {
           await this.invitesRepo.updateMany({
             where: { id, status: InviteStatus.QUEUED },
@@ -972,6 +936,22 @@ export class InvitesController extends Controller {
           })
           logger.error({
             message: 'Failed to send participant invite',
+            studyId,
+            inviteId: id,
+            err,
+          })
+          return
+        }
+        // Mail was sent. Any failure past this point leaves the row stranded at QUEUED
+        // (admin's Resend recovers it, will duplicate). Log so the mismatch is findable.
+        try {
+          await this.invitesRepo.updateMany({
+            where: { id, status: InviteStatus.QUEUED },
+            data: { status: InviteStatus.PENDING, sentAt: new Date() },
+          })
+        } catch (err) {
+          logger.error({
+            message: 'Post-send DB write failed; mail delivered but row not marked PENDING',
             studyId,
             inviteId: id,
             err,

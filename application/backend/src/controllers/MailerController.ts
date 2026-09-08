@@ -8,7 +8,7 @@ import { type ContactUsRequest } from 'common/types/api/mailer'
 import * as express from 'express'
 import prisma from '../PrismaClient'
 import { Role } from '@prisma/client'
-import { NotFoundError } from '../middlewares/ErrorHandler'
+import { NotFoundError, UnprocessableError } from '../middlewares/ErrorHandler'
 import { sendEmail } from '../mailer'
 import logger from 'common/src/logger'
 import { auditLog } from '../middlewares/AuditLog'
@@ -69,6 +69,12 @@ export class MailerController extends Controller {
     const recipientEmails = study.contactUsEmail
       ? [study.contactUsEmail]
       : [...orgAdminEmails, ...studyAdminEmails]
+
+    if (recipientEmails.length === 0) {
+      throw new UnprocessableError(
+        'No contact recipients configured for this study. Set study.contactUsEmail or add an admin.',
+      )
+    }
 
     // Keep firstName/lastName out of the subject — they're `/// @encrypted` in
     // schema.prisma and a subject reaches our logs, the mail server's and Message Trace.
