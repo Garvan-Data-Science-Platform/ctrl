@@ -89,9 +89,7 @@ export class MailerController extends Controller {
       bodyRequest.content,
     )
 
-    // Fire-and-forget. Awaiting would hang the HTTP request behind an m365 drain, matching
-    // OTP / password reset / invite behaviour. .catch guards Node's crash on unhandled
-    // promise rejections (#719). If either send fails, only the log line surfaces it.
+    // fire-and-forget so the request doesn't wait on the m365 send queue
     void sendEmail({
       to: recipientEmails,
       replyTo: user.email,

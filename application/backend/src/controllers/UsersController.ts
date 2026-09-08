@@ -421,9 +421,7 @@ export class UsersController extends Controller {
       subject = 'CTRL - Password Reset Link'
     }
 
-    // Fire-and-forget. Awaiting would hang the HTTP request behind an m365 drain; the token
-    // row is already written so the link works the moment the mail lands. .catch guards
-    // against Node's unhandled-rejection crash (#719).
+    // fire-and-forget so the request doesn't wait on the m365 send queue
     void sendEmail({
       to: user.email,
       subject,

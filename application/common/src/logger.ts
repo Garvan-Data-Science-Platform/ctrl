@@ -1,8 +1,7 @@
 import * as winston from 'winston'
 const { combine, timestamp, json, errors, prettyPrint } = winston.format
 
-// prettyPrint overwrites json() with util.inspect output, so in production Cloud
-// Logging sees unparsed text and `level` never becomes a severity.
+// prettyPrint clobbers json(); keep it out of prod so Cloud Logging parses `level`.
 const formats = [errors({ stack: true }), timestamp(), json()]
 if (process.env.NODE_ENV !== 'production') formats.push(prettyPrint())
 

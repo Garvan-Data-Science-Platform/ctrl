@@ -52,11 +52,8 @@ export const schema = {
             username: { type: 'string' },
             password: { type: 'string' },
             sender: { type: 'string' },
-            // STARTTLS is required unless this is explicitly false. Only set it false for
-            // a relay that genuinely has no TLS, such as a local mail catcher.
             requireTLS: { type: 'boolean' },
-            // nodemailer treats 0 as unlimited, which nothing here wants. No upper bound
-            // on smtp-basic because it depends entirely on the relay.
+            // 0 = unlimited in nodemailer; no upper bound (depends on the relay).
             maxConnections: { type: 'number', minimum: 1 },
           },
           required: [
@@ -68,9 +65,8 @@ export const schema = {
             'sender',
             'maxConnections',
           ],
-          // Helm merges the chart's username and password into every mailer block, so the
-          // m365-oauth variant cannot forbid extras. smtp-basic can, and a typo here should
-          // fail at boot.
+          // additionalProperties permitted on m365-oauth because helm merges
+          // username/password into every mailer block.
           additionalProperties: false,
         },
         {
@@ -83,9 +79,7 @@ export const schema = {
             host: { type: 'string', minLength: 1 },
             port: { type: 'number' },
             sender: { type: 'string', minLength: 1 },
-            // Exchange caps SMTP AUTH at 3 concurrent connections per mailbox and returns
-            // 432 4.3.2 above that. Caught at boot so a mistake fails here rather than on
-            // the first burst.
+            // Exchange caps at 3 concurrent SMTP AUTH per mailbox (432 4.3.2 above).
             maxConnections: { type: 'number', minimum: 1, maximum: 3 },
           },
           required: [
