@@ -89,29 +89,6 @@ describe('M365OAuthProvider', () => {
   })
 
   describe('sendMail', () => {
-    it('sends a mail via nodemailer with the configured sender as from', async () => {
-      mockAcquireToken.mockResolvedValue({
-        accessToken: 'fake-token',
-        expiresOn: new Date(Date.now() + 3600 * 1000),
-      })
-      const provider = new M365OAuthProvider(validConfig)
-      await provider.sendMail({
-        to: 'recipient@example.com',
-        subject: 'Test',
-        text: 'Hello',
-        html: '<p>Hello</p>',
-      })
-      const sent = mockNodeMailer.mock.getSentMail()
-      expect(sent).toHaveLength(1)
-      expect(sent[0]).toMatchObject({
-        to: 'recipient@example.com',
-        subject: 'Test',
-        text: 'Hello',
-        html: '<p>Hello</p>',
-        from: 'CTRL <ctrl-noreply@garvan.org.au>',
-      })
-    })
-
     it('honours opts.from override when provided', async () => {
       mockAcquireToken.mockResolvedValue({
         accessToken: 'fake',

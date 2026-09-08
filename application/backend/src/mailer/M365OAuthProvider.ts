@@ -92,7 +92,7 @@ export class M365OAuthProvider implements MailProvider {
 
   private async doSend(opts: MailOpts): Promise<void> {
     try {
-      await this.transporter.sendMail({ ...opts, from: opts.from ?? this.config.sender })
+      await this.transporter.sendMail(opts)
     } catch (err) {
       throw wrapSmtpError(err)
     }
