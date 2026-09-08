@@ -48,7 +48,7 @@ import {
   NotFoundError,
   UnprocessableError,
 } from '../middlewares/ErrorHandler'
-import { REGISTERABLE_INVITE_STATUSES } from '../utils/invite'
+import { ACTIVE_INVITE_STATUSES } from '../utils/invite'
 import { ParticipantType } from 'common/types/api/users/ParticipantProfile'
 import { createDefaultAnswers } from '../utils/answers'
 import { auditLog } from '../middlewares/AuditLog'
@@ -211,7 +211,7 @@ export class AuthController extends Controller {
     // PENDING — the row is real, only the drain has not yet flipped it to PENDING, so
     // recipients who land here mid-drain must be able to register.
     const invite = await this.inviteRepo.findFirst({ where: { id: inviteId, email } })
-    if (!invite || !REGISTERABLE_INVITE_STATUSES.includes(invite.status)) {
+    if (!invite || !ACTIVE_INVITE_STATUSES.includes(invite.status)) {
       // ErrorHandler logs err.message, so the address stays out of it. The caller supplied
       // both the inviteId and the email, so neither tells them anything they did not send.
       throw new NotFoundError('Invite not found')
@@ -265,7 +265,6 @@ export class AuthController extends Controller {
     })
 
     if (!res) {
-      // inviteId rather than email, the address is `/// @encrypted` and a log line is not
       logger.error({ message: 'No invitation found', inviteId })
       throw new NotFoundError(`Invite ${inviteId} not found`)
     }
@@ -410,19 +409,13 @@ export class AuthController extends Controller {
 
       responseData = challenge
 
-      // Not awaited, so the challenge reaches the client without waiting on the mail.
-      // Do not drop the .catch — no unhandledRejection handler exists, and a send
-      // failure would crash the process (#719).
+      // fire-and-forget so the challenge returns without waiting on the send
       sendEmail({
         to: user.email,
         subject: 'CTRL - One Time Password',
         text: `Your CTRL login code is: ${code}`,
-        // OTP has a 10-minute expiry with the user actively waiting on the code entry screen;
-        // the M365 provider queues at Bottleneck priority 1 so this jumps any pending bulk.
         mailPriority: 'high',
       }).catch(() =>
-        // sendEmail already logged the redacted provider-side reason; this line just
-        // pins the correlation ids so a log search on the failure joins to the token.
         logger.error({
           message: 'OTP email send failed',
           otpTokenId: otp.id,

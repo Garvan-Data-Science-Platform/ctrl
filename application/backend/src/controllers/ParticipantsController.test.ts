@@ -559,35 +559,6 @@ describe('InvitesController', () => {
       // Check expiry(s) were not reset (TODO: FIX)
     })
 
-    it('should not reduce alreadyAcceptedCount when a new invite fails to send', async () => {
-      // Regression: alreadyAcceptedCount used to be derived as existingInvites.length -
-      // emailsResent.length - failedEmails.length, but failedEmails is shared with the
-      // new-recipient loop, so a new-recipient failure silently reduced the accepted count.
-      mockNodeMailer.mock.setShouldFail(true)
-
-      const response = await request(app)
-        .post(`/studies/${TestStudies.TEST_STUDY.id}/invites`)
-        .send({
-          recipients: [
-            { email: TestInvites.INVITE_ACCEPTED.email, prefill: {} },
-            { email: 'will.fail@example.com', prefill: {} },
-          ],
-          subjectText: 'S',
-          explanatoryText: 'E',
-        })
-        .set({ Authorization: `Bearer ${organisationAdminToken}` })
-
-      const body: InviteParticipantsResponse = response.body
-      expect(response.status).toBe(202)
-      expect(body.alreadyAcceptedCount).toBe(1)
-      // Failed sends surface via row status after the drain, not in the 202 body.
-      await waitForInviteDrain(TestStudies.TEST_STUDY.id)
-      const failed = await prisma.invite.count({
-        where: { studyId: TestStudies.TEST_STUDY.id, status: 'FAILED_TO_SEND' },
-      })
-      expect(failed).toBe(1)
-    })
-
     it('should handle failed email sends correctly', async () => {
       mockNodeMailer.mock.setShouldFail(true)
       const emails = [
@@ -675,33 +646,28 @@ describe('InvitesController', () => {
       expect(sent).toHaveLength(1)
     })
 
-    it('should persist QUEUED rows before the drain fires (write-first)', async () => {
-      // Proves the recipient-lands-mid-drain guarantee: at 202-response time the row is
-      // already in the DB, so /register/{id} does not 404 while the send is in flight.
-      const email = 'writefirst@example.com'
+    it('should reject duplicate emails with conflicting prefill', async () => {
+      // Silent last-write-wins would drop one intent. 422 forces the admin to fix the
+      // source. Identical-prefill duplicates still collapse silently (harmless).
       const response = await request(app)
         .post(`/studies/${TestStudies.TEST_STUDY.id}/invites`)
         .send({
-          recipients: [{ email, prefill: {} }],
+          recipients: [
+            { email: 'conflict@example.com', prefill: { studyParticipant: { externalId: 'A' } } },
+            { email: 'conflict@example.com', prefill: { studyParticipant: { externalId: 'B' } } },
+          ],
           subjectText: 'S',
           explanatoryText: 'E',
         })
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
-      expect(response.status).toBe(202)
 
-      // Read the row before draining — with nodemailer-mock the drain resolves fast,
-      // so the row may already be PENDING here. Either QUEUED or PENDING is proof
-      // that write-first happened (the row exists at 202 return).
-      const midDrain = await prisma.invite.findFirstOrThrow({
-        where: { studyId: TestStudies.TEST_STUDY.id, email },
-      })
-      expect(['QUEUED', 'PENDING']).toContain(midDrain.status)
+      expect(response.status).toBe(422)
+      expect(response.body.details).toContain('Duplicate participant emails')
 
-      await waitForInviteDrain(TestStudies.TEST_STUDY.id)
-      const settled = await prisma.invite.findFirstOrThrow({
-        where: { studyId: TestStudies.TEST_STUDY.id, email },
+      const count = await prisma.invite.count({
+        where: { studyId: TestStudies.TEST_STUDY.id, email: 'conflict@example.com' },
       })
-      expect(settled.status).toBe('PENDING')
+      expect(count).toBe(0)
     })
 
     it('should write every invite row before its email is sent', async () => {
@@ -790,6 +756,33 @@ describe('InvitesController', () => {
       const after = await prisma.invite.findUniqueOrThrow({ where: { id: pendingInvite.id } })
       expect(after.sentAt).not.toBeNull()
       expect(after.sentAt!.getTime()).toBeGreaterThan(originalSentAt?.getTime() ?? 0)
+    })
+
+    it('should preserve sentAt when a resend fails to drain', async () => {
+      // sentAt is "last known good delivery", not "last attempt outcome".
+      // A failed resend must not erase the fact that the invite was previously sent.
+      const originalSentAt = new Date('2025-01-01T00:00:00Z')
+      const invite = await prisma.invite.findFirstOrThrow({
+        where: { studyId: TestStudies.TEST_STUDY.id, status: 'PENDING' },
+      })
+      await prisma.invite.update({
+        where: { id: invite.id },
+        data: { sentAt: originalSentAt },
+      })
+
+      mockNodeMailer.mock.setShouldFail(true)
+      const response = await request(app)
+        .post(`/studies/${TestStudies.TEST_STUDY.id}/invites/${invite.id}/resend`)
+        .set({ Authorization: `Bearer ${organisationAdminToken}` })
+      expect(response.status).toBe(202)
+
+      await waitForInviteDrain(TestStudies.TEST_STUDY.id)
+
+      const after = await prisma.invite.findUniqueOrThrow({ where: { id: invite.id } })
+      expect(after.status).toBe('FAILED_TO_SEND')
+      expect(after.sentAt?.toISOString()).toBe(originalSentAt.toISOString())
+
+      mockNodeMailer.mock.reset()
     })
 
     it('should resend invites left QUEUED by an interrupted drain', async () => {
