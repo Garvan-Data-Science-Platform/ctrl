@@ -27,6 +27,7 @@ import { axiosInstance } from '../../providers/dataProvider'
 import { useShow, useUpdate, useNavigation, useNotification } from '@refinedev/core'
 import { useCurrentStudyId } from '../../studyStore'
 import { useParams } from 'react-router'
+import { stepDescriptionRules, stepTitleRules } from '@common/src/validation'
 
 export const SurveyEditor = () => {
   const {
@@ -134,6 +135,22 @@ export const SurveyEditor = () => {
         })
       })
   }
+
+  const stepTitleRule = stepTitleRules(true)
+  const stepDescriptionRule = stepDescriptionRules(false)
+
+  const currentStep = surveyData[activeStep]
+  const isStepTitleInvalid = Boolean(
+    currentStep?.title &&
+      stepTitleRule.pattern &&
+      !stepTitleRule.pattern.value.test(currentStep?.title),
+  )
+
+  const isStepDescriptionInvalid = Boolean(
+    currentStep?.text &&
+      stepDescriptionRule.pattern &&
+      !stepDescriptionRule.pattern.value.test(currentStep?.text),
+  )
 
   return isLoading ? null : (
     <Box sx={{ display: 'flex', flexDirection: 'row' }}>
@@ -255,6 +272,8 @@ export const SurveyEditor = () => {
               fullWidth
               label="Title"
               data-cy="step-title"
+              error={isStepTitleInvalid}
+              helperText={isStepTitleInvalid ? (stepTitleRule.pattern?.message as string) : ''}
               onChange={(e) => updateStepField(activeStep, 'title', e.target.value)}
               value={surveyData[activeStep].title}
               disabled={disabled}
@@ -265,6 +284,10 @@ export const SurveyEditor = () => {
               sx={{ mt: 3 }}
               label="Description"
               data-cy="step-description"
+              error={isStepDescriptionInvalid}
+              helperText={
+                isStepDescriptionInvalid ? (stepDescriptionRule.pattern?.message as string) : ''
+              }
               onChange={(e) => updateStepField(activeStep, 'text', e.target.value)}
               value={surveyData[activeStep].text}
               disabled={disabled}

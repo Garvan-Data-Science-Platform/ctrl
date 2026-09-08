@@ -1,6 +1,7 @@
 /// <reference types="cypress" />
 
 const { TestUsers } = require('../../../common/testing/constants')
+const { VALIDATION_MESSAGES } = require('../../../common/src/validation')
 
 beforeEach(() => {
   cy.task('reset')
@@ -118,5 +119,118 @@ describe('Survey Editor', () => {
     //Editing choice will remove the duo code
     cy.get('[data-cy="choice-text"]').first().type('B')
     cy.contains('non-commercial').should('not.exist')
+  })
+
+  it('Invalid xss in step-title shows appropriate error messages', () => {
+    cy.visit('/surveys')
+    cy.get('[data-rowindex="0"] [data-cy="edit-button"]').first().click()
+    cy.wait(50)
+    cy.get('[data-cy="step-title"]').type("{{7*7}}<script>alert('xss-step-title')</script>", {
+      parseSpecialCharSequences: false,
+    })
+    cy.contains(VALIDATION_MESSAGES.STEP_TITLE_INVALID).should('exist')
+  })
+
+  it('Invalid xss in step-description shows appropriate error messages', () => {
+    cy.visit('/surveys')
+    cy.get('[data-rowindex="0"] [data-cy="edit-button"]').first().click()
+    cy.wait(50)
+    cy.get('[data-cy="step-description"]').type(
+      "{{7*7}}<script>alert('xss-step-description')</script>",
+      {
+        parseSpecialCharSequences: false,
+      },
+    )
+    cy.contains(VALIDATION_MESSAGES.STEP_DESCRIPTION_INVALID).should('exist')
+  })
+
+  it('Invalid xss in checkbox-question-text shows appropriate error messages', () => {
+    cy.visit('/surveys')
+    cy.visit('/surveys/edit/2')
+    cy.contains('Checkbox').click()
+    cy.get('[data-cy="checkbox-question-text"]').type(
+      "{{7*7}}<script>alert('xss-checkbox-question-text')</script>",
+      {
+        parseSpecialCharSequences: false,
+      },
+    )
+    cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_INVALID).should('exist')
+  })
+
+  it('Invalid xss in checkbox-question-tooltip shows appropriate error messages', () => {
+    cy.visit('/surveys')
+    cy.visit('/surveys/edit/2')
+    cy.contains('Checkbox').click()
+    cy.get('[data-cy="checkbox-question-text"]').type('Consent question')
+    cy.get('[data-cy="checkbox-question-tooltip"]').type(
+      "{{7*7}}<script>alert('xss-checkbox-question-tooltip')</script>",
+      {
+        parseSpecialCharSequences: false,
+      },
+    )
+    cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_INVALID).should('exist')
+  })
+
+  it('Invalid xss in video-url shows appropriate error messages', () => {
+    cy.visit('/surveys')
+    cy.visit('/surveys/edit/2')
+    cy.get('[data-cy="video-url"]').type(
+      "https://information{{7*7}}<script>alert('xss-video-url')</script>.video",
+      {
+        parseSpecialCharSequences: false,
+      },
+    )
+    cy.contains(VALIDATION_MESSAGES.URL_INVALID).should('exist')
+  })
+
+  it('Invalid xss in subheading-text shows appropriate error messages', () => {
+    cy.visit('/surveys')
+    cy.visit('/surveys/edit/2')
+    cy.contains('Subheading').click()
+    cy.get('[data-cy="subheading-text"]').type(
+      "{{7*7}}<script>alert('xss-subheading-text')</script>",
+      {
+        parseSpecialCharSequences: false,
+      },
+    )
+    cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_INVALID).should('exist')
+  })
+
+  it('Invalid xss in choice-question-text shows appropriate error messages', () => {
+    cy.visit('/surveys')
+    cy.visit('/surveys/edit/2')
+    cy.contains('Multi-choice').click()
+    cy.get('[data-cy="choice-question-text"]').type(
+      "{{7*7}}<script>alert('xss-choice-question-text')</script>",
+      {
+        parseSpecialCharSequences: false,
+      },
+    )
+    cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_INVALID).should('exist')
+  })
+
+  it('Invalid xss in choice-question-tooltip shows appropriate error messages', () => {
+    cy.visit('/surveys')
+    cy.visit('/surveys/edit/2')
+    cy.contains('Multi-choice').click()
+    cy.get('[data-cy="choice-question-text"]').type('Consent question')
+    cy.get('[data-cy="choice-question-tooltip"]').type(
+      "{{7*7}}<script>alert('xss-choice-question-tooltip')</script>",
+      {
+        parseSpecialCharSequences: false,
+      },
+    )
+    cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_INVALID).should('exist')
+  })
+
+  it('Invalid xss in choice-text shows appropriate error messages', () => {
+    cy.visit('/surveys')
+    cy.visit('/surveys/edit/2')
+    cy.contains('Multi-choice').click()
+    cy.get('[data-cy="choices-box"]').children('button').first().click()
+    cy.get('[data-cy="choice-text"]').type("{{7*7}}<script>alert('xss-choice-text')</script>", {
+      parseSpecialCharSequences: false,
+    })
+    cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_INVALID).should('exist')
   })
 })

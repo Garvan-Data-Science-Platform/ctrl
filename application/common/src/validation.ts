@@ -17,6 +17,9 @@ export const VALIDATION_MESSAGES = {
   INVITE_EMAIL_TEXT_INVALID: 'Invite email text contains invalid characters',
   CSS_COLOUR_INVALID:
     'Use HEX ("#a1b2c3"), RGB ("rgb(10,20,30)"), or a valid CSS colour name ("blue")',
+  STEP_TITLE_INVALID: 'Step title contains invalid characters',
+  STEP_DESCRIPTION_INVALID: 'Step description contains invalid characters',
+  SURVEY_ELEMENT_INVALID: 'Contains invalid characters',
 }
 export const nameRules = (required = true) => ({
   required: required ? VALIDATION_MESSAGES.REQUIRED : false,
@@ -131,5 +134,29 @@ export const cssColourRules = (required = false) => ({
   pattern: {
     value: REGEX.CSS_COLOUR,
     message: VALIDATION_MESSAGES.CSS_COLOUR_INVALID,
+  },
+})
+
+export const stepTitleRules = (required = true) => ({
+  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
+  pattern: {
+    value: REGEX.SURVEY_ELEMENT,
+    message: VALIDATION_MESSAGES.STEP_TITLE_INVALID,
+  },
+})
+
+export const stepDescriptionRules = (required = true) => ({
+  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
+  pattern: {
+    value: REGEX.SURVEY_ELEMENT,
+    message: VALIDATION_MESSAGES.STEP_DESCRIPTION_INVALID,
+  },
+})
+
+export const surveyElementRules = (required = true) => ({
+  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
+  pattern: {
+    value: REGEX.SURVEY_ELEMENT,
+    message: VALIDATION_MESSAGES.SURVEY_ELEMENT_INVALID,
   },
 })
