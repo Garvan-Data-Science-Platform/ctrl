@@ -748,7 +748,8 @@ export class InvitesController extends Controller {
     @Path() studyId: number,
     @Path() inviteId: string, // String because this is uuid
   ): Promise<void> {
-    // Excludes ACCEPTED only; Resend on REVOKED is treated as un-revoke (matches bulk).
+    // Excludes ACCEPTED only; Resend on REVOKED un-revokes (matches createInvites,
+    // NOT resendPendingInvites which only picks up PENDING/QUEUED).
     // No idempotency on QUEUED — accepts rare double-mail to keep Resend as the pod-
     // restart recovery path.
     const invite = await this.invitesRepo.findUniqueOrThrow({
@@ -844,13 +845,14 @@ export class InvitesController extends Controller {
       throw new NotFoundError('Invite not found')
     }
 
-    // Guard on ACTIVE statuses so a race with acceptInvite doesn't overwrite an
-    // ACCEPTED row (StudyParticipant would already exist, revoke would corrupt state).
+    // Protect the ACCEPTED case only — an accepted invite has a live StudyParticipant
+    // and revoking it would leave the enrollment floating. Any other status is fair
+    // game (admin can clean up FAILED_TO_SEND, EXPIRED, or re-REVOKE freely).
     const { count } = await this.invitesRepo.updateMany({
       where: {
         id: invite.id,
         studyId,
-        status: { in: ACTIVE_INVITE_STATUSES },
+        status: { not: InviteStatus.ACCEPTED },
       },
       data: { status: InviteStatus.REVOKED },
     })
