@@ -848,13 +848,14 @@ export class InvitesController extends Controller {
     @Path() studyId: number,
     @Path() inviteId: string, // String because this is uuid
   ): Promise<void> {
-    // Get all pending invitations. Exclude REVOKED as well as ACCEPTED so an admin who
-    // revokes an invite cannot have that intent silently reversed by a stale resend click.
+    // Only ACCEPTED is excluded — clicking Resend on a REVOKED invite is treated as an
+    // active un-revoke, matching the bulk-invite path where a REVOKED recipient in a new
+    // request flips back to PENDING.
     const pendingInvite = await this.invitesRepo.findUniqueOrThrow({
       where: {
         id: inviteId,
         studyId: studyId,
-        status: { notIn: [InviteStatus.ACCEPTED, InviteStatus.REVOKED] },
+        status: { not: InviteStatus.ACCEPTED },
       },
       select: { id: true, email: true },
     })
