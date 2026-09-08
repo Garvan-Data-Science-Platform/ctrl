@@ -34,12 +34,17 @@ export class M365OAuthProvider implements MailProvider {
   private readonly cca: ConfidentialClientApplication
   private transporter: Transporter | null = null
   private readonly user: string
-  // One Bottleneck limiter fronts every send. minTime enforces 2.1s spacing between job
-  // starts, giving ≤29 starts per any rolling 60s window — a one-slot margin under
-  // Exchange's 30/min per-mailbox cap. maxConcurrent caps in-flight sends at 2 so late
-  // completions can't briefly stack with fresh starts and push the mailbox above 30.
+  // One Bottleneck limiter fronts every send. Configured so the boundary arithmetic lands
+  // exactly on Exchange's 30/min per-mailbox cap, never over:
+  //   • minTime 2100 spaces starts 2.1s apart → 28-29 in-window starts across any rolling
+  //     60s slice.
+  //   • maxConcurrent 2 caps how many sends were already in-flight at the window boundary,
+  //     so the worst-case sum (in-flight + in-window starts) is at most 30.
+  // maxConcurrent 2 is load-bearing, not incidental. At 3 the sum breaks to 31; at 2 it
+  // sits on 30. Do not shorten minTime without shrinking maxConcurrent, and do not raise
+  // maxConcurrent without lengthening minTime.
   // Priority ordering uses Bottleneck's built-in priority queue (mailPriority = 'high'
-  // → priority 1, otherwise 5). See the limiter construction below for the full rationale.
+  // → priority 1, otherwise 5).
   private readonly limiter: Bottleneck
 
   constructor(private readonly config: M365OAuthConfig) {
@@ -58,15 +63,16 @@ export class M365OAuthProvider implements MailProvider {
     }
 
     this.limiter = new Bottleneck({
-      // 2100ms spacing yields at most 29 starts in any rolling 60s window (60_000 / 2100),
-      // leaving one-slot margin under Exchange's 30/min mailbox cap. 2000ms puts starts at
-      // t=0,2,…,60 — 31 points in a 60s window — and slow sends completing late can bunch
-      // subsequent starts a few messages higher again. Cost: ~5% throughput vs the ceiling,
-      // for insurance against the un-liftable 5.2.25x throttle that repeated overruns feed.
+      // 2.1s inter-start spacing. Boundary arithmetic: at most 2 sends already open at
+      // window edge + at most 28 fresh starts in the 60s slice = exactly 30, which is
+      // Exchange's per-mailbox cap. 2000ms would push in-window starts to 29 (30-31 total
+      // = over the cap). This value is chosen to land ON 30, not below it — treat it as
+      // a hard boundary, not a soft target.
       minTime: 2100,
-      // Cap at 2 rather than the pool's 3 so completions can't stack with a fresh start
-      // and briefly push the mailbox above 30/min. Also stays under config.maxConnections
-      // in case a deployer sets it to 1.
+      // Load-bearing. Caps how many sends can be in-flight at a window boundary. At 3 the
+      // boundary sum breaks to 31 and Exchange starts returning 4.7.500 Server busy, which
+      // feeds the un-liftable 5.2.25x throttle counter. Also stays ≤ config.maxConnections
+      // so a deployer who sets 1 is respected.
       maxConcurrent: Math.min(2, config.maxConnections),
     })
 
