@@ -579,7 +579,6 @@ export class InvitesController extends Controller {
         inviteId,
         userId: user.id,
       })
-      throw new NotFoundError('Invite is no longer acceptable')
     }
     return {
       acceptedInvite: invite.id,

@@ -1061,12 +1061,12 @@ describe('InvitesController', () => {
         },
       })
       expect(rows).toBe(1)
+
+      const finalInvite = await prisma.invite.findUniqueOrThrow({ where: { id: invite.id } })
+      expect(finalInvite.status).toBe('ACCEPTED')
     })
 
-    it('returns 404 when the invite is revoked mid-accept', async () => {
-      // Simulate a concurrent revoke landing between the register-time check and
-      // the final invite update. The guarded updateMany sees no matching row and
-      // the caller must be told the accept did not land.
+    it('returns 404 when the invite is already revoked before accept', async () => {
       const invite = await prisma.invite.findFirstOrThrow({
         where: { email: TestUsers.PARTICIPANT_UNANSWERED.email },
       })
