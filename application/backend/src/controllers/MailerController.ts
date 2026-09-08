@@ -89,26 +89,40 @@ export class MailerController extends Controller {
       bodyRequest.content,
     )
 
-    await sendEmail({
+    // Fire-and-forget. Awaiting would hang the HTTP request behind an m365 drain, matching
+    // OTP / password reset / invite behaviour. .catch guards Node's crash on unhandled
+    // promise rejections (#719). If either send fails, only the log line surfaces it.
+    void sendEmail({
       to: recipientEmails,
       replyTo: user.email,
       subject: subjectToAdmin,
       text: adminText,
       html: adminHtml,
-    })
+    }).catch((err) =>
+      logger.error({
+        message: 'Contact-us admin email send failed',
+        studyId: bodyRequest.studyId,
+        err,
+      }),
+    )
 
     // Send the email to the user
     const subjectToUser: string = 'CTRL Message Confirmation'
 
-    await sendEmail({
+    void sendEmail({
       to: user.email,
       subject: subjectToUser,
       text: participantText,
       html: participantHtml,
-    })
+    }).catch((err) =>
+      logger.error({
+        message: 'Contact-us confirmation email send failed',
+        studyId: bodyRequest.studyId,
+        userId,
+        err,
+      }),
+    )
 
-    // sendEmail already logs provider, recipient count, subject and duration;
-    // studyId is the extra it can't infer.
     logger.info('Contact-us request handled', { studyId: bodyRequest.studyId })
     return
   }

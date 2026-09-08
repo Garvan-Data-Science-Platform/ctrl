@@ -421,16 +421,23 @@ export class UsersController extends Controller {
       subject = 'CTRL - Password Reset Link'
     }
 
-    await sendEmail({
+    // Fire-and-forget. Awaiting would hang the HTTP request behind an m365 drain; the token
+    // row is already written so the link works the moment the mail lands. .catch guards
+    // against Node's unhandled-rejection crash (#719).
+    void sendEmail({
       to: user.email,
       subject,
       text,
       html,
-      // A password reset is a user sitting at a login screen holding a 15-minute token, so
-      // it takes the priority lane on the m365-oauth path. An admin invite reuses this same
-      // helper but the admin isn't waiting on the mail synchronously, so it stays default.
       ...(adminInvite ? {} : { mailPriority: 'high' as const }),
-    })
+    }).catch((err) =>
+      logger.error({
+        message: 'Password reset email send failed',
+        userId: user.id,
+        adminInvite,
+        err,
+      }),
+    )
   }
 
   @Post('/password/reset')
