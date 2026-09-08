@@ -421,7 +421,6 @@ describe('InvitesController', () => {
       const body: InviteParticipantsResponse = response.body
 
       expect(response.status).toBe(202)
-      expect(body.queuedForResendCount).toBe(1)
       expect(body.queuedCount).toBe(1)
       expect(body.alreadyAcceptedCount).toBe(0)
       expect(body.newInvitesCount).toBe(0)
@@ -482,7 +481,6 @@ describe('InvitesController', () => {
 
       const body: InviteParticipantsResponse = response.body
       expect(response.status).toBe(202)
-      expect(body.queuedForResendCount).toBe(1)
       expect(body.queuedCount).toBe(1)
       expect(body.alreadyAcceptedCount).toBe(0)
       expect(body.newInvitesCount).toBe(0)
@@ -584,7 +582,6 @@ describe('InvitesController', () => {
       // 202 body reports queued counts only. FAILED_TO_SEND surfaces on the row itself.
       expect(body.newInvitesCount).toBe(4)
       expect(body.queuedCount).toBe(4)
-      expect(body.queuedForResendCount).toBe(0)
       expect(body.alreadyAcceptedCount).toBe(0)
 
       await waitForInviteDrain(TestStudies.TEST_STUDY.id)

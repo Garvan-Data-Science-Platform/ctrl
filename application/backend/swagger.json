@@ -1933,10 +1933,6 @@
             "type": "number",
             "format": "double"
           },
-          "queuedForResendCount": {
-            "type": "number",
-            "format": "double"
-          },
           "queuedCount": {
             "type": "number",
             "format": "double"
@@ -1949,7 +1945,6 @@
         "required": [
           "resendEmailRequestCount",
           "newInvitesCount",
-          "queuedForResendCount",
           "queuedCount",
           "alreadyAcceptedCount"
         ],

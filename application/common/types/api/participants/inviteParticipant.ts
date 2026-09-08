@@ -20,7 +20,6 @@ export interface InviteParticipantsRequest {
 export interface InviteParticipantsResponse {
   resendEmailRequestCount: number
   newInvitesCount: number
-  queuedForResendCount: number
   queuedCount: number
   alreadyAcceptedCount: number
 }

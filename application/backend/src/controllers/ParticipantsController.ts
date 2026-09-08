@@ -730,7 +730,6 @@ export class InvitesController extends Controller {
     const responseData: InviteParticipantsResponse = {
       resendEmailRequestCount: emails.length,
       newInvitesCount: persistedNewIds.length,
-      queuedForResendCount: resendTargets.length,
       queuedCount: toDrainIds.length,
       alreadyAcceptedCount,
     }
