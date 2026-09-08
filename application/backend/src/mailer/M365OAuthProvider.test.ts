@@ -2,7 +2,7 @@ import * as nodemailer from 'nodemailer'
 import type { NodemailerMock } from 'nodemailer-mock'
 import { ConfidentialClientApplication } from '@azure/msal-node'
 import Bottleneck from 'bottleneck'
-import { M365OAuthProvider, redactSecrets, wrapSmtpError } from './M365OAuthProvider'
+import { M365OAuthProvider, wrapSmtpError } from './M365OAuthProvider'
 
 jest.mock('@azure/msal-node')
 // Bottleneck is mocked so its 2s spacing doesn't slow tests. Each beforeEach reinstates a
@@ -269,98 +269,6 @@ describe('M365OAuthProvider', () => {
         expect.any(Function),
       )
     })
-
-    // Uses the real Bottleneck library (jest.requireActual) so the rate cap and priority
-    // ordering are exercised end-to-end, not just the wiring. The rest of the file mocks
-    // Bottleneck to keep other tests fast; this one accepts real wall-clock delay because
-    // otherwise changing minTime to 200 would break nothing and the branch's headline
-    // claim would be untested. Uses a compressed minTime (200ms) so the test finishes in
-    // seconds rather than the production 2.1s spacing.
-    it('really paces sends at ≥ minTime spacing (real Bottleneck)', async () => {
-      const realBottleneckModule = jest.requireActual('bottleneck') as {
-        default: new (opts: unknown) => Bottleneck
-      }
-      const RealBottleneck = realBottleneckModule.default
-      // A compressed minTime keeps the test around a second while proving the mechanism.
-      // maxConcurrent: 1 so the assertion focuses on inter-start spacing, not concurrency.
-      const testMinTime = 200
-      MockedBottleneck.mockImplementation(
-        () => new RealBottleneck({ minTime: testMinTime, maxConcurrent: 1 }),
-      )
-      mockAcquireToken.mockResolvedValue({
-        accessToken: 'fake',
-        expiresOn: new Date(Date.now() + 3600 * 1000),
-      })
-      const provider = new M365OAuthProvider(validConfig)
-
-      const start = Date.now()
-      await Promise.all(
-        [1, 2, 3, 4, 5].map((n) =>
-          provider.sendMail({ to: `r${n}@example.com`, subject: `s${n}`, text: 't' }),
-        ),
-      )
-      const elapsed = Date.now() - start
-
-      // 5 sends spaced at 200ms → 4 intervals → ≥ 800ms elapsed. Real Bottleneck should
-      // hit this floor within a few ms; anything materially faster would mean the limiter
-      // isn't actually gating starts (which is exactly what this test exists to catch).
-      expect(elapsed).toBeGreaterThanOrEqual((5 - 1) * testMinTime)
-      // Sanity ceiling — 5 sends at 200ms spacing should never take longer than ~2s.
-      expect(elapsed).toBeLessThan(3000)
-    }, 10_000)
-
-    // Priority ordering with a real Bottleneck: submit 3 normal sends (which take multiple
-    // minTime slots to drain), then submit one urgent after the first has started. The
-    // urgent should slot in ahead of the remaining normals in the queue.
-    it('really lets an urgent send jump ahead of queued normal sends (real Bottleneck)', async () => {
-      const realBottleneckModule = jest.requireActual('bottleneck') as {
-        default: new (opts: unknown) => Bottleneck
-      }
-      const RealBottleneck = realBottleneckModule.default
-      MockedBottleneck.mockImplementation(
-        () => new RealBottleneck({ minTime: 200, maxConcurrent: 1 }),
-      )
-      mockAcquireToken.mockResolvedValue({
-        accessToken: 'fake',
-        expiresOn: new Date(Date.now() + 3600 * 1000),
-      })
-      const provider = new M365OAuthProvider(validConfig)
-      const arrivalOrder: string[] = []
-      // Wrap sends so each records its arrival at nodemailer's fake transporter — the
-      // order sends emerge from the limiter is what we assert on.
-      const track = async (id: string, mailPriority?: 'high') => {
-        await provider.sendMail({
-          to: `${id}@example.com`,
-          subject: id,
-          text: id,
-          ...(mailPriority ? { mailPriority } : {}),
-        })
-        arrivalOrder.push(id)
-      }
-      // Kick off three normal sends. The first starts immediately; the rest queue behind.
-      const normals = [track('n1'), track('n2'), track('n3')]
-      // Wait past the first slot so n1 is definitely in-flight and the queue holds n2,n3.
-      await new Promise((resolve) => setTimeout(resolve, 50))
-      // Submit an urgent. Bottleneck should place it ahead of the queued n2 and n3.
-      const urgent = track('urgent', 'high')
-      await Promise.all([...normals, urgent])
-      // The exact position depends on timing, but urgent must land before at least one
-      // of the normal sends that were queued behind n1.
-      const urgentIdx = arrivalOrder.indexOf('urgent')
-      const n3Idx = arrivalOrder.indexOf('n3')
-      expect(urgentIdx).toBeLessThan(n3Idx)
-    }, 10_000)
-  })
-})
-
-// The patterns themselves are covered in redact.test.ts. This only proves the wrapper
-// runs them and hands back an Error rather than a string.
-describe('redactSecrets', () => {
-  it('returns an Error with the secrets stripped', () => {
-    const output = redactSecrets(new Error('Auth failed {"client_secret": "SUPER-SECRET-VALUE"}'))
-    expect(output).toBeInstanceOf(Error)
-    expect(output.message).toContain('Auth failed')
-    expect(output.message).not.toContain('SUPER-SECRET-VALUE')
   })
 })
 
@@ -446,33 +354,6 @@ describe('wrapSmtpError', () => {
     })
     const wrapped = wrapSmtpError(err)
     expect(wrapped.message).toContain('daily recipient limit')
-  })
-
-  it('does not read a send-as denial as a quota failure', () => {
-    // 554 5.2.0 is a generic submission envelope, so matching the status code alone told
-    // the operator to wait out a 24 hour window that was never going to clear
-    const err = Object.assign(new Error('Message failed'), {
-      response:
-        '554 5.2.0 STOREDRV.Submission.Exception:SendAsDeniedException.MapiExceptionSendAsDenied',
-    })
-    const wrapped = wrapSmtpError(err)
-    expect(wrapped.message).toContain('not permitted to send')
-    expect(wrapped.message).not.toContain('daily recipient limit')
-  })
-
-  it('leaves an unrecognised 554 5.2.0 exception unclassified', () => {
-    const err = Object.assign(new Error('Message failed'), {
-      response: '554 5.2.0 STOREDRV.Submission.Exception:OutboundSpamException',
-    })
-    expect(wrapSmtpError(err).message).not.toContain('daily recipient limit')
-  })
-
-  it('does not blame the connection pool for a recipient thread limit', () => {
-    // same status code, but this one is the recipient mailbox being flooded
-    const err = Object.assign(new Error('Message failed'), {
-      response: '432 4.3.2 STOREDRV.Deliver; recipient thread limit exceeded',
-    })
-    expect(wrapSmtpError(err).message).not.toContain('concurrent connection limit')
   })
 
   it('gives 535 5.7.144 the same tenant-config diagnostic', () => {

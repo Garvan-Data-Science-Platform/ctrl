@@ -6,14 +6,11 @@ import { redactString } from './redact'
 import { extractAddress } from './sender'
 
 const TOKEN_FAILURE = 'M365 token acquisition failed'
-// MSAL treats a cached token as expired five minutes early. Matching that boundary at 300s
-// would land on it, and MSAL would still rule the token fresh, handing back the same one.
-// 240s puts the ask past that boundary so a real fetch happens instead.
+// 240s stays clear of MSAL's 300s cache-fresh boundary so a real fetch happens.
 const TOKEN_RENEWAL_MARGIN_MS = 240_000
 
-// Nodemailer defaults these to 2 min / 30 s / 10 min. A stalled connection holds one of
-// only three Exchange SMTP AUTH slots for that entire window; keep them tight so a hung
-// socket doesn't drown out the other two slots.
+// Kept tight so a stalled connection doesn't hold an Exchange SMTP AUTH slot for
+// nodemailer's defaults of 2 min / 30 s / 10 min.
 const SMTP_TIMEOUTS = {
   connectionTimeout: 30_000,
   greetingTimeout: 15_000,
@@ -32,19 +29,9 @@ interface M365OAuthConfig {
 
 export class M365OAuthProvider implements MailProvider {
   private readonly cca: ConfidentialClientApplication
-  private transporter: Transporter | null = null
+  private readonly transporter: Transporter
   private readonly user: string
-  // One Bottleneck limiter fronts every send. Configured so the boundary arithmetic lands
-  // exactly on Exchange's 30/min per-mailbox cap, never over:
-  //   • minTime 2100 spaces starts 2.1s apart → 28-29 in-window starts across any rolling
-  //     60s slice.
-  //   • maxConcurrent 2 caps how many sends were already in-flight at the window boundary,
-  //     so the worst-case sum (in-flight + in-window starts) is at most 30.
-  // maxConcurrent 2 is load-bearing, not incidental. At 3 the sum breaks to 31; at 2 it
-  // sits on 30. Do not shorten minTime without shrinking maxConcurrent, and do not raise
-  // maxConcurrent without lengthening minTime.
-  // Priority ordering uses Bottleneck's built-in priority queue (mailPriority = 'high'
-  // → priority 1, otherwise 5).
+  // Exchange caps sends at 30/min per mailbox; 2100ms spacing + concurrency 2 stays under it.
   private readonly limiter: Bottleneck
 
   constructor(private readonly config: M365OAuthConfig) {
@@ -55,24 +42,14 @@ export class M365OAuthProvider implements MailProvider {
     if (!config.port) throw new Error('m365-oauth: port is empty')
     if (!config.sender) throw new Error('m365-oauth: sender is empty')
 
-    // sender doubles as the SMTP AUTH username on this path, so a malformed one
-    // fails AUTH rather than just producing an odd From header
+    // sender doubles as the SMTP AUTH username, so validate it here.
     this.user = extractAddress(config.sender)
     if (!this.user.includes('@') || /\s/.test(this.user)) {
       throw new Error(`m365-oauth: sender is not a usable address: ${config.sender}`)
     }
 
     this.limiter = new Bottleneck({
-      // 2.1s inter-start spacing. Boundary arithmetic: at most 2 sends already open at
-      // window edge + at most 28 fresh starts in the 60s slice = exactly 30, which is
-      // Exchange's per-mailbox cap. 2000ms would push in-window starts to 29 (30-31 total
-      // = over the cap). This value is chosen to land ON 30, not below it — treat it as
-      // a hard boundary, not a soft target.
       minTime: 2100,
-      // Load-bearing. Caps how many sends can be in-flight at a window boundary. At 3 the
-      // boundary sum breaks to 31 and Exchange starts returning 4.7.500 Server busy, which
-      // feeds the un-liftable 5.2.25x throttle counter. Also stays ≤ config.maxConnections
-      // so a deployer who sets 1 is respected.
       maxConcurrent: Math.min(2, config.maxConnections),
     })
 
@@ -83,34 +60,13 @@ export class M365OAuthProvider implements MailProvider {
         authority: `https://login.microsoftonline.com/${config.tenantId}`,
       },
     })
-  }
 
-  async sendMail(opts: MailOpts): Promise<void> {
-    // Lower Bottleneck priority number = higher scheduling priority. 'high' hint jumps
-    // ahead of queued normal sends; unhinted sends default to 5.
-    return this.limiter.schedule({ priority: opts.mailPriority === 'high' ? 1 : 5 }, () =>
-      this.doSend(opts),
-    )
-  }
-
-  private async doSend(opts: MailOpts): Promise<void> {
-    const transporter = this.getTransporter()
-    try {
-      await transporter.sendMail({ ...opts, from: opts.from ?? this.config.sender })
-    } catch (err) {
-      throw wrapSmtpError(err)
-    }
-  }
-
-  private getTransporter(): Transporter {
-    if (this.transporter) return this.transporter
     this.transporter = nodemailer.createTransport({
       pool: true,
       ...SMTP_TIMEOUTS,
-      // Exchange allows three concurrent SMTP AUTH connections; nodemailer defaults to five.
-      maxConnections: this.config.maxConnections,
-      host: this.config.host,
-      port: this.config.port,
+      maxConnections: config.maxConnections,
+      host: config.host,
+      port: config.port,
       requireTLS: true,
       auth: {
         type: 'OAuth2',
@@ -119,22 +75,32 @@ export class M365OAuthProvider implements MailProvider {
     })
     this.transporter.set('oauth2_provision_cb', async (_user, renew, cb) => {
       try {
-        // renew means nodemailer's token was rejected, so go past MSAL's cache
+        // renew means nodemailer's token was rejected, bypass MSAL cache
         const token = await this.acquireToken(renew)
         cb(null, token.accessToken, token.expiresOn.getTime() - TOKEN_RENEWAL_MARGIN_MS)
       } catch (err) {
         cb(err instanceof Error ? err : new Error(String(err)))
       }
     })
-    return this.transporter
+  }
+
+  async sendMail(opts: MailOpts): Promise<void> {
+    return this.limiter.schedule({ priority: opts.mailPriority === 'high' ? 1 : 5 }, () =>
+      this.doSend(opts),
+    )
+  }
+
+  private async doSend(opts: MailOpts): Promise<void> {
+    try {
+      await this.transporter.sendMail({ ...opts, from: opts.from ?? this.config.sender })
+    } catch (err) {
+      throw wrapSmtpError(err)
+    }
   }
 
   private async acquireToken(skipCache = false): Promise<{ accessToken: string; expiresOn: Date }> {
     try {
       const result = await this.cca.acquireTokenByClientCredential({
-        // Microsoft's SMTP client-credentials guidance specifies this resource.
-        // The outlook.office.com value is from the HVE doc, which pairs with a
-        // different endpoint.
         scopes: ['https://outlook.office365.com/.default'],
         skipCache,
       })
@@ -143,14 +109,10 @@ export class M365OAuthProvider implements MailProvider {
       }
       return { accessToken: result.accessToken, expiresOn: result.expiresOn }
     } catch (err) {
-      throw new Error(`${TOKEN_FAILURE}: ${redactSecrets(err).message}`)
+      const raw = err instanceof Error ? err.message : String(err)
+      throw new Error(`${TOKEN_FAILURE}: ${redactString(raw)}`)
     }
   }
-}
-
-export function redactSecrets(err: unknown): Error {
-  const raw = err instanceof Error ? err.message : String(err)
-  return new Error(redactString(raw))
 }
 
 export function wrapSmtpError(err: unknown): Error {
@@ -161,8 +123,7 @@ export function wrapSmtpError(err: unknown): Error {
   const combined = `${rawMessage} ${response}`.trim()
   const safe = redactString(combined)
 
-  // Nodemailer stamps EAUTH on anything the provision callback throws, so this
-  // check has to come first or a token failure reads as an XOAUTH2 rejection.
+  // EAUTH gets stamped on anything the provision callback throws — check token first.
   if (combined.includes(TOKEN_FAILURE)) {
     return new Error(safe)
   }
@@ -174,8 +135,7 @@ export function wrapSmtpError(err: unknown): Error {
     return new Error(`M365 network error: ${safe}`)
   }
 
-  // 5.7.139 (tenant refused), 5.7.144 (invalid API permissions) and 5.7.3 (generic
-  // XOAUTH2 rejection) all point at the same tenant-side checklist.
+  // 5.7.139 / 5.7.144 / 5.7.3 all point at tenant-side auth config.
   if (
     combined.includes('535 5.7.139') ||
     combined.includes('535 5.7.3') ||
@@ -188,9 +148,8 @@ export function wrapSmtpError(err: unknown): Error {
     )
   }
 
-  // 550 5.2.251 to 5.2.255 mean the mailbox is already throttled, not that one send
-  // failed. Must sit above the SendAs branch, since 550 5.2.252 and 554 5.2.252 share
-  // a number and mean very different things.
+  // 550 5.2.25x = mailbox already throttled. Must sit above SendAs — 550 5.2.252 and
+  // 554 5.2.252 share a number but mean different things.
   if (/550 5\.2\.25[1-5]/.test(combined)) {
     return new Error(
       `M365 has throttled this mailbox from SMTP AUTH after repeated failures of the same kind. ` +
@@ -201,11 +160,7 @@ export function wrapSmtpError(err: unknown): Error {
     )
   }
 
-  // Repeated send-as failures are one of the triggers for the throttling above. Match the
-  // 554 form and the exception name, since a bare 5.2.252 also appears in the 550 throttle.
-  // Anchor 5.7.60 with word boundaries — an unanchored substring collides with the
-  // 550 5.7.606-649 "banned sending IP" family (a real Exchange egress-IP block code),
-  // which would misroute the operator to audit mailbox permissions instead of egress IPs.
+  // 5.7.60 anchored — 550 5.7.606-649 is a different (egress-IP block) family.
   if (
     /554 5\.2\.252/.test(combined) ||
     /\b5\.7\.60\b/.test(combined) ||
@@ -218,7 +173,7 @@ export function wrapSmtpError(err: unknown): Error {
     )
   }
 
-  // 432 4.3.2 also carries a recipient thread limit, which has nothing to do with our pool.
+  // 432 4.3.2 also carries a recipient thread limit; disambiguate on text.
   if (combined.includes('432 4.3.2') && /concurrent connections?/i.test(combined)) {
     return new Error(
       `M365 concurrent connection limit exceeded. Exchange allows three, check maxConnections ` +
@@ -226,7 +181,6 @@ export function wrapSmtpError(err: unknown): Error {
     )
   }
 
-  // 554 5.2.0 is a generic envelope; the exception name is what disambiguates.
   if (combined.includes('SubmissionQuotaExceededException')) {
     return new Error(
       `M365 daily recipient limit reached, 10,000 recipients per day for this mailbox. ` +

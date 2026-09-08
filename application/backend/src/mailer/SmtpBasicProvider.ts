@@ -13,7 +13,7 @@ interface SmtpBasicConfig {
 }
 
 export class SmtpBasicProvider implements MailProvider {
-  private transporter: Transporter | null = null
+  private readonly transporter: Transporter
 
   constructor(private readonly config: SmtpBasicConfig) {
     if (!config.host) throw new Error('smtp-basic: host is empty')
@@ -22,33 +22,28 @@ export class SmtpBasicProvider implements MailProvider {
     if (!config.password) throw new Error('smtp-basic: password is empty')
     if (!config.sender) throw new Error('smtp-basic: sender is empty')
 
-    // a malformed sender is what #909 was. The server rejects it at MAIL FROM with a bare
-    // 501 that names nothing, so fail here instead, where the config field has a name.
+    // Fail-fast on a malformed sender; a bare 501 at MAIL FROM would name nothing.
     const address = extractAddress(config.sender)
     if (!address.includes('@') || /\s/.test(address)) {
       throw new Error(`smtp-basic: sender is not a usable address: ${config.sender}`)
     }
+
+    this.transporter = nodemailer.createTransport({
+      pool: true,
+      maxConnections: config.maxConnections,
+      host: config.host,
+      port: config.port,
+      // Without this nodemailer only upgrades when the server advertises STARTTLS,
+      // silently sending the password in the clear when it doesn't.
+      requireTLS: config.requireTLS ?? true,
+      auth: {
+        user: config.username,
+        pass: config.password,
+      },
+    })
   }
 
   async sendMail(opts: MailOpts): Promise<void> {
-    await this.getTransporter().sendMail(opts)
-  }
-
-  private getTransporter(): Transporter {
-    if (this.transporter) return this.transporter
-    this.transporter = nodemailer.createTransport({
-      pool: true,
-      maxConnections: this.config.maxConnections,
-      host: this.config.host,
-      port: this.config.port,
-      // without this nodemailer only upgrades when the server advertises STARTTLS, and
-      // silently sends the password in the clear when it does not
-      requireTLS: this.config.requireTLS ?? true,
-      auth: {
-        user: this.config.username,
-        pass: this.config.password,
-      },
-    })
-    return this.transporter
+    await this.transporter.sendMail(opts)
   }
 }

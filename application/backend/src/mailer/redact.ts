@@ -10,10 +10,9 @@ export function redactString(str: string): string {
         '$1=[REDACTED]',
       )
       .replace(/Bearer\s+[A-Za-z0-9._\-+/=]+/g, 'Bearer [REDACTED]')
-      // a bare JWT, which is what a token looks like once it is out of its JSON field
+      // bare JWT (token outside its JSON field)
       .replace(/\beyJ[A-Za-z0-9._-]{10,}/g, '[REDACTED]')
-      // recipient addresses are PII and User.email is encrypted at rest, so it should not
-      // arrive in a log via an SMTP rejection either
+      // recipient addresses are PII; User.email is encrypted at rest
       .replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+/g, '[REDACTED-ADDRESS]')
   )
 }
