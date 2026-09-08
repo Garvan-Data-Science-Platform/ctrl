@@ -67,9 +67,15 @@ export const useSurveyStore = create<SurveyState>((set) => ({
   moveElement: (step: number, index: number, destination: number) =>
     set(
       produce((state: SurveyState) => {
-        // Updated to fix bug if moving more than one spot at a time
+        const rawTarget = destination + 1
+
+        if (rawTarget === index || rawTarget === index + 1) return
+
         const [movedElement] = state.data[step].elements.splice(index, 1)
-        state.data[step].elements.splice(destination, 0, movedElement)
+
+        const insertIndex = rawTarget > index ? rawTarget - 1 : rawTarget
+
+        state.data[step].elements.splice(insertIndex, 0, movedElement)
       }),
     ),
   moveStep: (index: number, direction: 'up' | 'down') =>

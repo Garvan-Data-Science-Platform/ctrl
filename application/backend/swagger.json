@@ -538,7 +538,7 @@
         "type": "string",
         "example": "https://redcap.orgname.com/api/",
         "maxLength": 128,
-        "pattern": "^(https?:\\/\\/[a-zA-Z0-9\\-._~:/?#[\\]@!$&'()*+,;=%]+)?$"
+        "pattern": "^(https?:\\/\\/[a-zA-Z0-9._~:/?#@!$&'()*+,;=%-]+)?$"
       },
       "SurveyVideo": {
         "properties": {
@@ -1238,7 +1238,7 @@
         "example": "https://orgname.com/tcLink/",
         "minLength": 1,
         "maxLength": 128,
-        "pattern": "^https?:\\/\\/[a-zA-Z0-9\\-._~:/?#[\\]@!$&'()*+,;=%]+$"
+        "pattern": "^https?:\\/\\/[a-zA-Z0-9._~:/?#@!$&'()*+,;=%-]+$"
       },
       "SettingsBase": {
         "properties": {

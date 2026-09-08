@@ -157,14 +157,14 @@ export type RedcapFormName = string
 /**
  * @minLength 1
  * @maxLength 128 // TODO: verify max length
- * @pattern ^https?:\/\/[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]+$
+ * @pattern ^https?:\/\/[a-zA-Z0-9._~:/?#@!$&'()*+,;=%-]+$
  * @example "https://orgname.com/tcLink/"
  */
 export type Url = string
 
 /**
  * @maxLength 128 // TODO: verify max length
- * @pattern ^(https?:\/\/[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]+)?$
+ * @pattern ^(https?:\/\/[a-zA-Z0-9._~:/?#@!$&'()*+,;=%-]+)?$
  * @example "https://redcap.orgname.com/api/"
  */
 export type OptionalUrl = string
