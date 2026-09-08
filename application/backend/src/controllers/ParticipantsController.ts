@@ -38,7 +38,7 @@ import { Participant } from 'common/types/api/participants/participant'
 import { sendEmail } from '../mailer'
 import { generateParticipantInviteEmail } from 'common/src/emails/generate'
 import { InviteStatus } from 'common/types/api/participants/invite'
-import { BadGatewayError, NotFoundError, UnprocessableError } from '../middlewares/ErrorHandler'
+import { NotFoundError, UnprocessableError } from '../middlewares/ErrorHandler'
 import {
   createDefaultAnswers,
   determineLastUpdated,
@@ -49,7 +49,12 @@ import { ProfilesController } from './ProfilesController'
 import { auditLog } from '../middlewares/AuditLog'
 import { Role } from '@prisma/client'
 import { genId } from '../utils/genId'
-import { generateInviteId, inviteExpiresAt } from '../utils/invite'
+import {
+  generateInviteId,
+  inviteExpiresAt,
+  REGISTERABLE_INVITE_STATUSES,
+  RESENDABLE_INVITE_STATUSES,
+} from '../utils/invite'
 import { Prefill } from 'common/types/invite'
 import type { RequestWithAuthentication } from '../authentication'
 
@@ -447,7 +452,7 @@ export class InvitesController extends Controller {
     const invites = await this.invitesRepo.findMany({
       where: {
         email: user.email,
-        status: InviteStatus.PENDING,
+        status: { in: REGISTERABLE_INVITE_STATUSES },
       },
       include: {
         study: {
@@ -540,7 +545,9 @@ export class InvitesController extends Controller {
     // Parse Prefill data
     const invitePrefill: Prefill = JSON.parse(invite?.prefill || '{}')
 
-    if (!invite || invite.status !== InviteStatus.PENDING) {
+    if (!invite || !REGISTERABLE_INVITE_STATUSES.includes(invite.status)) {
+      // QUEUED counts as still-open — the drain has not yet flipped it to PENDING but
+      // the row is real, so a recipient who lands here mid-drain must be able to accept.
       throw new NotFoundError(`Pending invite not found`)
     }
 
@@ -657,10 +664,11 @@ export class InvitesController extends Controller {
   /**
    * Create invites
    *
-   * @summary Creates invites for a list of participant emails and sends it to them
-   *
+   * @summary Queue invites for a list of participant emails and return 202. The mails
+   * are drained asynchronously; poll GET /studies/{studyId}/invites for per-row status.
    */
   @Post('/studies/{studyId}/invites')
+  @SuccessResponse('202', 'Invites queued')
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
   public async createInvites(
     @Path() studyId: number,
@@ -668,12 +676,8 @@ export class InvitesController extends Controller {
   ): Promise<InviteParticipantsResponse> {
     const { subjectText, explanatoryText } = bodyRequest
 
-    // Check if a published survey exists
     const currentSurvey = await this.surveyRepo.findFirst({
-      where: {
-        status: 'PUBLISHED',
-        studyId: studyId,
-      },
+      where: { status: 'PUBLISHED', studyId },
       orderBy: { versionNumber: 'desc' },
     })
 
@@ -688,266 +692,194 @@ export class InvitesController extends Controller {
       data: { inviteEmailSubject: subjectText, inviteEmailText: explanatoryText },
     })
 
-    const recipients = [...new Set(bodyRequest.recipients)]
-    const emails = recipients.map((val) => val.email)
-
+    // Dedup by email. A `new Set(recipients)` of {email,prefill} treats every
+    // reference as unique, so a duplicated email in one request minted two invite IDs
+    // and createMany({skipDuplicates:true}) silently dropped one — the dropped ID was
+    // still mailed, yielding a dead /register/{id} link.
+    const uniqueRecipients = Array.from(
+      new Map(bodyRequest.recipients.map((r) => [r.email, r])).values(),
+    )
+    const emails = uniqueRecipients.map((r) => r.email)
     const expiresAt = inviteExpiresAt()
 
-    // Fetch existing invites
-    let existingInvites = await this.invitesRepo.findMany({
-      where: {
-        studyId: studyId,
-      },
-    })
+    // Invite.email is `/// @encrypted`. The Prisma encryption extension only rewrites
+    // equals/set/not on string values, so an `in` array of plaintext addresses would
+    // compare against ciphertext and match nothing silently — fetch all rows for the
+    // study and filter in memory instead.
+    const allExisting = await this.invitesRepo.findMany({ where: { studyId } })
+    const existingInvites = allExisting.filter((invite) => emails.includes(invite.email))
 
-    //Has to be done by backend server due to encryption
-    existingInvites = existingInvites.filter((invite) => emails.includes(invite.email))
+    const existingByEmail = new Map(existingInvites.map((i) => [i.email, i]))
+    const alreadyAcceptedCount = existingInvites.filter(
+      (i) => i.status === InviteStatus.ACCEPTED,
+    ).length
 
-    const newRecipients = recipients.filter(
-      (r) => !existingInvites.map((invite) => invite.email).includes(r.email),
-    )
+    const resendTargets = existingInvites.filter((i) => i.status !== InviteStatus.ACCEPTED)
+    const newRecipients = uniqueRecipients.filter((r) => !existingByEmail.has(r.email))
 
-    const responseData = {
-      resendEmailRequestCount: emails.length,
-      newInvitesCount: newRecipients.length,
-      emailsResentCount: 0, // this gets assigned below
-      alreadyAcceptedCount: 0, // this gets assigned below
-      failedEmailsCount: 0, // this gets assigned below
-      failedEmails: [], // this gets assigned below
+    // Write-first: re-queue existing non-ACCEPTED rows before any send fires. Clicking
+    // the /register/{id} link mid-drain must find a live row, so the DB write has to
+    // precede the mail. Status guard on the write, not just the pre-filter above: if a
+    // participant accepts their invite between our findMany and this updateMany, the
+    // guard drops that row silently instead of flipping ACCEPTED → QUEUED (which would
+    // re-mail a register-link to someone already registered).
+    if (resendTargets.length > 0) {
+      await this.invitesRepo.updateMany({
+        where: {
+          id: { in: resendTargets.map((i) => i.id) },
+          status: { not: InviteStatus.ACCEPTED },
+        },
+        data: { status: InviteStatus.QUEUED, expiresAt, sentAt: null },
+      })
     }
 
-    const emailsResent: string[] = []
-    const failedEmails: string[] = []
+    // Write-first: create brand-new rows in QUEUED.
+    const newRecipientPayload = newRecipients.map((r) => ({
+      id: generateInviteId(),
+      email: r.email,
+      prefill: JSON.stringify(r.prefill),
+      studyId,
+      expiresAt,
+      status: InviteStatus.QUEUED,
+    }))
 
-    // Resend invites for existing emails
-    if (existingInvites.length > 0) {
-      // If status is REVOKED, reset expiresAt and update status to PENDING
-      await Promise.all(
-        existingInvites.map(async (invite) => {
-          if (invite.status === InviteStatus.ACCEPTED) {
-            return
-          }
-
-          const emailSent = await this.sendInvite(invite.email, studyId, invite.id)
-          if (!emailSent) {
-            // sendInvite already logs the failure with studyId and inviteId
-            await this.invitesRepo.update({
-              where: { id: invite.id },
-              data: {
-                status: InviteStatus.FAILED_TO_SEND,
-              },
-            })
-            failedEmails.push(invite.email)
-            return
-          }
-
-          logger.info({ message: 'Resent invite', studyId, inviteId: invite.id })
-          emailsResent.push(invite.email)
-
-          if (
-            invite.status === InviteStatus.REVOKED ||
-            invite.status === InviteStatus.EXPIRED ||
-            invite.status === InviteStatus.FAILED_TO_SEND
-          ) {
-            await this.invitesRepo.update({
-              where: { id: invite.id },
-              data: {
-                status: InviteStatus.PENDING,
-                expiresAt: expiresAt,
-                sentAt: new Date(),
-              },
-            })
-          } else if (invite.status === InviteStatus.PENDING) {
-            await this.invitesRepo.update({
-              where: { id: invite.id },
-              data: {
-                expiresAt,
-                sentAt: new Date(),
-              },
-            })
-          }
-        }),
-      )
-    }
-
-    // Create new invites
-    if (newRecipients.length > 0) {
-      const inviteResults = await Promise.all(
-        newRecipients.map(async (r) => {
-          const inviteId: string = generateInviteId()
-          const success = await this.sendInvite(r.email, studyId, inviteId)
-          if (!success) {
-            // sendInvite already logs the failure with studyId and inviteId
-            failedEmails.push(r.email)
-          }
-          return { recipient: r, id: inviteId, success }
-        }),
-      )
-
-      const successfulInvites = inviteResults.filter((invite) => invite.success)
-
-      const newFailedInvites = inviteResults.filter((invite) => !invite.success)
-
-      // Create invites with appropriate status
+    if (newRecipientPayload.length > 0) {
       await this.invitesRepo.createMany({
-        data: [
-          ...successfulInvites.map((invite) => ({
-            id: invite.id,
-            email: invite.recipient.email,
-            prefill: JSON.stringify(invite.recipient.prefill),
-            studyId,
-            expiresAt,
-            sentAt: new Date(),
-            status: InviteStatus.PENDING,
-          })),
-          ...newFailedInvites.map((invite) => ({
-            id: invite.id,
-            email: invite.recipient.email,
-            prefill: JSON.stringify(invite.recipient.prefill),
-            studyId,
-            expiresAt,
-            status: InviteStatus.FAILED_TO_SEND,
-          })),
-        ],
+        data: newRecipientPayload,
         skipDuplicates: true,
       })
     }
 
-    Object.assign(responseData, {
-      emailsResentCount: emailsResent.length,
-      // Count accepted directly. Deriving it as existingInvites − emailsResent − failedEmails
-      // silently reduces the count when a new-recipient send fails, since `failedEmails` is
-      // shared with the new-recipient loop below.
-      alreadyAcceptedCount: existingInvites.filter(
-        (invite) => invite.status === InviteStatus.ACCEPTED,
-      ).length,
-      failedEmailsCount: failedEmails.length,
-      failedEmails,
+    // Re-query which new IDs actually persisted. A concurrent createInvites for the
+    // same [studyId, emailHash] can win the unique-constraint race; our locally-minted
+    // ID never lands and mailing that link 404s. Only drain the IDs the DB confirms.
+    const attemptedNewIds = newRecipientPayload.map((p) => p.id)
+    const persistedNew = attemptedNewIds.length
+      ? await this.invitesRepo.findMany({
+          where: { studyId, id: { in: attemptedNewIds } },
+          select: { id: true },
+        })
+      : []
+    const persistedNewIds = persistedNew.map((r) => r.id)
+    const toDrainIds = [...resendTargets.map((i) => i.id), ...persistedNewIds]
+
+    // Kick off the drain unawaited. Node 15+ crashes on unhandled promise rejections,
+    // so the `.catch` is load-bearing — issue #719 was exactly this class of bug on
+    // an earlier version of the invite path.
+    void this.drainInvites(toDrainIds, studyId).catch((err) => {
+      logger.error({ message: 'drainInvites crashed', studyId, err })
     })
 
-    // responseData carries failedEmails for the caller, so log the counts rather than the object
-    logger.info({
-      message: 'Invite request handled',
-      studyId,
-      resendEmailRequestCount: responseData.resendEmailRequestCount,
-      newInvitesCount: responseData.newInvitesCount,
-      emailsResentCount: responseData.emailsResentCount,
-      alreadyAcceptedCount: responseData.alreadyAcceptedCount,
-      failedEmailsCount: responseData.failedEmailsCount,
-    })
+    this.setStatus(202)
+
+    const responseData: InviteParticipantsResponse = {
+      resendEmailRequestCount: emails.length,
+      newInvitesCount: persistedNewIds.length,
+      queuedForResendCount: resendTargets.length,
+      queuedCount: toDrainIds.length,
+      alreadyAcceptedCount,
+    }
+
+    logger.info({ message: 'Invite request queued', studyId, ...responseData })
     return responseData
   }
 
   /**
    * Resend invite by ID and StudyID
    *
-   * @summary Resend invite by ID and StudyID
+   * @summary Re-queue an invite by ID and StudyID and return 202. The mail drains
+   * asynchronously; poll GET /studies/{studyId}/invites for status.
    */
   @Post('/studies/{studyId}/invites/{inviteId}/resend')
+  @SuccessResponse('202', 'Invite queued')
   public async resendInviteById(
     @Path() studyId: number,
     @Path() inviteId: string, // String because this is uuid
   ): Promise<void> {
     // Only ACCEPTED is excluded — clicking Resend on a REVOKED invite is treated as an
-    // active un-revoke, matching the bulk-invite path where a REVOKED recipient in a new
-    // request flips back to PENDING.
-    const pendingInvite = await this.invitesRepo.findUniqueOrThrow({
+    // active un-revoke, matching the bulk-invite path. No idempotency check on QUEUED:
+    // a rare double-mail when Resend is clicked during an active drain is a smaller
+    // failure mode than blocking recovery when drain state is lost (pod restart leaves
+    // rows stranded in QUEUED, and Resend is the recovery path).
+    const invite = await this.invitesRepo.findUniqueOrThrow({
       where: {
         id: inviteId,
-        studyId: studyId,
+        studyId,
         status: { not: InviteStatus.ACCEPTED },
       },
-      select: { id: true, email: true },
+      select: { id: true },
     })
 
-    // Send email and check if failed
-    if (!(await this.sendInvite(pendingInvite.email, studyId, pendingInvite.id))) {
-      await this.invitesRepo.update({
-        where: {
-          id: pendingInvite.id,
-          studyId: studyId,
-        },
-        data: {
-          status: InviteStatus.FAILED_TO_SEND,
-        },
-      })
-      // ErrorHandler logs err.message, so the address stays out of it. The caller passed
-      // the inviteId in the path, so they already know which invite this is.
-      throw new BadGatewayError('Failed to send invite email')
-    }
-
-    logger.info({ message: 'Resent invite', studyId, inviteId })
-
-    await this.invitesRepo.update({
+    // updateMany rather than update: if the recipient accepted their invite between our
+    // findUniqueOrThrow above and this write, the ACCEPTED guard matches zero rows and
+    // the write is a silent no-op. update() would still fire with just {id, studyId},
+    // flipping ACCEPTED → QUEUED and mailing a stale register-link. The drain's own
+    // pre-read then finds a non-QUEUED row and skips the send.
+    await this.invitesRepo.updateMany({
       where: {
-        id: inviteId,
-        studyId: studyId,
+        id: invite.id,
+        studyId,
+        status: { not: InviteStatus.ACCEPTED },
       },
-      data: { status: InviteStatus.PENDING, sentAt: new Date() },
+      data: {
+        status: InviteStatus.QUEUED,
+        expiresAt: inviteExpiresAt(),
+        sentAt: null,
+      },
     })
+
+    void this.drainInvites([invite.id], studyId).catch((err) => {
+      logger.error({ message: 'drainInvites crashed', studyId, inviteId: invite.id, err })
+    })
+
+    this.setStatus(202)
   }
 
   /**
    * Resend all pending invites for a study
    *
-   * @summary Resend invites that are currently pending for a study
+   * @summary Re-queue all PENDING invites for a study and return 202. The mails drain
+   * asynchronously; poll GET /studies/{studyId}/invites for per-row status.
    */
   @Post('/studies/{studyId}/invites/resend')
+  @SuccessResponse('202', 'Invites queued')
   public async resendPendingInvites(@Path() studyId: number): Promise<void> {
-    // Get all pending invitations
+    // Includes QUEUED, not just PENDING: a pod restart mid-drain leaves rows stranded
+    // in QUEUED, and the bulk Resend button is where an admin recovers from that
+    // without clicking Resend once per stranded row.
     const pendingInvites = await this.invitesRepo.findMany({
-      where: {
-        status: InviteStatus.PENDING,
-        studyId: studyId,
-      },
-      select: { email: true, id: true },
+      where: { status: { in: RESENDABLE_INVITE_STATUSES }, studyId },
+      select: { id: true },
     })
 
-    // Send emails
-    const emailResults = await Promise.all(
-      pendingInvites.map(async (invite) => {
-        // sendInvite already logs the failure with studyId and inviteId
-        const success = await this.sendInvite(invite.email, studyId, invite.id)
-        return { id: invite.id, success }
-      }),
-    )
+    if (pendingInvites.length === 0) {
+      this.setStatus(202)
+      return
+    }
 
-    const successfulIds = emailResults.filter((result) => result.success).map((result) => result.id)
+    const inviteIds = pendingInvites.map((i) => i.id)
 
-    const failedIds = emailResults.filter((result) => !result.success).map((result) => result.id)
-
-    // Filter on id, not email. Invite.email is `/// @encrypted` and the encryption
-    // extension only rewrites `equals`/`set`/`not` on string values, so an `in` array
-    // of plaintext addresses compares against ciphertext and matches nothing silently
-    // — the mails go out but sentAt / FAILED_TO_SEND never persist.
+    // Guard on the pre-read status so a race with acceptInvite / revokeInvite
+    // (which advances the row to ACCEPTED or REVOKED) doesn't clobber their write.
     await this.invitesRepo.updateMany({
       where: {
-        studyId: studyId,
-        id: { in: successfulIds },
-        status: InviteStatus.PENDING,
+        studyId,
+        id: { in: inviteIds },
+        status: { in: RESENDABLE_INVITE_STATUSES },
       },
       data: {
-        status: InviteStatus.PENDING,
-        sentAt: new Date(),
+        status: InviteStatus.QUEUED,
+        expiresAt: inviteExpiresAt(),
+        sentAt: null,
       },
     })
 
-    await this.invitesRepo.updateMany({
-      where: {
-        studyId: studyId,
-        id: { in: failedIds },
-        status: InviteStatus.PENDING,
-      },
-      data: {
-        status: InviteStatus.FAILED_TO_SEND,
-      },
+    void this.drainInvites(inviteIds, studyId).catch((err) => {
+      logger.error({ message: 'drainInvites crashed', studyId, err })
     })
 
-    // Log sent emails
-    logger.info(`Resent ${successfulIds.length} emails to pending invites for studyId: ${studyId}`)
-    logger.info(
-      `Failed to send ${failedIds.length} emails to pending invites for studyId: ${studyId}`,
-    )
+    logger.info({ message: 'Pending invites re-queued', studyId, count: inviteIds.length })
+    this.setStatus(202)
   }
 
   /**
@@ -1009,32 +941,56 @@ export class InvitesController extends Controller {
     return JSON.parse(prefillData.prefill || '{}')
   }
 
-  private async sendInvite(email: string, studyId: number, inviteId: string): Promise<boolean> {
-    try {
-      const registerLink = `${process.env.HOSTNAME}/register/${inviteId}`
-      const study = await this.studyRepo.findFirstOrThrow({
-        where: {
-          id: studyId,
-        },
-      })
-      const subjectText = study?.inviteEmailSubject
-      const explanatoryText = study?.inviteEmailText
-      const { html, text } = generateParticipantInviteEmail(
-        registerLink,
-        subjectText,
-        explanatoryText,
-      )
+  private async sendInviteMail(email: string, studyId: number, inviteId: string): Promise<void> {
+    const registerLink = `${process.env.HOSTNAME}/register/${inviteId}`
+    const study = await this.studyRepo.findFirstOrThrow({ where: { id: studyId } })
+    const { html, text } = generateParticipantInviteEmail(
+      registerLink,
+      study.inviteEmailSubject,
+      study.inviteEmailText,
+    )
 
-      await sendEmail({
-        to: email,
-        subject: subjectText,
-        text,
-        html,
-      })
-      return true
-    } catch (error) {
-      logger.error({ errorMessage: 'Failed to send participant invite', studyId, inviteId, error })
-      return false
-    }
+    await sendEmail({
+      to: email,
+      subject: study.inviteEmailSubject,
+      text,
+      html,
+    })
+  }
+
+  // Drains QUEUED invite rows in parallel. Each iteration re-reads the row before
+  // sending (respects mid-drain revoke) and guards both the success and failure writes
+  // on the row still being QUEUED, so a revoke landing between the pre-read and the
+  // updateMany leaves the REVOKED write intact.
+  private async drainInvites(inviteIds: string[], studyId: number): Promise<void> {
+    await Promise.all(
+      inviteIds.map(async (inviteId) => {
+        try {
+          const stillQueued = await this.invitesRepo.findFirst({
+            where: { id: inviteId, studyId, status: InviteStatus.QUEUED },
+            select: { id: true, email: true },
+          })
+          if (!stillQueued) return
+
+          await this.sendInviteMail(stillQueued.email, studyId, stillQueued.id)
+
+          await this.invitesRepo.updateMany({
+            where: { id: inviteId, status: InviteStatus.QUEUED },
+            data: { status: InviteStatus.PENDING, sentAt: new Date() },
+          })
+        } catch (err) {
+          await this.invitesRepo.updateMany({
+            where: { id: inviteId, status: InviteStatus.QUEUED },
+            data: { status: InviteStatus.FAILED_TO_SEND },
+          })
+          logger.error({
+            message: 'Failed to send participant invite',
+            studyId,
+            inviteId,
+            err,
+          })
+        }
+      }),
+    )
   }
 }

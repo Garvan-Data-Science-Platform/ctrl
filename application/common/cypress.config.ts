@@ -5,6 +5,7 @@ import {
   partiallyCompleteSurvey,
   resetDB,
   revokeInvite,
+  waitForInviteDrain,
   wipeDB,
 } from 'common/testing/TestHelpers'
 import { defineConfig } from 'cypress'
@@ -98,6 +99,10 @@ export default defineConfig({
         },
         getRegistrationLink(email: string) {
           return getRegistrationLinkFromEmail(email)
+        },
+        async waitForInviteDrain({ studyId, timeoutMs }: { studyId: number; timeoutMs?: number }) {
+          await waitForInviteDrain(studyId, timeoutMs ?? 10_000)
+          return null
         },
       })
     },

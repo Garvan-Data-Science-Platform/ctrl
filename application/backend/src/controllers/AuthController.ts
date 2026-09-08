@@ -48,6 +48,7 @@ import {
   NotFoundError,
   UnprocessableError,
 } from '../middlewares/ErrorHandler'
+import { REGISTERABLE_INVITE_STATUSES } from '../utils/invite'
 import { ParticipantType } from 'common/types/api/users/ParticipantProfile'
 import { createDefaultAnswers } from '../utils/answers'
 import { auditLog } from '../middlewares/AuditLog'
@@ -206,9 +207,11 @@ export class AuthController extends Controller {
     // Extract info for user creation
     const { firstName, middleName, lastName, email, password, ...participantInfo } = bodyRequest
 
-    // Check that the Participant has an invitation
+    // Check that the Participant has an invitation. QUEUED is accepted alongside
+    // PENDING — the row is real, only the drain has not yet flipped it to PENDING, so
+    // recipients who land here mid-drain must be able to register.
     const invite = await this.inviteRepo.findFirst({ where: { id: inviteId, email } })
-    if (!invite || invite.status !== 'PENDING') {
+    if (!invite || !REGISTERABLE_INVITE_STATUSES.includes(invite.status)) {
       // ErrorHandler logs err.message, so the address stays out of it. The caller supplied
       // both the inviteId and the email, so neither tells them anything they did not send.
       throw new NotFoundError('Invite not found')

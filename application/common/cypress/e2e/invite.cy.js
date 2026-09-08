@@ -26,6 +26,10 @@ describe('Invites - Full E2E Flow', () => {
     // 3. Verify invite appears in pending list
     cy.get('[data-cy="pending-list"]', { timeout: 10000 }).should('contain.text', testEmail)
 
+    // POST /invites returns 202 before the drain runs, so wait for the QUEUED row to
+    // settle before asserting on MailHog. Otherwise the mail may not have arrived yet.
+    cy.task('waitForInviteDrain', { studyId: 1 })
+
     // 4. Verify invite email was sent via MailHog
     cy.task('getEmailsFor', testEmail).then((emails) => {
       expect(emails).to.have.length(1)
@@ -53,6 +57,7 @@ describe('Invites - Full E2E Flow', () => {
     // 1. Admin sends invite via UI
     cy.loginAdminUI()
     cy.sendInviteUI(testEmail)
+    cy.task('waitForInviteDrain', { studyId: 1 })
 
     // 2. Get invite ID and expire it via task
     cy.task('getInviteId', { email: testEmail, studyId: 1 }).then((inviteId) => {

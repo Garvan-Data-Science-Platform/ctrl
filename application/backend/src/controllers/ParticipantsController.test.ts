@@ -1,6 +1,6 @@
 import { generateToken } from '../authentication'
 import { Api } from '../Api'
-import { resetDB, inviteUser } from 'common/testing/TestHelpers'
+import { resetDB, inviteUser, waitForInviteDrain } from 'common/testing/TestHelpers'
 import request from 'supertest'
 import {
   GetInvitesResponse,
@@ -345,9 +345,12 @@ describe('InvitesController', () => {
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       const body: InviteParticipantsResponse = response.body
-      expect(response.status).toBe(200)
+      expect(response.status).toBe(202)
 
       expect(body.newInvitesCount).toBe(2)
+      expect(body.queuedCount).toBe(2)
+
+      await waitForInviteDrain(TestStudies.TEST_STUDY.id)
 
       // Check emails were successfully sent
       const sentEmails = mockNodeMailer.mock.getSentMail()
@@ -416,11 +419,13 @@ describe('InvitesController', () => {
 
       const body: InviteParticipantsResponse = response.body
 
-      expect(response.status).toBe(200)
-      expect(body.emailsResentCount).toBe(1)
+      expect(response.status).toBe(202)
+      expect(body.queuedForResendCount).toBe(1)
+      expect(body.queuedCount).toBe(1)
       expect(body.alreadyAcceptedCount).toBe(0)
       expect(body.newInvitesCount).toBe(0)
-      expect(body.failedEmailsCount).toBe(0)
+
+      await waitForInviteDrain(TestStudies.TEST_STUDY.id)
 
       // Check emails were successfully sent
       const sentEmails = mockNodeMailer.mock.getSentMail()
@@ -475,11 +480,13 @@ describe('InvitesController', () => {
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       const body: InviteParticipantsResponse = response.body
-      expect(response.status).toBe(200)
-      expect(body.emailsResentCount).toBe(1)
+      expect(response.status).toBe(202)
+      expect(body.queuedForResendCount).toBe(1)
+      expect(body.queuedCount).toBe(1)
       expect(body.alreadyAcceptedCount).toBe(0)
       expect(body.newInvitesCount).toBe(0)
-      expect(body.failedEmailsCount).toBe(0)
+
+      await waitForInviteDrain(TestStudies.TEST_STUDY.id)
 
       // Check email(s) were successfully sent
       const sentEmails = mockNodeMailer.mock.getSentMail()
@@ -523,8 +530,11 @@ describe('InvitesController', () => {
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       const body: InviteParticipantsResponse = response.body
-      expect(response.status).toBe(200)
+      expect(response.status).toBe(202)
       expect(body.alreadyAcceptedCount).toBe(1)
+      expect(body.queuedCount).toBe(0)
+
+      await waitForInviteDrain(TestStudies.TEST_STUDY.id)
 
       // Check email(s) were not sent
       const sentEmails = mockNodeMailer.mock.getSentMail()
@@ -567,9 +577,14 @@ describe('InvitesController', () => {
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       const body: InviteParticipantsResponse = response.body
-      expect(response.status).toBe(200)
+      expect(response.status).toBe(202)
       expect(body.alreadyAcceptedCount).toBe(1)
-      expect(body.failedEmailsCount).toBe(1)
+      // Failed sends surface via row status after the drain, not in the 202 body.
+      await waitForInviteDrain(TestStudies.TEST_STUDY.id)
+      const failed = await prisma.invite.count({
+        where: { studyId: TestStudies.TEST_STUDY.id, status: 'FAILED_TO_SEND' },
+      })
+      expect(failed).toBe(1)
     })
 
     it('should handle failed email sends correctly', async () => {
@@ -591,14 +606,16 @@ describe('InvitesController', () => {
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
       const body: InviteParticipantsResponse = response.body
-      console.log('Response body:', body)
-      expect(response.status).toBe(200)
+      expect(response.status).toBe(202)
 
-      // Check counters in response
-      expect(body.newInvitesCount).toBe(4) // Invites are created even if email fails
-      expect(body.failedEmailsCount).toBe(4) // One email failed to send
-      expect(body.emailsResentCount).toBe(0)
+      // Check counters in response — sends fail asynchronously in the drain, so the
+      // 202 body reports queued counts only. FAILED_TO_SEND surfaces on the row itself.
+      expect(body.newInvitesCount).toBe(4)
+      expect(body.queuedCount).toBe(4)
+      expect(body.queuedForResendCount).toBe(0)
       expect(body.alreadyAcceptedCount).toBe(0)
+
+      await waitForInviteDrain(TestStudies.TEST_STUDY.id)
 
       // Check emails attempts
       const sentEmails = mockNodeMailer.mock.getSentMail()
@@ -622,6 +639,69 @@ describe('InvitesController', () => {
       // Reset mock for other tests
       mockNodeMailer.mock.reset()
     })
+
+    it('should dedup duplicate emails in a single request to one invite + one mail', async () => {
+      // Regression: `new Set(recipients)` of {email,prefill} treats every reference as
+      // unique, so a duplicated email minted two invite IDs and createMany's
+      // skipDuplicates silently dropped one — the dropped ID was still mailed, yielding
+      // a dead /register/{id} link.
+      const email = 'dupe@example.com'
+      const response = await request(app)
+        .post(`/studies/${TestStudies.TEST_STUDY.id}/invites`)
+        .send({
+          recipients: [
+            { email, prefill: {} },
+            { email, prefill: {} },
+          ],
+          subjectText: 'S',
+          explanatoryText: 'E',
+        })
+        .set({ Authorization: `Bearer ${organisationAdminToken}` })
+
+      const body: InviteParticipantsResponse = response.body
+      expect(response.status).toBe(202)
+      expect(body.newInvitesCount).toBe(1)
+      expect(body.queuedCount).toBe(1)
+
+      await waitForInviteDrain(TestStudies.TEST_STUDY.id)
+
+      const rows = await prisma.invite.findMany({
+        where: { studyId: TestStudies.TEST_STUDY.id, email },
+      })
+      expect(rows).toHaveLength(1)
+
+      const sent = mockNodeMailer.mock.getSentMail().filter((m) => m.to === email)
+      expect(sent).toHaveLength(1)
+    })
+
+    it('should persist QUEUED rows before the drain fires (write-first)', async () => {
+      // Proves the recipient-lands-mid-drain guarantee: at 202-response time the row is
+      // already in the DB, so /register/{id} does not 404 while the send is in flight.
+      const email = 'writefirst@example.com'
+      const response = await request(app)
+        .post(`/studies/${TestStudies.TEST_STUDY.id}/invites`)
+        .send({
+          recipients: [{ email, prefill: {} }],
+          subjectText: 'S',
+          explanatoryText: 'E',
+        })
+        .set({ Authorization: `Bearer ${organisationAdminToken}` })
+      expect(response.status).toBe(202)
+
+      // Read the row before draining — with nodemailer-mock the drain resolves fast,
+      // so the row may already be PENDING here. Either QUEUED or PENDING is proof
+      // that write-first happened (the row exists at 202 return).
+      const midDrain = await prisma.invite.findFirstOrThrow({
+        where: { studyId: TestStudies.TEST_STUDY.id, email },
+      })
+      expect(['QUEUED', 'PENDING']).toContain(midDrain.status)
+
+      await waitForInviteDrain(TestStudies.TEST_STUDY.id)
+      const settled = await prisma.invite.findFirstOrThrow({
+        where: { studyId: TestStudies.TEST_STUDY.id, email },
+      })
+      expect(settled.status).toBe('PENDING')
+    })
   })
 
   describe('POST /studies/{studyId}/invites/resend', () => {
@@ -637,7 +717,9 @@ describe('InvitesController', () => {
         .post(`/studies/${TestStudies.TEST_STUDY.id}/invites/resend`)
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
 
-      expect(response.status).toBe(204)
+      expect(response.status).toBe(202)
+
+      await waitForInviteDrain(TestStudies.TEST_STUDY.id)
 
       // Check email(s) were successfully sent
       const sentEmails = mockNodeMailer.mock.getSentMail()
@@ -662,7 +744,9 @@ describe('InvitesController', () => {
       const response = await request(app)
         .post(`/studies/${TestStudies.TEST_STUDY.id}/invites/resend`)
         .set({ Authorization: `Bearer ${organisationAdminToken}` })
-      expect(response.status).toBe(204)
+      expect(response.status).toBe(202)
+
+      await waitForInviteDrain(TestStudies.TEST_STUDY.id)
 
       const after = await prisma.invite.findUniqueOrThrow({ where: { id: pendingInvite.id } })
       expect(after.sentAt).not.toBeNull()

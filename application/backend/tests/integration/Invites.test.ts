@@ -1,6 +1,6 @@
 import request from 'supertest'
 import { Api } from '../../src/Api'
-import { resetDB } from 'common/testing/TestHelpers'
+import { resetDB, waitForInviteDrain } from 'common/testing/TestHelpers'
 import {
   ContactMethod,
   ParticipantType,
@@ -90,8 +90,11 @@ describe('Participant Invites', () => {
       })
       .set({ Authorization: `Bearer ${orgAdminToken}` })
     const body: InviteParticipantsResponse = response.body
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(202)
     expect(body.newInvitesCount).toBe(1)
+    expect(body.queuedCount).toBe(1)
+
+    await waitForInviteDrain(1)
 
     // Check emails were successfully sent
     const sentEmails = mockNodeMailer.mock.getSentMail()
@@ -124,7 +127,9 @@ describe('Participant Invites', () => {
         explanatoryText: 'Text',
       })
       .set({ Authorization: `Bearer ${orgAdminToken}` })
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(202)
+
+    await waitForInviteDrain(1)
 
     // Reset mailer to clear intial invite email
     mockNodeMailer.mock.reset()
@@ -154,7 +159,9 @@ describe('Participant Invites', () => {
     const resendResponse = await request(app)
       .post(`/studies/1/invites/resend`)
       .set({ Authorization: `Bearer ${orgAdminToken}` })
-    expect(resendResponse.status).toBe(204)
+    expect(resendResponse.status).toBe(202)
+
+    await waitForInviteDrain(1)
 
     // Check emails were successfully sent again
     const sentEmails1 = mockNodeMailer.mock.getSentMail()
@@ -183,8 +190,10 @@ describe('Participant Invites', () => {
       .set({ Authorization: `Bearer ${orgAdminToken}` })
 
     const body: InviteParticipantsResponse = response.body
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(202)
     expect(body.newInvitesCount).toBe(1)
+
+    await waitForInviteDrain(1)
 
     // Check the invite exists
     const invite = await prisma.invite.findUnique({
@@ -231,8 +240,10 @@ describe('Participant Invites', () => {
       .set({ Authorization: `Bearer ${orgAdminToken}` })
 
     const body: InviteParticipantsResponse = responseToBeRevoked.body
-    expect(responseToBeRevoked.status).toBe(200)
+    expect(responseToBeRevoked.status).toBe(202)
     expect(body.newInvitesCount).toBe(1)
+
+    await waitForInviteDrain(1)
 
     // Check the invite exists
     const invite = await prisma.invite.findUnique({
@@ -288,8 +299,10 @@ describe('Participant Invites', () => {
       .set({ Authorization: `Bearer ${orgAdminToken}` })
 
     const body: InviteParticipantsResponse = responseToBeExpired.body
-    expect(responseToBeExpired.status).toBe(200)
+    expect(responseToBeExpired.status).toBe(202)
     expect(body.newInvitesCount).toBe(1)
+
+    await waitForInviteDrain(1)
 
     // Check the invite exists
     const invite = await prisma.invite.findUnique({
@@ -349,9 +362,11 @@ describe('Participant Invites', () => {
       })
       .set({ Authorization: `Bearer ${orgAdminToken}` })
     const body: InviteParticipantsResponse = response.body
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(202)
 
     expect(body.resendEmailRequestCount).toBe(1)
+
+    await waitForInviteDrain(1)
 
     // Check the invite exists
     const invite = await prisma.invite.findUnique({
@@ -387,8 +402,9 @@ describe('Participant Invites', () => {
         explanatoryText: 'Text',
       })
       .set({ Authorization: `Bearer ${orgAdminToken}` })
-    expect(sendInviteResponse.status).toBe(200)
-    console.log(sendInviteResponse.body)
+    expect(sendInviteResponse.status).toBe(202)
+
+    await waitForInviteDrain(1)
 
     // Check the invite expiry
     const invite = await prisma.invite.findUnique({
@@ -420,7 +436,9 @@ describe('Participant Invites', () => {
         explanatoryText: 'Text',
       })
       .set({ Authorization: `Bearer ${orgAdminToken}` })
-    expect(sendInviteResponse2.status).toBe(200)
+    expect(sendInviteResponse2.status).toBe(202)
+
+    await waitForInviteDrain(1)
 
     // Check the invite expiry
     const invite2 = await prisma.invite.findUnique({

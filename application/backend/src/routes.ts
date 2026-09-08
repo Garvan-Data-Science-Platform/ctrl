@@ -646,7 +646,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "InviteStatus": {
         "dataType": "refEnum",
-        "enums": ["PENDING","ACCEPTED","EXPIRED","REVOKED","FAILED_TO_SEND"],
+        "enums": ["PENDING","ACCEPTED","EXPIRED","REVOKED","FAILED_TO_SEND","QUEUED"],
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "GetInvitesResponse": {
@@ -662,9 +662,8 @@ const models: TsoaRoute.Models = {
         "properties": {
             "resendEmailRequestCount": {"dataType":"double","required":true},
             "newInvitesCount": {"dataType":"double","required":true},
-            "emailsResentCount": {"dataType":"double","required":true},
-            "failedEmails": {"dataType":"array","array":{"dataType":"string"},"required":true},
-            "failedEmailsCount": {"dataType":"double","required":true},
+            "queuedForResendCount": {"dataType":"double","required":true},
+            "queuedCount": {"dataType":"double","required":true},
             "alreadyAcceptedCount": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
@@ -2793,7 +2792,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 response,
                 next,
                 validatedArgs,
-                successStatus: undefined,
+                successStatus: 202,
               });
             } catch (err) {
                 return next(err);
@@ -2825,7 +2824,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 response,
                 next,
                 validatedArgs,
-                successStatus: undefined,
+                successStatus: 202,
               });
             } catch (err) {
                 return next(err);
@@ -2856,7 +2855,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 response,
                 next,
                 validatedArgs,
-                successStatus: undefined,
+                successStatus: 202,
               });
             } catch (err) {
                 return next(err);

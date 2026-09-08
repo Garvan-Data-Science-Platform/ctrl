@@ -82,7 +82,7 @@ describe('REDCap Participant Upload', () => {
       })
 
       cy.get('[data-cy="send-button"]').should('be.visible').click()
-      cy.contains('Invites sent').should('exist')
+      cy.contains('Invites queued').should('exist')
 
       // Check updated invites
       cy.request({

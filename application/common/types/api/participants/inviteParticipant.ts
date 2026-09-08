@@ -14,11 +14,13 @@ export interface InviteParticipantsRequest {
   explanatoryText: string
 }
 
+// Async lifecycle: the invite endpoint returns 202 after persisting rows in QUEUED and
+// firing an unawaited drain. Send-success counts (emailsResent / failedEmails) cannot be
+// known at response time and are dropped in favour of per-row status the admin polls for.
 export interface InviteParticipantsResponse {
   resendEmailRequestCount: number
   newInvitesCount: number
-  emailsResentCount: number
-  failedEmails: string[]
-  failedEmailsCount: number
+  queuedForResendCount: number
+  queuedCount: number
   alreadyAcceptedCount: number
 }

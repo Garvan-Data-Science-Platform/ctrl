@@ -56,6 +56,17 @@ export const ParticipantList = () => {
   const { dataGridProps: inviteGridProps } = useDataGrid({
     syncWithLocation: false,
     resource: 'invites',
+    // Poll only while a row is QUEUED (drain in flight). react-query stops polling as
+    // soon as the callback returns false, so a settled invite list is passive.
+    queryOptions: {
+      refetchInterval: (query) => {
+        const rows = (query.state.data as { data?: { inviteStatus?: InviteStatus }[] } | undefined)
+          ?.data
+        return Array.isArray(rows) && rows.some((r) => r.inviteStatus === InviteStatus.QUEUED)
+          ? 30_000
+          : false
+      },
+    },
   })
 
   const { studies, activeStudyIndex } = useStudyStore()
@@ -106,7 +117,7 @@ export const ParticipantList = () => {
       })
       .then(() => {
         setModalOpen(false)
-        open?.({ type: 'success', message: `Invites sent` })
+        open?.({ type: 'success', message: `Invites queued` })
         setLoading(false)
         invalidate({ resource: 'invites', invalidates: ['list'] })
       })
@@ -137,7 +148,7 @@ export const ParticipantList = () => {
     axiosInstance
       .post(`studies/${studies[activeStudyIndex].id}/invites/${id}/resend`)
       .then(() => {
-        open?.({ type: 'success', message: 'Invite Resent' })
+        open?.({ type: 'success', message: 'Invite queued' })
         invalidate({ resource: 'invites', invalidates: ['list'] })
       })
       .catch((error) => {
@@ -298,6 +309,7 @@ export const ParticipantList = () => {
     ACCEPTED: { label: 'Accepted' },
     EXPIRED: { label: 'Expired' },
     PENDING: { label: 'Pending' },
+    QUEUED: { label: 'Queued', color: 'info.main' },
     REVOKED: { label: 'Revoked' },
     FAILED_TO_SEND: { label: 'Failed to send', color: 'error.main' },
   }
