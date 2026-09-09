@@ -1,30 +1,10 @@
-import { Role } from '@prisma/client'
+import { Email, FirstName, LastName, RoleT } from '../../commonTypes'
 
-/**
- * @example {
- *  "firstName": "John",
- *  "lastName": "Doe",
- *  "email": "john.doe@email.com",
- *  "role": "Participant"
- * }
- */
 export interface CreateUserRequest {
-  /**
-   * @minLength 1
-   */
-  firstName: string
-  /**
-   * @minLength 1
-   */
-  lastName: string
-  /**
-   * @pattern ^(.+)@(.+)$ please provide valid email
-   */
-  email: string
-  /**
-   * @minLength 8
-   */
-  role: Role
+  firstName: FirstName
+  lastName: LastName
+  email: Email
+  role: RoleT
 }
 
 export interface CreateUserResponse {

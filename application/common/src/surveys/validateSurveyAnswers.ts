@@ -13,9 +13,11 @@ export function validateAnswers(surveyStep: SurveyStep, answers: SurveyStepAnswe
   }
 
   for (const element of surveyStep.elements) {
+    const answer = answers[counter]
+
     switch (element.type) {
       case 'question-checkbox':
-        if (!['boolean', 'undefined'].includes(typeof answers[counter])) {
+        if (typeof answer !== 'boolean' && answer !== null) {
           return false
         } else {
           counter += 1
@@ -23,11 +25,12 @@ export function validateAnswers(surveyStep: SurveyStep, answers: SurveyStepAnswe
         break
 
       case 'question-choices':
-        if (!element.data.choices.includes(answers[counter])) {
-          return false
-        } else {
-          counter += 1
+        if (answer !== null) {
+          if (typeof answer !== 'string' || !element.data.choices.includes(answer)) {
+            return false
+          }
         }
+        counter += 1
         break
 
       default:

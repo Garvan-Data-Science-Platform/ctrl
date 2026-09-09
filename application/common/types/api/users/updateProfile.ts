@@ -1,27 +1,45 @@
-import { RegisterParticipantRequest } from '../auth'
+import {
+  AddressLine,
+  DoB,
+  Email,
+  ExternalId,
+  FirstName,
+  LastName,
+  MiddleName,
+  Mobile,
+  Password,
+  Postcode,
+  Suburb,
+} from '../../commonTypes'
+import type {
+  AlternativeContact,
+  ContactMethod,
+  StateTerritory,
+  ParticipantType,
+  OnBehalf,
+} from '../users/ParticipantProfile'
 
-/**
- * @example {
- *  "firstName": "John",
- *  "middleName": "James",
- *  "lastName": "Doe",
- *  "email": "john.doe@email.com",
- *  "password": "Supersecret123",
- *  "dob": "2000-05-21",
- *  "mobile": "0412341234",
- *  "addressLine": "123 Sydney Street",
- *  "suburb": "Sydney",
- *  "postcode": "2000",
- *  "state": "NSW",
- *  "participantType": "STANDARD",
- *  "preferredContact": "MOBILE",
- *  "nextOfKin": {
- *    "firstName": "Jeremy",
- *    "middleName": "Jimmy",
- *    "lastName": "Doe",
- *    "mobile": "0412341432",
- *    "email": "jeremydoe@email.com"
- *  }
- * }
- */
-export type UpdateProfileRequest = Partial<RegisterParticipantRequest>
+export interface UpdateProfileRequest {
+  firstName?: FirstName
+  middleName?: MiddleName
+  lastName?: LastName
+  email?: Email
+  mobile?: Mobile
+  preferredContact?: ContactMethod
+  addressLine?: AddressLine
+  suburb?: Suburb
+  postcode?: Postcode
+  state?: StateTerritory
+  password?: Password
+  dob?: DoB
+  participantType?: ParticipantType
+  nextOfKin?: AlternativeContact
+  /**
+   * @maxItems 15
+   */
+  dependents?: OnBehalf[]
+  /**
+   * @maxLength 255
+   */
+  externalId?: ExternalId
+}

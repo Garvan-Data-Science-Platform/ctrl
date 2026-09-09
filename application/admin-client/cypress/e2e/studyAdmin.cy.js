@@ -67,8 +67,7 @@ describe('Study Admins', () => {
     const newStudy = 'STUDY X'
     cy.visit('/studies')
     cy.get('[data-cy="new-study-button"]').click()
-    cy.get('[data-cy="study-create"]').click()
-    cy.get('[data-cy="study-name"] input').should('be.focused').type(newStudy)
+    cy.get('[data-cy="study-name"] input').type(newStudy)
     cy.get('[data-cy="study-create"]').click()
     cy.get('[data-cy="study-create"]').should('not.exist')
     cy.contains(newStudy).should('exist')

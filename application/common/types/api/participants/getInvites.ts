@@ -1,10 +1,11 @@
+import { Email, StudyName, StudyDescription } from '../../commonTypes'
 import { InviteStatus } from './invite'
 // import { FamilyMember } from '../users/getParticipantProfile'
 
 export interface GetInvitesResponse {
   data: {
-    id: string // String because this is a uuid
-    email: string
+    id: string // String because this is a uuid TODO: add UUID type?
+    email: Email
     studyId: number
     createdAt: string
     expiresAt: string
@@ -16,14 +17,14 @@ export interface GetInvitesResponse {
 export interface GetUserInvitesResponse {
   data: {
     invites: {
-      id: string // String because this is a uuid
-      email: string
+      id: string // String because this is a uuid TODO: add UUID type?
+      email: Email
       studyId: number
       createdAt: string
       expiresAt: string
       sentAt?: string
-      studyName: string // may be other fields here in future
-      description?: string
+      studyName: StudyName
+      description?: StudyDescription
     }[]
     //    dependents: FamilyMember[]
   }

@@ -1,6 +1,7 @@
 /// <reference types="cypress" />
 
 const { TestUsers } = require('../../../common/testing/constants')
+const { VALIDATION_MESSAGES } = require('../../../common/src/validation')
 
 beforeEach(() => {
   cy.task('reset')
@@ -44,7 +45,7 @@ describe('Profile Edit', () => {
     cy.get('[data-cy="update-mobile"] input').clear()
     cy.get('[data-cy="update-mobile"]').type('0487654a')
     cy.get('[data-cy="update-button"]').click()
-    cy.contains('Invalid mobile').should('exist')
+    cy.contains(VALIDATION_MESSAGES.MOBILE_INVALID).should('exist')
   })
 
   it('Shows family members correctly', () => {
@@ -67,4 +68,107 @@ describe('Profile Edit', () => {
       expect($el.val()).to.not.include(TestUsers.PARTICIPANT_UNANSWERED.email)
     })
   })
+
+  it('Invalid xss firstName input gets correct error message', () => {
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
+    cy.visit('/profile/update')
+
+    cy.get('[data-cy="update-first"] input').clear()
+    cy.get('[data-cy="update-first"]')
+      .type("\{\{7*7}}<script>alert('xss-firstname')</script>$#", {
+        parseSpecialCharSequences: false,
+      })
+      .type('{enter}')
+
+    cy.get('[data-cy="update-button"]').click()
+    cy.contains(VALIDATION_MESSAGES.NAME_INVALID).should('exist')
+  })
+
+  it('Invalid xss lastName input gets correct error message', () => {
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
+    cy.visit('/profile/update')
+
+    cy.get('[data-cy="update-last"] input').clear()
+    cy.get('[data-cy="update-last"]').type("\{\{7*7}}<script>alert('xss-lastname')</script>$#", {
+      parseSpecialCharSequences: false,
+    })
+
+    cy.get('[data-cy="update-button"]').click()
+    cy.contains(VALIDATION_MESSAGES.NAME_INVALID).should('exist')
+  })
+
+  it('Invalid xss address input gets correct error message', () => {
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
+    cy.visit('/profile/update')
+
+    cy.get('[data-cy="update-address"] input').clear()
+    cy.get('[data-cy="update-address"]').type("\{\{7*7}}<script>alert('xss-address')</script>$#", {
+      parseSpecialCharSequences: false,
+    })
+
+    cy.get('[data-cy="update-button"]').click()
+    cy.contains(VALIDATION_MESSAGES.ADDRESS_INVALID).should('exist')
+  })
+
+  it('Invalid xss postcode input gets correct error message', () => {
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
+    cy.visit('/profile/update')
+
+    cy.get('[data-cy="update-postcode"] input').clear()
+    cy.get('[data-cy="update-postcode"]').type(
+      "\{\{7*7}}<script>alert('xss-postcode')</script>$#",
+      {
+        parseSpecialCharSequences: false,
+      },
+    )
+
+    cy.get('[data-cy="update-button"]').click()
+    cy.contains(VALIDATION_MESSAGES.POSTCODE_INVALID).should('exist')
+  })
+
+  it('Invalid xss mobile input gets correct error message', () => {
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
+    cy.visit('/profile/update')
+
+    cy.get('[data-cy="update-mobile"] input').clear()
+    cy.get('[data-cy="update-mobile"]').type("\{\{7*7}}<script>alert('xss-mobile')</script>$#", {
+      parseSpecialCharSequences: false,
+    })
+
+    cy.get('[data-cy="update-button"]').click()
+    cy.contains(VALIDATION_MESSAGES.MOBILE_INVALID).should('exist')
+  })
+
+  it('Invalid xss next-of-kin firstname input gets correct error message', () => {
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
+    cy.visit('/profile/update')
+
+    cy.get('[data-cy="update-nok-first"] input').clear()
+    cy.get('[data-cy="update-nok-first"]').type(
+      "\{\{7*7}}<script>alert('xss-nok-first')</script>$#",
+      {
+        parseSpecialCharSequences: false,
+      },
+    )
+
+    cy.get('[data-cy="update-button"]').click()
+    cy.contains(VALIDATION_MESSAGES.NAME_INVALID).should('exist')
+  })
+
+  it('Invalid xss next-of-kin lastname input gets correct error message', () => {
+    cy.login(TestUsers.PARTICIPANT_UNANSWERED.email)
+    cy.visit('/profile/update')
+
+    cy.get('[data-cy="update-nok-last"] input').clear()
+    cy.get('[data-cy="update-nok-last"]').type(
+      "\{\{7*7}}<script>alert('xss-nok-last')</script>$#",
+      {
+        parseSpecialCharSequences: false,
+      },
+    )
+
+    cy.get('[data-cy="update-button"]').click()
+    cy.contains(VALIDATION_MESSAGES.NAME_INVALID).should('exist')
+  })
+  // nok email validation is handled by electron/browser
 })

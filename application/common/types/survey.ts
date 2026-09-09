@@ -1,39 +1,47 @@
+import {
+  SurveyQuestionText,
+  SurveyQuestionTooltip,
+  SurveyStepDescription,
+  SurveyStepTitle,
+  SurveySubHeadingText,
+  OptionalUrl,
+} from './commonTypes'
+
 export interface DuoCode {
-  code: string
-  relatedAnswer: string | boolean
+  code: string // added via dropdown not form
+  relatedAnswer: SurveyQuestionText | boolean
 }
 
 export interface SurveyQuestionCheckbox {
-  text: string
-  tooltip?: string
-  required: boolean
+  text: SurveyQuestionText
+  tooltip?: SurveyQuestionTooltip
+  required?: boolean
   duoCodes?: DuoCode[]
+  value?: boolean | null
 }
 
 export interface SurveyQuestionChoices {
-  text: string
-  tooltip?: string
-  required: boolean
-  choices: string[]
+  text: SurveyQuestionText
+  tooltip?: SurveyQuestionTooltip
+  required?: boolean
+  choices: SurveyQuestionText[]
   duoCodes?: DuoCode[]
+  value?: SurveyQuestionText | null
 }
 
 export interface SurveySubHeading {
-  text: string
+  text: SurveySubHeadingText
 }
 
 export interface SurveyVideo {
-  link: string
-}
-
-export interface RefusalText {
-  title: string
-  text: string
-  button_text: string
+  link?: OptionalUrl
 }
 
 export type SurveyElementType = 'question-choices' | 'question-checkbox' | 'subheading' | 'video'
 
+/**
+ * @discriminator type
+ */
 export type SurveyElement =
   | {
       type: 'question-choices'
@@ -42,14 +50,12 @@ export type SurveyElement =
   | { type: 'question-checkbox'; data: SurveyQuestionCheckbox }
   | { type: 'video'; data: SurveyVideo }
   | { type: 'subheading'; data: SurveySubHeading }
-  | { type: SurveyElementType; data: any }
 
 export interface SurveyStep {
-  title: string
-  text: string
-  last_updated?: string
+  title: SurveyStepTitle
+  text: SurveyStepDescription
+  last_updated?: string // Added by frontend but not by form field
   elements: SurveyElement[]
-  //refusal_text: RefusalText
 }
 
 export type SurveyVersionStatus = 'PUBLISHED' | 'DRAFT'
@@ -64,7 +70,7 @@ export interface SurveyVersion {
 
 export type SurveyStepStatus = 'completed' | 'review_required' | 'viewed'
 
-export type SurveyStepAnswerArray = (string | boolean | null)[]
+export type SurveyStepAnswerArray = (SurveyQuestionText | boolean | null)[]
 
 export interface UserSurveyStepState {
   status: SurveyStepStatus

@@ -72,8 +72,8 @@ describe('Studies tests', () => {
       state: StateTerritory.ACT,
       suburb: 'ABCKDF',
       dependents: [
-        { firstName: 'Child1', lastName: 'K', dob: '2020-01-01', permanent: true },
-        { firstName: 'Child2', lastName: 'K', dob: '2020-01-02', permanent: false },
+        { firstName: 'ChildA', lastName: 'K', dob: '2020-01-01', permanent: true },
+        { firstName: 'ChildB', lastName: 'K', dob: '2020-01-02', permanent: false },
       ],
     }
     const reqBody2 = { ...reqBody, email: parent2Email, firstName: 'X' }
@@ -87,7 +87,7 @@ describe('Studies tests', () => {
       .send(reqBody2)
     expect(regRes.statusCode).toBe(201)
 
-    const deps1 = await prisma.participantProfile.findMany({ where: { firstName: 'Child1' } })
+    const deps1 = await prisma.participantProfile.findMany({ where: { firstName: 'ChildA' } })
     expect(deps1).toHaveLength(1)
 
     // Answer a question on survey 1
@@ -106,7 +106,7 @@ describe('Studies tests', () => {
     expect(
       (
         await prisma.surveyVersionAnswers.findFirstOrThrow({
-          where: { profile: { firstName: 'Child1' } },
+          where: { profile: { firstName: 'ChildA' } },
         })
       ).answers[1].answers,
     ).toEqual([true, 'Choice 1'])
@@ -114,7 +114,7 @@ describe('Studies tests', () => {
     expect(
       (
         await prisma.surveyVersionAnswers.findFirstOrThrow({
-          where: { profile: { firstName: 'Child2' } },
+          where: { profile: { firstName: 'ChildB' } },
         })
       ).answers[1].answers,
     ).toEqual([true, 'Choice 1'])
@@ -124,8 +124,8 @@ describe('Studies tests', () => {
         OR: [
           { firstName: 'J' },
           { firstName: 'X' },
-          { firstName: 'Child1' },
-          { firstName: 'Child2' },
+          { firstName: 'ChildA' },
+          { firstName: 'ChildB' },
         ],
         studies: {
           some: {
@@ -143,8 +143,8 @@ describe('Studies tests', () => {
         OR: [
           { firstName: 'J' },
           { firstName: 'X' },
-          { firstName: 'Child1' },
-          { firstName: 'Child2' },
+          { firstName: 'ChildA' },
+          { firstName: 'ChildB' },
         ],
         studies: {
           some: {
@@ -218,8 +218,8 @@ describe('Studies tests', () => {
         OR: [
           { firstName: 'J' },
           { firstName: 'X' },
-          { firstName: 'Child1' },
-          { firstName: 'Child2' },
+          { firstName: 'ChildA' },
+          { firstName: 'ChildB' },
         ],
         studies: {
           some: {
@@ -247,7 +247,7 @@ describe('Studies tests', () => {
     // get dependent answers from study1
     const dep1AnswersBefore = (
       await prisma.surveyVersionAnswers.findFirstOrThrow({
-        where: { profile: { firstName: 'Child1' } },
+        where: { profile: { firstName: 'ChildA' } },
       })
     ).answers[1].last_updated
 
@@ -282,7 +282,7 @@ describe('Studies tests', () => {
     // get dependent answers. get parent 1 answsers from study1 again
     const dep1AnswersAfter = (
       await prisma.surveyVersionAnswers.findFirstOrThrow({
-        where: { profile: { firstName: 'Child1' } },
+        where: { profile: { firstName: 'ChildA' } },
       })
     ).answers[1].last_updated
     // ensure they are the same
@@ -295,7 +295,7 @@ describe('Studies tests', () => {
   it('Second parent is added to study and answers differently to Parent1. Dependent answers (in study 1) do not get modified', async () => {
     const dep1AnswersBefore = (
       await prisma.surveyVersionAnswers.findFirstOrThrow({
-        where: { profile: { firstName: 'Child1' } },
+        where: { profile: { firstName: 'ChildA' } },
       })
     ).answers[1].last_updated
 
@@ -346,7 +346,7 @@ describe('Studies tests', () => {
     // get dependent answers. get parent 1 answsers from study1 again
     const dep1AnswersAfter = (
       await prisma.surveyVersionAnswers.findFirstOrThrow({
-        where: { profile: { firstName: 'Child1' } },
+        where: { profile: { firstName: 'ChildA' } },
       })
     ).answers[1].last_updated
     // ensure they are the same

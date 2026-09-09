@@ -57,8 +57,9 @@ export const AllResponsesView = () => {
 
   const questions = data?.data.data.surveyData
     .flatMap((val) => val.elements)
-    .filter((val) => val.type.includes('question'))
-    .map((val) => val.data.text)
+    .flatMap((val) =>
+      val.type === 'question-checkbox' || val.type === 'question-choices' ? [val.data.text] : [],
+    )
 
   const formatAnswer = (answer: string | boolean | null): string => {
     if (answer === true) {

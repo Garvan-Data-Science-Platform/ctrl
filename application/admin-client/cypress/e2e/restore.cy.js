@@ -74,16 +74,14 @@ describe('Delete and restore', () => {
     const study2 = 'New Study 2'
     cy.visit('/studies')
     cy.get('[data-cy="new-study-button"]').click()
-    cy.get('[data-cy="study-create"]').click()
-    cy.get('[data-cy="study-name"] input').should('be.focused').type(study1)
+    cy.get('[data-cy="study-name"] input').type(study1)
     cy.get('[data-cy="study-create"]').click()
     cy.get('[data-cy="study-create"]').should('not.exist')
     cy.contains(study1).should('exist')
 
     cy.visit('/studies')
     cy.get('[data-cy="new-study-button"]').click()
-    cy.get('[data-cy="study-create"]').click()
-    cy.get('[data-cy="study-name"] input').should('be.focused').type(study2)
+    cy.get('[data-cy="study-name"] input').type(study2)
     cy.get('[data-cy="study-create"]').click()
     cy.get('[data-cy="study-create"]').should('not.exist')
     cy.contains(study2).should('exist')

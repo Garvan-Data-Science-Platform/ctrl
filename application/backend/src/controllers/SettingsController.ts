@@ -31,12 +31,12 @@ import { NotFoundErrorResponse } from 'common/types/api/errors'
 import { NotFoundError } from '../middlewares/ErrorHandler'
 import { auditLog } from '../middlewares/AuditLog'
 import { processLogoImage } from 'common/src/imageHelpers'
-import { urlRegex } from 'common/src/regex'
+import { REGEX } from 'common/types/commonTypes'
 import { sanitizeUrl } from '@braintree/sanitize-url'
 
 function sanitiseAndValidateUrl(link: string) {
   const validatedUrl = sanitizeUrl(link)
-  if (urlRegex.test(validatedUrl)) {
+  if (REGEX.URL.test(validatedUrl)) {
     return validatedUrl
   } else {
     throw new Error('urlRegex failed')

@@ -1,17 +1,10 @@
+import { InviteEmailText, InviteEmailSubject } from '../../commonTypes'
 import { Recipient } from '../../invite'
 
-/**
- *
- * @example {
- *  "emails": ["john.doe@email.com", "jane@email.com"],
- *  "subjectText": "Invitation to Study",
- *  "explanatoryText": "You have been invited to participate in this Study. Please click this link to provide consent."
- * }
- */
 export interface InviteParticipantsRequest {
   recipients: Recipient[]
-  subjectText: string
-  explanatoryText: string
+  subjectText: InviteEmailSubject
+  explanatoryText: InviteEmailText
 }
 
 export interface InviteParticipantsResponse {

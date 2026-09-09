@@ -13,7 +13,14 @@ import { useForm } from '@refinedev/react-hook-form'
 import { Controller } from 'react-hook-form'
 import { ContactMethod, StateTerritory } from '@common/types/api/users/ParticipantProfile'
 import { GetParticipantResponse, UpdateParticipantRequest } from '@common/types/api/participants'
-import { emailRegex } from '@common/src/regex'
+import {
+  addressRules,
+  emailRules,
+  externalIdRules,
+  mobileRules,
+  nameRules,
+  postcodeRules,
+} from '@common/src/validation'
 
 export const ParticipantEdit = () => {
   const { id } = useParsed()
@@ -52,9 +59,7 @@ export const ParticipantEdit = () => {
     >
       <Box component="form" sx={{ display: 'flex', flexDirection: 'column' }} autoComplete="off">
         <TextField
-          {...register('profile.firstName', {
-            required: 'This field is required',
-          })}
+          {...register('profile.firstName', nameRules())}
           error={!!errors.profile?.firstName}
           helperText={errors.profile?.firstName?.message}
           margin="normal"
@@ -64,9 +69,7 @@ export const ParticipantEdit = () => {
           label={'First Name'}
         />
         <TextField
-          {...register('profile.lastName', {
-            required: 'This field is required',
-          })}
+          {...register('profile.lastName', nameRules())}
           error={!!errors.profile?.lastName}
           helperText={errors.profile?.lastName?.message}
           margin="normal"
@@ -76,13 +79,7 @@ export const ParticipantEdit = () => {
           label={'Last Name'}
         />
         <TextField
-          {...register('profile.email', {
-            required: 'This field is required',
-            pattern: {
-              value: emailRegex,
-              message: 'Invalid email',
-            },
-          })}
+          {...register('profile.email', emailRules())}
           error={!!errors.profile?.email}
           helperText={errors.profile?.email?.message}
           margin="normal"
@@ -92,7 +89,7 @@ export const ParticipantEdit = () => {
           label={'Email'}
         />
         <TextField
-          {...register('externalId')}
+          {...register('externalId', externalIdRules())}
           error={!!errors.externalId}
           helperText={errors.externalId?.message}
           margin="normal"
@@ -127,9 +124,7 @@ export const ParticipantEdit = () => {
           )}
         />
         <TextField
-          {...register('profile.addressLine', {
-            required: 'This field is required',
-          })}
+          {...register('profile.addressLine', addressRules())}
           error={!!errors.profile?.addressLine}
           helperText={errors.profile?.addressLine?.message}
           margin="normal"
@@ -139,9 +134,7 @@ export const ParticipantEdit = () => {
           label={'Address Line'}
         />
         <TextField
-          {...register('profile.suburb', {
-            required: 'This field is required',
-          })}
+          {...register('profile.suburb', addressRules())}
           error={!!errors.profile?.suburb}
           helperText={errors.profile?.suburb?.message}
           margin="normal"
@@ -176,13 +169,7 @@ export const ParticipantEdit = () => {
           )}
         />
         <TextField
-          {...register('profile.postcode', {
-            required: 'This field is required',
-            pattern: {
-              value: /^\d{4}$/,
-              message: 'Invalid postcode',
-            },
-          })}
+          {...register('profile.postcode', postcodeRules())}
           error={!!errors.profile?.postcode}
           helperText={errors.profile?.postcode?.message}
           margin="normal"
@@ -192,13 +179,7 @@ export const ParticipantEdit = () => {
           label={'Postcode'}
         />
         <TextField
-          {...register('profile.mobile', {
-            required: 'This field is required',
-            pattern: {
-              value: /04\d{8}$/,
-              message: 'Invalid mobile number',
-            },
-          })}
+          {...register('profile.mobile', mobileRules())}
           error={!!errors.profile?.mobile}
           helperText={errors.profile?.mobile?.message}
           margin="normal"
@@ -236,9 +217,7 @@ export const ParticipantEdit = () => {
           Alternative Contact
         </Typography>
         <TextField
-          {...register('profile.nextOfKin.firstName', {
-            required: 'This field is required',
-          })}
+          {...register('profile.nextOfKin.firstName', nameRules())}
           error={!!errors.profile?.nextOfKin?.firstName}
           helperText={errors.profile?.nextOfKin?.firstName?.message}
           margin="normal"
@@ -248,9 +227,7 @@ export const ParticipantEdit = () => {
           label={'First Name'}
         />
         <TextField
-          {...register('profile.nextOfKin.lastName', {
-            required: 'This field is required',
-          })}
+          {...register('profile.nextOfKin.lastName', nameRules())}
           error={!!errors.profile?.nextOfKin?.lastName}
           helperText={errors.profile?.nextOfKin?.lastName?.message}
           margin="normal"
@@ -260,13 +237,7 @@ export const ParticipantEdit = () => {
           label={'Last Name'}
         />
         <TextField
-          {...register('profile.nextOfKin.email', {
-            required: 'This field is required',
-            pattern: {
-              value: emailRegex,
-              message: 'Invalid email',
-            },
-          })}
+          {...register('profile.nextOfKin.email', emailRules())}
           error={!!errors.profile?.nextOfKin?.email}
           helperText={errors.profile?.nextOfKin?.email?.message}
           margin="normal"
@@ -276,12 +247,7 @@ export const ParticipantEdit = () => {
           label={'Email'}
         />
         <TextField
-          {...register('profile.nextOfKin.mobile', {
-            pattern: {
-              value: /04\d{8}$/,
-              message: 'Invalid mobile number',
-            },
-          })}
+          {...register('profile.nextOfKin.mobile', { ...mobileRules(), required: false })}
           error={!!errors.profile?.nextOfKin?.mobile}
           helperText={errors.profile?.nextOfKin?.mobile?.message}
           margin="normal"

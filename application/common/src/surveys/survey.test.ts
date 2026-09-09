@@ -1,4 +1,4 @@
-import { SurveyStep } from 'types/survey'
+import { SurveyQuestionChoices, SurveyStep } from 'types/survey'
 import { extractSurveyStepAnswers } from './extractSurveyStepAnswers'
 import { populateSurveyStepAnswers } from './populateSurveyStepAnswers'
 import { validateAnswers } from './validateSurveyAnswers'
@@ -21,8 +21,8 @@ describe('Survey utility tests', () => {
       const answers1 = populateSurveyStepAnswers(sampleSurveySteps[0], [])
       const answers2 = populateSurveyStepAnswers(sampleSurveySteps[1], [false, 'Choice 1'])
       expect(answers1).toStrictEqual(sampleSurveySteps[0])
-      expect(answers2.elements[0].data.value).toBe(false)
-      expect(answers2.elements[2].data.value).toBe('Choice 1')
+      expect((answers2.elements[0].data as SurveyQuestionChoices).value).toBe(false)
+      expect((answers2.elements[2].data as SurveyQuestionChoices).value).toBe('Choice 1')
     })
   })
 

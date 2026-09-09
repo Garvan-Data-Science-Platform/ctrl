@@ -69,7 +69,11 @@ describe('SurveysController', () => {
       const body: GetUserSurveyStepResponse = response.body
       expect(body.data.current_step).toBe(1)
       expect(body.data.total_steps).toBe(2)
-      expect(body.data.elements[0].data.value).toBe(false)
+      const element = body.data.elements[0]
+      expect(element.type).toBe('question-checkbox')
+      if (element.type === 'question-checkbox') {
+        expect(element.data.value).toBe(false)
+      }
       expect(body.data.elements[3].type).toBe('video')
     })
     it('should return null when the user has not answered yet', async () => {
@@ -78,7 +82,11 @@ describe('SurveysController', () => {
         .set({ Authorization: `Bearer ${tokenNoAnswers}` })
       expect(response.status).toBe(200)
       const body: GetUserSurveyStepResponse = response.body
-      expect(body.data.elements[0].data.value).toBe(null)
+      const element = body.data.elements[0]
+      expect(element.type).toBe('question-checkbox')
+      if (element.type === 'question-checkbox') {
+        expect(element.data.value).toBe(null)
+      }
     })
 
     it('should fail if step does not exist', async () => {
@@ -210,7 +218,7 @@ describe('SurveysController', () => {
             title: 'Title',
             elements: [
               { type: 'subheading', data: { text: 'Subheading text' } },
-              { type: 'question-checkbox', data: { text: 'Question 1' } },
+              { type: 'question-checkbox', data: { text: 'Question 1', required: false } },
             ],
           },
         ],
@@ -228,7 +236,9 @@ describe('SurveysController', () => {
           },
         },
       })
-      expect(survey?.data[0].elements[1].data.text).toBe('Question 1')
+      if (survey?.data[0].elements[1].type === 'question-checkbox') {
+        expect(survey?.data[0].elements[1].data.text).toBe('Question 1')
+      }
 
       const aLog = await prisma.auditLog.findFirstOrThrow({
         where: { userId: TestUsers.ORG_ADMIN.id },
@@ -245,6 +255,73 @@ describe('SurveysController', () => {
         .set({ Authorization: `Bearer ${tokenAdmin}` })
         .send({ data: [] })
       expect(response.status).toBe(500)
+    })
+
+    it('should reject invalid xss survey text', async () => {
+      const reqBody: UpdateSurveyRequest = {
+        data: [
+          {
+            text: "Hello<script>alert('xss')</script>",
+            title: "Title<script>alert('xss')</script>",
+            elements: [
+              {
+                type: 'question-checkbox',
+                data: {
+                  text: "Question 1<script>alert('xss')</script>",
+                  tooltip: "Tooltip 1<script>alert('xss')</script>",
+                  required: true,
+                  // DUO codes are selected via a menu
+                },
+              },
+              {
+                type: 'video',
+                data: { link: "https://www.youtube<script>alert('xss')</script>.com/" },
+              },
+              {
+                type: 'question-choices',
+                data: {
+                  text: "Question 2<script>alert('xss')</script>",
+                  required: true,
+                  tooltip: "Tooltip 2<script>alert('xss')</script>",
+                  choices: ["Yes<script>alert('xss')</script>", 'No', 'Not sure'],
+                },
+              },
+              {
+                type: 'subheading',
+                data: { text: "Subheading text<script>alert('xss')</script>" },
+              },
+            ],
+          },
+        ],
+      }
+      const response = await request(app)
+        .patch(`/studies/${TestStudies.TEST_STUDY.id}/surveys/2`)
+        .set({ Authorization: `Bearer ${tokenAdmin}` })
+        .send(reqBody)
+      expect(response.status).toBe(422)
+
+      const body = response.body
+      expect(body.message).toBe('Validation Failed')
+      expect(body.details).toEqual({
+        'data.$0.title': {
+          message: 'Invalid value provided',
+        },
+        'data.$0.text': {
+          message: 'Invalid value provided',
+        },
+        'elements.$0': {
+          message: 'Invalid value provided',
+        },
+        'elements.$1': {
+          message: 'Invalid value provided',
+        },
+        'elements.$2': {
+          message: 'Invalid value provided',
+        },
+        'elements.$3': {
+          message: 'Invalid value provided',
+        },
+      })
     })
   })
 

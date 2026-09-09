@@ -6,7 +6,7 @@
       {
         "type": "video",
         "data": {
-          "link": "w"
+          "link": "https://video.com"
         }
       }
     ]
@@ -37,7 +37,7 @@
       },
       {
         "type": "video",
-        "data": { "link": "w" }
+        "data": { "link": "https://information-video.com" }
       }
     ]
   }

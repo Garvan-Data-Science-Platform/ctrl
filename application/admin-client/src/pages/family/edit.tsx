@@ -35,6 +35,7 @@ import { GetFamilyResponse } from '@common/types/api/families'
 import { axiosInstance } from '../../providers/dataProvider'
 import { useCurrentStudyId } from '../../studyStore'
 import { useQueryClient } from '@tanstack/react-query'
+import { nameRules } from '@common/src/validation'
 
 export const FamilyEdit = () => {
   const studyId = useCurrentStudyId()
@@ -68,7 +69,12 @@ export const FamilyEdit = () => {
   }, [data, id, nav, queryClient])
 
   //Dependents add form
-  const { register, handleSubmit, reset } = useForm<OnBehalf>()
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<OnBehalf>()
 
   const resetForm = () => {
     reset()
@@ -333,18 +339,18 @@ export const FamilyEdit = () => {
                       label="First Name"
                       data-cy="dep-first"
                       required
-                      {...register(`firstName`, {
-                        required: 'This field is required',
-                      })}
+                      error={!!errors.firstName}
+                      helperText={errors.firstName?.message as string}
+                      {...register(`firstName`, nameRules())}
                     />
                     <TextField
                       sx={{ m: 1, flexGrow: 1 }}
                       label="Family Name"
                       required
+                      error={!!errors.lastName}
+                      helperText={errors.lastName?.message as string}
                       data-cy="dep-surname"
-                      {...register(`lastName`, {
-                        required: 'This field is required',
-                      })}
+                      {...register(`lastName`, nameRules())}
                     />
                     <TextField
                       type="date"

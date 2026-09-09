@@ -25,7 +25,13 @@ import { SensitiveTextField } from '../../components/SensitiveTextField'
 import { useSearchParams } from 'react-router'
 import { LogoUploader } from '../../components/LogoUploader'
 import { RESOURCES } from '../../constants'
-import { emailRegex } from '@common/src/regex'
+import {
+  emailRules,
+  urlRules,
+  studyNameRules,
+  studyDescriptionRules,
+  redcapTokenRules,
+} from '@common/src/validation'
 
 const StudyCard = ({
   studyIdx,
@@ -109,20 +115,43 @@ const StudyCard = ({
     setDeleteDialogOpen(false)
   }
 
+  const urlRule = urlRules(false)
+  const isUrlInvalid = Boolean(
+    redcapURL && urlRule.pattern && !urlRule.pattern.value.test(redcapURL),
+  )
+
+  const emailRule = emailRules(false)
+  const isEmailInvalid = Boolean(
+    contactUsEmail && emailRule.pattern && !emailRule.pattern.value.test(contactUsEmail),
+  )
+
+  const studyNameRule = studyNameRules(false)
+  const isStudyNameInvalid = Boolean(
+    newName && studyNameRule.pattern && !studyNameRule.pattern.value.test(newName),
+  )
+
+  const studyDescriptionRule = studyDescriptionRules(false)
+  const isStudyDescriptionInvalid = Boolean(
+    newDesc && studyDescriptionRule.pattern && !studyDescriptionRule.pattern.value.test(newDesc),
+  )
+
+  const redcapTokenRule = redcapTokenRules(false)
+  const isRedcapTokenInvalid = Boolean(
+    redcapToken && redcapTokenRule.pattern && !redcapTokenRule.pattern.value.test(redcapToken),
+  )
+
   const handleSettingsApply = () => {
-    const urlRegex =
-      /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/
-    if (redcapURL && !urlRegex.test(redcapURL)) {
+    if (isUrlInvalid) {
       open?.({
         type: 'error',
-        message: "Invalid Redcap API URL format. Must start with 'http(s)://'",
+        message: urlRule.pattern.message as string,
       })
       return
     }
-    if (contactUsEmail && !emailRegex.test(contactUsEmail)) {
+    if (isEmailInvalid) {
       open?.({
         type: 'error',
-        message: 'Invalid Email Address.',
+        message: emailRule.pattern.message as string,
       })
       return
     }
@@ -193,8 +222,12 @@ const StudyCard = ({
                 setNewName(e.target.value)
               }}
               data-cy="edit-name-field"
+              error={isStudyNameInvalid}
+              helperText={isStudyNameInvalid ? (studyNameRule.pattern?.message as string) : ''}
             ></TextField>
             <Button
+              disabled={isStudyNameInvalid}
+              data-cy="edit-name-save"
               onClick={() => {
                 handleUpdate({ name: newName })
               }}
@@ -228,8 +261,14 @@ const StudyCard = ({
                 setNewDesc(e.target.value)
               }}
               data-cy="edit-description-field"
+              error={isStudyDescriptionInvalid}
+              helperText={
+                isStudyDescriptionInvalid ? (studyDescriptionRule.pattern?.message as string) : ''
+              }
             ></TextField>
             <Button
+              disabled={isStudyDescriptionInvalid}
+              data-cy="edit-description-save"
               onClick={() => {
                 handleUpdate({ description: newDesc || '' })
               }}
@@ -283,6 +322,8 @@ const StudyCard = ({
               }
               name="contactUsEmail"
               data-cy="contactUsEmail"
+              error={isEmailInvalid}
+              helperText={isEmailInvalid ? (emailRule.pattern?.message as string) : ''}
               value={contactUsEmail}
               onChange={(e) => {
                 setContactUsEmail(e.target.value)
@@ -298,6 +339,8 @@ const StudyCard = ({
                 label={'Redcap API URL'}
                 name="redcapURL"
                 data-cy="redcapURL"
+                error={isUrlInvalid}
+                helperText={isUrlInvalid ? (urlRule.pattern?.message as string) : ''}
                 value={redcapURL}
                 onChange={(e) => {
                   setRedcapURL(e.target.value)
@@ -313,10 +356,13 @@ const StudyCard = ({
                 data-cy="redcapToken"
                 value={redcapToken}
                 placeholder={'Enter new token here'}
+                error={isRedcapTokenInvalid}
                 helperText={
-                  study.hasRedcapToken
-                    ? 'A token has been saved. Enter a new value to overwrite it.'
-                    : 'No token has been saved.'
+                  isRedcapTokenInvalid
+                    ? (redcapTokenRule.pattern?.message as string)
+                    : study.hasRedcapToken
+                      ? 'A token has been saved. Enter a new value to overwrite it.'
+                      : 'No token has been saved.'
                 }
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setRedcapToken(e.target.value)
@@ -327,7 +373,13 @@ const StudyCard = ({
                 sx={{ mt: 1, alignSelf: 'flex-start' }}
                 variant="contained"
                 size="small"
-                disabled={!settingsChanged}
+                disabled={
+                  !settingsChanged ||
+                  isEmailInvalid ||
+                  isUrlInvalid ||
+                  isRedcapTokenInvalid ||
+                  (redcapToken.length > 0 && redcapToken.length !== 32)
+                }
                 onClick={handleSettingsApply}
                 data-cy="settings-apply"
               >
@@ -365,6 +417,10 @@ const StudiesPage = () => {
   const [newStudyDialogOpen, setNewStudyDialogOpen] = useState(false)
   const [newStudyName, setNewStudyName] = useState('')
 
+  const studyNameRule = studyNameRules(true)
+  const isNewStudyNameInvalid = Boolean(
+    newStudyName && studyNameRule.pattern && !studyNameRule.pattern.value.test(newStudyName),
+  )
   const queryClient = useQueryClient()
 
   const handleCreateNewStudy = (e: React.FormEvent) => {
@@ -401,9 +457,16 @@ const StudiesPage = () => {
               value={newStudyName}
               onChange={(e) => setNewStudyName(e.target.value)}
               data-cy="study-name"
+              error={isNewStudyNameInvalid}
+              helperText={isNewStudyNameInvalid ? (studyNameRule.pattern?.message as string) : ''}
             />
             <Stack direction="row" justifyContent="space-between">
-              <Button variant="contained" type="submit" data-cy="study-create">
+              <Button
+                variant="contained"
+                type="submit"
+                data-cy="study-create"
+                disabled={isNewStudyNameInvalid || !newStudyName}
+              >
                 Create
               </Button>
               <Button onClick={handleCloseNewStudyDialog}>Cancel</Button>

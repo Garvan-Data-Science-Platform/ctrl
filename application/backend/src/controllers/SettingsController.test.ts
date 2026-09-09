@@ -98,6 +98,38 @@ describe('SettingsController', () => {
 
       expect(response.status).toBe(422)
     })
+
+    it('should return 422 if validation fails on invalid user input', async () => {
+      const reqBody = {
+        primaryColour: "{{7*7}}<script>alert('xss-primary-colour')</script>",
+        secondaryColour: "{{7*7}}<script>alert('xss-secondary-colour')</script>",
+        tcLink: "https://host.{{7*7}}<script>alert('xss-tcLink')</script>.com",
+        newsLink: "https://host.{{7*7}}<script>alert('xss-newsLink')</script>.com",
+      }
+
+      const response = await request(app)
+        .patch('/settings')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .send(reqBody)
+      expect(response.status).toEqual(422)
+
+      const body = response.body
+      expect(body.message).toBe('Validation Failed')
+      expect(body.details).toEqual({
+        'bodyRequest.primaryColour': {
+          message: 'Invalid value provided',
+        },
+        'bodyRequest.secondaryColour': {
+          message: 'Invalid value provided',
+        },
+        'bodyRequest.tcLink': {
+          message: 'Invalid value provided',
+        },
+        'bodyRequest.newsLink': {
+          message: 'Invalid value provided',
+        },
+      })
+    })
   })
 
   describe('GET /settings/userportal', () => {

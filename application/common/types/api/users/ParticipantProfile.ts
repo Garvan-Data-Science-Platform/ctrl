@@ -1,3 +1,5 @@
+import { DoB, Email, FirstName, LastName, MiddleName, Mobile } from '../../commonTypes'
+
 export enum ContactMethod {
   EMAIL = 'EMAIL',
   MOBILE = 'MOBILE',
@@ -23,16 +25,16 @@ export enum ParticipantType {
 }
 
 export interface AlternativeContact {
-  firstName: string
-  middleName?: string
-  lastName: string
-  mobile?: string | null
-  email: string
+  firstName: FirstName
+  middleName?: MiddleName
+  lastName: LastName
+  mobile?: Mobile | null
+  email: Email
 }
 
 export interface OnBehalf {
-  firstName: string
-  lastName: string
-  dob: string
+  firstName: FirstName
+  lastName: LastName
+  dob: DoB
   permanent: boolean
 }

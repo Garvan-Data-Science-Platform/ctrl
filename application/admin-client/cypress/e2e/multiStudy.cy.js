@@ -16,8 +16,7 @@ describe('Multi-study features', () => {
   it('Can changes studies, all data is updated accordingly', () => {
     cy.visit('/studies')
     cy.get('[data-cy="new-study-button"]').click()
-    cy.get('[data-cy="study-create"]').click()
-    cy.get('[data-cy="study-name"] input').should('be.focused').type('TEST')
+    cy.get('[data-cy="study-name"] input').type('TEST')
     cy.get('[data-cy="study-create"]').click()
     cy.visit('/surveys')
     //List of surveys

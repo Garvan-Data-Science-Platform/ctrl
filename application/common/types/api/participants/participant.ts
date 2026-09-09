@@ -1,12 +1,13 @@
+import { Email, FirstName, LastName } from '../../commonTypes'
 import { GetParticipantProfileResponse } from '../users'
 
 export interface Participant {
   id: number
   participantId: string
   externalId?: string
-  email?: string
-  firstName: string
-  lastName: string
+  email?: Email
+  firstName: FirstName
+  lastName: LastName
   familyId: number
   answers: ParticipantAnswerStatus[]
   lastUpdated?: string

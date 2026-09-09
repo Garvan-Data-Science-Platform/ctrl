@@ -1,6 +1,5 @@
 import {
   SurveyElement,
-  SurveyElementType,
   SurveyQuestionCheckbox,
   SurveyQuestionChoices,
   SurveySubHeading,
@@ -27,6 +26,7 @@ import { DUOEntry, DUOModal } from './DUOModal'
 import { useState } from 'react'
 import duoJson from './duo.json'
 import { useNotification } from '@refinedev/core'
+import { surveyElementRules, urlRules } from '@common/src/validation'
 
 const duoEntries = duoJson as DUOEntry[]
 
@@ -161,6 +161,12 @@ export function SurveyElementCard({
   }
 
   function renderSubHeading(data: SurveySubHeading) {
+    const subHeadingRule = surveyElementRules(true)
+
+    const isSubHeadingInvalid = Boolean(
+      data.text && subHeadingRule.pattern && !subHeadingRule.pattern.value.test(data.text),
+    )
+
     const charLimit = 200
     return (
       <Box sx={{ width: '100%' }}>
@@ -170,10 +176,16 @@ export function SurveyElementCard({
           fullWidth
           sx={{ mt: 2 }}
           label="Subheading text"
+          data-cy="subheading-text"
+          error={isSubHeadingInvalid}
           value={data.text}
           disabled={disabled}
           inputProps={{ maxLength: charLimit }}
-          helperText={`${data.text?.length || 0}/${charLimit}`}
+          helperText={
+            isSubHeadingInvalid
+              ? (subHeadingRule.pattern?.message as string)
+              : `${data.text?.length || 0}/${charLimit}`
+          }
           onChange={(e) => {
             handleUpdateField('text', e.target.value)
           }}
@@ -183,6 +195,21 @@ export function SurveyElementCard({
   }
 
   function renderQuestionCheckbox(data: SurveyQuestionCheckbox) {
+    const checkboxQuestionRule = surveyElementRules(false)
+    const checkboxTooltipRule = surveyElementRules(false)
+
+    const isCheckboxQuestionInvalid = Boolean(
+      data.text &&
+        checkboxQuestionRule.pattern &&
+        !checkboxQuestionRule.pattern.value.test(data.text),
+    )
+
+    const isCheckboxTooltipInvalid = Boolean(
+      data.tooltip &&
+        checkboxTooltipRule.pattern &&
+        !checkboxTooltipRule.pattern.value.test(data.tooltip),
+    )
+
     return (
       <Box sx={{ width: '100%' }}>
         <Typography fontWeight="bold">Checkbox Question</Typography>
@@ -191,6 +218,11 @@ export function SurveyElementCard({
           fullWidth
           sx={{ mt: 2 }}
           label="Question Text"
+          data-cy="checkbox-question-text"
+          error={isCheckboxQuestionInvalid}
+          helperText={
+            isCheckboxQuestionInvalid ? (checkboxQuestionRule.pattern?.message as string) : ''
+          }
           value={data.text}
           disabled={disabled}
           onChange={(e) => {
@@ -202,6 +234,11 @@ export function SurveyElementCard({
           fullWidth
           sx={{ mt: 2 }}
           label="Tooltip (optional)"
+          data-cy="checkbox-question-tooltip"
+          error={isCheckboxTooltipInvalid}
+          helperText={
+            isCheckboxTooltipInvalid ? (checkboxTooltipRule.pattern?.message as string) : ''
+          }
           value={data.tooltip || ''}
           disabled={disabled}
           onChange={(e) => {
@@ -214,6 +251,20 @@ export function SurveyElementCard({
   }
 
   function renderQuestionChoices(data: SurveyQuestionChoices) {
+    const choiceQuestionRule = surveyElementRules(false)
+    const choiceTooltipRule = surveyElementRules(false)
+    const choiceTextRule = surveyElementRules(false)
+
+    const isChoiceQuestionInvalid = Boolean(
+      data.text && choiceQuestionRule.pattern && !choiceQuestionRule.pattern.value.test(data.text),
+    )
+
+    const isChoiceTooltipInvalid = Boolean(
+      data.tooltip &&
+        choiceTooltipRule.pattern &&
+        !choiceTooltipRule.pattern.value.test(data.tooltip),
+    )
+
     //Removes Ontologies if an answer is changed or removed
     const checkDuos = (answer: string) => {
       const nonMatchingDUOs = data.duoCodes?.filter((duoVal) => duoVal.relatedAnswer != answer)
@@ -234,6 +285,11 @@ export function SurveyElementCard({
           fullWidth
           sx={{ mt: 2 }}
           label="Question Text"
+          data-cy="choice-question-text"
+          error={isChoiceQuestionInvalid}
+          helperText={
+            isChoiceQuestionInvalid ? (choiceQuestionRule.pattern?.message as string) : ''
+          }
           value={data.text}
           disabled={disabled}
           onChange={(e) => {
@@ -245,6 +301,9 @@ export function SurveyElementCard({
           fullWidth
           sx={{ mt: 2 }}
           label="Tooltip (optional)"
+          data-cy="choice-question-tooltip"
+          error={isChoiceTooltipInvalid}
+          helperText={isChoiceTooltipInvalid ? (choiceTooltipRule.pattern?.message as string) : ''}
           value={data.tooltip || ''}
           disabled={disabled}
           onChange={(e) => {
@@ -256,38 +315,47 @@ export function SurveyElementCard({
           sx={{ mt: 1, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1 }}
           data-cy="choices-box"
         >
-          {data.choices.map((val, idx) => (
-            <Box key={`choice_${idx}`}>
-              <TextField
-                value={val}
-                disabled={disabled}
-                onChange={(e) => {
-                  checkDuos(val)
-                  //eslint-disable-next-line
-                  handleUpdateChoice && handleUpdateChoice(idx, e.target.value)
-                }}
-                data-cy="choice-text"
-                slotProps={{
-                  input: {
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          disabled={disabled}
-                          onClick={() => {
-                            checkDuos(val)
-                            //eslint-disable-next-line
-                            handleDeleteChoice && handleDeleteChoice(idx)
-                          }}
-                        >
-                          <Close />
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  },
-                }}
-              />
-            </Box>
-          ))}
+          {data.choices.map((val, idx) => {
+            const isChoiceTextInvalid = Boolean(
+              val && choiceTextRule.pattern && !choiceTextRule.pattern.value.test(val),
+            )
+            return (
+              <Box key={`choice_${idx}`}>
+                <TextField
+                  value={val}
+                  disabled={disabled}
+                  error={isChoiceTextInvalid}
+                  helperText={
+                    isChoiceTextInvalid ? (choiceTextRule.pattern?.message as string) : ''
+                  }
+                  onChange={(e) => {
+                    checkDuos(val)
+                    //eslint-disable-next-line
+                    handleUpdateChoice && handleUpdateChoice(idx, e.target.value)
+                  }}
+                  data-cy="choice-text"
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            disabled={disabled}
+                            onClick={() => {
+                              checkDuos(val)
+                              //eslint-disable-next-line
+                              handleDeleteChoice && handleDeleteChoice(idx)
+                            }}
+                          >
+                            <Close />
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
+                />
+              </Box>
+            )
+          })}
           {!disabled && (
             <IconButton sx={{ width: 50, height: 50 }} onClick={handleAddChoice}>
               <Add />
@@ -300,6 +368,12 @@ export function SurveyElementCard({
   }
 
   function renderVideo(data: SurveyVideo) {
+    const urlRule = urlRules(false)
+
+    const isUrlInvalid = Boolean(
+      data.link && urlRule.pattern && !urlRule.pattern.value.test(data.link),
+    )
+
     return (
       <Box sx={{ width: '100%' }}>
         <Typography fontWeight="bold">Video/Embedded</Typography>
@@ -309,6 +383,9 @@ export function SurveyElementCard({
           sx={{ mt: 2 }}
           label="URL"
           value={data.link}
+          error={isUrlInvalid}
+          helperText={isUrlInvalid ? (urlRule.pattern?.message as string) : ''}
+          data-cy="video-url"
           disabled={disabled}
           onChange={(e) => {
             handleUpdateField('link', e.target.value)
@@ -318,15 +395,19 @@ export function SurveyElementCard({
     )
   }
 
-  type ContentRenderer = {
-    [key in SurveyElementType]: () => JSX.Element | null
-  }
-
-  const contentRenderer: ContentRenderer = {
-    'question-choices': () => renderQuestionChoices(element.data),
-    'question-checkbox': () => renderQuestionCheckbox(element.data),
-    video: () => renderVideo(element.data),
-    subheading: () => renderSubHeading(element.data),
+  const renderElementContent = () => {
+    switch (element.type) {
+      case 'question-choices':
+        return renderQuestionChoices(element.data)
+      case 'question-checkbox':
+        return renderQuestionCheckbox(element.data)
+      case 'video':
+        return renderVideo(element.data)
+      case 'subheading':
+        return renderSubHeading(element.data)
+      default:
+        return null
+    }
   }
   return (
     <Box
@@ -350,7 +431,7 @@ export function SurveyElementCard({
           <DragIndicator />
         </Box>
       )}
-      {contentRenderer[element.type]()}
+      {renderElementContent()}
       <Box sx={{ flexGrow: 1 }} />
       <IconButton disabled={disabled} sx={{ width: 50, height: 50 }} onClick={handleDelete}>
         <Delete />

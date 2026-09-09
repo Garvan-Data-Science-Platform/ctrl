@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router'
 import { axiosInstance } from '../../providers/dataProvider'
 import { Info } from '@mui/icons-material'
 import { LogoUploader } from '../../components/LogoUploader'
-import { urlRegex } from '@common/src/regex'
+import { cssColourRules, urlRules } from '@common/src/validation'
 import { RESOURCES } from '../../constants'
 
 const SettingsPage = () => {
@@ -35,7 +35,6 @@ const SettingsPage = () => {
 
   const { open } = useNotification()
   const orgSettingsData = query?.data?.data
-  console.log('SETTINGS DATA:', orgSettingsData)
 
   const handleSave = async (data: FieldValues) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -55,13 +54,13 @@ const SettingsPage = () => {
   }
   const nav = useNavigate()
 
-  const primaryColor = watch('primaryColour')
-  const secondaryColor = watch('secondaryColour')
+  const primaryColour = watch('primaryColour')
+  const secondaryColour = watch('secondaryColour')
 
-  const isColorOrEmpty = (strColor: string | null) => {
-    if (strColor == '' || strColor == null) return true
+  const isCssColourOrEmpty = (strColour: string | null) => {
+    if (strColour == '' || strColour == null) return true
     const s = new Option().style
-    s.color = strColor
+    s.color = strColour
     return s.color !== ''
   }
 
@@ -87,12 +86,7 @@ const SettingsPage = () => {
           </Box>
         </Box>
         <TextField
-          {...register('tcLink', {
-            pattern: {
-              value: urlRegex, //eslint-disable-line
-              message: 'Invalid url, must include http(s)://...',
-            },
-          })}
+          {...register('tcLink', urlRules())}
           error={!!(errors as any)?.tcLink}
           helperText={(errors as any)?.tcLink?.message}
           margin="normal"
@@ -103,12 +97,7 @@ const SettingsPage = () => {
           data-cy="tcLink"
         />
         <TextField
-          {...register('newsLink', {
-            pattern: {
-              value: urlRegex, //eslint-disable-line
-              message: 'Invalid url, must include http(s)://...',
-            },
-          })}
+          {...register('newsLink', urlRules())}
           error={!!(errors as any)?.newsLink}
           helperText={(errors as any)?.newsLink?.message}
           margin="normal"
@@ -129,9 +118,11 @@ const SettingsPage = () => {
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <TextField
             {...register('primaryColour', {
+              ...cssColourRules(), // validate via REGEX
               validate: (val) => {
-                if (!isColorOrEmpty(val)) {
-                  return 'Invalid colour'
+                // validate via DOM
+                if (!isCssColourOrEmpty(val)) {
+                  return 'Not a recognised CSS colour'
                 }
               },
             })}
@@ -146,15 +137,17 @@ const SettingsPage = () => {
             data-cy="primaryColour"
             slotProps={{
               input: {
-                endAdornment: <Box sx={{ width: 20, height: 20, bgcolor: primaryColor }} />,
+                endAdornment: <Box sx={{ width: 20, height: 20, bgcolor: primaryColour }} />,
               },
             }}
           />
           <TextField
             {...register('secondaryColour', {
+              ...cssColourRules(), // validate via regex
               validate: (val) => {
-                if (!isColorOrEmpty(val)) {
-                  return 'Invalid colour'
+                // validate via DOM
+                if (!isCssColourOrEmpty(val)) {
+                  return 'Not a recognised CSS colour'
                 }
               },
             })}
@@ -169,7 +162,7 @@ const SettingsPage = () => {
             data-cy="secondaryColour"
             slotProps={{
               input: {
-                endAdornment: <Box sx={{ width: 20, height: 20, bgcolor: secondaryColor }} />,
+                endAdornment: <Box sx={{ width: 20, height: 20, bgcolor: secondaryColour }} />,
               },
             }}
           />

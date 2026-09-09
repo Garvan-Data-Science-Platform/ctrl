@@ -1,3 +1,17 @@
+import {
+  AddressLine,
+  DoB,
+  Email,
+  ExternalId,
+  FirstName,
+  LastName,
+  MiddleName,
+  Mobile,
+  Password,
+  Postcode,
+  RoleT,
+  Suburb,
+} from '../../commonTypes'
 import type {
   AlternativeContact,
   ContactMethod,
@@ -6,85 +20,33 @@ import type {
   OnBehalf,
 } from '../users/ParticipantProfile'
 
-/**
- * @example {
- *  "firstName": "John",
- *  "middleName": "James",
- *  "lastName": "Doe",
- *  "email": "john.doe@email.com",
- *  "password": "Supersecret123",
- *  "dob": "2000-05-21",
- *  "mobile": "0412341234",
- *  "addressLine": "123 Sydney Street",
- *  "suburb": "Sydney",
- *  "postcode": "2000",
- *  "state": "NSW",
- *  "participantType": "STANDARD",
- *  "preferredContact": "MOBILE",
- *  "nextOfKin": {
- *    "firstName": "Jeremy",
- *    "middleName": "Jimmy",
- *    "lastName": "Doe",
- *    "mobile": "0412341432",
- *    "email": "jeremydoe@email.com"
- *  },
- *  "dependents": []
- * }
- */
 export interface RegisterParticipantRequest {
-  /**
-   * @minLength 1
-   */
-  firstName: string
-  /**
-   * @minLength 1
-   */
-  middleName?: string
-  /**
-   * @minLength 1
-   */
-  lastName: string
-  /**
-   * @pattern ^(.+)@(.+)$ please provide valid email
-   */
-  email: string
-  /**
-   * @pattern ^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$ please provide valid phone number
-   */
-  mobile: string
+  firstName: FirstName
+  middleName?: MiddleName
+  lastName: LastName
+  email: Email
+  mobile: Mobile
   preferredContact: ContactMethod
-  /**
-   * @minLength 1
-   */
-  addressLine: string
-  /**
-   * @minLength 1
-   */
-  suburb: string
-  /**
-   * @minLength 1
-   */
-  postcode: string
+  addressLine: AddressLine
+  suburb: Suburb
+  postcode: Postcode
   state: StateTerritory
-  /**
-   * @minLength 14 Password must be at least 14 characters
-   */
-  password: string
-  /**
-   * @isDate Date of birth must be of date format
-   */
-  dob: string
-  /**
-   * @isBool
-   */
+  password: Password
+  dob: DoB
   participantType: ParticipantType
   nextOfKin: AlternativeContact
+  /**
+   * @maxItems 15
+   */
   dependents: OnBehalf[]
-  externalId?: string
+  /**
+   * @maxLength 255
+   */
+  externalId?: ExternalId
 }
 
 export interface RegisterParticipantResponse {
   id: number
   token: string
-  role: string
+  role: RoleT
 }

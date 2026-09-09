@@ -137,7 +137,9 @@ const FormatResponseElement = (element: SurveyElement, mode: 'responses' | 'opti
     return (
       <View style={styles.tableRow} wrap={false}>
         <Text style={styles.tableQuestionCell}>
-          <Link href={element.data.link.replace('embed', 'watch')}>Video content</Link>
+          {typeof element.data.link === 'string' && (
+            <Link href={element.data.link.replace('embed', 'watch')}>Video content</Link>
+          )}
           <Text>{mode == 'options' && `\n\n${element.data.link}`}</Text>
         </Text>
       </View>

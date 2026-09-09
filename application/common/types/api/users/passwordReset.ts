@@ -1,25 +1,10 @@
-/**
- * @example {
- *  "email": "john.doe@email.com"
- * }
- */
+import { Email, Password } from '../../commonTypes'
+
 export interface GeneratePasswordResetLinkRequest {
-  /**
-   * @pattern ^(.+)@(.+)$ please provide valid email
-   */
-  email: string
+  email: Email
 }
 
-/**
- * @example {
- *  "newPassword": "Newsupersecret123",
- *  "token": "1063e00e4a273e698577"
- * }
- */
 export interface ResetPasswordRequest {
-  /**
-   * @minLength 14 Password must be at least 14 characters
-   */
-  newPassword: string
+  newPassword: Password
   token: string
 }

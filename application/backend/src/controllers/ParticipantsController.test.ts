@@ -598,6 +598,120 @@ describe('InvitesController', () => {
       // Reset mock for other tests
       mockNodeMailer.mock.reset()
     })
+
+    it('should validate xss in email', async () => {
+      const recipients = [{ email: "invite<script>alert('xss')</script>5@new.com", prefill: {} }]
+
+      const response = await request(app)
+        .post(`/studies/${TestStudies.TEST_STUDY.id}/invites`)
+        .send({ recipients, subjectText: 'Subject Text', explanatoryText: 'Explanatory Text' })
+        .set({ Authorization: `Bearer ${organisationAdminToken}` })
+
+      expect(response.status).toBe(422)
+
+      const body = response.body
+      expect(body.message).toBe('Validation Failed')
+      expect(body.details).toEqual({
+        'recipients.$0.email': {
+          message: 'Invalid value provided',
+        },
+      })
+    })
+
+    it('should validate xss in prefill', async () => {
+      const recipients = [
+        {
+          email: 'invite5@new.com',
+          prefill: {
+            profile: {
+              firstName: "{{7*7}}<script>alert('xss-firstname')</script>${{7*7}}#{7*7}<%= 7*7 %>",
+              middleName: '<script>',
+              lastName: '<script>',
+              dob: '<script>',
+              mobile: "602112341234<script>alert('xss-address')</script>",
+              addressLine: "<script>alert('xss-address')</script>",
+              suburb: "<img src=x onerror=alert('xss-suburb-img')>",
+              state: "NSW<script>alert('xss-address')</script>",
+              postcode: "6021<script>alert('xss-address')</script>",
+              preferredContact: "MOBILE<script>alert('xss-address')</script>",
+              nextOfKin: {
+                firstName: 'John{7*7}',
+                lastName: '<script>Smith</script>',
+                email: '<script>john</script>@smith.com',
+              },
+              dependents: [
+                {
+                  firstName: 'John{7*7}',
+                  lastName: '<script>Smith</script>',
+                  dob: '2020-01-01',
+                  permanent: false,
+                },
+              ],
+            },
+            studyParticipant: {
+              externalId: "123<script>alert('xss')</script>",
+            },
+          },
+        },
+      ]
+
+      const response = await request(app)
+        .post(`/studies/${TestStudies.TEST_STUDY.id}/invites`)
+        .send({ recipients, subjectText: 'Subject Text', explanatoryText: 'Explanatory Text' })
+        .set({ Authorization: `Bearer ${organisationAdminToken}` })
+
+      expect(response.status).toBe(422)
+
+      const body = response.body
+      expect(body.message).toBe('Validation Failed')
+      expect(body.details).toEqual({
+        'recipients.$0.prefill.profile.addressLine': {
+          message: 'Invalid value provided',
+        },
+        'recipients.$0.prefill.profile.dependents': {
+          message: 'Invalid value provided',
+        },
+        'recipients.$0.prefill.profile.dob': {
+          message: 'Invalid value provided',
+        },
+        'recipients.$0.prefill.profile.firstName': {
+          message: 'Invalid value provided',
+        },
+        'recipients.$0.prefill.profile.middleName': {
+          message: 'Invalid value provided',
+        },
+        'recipients.$0.prefill.profile.lastName': {
+          message: 'Invalid value provided',
+        },
+        'recipients.$0.prefill.profile.mobile': {
+          message: 'Invalid value provided',
+        },
+        'recipients.$0.prefill.profile.preferredContact': {
+          message: 'Invalid value provided',
+        },
+        'recipients.$0.prefill.profile.suburb': {
+          message: 'Invalid value provided',
+        },
+        'recipients.$0.prefill.profile.state': {
+          message: 'Invalid value provided',
+        },
+        'recipients.$0.prefill.profile.postcode': {
+          message: 'Invalid value provided',
+        },
+        'recipients.$0.prefill.profile.nextOfKin.email': {
+          message: 'Invalid value provided',
+        },
+        'recipients.$0.prefill.profile.nextOfKin.firstName': {
+          message: 'Invalid value provided',
+        },
+        'recipients.$0.prefill.profile.nextOfKin.lastName': {
+          message: 'Invalid value provided',
+        },
+        'recipients.$0.prefill.studyParticipant.externalId': {
+          message: 'Invalid value provided',
+        },
+      })
+    })
   })
 
   describe('POST /studies/{studyId}/invites/resend', () => {

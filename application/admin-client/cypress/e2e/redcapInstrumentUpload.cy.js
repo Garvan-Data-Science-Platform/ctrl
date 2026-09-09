@@ -1,6 +1,7 @@
 /// <reference types="cypress" />
 
 const { TestUsers } = require('../../../common/testing/constants')
+const { VALIDATION_MESSAGES } = require('../../../common/src/validation')
 
 beforeEach(() => {
   cy.task('reset')
@@ -175,6 +176,16 @@ describe('REDCap Survey Upload', () => {
       cy.get('[data-cy="helpPage"]').should('be.visible')
       cy.get('[data-cy="closeHelpPage"]').click()
       cy.get('[data-cy="helpPage"]').should('not.exist')
+    })
+    it('should validate xss in form name', () => {
+      cy.get('[data-cy="apiSubmit"]').should('be.visible').should('be.disabled')
+      cy.get('[data-cy="formName"]')
+        .should('be.visible')
+        .type("{{7*7}}<script>alert('xss-redcap-form')</script>", {
+          parseSpecialCharSequences: false,
+        })
+      cy.contains(VALIDATION_MESSAGES.REDCAP_FORM_INVALID).should('exist')
+      cy.get('[data-cy="apiSubmit"]').should('be.visible').should('be.disabled')
     })
   })
 })

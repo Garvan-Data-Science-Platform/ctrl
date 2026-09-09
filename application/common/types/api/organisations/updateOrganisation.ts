@@ -1,11 +1,5 @@
-/**
- * @example {
- *  "name": "UpdatedOrganisationName",
- * }
- */
+import { OrganisationName } from '../../commonTypes'
+
 export interface UpdateOrganisationRequest {
-  /**
-   * @minLength 1
-   */
-  name?: string
+  name?: OrganisationName
 }
