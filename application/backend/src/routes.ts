@@ -812,15 +812,28 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Partial_GetParticipantProfileResponse-at-data_": {
-        "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"id":{"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"undefined"}]},"firstName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"middleName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"lastName":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"dob":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"email":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"mobile":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"addressLine":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"suburb":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"state":{"dataType":"union","subSchemas":[{"ref":"StateTerritory"},{"dataType":"undefined"}]},"postcode":{"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"undefined"}]},"preferredContact":{"dataType":"union","subSchemas":[{"ref":"ContactMethod"},{"dataType":"undefined"}]},"participantType":{"dataType":"union","subSchemas":[{"ref":"ParticipantType"},{"dataType":"undefined"}]},"nextOfKin":{"dataType":"union","subSchemas":[{"ref":"AlternativeContact"},{"dataType":"undefined"}]},"familyMembers":{"dataType":"union","subSchemas":[{"dataType":"array","array":{"dataType":"refObject","ref":"FamilyMember"}},{"dataType":"undefined"}]},"familyId":{"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"undefined"}]}},"validators":{}},
+    "ProfilePrefill": {
+        "dataType": "refObject",
+        "properties": {
+            "firstName": {"ref":"FirstName","required":true},
+            "middleName": {"ref":"MiddleName"},
+            "lastName": {"ref":"LastName","required":true},
+            "dob": {"ref":"DoB","required":true},
+            "mobile": {"ref":"Mobile","required":true},
+            "addressLine": {"ref":"AddressLine"},
+            "suburb": {"ref":"Suburb"},
+            "state": {"ref":"StateTerritory"},
+            "postcode": {"ref":"Postcode"},
+            "preferredContact": {"ref":"ContactMethod","required":true},
+            "nextOfKin": {"ref":"AlternativeContact"},
+        },
+        "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Prefill": {
         "dataType": "refObject",
         "properties": {
-            "profile": {"ref":"Partial_GetParticipantProfileResponse-at-data_"},
+            "profile": {"ref":"ProfilePrefill"},
             "studyParticipant": {"dataType":"nestedObjectLiteral","nestedProperties":{"externalId":{"ref":"ExternalId"}}},
         },
         "additionalProperties": false,

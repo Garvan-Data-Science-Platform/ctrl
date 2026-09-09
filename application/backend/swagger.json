@@ -2068,69 +2068,56 @@
         "type": "object",
         "additionalProperties": false
       },
-      "Partial_GetParticipantProfileResponse-at-data_": {
+      "ProfilePrefill": {
         "properties": {
-          "id": {
-            "type": "number",
-            "format": "double"
-          },
           "firstName": {
-            "type": "string"
+            "$ref": "#/components/schemas/FirstName"
           },
           "middleName": {
-            "type": "string"
+            "$ref": "#/components/schemas/MiddleName"
           },
           "lastName": {
-            "type": "string"
+            "$ref": "#/components/schemas/LastName"
           },
           "dob": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
+            "$ref": "#/components/schemas/DoB"
           },
           "mobile": {
-            "type": "string"
+            "$ref": "#/components/schemas/Mobile"
           },
           "addressLine": {
-            "type": "string"
+            "$ref": "#/components/schemas/AddressLine"
           },
           "suburb": {
-            "type": "string"
+            "$ref": "#/components/schemas/Suburb"
           },
           "state": {
             "$ref": "#/components/schemas/StateTerritory"
           },
           "postcode": {
-            "type": "string"
+            "$ref": "#/components/schemas/Postcode"
           },
           "preferredContact": {
             "$ref": "#/components/schemas/ContactMethod"
           },
-          "participantType": {
-            "$ref": "#/components/schemas/ParticipantType"
-          },
           "nextOfKin": {
             "$ref": "#/components/schemas/AlternativeContact"
-          },
-          "familyMembers": {
-            "items": {
-              "$ref": "#/components/schemas/FamilyMember"
-            },
-            "type": "array"
-          },
-          "familyId": {
-            "type": "number",
-            "format": "double"
           }
         },
+        "required": [
+          "firstName",
+          "lastName",
+          "dob",
+          "mobile",
+          "preferredContact"
+        ],
         "type": "object",
-        "description": "Make all properties in T optional"
+        "additionalProperties": false
       },
       "Prefill": {
         "properties": {
           "profile": {
-            "$ref": "#/components/schemas/Partial_GetParticipantProfileResponse-at-data_"
+            "$ref": "#/components/schemas/ProfilePrefill"
           },
           "studyParticipant": {
             "properties": {
