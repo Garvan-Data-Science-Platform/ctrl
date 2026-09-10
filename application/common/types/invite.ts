@@ -13,16 +13,16 @@ import {
 import { AlternativeContact, ContactMethod, StateTerritory } from './api/users/ParticipantProfile'
 
 export interface ProfilePrefill {
-  firstName: FirstName
+  firstName?: FirstName
   middleName?: MiddleName
-  lastName: LastName
-  dob: DoB
-  mobile: Mobile
+  lastName?: LastName
+  dob?: DoB
+  mobile?: Mobile
   addressLine?: AddressLine
   suburb?: Suburb
   state?: StateTerritory
   postcode?: Postcode
-  preferredContact: ContactMethod
+  preferredContact?: ContactMethod
   nextOfKin?: AlternativeContact
   // No FamilyMember or family id as I can't see how
   // an external system would know the correct IDs.

@@ -29,6 +29,7 @@ import { GetParticipantResponse } from '@common/types/api/participants'
 import { ReactSpreadsheetImport } from 'react-spreadsheet-import'
 import { importFields } from '../../components/CSVImport'
 import { unflatten } from 'flat'
+import { fromExcelDateToISO } from '@common/src/utils'
 
 export const statusMap = {
   incomplete: {
@@ -478,9 +479,19 @@ export const ParticipantList = () => {
         onSubmit={(data: any) => {
           const recips = data.validData.map((row: any) => {
             const nested = unflatten(row) as any
+            const { profile, ...rest } = nested
+            const { email, ...profileWithoutEmail } = profile || {}
+
+            if (profileWithoutEmail.dob) {
+              const isoDate = fromExcelDateToISO(profileWithoutEmail.dob)
+              profileWithoutEmail.dob = isoDate ?? undefined
+            }
             return {
-              email: nested.profile.email,
-              prefill: nested,
+              email: email,
+              prefill: {
+                ...rest,
+                profile: profileWithoutEmail,
+              },
             }
           })
           setInitialRecipients(recips)

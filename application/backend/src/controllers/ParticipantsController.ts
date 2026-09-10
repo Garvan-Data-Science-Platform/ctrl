@@ -689,8 +689,10 @@ export class InvitesController extends Controller {
       data: { inviteEmailSubject: subjectText, inviteEmailText: explanatoryText },
     })
 
-    const recipients = [...new Set(bodyRequest.recipients)]
-    const emails = recipients.map((val) => val.email)
+    const uniqueRecipients = Array.from(
+      new Map(bodyRequest.recipients.map((r) => [r.email, r])).values(),
+    )
+    const emails = uniqueRecipients.map((val) => val.email)
 
     const expiresAt = inviteExpiresAt()
 
@@ -704,7 +706,7 @@ export class InvitesController extends Controller {
     //Has to be done by backend server due to encryption
     existingInvites = existingInvites.filter((invite) => emails.includes(invite.email))
 
-    const newRecipients = recipients.filter(
+    const newRecipients = uniqueRecipients.filter(
       (r) => !existingInvites.map((invite) => invite.email).includes(r.email),
     )
 
@@ -748,22 +750,21 @@ export class InvitesController extends Controller {
           if (
             invite.status === InviteStatus.REVOKED ||
             invite.status === InviteStatus.EXPIRED ||
-            invite.status === InviteStatus.FAILED_TO_SEND
+            invite.status === InviteStatus.FAILED_TO_SEND ||
+            invite.status === InviteStatus.PENDING
           ) {
+            const freshRecipientData = uniqueRecipients.find((r) => r.email === invite.email)
+
             await this.invitesRepo.update({
               where: { id: invite.id },
               data: {
                 status: InviteStatus.PENDING,
                 expiresAt: expiresAt,
                 sentAt: new Date(),
-              },
-            })
-          } else if (invite.status === InviteStatus.PENDING) {
-            await this.invitesRepo.update({
-              where: { id: invite.id },
-              data: {
-                expiresAt,
-                sentAt: new Date(),
+                // update prefill
+                prefill: freshRecipientData
+                  ? JSON.stringify(freshRecipientData.prefill)
+                  : undefined,
               },
             })
           }

@@ -61,7 +61,7 @@ describe('REDCap Participant Upload', () => {
 
       cy.url().should('include', 'participants')
       cy.get('[data-cy="prefill-details"]').first().trigger('mouseover')
-      cy.contains('1/1/2001').should('be.visible')
+      cy.contains('2001-01-01').should('be.visible')
 
       const expectedEmailsInModal = [
         'peter@louka.com',
@@ -228,5 +228,27 @@ describe('REDCap Participant Upload', () => {
       cy.get('[data-cy="closeHelpPage"]').click()
       cy.get('[data-cy="helpPage"]').should('not.exist')
     })
+    // // comment out WIP test
+    //     it('should validate user input', () => {
+    //       const fileNameXss = 'test_participantXss.csv'
+    //       cy.get('Confirm').should('not.exist')
+    //       cy.get('[data-cy="upload-button"]').click()
+    //       cy.get('input[type="file"]').attachFile(fileNameXss)
+    //       cy.contains('Select header row').should('exist')
+    //       cy.contains('Next').click()
+    //       cy.contains('Next').click()
+    //       cy.contains('Confirm').click()
+    //       cy.contains('Errors detected').should('be.visible')
+    //       cy.contains('Cancel').click()
+    //       cy.contains('Cancel').should('not.exist')
+    //       cy.get('input[type="checkbox"]').eq(7).check({ force: true })
+    //       cy.get('input[type="checkbox"]').eq(8).check({ force: true })
+    //       cy.contains('Discard').click()
+    //       // cy.contains('Confirm').click()
+
+    //       cy.url().should('include', 'participants')
+    //       cy.get('[data-cy="prefill-details"]').first().trigger('mouseover')
+    //       cy.contains('1/1/2001').should('be.visible')
+    //     })
   })
 })

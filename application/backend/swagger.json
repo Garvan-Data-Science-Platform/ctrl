@@ -2104,13 +2104,6 @@
             "$ref": "#/components/schemas/AlternativeContact"
           }
         },
-        "required": [
-          "firstName",
-          "lastName",
-          "dob",
-          "mobile",
-          "preferredContact"
-        ],
         "type": "object",
         "additionalProperties": false
       },

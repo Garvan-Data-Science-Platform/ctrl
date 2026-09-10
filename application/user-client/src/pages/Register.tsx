@@ -95,28 +95,20 @@ export default function Register() {
             // Prefill form data
             const prefillProfile = { ...data.profile }
             delete prefillProfile.password // Do not prefill password
-            function toISO(date: string) {
-              try {
-                const [d, m, y] = date.split(/[/-]/)
-                return y && m && d ? `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}` : ''
-              } catch {
-                return ''
-              }
-            }
             reset({
               firstName: prefillProfile.firstName ?? '',
               lastName: prefillProfile.lastName ?? '',
               email: prefillProfile.email ?? '',
               password: '',
               confirm_password: '',
-              dob: prefillProfile.dob ? toISO(prefillProfile.dob) : '',
+              dob: prefillProfile.dob ?? '',
               addressLine: prefillProfile.addressLine ?? '',
               suburb: prefillProfile.suburb ?? '',
               state: prefillProfile.state ?? ('' as StateTerritory),
               postcode: prefillProfile.postcode ?? '',
               mobile: prefillProfile.mobile ?? '',
-              preferredContact: prefillProfile.preferredContact ?? ('MOBILE' as ContactMethod),
-              nok_first: prefillProfile.nextOfKin?.lastName ?? '',
+              preferredContact: prefillProfile.preferredContact ?? ContactMethod.MOBILE,
+              nok_first: prefillProfile.nextOfKin?.firstName ?? '',
               nok_surname: prefillProfile.nextOfKin?.lastName ?? '',
               nok_email: prefillProfile.nextOfKin?.email ?? '',
               dependents: prefillProfile.dependents ?? [],

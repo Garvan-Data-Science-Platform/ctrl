@@ -36,15 +36,16 @@ export const importFields: Fields<PrefillKey> = [
     fieldType: { type: 'input' },
   },
   {
-    label: 'Date of Birth (dd/mm/yyyy)',
+    label: 'Date of Birth (YYYY-MM-DD or DD/MM/YYYY)',
     key: 'profile.dob',
     alternateMatches: ['dob', 'ctrl_dob'],
     fieldType: { type: 'input' },
     validations: [
       {
         rule: 'regex',
-        value: '^(0?[1-9]|[12][0-9]|3[01])[/\\-](0?[1-9]|1[0-2])[/\\-]\\d{4}$',
-        errorMessage: 'Must be format dd/mm/yyyy or dd-mm-yyyy',
+        value:
+          '^(\\d{4}[/\\-](0?[1-9]|1[0-2])[/\\-](0?[1-9]|[12][0-9]|3[01])|(0?[1-9]|[12][0-9]|3[01])[/\\-](0?[1-9]|1[0-2])[/\\-]\\d{4})$',
+        errorMessage: 'Must be format YYYY-MM-DD or DD/MM/YYYY',
       },
     ],
   },
