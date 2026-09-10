@@ -100,7 +100,8 @@ describe('registration', () => {
     cy.get('[data-cy="reg-email"]').clear()
     cy.get('[data-cy="reg-email"]').type(testEmail)
     cy.get('[data-cy="reg-button"]').click()
-    cy.contains(`Invite for ${testEmail} not found`).should('exist')
+    // API message dropped the address on this branch to keep PII out of the response body
+    cy.contains('Invite not found').should('exist')
   })
 
   it('Add dependents, check errors and valid submission', () => {

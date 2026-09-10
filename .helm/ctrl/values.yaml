@@ -18,11 +18,37 @@ config:
   disableAdminPasswordLogin: false
   otp: true
   inviteExpiryDays: 7
-  smtp:
+  # Mail provider. Supported: 'smtp-basic' (any SMTP server with username/password auth), 'm365-oauth' (Microsoft 365 OAuth 2 SMTP via MSAL).
+  # An smtp-basic block with empty host/username/password/sender is accepted at boot so
+  # a deployment that doesn't need mail yet can still start; the first actual send throws
+  # `smtp-basic: host is empty`. m365-oauth is stricter — empty fields there fail at boot.
+  mailer:
+    provider: smtp-basic
     host: ''
     port: 587
     username: ''
     password: ''
+    # The From address on every email CTRL sends, as 'Display Name <address@domain>'.
+    # Blank on purpose, a deployment that sends mail has to name its own sender.
+    sender: ''
+    # Set false only for a relay that genuinely has no TLS, such as a local mail catcher.
+    # Anything else leaves the SMTP password readable on the wire.
+    requireTLS: true
+    # Max concurrent SMTP sockets from this pod to the mail server. This default is
+    # Exchange's per-mailbox cap on the m365-oauth path; raising it there returns
+    # 432 4.3.2 (the schema enforces max 3 for that provider). On smtp-basic, set it to
+    # whatever your relay allows — most support far more than 3.
+    maxConnections: 3
+    # For m365-oauth, set provider to m365-oauth in your own values file and add:
+    #   tenantId: '<garvan-tenant-id>'
+    #   clientId: '<entra-app-client-id>'
+    #   clientSecret: '<entra-app-client-secret>'
+    #   host: smtp.office365.com
+    #   port: 587
+    #   sender: 'CTRL <ctrl-noreply@garvan.org.au>'
+    # Leave username, password and requireTLS as they are, they are ignored on that path.
+    # If application code ever passes opts.from with a different address, Exchange rejects
+    # with 554 5.2.252 (SendAsDenied) unless the Entra app has Send As on that mailbox.
 
 userClient:
   hostname: ctrlhost

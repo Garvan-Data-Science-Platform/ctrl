@@ -219,6 +219,19 @@ export async function revokeInvite(inviteId: string) {
   return null
 }
 
+// Poll until no invite rows are QUEUED for the study.
+export async function waitForInviteDrain(studyId: number, timeoutMs = 5000): Promise<void> {
+  const deadline = Date.now() + timeoutMs
+  for (;;) {
+    const queued = await prisma.invite.count({ where: { studyId, status: 'QUEUED' } })
+    if (queued === 0) return
+    if (Date.now() > deadline) {
+      throw new Error(`waitForInviteDrain: ${queued} invite(s) still QUEUED after ${timeoutMs}ms`)
+    }
+    await new Promise((r) => setTimeout(r, 25))
+  }
+}
+
 // Function to generate N audit log entries
 export async function seedAuditLogs(count: number) {
   if (count <= 0) return

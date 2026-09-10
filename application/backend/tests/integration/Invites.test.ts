@@ -1,6 +1,6 @@
 import request from 'supertest'
 import { Api } from '../../src/Api'
-import { resetDB } from 'common/testing/TestHelpers'
+import { resetDB, waitForInviteDrain } from 'common/testing/TestHelpers'
 import {
   ContactMethod,
   ParticipantType,
@@ -76,9 +76,7 @@ describe('Participant Invites', () => {
       .post(`/auth/register/participants/${missingInviteId}`)
       .send(participantRegisterRequestBody)
     expect(response.status).toBe(404)
-    expect(response.body.message).toBe(
-      `Invite for ${participantRegisterRequestBody.email} not found`,
-    )
+    expect(response.body.message).toBe('Invite not found')
   })
 
   it('should allow an OrganisationAdmin user to create and send invites to new participants', async () => {
@@ -92,14 +90,17 @@ describe('Participant Invites', () => {
       })
       .set({ Authorization: `Bearer ${orgAdminToken}` })
     const body: InviteParticipantsResponse = response.body
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(202)
     expect(body.newInvitesCount).toBe(1)
+    expect(body.queuedCount).toBe(1)
+
+    await waitForInviteDrain(1)
 
     // Check emails were successfully sent
     const sentEmails = mockNodeMailer.mock.getSentMail()
     expect(sentEmails.length).toBe(1)
     expect(sentEmails[0].to).toBe(participantRegisterRequestBody.email)
-    expect(sentEmails[0].from).toBe(`CTRL <noreply@${process.env.HOSTNAME}>`)
+    expect(sentEmails[0].from).toBe('CTRL <test@example.com>')
 
     // Check invites were created
     const createdInvite = await prisma.invite.findUnique({
@@ -126,7 +127,9 @@ describe('Participant Invites', () => {
         explanatoryText: 'Text',
       })
       .set({ Authorization: `Bearer ${orgAdminToken}` })
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(202)
+
+    await waitForInviteDrain(1)
 
     // Reset mailer to clear intial invite email
     mockNodeMailer.mock.reset()
@@ -156,7 +159,9 @@ describe('Participant Invites', () => {
     const resendResponse = await request(app)
       .post(`/studies/1/invites/resend`)
       .set({ Authorization: `Bearer ${orgAdminToken}` })
-    expect(resendResponse.status).toBe(204)
+    expect(resendResponse.status).toBe(202)
+
+    await waitForInviteDrain(1)
 
     // Check emails were successfully sent again
     const sentEmails1 = mockNodeMailer.mock.getSentMail()
@@ -168,7 +173,7 @@ describe('Participant Invites', () => {
     )
 
     expect(sentEmail1?.to).toBe(participantRegisterRequestBody.email)
-    expect(sentEmail1?.from).toBe(`CTRL <noreply@${process.env.HOSTNAME}>`)
+    expect(sentEmail1?.from).toBe('CTRL <test@example.com>')
     expect(sentEmail1?.subject).toBe('Subject')
     expect(sentEmail1?.text).toContain('Text')
   })
@@ -185,8 +190,10 @@ describe('Participant Invites', () => {
       .set({ Authorization: `Bearer ${orgAdminToken}` })
 
     const body: InviteParticipantsResponse = response.body
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(202)
     expect(body.newInvitesCount).toBe(1)
+
+    await waitForInviteDrain(1)
 
     // Check the invite exists
     const invite = await prisma.invite.findUnique({
@@ -233,8 +240,10 @@ describe('Participant Invites', () => {
       .set({ Authorization: `Bearer ${orgAdminToken}` })
 
     const body: InviteParticipantsResponse = responseToBeRevoked.body
-    expect(responseToBeRevoked.status).toBe(200)
+    expect(responseToBeRevoked.status).toBe(202)
     expect(body.newInvitesCount).toBe(1)
+
+    await waitForInviteDrain(1)
 
     // Check the invite exists
     const invite = await prisma.invite.findUnique({
@@ -275,9 +284,7 @@ describe('Participant Invites', () => {
       .send(participantRegisterRequestBody)
 
     expect(response.status).toBe(404)
-    expect(response.body.message).toBe(
-      `Invite for ${participantRegisterRequestBody.email} not found`,
-    )
+    expect(response.body.message).toBe('Invite not found')
   })
 
   it('should not allow participants to register using an EXPIRED invite', async () => {
@@ -292,8 +299,10 @@ describe('Participant Invites', () => {
       .set({ Authorization: `Bearer ${orgAdminToken}` })
 
     const body: InviteParticipantsResponse = responseToBeExpired.body
-    expect(responseToBeExpired.status).toBe(200)
+    expect(responseToBeExpired.status).toBe(202)
     expect(body.newInvitesCount).toBe(1)
+
+    await waitForInviteDrain(1)
 
     // Check the invite exists
     const invite = await prisma.invite.findUnique({
@@ -334,9 +343,7 @@ describe('Participant Invites', () => {
       .send(participantRegisterRequestBody)
 
     expect(response.status).toBe(404)
-    expect(response.body.message).toBe(
-      `Invite for ${participantRegisterRequestBody.email} not found`,
-    )
+    expect(response.body.message).toBe('Invite not found')
   })
 
   it('should allow participants to register using a PENDING invite', async () => {
@@ -355,9 +362,11 @@ describe('Participant Invites', () => {
       })
       .set({ Authorization: `Bearer ${orgAdminToken}` })
     const body: InviteParticipantsResponse = response.body
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(202)
 
     expect(body.resendEmailRequestCount).toBe(1)
+
+    await waitForInviteDrain(1)
 
     // Check the invite exists
     const invite = await prisma.invite.findUnique({
@@ -383,6 +392,44 @@ describe('Participant Invites', () => {
     expect(count).toEqual(1)
   })
 
+  it('should allow participants to register using a QUEUED invite', async () => {
+    // A recipient can click their /register/{id} link the instant the mail lands, which on
+    // the m365 path can be before the drain has flipped the row from QUEUED to PENDING.
+    // REGISTERABLE_INVITE_STATUSES has to include QUEUED for this to work.
+    const response = await request(app)
+      .post('/studies/1/invites')
+      .send({
+        recipients: [{ prefill: {}, email: participantRegisterRequestBody.email }],
+        subjectText: 'Subject',
+        explanatoryText: 'Text',
+      })
+      .set({ Authorization: `Bearer ${orgAdminToken}` })
+    expect(response.status).toBe(202)
+
+    await waitForInviteDrain(1)
+
+    const invite = await prisma.invite.findUniqueOrThrow({
+      where: {
+        studyId_emailHash: { email: participantRegisterRequestBody.email, studyId: 1 },
+      },
+    })
+
+    // Put it back to QUEUED after the drain has settled, so the state under test isn't
+    // racing the drain mid-assertion. This is the state a recipient genuinely arrives in
+    // when they click before their own send has resolved.
+    await prisma.invite.update({
+      where: { id: invite.id },
+      data: { status: InviteStatus.QUEUED },
+    })
+
+    const registerResponse = await request(app)
+      .post(`/auth/register/participants/${invite.id}`)
+      .send(participantRegisterRequestBody)
+
+    expect(registerResponse.status).toBe(201)
+    expect(registerResponse.body.token).not.toBeUndefined()
+  })
+
   // Invite expiry should be configurable
   it('should allow configuring invite expiry duration', async () => {
     const sendInviteResponse = await request(app)
@@ -393,8 +440,9 @@ describe('Participant Invites', () => {
         explanatoryText: 'Text',
       })
       .set({ Authorization: `Bearer ${orgAdminToken}` })
-    expect(sendInviteResponse.status).toBe(200)
-    console.log(sendInviteResponse.body)
+    expect(sendInviteResponse.status).toBe(202)
+
+    await waitForInviteDrain(1)
 
     // Check the invite expiry
     const invite = await prisma.invite.findUnique({
@@ -426,7 +474,9 @@ describe('Participant Invites', () => {
         explanatoryText: 'Text',
       })
       .set({ Authorization: `Bearer ${orgAdminToken}` })
-    expect(sendInviteResponse2.status).toBe(200)
+    expect(sendInviteResponse2.status).toBe(202)
+
+    await waitForInviteDrain(1)
 
     // Check the invite expiry
     const invite2 = await prisma.invite.findUnique({

@@ -26,6 +26,10 @@ describe('Invites - Full E2E Flow', () => {
     // 3. Verify invite appears in pending list
     cy.get('[data-cy="pending-list"]', { timeout: 10000 }).should('contain.text', testEmail)
 
+    // POST /invites returns 202 before the drain runs, so wait for the QUEUED row to
+    // settle before asserting on MailHog. Otherwise the mail may not have arrived yet.
+    cy.task('waitForInviteDrain', { studyId: 1 })
+
     // 4. Verify invite email was sent via MailHog
     cy.task('getEmailsFor', testEmail).then((emails) => {
       expect(emails).to.have.length(1)
@@ -53,6 +57,7 @@ describe('Invites - Full E2E Flow', () => {
     // 1. Admin sends invite via UI
     cy.loginAdminUI()
     cy.sendInviteUI(testEmail)
+    cy.task('waitForInviteDrain', { studyId: 1 })
 
     // 2. Get invite ID and expire it via task
     cy.task('getInviteId', { email: testEmail, studyId: 1 }).then((inviteId) => {
@@ -66,7 +71,7 @@ describe('Invites - Full E2E Flow', () => {
       cy.get('[data-cy="reg-button"]').click()
 
       // 5. Assert error message is shown
-      cy.contains(`Error Registering: "Invite for ${testEmail} not found"`).should('exist')
+      cy.contains('Error Registering: "Invite not found"').should('exist')
     })
   })
 
@@ -119,8 +124,10 @@ describe('Invites - Full E2E Flow', () => {
       cy.fillRegistrationForm({ email: existingEmail })
       cy.get('[data-cy="reg-button"]').click()
 
-      // 4. Assert error about already registered
-      cy.contains(`Error Registering: \"Invite for ${existingEmail} not found\"`).should('exist')
+      // 4. Assert error about already registered. Fresh invite for this exact address exists,
+      // so the "Invite not found" branch cannot fire — the real error is the unique-email
+      // constraint on User.
+      cy.contains('already in use').should('exist')
     })
   })
 
@@ -151,7 +158,7 @@ describe('Invites - Full E2E Flow', () => {
       cy.get('[data-cy="reg-button"]').click()
 
       // 5. Assert error message
-      cy.contains(`Error Registering: \"Invite for ${revokedEmail} not found\"`).should('exist')
+      cy.contains('Error Registering: "Invite not found"').should('exist')
     })
   })
 })
