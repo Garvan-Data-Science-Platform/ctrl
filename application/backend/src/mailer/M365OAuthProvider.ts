@@ -1,6 +1,7 @@
 import { ConfidentialClientApplication } from '@azure/msal-node'
 import Bottleneck from 'bottleneck'
 import nodemailer, { type Transporter } from 'nodemailer'
+import logger from 'common/src/logger'
 import type { MailOpts, MailProvider } from './provider'
 import { redactString } from './redact'
 import { extractAddress } from './sender'
@@ -85,6 +86,18 @@ export class M365OAuthProvider implements MailProvider {
   }
 
   async sendMail(opts: MailOpts): Promise<void> {
+    // Log queue state only when non-empty so steady-state 30/min sends stay quiet but
+    // any burst or stuck queue is visible. QUEUED + RUNNING are Bottleneck's counters
+    // for waiting jobs and in-flight jobs respectively. No PII: pure integers.
+    const counts = this.limiter.counts()
+    if (counts.QUEUED > 0 || counts.RUNNING > 0) {
+      logger.info({
+        message: 'M365 mailer queue state',
+        queued: counts.QUEUED,
+        running: counts.RUNNING,
+        incomingPriority: opts.mailPriority === 'high' ? 'high' : 'standard',
+      })
+    }
     return this.limiter.schedule({ priority: opts.mailPriority === 'high' ? 1 : 5 }, () =>
       this.doSend(opts),
     )

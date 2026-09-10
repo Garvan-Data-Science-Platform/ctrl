@@ -34,8 +34,10 @@ describe('M365OAuthProvider', () => {
       acquireTokenByClientCredential: mockAcquireToken,
     }))
     // Default passthrough: schedule runs the passed fn immediately.
+    // counts() returns all zeros so the queue-depth logger stays silent by default.
     MockedBottleneck.mockImplementation(() => ({
       schedule: (_options: unknown, fn: () => Promise<void>) => fn(),
+      counts: () => ({ RECEIVED: 0, QUEUED: 0, RUNNING: 0, EXECUTING: 0, DONE: 0 }),
     }))
   })
 
@@ -210,7 +212,10 @@ describe('M365OAuthProvider', () => {
     it('schedules with Bottleneck priority 1 when mailPriority is high', async () => {
       // Lower Bottleneck priority number = higher scheduling priority; 1 jumps ahead of 5.
       const scheduleSpy = jest.fn(async (_options: unknown, fn: () => Promise<void>) => fn())
-      MockedBottleneck.mockImplementation(() => ({ schedule: scheduleSpy }))
+      MockedBottleneck.mockImplementation(() => ({
+        schedule: scheduleSpy,
+        counts: () => ({ RECEIVED: 0, QUEUED: 0, RUNNING: 0, EXECUTING: 0, DONE: 0 }),
+      }))
       mockAcquireToken.mockResolvedValue({
         accessToken: 'fake',
         expiresOn: new Date(Date.now() + 3600 * 1000),
@@ -230,7 +235,10 @@ describe('M365OAuthProvider', () => {
 
     it('schedules with Bottleneck priority 5 when mailPriority is absent', async () => {
       const scheduleSpy = jest.fn(async (_options: unknown, fn: () => Promise<void>) => fn())
-      MockedBottleneck.mockImplementation(() => ({ schedule: scheduleSpy }))
+      MockedBottleneck.mockImplementation(() => ({
+        schedule: scheduleSpy,
+        counts: () => ({ RECEIVED: 0, QUEUED: 0, RUNNING: 0, EXECUTING: 0, DONE: 0 }),
+      }))
       mockAcquireToken.mockResolvedValue({
         accessToken: 'fake',
         expiresOn: new Date(Date.now() + 3600 * 1000),
@@ -372,6 +380,32 @@ describe('wrapSmtpError', () => {
     expect(wrapped.message).not.toContain(secretToken)
     expect(wrapped.message).toContain('[REDACTED]')
   })
+
+  it('classifies a plain object with no Error wrapping', () => {
+    // Real Exchange bounces occasionally arrive as plain objects (not Error instances),
+    // e.g. from a broken nodemailer plugin or a mock. wrapSmtpError reads code/response/message
+    // as duck-typed fields, so classification should still land.
+    const err = {
+      code: 'EAUTH',
+      response: '535 5.7.139 Application flagged for tenant policy',
+      message: 'Authentication failed',
+    }
+    const wrapped = wrapSmtpError(err)
+    expect(wrapped.message).toContain('Tenant-side authorisation')
+  })
+
+  it('classifies a plain object with only a response field', () => {
+    const err = { response: '432 4.3.2 Concurrent connections limit exceeded' }
+    const wrapped = wrapSmtpError(err)
+    expect(wrapped.message).toContain('concurrent connection limit')
+  })
+
+  it('falls back to String coercion for non-object throws', () => {
+    // If something throws a string or number, wrapSmtpError must not crash. Rare,
+    // but nothing prevents it in JS. errObj.message is undefined so String(err) wins.
+    const wrapped = wrapSmtpError('generic SMTP failure')
+    expect(wrapped.message).toContain('generic SMTP failure')
+  })
 })
 
 // The provision callback is what actually hands MSAL's token to nodemailer for
@@ -403,8 +437,10 @@ describe('provisionCallback', () => {
       acquireTokenByClientCredential: mockAcquireToken,
     }))
     // Default passthrough: schedule runs the passed fn immediately.
+    // counts() returns all zeros so the queue-depth logger stays silent by default.
     MockedBottleneck.mockImplementation(() => ({
       schedule: (_options: unknown, fn: () => Promise<void>) => fn(),
+      counts: () => ({ RECEIVED: 0, QUEUED: 0, RUNNING: 0, EXECUTING: 0, DONE: 0 }),
     }))
   })
 
@@ -480,8 +516,10 @@ describe('sendMail error wrapping integration', () => {
       acquireTokenByClientCredential: mockAcquireToken,
     }))
     // Default passthrough: schedule runs the passed fn immediately.
+    // counts() returns all zeros so the queue-depth logger stays silent by default.
     MockedBottleneck.mockImplementation(() => ({
       schedule: (_options: unknown, fn: () => Promise<void>) => fn(),
+      counts: () => ({ RECEIVED: 0, QUEUED: 0, RUNNING: 0, EXECUTING: 0, DONE: 0 }),
     }))
   })
 
