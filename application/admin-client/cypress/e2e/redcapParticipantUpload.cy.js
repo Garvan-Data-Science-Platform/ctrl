@@ -1,6 +1,7 @@
 /// <reference types="cypress" />
 
 const { TestUsers } = require('../../../common/testing/constants')
+const { VALIDATION_MESSAGES } = require('../../../common/src/validation')
 
 beforeEach(() => {
   cy.task('reset')
@@ -228,27 +229,27 @@ describe('REDCap Participant Upload', () => {
       cy.get('[data-cy="closeHelpPage"]').click()
       cy.get('[data-cy="helpPage"]').should('not.exist')
     })
-    // // comment out WIP test
-    //     it('should validate user input', () => {
-    //       const fileNameXss = 'test_participantXss.csv'
-    //       cy.get('Confirm').should('not.exist')
-    //       cy.get('[data-cy="upload-button"]').click()
-    //       cy.get('input[type="file"]').attachFile(fileNameXss)
-    //       cy.contains('Select header row').should('exist')
-    //       cy.contains('Next').click()
-    //       cy.contains('Next').click()
-    //       cy.contains('Confirm').click()
-    //       cy.contains('Errors detected').should('be.visible')
-    //       cy.contains('Cancel').click()
-    //       cy.contains('Cancel').should('not.exist')
-    //       cy.get('input[type="checkbox"]').eq(7).check({ force: true })
-    //       cy.get('input[type="checkbox"]').eq(8).check({ force: true })
-    //       cy.contains('Discard').click()
-    //       // cy.contains('Confirm').click()
 
-    //       cy.url().should('include', 'participants')
-    //       cy.get('[data-cy="prefill-details"]').first().trigger('mouseover')
-    //       cy.contains('1/1/2001').should('be.visible')
-    //     })
+    it('should validate user input', () => {
+      const fileNameXss = 'test_participantXss.csv'
+      cy.get('[data-cy="upload-button"]').click()
+      cy.get('input[type="file"]').attachFile(fileNameXss)
+      cy.contains('Select header row').should('exist')
+      cy.contains('Next').click()
+      cy.contains('Next').click()
+      cy.contains('Confirm').click()
+      cy.contains('Errors detected').should('be.visible')
+      cy.contains('Cancel').click()
+      cy.contains('Cancel').should('not.exist')
+
+      // TODO: not working!!
+      cy.get('[role="row"][aria-rowindex="6"]').as('fifthRow').should('exist')
+
+      cy.get('@fifthRow').find('[role="gridcell"][aria-colindex="1"]').first().as('emailCell')
+
+      cy.get('@emailCell').trigger('mouseover')
+
+      cy.contains(VALIDATION_MESSAGES.EMAIL_INVALID).should('be.visible')
+    })
   })
 })

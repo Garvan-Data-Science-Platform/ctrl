@@ -1,5 +1,7 @@
+import { VALIDATION_MESSAGES } from '@common/src/validation'
 import { GetParticipantProfileResponse } from '@common/types/api/users'
 import { ContactMethod, StateTerritory } from '@common/types/api/users/ParticipantProfile'
+import { REGEX } from '@common/types/commonTypes'
 import type { Fields } from 'react-spreadsheet-import/types/types'
 
 type PrefillKey =
@@ -15,7 +17,15 @@ export const importFields: Fields<PrefillKey> = [
     key: 'profile.email',
     fieldType: { type: 'input' },
     alternateMatches: ['email', 'ctrl_email'],
-    validations: [{ rule: 'required' }, { rule: 'unique' }],
+    validations: [
+      { rule: 'required' },
+      { rule: 'unique' },
+      {
+        rule: 'regex',
+        value: REGEX.EMAIL.source,
+        errorMessage: VALIDATION_MESSAGES.EMAIL_INVALID,
+      },
+    ],
   },
   {
     label: 'ID',
