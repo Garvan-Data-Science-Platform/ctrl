@@ -22,6 +22,7 @@
     "@refinedev/react-router": "^2.0.4",
     "@refinedev/simple-rest": "^6.0.1",
     "@tanstack/react-query": "^5.90.16",
+    "cypress-real-events": "^1.15.0",
     "flat": "^6.0.1",
     "immer": "^10.1.1",
     "mui-one-time-password-input": "^5.0.0",

@@ -18,7 +18,7 @@
     "paths": {
       "@common/*": ["../common/*"]
     },
-    "types": ["cypress-file-upload"]
+    "types": ["cypress-file-upload", "cypress-real-events"]
   },
   "include": ["src"],
   "references": [

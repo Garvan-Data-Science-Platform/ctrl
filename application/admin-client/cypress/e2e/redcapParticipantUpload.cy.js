@@ -242,13 +242,7 @@ describe('REDCap Participant Upload', () => {
       cy.contains('Cancel').click()
       cy.contains('Cancel').should('not.exist')
 
-      // TODO: not working!!
-      cy.get('[role="row"][aria-rowindex="6"]').as('fifthRow').should('exist')
-
-      cy.get('@fifthRow').find('[role="gridcell"][aria-colindex="1"]').first().as('emailCell')
-
-      cy.get('@emailCell').trigger('mouseover')
-
+      cy.contains('xss-email').should('be.visible').realHover()
       cy.contains(VALIDATION_MESSAGES.EMAIL_INVALID).should('be.visible')
     })
   })

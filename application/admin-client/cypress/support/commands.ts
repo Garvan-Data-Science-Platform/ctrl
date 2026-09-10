@@ -15,6 +15,7 @@
 // Cypress.Commands.add('login', (email, password) => { ... })
 //
 import 'cypress-file-upload'
+import 'cypress-real-events'
 
 // import common cypress commands
 import '../../../common/cypress/support/commands'
