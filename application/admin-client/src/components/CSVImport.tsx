@@ -32,18 +32,40 @@ export const importFields: Fields<PrefillKey> = [
     key: 'studyParticipant.externalId',
     alternateMatches: ['id', 'ctrl_study_id'],
     fieldType: { type: 'input' },
+    validations: [
+      // { rule: 'unique' }, TODO: check if external ID should be unique
+      {
+        rule: 'regex',
+        value: REGEX.EXTERNALID.source,
+        errorMessage: VALIDATION_MESSAGES.EXTERNALID_INVALID,
+      },
+    ],
   },
   {
     label: 'First Name',
     key: 'profile.firstName',
     alternateMatches: ['name', 'first name', 'ctrl_pers_name'],
     fieldType: { type: 'input' },
+    validations: [
+      {
+        rule: 'regex',
+        value: REGEX.NAME.source,
+        errorMessage: VALIDATION_MESSAGES.NAME_INVALID,
+      },
+    ],
   },
   {
     label: 'Last Name',
     key: 'profile.lastName',
     alternateMatches: ['surname', 'last name', 'ctrl_pers_surname'],
     fieldType: { type: 'input' },
+    validations: [
+      {
+        rule: 'regex',
+        value: REGEX.NAME.source,
+        errorMessage: VALIDATION_MESSAGES.NAME_INVALID,
+      },
+    ],
   },
   {
     label: 'Date of Birth (YYYY-MM-DD or DD/MM/YYYY)',
@@ -53,9 +75,8 @@ export const importFields: Fields<PrefillKey> = [
     validations: [
       {
         rule: 'regex',
-        value:
-          '^(\\d{4}[/\\-](0?[1-9]|1[0-2])[/\\-](0?[1-9]|[12][0-9]|3[01])|(0?[1-9]|[12][0-9]|3[01])[/\\-](0?[1-9]|1[0-2])[/\\-]\\d{4})$',
-        errorMessage: 'Must be format YYYY-MM-DD or DD/MM/YYYY',
+        value: REGEX.DOB.source,
+        errorMessage: VALIDATION_MESSAGES.DOB_INVALID,
       },
     ],
   },
@@ -64,18 +85,39 @@ export const importFields: Fields<PrefillKey> = [
     key: 'profile.mobile',
     alternateMatches: ['mobile', 'ctrl_phone_no'],
     fieldType: { type: 'input' },
+    validations: [
+      {
+        rule: 'regex',
+        value: REGEX.MOBILE.source,
+        errorMessage: VALIDATION_MESSAGES.MOBILE_INVALID,
+      },
+    ],
   },
   {
     label: 'Address Line',
     key: 'profile.addressLine',
     alternateMatches: ['address', 'ctrl_address'],
     fieldType: { type: 'input' },
+    validations: [
+      {
+        rule: 'regex',
+        value: REGEX.ADDRESS.source,
+        errorMessage: VALIDATION_MESSAGES.ADDRESS_INVALID,
+      },
+    ],
   },
   {
     label: 'Suburb',
     key: 'profile.suburb',
     alternateMatches: ['suburb', 'ctrl_suburb'],
     fieldType: { type: 'input' },
+    validations: [
+      {
+        rule: 'regex',
+        value: REGEX.ADDRESS.source,
+        errorMessage: VALIDATION_MESSAGES.ADDRESS_INVALID,
+      },
+    ],
   },
   {
     label: 'State',
@@ -100,6 +142,13 @@ export const importFields: Fields<PrefillKey> = [
     key: 'profile.postcode',
     alternateMatches: ['postcode', 'ctrl_postcode'],
     fieldType: { type: 'input' },
+    validations: [
+      {
+        rule: 'regex',
+        value: REGEX.POSTCODE.source,
+        errorMessage: VALIDATION_MESSAGES.POSTCODE_INVALID,
+      },
+    ],
   },
   {
     label: 'Preferred Contact Method',
@@ -119,17 +168,38 @@ export const importFields: Fields<PrefillKey> = [
     key: 'profile.nextOfKin.firstName',
     alternateMatches: ['ctrl_kin_name'],
     fieldType: { type: 'input' },
+    validations: [
+      {
+        rule: 'regex',
+        value: REGEX.NAME.source,
+        errorMessage: VALIDATION_MESSAGES.NAME_INVALID,
+      },
+    ],
   },
   {
     label: 'Alt Contact Last Name',
     key: 'profile.nextOfKin.lastName',
     alternateMatches: ['ctrl_kin_surname'],
     fieldType: { type: 'input' },
+    validations: [
+      {
+        rule: 'regex',
+        value: REGEX.NAME.source,
+        errorMessage: VALIDATION_MESSAGES.NAME_INVALID,
+      },
+    ],
   },
   {
     label: 'Alt Contact Email',
     key: 'profile.nextOfKin.email',
     fieldType: { type: 'input' },
     alternateMatches: ['ctrl_kin_email'],
+    validations: [
+      {
+        rule: 'regex',
+        value: REGEX.EMAIL.source,
+        errorMessage: VALIDATION_MESSAGES.EMAIL_INVALID,
+      },
+    ],
   },
 ]

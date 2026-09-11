@@ -237,13 +237,52 @@ describe('REDCap Participant Upload', () => {
       cy.contains('Select header row').should('exist')
       cy.contains('Next').click()
       cy.contains('Next').click()
-      cy.contains('Confirm').click()
-      cy.contains('Errors detected').should('be.visible')
-      cy.contains('Cancel').click()
-      cy.contains('Cancel').should('not.exist')
-
-      cy.contains('xss-email').should('be.visible').realHover()
+      // email
+      cy.contains('xss-email').should('be.visible').realHover({ scrollBehavior: 'center' })
       cy.contains(VALIDATION_MESSAGES.EMAIL_INVALID).should('be.visible')
+      // id
+      cy.contains('xss-id').should('be.visible').realHover({ scrollBehavior: 'center' })
+      cy.contains(VALIDATION_MESSAGES.EXTERNALID_INVALID).should('be.visible')
+      // first name
+      cy.contains('xss-first-name').should('be.visible').realHover({ scrollBehavior: 'center' })
+      cy.contains(VALIDATION_MESSAGES.NAME_INVALID).should('be.visible')
+      // last name
+      cy.contains('xss-last-name').should('be.visible').realHover({ scrollBehavior: 'center' })
+      cy.contains(VALIDATION_MESSAGES.NAME_INVALID).should('be.visible')
+      // date of birth
+      cy.contains('xss-dob').should('be.visible').realHover({ scrollBehavior: 'center' })
+      cy.contains(VALIDATION_MESSAGES.DOB_INVALID).should('be.visible')
+      // mobile
+      cy.contains('xss-mobile').should('be.visible').realHover({ scrollBehavior: 'center' })
+      cy.contains(VALIDATION_MESSAGES.MOBILE_INVALID).should('be.visible')
+      // address (need to scroll to the right first)
+      cy.contains('xss-address')
+        .scrollIntoView({ block: 'center', inline: 'center' })
+        .should('be.visible')
+        .realHover()
+      cy.contains(VALIDATION_MESSAGES.ADDRESS_INVALID).should('be.visible')
+      // suburb
+      cy.contains('xss-suburb').should('be.visible').realHover({ scrollBehavior: 'center' })
+      cy.contains(VALIDATION_MESSAGES.ADDRESS_INVALID).should('be.visible')
+      // postcode
+      cy.contains('xss-postcode').should('be.visible').realHover({ scrollBehavior: 'center' })
+      cy.contains(VALIDATION_MESSAGES.POSTCODE_INVALID).should('be.visible')
+      // next of kin (nok) first name
+      cy.contains('xss-nok-first-name').should('be.visible').realHover({ scrollBehavior: 'center' })
+      cy.contains(VALIDATION_MESSAGES.NAME_INVALID).should('be.visible')
+      // nok last name (need to scroll to the right again)
+      cy.contains('xss-nok-last-name')
+        .scrollIntoView({ block: 'center', inline: 'center' })
+        .should('be.visible')
+        .realHover({ scrollBehavior: 'center' })
+      cy.contains(VALIDATION_MESSAGES.NAME_INVALID).should('be.visible')
+      // nok email
+      cy.contains('xss-nok-email').should('be.visible').realHover({ scrollBehavior: 'center' })
+      cy.contains(VALIDATION_MESSAGES.EMAIL_INVALID).should('be.visible')
+
+      // NOTE: state is a different case with drop down matching
+      // cy.contains('xss-state').should('be.visible').realHover()
+      // cy.contains(VALIDATION_MESSAGES.STATE_INVALID).should('be.visible') // TODO Need state invalid
     })
   })
 })

@@ -20,6 +20,7 @@ export const VALIDATION_MESSAGES = {
   STEP_TITLE_INVALID: 'Step title contains invalid characters',
   STEP_DESCRIPTION_INVALID: 'Step description contains invalid characters',
   SURVEY_ELEMENT_INVALID: 'Contains invalid characters',
+  DOB_INVALID: 'Must be format YYYY-MM-DD or DD/MM/YYYY',
 }
 export const nameRules = (required = true) => ({
   required: required ? VALIDATION_MESSAGES.REQUIRED : false,
