@@ -18,7 +18,6 @@ export interface InviteParticipantsRequest {
 // firing an unawaited drain. Send-success counts (emailsResent / failedEmails) cannot be
 // known at response time and are dropped in favour of per-row status the admin polls for.
 export interface InviteParticipantsResponse {
-  resendEmailRequestCount: number
   newInvitesCount: number
   queuedCount: number
   alreadyAcceptedCount: number

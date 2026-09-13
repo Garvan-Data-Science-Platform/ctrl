@@ -725,7 +725,6 @@ export class InvitesController extends Controller {
     this.setStatus(202)
 
     const responseData: InviteParticipantsResponse = {
-      resendEmailRequestCount: emails.length,
       newInvitesCount: persistedNewIds.length,
       queuedCount: toDrainIds.length,
       alreadyAcceptedCount,

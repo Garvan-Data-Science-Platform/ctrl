@@ -141,10 +141,7 @@ export function wrapSmtpError(err: unknown): Error {
     return new Error(safe)
   }
 
-  if (
-    ['ETIMEDOUT', 'ENOTFOUND', 'ECONNREFUSED', 'ECONNRESET', 'ESOCKET'].includes(code) ||
-    combined.includes('login.microsoftonline.com')
-  ) {
+  if (['ETIMEDOUT', 'ENOTFOUND', 'ECONNREFUSED', 'ECONNRESET', 'ESOCKET'].includes(code)) {
     return new Error(`M365 network error: ${safe}`)
   }
 

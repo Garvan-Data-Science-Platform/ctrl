@@ -363,14 +363,6 @@ describe('wrapSmtpError', () => {
     expect(wrapped.message).toContain('M365 network error')
   })
 
-  it('wraps errors mentioning login.microsoftonline.com as network errors', () => {
-    const err = new Error(
-      'failed to fetch https://login.microsoftonline.com/tenant/oauth2/v2.0/token',
-    )
-    const wrapped = wrapSmtpError(err)
-    expect(wrapped.message).toContain('M365 network error')
-  })
-
   it('preserves secret redaction in wrapped errors', () => {
     const secretToken = 'abc123.def456.ghi789'
     const err = Object.assign(new Error(`auth failed: Bearer ${secretToken}`), {

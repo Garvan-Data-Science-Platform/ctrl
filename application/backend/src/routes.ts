@@ -660,7 +660,6 @@ const models: TsoaRoute.Models = {
     "InviteParticipantsResponse": {
         "dataType": "refObject",
         "properties": {
-            "resendEmailRequestCount": {"dataType":"double","required":true},
             "newInvitesCount": {"dataType":"double","required":true},
             "queuedCount": {"dataType":"double","required":true},
             "alreadyAcceptedCount": {"dataType":"double","required":true},

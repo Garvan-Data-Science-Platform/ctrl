@@ -361,10 +361,7 @@ describe('Participant Invites', () => {
         explanatoryText: 'Text',
       })
       .set({ Authorization: `Bearer ${orgAdminToken}` })
-    const body: InviteParticipantsResponse = response.body
     expect(response.status).toBe(202)
-
-    expect(body.resendEmailRequestCount).toBe(1)
 
     await waitForInviteDrain(1)
 

@@ -1925,10 +1925,6 @@
       },
       "InviteParticipantsResponse": {
         "properties": {
-          "resendEmailRequestCount": {
-            "type": "number",
-            "format": "double"
-          },
           "newInvitesCount": {
             "type": "number",
             "format": "double"
@@ -1943,7 +1939,6 @@
           }
         },
         "required": [
-          "resendEmailRequestCount",
           "newInvitesCount",
           "queuedCount",
           "alreadyAcceptedCount"
