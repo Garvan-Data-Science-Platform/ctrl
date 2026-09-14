@@ -100,6 +100,6 @@ describe('', () => {
     cy.get('[data-cy="pending-list"]').get('[data-rowindex="0"]').should('contain.text', 'Pending')
     cy.get('[data-cy="invite-actions"]').first().click()
     cy.get('[data-cy="resend-button"]').click()
-    cy.contains('Invite Resent', { timeout: 10000 }).should('exist')
+    cy.contains('Invite queued', { timeout: 10000 }).should('exist')
   })
 })

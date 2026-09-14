@@ -505,7 +505,7 @@ describe('UsersController', () => {
 
       expect(sentEmails).toHaveLength(1)
       expect(sentEmails[0]).toMatchObject({
-        from: `CTRL <noreply@${process.env.HOSTNAME}>`,
+        from: 'CTRL <test@example.com>',
         subject: 'CTRL - Password Reset Link',
         to: userEmail,
       })
@@ -530,7 +530,7 @@ describe('UsersController', () => {
 
       expect(sentEmails).toHaveLength(1)
       expect(sentEmails[0]).toMatchObject({
-        from: `CTRL <noreply@${process.env.HOSTNAME}>`,
+        from: 'CTRL <test@example.com>',
         subject: 'CTRL - Password Reset Link',
         to: TestUsers.ORG_ADMIN.email,
       })

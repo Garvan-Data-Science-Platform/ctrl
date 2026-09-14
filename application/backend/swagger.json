@@ -1871,7 +1871,8 @@
           "ACCEPTED",
           "EXPIRED",
           "REVOKED",
-          "FAILED_TO_SEND"
+          "FAILED_TO_SEND",
+          "QUEUED"
         ],
         "type": "string"
       },
@@ -1924,25 +1925,11 @@
       },
       "InviteParticipantsResponse": {
         "properties": {
-          "resendEmailRequestCount": {
-            "type": "number",
-            "format": "double"
-          },
           "newInvitesCount": {
             "type": "number",
             "format": "double"
           },
-          "emailsResentCount": {
-            "type": "number",
-            "format": "double"
-          },
-          "failedEmails": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "failedEmailsCount": {
+          "queuedCount": {
             "type": "number",
             "format": "double"
           },
@@ -1952,11 +1939,8 @@
           }
         },
         "required": [
-          "resendEmailRequestCount",
           "newInvitesCount",
-          "emailsResentCount",
-          "failedEmails",
-          "failedEmailsCount",
+          "queuedCount",
           "alreadyAcceptedCount"
         ],
         "type": "object",
@@ -6325,8 +6309,8 @@
       "post": {
         "operationId": "CreateInvites",
         "responses": {
-          "200": {
-            "description": "Ok",
+          "202": {
+            "description": "Invites queued",
             "content": {
               "application/json": {
                 "schema": {
@@ -6367,7 +6351,7 @@
           }
         },
         "description": "Create invites",
-        "summary": "Creates invites for a list of participant emails and sends it to them",
+        "summary": "Queue invites for a list of participant emails and return 202. The mails\nare drained asynchronously; poll GET /studies/{studyId}/invites for per-row status.",
         "tags": [
           "Invites"
         ],
@@ -6406,8 +6390,8 @@
       "post": {
         "operationId": "ResendInviteById",
         "responses": {
-          "204": {
-            "description": "No content"
+          "202": {
+            "description": "Invite queued"
           },
           "401": {
             "description": "Unauthorized",
@@ -6431,7 +6415,7 @@
           }
         },
         "description": "Resend invite by ID and StudyID",
-        "summary": "Resend invite by ID and StudyID",
+        "summary": "Re-queue an invite by ID and StudyID and return 202. The mail drains\nasynchronously; poll GET /studies/{studyId}/invites for status.",
         "tags": [
           "Invites"
         ],
@@ -6468,8 +6452,8 @@
       "post": {
         "operationId": "ResendPendingInvites",
         "responses": {
-          "204": {
-            "description": "No content"
+          "202": {
+            "description": "Invites queued"
           },
           "401": {
             "description": "Unauthorized",
@@ -6493,7 +6477,7 @@
           }
         },
         "description": "Resend all pending invites for a study",
-        "summary": "Resend invites that are currently pending for a study",
+        "summary": "Re-queue all PENDING invites for a study and return 202. The mails drain\nasynchronously; poll GET /studies/{studyId}/invites for per-row status.",
         "tags": [
           "Invites"
         ],

@@ -199,6 +199,7 @@ enum InviteStatus {
   EXPIRED
   REVOKED
   FAILED_TO_SEND
+  QUEUED
 }
 
 model PasswordResetToken {

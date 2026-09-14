@@ -56,6 +56,16 @@ export const ParticipantList = () => {
   const { dataGridProps: inviteGridProps } = useDataGrid({
     syncWithLocation: false,
     resource: 'invites',
+    // poll while any row is QUEUED
+    queryOptions: {
+      refetchInterval: (query) => {
+        const rows = (query.state.data as { data?: { inviteStatus?: InviteStatus }[] } | undefined)
+          ?.data
+        return Array.isArray(rows) && rows.some((r) => r.inviteStatus === InviteStatus.QUEUED)
+          ? 30_000
+          : false
+      },
+    },
   })
 
   const { studies, activeStudyIndex } = useStudyStore()
@@ -106,13 +116,17 @@ export const ParticipantList = () => {
       })
       .then(() => {
         setModalOpen(false)
-        open?.({ type: 'success', message: `Invites sent` })
+        open?.({ type: 'success', message: `Invites queued` })
         setLoading(false)
         invalidate({ resource: 'invites', invalidates: ['list'] })
       })
       .catch((error) => {
         setModalOpen(false)
-        open?.({ type: 'error', message: `Could not send invites: ${error}` })
+        // Prefer the backend's detail/message so validation errors like a duplicate
+        // conflict actually reach the admin instead of a bare "status code 422".
+        const detail =
+          error?.response?.data?.details || error?.response?.data?.message || error.message
+        open?.({ type: 'error', message: `Could not send invites: ${detail}` })
         setLoading(false)
       })
   }
@@ -137,7 +151,7 @@ export const ParticipantList = () => {
     axiosInstance
       .post(`studies/${studies[activeStudyIndex].id}/invites/${id}/resend`)
       .then(() => {
-        open?.({ type: 'success', message: 'Invite Resent' })
+        open?.({ type: 'success', message: 'Invite queued' })
         invalidate({ resource: 'invites', invalidates: ['list'] })
       })
       .catch((error) => {
@@ -298,6 +312,7 @@ export const ParticipantList = () => {
     ACCEPTED: { label: 'Accepted' },
     EXPIRED: { label: 'Expired' },
     PENDING: { label: 'Pending' },
+    QUEUED: { label: 'Queued', color: 'info.main' },
     REVOKED: { label: 'Revoked' },
     FAILED_TO_SEND: { label: 'Failed to send', color: 'error.main' },
   }

@@ -4,4 +4,5 @@ export enum InviteStatus {
   EXPIRED = 'EXPIRED',
   REVOKED = 'REVOKED',
   FAILED_TO_SEND = 'FAILED_TO_SEND',
+  QUEUED = 'QUEUED',
 }
