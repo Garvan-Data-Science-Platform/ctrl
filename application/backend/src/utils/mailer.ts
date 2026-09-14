@@ -4,21 +4,23 @@ import config from '../config'
 if (!process.env.HOSTNAME) {
   throw new Error('process.env.HOSTNAME is required but was not provided.')
 }
+// NOTE: this is likely superceeded by improved mailer as part of M365 OAuth PR
+// immediately invoked function expression (IIFE)
+export const fromAddress = (() => {
+  const rawHostname = process.env.HOSTNAME || 'localhost'
 
-const hostnameEnvVar = process.env.HOSTNAME
-let mailDomain: string
-
-if (/^https?:\/\//i.test(hostnameEnvVar)) {
   try {
-    mailDomain = new URL(hostnameEnvVar).hostname
-  } catch (err: any) {
-    throw new Error(`HOSTNAME deployment variable not configured. ${err}`)
-  }
-} else {
-  mailDomain = hostnameEnvVar
-}
+    // add a prefix if missing so URL contructor can parse it
+    const urlString = rawHostname.includes('://') ? rawHostname : `http://${rawHostname}`
+    const parsedUrl = new URL(urlString)
 
-export const fromAddress = `CTRL <noreply@${mailDomain}>`
+    // .hostname strips protol and port
+    return `CTRL <noreply@${parsedUrl.hostname}>`
+  } catch {
+    // fallbck if parsing fails completely
+    return `CTRL <noreply@localhost>`
+  }
+})()
 
 export async function createMailerTransporter() {
   if (process.env.STUB_MAILER == 'true') {
