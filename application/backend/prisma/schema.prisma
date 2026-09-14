@@ -18,7 +18,7 @@ model User {
   middleName          String? /// @encrypted
   lastName            String /// @encrypted
   email               String               @unique /// @encrypted
-  emailHash           String?              @unique /// @encryption:hash(email)
+  emailHash           String?              @unique /// @encryption:hash(email)?normalize=lowercase
   password            String
   role                Role                 @default(Participant)
   adminOfStudies      Study[]
@@ -181,7 +181,7 @@ model SurveyVersionAnswers {
 model Invite {
   id        String       @id @default(uuid())
   email     String /// @encrypted
-  emailHash String? /// @encryption:hash(email)
+  emailHash String? /// @encryption:hash(email)?normalize=lowercase
   status    InviteStatus @default(PENDING)
   studyId   Int
   study     Study        @relation(fields: [studyId], references: [id], onDelete: Cascade)
