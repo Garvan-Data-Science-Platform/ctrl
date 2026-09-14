@@ -121,4 +121,20 @@ describe('Mailer Configuration', () => {
 
     expect(mailerModule!.fromAddress).toBe('CTRL <noreply@production-domain.com>')
   })
+
+  it('should strip ports when no protocol provided', async () => {
+    process.env.HOSTNAME = 'localhost:5173'
+
+    const mailerModule = await import('../utils/mailer')
+
+    expect(mailerModule!.fromAddress).toBe('CTRL <noreply@localhost>')
+  })
+
+  it('should strip ports and protocol when provided', async () => {
+    process.env.HOSTNAME = 'https://staging.example.com:8080'
+
+    const mailerModule = await import('../utils/mailer')
+
+    expect(mailerModule!.fromAddress).toBe('CTRL <noreply@staging.example.com>')
+  })
 })
