@@ -3,7 +3,14 @@ import { Request, Response, NextFunction } from 'express'
 import prisma from '../PrismaClient'
 
 // SENSITIVE FIELDS THAT WE DO NOT WANT TO SHOW IN AUDIT LOG
-const SENSITIVE_FIELDS = ['password', 'redcapToken', 'otp_code', 'otp_token']
+const SENSITIVE_FIELDS = [
+  'password',
+  'redcapToken',
+  'otp_code',
+  'otp_token',
+  'token',
+  'newPassword',
+]
 
 export async function auditLog(req: Request, res: Response, next: NextFunction) {
   const userId = req.user?.userId || undefined

@@ -39,11 +39,13 @@ describe('AuditLog Middleware', () => {
     const testPayload = {
       email: 'notsecret@example.com',
       password: 'Supersecret123!',
+      newPassword: 'Supersecret321!',
       redcapURL: 'https://notsecret.com/123',
       redcapToken: 'SuperSecretToken123',
       otp_code: '321123',
       otp_token: '1234-1234-1234-1234',
       contactUsEmail: 'not@secret.com',
+      token: '1234-1234-1234-1234',
     }
 
     const response = await request(app).post('/dummy-endpoint').send(testPayload)
@@ -61,9 +63,11 @@ describe('AuditLog Middleware', () => {
     // Test that sensitive fields are obscured
     expect(savedBody.password).not.toBe('Supersecret123!')
     expect(savedBody.password).toBe('***')
+    expect(savedBody.newPassword).toBe('***')
     expect(savedBody.redcapToken).toBe('***')
     expect(savedBody.otp_code).toBe('***')
     expect(savedBody.otp_token).toBe('***')
+    expect(savedBody.token).toBe('***')
 
     // Test that non-sensitive fields are visible
     expect(savedBody.email).toBe('notsecret@example.com')
