@@ -689,8 +689,21 @@ export class InvitesController extends Controller {
       data: { inviteEmailSubject: subjectText, inviteEmailText: explanatoryText },
     })
 
-    const recipients = [...new Set(bodyRequest.recipients)]
-    const emails = recipients.map((val) => val.email)
+    const uniqueRecipientsMap = new Map()
+
+    bodyRequest.recipients.forEach((recipient) => {
+      const normalisedEmail = (recipient.email || '').trim().toLowerCase()
+
+      if (normalisedEmail && !uniqueRecipientsMap.has(normalisedEmail)) {
+        uniqueRecipientsMap.set(normalisedEmail, {
+          ...recipient,
+          email: normalisedEmail, // overwrite with normalised version
+        })
+      }
+    })
+
+    const recipients = Array.from(uniqueRecipientsMap.values())
+    const emails = Array.from(uniqueRecipientsMap.keys())
 
     const expiresAt = inviteExpiresAt()
 
