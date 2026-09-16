@@ -4,7 +4,14 @@ import prisma from './PrismaClient'
 import { resetDB } from 'common/testing/TestHelpers'
 import { TestStudies } from 'common/testing/constants'
 
+const saltedHash = (input: string, saltEnvName: string): string => {
+  const salt = process.env[saltEnvName]
+  if (!salt) throw new Error(`${saltEnvName} not set`)
+  return createHash('sha256').update(input).update(salt).digest('hex')
+}
+
 // Catches a future dev dropping ?saltEnv= from a schema.prisma annotation
+// or misconfiguring which salt env var applies to which field
 describe('PrismaClient blind-index salting', () => {
   const raw = new PrismaClient()
 
@@ -16,7 +23,7 @@ describe('PrismaClient blind-index salting', () => {
     await raw.$disconnect()
   })
 
-  it('User.emailHash is salted, not plain sha256(email)', async () => {
+  it('User.emailHash uses EMAIL_HASH_SALT', async () => {
     const email = `salt-check-user-${Date.now()}@example.com`
     const created = await prisma.user.create({
       data: { email, firstName: 'x', lastName: 'y', password: 'p' },
@@ -25,11 +32,11 @@ describe('PrismaClient blind-index salting', () => {
       where: { id: created.id },
       select: { emailHash: true },
     })
-    expect(row.emailHash).not.toBeNull()
+    expect(row.emailHash).toEqual(saltedHash(email, 'EMAIL_HASH_SALT'))
     expect(row.emailHash).not.toEqual(createHash('sha256').update(email).digest('hex'))
   })
 
-  it('ParticipantProfile firstNameHash / lastNameHash / dobHash are salted', async () => {
+  it('ParticipantProfile firstName/lastName/dob use their per-field salts', async () => {
     const stamp = Date.now()
     const firstName = `salt-first-${stamp}`
     const lastName = `salt-last-${stamp}`
@@ -52,12 +59,12 @@ describe('PrismaClient blind-index salting', () => {
       where: { id: created.id },
       select: { firstNameHash: true, lastNameHash: true, dobHash: true },
     })
-    expect(row.firstNameHash).not.toEqual(createHash('sha256').update(firstName).digest('hex'))
-    expect(row.lastNameHash).not.toEqual(createHash('sha256').update(lastName).digest('hex'))
-    expect(row.dobHash).not.toEqual(createHash('sha256').update(dob).digest('hex'))
+    expect(row.firstNameHash).toEqual(saltedHash(firstName, 'FIRST_NAME_HASH_SALT'))
+    expect(row.lastNameHash).toEqual(saltedHash(lastName, 'LAST_NAME_HASH_SALT'))
+    expect(row.dobHash).toEqual(saltedHash(dob, 'DOB_HASH_SALT'))
   })
 
-  it('Invite.emailHash is salted, not plain sha256(email)', async () => {
+  it('Invite.emailHash uses EMAIL_HASH_SALT (shared with User)', async () => {
     const email = `salt-check-invite-${Date.now()}@example.com`
     const created = await prisma.invite.create({
       data: {
@@ -70,7 +77,19 @@ describe('PrismaClient blind-index salting', () => {
       where: { id: created.id },
       select: { emailHash: true },
     })
-    expect(row.emailHash).not.toBeNull()
-    expect(row.emailHash).not.toEqual(createHash('sha256').update(email).digest('hex'))
+    expect(row.emailHash).toEqual(saltedHash(email, 'EMAIL_HASH_SALT'))
+  })
+
+  it('per-field salts are distinct: same input hashes differently across field types', async () => {
+    const shared = `same-input-${Date.now()}`
+    expect(saltedHash(shared, 'EMAIL_HASH_SALT')).not.toEqual(
+      saltedHash(shared, 'FIRST_NAME_HASH_SALT'),
+    )
+    expect(saltedHash(shared, 'FIRST_NAME_HASH_SALT')).not.toEqual(
+      saltedHash(shared, 'LAST_NAME_HASH_SALT'),
+    )
+    expect(saltedHash(shared, 'LAST_NAME_HASH_SALT')).not.toEqual(
+      saltedHash(shared, 'DOB_HASH_SALT'),
+    )
   })
 })
