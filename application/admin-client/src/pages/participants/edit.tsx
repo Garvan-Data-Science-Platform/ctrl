@@ -39,6 +39,12 @@ export const ParticipantEdit = () => {
     const { externalId, profile } = values
     // eslint-disable-next-line
     const { familyId, familyMembers, id, ...rest } = profile
+    if (rest.email) {
+      rest.email = rest.email.trim()
+    }
+    if (rest.nextOfKin?.email) {
+      rest.nextOfKin.email = rest.nextOfKin.email.trim()
+    }
     onFinish({
       externalId: externalId || '',
       profile: rest,

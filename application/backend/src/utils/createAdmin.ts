@@ -2,15 +2,17 @@ import { hashPassword } from '../authentication'
 import prisma from '../PrismaClient'
 
 const createAdmin = async () => {
-  const admin = await prisma.user.findFirst({ where: { email: process.env['ORG_ADMIN_EMAIL'] } })
+  const email = (process.env['ORG_ADMIN_EMAIL'] ?? '').trim()
+  const password = (process.env['ORG_ADMIN_PASSWORD'] ?? '').trim()
+  const admin = await prisma.user.findFirst({ where: { email } })
 
-  if (!admin && process.env['ORG_ADMIN_PASSWORD'] && process.env['ORG_ADMIN_EMAIL']) {
+  if (!admin && password && email) {
     await prisma.user.create({
       data: {
-        email: process.env['ORG_ADMIN_EMAIL'] as string,
+        email,
         firstName: 'ORG_ADMIN',
         lastName: 'USER',
-        password: await hashPassword(process.env['ORG_ADMIN_PASSWORD']),
+        password: await hashPassword(password),
         role: 'OrganisationAdmin',
       },
     })

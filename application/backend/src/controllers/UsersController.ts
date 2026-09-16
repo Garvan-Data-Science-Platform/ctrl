@@ -176,6 +176,7 @@ export class UsersController extends Controller {
     @Request() request: RequestWithAuthentication,
     @Body() bodyRequest: CreateUserRequest,
   ): Promise<CreateUserResponse> {
+    const email = bodyRequest.email.trim()
     const callingUser = await this.userRepo.findUniqueOrThrow({
       where: { id: request.user.userId },
       select: { id: true, role: true, adminOfStudies: { select: { id: true } } },
@@ -184,14 +185,13 @@ export class UsersController extends Controller {
       throw new UnprocessableError('As a study admin, you can only create other study admins')
     }
 
-    const isDeleted =
-      (await this.userRepo.count({ where: { email: bodyRequest.email, deleted: true } })) > 0
+    const isDeleted = (await this.userRepo.count({ where: { email, deleted: true } })) > 0
     if (isDeleted) {
       throw new UnprocessableError(
         'This email belongs to a deleted user, you must restore the user instead of creating a new one',
       )
     }
-    const emailExists = (await this.userRepo.count({ where: { email: bodyRequest.email } })) > 0
+    const emailExists = (await this.userRepo.count({ where: { email } })) > 0
     if (emailExists) {
       throw new UnprocessableError('Email already exists')
     }
@@ -205,6 +205,7 @@ export class UsersController extends Controller {
     const insertedUser = await this.userRepo.create({
       data: {
         ...bodyRequest,
+        email,
         password,
         adminOfStudies: studyToAdd !== undefined ? { connect: { id: studyToAdd } } : undefined,
       },
@@ -213,7 +214,7 @@ export class UsersController extends Controller {
     const responseData = {
       id: insertedUser.id,
     }
-    await this.generatePasswordResetLink({ email: bodyRequest.email }, undefined, true)
+    await this.generatePasswordResetLink({ email }, undefined, true)
     logger.info({ ...responseData })
     return responseData
   }
@@ -233,6 +234,7 @@ export class UsersController extends Controller {
     @Path() userId: number,
     @Body() bodyRequest: UpdateUserRequest,
   ) {
+    const email = bodyRequest.email?.trim()
     const callingUser = await this.userRepo.findUniqueOrThrow({
       where: { id: request.user.userId },
     })
@@ -257,7 +259,7 @@ export class UsersController extends Controller {
 
     await this.userRepo.update({
       where: { id: userId },
-      data: bodyRequest,
+      data: { ...bodyRequest, email },
     })
   }
 
@@ -371,7 +373,8 @@ export class UsersController extends Controller {
     clientType?: string,
     adminInvite = false,
   ): Promise<void> {
-    const user = await prisma.user.findUnique({ where: { email: bodyRequest.email } })
+    const email = bodyRequest.email.trim()
+    const user = await prisma.user.findUnique({ where: { email } })
 
     if (
       !user ||
@@ -441,7 +444,8 @@ export class UsersController extends Controller {
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   @Response<UnauthorizedErrorResponse>('403', 'Forbidden')
   public async resetPassword(@Body() bodyRequest: ResetPasswordRequest): Promise<void> {
-    const { token, newPassword } = bodyRequest
+    const { token, newPassword: rawNewPassword } = bodyRequest
+    const newPassword = rawNewPassword.trim()
     const passwordResetToken = await this.passwordResetTokenRepo.findUnique({
       where: { token },
       include: { user: true },

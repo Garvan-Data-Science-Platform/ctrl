@@ -337,7 +337,8 @@ export class IntegrationsController extends Controller {
     const existingUsers: string[] = []
 
     for (const participant of data) {
-      const { email, ...participantData } = participant
+      const { email: rawEmail, ...participantData } = participant
+      const email = rawEmail.trim()
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (participantData as any).password
