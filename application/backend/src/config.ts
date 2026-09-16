@@ -4,9 +4,8 @@ import path from 'path'
 import Ajv from 'ajv'
 import { FromSchema } from 'json-schema-to-ts'
 
-// Blind-index hash salts must exist in every environment (schema.prisma references them via ?saltEnv=NAME).
-// Deliberately outside the NODE_ENV !== 'test' guard below: tests hash too, so a missing salt in a test env
-// must fail loudly rather than silently fall back to unsalted hashing.
+// Blind-index hash salts required in every env. Kept above the test guard below so a missing salt
+// fails loudly instead of silently falling back to unsalted hashing.
 for (const name of [
   'EMAIL_HASH_SALT',
   'FIRST_NAME_HASH_SALT',
@@ -14,7 +13,7 @@ for (const name of [
   'DOB_HASH_SALT',
 ]) {
   if (!process.env[name]) {
-    throw new Error(`${name} is required. See application/backend/.env.example.`)
+    throw new Error(`${name} is required, see application/backend/.env.example`)
   }
 }
 
