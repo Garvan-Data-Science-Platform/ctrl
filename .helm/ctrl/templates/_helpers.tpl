@@ -97,3 +97,22 @@ postgres-password: {{ index $secret.data "postgres-password" }}
 postgres-password: {{ randAlphaNum 10 | b64enc }}
 {{- end -}}
 {{- end -}}
+
+
+{{/*
+Create or generate per-field blind-index hash salts
+*/}}
+{{- define "secret.hashsalts" -}}
+{{- $secret := lookup "v1" "Secret" .Release.Namespace "hash-salts" -}}
+{{- if $secret.data -}}
+email-hash-salt: {{ index $secret.data "email-hash-salt" }}
+first-name-hash-salt: {{ index $secret.data "first-name-hash-salt" }}
+last-name-hash-salt: {{ index $secret.data "last-name-hash-salt" }}
+dob-hash-salt: {{ index $secret.data "dob-hash-salt" }}
+{{- else -}}
+email-hash-salt: {{ randAlphaNum 32 | b64enc }}
+first-name-hash-salt: {{ randAlphaNum 32 | b64enc }}
+last-name-hash-salt: {{ randAlphaNum 32 | b64enc }}
+dob-hash-salt: {{ randAlphaNum 32 | b64enc }}
+{{- end -}}
+{{- end -}}
