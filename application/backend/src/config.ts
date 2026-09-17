@@ -4,6 +4,19 @@ import path from 'path'
 import Ajv from 'ajv'
 import { FromSchema } from 'json-schema-to-ts'
 
+// Blind-index hash salts required in every env. Kept above the test guard below so a missing salt
+// fails loudly instead of silently falling back to unsalted hashing.
+for (const name of [
+  'EMAIL_HASH_SALT',
+  'FIRST_NAME_HASH_SALT',
+  'LAST_NAME_HASH_SALT',
+  'DOB_HASH_SALT',
+]) {
+  if (!process.env[name]) {
+    throw new Error(`${name} is required, see application/backend/.env.example`)
+  }
+}
+
 //Validate
 const schema = {
   type: 'object',

@@ -60,6 +60,26 @@ spec:
                 secretKeyRef:
                   name: aeskey
                   key: aeskey
+            - name: EMAIL_HASH_SALT
+              valueFrom:
+                secretKeyRef:
+                  name: hash-salts
+                  key: email-hash-salt
+            - name: FIRST_NAME_HASH_SALT
+              valueFrom:
+                secretKeyRef:
+                  name: hash-salts
+                  key: first-name-hash-salt
+            - name: LAST_NAME_HASH_SALT
+              valueFrom:
+                secretKeyRef:
+                  name: hash-salts
+                  key: last-name-hash-salt
+            - name: DOB_HASH_SALT
+              valueFrom:
+                secretKeyRef:
+                  name: hash-salts
+                  key: dob-hash-salt
             - name: CONFIG_DIR
               value: '/config'
             
