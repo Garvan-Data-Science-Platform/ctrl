@@ -177,6 +177,7 @@ describe('REDCap Survey Upload', () => {
       cy.get('[data-cy="closeHelpPage"]').click()
       cy.get('[data-cy="helpPage"]').should('not.exist')
     })
+
     it('should validate xss in form name', () => {
       cy.get('[data-cy="apiSubmit"]').should('be.visible').should('be.disabled')
       cy.get('[data-cy="formName"]')
@@ -186,6 +187,29 @@ describe('REDCap Survey Upload', () => {
         })
       cy.contains(VALIDATION_MESSAGES.REDCAP_FORM_INVALID).should('exist')
       cy.get('[data-cy="apiSubmit"]').should('be.visible').should('be.disabled')
+    })
+
+    it('should validate xss in file upload submission', () => {
+      const fileName = 'test_instrument1Xss.csv'
+      cy.get('[data-cy="surveyAttach"]').attachFile(fileName)
+
+      // Click the initial confirm button
+      cy.contains('button', 'Confirm').click()
+
+      // Verify dialog content
+      cy.get('[data-cy="confirmDialog"]').should('be.visible')
+      cy.contains('Warning: This action will overwrite the current draft survey').should(
+        'be.visible',
+      )
+      cy.contains(`The imported data from "${fileName}" will replace any existing content`).should(
+        'be.visible',
+      )
+
+      // Click the confirmation button in dialog
+      cy.contains('button', 'Yes, Overwrite').click()
+
+      // Invalid content is flagged in UI
+      cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_INVALID).should('be.visible')
     })
   })
 })
