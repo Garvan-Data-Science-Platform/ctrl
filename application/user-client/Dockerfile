@@ -19,7 +19,7 @@ COPY application/user-client/package.json application/user-client/
 COPY application/backend/package.json application/backend/
 COPY application/common/package.json application/common/
 
-RUN corepack enable && yarn 
+RUN corepack enable && yarn
 
 COPY application/user-client application/user-client
 COPY application/backend application/backend
@@ -27,9 +27,9 @@ COPY application/common application/common
 
 RUN yarn workspace backend prisma:generate
 
-RUN yarn workspace user-client build 
+RUN yarn workspace user-client build
 
-FROM nginx
+FROM nginx:1.31.4-alpine
 
 COPY --from=build /usr/src/app/application/user-client/dist /usr/share/nginx/html
 
