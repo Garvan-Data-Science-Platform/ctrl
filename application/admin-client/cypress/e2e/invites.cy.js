@@ -193,4 +193,17 @@ describe('', () => {
     cy.contains(VALIDATION_MESSAGES.INVITE_EMAIL_TEXT_INVALID).should('exist')
     cy.get('[data-cy="send-button"]').should('be.disabled')
   })
+
+  it('Can correctly handles carriage returns', () => {
+    cy.visit('/participants')
+    cy.get('[data-cy="invite-button"]').click()
+    cy.get('[data-cy="email-field"]').trigger('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: { getData: (type) => 'robert@g.co\r\nrichard@g.co' },
+    })
+    cy.get('[data-cy="recipients-list"]')
+      .should('contain.text', 'robert@g.co')
+      .should('contain.text', 'richard@g.co')
+  })
 })

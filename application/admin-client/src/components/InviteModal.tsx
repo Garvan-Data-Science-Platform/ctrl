@@ -91,7 +91,7 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
     event.preventDefault()
     const pasted = event.clipboardData.getData('Text')
     // handle windows carriage returns '\r'
-    const rows = pasted.replace(/r/g, '').split('\n')
+    const rows = pasted.replace(/\r/g, '').split('\n')
     let skippedCount = 0
 
     setRecipients((current) => {
