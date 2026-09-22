@@ -4,7 +4,7 @@ import { InviteStatus } from './invite'
 
 export interface GetInvitesResponse {
   data: {
-    id: string // String because this is a uuid TODO: add UUID type?
+    id: string // String because this is a uuid
     email: Email
     studyId: number
     createdAt: string
@@ -17,7 +17,7 @@ export interface GetInvitesResponse {
 export interface GetUserInvitesResponse {
   data: {
     invites: {
-      id: string // String because this is a uuid TODO: add UUID type?
+      id: string // String because this is a uuid
       email: Email
       studyId: number
       createdAt: string

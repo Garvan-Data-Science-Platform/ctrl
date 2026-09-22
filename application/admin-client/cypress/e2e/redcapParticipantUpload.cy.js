@@ -281,8 +281,6 @@ describe('REDCap Participant Upload', () => {
       cy.contains(VALIDATION_MESSAGES.EMAIL_INVALID).should('be.visible')
 
       // NOTE: state is a different case with drop down matching
-      // cy.contains('xss-state').should('be.visible').realHover()
-      // cy.contains(VALIDATION_MESSAGES.STATE_INVALID).should('be.visible') // TODO Need state invalid
     })
   })
 })

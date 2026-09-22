@@ -33,7 +33,6 @@ export const importFields: Fields<PrefillKey> = [
     alternateMatches: ['id', 'ctrl_study_id'],
     fieldType: { type: 'input' },
     validations: [
-      // { rule: 'unique' }, TODO: check if external ID should be unique
       {
         rule: 'regex',
         value: REGEX.EXTERNALID.source,

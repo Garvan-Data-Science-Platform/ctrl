@@ -1,4 +1,3 @@
-// TODO: Is this needed given enum from schema.prisma?
 export enum InviteStatus {
   PENDING = 'PENDING',
   ACCEPTED = 'ACCEPTED',

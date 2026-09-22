@@ -10,6 +10,6 @@ export interface SettingsBase {
 // required tcLink and newsLink
 export interface GetSettingsResponse {
   data: SettingsBase & {
-    logoSet: string | null // TODO: add type?
+    logoSet: string | null
   }
 }

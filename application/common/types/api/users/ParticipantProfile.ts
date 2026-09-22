@@ -32,6 +32,7 @@ export interface AlternativeContact {
   email: Email
 }
 
+// This relates to dependent
 export interface OnBehalf {
   firstName: FirstName
   lastName: LastName
