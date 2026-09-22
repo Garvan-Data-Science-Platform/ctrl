@@ -1172,6 +1172,7 @@
       "StudyName": {
         "type": "string",
         "example": "Acme Genomics Study",
+        "minLength": 1,
         "maxLength": 128,
         "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
       },
@@ -1190,6 +1191,7 @@
       "StudyDescription": {
         "type": "string",
         "example": "This is a short description of the study",
+        "minLength": 1,
         "maxLength": 900,
         "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
       },

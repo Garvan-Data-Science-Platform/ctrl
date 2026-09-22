@@ -519,7 +519,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "StudyName": {
         "dataType": "refAlias",
-        "type": {"dataType":"string","validators":{"maxLength":{"value":128},"pattern":{"value":"^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"}}},
+        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":128},"pattern":{"value":"^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"}}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "CreateStudyRequest": {
@@ -532,7 +532,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "StudyDescription": {
         "dataType": "refAlias",
-        "type": {"dataType":"string","validators":{"maxLength":{"value":900},"pattern":{"value":"^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"}}},
+        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":900},"pattern":{"value":"^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"}}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "RedcapToken": {

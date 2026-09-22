@@ -120,8 +120,8 @@ export type RoleT = Role
 
 export type UserT = User
 
-// * @minLength 1 //TODO: check if we want minLength for study name
 /**
+ * @minLength 1
  * @maxLength 128
  * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
  * @example "Acme Genomics Study"
@@ -129,6 +129,7 @@ export type UserT = User
 export type StudyName = string
 
 /**
+ * @minLength 1
  * @maxLength 900
  * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
  * @example "This is a short description of the study"
