@@ -118,7 +118,6 @@ export type ExternalId = string
  */
 export type RoleT = Role
 
-// TODO: add annotations?
 export type UserT = User
 
 // * @minLength 1 //TODO: check if we want minLength for study name
@@ -130,7 +129,7 @@ export type UserT = User
 export type StudyName = string
 
 /**
- * @maxLength 900 // TODO: align this with the maxLength of the field
+ * @maxLength 900
  * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
  * @example "This is a short description of the study"
  */
@@ -150,7 +149,7 @@ export type RedcapToken = string
 
 /**
  * @minLength 1
- * @maxLength 128 // TODO: align this with the maxLength of the field
+ * @maxLength 128
  * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€_+]+$
  * @example "Name of REDCap instrument (from Column B of data dictionary)"
  */
@@ -158,14 +157,14 @@ export type RedcapFormName = string
 
 /**
  * @minLength 1
- * @maxLength 128 // TODO: verify max length
+ * @maxLength 128
  * @pattern ^https?:\/\/[a-zA-Z0-9._~:/?#@!$&'()*+,;=%-]+$
  * @example "https://orgname.com/tcLink/"
  */
 export type Url = string
 
 /**
- * @maxLength 128 // TODO: verify max length
+ * @maxLength 128
  * @pattern ^(https?:\/\/[a-zA-Z0-9._~:/?#@!$&'()*+,;=%-]+)?$
  * @example "https://redcap.orgname.com/api/"
  */
@@ -173,7 +172,7 @@ export type OptionalUrl = string
 
 /**
  * @minLength 1
- * @maxLength 128 // TODO: align this with the maxLength of the field
+ * @maxLength 128
  * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
  * @example "Invitation to CTRL - Dynamic Consent Platform"
  */
@@ -181,7 +180,7 @@ export type InviteEmailSubject = string
 
 /**
  * @minLength 1
- * @maxLength 900 // TODO: align this with the maxLength of the field
+ * @maxLength 900
  * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
  * @example "You have been invited to register with CTRL dynamic consent platform"
  */
@@ -189,7 +188,7 @@ export type InviteEmailText = string
 
 /**
  * @minLength 1
- * @maxLength 128 // TODO: align this with the maxLength of the field
+ * @maxLength 128
  * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
  * @example "Acme Medical Research Institute"
  */
@@ -197,35 +196,35 @@ export type OrganisationName = string
 
 /**
  * @minLength 1
- * @maxLength 900 // TODO: align this with the maxLength of the field
+ * @maxLength 900
  * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$
  * @example "There was some problem with this thing that I was doing.\nBut I don't know why?\n\nCheers,\nJohn Doe"
  */
 export type ContactUsText = string
 
 /**
- * @maxLength 128 // TODO: align this with the maxLength of the field
+ * @maxLength 128
  * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]*$
  * @example "Introduction to CTRL"
  */
 export type SurveyStepTitle = string
 
 /**
- * @maxLength 900 // TODO: align this with the maxLength of the field
+ * @maxLength 900
  * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]*$
  * @example "Watch our short video about the consent process for taking part in medical research."
  */
 export type SurveyStepDescription = string
 
 /**
- * @maxLength 900 // TODO: align this with the maxLength of the field
+ * @maxLength 900
  * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]*$
  * @example "Do you consent to the genomic test?"
  */
 export type SurveyQuestionText = string
 
 /**
- * @maxLength 900 // TODO: align this with the maxLength of the field
+ * @maxLength 900
  * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]*$
  * @example "Here is an explanation of what genomic means"
  */
