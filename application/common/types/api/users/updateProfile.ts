@@ -38,8 +38,5 @@ export interface UpdateProfileRequest {
    * @maxItems 15
    */
   dependents?: OnBehalf[]
-  /**
-   * @maxLength 255
-   */
   externalId?: ExternalId
 }
