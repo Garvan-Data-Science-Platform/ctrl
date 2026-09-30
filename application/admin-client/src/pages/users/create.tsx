@@ -8,16 +8,24 @@ import { Controller } from 'react-hook-form'
 export const UserCreate = () => {
   const {
     saveButtonProps,
-    refineCore: { formLoading },
+    refineCore: { formLoading, onFinish },
     register,
+    handleSubmit,
     control,
     formState: { errors },
   } = useForm({})
 
   const { data: identity } = useGetIdentity<{ role: string; id: number }>()
 
+  const handleSubmitCustom = (values: any) => {
+    onFinish({ ...values, email: values.email?.trim() })
+  }
+
   return (
-    <Create isLoading={formLoading} saveButtonProps={saveButtonProps}>
+    <Create
+      isLoading={formLoading}
+      saveButtonProps={{ ...saveButtonProps, onClick: handleSubmit(handleSubmitCustom) }}
+    >
       <Box component="form" sx={{ display: 'flex', flexDirection: 'column' }} autoComplete="off">
         <TextField
           {...register('firstName', {

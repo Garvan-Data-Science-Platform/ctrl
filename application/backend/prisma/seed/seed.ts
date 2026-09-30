@@ -330,31 +330,35 @@ const main = async () => {
     },
   })
 
+  const exampleAdminEmail = (process.env.EXAMPLE_ORG_ADMIN_EMAIL ?? '').trim()
+  const exampleAdminPassword = (process.env.EXAMPLE_ORG_ADMIN_PASSWORD ?? '').trim()
   const exampleAdmin = await prisma.user.upsert({
-    where: { email: String(process.env.EXAMPLE_ORG_ADMIN_EMAIL) },
+    where: { email: exampleAdminEmail },
     update: {},
     create: {
-      email: String(process.env.EXAMPLE_ORG_ADMIN_EMAIL),
+      email: exampleAdminEmail,
       firstName: 'Example',
       lastName: 'Admin',
       role: 'OrganisationAdmin',
-      password: hashPassword(String(process.env.EXAMPLE_ORG_ADMIN_PASSWORD)),
+      password: hashPassword(exampleAdminPassword),
     },
   })
   console.log('Added the following users:', exampleAdmin)
 
   const exampleAnswers = createDefaultAnswers(SeedSurveyStepData)
   exampleAnswers[1].answers[0] = false //For DUO testing
+  const exampleParticipantEmail = (process.env.EXAMPLE_PARTICIPANT_EMAIL ?? '').trim()
+  const exampleParticipantPassword = (process.env.EXAMPLE_PARTICIPANT_PASSWORD ?? '').trim()
   const exampleUser = await prisma.user.upsert({
-    where: { email: String(process.env.EXAMPLE_PARTICIPANT_EMAIL) },
+    where: { email: exampleParticipantEmail },
     update: {},
     create: {
-      email: String(process.env.EXAMPLE_PARTICIPANT_EMAIL),
+      email: exampleParticipantEmail,
       firstName: 'Judith',
       middleName: 'Arundell',
       lastName: 'Wright',
       role: 'Participant',
-      password: hashPassword(String(process.env.EXAMPLE_PARTICIPANT_PASSWORD)),
+      password: hashPassword(exampleParticipantPassword),
       profiles: {
         create: [
           {

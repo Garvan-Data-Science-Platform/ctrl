@@ -80,7 +80,7 @@ export default function ResetPassword() {
     setStatus('pending')
 
     const reqData: ResetPasswordRequest = {
-      newPassword: data.newPassword,
+      newPassword: data.newPassword.trim(),
       token: token,
     }
 
@@ -171,7 +171,7 @@ export default function ResetPassword() {
                 {...register('newPassword', {
                   required: 'This field is required',
                   validate: (val) => {
-                    const { isValid, fields } = checkPasswordStrength(val)
+                    const { isValid, fields } = checkPasswordStrength(val.trim())
                     if (!isValid) {
                       return `Invalid password. ${Object.values(fields).map((f) => ' ' + f.message)}`
                     }
@@ -189,7 +189,7 @@ export default function ResetPassword() {
                 {...register('confirmPassword', {
                   required: 'This field is required',
                   validate: (val: string) => {
-                    if (watch('newPassword') != val) {
+                    if (watch('newPassword')?.trim() !== val.trim()) {
                       return 'Your passwords do not match'
                     }
                   },

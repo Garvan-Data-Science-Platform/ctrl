@@ -87,7 +87,7 @@ export default function ProfileEdit() {
       nextOfKin: {
         firstName: data['nok_first'],
         lastName: data['nok_surname'],
-        email: data['nok_email'],
+        email: data['nok_email'].trim(),
         mobile: data['nok_mobile'],
       },
     }

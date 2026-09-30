@@ -20,11 +20,16 @@ export const UserEdit = () => {
   type FieldValues = UpdateUserRequest
   const {
     saveButtonProps,
-    refineCore: { formLoading },
+    refineCore: { formLoading, onFinish },
     register,
+    handleSubmit,
     control,
     formState: { errors },
   } = useForm<any, any, FieldValues>({ refineCoreProps: { redirect: false } })
+
+  const handleSubmitCustom = (values: any) => {
+    onFinish({ ...values, email: values.email?.trim() })
+  }
 
   const { query } = useShow()
 
@@ -71,7 +76,7 @@ export const UserEdit = () => {
   return (
     <Edit
       isLoading={formLoading}
-      saveButtonProps={saveButtonProps}
+      saveButtonProps={{ ...saveButtonProps, onClick: handleSubmit(handleSubmitCustom) }}
       canDelete={identity?.role == 'OrganisationAdmin'}
       footerButtonProps={{
         sx: { display: 'flex', justifyContent: 'flex-start', width: '100%', pl: 2, pb: 2 },

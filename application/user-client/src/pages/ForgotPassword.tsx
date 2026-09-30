@@ -35,8 +35,10 @@ export default function ForgotPassword() {
     // Set to pending before the request
     setStatus('pending')
 
+    const payload: GeneratePasswordResetLinkRequest = { ...data, email: data.email.trim() }
+
     apiClient
-      .post('/users/password/generate-reset-link', data, {
+      .post('/users/password/generate-reset-link', payload, {
         headers: { 'Content-Type': 'application/json', 'x-client-type': 'user-client' },
       })
       .then((res) => {

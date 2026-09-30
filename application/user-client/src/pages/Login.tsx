@@ -50,10 +50,12 @@ export default function Login() {
   const queryClient = useQueryClient()
 
   const onSubmit = (data: unknown) => {
+    const req = data as LoginRequest
+    const payload = { ...req, email: req.email.trim(), password: req.password.trim() }
     fetch(import.meta.env.VITE_BACKEND_URL + '/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-client-type': clientType },
-      body: JSON.stringify(data as LoginRequest),
+      body: JSON.stringify(payload),
     })
       .then((res) => {
         if (res.ok) {
