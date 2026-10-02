@@ -151,6 +151,7 @@ export class UsersController extends Controller {
     const user: UserResponse | null = await this.userRepo.findUnique({
       where: { id: userId },
       include: { adminOfStudies: { select: { name: true, id: true } } },
+      omit: { password: true, emailHash: true },
     })
     if (!user) {
       const errorMessage: string = `User with ID: ${userId} not found`
