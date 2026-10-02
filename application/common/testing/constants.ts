@@ -1,5 +1,9 @@
 // Constants shared for all tests
 
+// Strong test password with no common test-user PII substrings (e.g. 'test', 'admin').
+// Use in tests that register/login with placeholder names.
+export const STRONG_TEST_PASSWORD = 'Constellation2026'
+
 // Test user credentials (for seed data and tests)
 export const TestUsers = {
   OPERATOR_ADMIN: {

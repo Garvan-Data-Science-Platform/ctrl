@@ -93,6 +93,25 @@ describe('registration', () => {
     cy.contains('must not contain easily guessable words').should('exist')
   })
 
+  it('Input password containing personal info and get correct error message', () => {
+    cy.task('getInviteIdtask', {
+      email: TestInvites.INVITE_PENDING.email,
+      studyId: TestStudies.TEST_STUDY.id,
+    })
+      .as('inviteId')
+      .then((inviteId) => {
+        cy.visit(`/register/${inviteId}`)
+      })
+    cy.wait(500) // wait for form to be fully loaded
+    cy.get('[data-cy="reg-first"] input').clear()
+    cy.get('[data-cy="reg-first"]').type('Tanuj')
+    cy.get('[data-cy="reg-password"]').type('TanujCorduroy2026')
+    cy.get('[data-cy="reg-confirm-password"]').type('TanujCorduroy2026')
+    cy.get('[data-cy="reg-button"]').click()
+    cy.contains('Invalid password').should('exist')
+    cy.contains('contains personal information').should('exist')
+  })
+
   it('Attempt to register existing email (i.e. no invite) and get correct error message', () => {
     cy.visit('/register/not-a-real-inviteId')
     fillValid()

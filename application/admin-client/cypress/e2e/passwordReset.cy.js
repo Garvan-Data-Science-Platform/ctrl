@@ -41,6 +41,14 @@ describe('Password Reset', () => {
     cy.contains('must not contain easily guessable').should('exist')
   })
 
+  it('rejects a new password containing the users personal info', () => {
+    cy.intercept('POST', '/users/password/reset').as('resetRequest')
+    cy.visit('/update-password?token=valid-reset-token')
+    cy.get('input[id="password"]').type('ResetCorduroy2026')
+    cy.get('input[id="confirmPassword"]').type('ResetCorduroy2026{enter}')
+    cy.wait('@resetRequest').its('response.statusCode').should('eq', 422)
+  })
+
   it('opens password reset page and enters non-matching passwords', () => {
     cy.visit('/update-password?token=valid-reset-token')
     cy.get('input[id="password"]').type('pass')
