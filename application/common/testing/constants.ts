@@ -4,17 +4,17 @@
 export const TestUsers = {
   OPERATOR_ADMIN: {
     email: 'operatoradmin@example.com',
-    password: 'Loginforadmin1',
+    password: 'Loginfortests123',
     id: 96,
   },
   ORG_ADMIN: {
     email: 'admin@example.com',
-    password: 'Loginforadmin1',
+    password: 'Loginfortests123',
     id: 97,
   },
   ORG_ADMIN_2: {
     email: 'admin2@example.com',
-    password: 'Loginforadmin1',
+    password: 'Loginfortests123',
     id: 101,
   },
   PARTICIPANT_UNANSWERED: {
@@ -37,7 +37,7 @@ export const TestUsers = {
   },
   STUDY_ADMIN: {
     email: 'studyadmin@example.com',
-    password: 'Loginforadmin1',
+    password: 'Loginfortests123',
     id: 106,
   },
   PASSWORD_RESET_USER: {
@@ -102,4 +102,77 @@ export const MIME_TYPES: Record<string, string> = {
   // csv: 'text/csv'
 }
 
-export const commonPasswordBaseWords = ['Password', 'Changeme', 'Welcome']
+export const commonPasswordBaseWords = [
+  // Numeric sequences
+  '000000',
+  '111111',
+  '1111111',
+  '11111111',
+  '112233',
+  '123123',
+  '123321',
+  '12345',
+  '123456',
+  '1234567',
+  '12345678',
+  '123456789',
+  '1234567890',
+  '12345678910',
+  '555555',
+  '654321',
+  '666666',
+  '7777777',
+  '987654321',
+
+  // Common words used as passwords
+  'Abc123',
+  'Admin',
+  'Ashley',
+  'Bailey',
+  'Baseball',
+  'Changeme',
+  'Dragon',
+  'Football',
+  'Google',
+  'Iloveyou',
+  'Jesus',
+  'Letmein',
+  'Master',
+  'Michael',
+  'Monkey',
+  'Mustang',
+  'Mynoob',
+  'Ninja',
+  'Password',
+  'Qwerty',
+  'Secret',
+  'Shadow',
+  'Sunshine',
+  'Superman',
+  'Trustno1',
+  'Welcome',
+
+  // Compound and modified patterns
+  'Aa123456',
+  'Aa@123456',
+  'Admin123',
+  'Admin@123',
+  'Admintelecom',
+  'P@ssw0rd',
+  'Pass@123',
+  'Passw0rd',
+  'Password1',
+
+  // Keyboard walks and bot-observed patterns
+  '123qwe',
+  '18atcskd2w',
+  '1q2w3e',
+  '1q2w3e4r',
+  '1q2w3e4r5t',
+  '3rjs1la7qe',
+  'Qazwsx',
+  'Qwerty1',
+  'Qwerty123',
+  'Qwertyuiop',
+  'Zxcvbnm',
+]

@@ -20,9 +20,10 @@ export function checkPasswordStrength(password: string): PasswordStrengthResult 
   if (password.length < 14) {
     fields.Length = { message: 'Password must be at least 14 characters' }
   }
-  if (baseWordRegex.test(password)) {
+  const commonMatch = password.match(baseWordRegex)
+  if (commonMatch) {
     fields.CommonBase = {
-      message: `Password must not contain easily guessable words (i.e. ${commonPasswordBaseWords.join(', ')})`,
+      message: `Password contains a commonly used weak pattern: "${commonMatch[0]}". Please choose something less predictable.`,
     }
   }
   if (!/[A-Z]/.test(password)) {
