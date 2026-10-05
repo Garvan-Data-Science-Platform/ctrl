@@ -3,6 +3,15 @@ generator client {
   previewFeatures = ["omitApi"]
 } 
 
+generator dbml {
+  provider              = "prisma-dbml-generator"
+  output                = "./dbml"
+  outputName            = "schema.dbml"
+  projectName           = "CTRL"
+  projectDatabaseType   = "PostgreSQL"
+  includeRelationFields = "true"
+}
+
 generator json {
   provider = "prisma-json-types-generator"
 }

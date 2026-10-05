@@ -1,0 +1,268 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Project "CTRL" {
+  database_type: 'PostgreSQL'
+  Note: ''
+}
+
+Table User {
+  id Int [pk, increment]
+  firstName String [not null, note: '@encrypted']
+  middleName String [note: '@encrypted']
+  lastName String [not null, note: '@encrypted']
+  email String [unique, not null, note: '@encrypted']
+  emailHash String [unique, note: '@encryption:hash(email)']
+  password String [not null]
+  role Role [not null, default: 'Participant']
+  adminOfStudies Study [not null]
+  organisations Organisation [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  agreedTermsAt DateTime
+  profiles ParticipantProfile [not null]
+  auditLogs AuditLog [not null]
+  otpTokens OTPToken [not null]
+  passwordResetTokens PasswordResetToken [not null]
+  lockedUntil DateTime
+  retriesRemaining Int [not null, default: 10]
+  deleted Boolean [not null, default: false]
+}
+
+Table ParticipantProfile {
+  id Int [pk, increment]
+  individualId String [unique, not null]
+  firstName String [not null, note: '@encrypted']
+  firstNameHash String [note: '@encryption:hash(firstName)']
+  middleName String [note: '@encrypted']
+  lastName String [not null, note: '@encrypted']
+  lastNameHash String [note: '@encryption:hash(lastName)']
+  dob String [not null, note: '@encrypted']
+  dobHash String [note: '@encryption:hash(dob)']
+  mobile String [not null, note: '@encrypted']
+  addressLine String [not null, note: '@encrypted']
+  suburb String [not null, note: '@encrypted']
+  state StateTerritory [not null]
+  postcode String [not null, note: '@encrypted']
+  participantType ParticipantType [not null]
+  nextOfKin AlternativeContact
+  preferredContact ContactMethod [not null]
+  studies StudyParticipant [not null]
+  familyId Int [increment, not null]
+  userId Int
+  user User
+  surveys SurveyVersionAnswers [not null]
+}
+
+Table StudyParticipant {
+  participantProfile ParticipantProfile [not null]
+  participantProfileId Int [not null]
+  study Study [not null]
+  studyId Int [not null]
+  participantNumber Int [not null, default: 0]
+  participantId String
+  externalId String
+  deleted Boolean [not null, default: false]
+
+  indexes {
+    (participantProfileId, studyId) [pk]
+  }
+}
+
+Table AlternativeContact {
+  id Int [pk, increment]
+  firstName String [not null, note: '@encrypted']
+  middleName String [note: '@encrypted']
+  lastName String [not null, note: '@encrypted']
+  mobile String [note: '@encrypted']
+  email String [not null, note: '@encrypted']
+  ParticipantProfile ParticipantProfile [not null]
+  participantProfileId Int [unique, not null]
+}
+
+Table Organisation {
+  id Int [pk, increment]
+  name String [unique, not null]
+  primaryColour String
+  secondaryColour String
+  elsaToken String [note: '@encrypted']
+  logo Bytes
+  tcLink String [not null, default: 'https://garvan-data-science-platform.github.io/ctrl-docs/docs/terms-and-conditions']
+  newsLink String
+  users User [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Study {
+  id Int [pk, increment]
+  name String [not null]
+  description String
+  logo Bytes
+  redcapURL String [note: '@encrypted']
+  redcapToken String [note: '@encrypted']
+  inviteEmailSubject String [not null, default: 'Invitation to CTRL - Dynamic Consent Platform']
+  inviteEmailText String [not null, default: 'You have been invited to register with CTRL dynamic consent platform.']
+  contactUsEmail String
+  surveys SurveyVersion [not null]
+  profiles StudyParticipant [not null]
+  invites Invite [not null]
+  admins User [not null]
+  deleted Boolean [not null, default: false]
+}
+
+Table SurveyVersion {
+  id Int [pk, increment]
+  versionNumber Int [not null]
+  data Json [not null, note: '![PrismaJson.SurveyVersionData]']
+  status SurveyVersionStatus [not null, default: 'DRAFT']
+  surveyVersionAnswers SurveyVersionAnswers [not null]
+  study Study [not null]
+  studyId Int [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  publishedAt DateTime
+
+  indexes {
+    (studyId, versionNumber) [unique]
+  }
+}
+
+Table SurveyVersionAnswers {
+  id Int [pk, increment]
+  version SurveyVersion [not null]
+  versionId Int [not null]
+  profile ParticipantProfile [not null]
+  profileId Int [not null]
+  answers Json [not null, note: '![PrismaJson.SurveyAnswerData]']
+  derived String
+}
+
+Table Invite {
+  id String [pk]
+  email String [not null, note: '@encrypted']
+  emailHash String [note: '@encryption:hash(email)']
+  status InviteStatus [not null, default: 'PENDING']
+  studyId Int [not null]
+  study Study [not null]
+  expiresAt DateTime [not null]
+  createdAt DateTime [default: `now()`, not null]
+  sentAt DateTime
+  prefill String [note: '@encrypted']
+
+  indexes {
+    (studyId, emailHash) [unique]
+  }
+}
+
+Table PasswordResetToken {
+  id Int [pk, increment]
+  token String [unique, not null]
+  userId Int [not null]
+  user User [not null]
+  expiresAt DateTime [not null]
+  used Boolean [not null, default: false]
+}
+
+Table AuditLog {
+  id Int [pk, increment]
+  resource String [not null]
+  operation AuditLogOperation [not null]
+  success Boolean [not null, default: true]
+  timestamp DateTime [default: `now()`, not null]
+  userId Int
+  user User
+  meta Json [not null]
+  requestBody String [note: '@encrypted']
+}
+
+Table OTPToken {
+  id String [pk]
+  userId Int [not null]
+  user User [not null]
+  code String [not null]
+  expiresAt DateTime [not null]
+}
+
+Table StudyToUser {
+  adminofstudiesId Int [ref: > Study.id]
+  adminsId Int [ref: > User.id]
+}
+
+Table OrganisationToUser {
+  organisationsId Int [ref: > Organisation.id]
+  usersId Int [ref: > User.id]
+}
+
+Enum ParticipantType {
+  STANDARD
+  GUARDIAN
+  DEPENDENT_AGE
+  DEPENDENT_OTHER
+}
+
+Enum Role {
+  OperatorAdmin
+  Participant
+  OrganisationAdmin
+  StudyAdmin
+}
+
+Enum StateTerritory {
+  ACT
+  NSW
+  NT
+  QLD
+  SA
+  TAS
+  VIC
+  WA
+}
+
+Enum ContactMethod {
+  EMAIL
+  MOBILE
+  MAIL
+}
+
+Enum SurveyVersionStatus {
+  DRAFT
+  PUBLISHED
+}
+
+Enum InviteStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  REVOKED
+  FAILED_TO_SEND
+}
+
+Enum AuditLogOperation {
+  CREATE
+  UPDATE
+  DELETE
+}
+
+Ref: ParticipantProfile.userId > User.id
+
+Ref: StudyParticipant.participantProfileId > ParticipantProfile.id [delete: Cascade]
+
+Ref: StudyParticipant.studyId > Study.id [delete: Cascade]
+
+Ref: AlternativeContact.participantProfileId - ParticipantProfile.id [delete: Cascade]
+
+Ref: SurveyVersion.studyId > Study.id [delete: Cascade]
+
+Ref: SurveyVersionAnswers.versionId > SurveyVersion.id [delete: Cascade]
+
+Ref: SurveyVersionAnswers.profileId > ParticipantProfile.id [delete: Cascade]
+
+Ref: Invite.studyId > Study.id [delete: Cascade]
+
+Ref: PasswordResetToken.userId > User.id [delete: Cascade]
+
+Ref: AuditLog.userId > User.id [delete: Restrict]
+
+Ref: OTPToken.userId > User.id [delete: Cascade]
