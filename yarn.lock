@@ -1483,10 +1483,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@faker-js/faker@npm:^10.0.0":
-  version: 10.0.0
-  resolution: "@faker-js/faker@npm:10.0.0"
-  checksum: 10c0/7692f21cad661cd0cb150d72d4dff79322c892923c97a263c12ae74de45739306bea4e2630e8ac852dd4395ead2cb76be3715011395256c56e8a9b39acdcb97a
+"@faker-js/faker@npm:^10.6.0":
+  version: 10.6.0
+  resolution: "@faker-js/faker@npm:10.6.0"
+  checksum: 10c0/ee285d597249a019f3a11b6705d1908616ea9e880207ca4f89e6205dbf7e98abd1129f025f5da19484f5e88f556b0629a4363745ff0bbaf1984ebf54cffde6e3
   languageName: node
   linkType: hard
 
@@ -5080,15 +5080,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/winston@npm:^2.4.4":
-  version: 2.4.4
-  resolution: "@types/winston@npm:2.4.4"
-  dependencies:
-    winston: "npm:*"
-  checksum: 10c0/8b967c089ba71773cca671b76aba931b2849afb3a6c03cbc5ef04d19e44092e0957573c730cdfbdda71eeb44984d3554e7edb88391c2a3c1aa36cafadc8f2b87
-  languageName: node
-  linkType: hard
-
 "@types/yargs-parser@npm:*":
   version: 21.0.3
   resolution: "@types/yargs-parser@npm:21.0.3"
@@ -6827,8 +6818,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "common@workspace:application/common"
   dependencies:
-    "@types/winston": "npm:^2.4.4"
-    dompurify: "npm:^3.3.3"
+    dompurify: "npm:^3.4.16"
     dotenv: "npm:^16.4.5"
     jest: "npm:^29.7.0"
     pdf-parse-new: "npm:^1.3.9"
@@ -7051,7 +7041,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "ctrl@workspace:."
   dependencies:
-    "@faker-js/faker": "npm:^10.0.0"
+    "@faker-js/faker": "npm:^10.6.0"
     "@react-pdf/renderer": "npm:^4.2.2"
     "@types/node": "npm:^22.1.0"
     "@typescript-eslint/eslint-plugin": "npm:^8.31.1"
@@ -7438,15 +7428,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dompurify@npm:^3.3.3":
-  version: 3.3.3
-  resolution: "dompurify@npm:3.3.3"
+"dompurify@npm:^3.4.16":
+  version: 3.4.16
+  resolution: "dompurify@npm:3.4.16"
   dependencies:
     "@types/trusted-types": "npm:^2.0.7"
   dependenciesMeta:
     "@types/trusted-types":
       optional: true
-  checksum: 10c0/097c14a21a3f6cb95beded9ecd255f7c3512c42767b048390c747b0fe35736f6a71e02320fc50a9ac2be645834b463e4760915d595d502a56452daf339d0ea9c
+  checksum: 10c0/65a901c6b6d489d3e898f67223d81dac66d613cda48f5785f0ed52a4ae320c4b2745490a58c14161e29f0273080fea0a0cb234a9ef892650e1a9b2a7befa07a5
   languageName: node
   linkType: hard
 
@@ -16053,7 +16043,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"winston@npm:*, winston@npm:^3.13.1, winston@npm:^3.17.0":
+"winston@npm:^3.13.1, winston@npm:^3.17.0":
   version: 3.17.0
   resolution: "winston@npm:3.17.0"
   dependencies:

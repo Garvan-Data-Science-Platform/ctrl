@@ -16,7 +16,7 @@
   ],
   "private": true,
   "devDependencies": {
-    "@faker-js/faker": "^10.0.0",
+    "@faker-js/faker": "^10.6.0",
     "@types/node": "^22.1.0",
     "@typescript-eslint/eslint-plugin": "^8.31.1",
     "@typescript-eslint/parser": "^8.31.1",
