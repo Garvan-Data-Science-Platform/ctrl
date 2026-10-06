@@ -50,7 +50,7 @@ import {
   generatePasswordResetEmail,
 } from 'common/src/emails/generate'
 import crypto, { randomBytes } from 'crypto'
-import nodemailer from 'nodemailer'
+import { SendMailOptions } from 'nodemailer'
 import { createMailerTransporter, fromAddress } from '../utils/mailer'
 import { auditLog } from '../middlewares/AuditLog'
 import config from '../config'
@@ -422,7 +422,7 @@ export class UsersController extends Controller {
       subject = 'CTRL - Password Reset Link'
     }
 
-    const mailToUserOptions: nodemailer.SendMailOptions = {
+    const mailToUserOptions: SendMailOptions = {
       from: fromAddress,
       to: user.email,
       subject,

@@ -5114,15 +5114,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/nodemailer@npm:^6.4.17":
-  version: 6.4.17
-  resolution: "@types/nodemailer@npm:6.4.17"
-  dependencies:
-    "@types/node": "npm:*"
-  checksum: 10c0/689abb3005cf36cf89c2abe56f0aa4469a37e0814633a73fbeb35732e856f4b0d7ab32b6d91585038b6941f5b70db58ec2bd147ebe9f73e528eb6c99604f4e82
-  languageName: node
-  linkType: hard
-
 "@types/parse-json@npm:^4.0.0":
   version: 4.0.2
   resolution: "@types/parse-json@npm:4.0.2"
@@ -6213,7 +6204,6 @@ __metadata:
     "@types/express": "npm:^5.0.1"
     "@types/jest": "npm:^29.5.12"
     "@types/jsonwebtoken": "npm:^9.0.7"
-    "@types/nodemailer": "npm:^6.4.17"
     "@types/pg": "npm:^8.11.6"
     "@types/supertest": "npm:^6.0.2"
     "@types/swagger-ui-express": "npm:^4.1.8"
@@ -6233,8 +6223,8 @@ __metadata:
     json5: "npm:^2.2.3"
     jsonwebtoken: "npm:^9.0.2"
     multer: "npm:^2.4.0"
-    nodemailer: "npm:^9.0.1"
-    nodemailer-mock: "npm:^2.0.6"
+    nodemailer: "npm:^10.0.15"
+    nodemailer-mock: "npm:^2.1.0"
     pg: "npm:^8.12.0"
     prisma: "npm:^5.20.0"
     prisma-field-encryption: "npm:^1.6.0"
@@ -12431,21 +12421,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nodemailer-mock@npm:^2.0.6":
-  version: 2.0.9
-  resolution: "nodemailer-mock@npm:2.0.9"
+"nodemailer-mock@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "nodemailer-mock@npm:2.1.0"
   dependencies:
-    debug: "npm:^4.4.0"
+    debug: "npm:^4.4.3"
   peerDependencies:
-    nodemailer: ^6.x || ^7.x
-  checksum: 10c0/b14e6d0551bc82325dd796311b8f28245bbd48b4b770ed5ec67b7532f2244cdceb8abb33c70b0e094f50b2137996037989563cb175e65be2afe96cec755461d2
+    nodemailer: ^6.x || ^7.x || ^8.x || ^9.x || ^10.x
+  checksum: 10c0/1f63f9da5f4ce8b9417750536c8dde87022f2eaa6b19ded1daffd1427a325574809445443aaff94df789e3b474036d27214651795bf19f137623fdc71149176c
   languageName: node
   linkType: hard
 
-"nodemailer@npm:^9.0.1":
-  version: 9.0.3
-  resolution: "nodemailer@npm:9.0.3"
-  checksum: 10c0/9e93516fb9fcc8835b683cdf3b90135648dabf0133ac9b04890303c2e23eef1d7bae58fe98afb0e251ae10428b96f05df483deb78f0b49f47793debbb0383216
+"nodemailer@npm:^10.0.15":
+  version: 10.0.15
+  resolution: "nodemailer@npm:10.0.15"
+  checksum: 10c0/d91aa2d9f697143cce981f0208fe69c46690cb2392ba35e60adbb441ee5ef0edfc977c23d557b98f08e47f1fe64799fc2f34e7f0f2e50b0a1fd3eb6724b3c30d
   languageName: node
   linkType: hard
 

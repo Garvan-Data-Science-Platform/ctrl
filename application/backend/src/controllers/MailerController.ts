@@ -10,7 +10,7 @@ import prisma from '../PrismaClient'
 import { Role } from '@prisma/client'
 import { NotFoundError } from '../middlewares/ErrorHandler'
 import { createMailerTransporter, fromAddress } from '../utils/mailer'
-import nodemailer from 'nodemailer'
+import { SendMailOptions } from 'nodemailer'
 import logger from 'common/src/logger'
 import { auditLog } from '../middlewares/AuditLog'
 import {
@@ -91,7 +91,7 @@ export class MailerController extends Controller {
       bodyRequest.content,
     )
 
-    const mailToAdminsOptions: nodemailer.SendMailOptions = {
+    const mailToAdminsOptions: SendMailOptions = {
       from: fromAddress,
       to: recipientEmails,
       replyTo: user.email,
@@ -106,7 +106,7 @@ export class MailerController extends Controller {
     // Send the email to the user
     const subjectToUser: string = `CTRL Message Confirmation`
 
-    const mailToUserOptions: nodemailer.SendMailOptions = {
+    const mailToUserOptions: SendMailOptions = {
       from: fromAddress,
       to: user.email,
       subject: subjectToUser,

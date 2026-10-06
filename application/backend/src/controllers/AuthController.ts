@@ -53,7 +53,7 @@ import { createDefaultAnswers } from '../utils/answers'
 import { auditLog } from '../middlewares/AuditLog'
 import config from '../config'
 import { randomInt } from 'node:crypto'
-import nodemailer from 'nodemailer'
+import { SendMailOptions } from 'nodemailer'
 import { createMailerTransporter, fromAddress } from '../utils/mailer'
 import { genId, genIndId } from '../utils/genId'
 import { Prefill } from 'common/types/invite'
@@ -405,7 +405,7 @@ export class AuthController extends Controller {
 
       responseData = challenge
 
-      const mailToUserOptions: nodemailer.SendMailOptions = {
+      const mailToUserOptions: SendMailOptions = {
         from: fromAddress,
         to: user.email,
         subject: 'CTRL - One Time Password',

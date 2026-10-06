@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer'
+import { createTransport, TransportOptions } from 'nodemailer'
 import config from '../config'
 
 if (!process.env.HOSTNAME) {
@@ -33,7 +33,7 @@ export async function createMailerTransporter() {
     throw new Error('SMTP settings not configured')
   }
   // Check the mailer is available
-  return nodemailer.createTransport({
+  return createTransport({
     pool: true,
     host: config.smtp.host,
     port: config.smtp.port,
@@ -41,5 +41,5 @@ export async function createMailerTransporter() {
       user: config.smtp.username,
       pass: config.smtp.password,
     },
-  } as nodemailer.TransportOptions)
+  } as TransportOptions)
 }
