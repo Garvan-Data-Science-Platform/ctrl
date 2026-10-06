@@ -48,7 +48,6 @@
     "proxy-addr": "^2.0.8",
     "postcss": "^8.5.23",
     "qs": "^6.14.2",
-    "react-router": "^7.18.1",
     "router/path-to-regexp": "^8.4.0",
     "tar": "^7.5.22",
     "tmp": "^0.2.7",

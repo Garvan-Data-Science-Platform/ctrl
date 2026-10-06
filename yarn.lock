@@ -5531,7 +5531,7 @@ __metadata:
     react-dom: "npm:^18.0.0"
     react-hook-form: "npm:^7.30.0"
     react-markdown: "npm:^10.0.1"
-    react-router: "npm:^7.18.1"
+    react-router: "npm:^7.18.4"
     react-spreadsheet-import: "npm:^4.7.1"
     start-server-and-test: "npm:^2.0.10"
     typescript: "npm:^5.8.3"
@@ -13438,9 +13438,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-router@npm:^7.18.1":
-  version: 7.18.1
-  resolution: "react-router@npm:7.18.1"
+"react-router@npm:^7.0.2, react-router@npm:^7.18.4":
+  version: 7.18.4
+  resolution: "react-router@npm:7.18.4"
   dependencies:
     cookie: "npm:^1.0.1"
     set-cookie-parser: "npm:^2.6.0"
@@ -13450,7 +13450,7 @@ __metadata:
   peerDependenciesMeta:
     react-dom:
       optional: true
-  checksum: 10c0/1a559de58d656bad5565f2232e4f4fab7e9f5282dfaf95bc24f195a06e7e85b281077fe5c21ed3ff527e3d90d930447e0d0bb0f0713950d2a56ad0f0377a7d09
+  checksum: 10c0/352d103f9d738c7bf56cbb135c0d3d44e6325d15e360f58b6e844c1f5f8cbcd4ccb2de347f14e53984683fc237505a045633e9cb92c5457a1162dae054e08a32
   languageName: node
   linkType: hard
 
@@ -15699,7 +15699,7 @@ __metadata:
     react: "npm:^18.3.1"
     react-dom: "npm:^18.3.1"
     react-hook-form: "npm:^7.53.0"
-    react-router: "npm:^7.18.1"
+    react-router: "npm:^7.18.4"
     start-server-and-test: "npm:^2.0.9"
     typescript: "npm:^5.8.3"
     typescript-eslint: "npm:^8.31.1"
