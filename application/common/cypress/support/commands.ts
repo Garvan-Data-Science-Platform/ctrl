@@ -33,8 +33,8 @@ Cypress.Commands.add('uploadCommonFile', (selector, fileName) => {
  */
 Cypress.Commands.add('loginAdminUI', () => {
   cy.visit(AppUrls.ADMIN_CLIENT)
-  cy.get('input[name="email"]').type(TestUsers.ADMIN.email)
-  cy.get('input[name="password"]').type(TestUsers.ADMIN.password)
+  cy.get('input[name="email"]').type(TestUsers.ORG_ADMIN.email)
+  cy.get('input[name="password"]').type(TestUsers.ORG_ADMIN.password)
   cy.get('button[type="submit"]').click()
   cy.url().should('include', '/surveys') // Wait for redirect after successful login
 })

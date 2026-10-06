@@ -50,7 +50,7 @@ seed:
 	yarn prisma:seed
 
 clean: db-down
-	NODE_VERSION=$(NODE_VERSION) docker volume rm ctrl-next_ctrl-db
+	NODE_VERSION=$(NODE_VERSION) docker volume rm ctrl_ctrl-db
 
 # Local deployment via minikube and helm
 

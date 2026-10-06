@@ -15,12 +15,14 @@ ENV VITE_BACKEND_URL "/api"
 ENV VITE_APP_VERSION ${APP_VERSION}
 
 COPY package.json .yarnrc.yml yarn.lock ./
+# This line below should be removed when reliance on yarn patch is resolved
+COPY .yarn/patches/* ./.yarn/patches/
 COPY application/admin-client/package.json application/admin-client/
 COPY application/user-client/package.json application/user-client/
 COPY application/backend/package.json application/backend/
 COPY application/common/package.json application/common/
 
-RUN corepack enable && yarn 
+RUN corepack enable && yarn
 
 COPY application/admin-client application/admin-client
 COPY application/backend application/backend
@@ -30,7 +32,7 @@ RUN yarn workspace backend prisma:generate
 
 RUN yarn workspace admin-client build
 
-FROM nginx
+FROM nginx:1.31.4-alpine
 
 COPY --from=build /usr/src/app/application/admin-client/dist /usr/share/nginx/html
 

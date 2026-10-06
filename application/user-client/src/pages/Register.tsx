@@ -110,7 +110,7 @@ export default function Register() {
               postcode: prefillProfile.postcode ?? '',
               mobile: prefillProfile.mobile ?? '',
               preferredContact: prefillProfile.preferredContact ?? ('MOBILE' as ContactMethod),
-              nok_first: prefillProfile.nextOfKin?.lastName ?? '',
+              nok_first: prefillProfile.nextOfKin?.firstName ?? '',
               nok_surname: prefillProfile.nextOfKin?.lastName ?? '',
               nok_email: prefillProfile.nextOfKin?.email ?? '',
               dependents: prefillProfile.dependents ?? [],
