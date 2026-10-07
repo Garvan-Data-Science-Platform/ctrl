@@ -104,9 +104,9 @@ describe('registration', () => {
       })
     cy.wait(500) // wait for form to be fully loaded
     cy.get('[data-cy="reg-first"] input').clear()
-    cy.get('[data-cy="reg-first"]').type('Tanuj')
-    cy.get('[data-cy="reg-password"]').type('TanujCorduroy2026')
-    cy.get('[data-cy="reg-confirm-password"]').type('TanujCorduroy2026')
+    cy.get('[data-cy="reg-first"]').type('Marigold')
+    cy.get('[data-cy="reg-password"]').type('MarigoldCorduroy2026')
+    cy.get('[data-cy="reg-confirm-password"]').type('MarigoldCorduroy2026')
     cy.get('[data-cy="reg-button"]').click()
     cy.contains('Invalid password').should('exist')
     cy.contains('contains personal information').should('exist')

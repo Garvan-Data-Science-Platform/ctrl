@@ -43,12 +43,12 @@ describe('checkPasswordStrength', () => {
 
   describe('with context — PII rejection', () => {
     it('rejects a password containing the first name', () => {
-      const { isValid, fields } = checkPasswordStrength('Tanuj2026StrongOne', {
-        firstName: 'Tanuj',
+      const { isValid, fields } = checkPasswordStrength('Marigold2026StrongOne', {
+        firstName: 'Marigold',
       })
       expect(isValid).toBe(false)
       expect(fields.PersonalInfo).toBeDefined()
-      expect(fields.PersonalInfo.message).toContain('tanuj')
+      expect(fields.PersonalInfo.message).toContain('marigold')
     })
 
     it('rejects a password containing the last name', () => {
@@ -68,17 +68,17 @@ describe('checkPasswordStrength', () => {
     })
 
     it('rejects a password containing the email local part', () => {
-      const { isValid, fields } = checkPasswordStrength('Tanuj2026MyStrong', {
-        email: 'tanuj@garvan.org.au',
+      const { isValid, fields } = checkPasswordStrength('Marigold2026MyStrong', {
+        email: 'marigold@example.com',
       })
       expect(isValid).toBe(false)
       expect(fields.PersonalInfo).toBeDefined()
-      expect(fields.PersonalInfo.message).toContain('tanuj')
+      expect(fields.PersonalInfo.message).toContain('marigold')
     })
 
     it('does not reject a password containing only the email domain', () => {
-      const { fields } = checkPasswordStrength('GarvanStaff2026Big', {
-        email: 'someone@garvan.org.au',
+      const { fields } = checkPasswordStrength('ExampleStaff2026Big', {
+        email: 'someone@example.org',
       })
       expect(fields.PersonalInfo).toBeUndefined()
     })
@@ -93,8 +93,8 @@ describe('checkPasswordStrength', () => {
     })
 
     it('matches case-insensitively', () => {
-      const { isValid, fields } = checkPasswordStrength('TANUJBrightStar26', {
-        firstName: 'Tanuj',
+      const { isValid, fields } = checkPasswordStrength('MARIGOLDBrightStar26', {
+        firstName: 'Marigold',
       })
       expect(isValid).toBe(false)
       expect(fields.PersonalInfo).toBeDefined()
@@ -102,10 +102,10 @@ describe('checkPasswordStrength', () => {
 
     it('accepts a strong password with valid context', () => {
       const { isValid, fields } = checkPasswordStrength(strongPassword, {
-        firstName: 'Elizabeth',
-        lastName: 'Windsor',
-        email: 'elizabeth@example.com',
-        dob: '1926-04-21',
+        firstName: 'Ottilie',
+        lastName: 'Brackenbury',
+        email: 'ottilie@example.com',
+        dob: '1975-08-14',
       })
       expect(isValid).toBe(true)
       expect(fields).toEqual({})
@@ -169,8 +169,8 @@ describe('checkPasswordStrength', () => {
     })
 
     it('returns multiple errors when password violates multiple checks', () => {
-      const { isValid, fields } = checkPasswordStrength('tanuj', {
-        firstName: 'Tanuj',
+      const { isValid, fields } = checkPasswordStrength('marigold', {
+        firstName: 'Marigold',
       })
       expect(isValid).toBe(false)
       expect(fields.Length).toBeDefined()
@@ -180,10 +180,10 @@ describe('checkPasswordStrength', () => {
     })
 
     it('names the specific matched token in the error message', () => {
-      const { fields } = checkPasswordStrength('Elizabeth2026Extra', {
-        firstName: 'Elizabeth',
+      const { fields } = checkPasswordStrength('Ottilie2026Extra', {
+        firstName: 'Ottilie',
       })
-      expect(fields.PersonalInfo.message).toContain('elizabeth')
+      expect(fields.PersonalInfo.message).toContain('ottilie')
     })
   })
 })
