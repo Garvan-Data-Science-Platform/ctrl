@@ -106,9 +106,18 @@ export function ErrorHandler(
   res: Response,
   next: NextFunction,
 ): Response | void {
-  // tsoa copies the rejected input into ValidateError fields as `value`, and it can be a password
+  // tsoa copies the rejected input into ValidateError fields as `value`, and it can be a password.
+  // message and stack aren't enumerable, so name them rather than spread the error.
   console.log(
-    err instanceof ValidateError ? { ...err, fields: sanitiseFieldErrors(err.fields) } : err,
+    err instanceof ValidateError
+      ? {
+          name: err.name,
+          message: err.message,
+          status: err.status,
+          fields: sanitiseFieldErrors(err.fields),
+          stack: err.stack,
+        }
+      : err,
   )
   // Bad Request Errors
   if (err instanceof FileUploadError || err instanceof TypeError) {

@@ -355,6 +355,7 @@ describe('AuthController', () => {
 
       const logged = logSpy.mock.calls.flat().map((arg) => inspect(arg, { depth: null }))
       expect(logged.join('\n').toLowerCase()).not.toContain('monkey')
+      expect(logged.join('\n')).toContain('Password does not meet strength requirements')
       logSpy.mockRestore()
     })
 
