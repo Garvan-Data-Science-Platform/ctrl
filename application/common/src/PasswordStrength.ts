@@ -25,8 +25,10 @@ function extractPiiTokens(context: PasswordContext): string[] {
   const tokens = new Set<string>()
   const addTokens = (value: string | undefined) => {
     if (!value) return
+    // Split on anything that isn't a letter or digit in any script, so `john.smith`
+    // and `Smith-Jones` give separate tokens while `José` stays whole
     value
-      .split(/\s+/)
+      .split(/[^\p{L}\p{N}]+/u)
       .map((token) => token.trim().toLowerCase())
       .filter((token) => token.length >= 4)
       .forEach((token) => tokens.add(token))

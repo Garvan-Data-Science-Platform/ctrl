@@ -126,6 +126,31 @@ describe('checkPasswordStrength', () => {
       expect(fields.PersonalInfo).toBeDefined()
     })
 
+    it('splits the email local part on dots and hyphens', () => {
+      const { isValid, fields } = checkPasswordStrength('Smith2026StrongOne', {
+        email: 'john.smith@example.com',
+      })
+      expect(isValid).toBe(false)
+      expect(fields.PersonalInfo).toBeDefined()
+      expect(fields.PersonalInfo.message).toContain('smith')
+    })
+
+    it('splits hyphenated names', () => {
+      const { isValid, fields } = checkPasswordStrength('Jones2026StrongOne', {
+        lastName: 'Smith-Jones',
+      })
+      expect(isValid).toBe(false)
+      expect(fields.PersonalInfo).toBeDefined()
+    })
+
+    it('keeps accented letters inside a name token', () => {
+      const { isValid, fields } = checkPasswordStrength('José2026StrongOne', {
+        firstName: 'José',
+      })
+      expect(isValid).toBe(false)
+      expect(fields.PersonalInfo).toBeDefined()
+    })
+
     it('handles an empty context object', () => {
       const { isValid, fields } = checkPasswordStrength(strongPassword, {})
       expect(isValid).toBe(true)
