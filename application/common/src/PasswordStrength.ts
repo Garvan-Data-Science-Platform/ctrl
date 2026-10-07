@@ -90,3 +90,8 @@ export function checkPasswordStrength(
     fields,
   }
 }
+
+// The reset pages only have the token, so they can't run the personal info check in the browser.
+// They show this when the server rejects a new password with a `PersonalInfo` error.
+export const PERSONAL_INFO_REJECTED_MESSAGE =
+  "Your password can't include your name, email or birth year."

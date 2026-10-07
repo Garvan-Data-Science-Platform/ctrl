@@ -11,7 +11,7 @@ import {
 import { useForm } from 'react-hook-form'
 import { Link, useLocation } from 'react-router'
 import { ResetPasswordRequest } from '@common/types/api/users'
-import { checkPasswordStrength } from '@common/src/PasswordStrength'
+import { checkPasswordStrength, PERSONAL_INFO_REJECTED_MESSAGE } from '@common/src/PasswordStrength'
 import { apiClient } from '../apiClient'
 import { useEffect, useState } from 'react'
 
@@ -99,7 +99,12 @@ export default function ResetPassword() {
         }
       })
       .catch((e) => {
-        // Back to unsent if there is an error
+        // The token is still valid here, so keep the form and let them choose another password
+        if (e.response?.data?.details?.PersonalInfo) {
+          setStatus('unsent')
+          setError('root.serverError', { message: PERSONAL_INFO_REJECTED_MESSAGE })
+          return
+        }
         setStatus('error')
         setError('root.serverError', { message: `Error Resetting Password: ${e}` })
       })

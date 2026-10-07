@@ -1,6 +1,7 @@
 /// <reference types="cypress" />
 
 const { TestUsers } = require('../../../common/testing/constants')
+const { PERSONAL_INFO_REJECTED_MESSAGE } = require('../../../common/src/PasswordStrength')
 
 beforeEach(() => {
   cy.task('reset')
@@ -48,6 +49,7 @@ describe('Password Reset', () => {
     cy.get('input[id="password"]').type(piiPassword)
     cy.get('input[id="confirmPassword"]').type(`${piiPassword}{enter}`)
     cy.wait('@resetRequest').its('response.statusCode').should('eq', 422)
+    cy.contains(PERSONAL_INFO_REJECTED_MESSAGE).should('exist')
   })
 
   it('opens password reset page and enters non-matching passwords', () => {
