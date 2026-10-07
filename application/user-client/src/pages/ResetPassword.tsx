@@ -12,6 +12,7 @@ import { useForm } from 'react-hook-form'
 import { Link, useLocation } from 'react-router'
 import { ResetPasswordRequest } from '@common/types/api/users'
 import { checkPasswordStrength, PERSONAL_INFO_REJECTED_MESSAGE } from '@common/src/PasswordStrength'
+import { isAxiosError } from 'axios'
 import { apiClient } from '../apiClient'
 import { useEffect, useState } from 'react'
 
@@ -90,6 +91,11 @@ export default function ResetPassword() {
         if (res.status == 200) {
           // Set to sent on successful response
           setStatus('sent')
+        } else if (isAxiosError(res) && res.response?.data?.details?.PersonalInfo) {
+          // apiClient resolves HTTP errors rather than rejecting them. The token is still
+          // valid here, so keep the form and let them choose another password
+          setStatus('unsent')
+          setError('root.serverError', { message: PERSONAL_INFO_REJECTED_MESSAGE })
         } else {
           // Set to error
           setStatus('error')
@@ -99,12 +105,7 @@ export default function ResetPassword() {
         }
       })
       .catch((e) => {
-        // The token is still valid here, so keep the form and let them choose another password
-        if (e.response?.data?.details?.PersonalInfo) {
-          setStatus('unsent')
-          setError('root.serverError', { message: PERSONAL_INFO_REJECTED_MESSAGE })
-          return
-        }
+        // Back to unsent if there is an error
         setStatus('error')
         setError('root.serverError', { message: `Error Resetting Password: ${e}` })
       })
