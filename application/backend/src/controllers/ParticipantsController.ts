@@ -36,7 +36,7 @@ import {
 } from 'tsoa'
 import { Participant } from 'common/types/api/participants/participant'
 import { createMailerTransporter, fromAddress } from '../utils/mailer'
-import nodemailer from 'nodemailer'
+import { SendMailOptions } from 'nodemailer'
 import { generateParticipantInviteEmail } from 'common/src/emails/generate'
 import { InviteStatus } from 'common/types/api/participants/invite'
 import { BadGatewayError, NotFoundError, UnprocessableError } from '../middlewares/ErrorHandler'
@@ -1019,7 +1019,7 @@ export class InvitesController extends Controller {
         explanatoryText,
       )
 
-      const mailOptions: nodemailer.SendMailOptions = {
+      const mailOptions: SendMailOptions = {
         from: fromAddress,
         to: email,
         subject: subjectText,
