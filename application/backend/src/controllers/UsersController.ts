@@ -50,7 +50,7 @@ import {
   generatePasswordResetEmail,
 } from 'common/src/emails/generate'
 import crypto, { randomBytes } from 'crypto'
-import nodemailer from 'nodemailer'
+import { SendMailOptions } from 'nodemailer'
 import { createMailerTransporter, fromAddress } from '../utils/mailer'
 import { auditLog } from '../middlewares/AuditLog'
 import config from '../config'
@@ -151,6 +151,7 @@ export class UsersController extends Controller {
     const user: UserResponse | null = await this.userRepo.findUnique({
       where: { id: userId },
       include: { adminOfStudies: { select: { name: true, id: true } } },
+      omit: { password: true, emailHash: true },
     })
     if (!user) {
       const errorMessage: string = `User with ID: ${userId} not found`
@@ -422,7 +423,7 @@ export class UsersController extends Controller {
       subject = 'CTRL - Password Reset Link'
     }
 
-    const mailToUserOptions: nodemailer.SendMailOptions = {
+    const mailToUserOptions: SendMailOptions = {
       from: fromAddress,
       to: user.email,
       subject,
