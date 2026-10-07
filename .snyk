@@ -22,4 +22,8 @@ ignore:
     - '*':
         reason: 'No fixed version available'
         expires: '2026-10-21T00:00:00.000Z'
+  SNYK-JS-GRAYMATTER-20532010:
+    - '*':
+        reason: 'Mitigated by aliasing dependency to @11ty/gray-matter fork via Yarn resolutions'
+        expires: '2026-12-21T00:00:00.000Z'
 patch: {}
