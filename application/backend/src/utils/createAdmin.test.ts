@@ -20,6 +20,14 @@ describe('Test create admin script', () => {
     const admin_users = await prisma.user.findMany({ where: { role: 'OrganisationAdmin' } })
     expect(admin_users).toHaveLength(3)
   })
+  it('Throws if ORG_ADMIN_PASSWORD contains part of ORG_ADMIN_EMAIL', async () => {
+    process.env['ORG_ADMIN_EMAIL'] = 'marigold.admin@test.com'
+    // Passes every other rule, so only the email check can reject it
+    process.env['ORG_ADMIN_PASSWORD'] = 'Marigold2026Strong'
+    await expect(createAdmin()).rejects.toThrow('ORG_ADMIN_PASSWORD does not meet strength policy')
+    const admin_users = await prisma.user.findMany({ where: { role: 'OrganisationAdmin' } })
+    expect(admin_users).toHaveLength(3)
+  })
   it('Throws if ORG_ADMIN_PASSWORD does not meet strength policy', async () => {
     process.env['ORG_ADMIN_EMAIL'] = 'weak-admin@test.com'
     process.env['ORG_ADMIN_PASSWORD'] = 'tespassword'
