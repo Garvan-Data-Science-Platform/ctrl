@@ -20,7 +20,7 @@ describe('User Password Reset', () => {
   // Note: using different test data pw to ensure consistency with pw requirements
   const newPassword = TestUsers.PARTICIPANT_COMPLETED.password
   const invalidPassword = 'password'
-  const piiPassword = 'ResetConstellation26' // contains "reset" - the seeded user's firstName
+  const piiPassword = `${TestUsers.PASSWORD_RESET_USER.firstName}Constellation26` // contains the seeded user's firstName
 
   beforeAll(async () => {
     api.run()

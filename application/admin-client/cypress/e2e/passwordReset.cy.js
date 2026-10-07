@@ -42,10 +42,11 @@ describe('Password Reset', () => {
   })
 
   it('rejects a new password containing the users personal info', () => {
+    const piiPassword = `${TestUsers.PASSWORD_RESET_USER.firstName}Corduroy2026`
     cy.intercept('POST', '/users/password/reset').as('resetRequest')
     cy.visit('/update-password?token=valid-reset-token')
-    cy.get('input[id="password"]').type('ResetCorduroy2026')
-    cy.get('input[id="confirmPassword"]').type('ResetCorduroy2026{enter}')
+    cy.get('input[id="password"]').type(piiPassword)
+    cy.get('input[id="confirmPassword"]').type(`${piiPassword}{enter}`)
     cy.wait('@resetRequest').its('response.statusCode').should('eq', 422)
   })
 

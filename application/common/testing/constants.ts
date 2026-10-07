@@ -47,6 +47,8 @@ export const TestUsers = {
   PASSWORD_RESET_USER: {
     id: 105,
     email: 'test-reset-password@example.com',
+    firstName: 'Reset',
+    lastName: 'Recipient',
     password: 'Oldloginforuser1',
   },
 }
