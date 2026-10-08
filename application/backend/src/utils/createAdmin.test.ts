@@ -23,6 +23,10 @@ describe('Test create admin script', () => {
   it('Throws if ORG_ADMIN_PASSWORD does not meet strength policy', async () => {
     process.env['ORG_ADMIN_EMAIL'] = 'weak-admin@test.com'
     process.env['ORG_ADMIN_PASSWORD'] = 'tespassword'
-    await expect(createAdmin()).rejects.toThrow('ORG_ADMIN_PASSWORD does not meet strength policy')
+    await expect(createAdmin()).rejects.toThrow(
+      new Error(
+        'ORG_ADMIN_PASSWORD does not meet strength policy: Length, CommonBase, Uppercase, Number',
+      ),
+    )
   })
 })

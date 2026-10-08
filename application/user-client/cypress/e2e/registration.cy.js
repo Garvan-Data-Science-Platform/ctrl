@@ -90,7 +90,7 @@ describe('registration', () => {
     cy.get('[data-cy="reg-confirm-password"]').type('Testpassword1')
     cy.get('[data-cy="reg-button"]').click()
     cy.contains('Invalid password').should('exist')
-    cy.contains('must not contain easily guessable words').should('exist')
+    cy.contains('commonly used weak pattern').should('exist')
   })
 
   it('Attempt to register existing email (i.e. no invite) and get correct error message', () => {

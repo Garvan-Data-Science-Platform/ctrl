@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { ValidateError } from 'tsoa'
+import { FieldErrors, ValidateError } from 'tsoa'
 import { TokenExpiredError, JsonWebTokenError } from 'jsonwebtoken'
 import { Prisma } from '@prisma/client'
 import logger from 'common/src/logger'
@@ -92,13 +92,33 @@ export class UnprocessableError extends Error {
   }
 }
 
+export function sanitiseFieldErrors(fields: FieldErrors): FieldErrors {
+  const sanitised: FieldErrors = {}
+  for (const field of Object.keys(fields)) {
+    sanitised[field] = { message: 'Invalid value provided' }
+  }
+  return sanitised
+}
+
 export function ErrorHandler(
   err: unknown,
   req: Request,
   res: Response,
   next: NextFunction,
 ): Response | void {
-  console.log(err)
+  // tsoa copies the rejected input into ValidateError fields as `value`, and it can be a password.
+  // message and stack aren't enumerable, so name them rather than spread the error.
+  console.log(
+    err instanceof ValidateError
+      ? {
+          name: err.name,
+          message: err.message,
+          status: err.status,
+          fields: sanitiseFieldErrors(err.fields),
+          stack: err.stack,
+        }
+      : err,
+  )
   // Bad Request Errors
   if (err instanceof FileUploadError || err instanceof TypeError) {
     const errorResponse: BadRequestErrorResponse = {
@@ -110,15 +130,9 @@ export function ErrorHandler(
 
   // Validation Errors
   if (err instanceof ValidateError) {
-    const sanitisedDetails: Record<string, { message: string }> = {}
-    for (const [field] of Object.entries(err.fields)) {
-      sanitisedDetails[field] = {
-        message: 'Invalid value provided',
-      }
-    }
     const errorResponse: ValidateErrorResponse = {
       message: 'Validation Failed',
-      details: sanitisedDetails,
+      details: sanitiseFieldErrors(err.fields),
     }
     logger.error({ ...errorResponse })
     return res.status(422).json(errorResponse)

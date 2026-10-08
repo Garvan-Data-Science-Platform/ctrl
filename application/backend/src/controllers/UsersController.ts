@@ -39,6 +39,7 @@ import {
 import {
   NotFoundError,
   PasswordResetTokenInvalidError,
+  sanitiseFieldErrors,
   UnprocessableError,
 } from '../middlewares/ErrorHandler'
 import { hashPassword } from '../authentication'
@@ -464,7 +465,10 @@ export class UsersController extends Controller {
     const { isValid, fields } = await checkPasswordStrength(newPassword)
 
     if (!isValid) {
-      throw new ValidateError(fields, 'New password does not meet strength requirements')
+      throw new ValidateError(
+        sanitiseFieldErrors(fields),
+        'New password does not meet strength requirements',
+      )
     }
 
     const hashedPassword = await hashPassword(newPassword)
