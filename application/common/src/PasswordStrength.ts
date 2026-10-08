@@ -8,12 +8,48 @@ export interface FieldErrors {
   }
 }
 
+export interface PasswordContext {
+  email?: string
+  firstName?: string
+  middleName?: string
+  lastName?: string
+  dob?: string
+}
+
 interface PasswordStrengthResult {
   isValid: boolean
   fields: FieldErrors
 }
 
-export function checkPasswordStrength(password: string): PasswordStrengthResult {
+function extractPiiTokens(context: PasswordContext): string[] {
+  const tokens = new Set<string>()
+  const addTokens = (value: string | undefined) => {
+    if (!value) return
+    // Split on anything that isn't a letter or digit in any script, so `john.smith`
+    // and `Smith-Jones` give separate tokens while `José` stays whole
+    value
+      .split(/[^\p{L}\p{N}]+/u)
+      .map((token) => token.trim().toLowerCase())
+      .filter((token) => token.length >= 4)
+      .forEach((token) => tokens.add(token))
+  }
+  addTokens(context.firstName)
+  addTokens(context.middleName)
+  addTokens(context.lastName)
+  if (context.email) {
+    addTokens(context.email.split('@')[0])
+  }
+  if (context.dob) {
+    const year = context.dob.match(/\d{4}/)?.[0]
+    if (year) tokens.add(year)
+  }
+  return Array.from(tokens)
+}
+
+export function checkPasswordStrength(
+  password: string,
+  context?: PasswordContext,
+): PasswordStrengthResult {
   const fields: FieldErrors = {}
   const baseWordRegex = new RegExp(commonPasswordBaseWords.join('|'), 'i')
 
@@ -23,6 +59,16 @@ export function checkPasswordStrength(password: string): PasswordStrengthResult 
   if (baseWordRegex.test(password)) {
     fields.CommonBase = {
       message: `Password must not contain easily guessable words (i.e. ${commonPasswordBaseWords.join(', ')})`,
+    }
+  }
+  if (context) {
+    const tokens = extractPiiTokens(context)
+    const lowerPassword = password.toLowerCase()
+    const matchedToken = tokens.find((t) => lowerPassword.includes(t))
+    if (matchedToken) {
+      fields.PersonalInfo = {
+        message: `Password contains personal information: "${matchedToken}"`,
+      }
     }
   }
   if (!/[A-Z]/.test(password)) {
@@ -44,3 +90,8 @@ export function checkPasswordStrength(password: string): PasswordStrengthResult 
     fields,
   }
 }
+
+// The reset pages only have the token, so they can't run the personal info check in the browser.
+// They show this when the server rejects a new password with a `PersonalInfo` error.
+export const PERSONAL_INFO_REJECTED_MESSAGE =
+  "Your password can't include your name, email or birth year."
