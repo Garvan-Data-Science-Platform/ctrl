@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { InviteStatus, PrismaClient } from '@prisma/client'
 import { hashPassword } from '../../src/authentication'
 import { SurveyStep } from '../../../common/types/survey'
 import { createDefaultAnswers, recalculateAnswers } from '../../src/utils/answers'
@@ -7,6 +7,14 @@ import { TestUsers } from '../../../common/testing/constants.ts'
 
 // Using test data pw to ensure pw requirements are met
 const seedUserPassword = TestUsers.PARTICIPANT_COMPLETED.password
+
+// Emails for the four participants seeded below, shared by their invites and user accounts
+const SeedParticipantEmails = {
+  MICHAEL: 'michaelwilson@example.com',
+  SALLY: 'sallywilson@example.com',
+  ALICE: 'alicejohnson@example.com',
+  JUDITH: String(process.env.EXAMPLE_PARTICIPANT_EMAIL),
+}
 
 const main = async () => {
   await prisma.organisation.upsert({
@@ -20,9 +28,38 @@ const main = async () => {
   })
 
   const ShortSurveyStepData = require('./shortSurveyData.json')
+  // Short Study - nested ACCEPTED invites for the four participants seeded below (Michael, Sally, Alice, Judith)
   const shortStudy = await prisma.study.create({
     data: {
       name: 'Short Study',
+      invites: {
+        create: [
+          {
+            email: SeedParticipantEmails.MICHAEL,
+            status: InviteStatus.ACCEPTED,
+            expiresAt: new Date('2026-01-01'),
+            sentAt: new Date('2025-12-15'),
+          },
+          {
+            email: SeedParticipantEmails.SALLY,
+            status: InviteStatus.ACCEPTED,
+            expiresAt: new Date('2026-01-01'),
+            sentAt: new Date('2025-12-15'),
+          },
+          {
+            email: SeedParticipantEmails.ALICE,
+            status: InviteStatus.ACCEPTED,
+            expiresAt: new Date('2026-01-01'),
+            sentAt: new Date('2025-12-15'),
+          },
+          {
+            email: SeedParticipantEmails.JUDITH,
+            status: InviteStatus.ACCEPTED,
+            expiresAt: new Date('2026-01-01'),
+            sentAt: new Date('2025-12-15'),
+          },
+        ],
+      },
     },
   })
   console.log('Short Study created:', shortStudy)
@@ -49,11 +86,12 @@ const main = async () => {
 
   const baseAnswers = createDefaultAnswers(ShortSurveyStepData)
 
+  // Michael - nested writes for user + profile + nextOfKin + studies + surveys
   const michael = await prisma.user.upsert({
-    where: { email: 'michaelwilson@example.com' },
+    where: { email: SeedParticipantEmails.MICHAEL },
     update: {},
     create: {
-      email: 'michaelwilson@example.com',
+      email: SeedParticipantEmails.MICHAEL,
       firstName: 'Michael',
       lastName: 'Wilson',
       role: 'Participant',
@@ -99,12 +137,12 @@ const main = async () => {
       },
     },
   })
-
+  // Sally - same nested pattern as Michael, second guardian on Short Study
   await prisma.user.upsert({
-    where: { email: 'sallywilson@example.com' },
+    where: { email: SeedParticipantEmails.SALLY },
     update: {},
     create: {
-      email: 'sallywilson@example.com',
+      email: SeedParticipantEmails.SALLY,
       firstName: 'Sally',
       lastName: 'Wilson',
       role: 'Participant',
@@ -150,7 +188,7 @@ const main = async () => {
       },
     },
   })
-
+  // Johnny - dependent profile (no user account, so no invite) linked to Short Study
   await prisma.participantProfile.upsert({
     where: {
       individualId: 'IND-ABC-003',
@@ -193,11 +231,12 @@ const main = async () => {
     },
   })
 
+  // Alice - Participant user on Short Study
   const alice = await prisma.user.upsert({
-    where: { email: 'alicejohnson@example.com' },
+    where: { email: SeedParticipantEmails.ALICE },
     update: {},
     create: {
-      email: 'alicejohnson@example.com',
+      email: SeedParticipantEmails.ALICE,
       firstName: 'Alice',
       middleName: 'Mary',
       lastName: 'Johnson',
@@ -245,13 +284,22 @@ const main = async () => {
       },
     },
   })
-
-  // Ensure a Study record exists
+  // Seed Study - nested ACCEPTED invite for Judith below (she is also on Short Study, that invite is nested above)
   const defaultStudy = await prisma.study.create({
     data: {
       name: 'Seed Study',
       redcapURL: process.env.REDCAP_API_URL,
       redcapToken: process.env.REDCAP_API_TOKEN,
+      invites: {
+        create: [
+          {
+            email: SeedParticipantEmails.JUDITH,
+            status: InviteStatus.ACCEPTED,
+            expiresAt: new Date('2026-01-01'),
+            sentAt: new Date('2025-12-15'),
+          },
+        ],
+      },
     },
   })
 
@@ -345,11 +393,12 @@ const main = async () => {
 
   const exampleAnswers = createDefaultAnswers(SeedSurveyStepData)
   exampleAnswers[1].answers[0] = false //For DUO testing
+  // Judith - example participant registered on both Short Study and Seed Study
   const exampleUser = await prisma.user.upsert({
-    where: { email: String(process.env.EXAMPLE_PARTICIPANT_EMAIL) },
+    where: { email: SeedParticipantEmails.JUDITH },
     update: {},
     create: {
-      email: String(process.env.EXAMPLE_PARTICIPANT_EMAIL),
+      email: SeedParticipantEmails.JUDITH,
       firstName: 'Judith',
       middleName: 'Arundell',
       lastName: 'Wright',

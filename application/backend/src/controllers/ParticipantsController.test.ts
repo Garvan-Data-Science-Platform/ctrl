@@ -750,6 +750,7 @@ describe('InvitesController', () => {
       const invite = await prisma.invite.findFirstOrThrow({
         where: {
           email: TestUsers.PARTICIPANT_UNANSWERED.email,
+          studyId: TestStudies.TEST_STUDY_2.id,
         },
       })
 
@@ -805,6 +806,7 @@ describe('InvitesController', () => {
       const invite = await prisma.invite.findFirstOrThrow({
         where: {
           email: TestUsers.PARTICIPANT_UNANSWERED.email,
+          studyId: TestStudies.TEST_STUDY_2.id,
         },
       })
 
