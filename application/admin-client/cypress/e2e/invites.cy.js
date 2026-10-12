@@ -131,7 +131,7 @@ describe('', () => {
     })
     cy.get('[data-cy="recipients-list"]')
       .should('contain.text', 'email1@g.co')
-      .should('not.contain', 'xss-email-addres')
+      .should('not.contain', 'xss-email-address')
   })
 
   it('Should validate xss in External ID', () => {
