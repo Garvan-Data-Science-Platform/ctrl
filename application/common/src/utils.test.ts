@@ -3,9 +3,9 @@ import { fromExcelDateToISO } from './utils'
 describe('Date utility tests', () => {
   const validDatewithDash = '1992-07-20'
   const validDateWithSlash = '1992/07/20'
-  const validDDMMYYYDateWithSlash = '20/07/1992'
-  const validDDMMYYYDateWithDash = '20-07-1992'
-  const unambiguousMMDDYYYDate = '07-20-1992'
+  const validDDMMYYYYDateWithSlash = '20/07/1992'
+  const validDDMMYYYYDateWithDash = '20-07-1992'
+  const unambiguousMMDDYYYYDate = '07-20-1992'
 
   it('Correctly parses YYYY MM DD with slashes', () => {
     expect(fromExcelDateToISO(validDateWithSlash)).toEqual(validDatewithDash)
@@ -14,13 +14,13 @@ describe('Date utility tests', () => {
     expect(fromExcelDateToISO(validDatewithDash)).toEqual(validDatewithDash)
   })
   it('Correctly parses DD MM YYYY with slashes', () => {
-    expect(fromExcelDateToISO(validDDMMYYYDateWithSlash)).toEqual(validDatewithDash)
+    expect(fromExcelDateToISO(validDDMMYYYYDateWithSlash)).toEqual(validDatewithDash)
   })
   it('Correctly parses DD MM YYYY with dashes', () => {
-    expect(fromExcelDateToISO(validDDMMYYYDateWithDash)).toEqual(validDatewithDash)
+    expect(fromExcelDateToISO(validDDMMYYYYDateWithDash)).toEqual(validDatewithDash)
   })
   it('Correctly parses unambiguous MM DD YYYY', () => {
-    expect(fromExcelDateToISO(unambiguousMMDDYYYDate)).toEqual(validDatewithDash)
+    expect(fromExcelDateToISO(unambiguousMMDDYYYYDate)).toEqual(validDatewithDash)
   })
   it('Correctly defaults to DD MM YYYY with ambiguous dates', () => {
     expect(fromExcelDateToISO('06-07-2026')).toEqual('2026-07-06')
