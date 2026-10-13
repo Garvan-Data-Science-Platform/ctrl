@@ -89,7 +89,7 @@ export const ParticipantEdit = () => {
           label={'Email'}
         />
         <TextField
-          {...register('externalId', externalIdRules())}
+          {...register('externalId', externalIdRules(false))} // False so that External ID is not required
           error={!!errors.externalId}
           helperText={errors.externalId?.message}
           margin="normal"
