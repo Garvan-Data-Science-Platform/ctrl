@@ -13,7 +13,8 @@ export const REGEX = {
   POSTCODE: /^\d{4}$/,
   EMAIL: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
   EXTERNALID: /^[a-zA-Z0-9\-_=.:]*$/,
-  URL: /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/, // https://regex-snippets.com/url-and-path modified to remove unnecessary escape characters
+  // Source for URL regex https://regex-snippets.com/url-and-path modified to remove unnecessary escape characters
+  URL: /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/,
   STUDY_NAME: /^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$/,
   STUDY_DESCRIPTION: /^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$/,
   REDCAP_TOKEN: /^[a-fA-F0-9]{32}$/,
@@ -23,6 +24,8 @@ export const REGEX = {
   CSS_COLOUR:
     /^(#(?:[0-9a-fA-F]{3,4}){1,2}|rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*(?:,\s*[0-9.]+\s*)?\)|[a-zA-Z]{3,30})?$/,
   SURVEY_ELEMENT: /^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$/,
+  // REGEX allows multiple date formats (see functions in application/common/src/utils.ts) in CSV imput modal
+  //   note: this regex is different to that used in the DoB type as we only want one format of date in the database
   DOB: /^(\d{4}[/-](0?[1-9]|1[0-2])[/-](0?[1-9]|[12][0-9]|3[01])|(0?[1-9]|[12][0-9]|3[01])[/-](0?[1-9]|1[0-2])[/-]\d{4})$/,
 }
 
@@ -100,6 +103,7 @@ export type Suburb = string
  */
 export type Postcode = string
 
+//note: the DoB pattern regex is different to the DOB REGEX above as we only want one format of date in the database
 /**
  * @pattern ^\d{4}-\d{2}-\d{2}$
  * @example "2000-05-21"
