@@ -5,25 +5,28 @@ import { Role, User } from '@prisma/client'
 
 // @common/types/commonTypes.ts
 
-// Specifying these here, so that they can be defined in one file (even though its not DRY within the file as regex are defined here and in TSOA annotations)
+// Specifying REGEX here, so that they can be defined in the same file as Type definitions with `@patterns`
+// (even though its not completely DRY within the file as regex are defined here and in TSOA annotations)
+const SafeText = /^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$/
+
 export const REGEX = {
   NAME: /^[a-zA-ZÀ-ÖØ-öø-ɏ\s\-'.]+$/,
-  ADDRESS: /^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$/,
+  ADDRESS: SafeText,
   MOBILE: /^04\d{8}$/,
   POSTCODE: /^\d{4}$/,
   EMAIL: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
   EXTERNALID: /^[a-zA-Z0-9\-_=.:]*$/,
   // Source for URL regex https://regex-snippets.com/url-and-path modified to remove unnecessary escape characters
   URL: /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/,
-  STUDY_NAME: /^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$/,
-  STUDY_DESCRIPTION: /^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$/,
+  STUDY_NAME: SafeText,
+  STUDY_DESCRIPTION: SafeText,
   REDCAP_TOKEN: /^[a-fA-F0-9]{32}$/,
-  REDCAP_FORM: /^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€_+]+$/,
+  REDCAP_FORM: SafeText,
   // Same REGEX For invite email subject and body text
-  INVITE_EMAIL: /^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$/,
+  INVITE_EMAIL: SafeText,
   CSS_COLOUR:
     /^(#(?:[0-9a-fA-F]{3,4}){1,2}|rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*(?:,\s*[0-9.]+\s*)?\)|[a-zA-Z]{3,30})?$/,
-  SURVEY_ELEMENT: /^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$/,
+  SURVEY_ELEMENT: SafeText,
   // REGEX allows multiple date formats (see functions in application/common/src/utils.ts) in CSV imput modal
   //   note: this regex is different to that used in the DoB type as we only want one format of date in the database
   DOB: /^(\d{4}[/-](0?[1-9]|1[0-2])[/-](0?[1-9]|[12][0-9]|3[01])|(0?[1-9]|[12][0-9]|3[01])[/-](0?[1-9]|1[0-2])[/-]\d{4})$/,
