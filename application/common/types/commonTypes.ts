@@ -13,7 +13,7 @@ export const REGEX = {
   POSTCODE: /^\d{4}$/,
   EMAIL: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
   EXTERNALID: /^[a-zA-Z0-9\-_=.:]*$/,
-  URL: /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/,
+  URL: /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/, // https://regex-snippets.com/url-and-path modified to remove unnecessary escape characters
   STUDY_NAME: /^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$/,
   STUDY_DESCRIPTION: /^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$/,
   REDCAP_TOKEN: /^[a-fA-F0-9]{32}$/,
@@ -159,7 +159,7 @@ export type RedcapFormName = string
 /**
  * @minLength 1
  * @maxLength 128
- * @pattern ^https?:\/\/[a-zA-Z0-9._~:/?#@!$&'()*+,;=%-]+$
+ * @pattern ^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$
  * @example "https://orgname.com/tcLink/"
  */
 export type Url = string
