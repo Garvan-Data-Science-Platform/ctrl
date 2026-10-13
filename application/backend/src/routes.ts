@@ -564,7 +564,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Url": {
         "dataType": "refAlias",
-        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":128},"pattern":{"value":"^https?:\\/\\/[a-zA-Z0-9._~:/?#@!$&'()*+,;=%-]+$"}}},
+        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":128},"pattern":{"value":"^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$"}}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "SettingsBase": {
@@ -712,7 +712,7 @@ const models: TsoaRoute.Models = {
             "participantType": {"ref":"ParticipantType"},
             "nextOfKin": {"ref":"AlternativeContact"},
             "dependents": {"dataType":"array","array":{"dataType":"refObject","ref":"OnBehalf"},"validators":{"maxItems":{"value":15}}},
-            "externalId": {"ref":"ExternalId","validators":{"maxLength":{"value":255}}},
+            "externalId": {"ref":"ExternalId"},
         },
         "additionalProperties": false,
     },
@@ -1083,7 +1083,7 @@ const models: TsoaRoute.Models = {
             "participantType": {"ref":"ParticipantType","required":true},
             "nextOfKin": {"ref":"AlternativeContact","required":true},
             "dependents": {"dataType":"array","array":{"dataType":"refObject","ref":"OnBehalf"},"required":true,"validators":{"maxItems":{"value":15}}},
-            "externalId": {"ref":"ExternalId","validators":{"maxLength":{"value":255}}},
+            "externalId": {"ref":"ExternalId"},
         },
         "additionalProperties": false,
     },
