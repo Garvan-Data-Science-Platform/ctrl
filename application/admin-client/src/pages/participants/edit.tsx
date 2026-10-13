@@ -119,7 +119,9 @@ export const ParticipantEdit = () => {
               label="Date of Birth"
               value={new Date(field.value || 0).toISOString().split('T')[0]}
               inputRef={field.ref}
-              onChange={(val) => field.onChange(new Date(val.target.value).toISOString())}
+              onChange={(val) =>
+                field.onChange(new Date(val.target.value).toISOString().split('T')[0])
+              }
             />
           )}
         />
