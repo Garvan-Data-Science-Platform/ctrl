@@ -178,7 +178,7 @@ describe('REDCap Survey Upload', () => {
       cy.get('[data-cy="helpPage"]').should('not.exist')
     })
 
-    it('should validate xss in form name', () => {
+    it('should validate against xss in form name', () => {
       cy.get('[data-cy="apiSubmit"]').should('be.visible').should('be.disabled')
       cy.get('[data-cy="formName"]')
         .should('be.visible')
@@ -189,7 +189,7 @@ describe('REDCap Survey Upload', () => {
       cy.get('[data-cy="apiSubmit"]').should('be.visible').should('be.disabled')
     })
 
-    it('should validate xss in file upload submission', () => {
+    it('should validate against xss in file upload submission', () => {
       const fileName = 'test_instrument1Xss.csv'
       cy.get('[data-cy="surveyAttach"]').attachFile(fileName)
 

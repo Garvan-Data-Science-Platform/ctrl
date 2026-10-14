@@ -599,7 +599,7 @@ describe('InvitesController', () => {
       mockNodeMailer.mock.reset()
     })
 
-    it('should validate xss in email', async () => {
+    it('should validate against xss in email', async () => {
       const recipients = [{ email: "invite<script>alert('xss')</script>5@new.com", prefill: {} }]
 
       const response = await request(app)
@@ -618,7 +618,7 @@ describe('InvitesController', () => {
       })
     })
 
-    it('should validate xss in prefill', async () => {
+    it('should validate against xss in prefill', async () => {
       const recipients = [
         {
           email: 'invite5@new.com',

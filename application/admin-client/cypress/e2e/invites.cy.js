@@ -105,7 +105,7 @@ describe('', () => {
     cy.contains('Invite Resent', { timeout: 10000 }).should('exist')
   })
 
-  it('Should validate xss in email addresses', () => {
+  it('Should validate against xss in email addresses', () => {
     cy.visit('/participants')
     cy.get('[data-cy="invite-button"]').click()
     cy.get('[data-cy="email-field"]')
@@ -118,7 +118,7 @@ describe('', () => {
     cy.get('[data-cy="send-button"]').should('be.disabled')
   })
 
-  it('Should validate xss in pasted email addresses', () => {
+  it('Should validate against xss in pasted email addresses', () => {
     cy.visit('/participants')
     cy.get('[data-cy="invite-button"]').click()
     cy.get('[data-cy="email-field"]').trigger('paste', {
@@ -134,7 +134,7 @@ describe('', () => {
       .should('not.contain', 'xss-email-address')
   })
 
-  it('Should validate xss in External ID', () => {
+  it('Should validate against xss in External ID', () => {
     cy.visit('/participants')
     cy.get('[data-cy="invite-button"]').click()
     cy.get('[data-cy="email-field"]').clear().type('valid1@g.co')
@@ -150,7 +150,7 @@ describe('', () => {
     cy.get('[data-cy="send-button"]').should('be.disabled')
   })
 
-  it('Should validate xss in pasted External ID', () => {
+  it('Should validate against xss in pasted External ID', () => {
     cy.visit('/participants')
     cy.get('[data-cy="invite-button"]').click()
     cy.get('[data-cy="email-field"]').trigger('paste', {
@@ -168,7 +168,7 @@ describe('', () => {
     cy.contains('Skipped 1 entry(s) due to invalid formatting').should('exist')
   })
 
-  it('Should validate xss in email subject', () => {
+  it('Should validate against xss in email subject', () => {
     cy.visit('/participants')
     cy.get('[data-cy="invite-button"]').click()
     cy.get('[data-cy="email-subject"]').should('contain.text', 'Invitation to CTRL')
@@ -181,7 +181,7 @@ describe('', () => {
     cy.get('[data-cy="send-button"]').should('be.disabled')
   })
 
-  it('Should validate xss in email text', () => {
+  it('Should validate against xss in email text', () => {
     cy.visit('/participants')
     cy.get('[data-cy="invite-button"]').click()
     cy.get('[data-cy="email-text"]').should('contain.text', 'You have been invited')

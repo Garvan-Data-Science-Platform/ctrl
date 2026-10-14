@@ -70,7 +70,7 @@ describe('Participants', () => {
     cy.contains('Incomplete').should('be.visible')
   })
 
-  it('Edit participant, validate xss first name', () => {
+  it('Edit participant, validate against xss first name', () => {
     cy.login(TestUsers.ORG_ADMIN.email)
     cy.visit(`/participants/edit/${TestUsers.PARTICIPANT_UNANSWERED.id}`)
     cy.contains('Edit Participant').should('exist')
@@ -83,7 +83,7 @@ describe('Participants', () => {
     cy.contains(VALIDATION_MESSAGES.NAME_INVALID).should('exist')
   })
 
-  it('Edit participant, validate xss last name', () => {
+  it('Edit participant, validate against xss last name', () => {
     cy.login(TestUsers.ORG_ADMIN.email)
     cy.visit(`/participants/edit/${TestUsers.PARTICIPANT_UNANSWERED.id}`)
     cy.contains('Edit Participant').should('exist')
@@ -96,7 +96,7 @@ describe('Participants', () => {
     cy.contains(VALIDATION_MESSAGES.NAME_INVALID).should('exist')
   })
 
-  it('Edit participant, validate xss email', () => {
+  it('Edit participant, validate against xss email', () => {
     cy.login(TestUsers.ORG_ADMIN.email)
     cy.visit(`/participants/edit/${TestUsers.PARTICIPANT_UNANSWERED.id}`)
     cy.contains('Edit Participant').should('exist')
@@ -109,7 +109,7 @@ describe('Participants', () => {
     cy.contains(VALIDATION_MESSAGES.EMAIL_INVALID).should('exist')
   })
 
-  it('Edit participant, validate xss externalId', () => {
+  it('Edit participant, validate against xss externalId', () => {
     cy.login(TestUsers.ORG_ADMIN.email)
     cy.visit(`/participants/edit/${TestUsers.PARTICIPANT_UNANSWERED.id}`)
     cy.contains('Edit Participant').should('exist')
@@ -122,7 +122,7 @@ describe('Participants', () => {
     cy.contains(VALIDATION_MESSAGES.EXTERNALID_INVALID).should('exist')
   })
 
-  it('Edit participant, validate xss address', () => {
+  it('Edit participant, validate against xss address', () => {
     cy.login(TestUsers.ORG_ADMIN.email)
     cy.visit(`/participants/edit/${TestUsers.PARTICIPANT_UNANSWERED.id}`)
     cy.contains('Edit Participant').should('exist')
@@ -135,7 +135,7 @@ describe('Participants', () => {
     cy.contains(VALIDATION_MESSAGES.ADDRESS_INVALID).should('exist')
   })
 
-  it('Edit participant, validate xss suburb', () => {
+  it('Edit participant, validate against xss suburb', () => {
     cy.login(TestUsers.ORG_ADMIN.email)
     cy.visit(`/participants/edit/${TestUsers.PARTICIPANT_UNANSWERED.id}`)
     cy.contains('Edit Participant').should('exist')
@@ -148,7 +148,7 @@ describe('Participants', () => {
     cy.contains(VALIDATION_MESSAGES.ADDRESS_INVALID).should('exist')
   })
 
-  it('Edit participant, validate xss postcode', () => {
+  it('Edit participant, validate against xss postcode', () => {
     cy.login(TestUsers.ORG_ADMIN.email)
     cy.visit(`/participants/edit/${TestUsers.PARTICIPANT_UNANSWERED.id}`)
     cy.contains('Edit Participant').should('exist')
@@ -161,7 +161,7 @@ describe('Participants', () => {
     cy.contains(VALIDATION_MESSAGES.POSTCODE_INVALID).should('exist')
   })
 
-  it('Edit participant, validate xss mobile', () => {
+  it('Edit participant, validate against xss mobile', () => {
     cy.login(TestUsers.ORG_ADMIN.email)
     cy.visit(`/participants/edit/${TestUsers.PARTICIPANT_UNANSWERED.id}`)
     cy.contains('Edit Participant').should('exist')
@@ -174,7 +174,7 @@ describe('Participants', () => {
     cy.contains(VALIDATION_MESSAGES.MOBILE_INVALID).should('exist')
   })
 
-  it('Edit participant, validate xss nok first name', () => {
+  it('Edit participant, validate against xss nok first name', () => {
     cy.login(TestUsers.ORG_ADMIN.email)
     cy.visit(`/participants/edit/${TestUsers.PARTICIPANT_UNANSWERED.id}`)
     cy.contains('Edit Participant').should('exist')
@@ -187,7 +187,7 @@ describe('Participants', () => {
     cy.contains(VALIDATION_MESSAGES.NAME_INVALID).should('exist')
   })
 
-  it('Edit participant, validate xss nok last name', () => {
+  it('Edit participant, validate against xss nok last name', () => {
     cy.login(TestUsers.ORG_ADMIN.email)
     cy.visit(`/participants/edit/${TestUsers.PARTICIPANT_UNANSWERED.id}`)
     cy.contains('Edit Participant').should('exist')
@@ -200,7 +200,7 @@ describe('Participants', () => {
     cy.contains(VALIDATION_MESSAGES.NAME_INVALID).should('exist')
   })
 
-  it('Edit participant, validate xss nok email', () => {
+  it('Edit participant, validate against xss nok email', () => {
     cy.login(TestUsers.ORG_ADMIN.email)
     cy.visit(`/participants/edit/${TestUsers.PARTICIPANT_UNANSWERED.id}`)
     cy.contains('Edit Participant').should('exist')
@@ -213,7 +213,7 @@ describe('Participants', () => {
     cy.contains(VALIDATION_MESSAGES.EMAIL_INVALID).should('exist')
   })
 
-  it('Edit participant, validate xss nok mobile', () => {
+  it('Edit participant, validate against xss nok mobile', () => {
     cy.login(TestUsers.ORG_ADMIN.email)
     cy.visit(`/participants/edit/${TestUsers.PARTICIPANT_UNANSWERED.id}`)
     cy.contains('Edit Participant').should('exist')
