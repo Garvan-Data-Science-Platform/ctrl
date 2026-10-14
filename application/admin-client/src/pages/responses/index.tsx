@@ -27,8 +27,18 @@ export const ResponsesView = () => {
             <Table>
               <TableBody>
                 {val.elements.map((e_val, e_idx) => {
-                  if (e_val.type === 'video' || e_val.type === 'subheading') {
+                  if (e_val.type === 'video') {
                     return null
+                  }
+                  if (e_val.type === 'subheading') {
+                    return (
+                      <TableRow key={e_idx}>
+                        <TableCell variant="head" sx={{ fontStyle: 'italic' }}>
+                          {e_val.data.text}
+                        </TableCell>
+                        <TableCell></TableCell>
+                      </TableRow>
+                    )
                   }
                   return (
                     <TableRow key={e_idx}>
