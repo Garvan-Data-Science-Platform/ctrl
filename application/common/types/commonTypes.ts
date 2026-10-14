@@ -7,7 +7,7 @@ import { Role, User } from '@prisma/client'
 
 // Specifying REGEX here, so that they can be defined in the same file as Type definitions with `@patterns`
 // (even though its not completely DRY within the file as regex are defined here and in TSOA annotations)
-const SafeText = /^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+]+$/
+const SafeText = /^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€+_]+$/
 
 export const REGEX = {
   NAME: /^[a-zA-ZÀ-ÖØ-öø-ɏ\s\-'.]+$/,
