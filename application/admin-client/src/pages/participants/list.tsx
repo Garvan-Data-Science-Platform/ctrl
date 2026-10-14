@@ -479,19 +479,14 @@ export const ParticipantList = () => {
         onSubmit={(data: any) => {
           const recips = data.validData.map((row: any) => {
             const nested = unflatten(row) as any
-            const { profile, ...rest } = nested
-            const { email, ...profileWithoutEmail } = profile || {}
 
-            if (profileWithoutEmail.dob) {
-              const isoDate = fromExcelDateToISO(profileWithoutEmail.dob)
-              profileWithoutEmail.dob = isoDate ?? undefined
+            if (nested.profile.dob) {
+              const isoDate = fromExcelDateToISO(nested.profile.dob)
+              nested.profile.dob = isoDate ?? undefined
             }
             return {
-              email: email,
-              prefill: {
-                ...rest,
-                profile: profileWithoutEmail,
-              },
+              email: nested.profile.email,
+              prefill: nested,
             }
           })
           setInitialRecipients(recips)

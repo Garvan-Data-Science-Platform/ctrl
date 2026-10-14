@@ -16,6 +16,7 @@ export interface ProfilePrefill {
   firstName?: FirstName
   middleName?: MiddleName
   lastName?: LastName
+  email?: Email
   dob?: DoB
   mobile?: Mobile
   addressLine?: AddressLine

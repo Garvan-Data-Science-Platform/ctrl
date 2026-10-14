@@ -2081,6 +2081,9 @@
           "lastName": {
             "$ref": "#/components/schemas/LastName"
           },
+          "email": {
+            "$ref": "#/components/schemas/Email"
+          },
           "dob": {
             "$ref": "#/components/schemas/DoB"
           },

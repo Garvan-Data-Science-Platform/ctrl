@@ -818,6 +818,7 @@ const models: TsoaRoute.Models = {
             "firstName": {"ref":"FirstName"},
             "middleName": {"ref":"MiddleName"},
             "lastName": {"ref":"LastName"},
+            "email": {"ref":"Email"},
             "dob": {"ref":"DoB"},
             "mobile": {"ref":"Mobile"},
             "addressLine": {"ref":"AddressLine"},
