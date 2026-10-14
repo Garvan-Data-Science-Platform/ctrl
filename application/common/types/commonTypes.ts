@@ -14,9 +14,11 @@ export const REGEX = {
   ADDRESS: SafeText,
   MOBILE: /^04\d{8}$/,
   POSTCODE: /^\d{4}$/,
-  EMAIL: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+  // Source for email regex: https://html.spec.whatwg.org/multipage/input.html#email-state-(type=email) modified to remove unnecessary escape characters
+  EMAIL:
+    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/,
   EXTERNALID: /^[a-zA-Z0-9\-_=.:]*$/,
-  // Source for URL regex https://regex-snippets.com/url-and-path modified to remove unnecessary escape characters
+  // Source for URL regex: https://regex-snippets.com/url-and-path modified to remove unnecessary escape characters
   URL: /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/,
   STUDY_NAME: SafeText,
   STUDY_DESCRIPTION: SafeText,
