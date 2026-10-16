@@ -18,7 +18,6 @@ import {
 import { Integrations } from '../../../integrations/src/Integrations'
 import prisma from '../PrismaClient'
 import { Readable } from 'stream'
-import { RegisterParticipantRequest } from 'common/types/api/auth'
 import type {
   UploadRedcapInstrumentResponse,
   UploadRedcapInstrumentAPIRequest,
@@ -44,7 +43,7 @@ import logger from 'common/src/logger'
 import { auditLog } from '../middlewares/AuditLog'
 import { SurveyVersionAnswers } from '@prisma/client'
 import { randomBytes } from 'crypto'
-import { Prefill, Recipient } from 'common/types/invite'
+import { Prefill, ProfilePrefill, Recipient } from 'common/types/invite'
 
 interface ElsaDuosResponse {
   data: { participantId: string; duos: string[] }[]
@@ -323,7 +322,7 @@ export class IntegrationsController extends Controller {
 
   private async processParticipantData(studyId: number, rawData: Record<string, string>[]) {
     // Map REDCap data to CTRL data
-    let data: RegisterParticipantRequest[] = []
+    let data: ProfilePrefill[] = []
     try {
       data = this.integrationService.mapRecordToParticipantRequests(rawData)
     } catch (error) {
@@ -337,20 +336,10 @@ export class IntegrationsController extends Controller {
     const existingUsers: string[] = []
 
     for (const participant of data) {
-      const { email, ...participantData } = participant
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      delete (participantData as any).password
-
-      // Exclude dependents and externalId from profile
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { dependents, externalId, ...profile } = participantData
-
       // Check if user has a participant profile associated with this study
       const user = await this.userRepo.findUnique({
         where: {
-          email,
+          email: participant.email,
           profiles: {
             every: {
               studies: {
@@ -362,17 +351,18 @@ export class IntegrationsController extends Controller {
       })
 
       // If user is already part of that study add to existingUser
-      if (user) {
-        existingUsers.push(email)
+      if (user && participant.email) {
+        existingUsers.push(participant.email)
       } else {
-        const alreadyAdded = newParticipants.some((recipient) => recipient.email === email)
+        const alreadyAdded = newParticipants.some(
+          (recipient) => recipient.email === participant.email,
+        )
 
-        if (!alreadyAdded) {
+        if (!alreadyAdded && participant.email) {
           const prefill: Prefill = {
-            profile,
-            studyParticipant: { externalId },
+            profile: participant,
           }
-          newParticipants.push({ email, prefill })
+          newParticipants.push({ email: participant.email, prefill })
         }
       }
     }

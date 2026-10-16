@@ -1,6 +1,6 @@
 import { mapToSurveyElement, mapToParticipantRequest } from './mapData'
-import { RegisterParticipantRequest } from '../../common/types/api/auth'
 import { SurveyStep } from '../../common/types/survey'
+import { ProfilePrefill } from 'common/types/invite'
 
 export class Integrations {
   mapping: Record<string, string>
@@ -10,8 +10,8 @@ export class Integrations {
   }
 
   // returns a list of participant request to create users
-  mapRecordToParticipantRequests(csv: Record<string, string>[]): RegisterParticipantRequest[] {
-    const res: RegisterParticipantRequest[] = []
+  mapRecordToParticipantRequests(csv: Record<string, string>[]): ProfilePrefill[] {
+    const res: ProfilePrefill[] = []
     for (const userData of csv) {
       res.push(mapToParticipantRequest(userData, this.mapping))
     }

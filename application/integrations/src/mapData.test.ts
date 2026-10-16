@@ -33,7 +33,7 @@ describe('mapToParticipantRequest', () => {
   // Test case for missing optional fields (no error thrown)
   it('should not throw an error for missing optional fields', () => {
     const result = mapToParticipantRequest(sourceDataNoNOKMobile, testMapping)
-    expect(result.nextOfKin.mobile).toBeUndefined() // No mobile for next of kin, should be undefined
+    expect(result.nextOfKin!.mobile).toBeUndefined() // No mobile for next of kin, should be undefined
   })
 })
 

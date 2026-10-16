@@ -125,8 +125,7 @@ describe('REDCap Participant Upload', () => {
                 suburb: 'suburb',
                 postcode: '2088',
                 state: 'NSW',
-                dob: '07/13/2000',
-                participantType: 'STANDARD',
+                dob: '2000-07-12',
                 nextOfKin: {
                   firstName: 'fake',
                   lastName: 'fakerson',
@@ -149,8 +148,7 @@ describe('REDCap Participant Upload', () => {
                 suburb: 'fakie',
                 postcode: '2010',
                 state: 'ACT',
-                dob: '01/10/1984',
-                participantType: 'STANDARD',
+                dob: '1984-10-01',
                 nextOfKin: {
                   firstName: 'fake',
                   lastName: 'fakerson',
@@ -207,6 +205,8 @@ describe('REDCap Participant Upload', () => {
         cy.get('[data-cy="remove-button"]').should('have.length', expectedEmailsInModal.length)
       })
 
+      // wait til email subject and invite text is there before sending
+      cy.wait(200)
       cy.get('[data-cy="send-button"]').should('be.visible').click()
 
       // Check updated updated list of invites
@@ -220,6 +220,17 @@ describe('REDCap Participant Upload', () => {
         expect(response.status).to.eq(200)
         updatedInvites = response.body.data
         cy.wrap(updatedInvites).as('updatedInvites')
+      })
+
+      // Check that the participant has been updated
+      cy.get('@initialInvites').then((initialInvites) => {
+        cy.get('@updatedInvites').then((updatedInvites) => {
+          console.log('initialInvites', initialInvites)
+          console.log('updatedInvites', updatedInvites)
+          const num_new_invites = updatedInvites.length - initialInvites.length
+          expect(initialInvites.length).to.be.lessThan(updatedInvites.length)
+          expect(num_new_invites).to.eq(expectedEmailsInModal.length)
+        })
       })
     })
 
