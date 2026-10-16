@@ -1,12 +1,6 @@
-import {
-  ContactMethod,
-  ParticipantType,
-  StateTerritory,
-} from 'common/types/api/users/ParticipantProfile'
-import { TestUsers } from 'common/testing/constants'
+import { ContactMethod, StateTerritory } from 'common/types/api/users/ParticipantProfile'
 
 export const expectedMappedData = {
-  externalId: 'external-123',
   firstName: 'John',
   lastName: 'Doe',
   email: 'john.doe@example.com',
@@ -16,21 +10,11 @@ export const expectedMappedData = {
   suburb: 'Somewhere',
   postcode: '12345',
   state: Object.values(StateTerritory)[1], // assuming '1' maps to a valid StateTerritory
-  password: TestUsers.PARTICIPANT_COMPLETED.password, // use test data to meet pw requirements
-  dob: '01/01/1990',
-  participantType: ParticipantType.STANDARD,
+  dob: '1990-01-01',
   nextOfKin: {
     firstName: 'Jane',
     lastName: 'Doe',
     email: 'jane.doe@example.com',
     mobile: '0987654321',
   },
-  dependents: [
-    {
-      firstName: 'test',
-      lastName: 'child',
-      dob: '1990-01-01',
-      permanent: false,
-    },
-  ],
 }

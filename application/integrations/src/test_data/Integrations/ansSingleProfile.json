@@ -1,11 +1,7 @@
 [
   {
-    "externalId": "997",
     "addressLine": "2 fake st",
-    "dependents": [
-      { "dob": "1984-01-10", "firstName": "test", "lastName": "child", "permanent": false }
-    ],
-    "dob": "01/10/1984",
+    "dob": "1984-01-10",
     "email": "example@example.com",
     "firstName": "John",
     "lastName": "Smith",
@@ -16,8 +12,6 @@
       "lastName": "fakerson",
       "mobile": "0448434946"
     },
-    "participantType": "STANDARD",
-    "password": "Loginforuser12",
     "postcode": "2010",
     "preferredContact": "EMAIL",
     "state": "ACT",

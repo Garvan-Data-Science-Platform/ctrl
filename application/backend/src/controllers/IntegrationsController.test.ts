@@ -51,7 +51,8 @@ describe('IntegrationsController', () => {
             prefill: {
               profile: {
                 addressLine: '2 fake st',
-                dob: '01/10/1984',
+                dob: '1984-01-10',
+                email: 'example@example.com',
                 firstName: 'John',
                 lastName: 'Smith',
                 mobile: '0448434946',
@@ -61,14 +62,10 @@ describe('IntegrationsController', () => {
                   lastName: 'fakerson',
                   mobile: '0448434946',
                 },
-                participantType: 'STANDARD',
                 postcode: '2010',
                 preferredContact: 'EMAIL',
                 state: 'ACT',
                 suburb: 'fakie',
-              },
-              studyParticipant: {
-                externalId: '1',
               },
             },
           },
