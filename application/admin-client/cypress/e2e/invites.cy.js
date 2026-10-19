@@ -98,10 +98,12 @@ describe('', () => {
     cy.get('[data-cy="email-subject"]').should('contain.text', 'Invitation to CTRL')
     cy.get('[data-cy="email-subject"]').clear()
     cy.get('[data-cy="send-button"]').should('be.disabled')
-    cy.get('[data-cy="email-subject"]').type('Invitation to CTRL')
+    cy.contains(VALIDATION_MESSAGES.INVITE_EMAIL_SUBJECT_INVALID).should('exist')
 
+    cy.get('[data-cy="email-subject"]').type('Invitation to CTRL')
     cy.get('[data-cy="email-text"]').should('contain.text', 'You have been invited')
     cy.get('[data-cy="email-text"]').clear()
+    cy.contains(VALIDATION_MESSAGES.INVITE_EMAIL_TEXT_INVALID).should('exist')
     cy.get('[data-cy="send-button"]').should('be.disabled')
   })
 
