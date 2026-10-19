@@ -89,6 +89,22 @@ describe('', () => {
     cy.get('[data-cy="send-button"]').click()
     cy.get('[data-cy="pending-list"]', { timeout: 10000 }).should('contain.text', 'valid1@g.co')
   })
+
+  it('Should disable send button if email subject or text is empty', () => {
+    cy.visit('/participants')
+    cy.get('[data-cy="invite-button"]').click()
+    cy.get('[data-cy="email-field"]').clear().type('valid1@g.co').type('{enter}')
+
+    cy.get('[data-cy="email-subject"]').should('contain.text', 'Invitation to CTRL')
+    cy.get('[data-cy="email-subject"]').clear()
+    cy.get('[data-cy="send-button"]').should('be.disabled')
+    cy.get('[data-cy="email-subject"]').type('Invitation to CTRL')
+
+    cy.get('[data-cy="email-text"]').should('contain.text', 'You have been invited')
+    cy.get('[data-cy="email-text"]').clear()
+    cy.get('[data-cy="send-button"]').should('be.disabled')
+  })
+
   it('Can revoke an invite', () => {
     cy.visit('/participants')
     cy.get('[data-cy="pending-list"]').get('[data-rowindex="0"]').should('contain.text', 'Pending')

@@ -58,12 +58,10 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
     idFieldValue && externalIdRule.pattern && !externalIdRule.pattern.value.test(idFieldValue),
   )
   const isInviteEmailSubjectInvalid = Boolean(
-    emailTitle &&
-      inviteEmailSubjectRule.pattern &&
-      !inviteEmailSubjectRule.pattern.value.test(emailTitle),
+    inviteEmailSubjectRule.pattern && !inviteEmailSubjectRule.pattern.value.test(emailTitle),
   )
   const isInviteEmailTextInvalid = Boolean(
-    emailText && inviteEmailTextRule.pattern && !inviteEmailTextRule.pattern.value.test(emailText),
+    inviteEmailTextRule.pattern && !inviteEmailTextRule.pattern.value.test(emailText),
   )
 
   const handleAdd = () => {
