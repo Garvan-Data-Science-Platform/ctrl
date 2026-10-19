@@ -12,6 +12,18 @@ import { useAppStore } from './store.ts'
 
 const queryClient = new QueryClient()
 
+// A link back to this portal would load the portal inside its own news frame, so it counts as
+// no link: NavBar hides News and the News page redirects home.
+function isUsableNewsLink(link: string | null): link is string {
+  if (!link) return false
+  try {
+    return new URL(link, window.location.href).origin !== window.location.origin
+  } catch {
+    // new URL throws on malformed values saved before the backend validated links.
+    return false
+  }
+}
+
 function App() {
   const [theme, setTheme] = useState<Theme | null>(null)
   const { setNewsLink } = useAppStore()
@@ -25,7 +37,7 @@ function App() {
   useEffect(() => {
     apiClient.get('/settings/userportal').then((res) => {
       const { primaryColour: primary, secondaryColour: secondary, newsLink } = res.data.data
-      setNewsLink(newsLink)
+      setNewsLink(isUsableNewsLink(newsLink) ? newsLink : null)
       setTheme(
         customTheme({
           primary: primary ? standardize_color(primary) : '#2196f3',
