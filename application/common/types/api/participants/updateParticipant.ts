@@ -1,6 +1,7 @@
+import { ExternalId } from '../../commonTypes'
 import { UpdateProfileRequest } from '../users/updateProfile'
 
 export type UpdateParticipantRequest = {
-  externalId: string
+  externalId: ExternalId
   profile: UpdateProfileRequest
 }
