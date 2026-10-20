@@ -30,6 +30,7 @@ import { ReactSpreadsheetImport } from 'react-spreadsheet-import'
 import { importFields } from '../../components/CSVImport'
 import { unflatten } from 'flat'
 import { fromExcelDateToISO } from '@common/src/utils'
+import { VALIDATION_MESSAGES } from '@common/src/validation'
 
 export const statusMap = {
   incomplete: {
@@ -476,14 +477,28 @@ export const ParticipantList = () => {
               "When you upload a file you will have a chance to match the column headers with the fields listed below. These fields will be used to: (1) determine what email address to send an invitation to. (2) Prefill the registration form (if applicable). (3) Populate the user's externalID for this study.",
           },
         }}
+        rowHook={(row: any, addError) => {
+          const rawDob = row['profile.dob'] as string | undefined
+
+          if (rawDob) {
+            const isoDate = fromExcelDateToISO(rawDob)
+
+            if (!isoDate) {
+              addError('profile.dob', {
+                message: VALIDATION_MESSAGES.DOB_INVALID,
+                level: 'error',
+              })
+            } else {
+              row['profile.dob'] = isoDate
+            }
+          }
+
+          return row
+        }}
         onSubmit={(data: any) => {
           const recips = data.validData.map((row: any) => {
             const nested = unflatten(row) as any
 
-            if (nested.profile.dob) {
-              const isoDate = fromExcelDateToISO(nested.profile.dob)
-              nested.profile.dob = isoDate ?? undefined
-            }
             return {
               email: nested.profile.email,
               prefill: nested,

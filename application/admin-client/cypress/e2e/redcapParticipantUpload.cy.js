@@ -293,5 +293,17 @@ describe('REDCap Participant Upload', () => {
 
       // NOTE: state is a different case with drop down matching
     })
+
+    it('should show error with invalid date input', () => {
+      const fileNameDateError = 'test_participantInvalidDate.csv'
+      cy.get('[data-cy="upload-button"]').click()
+      cy.get('input[type="file"]').attachFile(fileNameDateError)
+      cy.contains('Select header row').should('exist')
+      cy.contains('Next').click()
+      cy.contains('Next').click()
+      // email
+      cy.contains('31/02/2000').should('be.visible').realHover({ scrollBehavior: 'center' })
+      cy.contains(VALIDATION_MESSAGES.DOB_INVALID).should('be.visible')
+    })
   })
 })
