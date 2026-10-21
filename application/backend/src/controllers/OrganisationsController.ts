@@ -161,7 +161,7 @@ export class OrganisationsController extends Controller {
   public async getOrganisationUsers(@Path() orgID: number): Promise<GetOrganisationUsersResponse> {
     const organisation = await this.organisationRepo.findUnique({
       where: { id: orgID },
-      include: { users: true },
+      include: { users: { omit: { password: true, emailHash: true } } },
     })
 
     if (!organisation) {
