@@ -1,5 +1,5 @@
-import { User } from '@prisma/client'
+import { UserResponse } from '../users'
 
 export interface GetOrganisationUsersResponse {
-  data: User[]
+  data: UserResponse[]
 }

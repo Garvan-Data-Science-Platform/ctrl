@@ -218,6 +218,32 @@ describe('OrganisationsController', () => {
       expect(body.data[0].id).toBe(TestUsers.ORG_ADMIN.id)
     })
 
+    it('should not return user password', async () => {
+      const response = await request(app)
+        .get(`/organisations/${testOrganisationId}/users`)
+        .set({ Authorization: `Bearer ${orgAdmintoken}` })
+      expect(response.status).toBe(200)
+
+      const body: GetOrganisationUsersResponse = response.body
+      expect(body.data.length).toBe(4)
+      for (const user of body.data) {
+        expect(user).not.toHaveProperty('password')
+      }
+    })
+
+    it('should not return user emailHash', async () => {
+      const response = await request(app)
+        .get(`/organisations/${testOrganisationId}/users`)
+        .set({ Authorization: `Bearer ${orgAdmintoken}` })
+      expect(response.status).toBe(200)
+
+      const body: GetOrganisationUsersResponse = response.body
+      expect(body.data.length).toBe(4)
+      for (const user of body.data) {
+        expect(user).not.toHaveProperty('emailHash')
+      }
+    })
+
     it('should return a 404 error if the organisation is not found', async () => {
       const notExistingOrganisationId: number = 1234567890
       const response = await request(app)

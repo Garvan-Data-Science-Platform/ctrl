@@ -2225,85 +2225,11 @@
         "type": "object",
         "additionalProperties": false
       },
-      "User": {
-        "description": "Model User",
-        "properties": {
-          "deleted": {
-            "type": "boolean"
-          },
-          "retriesRemaining": {
-            "type": "number",
-            "format": "double"
-          },
-          "lockedUntil": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "agreedTermsAt": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "role": {
-            "$ref": "#/components/schemas/_36_Enums.Role"
-          },
-          "password": {
-            "type": "string"
-          },
-          "emailHash": {
-            "type": "string",
-            "nullable": true
-          },
-          "email": {
-            "type": "string"
-          },
-          "lastName": {
-            "type": "string"
-          },
-          "middleName": {
-            "type": "string",
-            "nullable": true
-          },
-          "firstName": {
-            "type": "string"
-          },
-          "id": {
-            "type": "number",
-            "format": "double"
-          }
-        },
-        "required": [
-          "deleted",
-          "retriesRemaining",
-          "lockedUntil",
-          "agreedTermsAt",
-          "updatedAt",
-          "createdAt",
-          "role",
-          "password",
-          "emailHash",
-          "email",
-          "lastName",
-          "middleName",
-          "firstName",
-          "id"
-        ],
-        "type": "object"
-      },
       "GetOrganisationUsersResponse": {
         "properties": {
           "data": {
             "items": {
-              "$ref": "#/components/schemas/User"
+              "$ref": "#/components/schemas/UserResponse"
             },
             "type": "array"
           }
