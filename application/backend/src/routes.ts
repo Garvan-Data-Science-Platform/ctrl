@@ -144,12 +144,12 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "FirstName": {
         "dataType": "refAlias",
-        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":100},"pattern":{"value":"^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F\\s\\-'’.]+$"}}},
+        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":100},"pattern":{"value":"^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF\\s\\-'\\u2019.]+$"}}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "LastName": {
         "dataType": "refAlias",
-        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":100},"pattern":{"value":"^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F\\s\\-'’.]+$"}}},
+        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":100},"pattern":{"value":"^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF\\s\\-'\\u2019.]+$"}}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Email": {
@@ -247,22 +247,22 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "SurveyStepTitle": {
         "dataType": "refAlias",
-        "type": {"dataType":"string","validators":{"maxLength":{"value":2048},"pattern":{"value":"^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F0-9\\s.,!?:;()'\"\\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$"}}},
+        "type": {"dataType":"string","validators":{"maxLength":{"value":2048},"pattern":{"value":"^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]+$"}}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "SurveyStepDescription": {
         "dataType": "refAlias",
-        "type": {"dataType":"string","validators":{"maxLength":{"value":2048},"pattern":{"value":"^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F0-9\\s.,!?:;()'\"\\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$"}}},
+        "type": {"dataType":"string","validators":{"maxLength":{"value":2048},"pattern":{"value":"^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]+$"}}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "SurveyQuestionText": {
         "dataType": "refAlias",
-        "type": {"dataType":"string","validators":{"maxLength":{"value":2048},"pattern":{"value":"^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F0-9\\s.,!?:;()'\"\\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$"}}},
+        "type": {"dataType":"string","validators":{"maxLength":{"value":2048},"pattern":{"value":"^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]+$"}}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "SurveyQuestionTooltip": {
         "dataType": "refAlias",
-        "type": {"dataType":"string","validators":{"maxLength":{"value":2048},"pattern":{"value":"^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F0-9\\s.,!?:;()'\"\\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$"}}},
+        "type": {"dataType":"string","validators":{"maxLength":{"value":2048},"pattern":{"value":"^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]+$"}}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "DuoCode": {
@@ -314,7 +314,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "SurveySubHeadingText": {
         "dataType": "refAlias",
-        "type": {"dataType":"string","validators":{"maxLength":{"value":2048},"pattern":{"value":"^([a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F0-9\\s.,!?:;()'\"\\-/#@&%$£€+_‘’“”–—…•≥≤°=]+)?$"}}},
+        "type": {"dataType":"string","validators":{"maxLength":{"value":2048},"pattern":{"value":"^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]+$"}}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "SurveySubHeading": {
@@ -519,7 +519,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "StudyName": {
         "dataType": "refAlias",
-        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":2048},"pattern":{"value":"^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F0-9\\s.,!?:;()'\"\\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$"}}},
+        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":2048},"pattern":{"value":"^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]+$"}}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "CreateStudyRequest": {
@@ -532,7 +532,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "StudyDescription": {
         "dataType": "refAlias",
-        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":2048},"pattern":{"value":"^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F0-9\\s.,!?:;()'\"\\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$"}}},
+        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":2048},"pattern":{"value":"^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]+$"}}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "RedcapToken": {
@@ -607,7 +607,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "MiddleName": {
         "dataType": "refAlias",
-        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":100},"pattern":{"value":"^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F\\s\\-'’.]+$"}}},
+        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":100},"pattern":{"value":"^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF\\s\\-'\\u2019.]+$"}}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Mobile": {
@@ -617,12 +617,12 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "AddressLine": {
         "dataType": "refAlias",
-        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":128},"pattern":{"value":"^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F0-9\\s.,!?:;()'\"\\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$"}}},
+        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":128},"pattern":{"value":"^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]+$"}}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Suburb": {
         "dataType": "refAlias",
-        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":128},"pattern":{"value":"^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F0-9\\s.,!?:;()'\"\\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$"}}},
+        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":128},"pattern":{"value":"^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]+$"}}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "StateTerritory": {
@@ -851,12 +851,12 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "InviteEmailSubject": {
         "dataType": "refAlias",
-        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":2048},"pattern":{"value":"^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F0-9\\s.,!?:;()'\"\\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$"}}},
+        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":2048},"pattern":{"value":"^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]+$"}}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "InviteEmailText": {
         "dataType": "refAlias",
-        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":2048},"pattern":{"value":"^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F0-9\\s.,!?:;()'\"\\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$"}}},
+        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":2048},"pattern":{"value":"^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]+$"}}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "InviteParticipantsRequest": {
@@ -914,7 +914,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "OrganisationName": {
         "dataType": "refAlias",
-        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":2048},"pattern":{"value":"^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F0-9\\s.,!?:;()'\"\\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$"}}},
+        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":2048},"pattern":{"value":"^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]+$"}}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "CreateOrganisationRequest": {
@@ -943,7 +943,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "ContactUsText": {
         "dataType": "refAlias",
-        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":1000},"pattern":{"value":"^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F0-9\\s.,!?:;()'\"\\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$"}}},
+        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":1000},"pattern":{"value":"^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]+$"}}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "ContactUsRequest": {
@@ -975,7 +975,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "RedcapFormName": {
         "dataType": "refAlias",
-        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":2048},"pattern":{"value":"^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€_+]+$\n^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F0-9\\s.,!?:;()'\"\\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$"}}},
+        "type": {"dataType":"string","validators":{"minLength":{"value":1},"maxLength":{"value":2048},"pattern":{"value":"^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]+$"}}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "UploadRedcapInstrumentAPIRequest": {

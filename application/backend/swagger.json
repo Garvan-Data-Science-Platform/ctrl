@@ -249,14 +249,14 @@
         "example": "John",
         "minLength": 1,
         "maxLength": 100,
-        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F\\s\\-'’.]+$"
+        "pattern": "^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF\\s\\-'\\u2019.]+$"
       },
       "LastName": {
         "type": "string",
         "example": "Doe",
         "minLength": 1,
         "maxLength": 100,
-        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F\\s\\-'’.]+$"
+        "pattern": "^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF\\s\\-'\\u2019.]+$"
       },
       "Email": {
         "type": "string",
@@ -424,25 +424,25 @@
         "type": "string",
         "example": "Introduction to CTRL",
         "maxLength": 2048,
-        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F0-9\\s.,!?:;()'\"\\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$"
+        "pattern": "^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]+$"
       },
       "SurveyStepDescription": {
         "type": "string",
         "example": "Watch our short video about the consent process for taking part in medical research.",
         "maxLength": 2048,
-        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F0-9\\s.,!?:;()'\"\\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$"
+        "pattern": "^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]+$"
       },
       "SurveyQuestionText": {
         "type": "string",
         "example": "Do you consent to the genomic test?",
         "maxLength": 2048,
-        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F0-9\\s.,!?:;()'\"\\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$"
+        "pattern": "^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]+$"
       },
       "SurveyQuestionTooltip": {
         "type": "string",
         "example": "Here is an explanation of what genomic means",
         "maxLength": 2048,
-        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F0-9\\s.,!?:;()'\"\\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$"
+        "pattern": "^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]+$"
       },
       "DuoCode": {
         "properties": {
@@ -553,7 +553,7 @@
         "type": "string",
         "example": "Section with questions about consent",
         "maxLength": 2048,
-        "pattern": "^([a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F0-9\\s.,!?:;()'\"\\-/#@&%$£€+_‘’“”–—…•≥≤°=]+)?$"
+        "pattern": "^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]+$"
       },
       "SurveySubHeading": {
         "properties": {
@@ -1174,7 +1174,7 @@
         "example": "Acme Genomics Study",
         "minLength": 1,
         "maxLength": 2048,
-        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F0-9\\s.,!?:;()'\"\\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$"
+        "pattern": "^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]+$"
       },
       "CreateStudyRequest": {
         "properties": {
@@ -1193,7 +1193,7 @@
         "example": "This is a short description of the study",
         "minLength": 1,
         "maxLength": 2048,
-        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F0-9\\s.,!?:;()'\"\\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$"
+        "pattern": "^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]+$"
       },
       "RedcapToken": {
         "type": "string",
@@ -1377,7 +1377,7 @@
         "example": "William",
         "minLength": 1,
         "maxLength": 100,
-        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F\\s\\-'’.]+$"
+        "pattern": "^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF\\s\\-'\\u2019.]+$"
       },
       "Mobile": {
         "type": "string",
@@ -1389,14 +1389,14 @@
         "example": "123 Sydney Street",
         "minLength": 1,
         "maxLength": 128,
-        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F0-9\\s.,!?:;()'\"\\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$"
+        "pattern": "^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]+$"
       },
       "Suburb": {
         "type": "string",
         "example": "Darlinghurst",
         "minLength": 1,
         "maxLength": 128,
-        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F0-9\\s.,!?:;()'\"\\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$"
+        "pattern": "^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]+$"
       },
       "StateTerritory": {
         "enum": [
@@ -2150,14 +2150,14 @@
         "example": "Invitation to CTRL - Dynamic Consent Platform",
         "minLength": 1,
         "maxLength": 2048,
-        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F0-9\\s.,!?:;()'\"\\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$"
+        "pattern": "^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]+$"
       },
       "InviteEmailText": {
         "type": "string",
         "example": "You have been invited to register with CTRL dynamic consent platform",
         "minLength": 1,
         "maxLength": 2048,
-        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F0-9\\s.,!?:;()'\"\\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$"
+        "pattern": "^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]+$"
       },
       "InviteParticipantsRequest": {
         "properties": {
@@ -2300,7 +2300,7 @@
         "example": "Acme Medical Research Institute",
         "minLength": 1,
         "maxLength": 2048,
-        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F0-9\\s.,!?:;()'\"\\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$"
+        "pattern": "^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]+$"
       },
       "CreateOrganisationRequest": {
         "properties": {
@@ -2343,7 +2343,7 @@
         "example": "There was some problem with this thing that I was doing.\nBut I don't know why?\n\nCheers,\nJohn Doe",
         "minLength": 1,
         "maxLength": 1000,
-        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F0-9\\s.,!?:;()'\"\\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$"
+        "pattern": "^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]+$"
       },
       "ContactUsRequest": {
         "properties": {
@@ -2407,7 +2407,7 @@
         "example": "Name of REDCap instrument (from Column B of data dictionary)",
         "minLength": 1,
         "maxLength": 2048,
-        "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€_+]+$\n^[a-zA-ZÀ-ÖØ-öø-ɏ\\u1E00-\\u1EFF\\u0300-\\u036F0-9\\s.,!?:;()'\"\\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$"
+        "pattern": "^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]+$"
       },
       "UploadRedcapInstrumentAPIRequest": {
         "properties": {

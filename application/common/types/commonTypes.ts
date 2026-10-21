@@ -7,12 +7,16 @@ import { Role, User } from '@prisma/client'
 
 // Specifying REGEX here, so that they can be defined in the same file as Type definitions with `@patterns`
 // (even though its not completely DRY within the file as regex are defined here and in TSOA annotations)
-// Explicit Unicode ranges - safe for TSOA and frontend without the 'u' flag
+
+// Explicit Unicode ranges - safe for TSOA and frontend without the 'u' flag and resiliant to copy/paste
+// Replaced À-Ö with \u00C0-\u00D6
+// Replaced Ø-ö with \u00D8-\u00F6
+// Replaced ø-ɏ with \u00F8-\u024F
 const SafeText =
-  /^[a-zA-ZÀ-ÖØ-öø-ɏ\u1E00-\u1EFF\u0300-\u036F0-9\s.,!?:;()'"\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$/
+  /^[\u0300-\u036Fa-zA-Z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u024F\u1E00-\u1EFF0-9\s.,!?:;()'"\-/#@&%$\u00A3\u20AC+_\u2018\u2019\u201C\u201D\u2013\u2014\u2026\u2022\u2265\u2264\u00B0=]+$/
 
 export const REGEX = {
-  NAME: /^[a-zA-ZÀ-ÖØ-öø-ɏ\u1E00-\u1EFF\u0300-\u036F\s\-'’.]+$/,
+  NAME: /^[\u0300-\u036Fa-zA-Z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u024F\u1E00-\u1EFF\s\-'\u2019.]+$/,
   ADDRESS: SafeText,
   MOBILE: /^04\d{8}$/,
   POSTCODE: /^\d{4}$/,
@@ -39,7 +43,7 @@ export const REGEX = {
 /**
  * @minLength 1
  * @maxLength 100
- * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ\u1E00-\u1EFF\u0300-\u036F\s\-'’.]+$
+ * @pattern ^[\u0300-\u036Fa-zA-Z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u024F\u1E00-\u1EFF\s\-'\u2019.]+$
  * @example "John"
  */
 export type FirstName = string
@@ -47,7 +51,7 @@ export type FirstName = string
 /**
  * @minLength 1
  * @maxLength 100
- * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ\u1E00-\u1EFF\u0300-\u036F\s\-'’.]+$
+ * @pattern ^[\u0300-\u036Fa-zA-Z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u024F\u1E00-\u1EFF\s\-'\u2019.]+$
  * @example "William"
  */
 export type MiddleName = string
@@ -55,7 +59,7 @@ export type MiddleName = string
 /**
  * @minLength 1
  * @maxLength 100
- * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ\u1E00-\u1EFF\u0300-\u036F\s\-'’.]+$
+ * @pattern ^[\u0300-\u036Fa-zA-Z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u024F\u1E00-\u1EFF\s\-'\u2019.]+$
  * @example "Doe"
  */
 export type LastName = string
@@ -91,7 +95,7 @@ export type Mobile = string
 /**
  * @minLength 1
  * @maxLength 128
- * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ\u1E00-\u1EFF\u0300-\u036F0-9\s.,!?:;()'"\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$
+ * @pattern ^[\u0300-\u036Fa-zA-Z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u024F\u1E00-\u1EFF0-9\s.,!?:;()'"\-/#@&%$\u00A3\u20AC+_\u2018\u2019\u201C\u201D\u2013\u2014\u2026\u2022\u2265\u2264\u00B0=]+$
  * @example "123 Sydney Street"
  */
 export type AddressLine = string
@@ -99,7 +103,7 @@ export type AddressLine = string
 /**
  * @minLength 1
  * @maxLength 128
- * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ\u1E00-\u1EFF\u0300-\u036F0-9\s.,!?:;()'"\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$
+ * @pattern ^[\u0300-\u036Fa-zA-Z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u024F\u1E00-\u1EFF0-9\s.,!?:;()'"\-/#@&%$\u00A3\u20AC+_\u2018\u2019\u201C\u201D\u2013\u2014\u2026\u2022\u2265\u2264\u00B0=]+$
  * @example "Darlinghurst"
  */
 export type Suburb = string
@@ -134,7 +138,7 @@ export type UserT = User
 /**
  * @minLength 1
  * @maxLength 2048
- * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ\u1E00-\u1EFF\u0300-\u036F0-9\s.,!?:;()'"\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$
+ * @pattern ^[\u0300-\u036Fa-zA-Z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u024F\u1E00-\u1EFF0-9\s.,!?:;()'"\-/#@&%$\u00A3\u20AC+_\u2018\u2019\u201C\u201D\u2013\u2014\u2026\u2022\u2265\u2264\u00B0=]+$
  * @example "Acme Genomics Study"
  */
 export type StudyName = string
@@ -142,7 +146,7 @@ export type StudyName = string
 /**
  * @minLength 1
  * @maxLength 2048
- * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ\u1E00-\u1EFF\u0300-\u036F0-9\s.,!?:;()'"\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$
+ * @pattern ^[\u0300-\u036Fa-zA-Z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u024F\u1E00-\u1EFF0-9\s.,!?:;()'"\-/#@&%$\u00A3\u20AC+_\u2018\u2019\u201C\u201D\u2013\u2014\u2026\u2022\u2265\u2264\u00B0=]+$
  * @example "This is a short description of the study"
  */
 export type StudyDescription = string
@@ -162,8 +166,7 @@ export type RedcapToken = string
 /**
  * @minLength 1
  * @maxLength 2048
- * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\s.,!?:;()'"\-/#@&%$£€_+]+$
- ^[a-zA-ZÀ-ÖØ-öø-ɏ\u1E00-\u1EFF\u0300-\u036F0-9\s.,!?:;()'"\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$
+ * @pattern ^[\u0300-\u036Fa-zA-Z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u024F\u1E00-\u1EFF0-9\s.,!?:;()'"\-/#@&%$\u00A3\u20AC+_\u2018\u2019\u201C\u201D\u2013\u2014\u2026\u2022\u2265\u2264\u00B0=]+$
  * @example "Name of REDCap instrument (from Column B of data dictionary)"
  */
 export type RedcapFormName = string
@@ -186,7 +189,7 @@ export type OptionalUrl = string
 /**
  * @minLength 1
  * @maxLength 2048
- * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ\u1E00-\u1EFF\u0300-\u036F0-9\s.,!?:;()'"\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$
+ * @pattern ^[\u0300-\u036Fa-zA-Z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u024F\u1E00-\u1EFF0-9\s.,!?:;()'"\-/#@&%$\u00A3\u20AC+_\u2018\u2019\u201C\u201D\u2013\u2014\u2026\u2022\u2265\u2264\u00B0=]+$
  * @example "Invitation to CTRL - Dynamic Consent Platform"
  */
 export type InviteEmailSubject = string
@@ -194,7 +197,7 @@ export type InviteEmailSubject = string
 /**
  * @minLength 1
  * @maxLength 2048
- * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ\u1E00-\u1EFF\u0300-\u036F0-9\s.,!?:;()'"\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$
+ * @pattern ^[\u0300-\u036Fa-zA-Z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u024F\u1E00-\u1EFF0-9\s.,!?:;()'"\-/#@&%$\u00A3\u20AC+_\u2018\u2019\u201C\u201D\u2013\u2014\u2026\u2022\u2265\u2264\u00B0=]+$
  * @example "You have been invited to register with CTRL dynamic consent platform"
  */
 export type InviteEmailText = string
@@ -202,7 +205,7 @@ export type InviteEmailText = string
 /**
  * @minLength 1
  * @maxLength 2048
- * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ\u1E00-\u1EFF\u0300-\u036F0-9\s.,!?:;()'"\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$
+ * @pattern ^[\u0300-\u036Fa-zA-Z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u024F\u1E00-\u1EFF0-9\s.,!?:;()'"\-/#@&%$\u00A3\u20AC+_\u2018\u2019\u201C\u201D\u2013\u2014\u2026\u2022\u2265\u2264\u00B0=]+$
  * @example "Acme Medical Research Institute"
  */
 export type OrganisationName = string
@@ -210,42 +213,42 @@ export type OrganisationName = string
 /**
  * @minLength 1
  * @maxLength 1000
- * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ\u1E00-\u1EFF\u0300-\u036F0-9\s.,!?:;()'"\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$
+ * @pattern ^[\u0300-\u036Fa-zA-Z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u024F\u1E00-\u1EFF0-9\s.,!?:;()'"\-/#@&%$\u00A3\u20AC+_\u2018\u2019\u201C\u201D\u2013\u2014\u2026\u2022\u2265\u2264\u00B0=]+$
  * @example "There was some problem with this thing that I was doing.\nBut I don't know why?\n\nCheers,\nJohn Doe"
  */
 export type ContactUsText = string
 
 /**
  * @maxLength 2048
- * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ\u1E00-\u1EFF\u0300-\u036F0-9\s.,!?:;()'"\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$
+ * @pattern ^[\u0300-\u036Fa-zA-Z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u024F\u1E00-\u1EFF0-9\s.,!?:;()'"\-/#@&%$\u00A3\u20AC+_\u2018\u2019\u201C\u201D\u2013\u2014\u2026\u2022\u2265\u2264\u00B0=]+$
  * @example "Introduction to CTRL"
  */
 export type SurveyStepTitle = string
 
 /**
  * @maxLength 2048
- * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ\u1E00-\u1EFF\u0300-\u036F0-9\s.,!?:;()'"\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$
+ * @pattern ^[\u0300-\u036Fa-zA-Z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u024F\u1E00-\u1EFF0-9\s.,!?:;()'"\-/#@&%$\u00A3\u20AC+_\u2018\u2019\u201C\u201D\u2013\u2014\u2026\u2022\u2265\u2264\u00B0=]+$
  * @example "Watch our short video about the consent process for taking part in medical research."
  */
 export type SurveyStepDescription = string
 
 /**
  * @maxLength 2048
- * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ\u1E00-\u1EFF\u0300-\u036F0-9\s.,!?:;()'"\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$
+ * @pattern ^[\u0300-\u036Fa-zA-Z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u024F\u1E00-\u1EFF0-9\s.,!?:;()'"\-/#@&%$\u00A3\u20AC+_\u2018\u2019\u201C\u201D\u2013\u2014\u2026\u2022\u2265\u2264\u00B0=]+$
  * @example "Do you consent to the genomic test?"
  */
 export type SurveyQuestionText = string
 
 /**
  * @maxLength 2048
- * @pattern ^[a-zA-ZÀ-ÖØ-öø-ɏ\u1E00-\u1EFF\u0300-\u036F0-9\s.,!?:;()'"\-/#@&%$£€+_‘’“”–—…•≥≤°=]+$
+ * @pattern ^[\u0300-\u036Fa-zA-Z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u024F\u1E00-\u1EFF0-9\s.,!?:;()'"\-/#@&%$\u00A3\u20AC+_\u2018\u2019\u201C\u201D\u2013\u2014\u2026\u2022\u2265\u2264\u00B0=]+$
  * @example "Here is an explanation of what genomic means"
  */
 export type SurveyQuestionTooltip = string
 
 /**
  * @maxLength 2048
- * @pattern ^([a-zA-ZÀ-ÖØ-öø-ɏ\u1E00-\u1EFF\u0300-\u036F0-9\s.,!?:;()'"\-/#@&%$£€+_‘’“”–—…•≥≤°=]+)?$
+ * @pattern ^[\u0300-\u036Fa-zA-Z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u024F\u1E00-\u1EFF0-9\s.,!?:;()'"\-/#@&%$\u00A3\u20AC+_\u2018\u2019\u201C\u201D\u2013\u2014\u2026\u2022\u2265\u2264\u00B0=]+$
  * @example "Section with questions about consent"
  */
 export type SurveySubHeadingText = string
