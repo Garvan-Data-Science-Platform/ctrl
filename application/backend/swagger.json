@@ -423,25 +423,25 @@
       "SurveyStepTitle": {
         "type": "string",
         "example": "Introduction to CTRL",
-        "maxLength": 128,
+        "maxLength": 2048,
         "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]*$"
       },
       "SurveyStepDescription": {
         "type": "string",
         "example": "Watch our short video about the consent process for taking part in medical research.",
-        "maxLength": 900,
+        "maxLength": 2048,
         "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]*$"
       },
       "SurveyQuestionText": {
         "type": "string",
         "example": "Do you consent to the genomic test?",
-        "maxLength": 900,
+        "maxLength": 2048,
         "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]*$"
       },
       "SurveyQuestionTooltip": {
         "type": "string",
         "example": "Here is an explanation of what genomic means",
-        "maxLength": 900,
+        "maxLength": 2048,
         "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]*$"
       },
       "DuoCode": {
@@ -537,7 +537,7 @@
       "OptionalUrl": {
         "type": "string",
         "example": "https://redcap.orgname.com/api/",
-        "maxLength": 128,
+        "maxLength": 2048,
         "pattern": "^(https?:\\/\\/[a-zA-Z0-9._~:/?#@!$&'()*+,;=%-]+)?$"
       },
       "SurveyVideo": {
@@ -552,7 +552,7 @@
       "SurveySubHeadingText": {
         "type": "string",
         "example": "Section with questions about consent",
-        "maxLength": 200,
+        "maxLength": 2048,
         "pattern": "^([a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+)?$"
       },
       "SurveySubHeading": {
@@ -1173,7 +1173,7 @@
         "type": "string",
         "example": "Acme Genomics Study",
         "minLength": 1,
-        "maxLength": 128,
+        "maxLength": 2048,
         "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
       },
       "CreateStudyRequest": {
@@ -1192,7 +1192,7 @@
         "type": "string",
         "example": "This is a short description of the study",
         "minLength": 1,
-        "maxLength": 900,
+        "maxLength": 2048,
         "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
       },
       "RedcapToken": {
@@ -1239,7 +1239,7 @@
         "type": "string",
         "example": "https://orgname.com/tcLink/",
         "minLength": 1,
-        "maxLength": 128,
+        "maxLength": 2048,
         "pattern": "^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$"
       },
       "SettingsBase": {
@@ -1906,7 +1906,7 @@
             "$ref": "#/components/schemas/UpdateProfileRequest"
           },
           "externalId": {
-            "type": "string"
+            "$ref": "#/components/schemas/ExternalId"
           }
         },
         "required": [
@@ -2149,14 +2149,14 @@
         "type": "string",
         "example": "Invitation to CTRL - Dynamic Consent Platform",
         "minLength": 1,
-        "maxLength": 128,
+        "maxLength": 2048,
         "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
       },
       "InviteEmailText": {
         "type": "string",
         "example": "You have been invited to register with CTRL dynamic consent platform",
         "minLength": 1,
-        "maxLength": 900,
+        "maxLength": 2048,
         "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
       },
       "InviteParticipantsRequest": {
@@ -2299,7 +2299,7 @@
         "type": "string",
         "example": "Acme Medical Research Institute",
         "minLength": 1,
-        "maxLength": 128,
+        "maxLength": 2048,
         "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
       },
       "CreateOrganisationRequest": {
@@ -2342,7 +2342,7 @@
         "type": "string",
         "example": "There was some problem with this thing that I was doing.\nBut I don't know why?\n\nCheers,\nJohn Doe",
         "minLength": 1,
-        "maxLength": 900,
+        "maxLength": 1000,
         "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€+]+$"
       },
       "ContactUsRequest": {
@@ -2406,7 +2406,7 @@
         "type": "string",
         "example": "Name of REDCap instrument (from Column B of data dictionary)",
         "minLength": 1,
-        "maxLength": 128,
+        "maxLength": 2048,
         "pattern": "^[a-zA-ZÀ-ÖØ-öø-ɏ0-9\\s.,!?:;()'\"\\-/#@&%$£€_+]+$"
       },
       "UploadRedcapInstrumentAPIRequest": {
