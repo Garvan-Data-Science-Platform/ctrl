@@ -131,8 +131,8 @@ describe('Survey tests', () => {
     const reqBody: UpdateSurveyRequest = {
       data: [
         {
-          text: '',
-          title: '',
+          text: 'Description',
+          title: 'Got to have a title',
           elements: [
             { type: 'question-checkbox', data: { text: 'Question 1b', value: true } },
             {
@@ -146,8 +146,8 @@ describe('Survey tests', () => {
           ],
         },
         {
-          text: '',
-          title: '',
+          text: 'Description',
+          title: 'Got to have a title',
           elements: [
             { type: 'question-checkbox', data: { text: 'Question 1', value: true } },
             { type: 'question-checkbox', data: { text: 'Question 2', value: true } },

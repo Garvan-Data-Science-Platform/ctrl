@@ -13,7 +13,7 @@
   },
   {
     "title": "Step 2",
-    "text": "",
+    "text": "Description of step 2",
     "elements": [
       {
         "type": "question-checkbox",
