@@ -7,7 +7,7 @@ import { ValidateError } from 'tsoa'
 import logger from 'common/src/logger'
 import {
   BadGatewayError,
-  CONFLICT_DETAILS,
+  CONFLICT_MESSAGE,
   ErrorHandler,
   FileUploadError,
   IncorrectPermissionsError,
@@ -60,9 +60,9 @@ describe('ErrorHandler', () => {
 
       expect(response.status).toBe(409)
       expect(response.body).toEqual({
-        message: 'Conflict',
+        message: CONFLICT_MESSAGE,
         code: 'P2002',
-        details: CONFLICT_DETAILS,
+        details: CONFLICT_MESSAGE,
       })
       expect(response.text).not.toContain('emailHash')
       expect(response.text).not.toContain(PLANTED_SECRET)

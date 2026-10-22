@@ -3,10 +3,15 @@ import { Role } from '@prisma/client'
 import { Api } from '../../src/Api'
 import prisma from '../../src/PrismaClient'
 import { generateToken } from '../../src/authentication'
-import { CONFLICT_DETAILS } from '../../src/middlewares/ErrorHandler'
+import { CONFLICT_MESSAGE } from '../../src/middlewares/ErrorHandler'
 import { resetDB } from 'common/testing/TestHelpers'
 import { TestStudies, TestUsers } from 'common/testing/constants'
-import type { RegisterRequest } from 'common/types/api/auth'
+import type { RegisterParticipantRequest, RegisterRequest } from 'common/types/api/auth'
+import {
+  ContactMethod,
+  ParticipantType,
+  StateTerritory,
+} from 'common/types/api/users/ParticipantProfile'
 import type { OIDCLoginRequest, OTPLoginRequest } from 'common/types/api/auth/login'
 import type { UpdateSurveyAnswersRequest } from 'common/types/api/surveys'
 
@@ -60,7 +65,49 @@ describe('Error responses', () => {
       .send(registerRequest)
 
     expect(response.status).toBe(409)
-    expect(response.body).toEqual({ message: 'Conflict', code: 'P2002', details: CONFLICT_DETAILS })
+    expect(response.body).toEqual({
+      message: CONFLICT_MESSAGE,
+      code: 'P2002',
+      details: CONFLICT_MESSAGE,
+    })
+    expect(response.text).not.toContain('emailHash')
+  })
+
+  it('should return a 409 with readable text when an existing user registers through a new invite', async () => {
+    const invite = await prisma.invite.create({
+      data: {
+        email: TestUsers.PARTICIPANT_UNANSWERED.email,
+        studyId: TestStudies.TEST_STUDY_2.id,
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
+      },
+    })
+    const registerRequest: RegisterParticipantRequest = {
+      firstName: 'Existing',
+      lastName: 'Participant',
+      email: TestUsers.PARTICIPANT_UNANSWERED.email,
+      password: 'Loginfortests123',
+      mobile: '+61477777777',
+      addressLine: '123 Some Street',
+      suburb: 'Sydney',
+      postcode: '2000',
+      state: StateTerritory.NSW,
+      preferredContact: ContactMethod.MOBILE,
+      dob: '1990-01-01',
+      participantType: ParticipantType.STANDARD,
+      nextOfKin: { firstName: 'John', lastName: 'Smith', email: 'john@smith.com' },
+      dependents: [],
+    }
+
+    const response = await request(app)
+      .post(`/auth/register/participants/${invite.id}`)
+      .send(registerRequest)
+
+    expect(response.status).toBe(409)
+    expect(response.body).toEqual({
+      message: CONFLICT_MESSAGE,
+      code: 'P2002',
+      details: CONFLICT_MESSAGE,
+    })
     expect(response.text).not.toContain('emailHash')
   })
 

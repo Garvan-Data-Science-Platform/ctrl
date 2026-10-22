@@ -44,9 +44,9 @@ export interface ValidateErrorResponse {
 
 /**
  * @example {
- *  "message": "Conflict",
+ *  "message": "These details are already in use",
  *  "code": "P2002",
- *  "details": "A record with these details already exists"
+ *  "details": "These details are already in use"
  * }
  */
 export interface PrismaErrorResponse {
