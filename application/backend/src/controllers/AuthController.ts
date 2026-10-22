@@ -281,13 +281,13 @@ export class AuthController extends Controller {
     @Header('x-client-type') clientType?: string,
   ): Promise<LoginSuccessResponse> {
     if (!config.oidc) {
-      throw new Error('OIDC Not Configured')
+      throw new UnprocessableError('OIDC Not Configured')
     }
 
     const oidc = config.oidc.find((val) => val.name === bodyRequest.provider)
 
     if (!oidc) {
-      throw new Error('OIDC Provider not found')
+      throw new UnprocessableError('OIDC Provider not found')
     }
 
     const { clientId, clientSecret, providerUrl } = oidc
@@ -322,7 +322,7 @@ export class AuthController extends Controller {
       const { email } = await userinfo_res.json()
       user = await this.userRepo.findFirst({ where: { email } })
     } catch {
-      throw new Error('Error authenticating with OIDC')
+      throw new UnprocessableError('Error authenticating with OIDC')
     }
 
     if (!user) {
@@ -445,7 +445,7 @@ export class AuthController extends Controller {
     })
 
     if (!otp) {
-      throw new Error('Bad request')
+      throw new UnprocessableError('Bad request')
     }
 
     const user = await this.userRepo.findFirstOrThrow({ where: { id: otp.userId } })

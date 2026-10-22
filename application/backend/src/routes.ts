@@ -47,7 +47,6 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "message": {"dataType":"enum","enums":["Internal Server Error"],"required":true},
-            "details": {"dataType":"any"},
         },
         "additionalProperties": false,
     },

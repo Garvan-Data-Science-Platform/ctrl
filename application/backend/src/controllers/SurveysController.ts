@@ -16,6 +16,7 @@ import {
   Middlewares,
 } from 'tsoa'
 import logger from 'common/src/logger'
+import { UnprocessableError } from '../middlewares/ErrorHandler'
 import type {
   GetAllResponsesResponse,
   GetResponsesByIdResponse,
@@ -386,7 +387,7 @@ export class SurveysController extends Controller {
     })
 
     if (survey.status !== 'PUBLISHED') {
-      throw Error('Cannot submit answers for unpublished survey version')
+      throw new UnprocessableError('Cannot submit answers for unpublished survey version')
     }
 
     const surveySteps = survey.data
@@ -533,7 +534,7 @@ export class SurveysController extends Controller {
     })
 
     if (survey.status == 'PUBLISHED') {
-      throw Error('Cannot edit a published survey')
+      throw new UnprocessableError('Cannot edit a published survey')
     }
 
     await this.surveyRepo.update({
@@ -566,7 +567,7 @@ export class SurveysController extends Controller {
     })
 
     if (survey.status != 'DRAFT') {
-      throw Error('Can only publish a draft survey')
+      throw new UnprocessableError('Can only publish a draft survey')
     }
 
     //Validate questions

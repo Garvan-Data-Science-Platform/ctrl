@@ -3,6 +3,7 @@ import { ValidateError } from 'tsoa'
 import { TokenExpiredError, JsonWebTokenError } from 'jsonwebtoken'
 import { Prisma } from '@prisma/client'
 import logger from 'common/src/logger'
+import multer from 'multer'
 import {
   InternalErrorResponse,
   NotFoundErrorResponse,
@@ -12,6 +13,45 @@ import {
   BadRequestErrorResponse,
   UnprocessableErrorResponse,
 } from 'common/types/api/errors'
+
+// Fixed text for unique constraint violations. It tells the user what went wrong without naming
+// the model or columns that Prisma reports. User's only unique fields hold the email.
+export const EMAIL_CONFLICT_MESSAGE = 'Email already exists'
+export const CONFLICT_MESSAGE = 'Already exists'
+
+type PrismaError =
+  | Prisma.PrismaClientKnownRequestError
+  | Prisma.PrismaClientUnknownRequestError
+  | Prisma.PrismaClientValidationError
+  | Prisma.PrismaClientRustPanicError
+  | Prisma.PrismaClientInitializationError
+
+function isPrismaError(err: unknown): err is PrismaError {
+  return (
+    err instanceof Prisma.PrismaClientKnownRequestError ||
+    err instanceof Prisma.PrismaClientUnknownRequestError ||
+    err instanceof Prisma.PrismaClientValidationError ||
+    err instanceof Prisma.PrismaClientRustPanicError ||
+    err instanceof Prisma.PrismaClientInitializationError
+  )
+}
+
+// Prisma's messages quote the failed query, including the values the client sent, so only the
+// error's name and identifiers are safe to log. Other errors are logged as they are.
+function errorForLog(err: unknown) {
+  if (err instanceof Prisma.PrismaClientKnownRequestError) {
+    return {
+      name: err.name,
+      code: err.code,
+      modelName: err.meta?.modelName,
+      target: err.meta?.target,
+    }
+  }
+  if (isPrismaError(err)) {
+    return { name: err.name }
+  }
+  return err
+}
 
 export class NoTokenError extends Error {
   constructor() {
@@ -98,7 +138,7 @@ export function ErrorHandler(
   res: Response,
   next: NextFunction,
 ): Response | void {
-  console.log(err)
+  console.log(errorForLog(err))
   // Bad Request Errors
   if (err instanceof FileUploadError || err instanceof TypeError) {
     const errorResponse: BadRequestErrorResponse = {
@@ -152,24 +192,40 @@ export function ErrorHandler(
     return res.status(403).json(errorResponse)
   }
 
-  // Handle Prisma Known Errors
-  if (err instanceof Prisma.PrismaClientKnownRequestError) {
-    let status: number = 500
-    const error: PrismaErrorResponse = {
-      message: err.message,
-      code: err.code,
-      details: err.meta,
+  // Prisma errors: never send Prisma's message or meta, which quote the query and its values
+  if (isPrismaError(err)) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+      const conflictMessage =
+        err.meta?.modelName === Prisma.ModelName.User ? EMAIL_CONFLICT_MESSAGE : CONFLICT_MESSAGE
+      // The participant portal shows message and the admin portal shows details, so both carry it
+      const errorResponse: PrismaErrorResponse = {
+        message: conflictMessage,
+        code: err.code,
+        details: conflictMessage,
+      }
+      logger.error({ ...errorResponse, error: errorForLog(err) })
+      return res.status(409).json(errorResponse)
     }
 
-    if (err.code === 'P2002') {
-      error.message = `${err.meta?.target} already in use`
-    } else if (err.code === 'P2025') {
-      error.message = 'Record not found'
-      status = 404
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
+      const errorResponse: PrismaErrorResponse = { message: 'Record not found', code: err.code }
+      logger.error({ ...errorResponse, error: errorForLog(err) })
+      return res.status(404).json(errorResponse)
     }
 
-    logger.error({ ...error })
-    return res.status(status).json(error)
+    const errorResponse: InternalErrorResponse = { message: 'Internal Server Error' }
+    logger.error({ ...errorResponse, error: errorForLog(err) })
+    return res.status(500).json(errorResponse)
+  }
+
+  // Upload rejected by multer, e.g. a file over the size limit
+  if (err instanceof multer.MulterError) {
+    const errorResponse: BadRequestErrorResponse = {
+      message: 'File upload failed',
+      details: err.message,
+    }
+    logger.error({ ...errorResponse })
+    return res.status(400).json(errorResponse)
   }
 
   // Not Found Error
@@ -201,15 +257,15 @@ export function ErrorHandler(
     return res.status(422).json(error)
   }
 
-  // Default error handling for any other type of error
+  // Default error handling for any other type of error. The message stays in the server logs only,
+  // because it may come from a library and describe internals.
   if (err instanceof Error) {
-    const error: InternalErrorResponse = {
-      message: 'Internal Server Error',
-      details: err.message,
-    }
-
-    logger.error({ ...error })
-    return res.status(500).json(error)
+    const errorResponse: InternalErrorResponse = { message: 'Internal Server Error' }
+    logger.error({
+      ...errorResponse,
+      error: { name: err.name, message: err.message, stack: err.stack },
+    })
+    return res.status(500).json(errorResponse)
   }
   next()
 }
