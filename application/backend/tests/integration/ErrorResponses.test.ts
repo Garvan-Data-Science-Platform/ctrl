@@ -1,11 +1,14 @@
 import request from 'supertest'
 import { Role } from '@prisma/client'
 import { Api } from '../../src/Api'
+import prisma from '../../src/PrismaClient'
 import { generateToken } from '../../src/authentication'
 import { CONFLICT_DETAILS } from '../../src/middlewares/ErrorHandler'
 import { resetDB } from 'common/testing/TestHelpers'
-import { TestUsers } from 'common/testing/constants'
+import { TestStudies, TestUsers } from 'common/testing/constants'
 import type { RegisterRequest } from 'common/types/api/auth'
+import type { OIDCLoginRequest, OTPLoginRequest } from 'common/types/api/auth/login'
+import type { UpdateSurveyAnswersRequest } from 'common/types/api/surveys'
 
 // Error responses must never carry internal error text, such as Prisma's message, which quotes the
 // values the client sent.
@@ -59,5 +62,52 @@ describe('Error responses', () => {
     expect(response.status).toBe(409)
     expect(response.body).toEqual({ message: 'Conflict', code: 'P2002', details: CONFLICT_DETAILS })
     expect(response.text).not.toContain('emailHash')
+  })
+
+  it('should return a 422 with its message when OIDC is not configured', async () => {
+    const loginRequest: OIDCLoginRequest = {
+      code: '123',
+      provider: 'test',
+      redirect_uri: 'redirect',
+    }
+    const response = await request(app).post('/auth/login/oidc').send(loginRequest)
+
+    expect(response.status).toBe(422)
+    expect(response.body).toEqual({
+      message: 'Unprocessable Content',
+      details: 'OIDC Not Configured',
+    })
+  })
+
+  it('should return a 422 with its message for an unknown OTP token', async () => {
+    const otpRequest: OTPLoginRequest = { otp_token: 'does-not-exist', otp_code: '123456' }
+    const response = await request(app).post('/auth/login/otp').send(otpRequest)
+
+    expect(response.status).toBe(422)
+    expect(response.body).toEqual({ message: 'Unprocessable Content', details: 'Bad request' })
+  })
+
+  it('should return a 422 with its message for answers to an unpublished survey version', async () => {
+    const draft = await prisma.surveyVersion.create({
+      data: { studyId: TestStudies.TEST_STUDY.id, versionNumber: 999, data: [] },
+    })
+    await prisma.surveyVersionAnswers.create({
+      data: { versionId: draft.id, profileId: TestUsers.PARTICIPANT_COMPLETED.id, answers: [] },
+    })
+    const participantCompletedToken = await generateToken({
+      userId: TestUsers.PARTICIPANT_COMPLETED.id,
+    })
+    const reqBody: UpdateSurveyAnswersRequest = { step: 1, data: [true, 'Choice 1'] }
+
+    const response = await request(app)
+      .post(`/studies/${TestStudies.TEST_STUDY.id}/survey-answers`)
+      .set({ Authorization: `Bearer ${participantCompletedToken}` })
+      .send(reqBody)
+
+    expect(response.status).toBe(422)
+    expect(response.body).toEqual({
+      message: 'Unprocessable Content',
+      details: 'Cannot submit answers for unpublished survey version',
+    })
   })
 })

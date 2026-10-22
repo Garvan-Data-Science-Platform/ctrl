@@ -195,7 +195,7 @@ export class StudiesController extends Controller {
     @Request() request: RequestWithAuthentication,
   ): Promise<CreateStudyResponse> {
     if ((await this.studyRepo.count({ where: { name: bodyRequest.name, deleted: false } })) > 0) {
-      throw new Error('Study with that name already exists')
+      throw new UnprocessableError('Study with that name already exists')
     }
     const newStudy = await this.studyRepo.create({
       data: {
@@ -232,7 +232,7 @@ export class StudiesController extends Controller {
       bodyRequest.name &&
       (await this.studyRepo.count({ where: { name: bodyRequest.name, deleted: false } })) > 0
     ) {
-      throw new Error('Study with that name already exists')
+      throw new UnprocessableError('Study with that name already exists')
     }
 
     await this.studyRepo.update({
