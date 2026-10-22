@@ -20,6 +20,7 @@ import {
   StateTerritory,
 } from 'common/types/api/users/ParticipantProfile'
 import { generateToken } from '../authentication'
+import { CONFLICT_DETAILS } from '../middlewares/ErrorHandler'
 import fetchMock from 'fetch-mock'
 jest.mock('../config')
 import config from '../config'
@@ -155,7 +156,8 @@ describe('AuthController', () => {
         .post('/auth/register')
         .set({ Authorization: `Bearer ${orgAdminToken}` })
         .send(registerRequest)
-      expect(response.status).toEqual(500)
+      expect(response.status).toEqual(409)
+      expect(response.body.details).toBe(CONFLICT_DETAILS)
     })
 
     it('should fail validation if provided with an invalid email', async () => {

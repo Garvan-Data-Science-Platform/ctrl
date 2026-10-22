@@ -1,12 +1,10 @@
 /**
  * @example {
- *  "message": "Internal Server Error",
- *  "details": { "message": "Some error happened D:" }
+ *  "message": "Internal Server Error"
  * }
  */
 export interface InternalErrorResponse {
   message: 'Internal Server Error'
-  details?: unknown
 }
 
 /**
@@ -46,20 +44,15 @@ export interface ValidateErrorResponse {
 
 /**
  * @example {
- *  "message": "email already in use",
+ *  "message": "Conflict",
  *  "code": "P2002",
- *  "details": {
- *    "modelName": "User",
- *    "target": [
- *      "email"
- *    ]
- *  }
+ *  "details": "A record with these details already exists"
  * }
  */
 export interface PrismaErrorResponse {
   message: string
   code: string
-  details?: unknown
+  details?: string
 }
 
 /**
