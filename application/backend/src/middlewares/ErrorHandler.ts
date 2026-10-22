@@ -15,8 +15,9 @@ import {
 } from 'common/types/api/errors'
 
 // Fixed text for unique constraint violations. It tells the user what went wrong without naming
-// the model or columns that Prisma reports.
-export const CONFLICT_MESSAGE = 'These details are already in use'
+// the model or columns that Prisma reports. User's only unique fields hold the email.
+export const EMAIL_CONFLICT_MESSAGE = 'Email already exists'
+export const CONFLICT_MESSAGE = 'Already exists'
 
 type PrismaError =
   | Prisma.PrismaClientKnownRequestError
@@ -194,11 +195,13 @@ export function ErrorHandler(
   // Prisma errors: never send Prisma's message or meta, which quote the query and its values
   if (isPrismaError(err)) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+      const conflictMessage =
+        err.meta?.modelName === Prisma.ModelName.User ? EMAIL_CONFLICT_MESSAGE : CONFLICT_MESSAGE
       // The participant portal shows message and the admin portal shows details, so both carry it
       const errorResponse: PrismaErrorResponse = {
-        message: CONFLICT_MESSAGE,
+        message: conflictMessage,
         code: err.code,
-        details: CONFLICT_MESSAGE,
+        details: conflictMessage,
       }
       logger.error({ ...errorResponse, error: errorForLog(err) })
       return res.status(409).json(errorResponse)

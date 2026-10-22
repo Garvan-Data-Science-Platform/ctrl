@@ -8,6 +8,7 @@ import logger from 'common/src/logger'
 import {
   BadGatewayError,
   CONFLICT_MESSAGE,
+  EMAIL_CONFLICT_MESSAGE,
   ErrorHandler,
   FileUploadError,
   IncorrectPermissionsError,
@@ -50,7 +51,7 @@ describe('ErrorHandler', () => {
   })
 
   describe('Prisma errors', () => {
-    it('should return a 409 with fixed text for a unique constraint violation', async () => {
+    it('should return a 409 with fixed text for a unique constraint violation on a user email', async () => {
       const err = new Prisma.PrismaClientKnownRequestError(prismaMessage, {
         code: 'P2002',
         clientVersion: CLIENT_VERSION,
@@ -60,12 +61,45 @@ describe('ErrorHandler', () => {
 
       expect(response.status).toBe(409)
       expect(response.body).toEqual({
+        message: EMAIL_CONFLICT_MESSAGE,
+        code: 'P2002',
+        details: EMAIL_CONFLICT_MESSAGE,
+      })
+      expect(response.text).not.toContain('emailHash')
+      expect(response.text).not.toContain(PLANTED_SECRET)
+    })
+
+    it('should return a 409 with generic text for a unique constraint violation on another model', async () => {
+      const err = new Prisma.PrismaClientKnownRequestError(prismaMessage, {
+        code: 'P2002',
+        clientVersion: CLIENT_VERSION,
+        meta: { modelName: 'Invite', target: ['studyId', 'emailHash'] },
+      })
+      const response = await request(appThatFailsWith(err)).get('/fail')
+
+      expect(response.status).toBe(409)
+      expect(response.body).toEqual({
         message: CONFLICT_MESSAGE,
         code: 'P2002',
         details: CONFLICT_MESSAGE,
       })
+      expect(response.text).not.toContain('Invite')
       expect(response.text).not.toContain('emailHash')
-      expect(response.text).not.toContain(PLANTED_SECRET)
+    })
+
+    it('should return a 409 with generic text when Prisma does not name the model', async () => {
+      const err = new Prisma.PrismaClientKnownRequestError(prismaMessage, {
+        code: 'P2002',
+        clientVersion: CLIENT_VERSION,
+      })
+      const response = await request(appThatFailsWith(err)).get('/fail')
+
+      expect(response.status).toBe(409)
+      expect(response.body).toEqual({
+        message: CONFLICT_MESSAGE,
+        code: 'P2002',
+        details: CONFLICT_MESSAGE,
+      })
     })
 
     it('should return a 404 without Prisma meta when a record is not found', async () => {

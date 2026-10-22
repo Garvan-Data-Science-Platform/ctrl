@@ -3,7 +3,7 @@ import { Role } from '@prisma/client'
 import { Api } from '../../src/Api'
 import prisma from '../../src/PrismaClient'
 import { generateToken } from '../../src/authentication'
-import { CONFLICT_MESSAGE } from '../../src/middlewares/ErrorHandler'
+import { EMAIL_CONFLICT_MESSAGE } from '../../src/middlewares/ErrorHandler'
 import { resetDB } from 'common/testing/TestHelpers'
 import { TestStudies, TestUsers } from 'common/testing/constants'
 import type { RegisterParticipantRequest, RegisterRequest } from 'common/types/api/auth'
@@ -14,6 +14,7 @@ import {
 } from 'common/types/api/users/ParticipantProfile'
 import type { OIDCLoginRequest, OTPLoginRequest } from 'common/types/api/auth/login'
 import type { UpdateSurveyAnswersRequest } from 'common/types/api/surveys'
+import type { UpdateUserRequest } from 'common/types/api/users'
 
 // Error responses must never carry internal error text, such as Prisma's message, which quotes the
 // values the client sent.
@@ -66,9 +67,9 @@ describe('Error responses', () => {
 
     expect(response.status).toBe(409)
     expect(response.body).toEqual({
-      message: CONFLICT_MESSAGE,
+      message: EMAIL_CONFLICT_MESSAGE,
       code: 'P2002',
-      details: CONFLICT_MESSAGE,
+      details: EMAIL_CONFLICT_MESSAGE,
     })
     expect(response.text).not.toContain('emailHash')
   })
@@ -104,11 +105,32 @@ describe('Error responses', () => {
 
     expect(response.status).toBe(409)
     expect(response.body).toEqual({
-      message: CONFLICT_MESSAGE,
+      message: EMAIL_CONFLICT_MESSAGE,
       code: 'P2002',
-      details: CONFLICT_MESSAGE,
+      details: EMAIL_CONFLICT_MESSAGE,
     })
     expect(response.text).not.toContain('emailHash')
+  })
+
+  it('should return a 409 with readable text when an admin changes an email to one already in use', async () => {
+    const updateRequest: UpdateUserRequest = { email: TestUsers.PARTICIPANT_COMPLETED.email }
+    const response = await request(app)
+      .patch(`/users/${TestUsers.PARTICIPANT_UNANSWERED.id}`)
+      .set({ Authorization: `Bearer ${orgAdminToken}` })
+      .send(updateRequest)
+
+    expect(response.status).toBe(409)
+    expect(response.body).toEqual({
+      message: EMAIL_CONFLICT_MESSAGE,
+      code: 'P2002',
+      details: EMAIL_CONFLICT_MESSAGE,
+    })
+    expect(response.text).not.toContain('emailHash')
+
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { id: TestUsers.PARTICIPANT_UNANSWERED.id },
+    })
+    expect(user.email).toBe(TestUsers.PARTICIPANT_UNANSWERED.email)
   })
 
   it('should return a 422 with its message when OIDC is not configured', async () => {

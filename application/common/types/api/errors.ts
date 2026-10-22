@@ -44,9 +44,9 @@ export interface ValidateErrorResponse {
 
 /**
  * @example {
- *  "message": "These details are already in use",
+ *  "message": "Email already exists",
  *  "code": "P2002",
- *  "details": "These details are already in use"
+ *  "details": "Email already exists"
  * }
  */
 export interface PrismaErrorResponse {
