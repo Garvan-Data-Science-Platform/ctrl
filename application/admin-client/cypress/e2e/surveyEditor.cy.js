@@ -233,4 +233,70 @@ describe('Survey Editor', () => {
     })
     cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_INVALID).should('exist')
   })
+
+  it('Invalid text disables publish button, blocks autosave, and shows error with tooltip in Survey Step pane', () => {
+    cy.intercept('PATCH', '**/studies/*/surveys/*').as('autosave')
+
+    cy.visit('/surveys')
+    cy.visit('/surveys/edit/2')
+    cy.get('[data-cy="step-description"]').type(
+      "{{7*7}}<script>alert('xss-description-text')</script>",
+      {
+        parseSpecialCharSequences: false,
+      },
+    )
+
+    // Wait longer than 2000ms autosave debounce timer
+    cy.wait(2500)
+
+    // Check publish button is disabled
+    cy.get('[data-cy="publish-button"]').should('be.disabled')
+
+    // check autosave
+    cy.get('@autosave.all').then((requests) => {
+      expect(requests).to.have.length(0)
+    })
+
+    // check Survey Steps pane error colour and tooltip
+    cy.get('[data-cy="step-list"]')
+      .find('[data-testid="ErrorOutlineIcon"]')
+      .first()
+      .trigger('mouseover')
+
+    cy.get('[data-cy="step-list"]')
+      .find('.MuiListItemButton-root')
+      .first()
+      .within(() => {
+        cy.get('[data-testid="ErrorOutlineIcon"]')
+          .should('be.visible')
+          .and('have.class', 'MuiSvgIcon-colorError')
+      })
+
+    cy.get('.MuiTooltip-tooltip')
+      .should('be.visible')
+      .and('contain.text', 'This step contains invalid fields')
+
+    cy.get('[data-cy="step-list"]')
+      .find('[data-testid="ErrorOutlineIcon"]')
+      .first()
+      .trigger('mouseout')
+
+    // test inverse
+    cy.get('[data-cy="step-description"]').find('textarea').first().clear().type('Descriptions')
+    cy.wait(500)
+
+    // publish is enabled
+    cy.get('[data-cy="publish-button"]').should('not.be.disabled')
+
+    // no error state or tooltip
+    cy.get('[data-cy="step-list"]')
+      .find('.MuiListItemButton-root')
+      .first()
+      .within(() => {
+        cy.get('[data-testid="ErrorOutlineIcon"]').should('not.exist')
+      })
+
+    // autosave resumes
+    cy.wait('@autosave').its('response.statusCode').should('eq', 204)
+  })
 })

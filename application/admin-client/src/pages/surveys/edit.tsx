@@ -1,4 +1,4 @@
-import { Add, AddCircle, Settings } from '@mui/icons-material'
+import { Add, AddCircle, ErrorOutline, Settings } from '@mui/icons-material'
 import {
   Box,
   Button,
@@ -16,9 +16,10 @@ import {
   Menu,
   MenuItem,
   TextField,
+  Tooltip,
 } from '@mui/material'
 import { SurveyElementType } from '@common/types/survey'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { SurveyElementCard, SurveyDropSpace } from '../../components/SurveyElementCard'
@@ -27,7 +28,12 @@ import { axiosInstance } from '../../providers/dataProvider'
 import { useShow, useUpdate, useNavigation, useNotification } from '@refinedev/core'
 import { useCurrentStudyId } from '../../studyStore'
 import { useParams } from 'react-router'
-import { stepDescriptionRules, stepTitleRules } from '@common/src/validation'
+import {
+  stepDescriptionRules,
+  stepTitleRules,
+  surveyElementRules,
+  urlRules,
+} from '@common/src/validation'
 
 export const SurveyEditor = () => {
   const {
@@ -49,7 +55,6 @@ export const SurveyEditor = () => {
   const [savePending, setSavePending] = useState(false)
   const [publishDialogOpen, setPublishDialogOpen] = useState(false)
   const [justLoaded, setJustLoaded] = useState(true)
-  const [timeoutObject, setTimeoutObject] = useState()
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const optionsOpen = Boolean(anchorEl)
@@ -82,6 +87,111 @@ export const SurveyEditor = () => {
 
   const disabled = queryData?.data.status != 'DRAFT'
 
+  const stepTitleRule = stepTitleRules(true)
+  const stepDescriptionRule = stepDescriptionRules(false)
+  const surveyElementRule = surveyElementRules(false)
+  const urlRule = urlRules(false)
+
+  const currentStep = surveyData[activeStep]
+  const isStepTitleInvalid = Boolean(
+    currentStep?.title &&
+      stepTitleRule.pattern &&
+      !stepTitleRule.pattern.value.test(currentStep?.title),
+  )
+
+  const isStepDescriptionInvalid = Boolean(
+    currentStep?.text &&
+      stepDescriptionRule.pattern &&
+      !stepDescriptionRule.pattern.value.test(currentStep?.text),
+  )
+
+  const invalidSteps = useMemo(() => {
+    if (!surveyData) return []
+    const invalidIndicies: number[] = []
+
+    surveyData.forEach((step, index) => {
+      let stepIsInvalid = false
+
+      if (step.title && stepTitleRule.pattern && !stepTitleRule.pattern.value.test(step.title)) {
+        stepIsInvalid = true
+      }
+      if (
+        step.text &&
+        stepDescriptionRule.pattern &&
+        !stepDescriptionRule.pattern.value.test(step.text)
+      ) {
+        stepIsInvalid = true
+      }
+
+      if (!stepIsInvalid) {
+        for (const element of step.elements) {
+          const { type, data } = element
+
+          if (
+            type === 'subheading' &&
+            data.text &&
+            surveyElementRule.pattern &&
+            !surveyElementRule.pattern.value.test(data.text)
+          )
+            stepIsInvalid = true
+          if (
+            type === 'video' &&
+            data.link &&
+            urlRule.pattern &&
+            !urlRule.pattern.value.test(data.link)
+          )
+            stepIsInvalid = true
+          if (type === 'question-checkbox') {
+            if (
+              data.text &&
+              surveyElementRule.pattern &&
+              !surveyElementRule.pattern.value.test(data.text)
+            )
+              stepIsInvalid = true
+            if (
+              data.tooltip &&
+              surveyElementRule.pattern &&
+              !surveyElementRule.pattern.value.test(data.tooltip)
+            )
+              stepIsInvalid = true
+          }
+          if (type === 'question-choices') {
+            if (
+              data.text &&
+              surveyElementRule.pattern &&
+              !surveyElementRule.pattern.value.test(data.text)
+            )
+              stepIsInvalid = true
+            if (
+              data.tooltip &&
+              surveyElementRule.pattern &&
+              !surveyElementRule.pattern.value.test(data.tooltip)
+            )
+              stepIsInvalid = true
+            if (data.choices && data.choices.length > 0) {
+              for (const choice of data.choices) {
+                if (
+                  choice &&
+                  surveyElementRule.pattern &&
+                  !surveyElementRule.pattern.value.test(choice)
+                )
+                  stepIsInvalid = true
+              }
+            }
+          }
+          if (stepIsInvalid) break
+        }
+      }
+      if (stepIsInvalid) {
+        invalidIndicies.push(index)
+      }
+    })
+
+    return invalidIndicies
+  }, [surveyData, stepTitleRule, stepDescriptionRule, surveyElementRule, urlRule])
+
+  const isSurveyInvalid = invalidSteps.length > 0
+
   useEffect(() => {
     if (queryData && !isLoading) {
       setJustLoaded(true)
@@ -96,21 +206,21 @@ export const SurveyEditor = () => {
 
   useEffect(() => {
     if (justLoaded) {
-      setTimeout(() => {
+      const loadTimer = setTimeout(() => {
         setJustLoaded(false)
       }, 500)
-      return
+      return () => clearTimeout(loadTimer)
     }
-    if (surveyData && !justLoaded) {
+
+    if (surveyData && !justLoaded && !isSurveyInvalid) {
       setSavePending(true)
-      clearTimeout(timeoutObject)
-      const t = setTimeout(() => {
+      const saveTimer = setTimeout(() => {
         mutate({ id: surveyId as string, values: { data: surveyData }, invalidates: [] })
         setSavePending(false)
       }, 2000)
-      setTimeoutObject(t as any)
+      return () => clearTimeout(saveTimer)
     }
-  }, [surveyData])
+  }, [surveyData, justLoaded, isSurveyInvalid])
 
   type ElementLabels = {
     [key in SurveyElementType]: string
@@ -136,22 +246,6 @@ export const SurveyEditor = () => {
       })
   }
 
-  const stepTitleRule = stepTitleRules(true)
-  const stepDescriptionRule = stepDescriptionRules(false)
-
-  const currentStep = surveyData[activeStep]
-  const isStepTitleInvalid = Boolean(
-    currentStep?.title &&
-      stepTitleRule.pattern &&
-      !stepTitleRule.pattern.value.test(currentStep?.title),
-  )
-
-  const isStepDescriptionInvalid = Boolean(
-    currentStep?.text &&
-      stepDescriptionRule.pattern &&
-      !stepDescriptionRule.pattern.value.test(currentStep?.text),
-  )
-
   return isLoading ? null : (
     <Box sx={{ display: 'flex', flexDirection: 'row' }}>
       <Box sx={{ border: '1px solid lightgrey', height: '100vh', ml: -3, mt: -3 }}>
@@ -168,7 +262,7 @@ export const SurveyEditor = () => {
           <Button
             variant="outlined"
             data-cy="publish-button"
-            disabled={savePending || disabled}
+            disabled={savePending || disabled || isSurveyInvalid}
             onClick={() => setPublishDialogOpen(true)}
           >
             Publish
@@ -185,13 +279,27 @@ export const SurveyEditor = () => {
         <ListSubheader>Survey Steps</ListSubheader>
         <Divider />
         <List sx={{ width: 250 }} data-cy="step-list">
-          {surveyData.map((val, index) => (
-            <ListItem key={`step_${index}`} disablePadding>
-              <ListItemButton onClick={() => setActiveStep(index)} selected={activeStep == index}>
-                <ListItemText primary={val.title} />
-              </ListItemButton>
-            </ListItem>
-          ))}
+          {surveyData.map((val, index) => {
+            const hasError = invalidSteps.includes(index)
+            return (
+              <ListItem key={`step_${index}`} disablePadding>
+                <ListItemButton
+                  onClick={() => setActiveStep(index)}
+                  selected={activeStep === index}
+                >
+                  <ListItemText
+                    primary={val.title || `Step ${index + 1}`}
+                    sx={{ color: hasError ? 'error.main' : 'inherit' }}
+                  />
+                  {hasError && (
+                    <Tooltip title="This step contains invalid fields">
+                      <ErrorOutline color="error" fontSize="small" sx={{ ml: 1 }} />
+                    </Tooltip>
+                  )}
+                </ListItemButton>
+              </ListItem>
+            )
+          })}
         </List>
         <Divider />
         <List>
