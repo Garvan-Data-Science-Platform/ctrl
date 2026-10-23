@@ -17,9 +17,10 @@ export const VALIDATION_MESSAGES = {
   INVITE_EMAIL_TEXT_INVALID: 'Invite email text contains invalid characters',
   CSS_COLOUR_INVALID:
     'Use HEX ("#a1b2c3"), RGB ("rgb(10,20,30)"), or a valid CSS colour name ("blue")',
-  STEP_TITLE_INVALID: 'Step title contains invalid characters',
-  STEP_DESCRIPTION_INVALID: 'Step description contains invalid characters',
-  SURVEY_ELEMENT_INVALID: 'Contains invalid characters',
+  STEP_TITLE_INVALID: 'Step title contains invalid characters or is empty',
+  STEP_DESCRIPTION_INVALID: 'Step description contains invalid characters or is empty',
+  SURVEY_ELEMENT_INVALID: 'Contains invalid characters or is empty',
+  SURVEY_STEP_CONTAINS_INVALID_ELEMENT: 'This step contains invalid or empty fields',
   DOB_INVALID: 'Must be a valid date and format (YYYY-MM-DD or DD/MM/YYYY)',
 }
 export const nameRules = (required = true) => ({

@@ -33,6 +33,7 @@ import {
   stepTitleRules,
   surveyElementRules,
   urlRules,
+  VALIDATION_MESSAGES,
 } from '@common/src/validation'
 
 export const SurveyEditor = () => {
@@ -256,7 +257,7 @@ export const SurveyEditor = () => {
                     sx={{ color: hasError ? 'error.main' : 'inherit' }}
                   />
                   {hasError && (
-                    <Tooltip title="This step contains invalid fields">
+                    <Tooltip title={VALIDATION_MESSAGES.SURVEY_STEP_CONTAINS_INVALID_ELEMENT}>
                       <ErrorOutline color="error" fontSize="small" sx={{ ml: 1 }} />
                     </Tooltip>
                   )}

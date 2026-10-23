@@ -274,7 +274,7 @@ describe('Survey Editor', () => {
 
     cy.get('.MuiTooltip-tooltip')
       .should('be.visible')
-      .and('contain.text', 'This step contains invalid fields')
+      .and('contain.text', VALIDATION_MESSAGES.SURVEY_STEP_CONTAINS_INVALID_ELEMENT)
 
     cy.get('[data-cy="step-list"]')
       .find('[data-testid="ErrorOutlineIcon"]')
