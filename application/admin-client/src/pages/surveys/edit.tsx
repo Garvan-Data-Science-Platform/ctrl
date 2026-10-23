@@ -107,87 +107,51 @@ export const SurveyEditor = () => {
 
   const invalidSteps = useMemo(() => {
     if (!surveyData) return []
-    const invalidIndicies: number[] = []
 
-    surveyData.forEach((step, index) => {
-      let stepIsInvalid = false
+    const checkInvalid = (inputValue: string | undefined, rule: any) =>
+      Boolean(inputValue && rule.pattern && !rule.pattern.value.test(inputValue))
 
-      if (step.title && stepTitleRule.pattern && !stepTitleRule.pattern.value.test(step.title)) {
-        stepIsInvalid = true
-      }
-      if (
-        step.text &&
-        stepDescriptionRule.pattern &&
-        !stepDescriptionRule.pattern.value.test(step.text)
-      ) {
-        stepIsInvalid = true
+    return surveyData.reduce((invalidIndicies: number[], step, index) => {
+      const stepLevelInvalid =
+        checkInvalid(step.title, stepTitleRule) || checkInvalid(step.text, stepDescriptionRule)
+
+      if (stepLevelInvalid) {
+        invalidIndicies.push(index)
+        return invalidIndicies
       }
 
-      if (!stepIsInvalid) {
-        for (const element of step.elements) {
-          const { type, data } = element
+      //.some() stops checking and returns true when a condition matches
+      const hasInvalidElement = step.elements.some(({ type, data }) => {
+        switch (type) {
+          case 'subheading':
+            return checkInvalid(data.text, surveyElementRule)
 
-          if (
-            type === 'subheading' &&
-            data.text &&
-            surveyElementRule.pattern &&
-            !surveyElementRule.pattern.value.test(data.text)
-          )
-            stepIsInvalid = true
-          if (
-            type === 'video' &&
-            data.link &&
-            urlRule.pattern &&
-            !urlRule.pattern.value.test(data.link)
-          )
-            stepIsInvalid = true
-          if (type === 'question-checkbox') {
-            if (
-              data.text &&
-              surveyElementRule.pattern &&
-              !surveyElementRule.pattern.value.test(data.text)
+          case 'video':
+            return checkInvalid(data.link, urlRule)
+
+          case 'question-checkbox':
+            return (
+              checkInvalid(data.text, surveyElementRule) ||
+              checkInvalid(data.tooltip, surveyElementRule)
             )
-              stepIsInvalid = true
-            if (
-              data.tooltip &&
-              surveyElementRule.pattern &&
-              !surveyElementRule.pattern.value.test(data.tooltip)
+
+          case 'question-choices':
+            return (
+              checkInvalid(data.text, surveyElementRule) ||
+              checkInvalid(data.tooltip, surveyElementRule) ||
+              data.choices?.some((choice: string) => checkInvalid(choice, surveyElementRule))
             )
-              stepIsInvalid = true
-          }
-          if (type === 'question-choices') {
-            if (
-              data.text &&
-              surveyElementRule.pattern &&
-              !surveyElementRule.pattern.value.test(data.text)
-            )
-              stepIsInvalid = true
-            if (
-              data.tooltip &&
-              surveyElementRule.pattern &&
-              !surveyElementRule.pattern.value.test(data.tooltip)
-            )
-              stepIsInvalid = true
-            if (data.choices && data.choices.length > 0) {
-              for (const choice of data.choices) {
-                if (
-                  choice &&
-                  surveyElementRule.pattern &&
-                  !surveyElementRule.pattern.value.test(choice)
-                )
-                  stepIsInvalid = true
-              }
-            }
-          }
-          if (stepIsInvalid) break
+
+          default:
+            return false
         }
-      }
-      if (stepIsInvalid) {
+      })
+
+      if (hasInvalidElement) {
         invalidIndicies.push(index)
       }
-    })
-
-    return invalidIndicies
+      return invalidIndicies
+    }, [])
   }, [surveyData, stepTitleRule, stepDescriptionRule, surveyElementRule, urlRule])
 
   const isSurveyInvalid = invalidSteps.length > 0
