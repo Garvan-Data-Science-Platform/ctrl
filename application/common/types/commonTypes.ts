@@ -15,6 +15,8 @@ import { Role, User } from '@prisma/client'
 const SafeText =
   /^[\u0300-\u036Fa-zA-Z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u024F\u1E00-\u1EFF0-9\s.,!?:;()'"\-/#@&%$\u00A3\u20AC+_\u2018\u2019\u201C\u201D\u2013\u2014\u2026\u2022\u2265\u2264\u00B0=]+$/
 
+const SafeTextOptional = new RegExp(SafeText.source.replace(/\+\$$/, '*$'))
+
 export const REGEX = {
   NAME: /^[\u0300-\u036Fa-zA-Z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u024F\u1E00-\u1EFF\s\-'\u2019.]+$/,
   ADDRESS: SafeText,
@@ -34,7 +36,8 @@ export const REGEX = {
   INVITE_EMAIL: SafeText,
   CSS_COLOUR:
     /^(#(?:[0-9a-fA-F]{3,4}){1,2}|rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*(?:,\s*[0-9.]+\s*)?\)|[a-zA-Z]{3,30})?$/,
-  SURVEY_ELEMENT: SafeText,
+  SURVEY_ELEMENT_REQUIRED: SafeText,
+  SURVEY_ELEMENT_OPTIONAL: SafeTextOptional,
   // REGEX allows multiple date formats (see functions in application/common/src/utils.ts) in CSV imput modal
   //   note: this regex is different to that used in the DoB type as we only want one format of date in the database
   DOB: /^(\d{4}[/-](0?[1-9]|1[0-2])[/-](0?[1-9]|[12][0-9]|3[01])|(0?[1-9]|[12][0-9]|3[01])[/-](0?[1-9]|1[0-2])[/-]\d{4})$/,
@@ -239,9 +242,11 @@ export type SurveyStepDescription = string
  */
 export type SurveyQuestionText = string
 
+// NOTE: * at the end of the REGEX below to allow optional Tooltip
+
 /**
  * @maxLength 2048
- * @pattern ^[\u0300-\u036Fa-zA-Z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u024F\u1E00-\u1EFF0-9\s.,!?:;()'"\-/#@&%$\u00A3\u20AC+_\u2018\u2019\u201C\u201D\u2013\u2014\u2026\u2022\u2265\u2264\u00B0=]+$
+ * @pattern ^[\u0300-\u036Fa-zA-Z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u024F\u1E00-\u1EFF0-9\s.,!?:;()'"\-/#@&%$\u00A3\u20AC+_\u2018\u2019\u201C\u201D\u2013\u2014\u2026\u2022\u2265\u2264\u00B0=]*$
  * @example "Here is an explanation of what genomic means"
  */
 export type SurveyQuestionTooltip = string

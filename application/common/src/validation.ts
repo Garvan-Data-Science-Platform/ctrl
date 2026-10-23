@@ -142,7 +142,7 @@ export const cssColourRules = (required = false) => ({
 export const stepTitleRules = (required = true) => ({
   required: required ? VALIDATION_MESSAGES.REQUIRED : false,
   pattern: {
-    value: REGEX.SURVEY_ELEMENT,
+    value: REGEX.SURVEY_ELEMENT_REQUIRED,
     message: VALIDATION_MESSAGES.STEP_TITLE_INVALID,
   },
 })
@@ -150,7 +150,7 @@ export const stepTitleRules = (required = true) => ({
 export const stepDescriptionRules = (required = true) => ({
   required: required ? VALIDATION_MESSAGES.REQUIRED : false,
   pattern: {
-    value: REGEX.SURVEY_ELEMENT,
+    value: REGEX.SURVEY_ELEMENT_REQUIRED,
     message: VALIDATION_MESSAGES.STEP_DESCRIPTION_INVALID,
   },
 })
@@ -158,7 +158,7 @@ export const stepDescriptionRules = (required = true) => ({
 export const surveyElementRules = (required = true) => ({
   required: required ? VALIDATION_MESSAGES.REQUIRED : false,
   pattern: {
-    value: REGEX.SURVEY_ELEMENT,
+    value: REGEX.SURVEY_ELEMENT_OPTIONAL,
     message: VALIDATION_MESSAGES.SURVEY_ELEMENT_INVALID,
   },
 })

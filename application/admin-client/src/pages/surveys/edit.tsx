@@ -89,9 +89,10 @@ export const SurveyEditor = () => {
   const disabled = queryData?.data.status != 'DRAFT'
 
   const stepTitleRule = stepTitleRules(true)
-  const stepDescriptionRule = stepDescriptionRules(false)
-  const surveyElementRule = surveyElementRules(false)
-  const urlRule = urlRules(false)
+  const stepDescriptionRule = stepDescriptionRules(true)
+  const surveyElementRequiredRule = surveyElementRules(true)
+  const surveyElementOptionalRule = surveyElementRules(false)
+  const urlRule = urlRules(true)
 
   const currentStep = surveyData[activeStep]
   const isStepTitleInvalid = Boolean(
@@ -109,8 +110,11 @@ export const SurveyEditor = () => {
   const invalidSteps = useMemo(() => {
     if (!surveyData) return []
 
-    const checkInvalid = (inputValue: string | undefined, rule: any) =>
-      Boolean(inputValue && rule.pattern && !rule.pattern.value.test(inputValue))
+    const checkInvalid = (inputValue: string | undefined, rule: any) => {
+      if (rule.required && !inputValue) return true
+      if (inputValue && rule.pattern && !rule.pattern.value.test(inputValue)) return true
+      return false
+    }
 
     return surveyData.reduce((invalidIndicies: number[], step, index) => {
       const stepLevelInvalid =
@@ -125,22 +129,24 @@ export const SurveyEditor = () => {
       const hasInvalidElement = step.elements.some(({ type, data }) => {
         switch (type) {
           case 'subheading':
-            return checkInvalid(data.text, surveyElementRule)
+            return checkInvalid(data.text, surveyElementRequiredRule)
 
           case 'video':
             return checkInvalid(data.link, urlRule)
 
           case 'question-checkbox':
             return (
-              checkInvalid(data.text, surveyElementRule) ||
-              checkInvalid(data.tooltip, surveyElementRule)
+              checkInvalid(data.text, surveyElementRequiredRule) ||
+              checkInvalid(data.tooltip, surveyElementOptionalRule)
             )
 
           case 'question-choices':
             return (
-              checkInvalid(data.text, surveyElementRule) ||
-              checkInvalid(data.tooltip, surveyElementRule) ||
-              data.choices?.some((choice: string) => checkInvalid(choice, surveyElementRule))
+              checkInvalid(data.text, surveyElementRequiredRule) ||
+              checkInvalid(data.tooltip, surveyElementOptionalRule) ||
+              data.choices?.some((choice: string) =>
+                checkInvalid(choice, surveyElementRequiredRule),
+              )
             )
 
           default:
@@ -153,7 +159,14 @@ export const SurveyEditor = () => {
       }
       return invalidIndicies
     }, [])
-  }, [surveyData, stepTitleRule, stepDescriptionRule, surveyElementRule, urlRule])
+  }, [
+    surveyData,
+    stepTitleRule,
+    stepDescriptionRule,
+    surveyElementRequiredRule,
+    surveyElementOptionalRule,
+    urlRule,
+  ])
 
   const isSurveyInvalid = invalidSteps.length > 0
 
