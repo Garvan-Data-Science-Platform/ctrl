@@ -26,7 +26,7 @@ const defaultElementData: DefaultElementData = {
   video: { link: '' },
   subheading: { text: '' },
   'question-checkbox': { text: '', value: false, required: false }, // I presume value should be false, used to be true
-  'question-choices': { choices: [], text: '', value: '' },
+  'question-choices': { choices: [''], text: '', value: '' },
 }
 
 export const useSurveyStore = create<SurveyState>((set) => ({
