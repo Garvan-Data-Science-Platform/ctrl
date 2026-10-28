@@ -23,7 +23,8 @@ import {
 // Stands in for anything a client submitted. It must never reach a response or a log.
 const PLANTED_SECRET = 'PlantedSecret-971'
 const CLIENT_VERSION = '5.22.0'
-const prismaMessage = `Invalid \`prisma.user.update()\` invocation: password: "${PLANTED_SECRET}"`
+// Multi-line like a real Prisma message, which quotes the query arguments on their own lines
+const prismaMessage = `\nInvalid \`prisma.user.update()\` invocation:\n  data: {\n    password: "${PLANTED_SECRET}"\n  }`
 
 // Isolated app whose only route passes the given value to the error handler.
 const appThatFailsWith = (err: unknown) => {
@@ -161,7 +162,7 @@ describe('ErrorHandler', () => {
       expect(response.body).toEqual({ message: 'Internal Server Error' })
     })
 
-    it('should log the error name, code and model but never the Prisma message', async () => {
+    it('should log the error name, code, model and stack frames but never the Prisma message', async () => {
       const knownErr = new Prisma.PrismaClientKnownRequestError(prismaMessage, {
         code: 'P2002',
         clientVersion: CLIENT_VERSION,
@@ -179,6 +180,8 @@ describe('ErrorHandler', () => {
       expect(logged).toContain('P2002')
       expect(logged).toContain('User')
       expect(logged).toContain('PrismaClientValidationError')
+      // Frames point at where the error was created, here this test file
+      expect(logged).toContain('ErrorHandler.test.ts')
     })
   })
 
@@ -189,6 +192,15 @@ describe('ErrorHandler', () => {
       expect(response.status).toBe(500)
       expect(response.body).toEqual({ message: 'Internal Server Error' })
       expect(everythingLogged()).toContain('Unexpected failure')
+    })
+
+    it('should return a plain 500 for a TypeError and keep its message in the logs', async () => {
+      const err = new TypeError("Cannot read properties of undefined (reading 'id')")
+      const response = await request(appThatFailsWith(err)).get('/fail')
+
+      expect(response.status).toBe(500)
+      expect(response.body).toEqual({ message: 'Internal Server Error' })
+      expect(everythingLogged()).toContain("reading 'id'")
     })
 
     it('should return a 422 with the message of an UnprocessableError', async () => {
@@ -208,6 +220,48 @@ describe('ErrorHandler', () => {
 
       expect(response.status).toBe(400)
       expect(response.body).toEqual({ message: 'File upload failed', details: 'File too large' })
+    })
+
+    it('should return a 400 without sending or logging a body that is not valid JSON', async () => {
+      const app = express()
+      app.use(express.json())
+      app.post('/fail', (_req: Request, res: Response) => res.sendStatus(200))
+      app.use(ErrorHandler)
+
+      const response = await request(app)
+        .post('/fail')
+        .set('Content-Type', 'application/json')
+        .send(`{"password": ${PLANTED_SECRET}}`)
+
+      // The parser's message quotes about ten characters of the body, so check for the prefix
+      const secretPrefix = PLANTED_SECRET.slice(0, 10)
+      expect(response.status).toBe(400)
+      expect(response.body).toEqual({ message: 'Invalid JSON' })
+      expect(everythingLogged()).not.toContain(secretPrefix)
+    })
+
+    it('should keep the status and reason of other bodies express.json() rejects', async () => {
+      const app = express()
+      app.use(express.json())
+      app.post('/fail', (_req: Request, res: Response) => res.sendStatus(200))
+      app.use(ErrorHandler)
+
+      const tooLarge = await request(app)
+        .post('/fail')
+        .set('Content-Type', 'application/json')
+        .send(JSON.stringify({ data: 'a'.repeat(120 * 1024) }))
+      const wrongCharset = await request(app)
+        .post('/fail')
+        .set('Content-Type', 'application/json; charset=latin1')
+        .send('{"a":1}')
+
+      expect(tooLarge.status).toBe(413)
+      expect(tooLarge.body).toEqual({
+        message: 'Request body rejected',
+        details: 'request entity too large',
+      })
+      expect(wrongCharset.status).toBe(415)
+      expect(wrongCharset.body.details).toContain('LATIN1')
     })
 
     it('should return a 400 for a FileUploadError', async () => {

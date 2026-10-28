@@ -31,12 +31,15 @@ import prisma from '../PrismaClient'
 import { Study } from '@prisma/client'
 import { NotFoundError, UnprocessableError } from '../middlewares/ErrorHandler'
 import {
+  BadRequestErrorResponse,
   ValidateErrorResponse,
   NotFoundErrorResponse,
   UnauthorizedErrorResponse,
+  UnprocessableErrorResponse,
 } from 'common/types/api/errors'
 import { processLogoImage } from 'common/src/imageHelpers'
 import { auditLog } from '../middlewares/AuditLog'
+import { requireFile } from '../middlewares/RequireFile'
 import { Readable } from 'stream'
 import type { RequestWithAuthentication } from 'authentication'
 
@@ -189,7 +192,7 @@ export class StudiesController extends Controller {
    */
   @Post('/')
   @SuccessResponse('201', 'Created')
-  @Response<ValidateErrorResponse>('422', 'Validation Failed')
+  @Response<ValidateErrorResponse | UnprocessableErrorResponse>('422', 'Unprocessable Content')
   public async createStudy(
     @Body() bodyRequest: CreateStudyRequest,
     @Request() request: RequestWithAuthentication,
@@ -218,7 +221,7 @@ export class StudiesController extends Controller {
    */
   @Patch('/{studyId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
-  @Response<ValidateErrorResponse>('422', 'Validation Failed')
+  @Response<ValidateErrorResponse | UnprocessableErrorResponse>('422', 'Unprocessable Content')
   public async updateStudy(
     @Path() studyId: number,
     @Request() request: RequestWithAuthentication,
@@ -243,6 +246,8 @@ export class StudiesController extends Controller {
 
   @Post('/{studyId}/logo')
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
+  @Response<BadRequestErrorResponse>('400', 'Bad Request')
+  @Middlewares(requireFile)
   public async uploadLogo(
     @UploadedFile() file: Express.Multer.File,
     @Path() studyId: number,

@@ -414,6 +414,16 @@ describe('StudiesController', () => {
       expect(response.status).toBe(422)
     })
 
+    it('should return a 400 if the multipart request has no file field', async () => {
+      const response = await request(app)
+        .post(`/studies/${testStudyId}/logo`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .field('notTheFile', 'x')
+
+      expect(response.status).toBe(400)
+      expect(response.body.message).toBe('No file uploaded')
+    })
+
     it('should change logo if a logo gets updated', async () => {
       // Post logo
       const originalLogoPostResponse = await request(app)
