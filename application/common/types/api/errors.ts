@@ -68,8 +68,8 @@ export interface NotFoundErrorResponse {
 
 /**
  * @example {
- *  "message": "Bad Request",
- *  "details": { "message": "File is of incorrect type" }
+ *  "message": "File upload failed",
+ *  "details": "File too large"
  * }
  */
 export interface BadRequestErrorResponse {

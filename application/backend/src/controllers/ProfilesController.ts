@@ -4,6 +4,8 @@ import {
   UnauthorizedErrorResponse,
   InternalErrorResponse,
   NotFoundErrorResponse,
+  PrismaErrorResponse,
+  UnprocessableErrorResponse,
   ValidateErrorResponse,
 } from 'common/types/api/errors'
 import type { GetParticipantProfileResponse, UpdateProfileRequest } from 'common/types/api/users'
@@ -170,7 +172,8 @@ export class ProfilesController extends Controller {
   }
 
   @Patch('/{profileId}')
-  @Response<ValidateErrorResponse>('422', 'Validation Failed')
+  @Response<ValidateErrorResponse | UnprocessableErrorResponse>('422', 'Unprocessable Content')
+  @Response<PrismaErrorResponse>('409', 'Conflict')
   public async updateProfileById(
     @Request() request: RequestWithAuthentication,
     @Path() profileId: number,

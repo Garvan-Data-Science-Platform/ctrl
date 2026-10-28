@@ -33,7 +33,7 @@ import prisma from '../PrismaClient'
 import '../jsontypes'
 import { validateAnswers } from 'common/src/surveys/validateSurveyAnswers'
 import { populateSurveyStepAnswers } from 'common/src/surveys/populateSurveyStepAnswers'
-import { ValidateErrorResponse } from 'common/types/api/errors'
+import { UnprocessableErrorResponse, ValidateErrorResponse } from 'common/types/api/errors'
 import {
   answersFromPreviousSurvey,
   combineGuardianAnswers,
@@ -353,7 +353,7 @@ export class SurveysController extends Controller {
   @Post('/survey-answers')
   @Security('jwt', ['Participant'])
   @Response('404', 'Not Found')
-  @Response<ValidateErrorResponse>('422', 'Validation Failed')
+  @Response<ValidateErrorResponse | UnprocessableErrorResponse>('422', 'Unprocessable Content')
   public async updateSurveyAnswers(
     @Request() request: any,
     @Path() studyId: number,
@@ -517,7 +517,7 @@ export class SurveysController extends Controller {
    */
   @Patch('/surveys/{versionNumber}')
   @Response('404', 'Not Found')
-  @Response<ValidateErrorResponse>('422', 'Validation Failed')
+  @Response<ValidateErrorResponse | UnprocessableErrorResponse>('422', 'Unprocessable Content')
   @Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
   public async updateSurvey(
     @Path() studyId: number,
@@ -554,7 +554,7 @@ export class SurveysController extends Controller {
    */
   @Post('/surveys/{versionNumber}/publish')
   @Response('404', 'Not Found')
-  @Response<ValidateErrorResponse>('422', 'Validation Failed')
+  @Response<ValidateErrorResponse | UnprocessableErrorResponse>('422', 'Unprocessable Content')
   @Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
   public async publishSurvey(@Path() studyId: number, @Path() versionNumber: number) {
     const survey = await this.surveyRepo.findUniqueOrThrow({
