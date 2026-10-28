@@ -86,7 +86,7 @@ describe('Error responses', () => {
       firstName: 'Existing',
       lastName: 'Participant',
       email: TestUsers.PARTICIPANT_UNANSWERED.email,
-      password: 'Loginfortests123',
+      password: TestUsers.PARTICIPANT_UNANSWERED.password,
       mobile: '+61477777777',
       addressLine: '123 Some Street',
       suburb: 'Sydney',
