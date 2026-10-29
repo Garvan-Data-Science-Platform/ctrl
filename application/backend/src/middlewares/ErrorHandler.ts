@@ -15,9 +15,10 @@ import {
 } from 'common/types/api/errors'
 
 // Fixed text for unique constraint violations. It tells the user what went wrong without naming
-// the model or columns that Prisma reports. User's only unique fields hold the email.
+// the model or columns that Prisma reports.
 export const EMAIL_CONFLICT_MESSAGE = 'Email already exists'
 export const CONFLICT_MESSAGE = 'Already exists'
+const EMAIL_COLUMNS = ['email', 'emailHash']
 
 type PrismaError =
   | Prisma.PrismaClientKnownRequestError
@@ -61,13 +62,8 @@ function stackFrames(err: Error) {
 }
 
 // Prisma's messages quote the failed query, including the values the client sent, so only the
-// error's name, identifiers and stack frames are safe to log. A JSON parse error holds the raw
-// request in body and can quote part of it in message, so neither is logged. Other errors are
-// logged as they are.
-function errorForLog(err: unknown) {
-  if (isJsonParseError(err)) {
-    return { name: err.name, type: 'entity.parse.failed' }
-  }
+// error's name, identifiers and stack frames are safe to log
+function errorForLog(err: PrismaError) {
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
     return {
       name: err.name,
@@ -77,10 +73,7 @@ function errorForLog(err: unknown) {
       stack: stackFrames(err),
     }
   }
-  if (isPrismaError(err)) {
-    return { name: err.name, stack: stackFrames(err) }
-  }
-  return err
+  return { name: err.name, stack: stackFrames(err) }
 }
 
 export class NoTokenError extends Error {
@@ -168,20 +161,21 @@ export function ErrorHandler(
   res: Response,
   next: NextFunction,
 ): Response | void {
-  console.log(errorForLog(err))
   // Bad Request Errors
   if (err instanceof FileUploadError) {
     const errorResponse: BadRequestErrorResponse = {
       message: err.message,
       details: err,
     }
+    logger.error({ ...errorResponse })
     return res.status(400).json(errorResponse)
   }
 
   // Body that isn't valid JSON. A fixed message, because the parser's own can quote the request.
   if (isJsonParseError(err)) {
     const errorResponse: BadRequestErrorResponse = { message: 'Invalid JSON' }
-    logger.error({ ...errorResponse, error: errorForLog(err) })
+    // Name only: the error's body holds the raw request, and its message can quote part of it
+    logger.error({ ...errorResponse, error: { name: err.name, type: 'entity.parse.failed' } })
     return res.status(400).json(errorResponse)
   }
 
@@ -243,10 +237,12 @@ export function ErrorHandler(
   // Prisma errors: never send Prisma's message or meta, which quote the query and its values
   if (isPrismaError(err)) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
-      // modelName is the model of the query called (prisma.user.*), not the table that clashed. It
-      // means the email only while no user.* query also creates rows in a table with a unique column.
-      const conflictMessage =
-        err.meta?.modelName === Prisma.ModelName.User ? EMAIL_CONFLICT_MESSAGE : CONFLICT_MESSAGE
+      const target = err.meta?.target
+      const isEmailClash =
+        err.meta?.modelName === Prisma.ModelName.User &&
+        Array.isArray(target) &&
+        target.some((column) => EMAIL_COLUMNS.includes(column))
+      const conflictMessage = isEmailClash ? EMAIL_CONFLICT_MESSAGE : CONFLICT_MESSAGE
       // The participant portal shows message and the admin portal shows details, so both carry it
       const errorResponse: PrismaErrorResponse = {
         message: conflictMessage,
@@ -317,5 +313,7 @@ export function ErrorHandler(
     })
     return res.status(500).json(errorResponse)
   }
+  // Only the type, because a thrown non-Error value can hold anything
+  logger.error({ message: 'Non-Error value passed to ErrorHandler', type: typeof err })
   next()
 }

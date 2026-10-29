@@ -21,6 +21,7 @@ import {
 } from 'common/types/api/users/ParticipantProfile'
 import { generateToken } from '../authentication'
 import { EMAIL_CONFLICT_MESSAGE } from '../middlewares/ErrorHandler'
+import logger from 'common/src/logger'
 import fetchMock from 'fetch-mock'
 jest.mock('../config')
 import config from '../config'
@@ -788,6 +789,7 @@ describe('AuthController', () => {
     it('Should return a 422 when the provider cannot be reached', async () => {
       fetchMock.removeRoutes()
       fetchMock.mockGlobal().route('http://testurl/.well-known/openid-configuration', 503)
+      const loggerError = jest.spyOn(logger, 'error')
 
       const loginRequest: OIDCLoginRequest = {
         code: '123',
@@ -798,6 +800,31 @@ describe('AuthController', () => {
       const response = await request(app).post('/auth/login/oidc').send(loginRequest)
       expect(response.status).toBe(422)
       expect(response.body.details).toBe('Error authenticating with OIDC')
+      expect(loggerError).toHaveBeenCalledWith(
+        expect.objectContaining({ message: 'OIDC provider request failed' }),
+      )
+      loggerError.mockRestore()
+    })
+
+    it('Should return a 500 when the database fails after the provider succeeds', async () => {
+      fetchMock.removeRoutes()
+      fetchMock.mockGlobal().route('http://testurl/.well-known/openid-configuration', {
+        token_endpoint: 'http://token',
+        userinfo_endpoint: 'http://userinfo',
+      })
+      fetchMock.mockGlobal().route('http://token', { access_token: '123' })
+      fetchMock.mockGlobal().route('http://userinfo', { email: TestUsers.ORG_ADMIN.email })
+      jest.spyOn(prisma.user, 'findFirst').mockRejectedValueOnce(new Error('Database unavailable'))
+
+      const loginRequest: OIDCLoginRequest = {
+        code: '123',
+        provider: 'test',
+        redirect_uri: 'redirect',
+      }
+
+      const response = await request(app).post('/auth/login/oidc').send(loginRequest)
+      expect(response.status).toBe(500)
+      expect(response.body).toEqual({ message: 'Internal Server Error' })
     })
 
     it('Should enforce permissions', async () => {

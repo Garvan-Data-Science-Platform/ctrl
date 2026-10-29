@@ -88,6 +88,18 @@ describe('ErrorHandler', () => {
       expect(response.text).not.toContain('emailHash')
     })
 
+    it('should return a 409 with generic text for a User clash on a column other than email', async () => {
+      const err = new Prisma.PrismaClientKnownRequestError(prismaMessage, {
+        code: 'P2002',
+        clientVersion: CLIENT_VERSION,
+        meta: { modelName: 'User', target: ['username'] },
+      })
+      const response = await request(appThatFailsWith(err)).get('/fail')
+
+      expect(response.status).toBe(409)
+      expect(response.body.message).toBe(CONFLICT_MESSAGE)
+    })
+
     it('should return a 409 with generic text when Prisma does not name the model', async () => {
       const err = new Prisma.PrismaClientKnownRequestError(prismaMessage, {
         code: 'P2002',
@@ -273,8 +285,12 @@ describe('ErrorHandler', () => {
       expect(response.body.message).toBe('No file uploaded')
     })
 
-    it('should return a 422 with sanitised fields for a ValidateError', async () => {
-      const err = new ValidateError({ 'bodyRequest.password': { message: 'bad', value: 'x' } }, '')
+    it('should return a 422 with sanitised fields for a ValidateError and never log the value', async () => {
+      // tsoa copies the rejected input into the field as value, and it can be a password
+      const err = new ValidateError(
+        { 'bodyRequest.password': { message: 'bad', value: PLANTED_SECRET } },
+        '',
+      )
       const response = await request(appThatFailsWith(err)).get('/fail')
 
       expect(response.status).toBe(422)
@@ -282,6 +298,8 @@ describe('ErrorHandler', () => {
         message: 'Validation Failed',
         details: { 'bodyRequest.password': { message: 'Invalid value provided' } },
       })
+      expect(everythingLogged()).not.toContain(PLANTED_SECRET)
+      expect(consoleLog).not.toHaveBeenCalled()
     })
 
     it('should return a 401 for authorisation errors, with or without details', async () => {

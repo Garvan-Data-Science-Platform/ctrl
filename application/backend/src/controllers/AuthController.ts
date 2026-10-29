@@ -303,7 +303,7 @@ export class AuthController extends Controller {
       code: bodyRequest.code,
     })
 
-    let user
+    let email: string
 
     try {
       const oidc_data = await fetch(`${providerUrl}/.well-known/openid-configuration`)
@@ -322,11 +322,17 @@ export class AuthController extends Controller {
         method: 'POST',
       })
 
-      const { email } = await userinfo_res.json()
-      user = await this.userRepo.findFirst({ where: { email } })
-    } catch {
+      email = (await userinfo_res.json()).email
+    } catch (err) {
+      // Only the provider calls are in the try, so a database error below still becomes a 500
+      logger.error({
+        message: 'OIDC provider request failed',
+        error: err instanceof Error ? { name: err.name, message: err.message } : String(err),
+      })
       throw new UnprocessableError('Error authenticating with OIDC')
     }
+
+    const user = await this.userRepo.findFirst({ where: { email } })
 
     if (!user) {
       throw new IncorrectPermissionsError('This email is not registered with CTRL.')
