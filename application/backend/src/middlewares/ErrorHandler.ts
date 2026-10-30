@@ -165,7 +165,7 @@ export function ErrorHandler(
   if (err instanceof FileUploadError) {
     const errorResponse: BadRequestErrorResponse = {
       message: err.message,
-      details: err,
+      details: err.message,
     }
     logger.error({ ...errorResponse })
     return res.status(400).json(errorResponse)

@@ -282,7 +282,7 @@ describe('ErrorHandler', () => {
       )
 
       expect(response.status).toBe(400)
-      expect(response.body.message).toBe('No file uploaded')
+      expect(response.body).toEqual({ message: 'No file uploaded', details: 'No file uploaded' })
     })
 
     it('should return a 422 with sanitised fields for a ValidateError and never log the value', async () => {
