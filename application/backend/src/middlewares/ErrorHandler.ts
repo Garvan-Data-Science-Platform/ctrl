@@ -3,6 +3,7 @@ import { ValidateError } from 'tsoa'
 import { TokenExpiredError, JsonWebTokenError } from 'jsonwebtoken'
 import { Prisma } from '@prisma/client'
 import logger from 'common/src/logger'
+import multer from 'multer'
 import {
   InternalErrorResponse,
   NotFoundErrorResponse,
@@ -12,6 +13,68 @@ import {
   BadRequestErrorResponse,
   UnprocessableErrorResponse,
 } from 'common/types/api/errors'
+
+// Fixed text for unique constraint violations. It tells the user what went wrong without naming
+// the model or columns that Prisma reports.
+export const EMAIL_CONFLICT_MESSAGE = 'Email already exists'
+export const CONFLICT_MESSAGE = 'Already exists'
+const EMAIL_COLUMNS = ['email', 'emailHash']
+
+type PrismaError =
+  | Prisma.PrismaClientKnownRequestError
+  | Prisma.PrismaClientUnknownRequestError
+  | Prisma.PrismaClientValidationError
+  | Prisma.PrismaClientRustPanicError
+  | Prisma.PrismaClientInitializationError
+
+function isPrismaError(err: unknown): err is PrismaError {
+  return (
+    err instanceof Prisma.PrismaClientKnownRequestError ||
+    err instanceof Prisma.PrismaClientUnknownRequestError ||
+    err instanceof Prisma.PrismaClientValidationError ||
+    err instanceof Prisma.PrismaClientRustPanicError ||
+    err instanceof Prisma.PrismaClientInitializationError
+  )
+}
+
+// Thrown by express.json() for a body that isn't valid JSON
+function isJsonParseError(err: unknown): err is SyntaxError {
+  return err instanceof SyntaxError && 'type' in err && err.type === 'entity.parse.failed'
+}
+
+// http-errors thrown by express.json() for other bad bodies: 413 over the size limit, 415 for an
+// unsupported charset, 400 for an aborted request. Their messages never quote the body.
+function isExposedClientError(err: unknown): err is Error & { status: number } {
+  return (
+    err instanceof Error &&
+    'expose' in err &&
+    err.expose === true &&
+    'status' in err &&
+    typeof err.status === 'number' &&
+    err.status >= 400 &&
+    err.status < 500
+  )
+}
+
+// A stack starts with the error's message, so keep only the frames, which say where it came from
+function stackFrames(err: Error) {
+  return err.stack?.split('\n').filter((line) => /^\s+at /.test(line))
+}
+
+// Prisma's messages quote the failed query, including the values the client sent, so only the
+// error's name, identifiers and stack frames are safe to log
+function errorForLog(err: PrismaError) {
+  if (err instanceof Prisma.PrismaClientKnownRequestError) {
+    return {
+      name: err.name,
+      code: err.code,
+      modelName: err.meta?.modelName,
+      target: err.meta?.target,
+      stack: stackFrames(err),
+    }
+  }
+  return { name: err.name, stack: stackFrames(err) }
+}
 
 export class NoTokenError extends Error {
   constructor() {
@@ -98,14 +161,33 @@ export function ErrorHandler(
   res: Response,
   next: NextFunction,
 ): Response | void {
-  console.log(err)
   // Bad Request Errors
-  if (err instanceof FileUploadError || err instanceof TypeError) {
+  if (err instanceof FileUploadError) {
     const errorResponse: BadRequestErrorResponse = {
       message: err.message,
-      details: err,
+      details: err.message,
     }
+    logger.error({ ...errorResponse })
     return res.status(400).json(errorResponse)
+  }
+
+  // Body that isn't valid JSON. A fixed message, because the parser's own can quote the request.
+  if (isJsonParseError(err)) {
+    const errorResponse: BadRequestErrorResponse = { message: 'Invalid JSON' }
+    // Name only: the error's body holds the raw request, and its message can quote part of it
+    logger.error({ ...errorResponse, error: { name: err.name, type: 'entity.parse.failed' } })
+    return res.status(400).json(errorResponse)
+  }
+
+  // Other bodies express.json() rejects keep their own status. This comes after the parse error
+  // above, which is also exposed but can quote the body. The reason goes in details, as for multer.
+  if (isExposedClientError(err)) {
+    const errorResponse: BadRequestErrorResponse = {
+      message: 'Request body rejected',
+      details: err.message,
+    }
+    logger.error({ ...errorResponse })
+    return res.status(err.status).json(errorResponse)
   }
 
   // Validation Errors
@@ -152,24 +234,44 @@ export function ErrorHandler(
     return res.status(403).json(errorResponse)
   }
 
-  // Handle Prisma Known Errors
-  if (err instanceof Prisma.PrismaClientKnownRequestError) {
-    let status: number = 500
-    const error: PrismaErrorResponse = {
-      message: err.message,
-      code: err.code,
-      details: err.meta,
+  // Prisma errors: never send Prisma's message or meta, which quote the query and its values
+  if (isPrismaError(err)) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+      const target = err.meta?.target
+      const isEmailClash =
+        err.meta?.modelName === Prisma.ModelName.User &&
+        Array.isArray(target) &&
+        target.some((column) => EMAIL_COLUMNS.includes(column))
+      const conflictMessage = isEmailClash ? EMAIL_CONFLICT_MESSAGE : CONFLICT_MESSAGE
+      // The participant portal shows message and the admin portal shows details, so both carry it
+      const errorResponse: PrismaErrorResponse = {
+        message: conflictMessage,
+        code: err.code,
+        details: conflictMessage,
+      }
+      logger.error({ ...errorResponse, error: errorForLog(err) })
+      return res.status(409).json(errorResponse)
     }
 
-    if (err.code === 'P2002') {
-      error.message = `${err.meta?.target} already in use`
-    } else if (err.code === 'P2025') {
-      error.message = 'Record not found'
-      status = 404
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
+      const errorResponse: PrismaErrorResponse = { message: 'Record not found', code: err.code }
+      logger.error({ ...errorResponse, error: errorForLog(err) })
+      return res.status(404).json(errorResponse)
     }
 
-    logger.error({ ...error })
-    return res.status(status).json(error)
+    const errorResponse: InternalErrorResponse = { message: 'Internal Server Error' }
+    logger.error({ ...errorResponse, error: errorForLog(err) })
+    return res.status(500).json(errorResponse)
+  }
+
+  // Upload rejected by multer, e.g. a file over the size limit
+  if (err instanceof multer.MulterError) {
+    const errorResponse: BadRequestErrorResponse = {
+      message: 'File upload failed',
+      details: err.message,
+    }
+    logger.error({ ...errorResponse })
+    return res.status(400).json(errorResponse)
   }
 
   // Not Found Error
@@ -190,7 +292,7 @@ export function ErrorHandler(
     return res.status(502).json(errorResponse)
   }
 
-  // Default error handling for any other type of error
+  // Unprocessable Errors
   if (err instanceof UnprocessableError) {
     const error: UnprocessableErrorResponse = {
       message: 'Unprocessable Content',
@@ -201,15 +303,17 @@ export function ErrorHandler(
     return res.status(422).json(error)
   }
 
-  // Default error handling for any other type of error
+  // Default error handling for any other type of error. The message stays in the server logs only,
+  // because it may come from a library and describe internals.
   if (err instanceof Error) {
-    const error: InternalErrorResponse = {
-      message: 'Internal Server Error',
-      details: err.message,
-    }
-
-    logger.error({ ...error })
-    return res.status(500).json(error)
+    const errorResponse: InternalErrorResponse = { message: 'Internal Server Error' }
+    logger.error({
+      ...errorResponse,
+      error: { name: err.name, message: err.message, stack: err.stack },
+    })
+    return res.status(500).json(errorResponse)
   }
+  // Only the type, because a thrown non-Error value can hold anything
+  logger.error({ message: 'Non-Error value passed to ErrorHandler', type: typeof err })
   next()
 }

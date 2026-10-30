@@ -267,7 +267,8 @@ describe('StudiesController', () => {
         .post('/studies')
         .set({ Authorization: `Bearer ${orgAdminToken}` })
         .send({ name: studyNameAlreadyExists } as CreateStudyRequest)
-      expect(response.status).toBe(500)
+      expect(response.status).toBe(422)
+      expect(response.body.details).toBe('Study with that name already exists')
     })
 
     it('should return a 500 error if a database error occurs', async () => {
@@ -310,6 +311,16 @@ describe('StudiesController', () => {
       })
       expect(updatedStudy).not.toBeNull()
       expect(updatedStudy?.name).toBe(updatedStudyName)
+    })
+
+    it('should return a 422 when renaming a study to an existing name', async () => {
+      const response = await request(app)
+        .patch(`/studies/${testStudyId}`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .send({ name: TestStudies.TEST_STUDY_2.name } as UpdateStudyRequest)
+
+      expect(response.status).toBe(422)
+      expect(response.body.details).toBe('Study with that name already exists')
     })
 
     it('should return a 404 error if the study is not found', async () => {
@@ -401,6 +412,16 @@ describe('StudiesController', () => {
         .attach('file', `${fixturesPath}/invalid_logo.png`)
 
       expect(response.status).toBe(422)
+    })
+
+    it('should return a 400 if the multipart request has no file field', async () => {
+      const response = await request(app)
+        .post(`/studies/${testStudyId}/logo`)
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+        .field('notTheFile', 'x')
+
+      expect(response.status).toBe(400)
+      expect(response.body.message).toBe('No file uploaded')
     })
 
     it('should change logo if a logo gets updated', async () => {

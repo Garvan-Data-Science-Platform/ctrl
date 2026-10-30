@@ -47,7 +47,6 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "message": {"dataType":"enum","enums":["Internal Server Error"],"required":true},
-            "details": {"dataType":"any"},
         },
         "additionalProperties": false,
     },
@@ -61,15 +60,6 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "UnprocessableErrorResponse": {
-        "dataType": "refObject",
-        "properties": {
-            "message": {"dataType":"enum","enums":["Unprocessable Content"],"required":true},
-            "details": {"dataType":"string"},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "ValidateErrorResponse": {
         "dataType": "refObject",
         "properties": {
@@ -79,12 +69,11 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "UnprocessableError": {
+    "UnprocessableErrorResponse": {
         "dataType": "refObject",
         "properties": {
-            "name": {"dataType":"string","required":true},
-            "message": {"dataType":"string","required":true},
-            "stack": {"dataType":"string"},
+            "message": {"dataType":"enum","enums":["Unprocessable Content"],"required":true},
+            "details": {"dataType":"string"},
         },
         "additionalProperties": false,
     },
@@ -154,6 +143,16 @@ const models: TsoaRoute.Models = {
             "lastName": {"dataType":"string","required":true,"validators":{"minLength":{"value":1}}},
             "email": {"dataType":"string","required":true,"validators":{"pattern":{"errorMsg":"please provide valid email","value":"^(.+)@(.+)$"}}},
             "role": {"ref":"Role","required":true,"validators":{"minLength":{"value":8}}},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "PrismaErrorResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "message": {"dataType":"string","required":true},
+            "code": {"dataType":"string","required":true},
+            "details": {"dataType":"string"},
         },
         "additionalProperties": false,
     },
@@ -476,6 +475,15 @@ const models: TsoaRoute.Models = {
             "redcapToken": {"dataType":"string"},
             "redcapURL": {"dataType":"string"},
             "contactUsEmail": {"dataType":"string"},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "BadRequestErrorResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "message": {"dataType":"string","required":true},
+            "details": {"dataType":"any"},
         },
         "additionalProperties": false,
     },

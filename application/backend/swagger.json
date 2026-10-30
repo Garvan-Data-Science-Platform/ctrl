@@ -15,8 +15,7 @@
               "Internal Server Error"
             ],
             "nullable": false
-          },
-          "details": {}
+          }
         },
         "required": [
           "message"
@@ -24,10 +23,7 @@
         "type": "object",
         "additionalProperties": false,
         "example": {
-          "message": "Internal Server Error",
-          "details": {
-            "message": "Some error happened D:"
-          }
+          "message": "Internal Server Error"
         }
       },
       "UnauthorizedErrorResponse": {
@@ -47,29 +43,6 @@
           "details": {
             "message": "Token not in headers"
           }
-        }
-      },
-      "UnprocessableErrorResponse": {
-        "properties": {
-          "message": {
-            "type": "string",
-            "enum": [
-              "Unprocessable Content"
-            ],
-            "nullable": false
-          },
-          "details": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "message"
-        ],
-        "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "message": "Unprocessable Content",
-          "details": "There was a problem"
         }
       },
       "ValidateErrorResponse": {
@@ -94,24 +67,28 @@
         "type": "object",
         "additionalProperties": false
       },
-      "UnprocessableError": {
+      "UnprocessableErrorResponse": {
         "properties": {
-          "name": {
-            "type": "string"
-          },
           "message": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "Unprocessable Content"
+            ],
+            "nullable": false
           },
-          "stack": {
+          "details": {
             "type": "string"
           }
         },
         "required": [
-          "name",
           "message"
         ],
         "type": "object",
-        "additionalProperties": false
+        "additionalProperties": false,
+        "example": {
+          "message": "Unprocessable Content",
+          "details": "There was a problem"
+        }
       },
       "Pick_User.Exclude_keyofUser.password-or-emailHash__": {
         "properties": {
@@ -284,6 +261,30 @@
           "lastName": "Doe",
           "email": "john.doe@email.com",
           "role": "Participant"
+        }
+      },
+      "PrismaErrorResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "details": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message",
+          "code"
+        ],
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "message": "Email already exists",
+          "code": "P2002",
+          "details": "Email already exists"
         }
       },
       "UpdateUserRequest": {
@@ -1176,6 +1177,23 @@
         },
         "type": "object",
         "additionalProperties": false
+      },
+      "BadRequestErrorResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "details": {}
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "message": "File upload failed",
+          "details": "File too large"
+        }
       },
       "GetSettingsResponse": {
         "properties": {
@@ -3309,6 +3327,16 @@
               }
             }
           },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrismaErrorResponse"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Validation Failed",
             "content": {
@@ -3835,11 +3863,18 @@
             "description": "Not Found"
           },
           "422": {
-            "description": "Validation Failed",
+            "description": "Unprocessable Content",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidateErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                    }
+                  ]
                 }
               }
             }
@@ -4060,11 +4095,18 @@
             "description": "Not Found"
           },
           "422": {
-            "description": "Validation Failed",
+            "description": "Unprocessable Content",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidateErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                    }
+                  ]
                 }
               }
             }
@@ -4249,11 +4291,18 @@
             "description": "Not Found"
           },
           "422": {
-            "description": "Validation Failed",
+            "description": "Unprocessable Content",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidateErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                    }
+                  ]
                 }
               }
             }
@@ -4363,11 +4412,18 @@
             }
           },
           "422": {
-            "description": "Validation Failed",
+            "description": "Unprocessable Content",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidateErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                    }
+                  ]
                 }
               }
             }
@@ -4615,11 +4671,18 @@
             }
           },
           "422": {
-            "description": "Validation Failed",
+            "description": "Unprocessable Content",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidateErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                    }
+                  ]
                 }
               }
             }
@@ -4725,6 +4788,16 @@
         "responses": {
           "204": {
             "description": "No content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestErrorResponse"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized",
@@ -5067,6 +5140,16 @@
         "responses": {
           "204": {
             "description": "No content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestErrorResponse"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized",
@@ -5505,12 +5588,29 @@
               }
             }
           },
-          "422": {
-            "description": "Validation Failed",
+          "409": {
+            "description": "Conflict",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                  "$ref": "#/components/schemas/PrismaErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidateErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                    }
+                  ]
                 }
               }
             }
@@ -5589,7 +5689,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidateErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                    }
+                  ]
                 }
               }
             }
@@ -5660,7 +5767,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidateErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                    }
+                  ]
                 }
               }
             }
@@ -5724,7 +5838,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidateErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                    }
+                  ]
                 }
               }
             }
@@ -5814,7 +5935,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidateErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                    }
+                  ]
                 }
               }
             }
@@ -5880,12 +6008,29 @@
               }
             }
           },
-          "422": {
-            "description": "Validation Failed",
+          "409": {
+            "description": "Conflict",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidateErrorResponse"
+                  "$ref": "#/components/schemas/PrismaErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidateErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                    }
+                  ]
                 }
               }
             }
@@ -5973,7 +6118,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidateErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                    }
+                  ]
                 }
               }
             }
@@ -6049,12 +6201,29 @@
               }
             }
           },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrismaErrorResponse"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Content",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/InternalErrorResponse"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidateErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                    }
+                  ]
                 }
               }
             }
@@ -6203,6 +6372,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrismaErrorResponse"
                 }
               }
             }
@@ -7391,6 +7570,16 @@
               }
             }
           },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestErrorResponse"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized",
             "content": {
@@ -7544,6 +7733,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UploadRedcapInstrumentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestErrorResponse"
                 }
               }
             }
@@ -8370,12 +8569,29 @@
               }
             }
           },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrismaErrorResponse"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Content",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UnprocessableError"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidateErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                    }
+                  ]
                 }
               }
             }
@@ -8435,7 +8651,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UnprocessableError"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidateErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                    }
+                  ]
                 }
               }
             }
@@ -8479,7 +8702,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UnprocessableError"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidateErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                    }
+                  ]
                 }
               }
             }
@@ -8528,12 +8758,29 @@
               }
             }
           },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrismaErrorResponse"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Content",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UnprocessableError"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidateErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                    }
+                  ]
                 }
               }
             }
@@ -8606,7 +8853,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UnprocessableError"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidateErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                    }
+                  ]
                 }
               }
             }
@@ -8679,7 +8933,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UnprocessableError"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidateErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                    }
+                  ]
                 }
               }
             }
@@ -8752,7 +9013,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UnprocessableError"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidateErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                    }
+                  ]
                 }
               }
             }
@@ -8808,7 +9076,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UnprocessableError"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidateErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UnprocessableErrorResponse"
+                    }
+                  ]
                 }
               }
             }
