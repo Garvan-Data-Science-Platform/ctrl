@@ -59,13 +59,13 @@ export const POSTCODE_RULE = {
   },
 }
 
-export const mobileRules = (required = true) => ({
-  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
+export const MOBILE_RULE = {
+  required: VALIDATION_MESSAGES.REQUIRED,
   pattern: {
     value: REGEX.MOBILE,
     message: VALIDATION_MESSAGES.MOBILE_INVALID,
   },
-})
+}
 
 export const externalIdRules = (required = true) => ({
   required: required ? VALIDATION_MESSAGES.REQUIRED : false,

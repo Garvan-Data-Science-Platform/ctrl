@@ -24,7 +24,7 @@ import { ContactMethod, StateTerritory } from '@common/types/api/users/Participa
 import {
   ADDRESS_RULE,
   EMAIL_RULE,
-  mobileRules,
+  MOBILE_RULE,
   NAME_RULE,
   POSTCODE_RULE,
 } from '@common/src/validation'
@@ -215,7 +215,7 @@ export default function ProfileEdit() {
                   helperText={errors.mobile?.message}
                   data-cy="update-mobile"
                   disabled={isPending}
-                  {...register('mobile', { ...mobileRules(), value: data?.mobile })}
+                  {...register('mobile', { ...MOBILE_RULE, value: data?.mobile })}
                 />
                 <FormControl sx={{ m: 1, flexGrow: 1, minWidth: 240 }}>
                   <InputLabel id="pref-select-label">Preferred Contact Method</InputLabel>

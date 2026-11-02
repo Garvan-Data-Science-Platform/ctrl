@@ -17,7 +17,7 @@ import {
   ADDRESS_RULE,
   EMAIL_RULE,
   externalIdRules,
-  mobileRules,
+  MOBILE_RULE,
   NAME_RULE,
   POSTCODE_RULE,
 } from '@common/src/validation'
@@ -181,7 +181,7 @@ export const ParticipantEdit = () => {
           label={'Postcode'}
         />
         <TextField
-          {...register('profile.mobile', mobileRules())}
+          {...register('profile.mobile', MOBILE_RULE)}
           error={!!errors.profile?.mobile}
           helperText={errors.profile?.mobile?.message}
           margin="normal"
@@ -249,7 +249,7 @@ export const ParticipantEdit = () => {
           label={'Email'}
         />
         <TextField
-          {...register('profile.nextOfKin.mobile', { ...mobileRules(), required: false })}
+          {...register('profile.nextOfKin.mobile', { ...MOBILE_RULE, required: false })}
           error={!!errors.profile?.nextOfKin?.mobile}
           helperText={errors.profile?.nextOfKin?.mobile?.message}
           margin="normal"

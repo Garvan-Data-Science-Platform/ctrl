@@ -32,7 +32,7 @@ import { useEffect, useState } from 'react'
 import {
   ADDRESS_RULE,
   EMAIL_RULE,
-  mobileRules,
+  MOBILE_RULE,
   NAME_RULE,
   POSTCODE_RULE,
 } from '@common/src/validation'
@@ -331,7 +331,7 @@ export default function Register() {
                 helperText={errors.mobile?.message}
                 data-cy="reg-mobile"
                 slotProps={{ inputLabel: { shrink: Boolean(watch('mobile')) } }}
-                {...register('mobile', mobileRules())}
+                {...register('mobile', MOBILE_RULE)}
               />
               <FormControl sx={{ m: 1, flexGrow: 1, minWidth: 240 }}>
                 <InputLabel id="pref-select-label">Preferred Contact Method</InputLabel>
