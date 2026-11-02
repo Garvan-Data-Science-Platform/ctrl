@@ -3,7 +3,7 @@ import { useGetIdentity } from '@refinedev/core'
 import { Create } from '@refinedev/mui'
 import { useForm } from '@refinedev/react-hook-form'
 import { Controller } from 'react-hook-form'
-import { emailRules, nameRules } from '@common/src/validation'
+import { emailRules, NAME_RULES } from '@common/src/validation'
 
 export const UserCreate = () => {
   const {
@@ -20,7 +20,7 @@ export const UserCreate = () => {
     <Create isLoading={formLoading} saveButtonProps={saveButtonProps}>
       <Box component="form" sx={{ display: 'flex', flexDirection: 'column' }} autoComplete="off">
         <TextField
-          {...register('firstName', nameRules())}
+          {...register('firstName', NAME_RULES)}
           error={!!(errors as any)?.firstName}
           helperText={(errors as any)?.firstName?.message}
           margin="normal"
@@ -32,7 +32,7 @@ export const UserCreate = () => {
           name="firstName"
         />
         <TextField
-          {...register('lastName', nameRules())}
+          {...register('lastName', NAME_RULES)}
           error={!!(errors as any)?.lastName}
           helperText={(errors as any)?.lastName?.message}
           margin="normal"

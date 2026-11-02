@@ -18,18 +18,19 @@ export const VALIDATION_MESSAGES = {
   CSS_COLOUR_INVALID:
     'Use HEX ("#a1b2c3"), RGB ("rgb(10,20,30)"), or a valid CSS colour name ("blue")',
   STEP_TITLE_INVALID: 'Step title contains invalid characters or is empty',
-  STEP_DESCRIPTION_INVALID: 'Step description contains invalid characters or is empty',
-  SURVEY_ELEMENT_INVALID: 'Contains invalid characters or is empty',
+  STEP_DESCRIPTION_INVALID: 'Step description contains invalid characters',
+  SURVEY_ELEMENT_INVALID: 'Contains invalid characters',
+  SURVEY_ELEMENT_OPTIONAL_INVALID: 'Contains invalid characters',
   SURVEY_STEP_CONTAINS_INVALID_ELEMENT: 'This step contains invalid or empty fields',
   DOB_INVALID: 'Must be a valid date and format (YYYY-MM-DD or DD/MM/YYYY)',
 }
-export const nameRules = (required = true) => ({
-  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
+export const NAME_RULES = {
+  required: VALIDATION_MESSAGES.REQUIRED,
   pattern: {
     value: REGEX.NAME,
     message: VALIDATION_MESSAGES.NAME_INVALID,
   },
-})
+}
 
 export const emailRules = (required = true) => ({
   required: required ? VALIDATION_MESSAGES.REQUIRED : false,
@@ -139,26 +140,33 @@ export const cssColourRules = (required = false) => ({
   },
 })
 
-export const stepTitleRules = (required = true) => ({
-  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
+export const stepTitleRules = {
+  required: VALIDATION_MESSAGES.REQUIRED,
   pattern: {
     value: REGEX.SURVEY_ELEMENT_REQUIRED,
     message: VALIDATION_MESSAGES.STEP_TITLE_INVALID,
   },
-})
+}
 
-export const stepDescriptionRules = (required = true) => ({
-  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
+export const stepDescriptionRules = {
+  required: VALIDATION_MESSAGES.REQUIRED,
   pattern: {
     value: REGEX.SURVEY_ELEMENT_REQUIRED,
     message: VALIDATION_MESSAGES.STEP_DESCRIPTION_INVALID,
   },
-})
+}
 
-export const surveyElementRules = (required = true) => ({
-  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
+export const surveyElementRequiredRules = {
+  required: VALIDATION_MESSAGES.REQUIRED,
   pattern: {
-    value: REGEX.SURVEY_ELEMENT_OPTIONAL,
+    value: REGEX.SURVEY_ELEMENT_REQUIRED,
     message: VALIDATION_MESSAGES.SURVEY_ELEMENT_INVALID,
   },
-})
+}
+
+export const surveyElementOptionalRules = {
+  pattern: {
+    value: REGEX.SURVEY_ELEMENT_OPTIONAL,
+    message: VALIDATION_MESSAGES.SURVEY_ELEMENT_OPTIONAL_INVALID,
+  },
+}

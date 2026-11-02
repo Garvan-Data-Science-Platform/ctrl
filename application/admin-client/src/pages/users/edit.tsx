@@ -14,7 +14,7 @@ import { useStudyStore } from '../../studyStore'
 import { useGetIdentity, useInvalidate, useNotification, useParsed, useShow } from '@refinedev/core'
 import { Controller } from 'react-hook-form'
 import { axiosInstance } from '../../providers/dataProvider'
-import { emailRules, nameRules } from '@common/src/validation'
+import { emailRules, NAME_RULES } from '@common/src/validation'
 
 export const UserEdit = () => {
   type FieldValues = UpdateUserRequest
@@ -84,7 +84,7 @@ export const UserEdit = () => {
           autoComplete="off"
         >
           <TextField
-            {...register('firstName', nameRules())}
+            {...register('firstName', NAME_RULES)}
             error={!!(errors as any)?.firstName}
             helperText={(errors as any)?.firstName?.message}
             margin="normal"
@@ -97,7 +97,7 @@ export const UserEdit = () => {
             data-cy="first"
           />
           <TextField
-            {...register('lastName', nameRules())}
+            {...register('lastName', NAME_RULES)}
             error={!!(errors as any)?.lastName}
             helperText={(errors as any)?.lastName?.message}
             margin="normal"
