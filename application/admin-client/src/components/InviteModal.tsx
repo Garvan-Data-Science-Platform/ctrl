@@ -16,7 +16,7 @@ import { axiosInstance } from '../providers/dataProvider'
 import { GetInviteTextResponse } from '@common/types/api/participants'
 import { useCurrentStudyId } from '../studyStore'
 import {
-  emailRules,
+  EMAIL_RULE,
   externalIdRules,
   inviteEmailSubjectRules,
   inviteEmailTextRules,
@@ -30,14 +30,13 @@ interface InviteModalProps {
 }
 
 export function InviteModal({ onSend, onCancel, initialRecipients = [] }: InviteModalProps) {
-  const emailRule = emailRules(true)
   const externalIdRule = externalIdRules(false)
   const inviteEmailSubjectRule = inviteEmailSubjectRules(true)
   const inviteEmailTextRule = inviteEmailTextRules(true)
 
   // helper for filtering arrays and pasting
   const isEmailValidHelper = (email: string) =>
-    emailRule.pattern ? emailRule.pattern.value.test(email) : false
+    EMAIL_RULE.pattern ? EMAIL_RULE.pattern.value.test(email) : false
 
   const { open } = useNotification()
 
@@ -52,7 +51,7 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
   const studyId = useCurrentStudyId()
 
   const isEmailInvalid = Boolean(
-    fieldValue && emailRule.pattern && !emailRule.pattern.value.test(fieldValue),
+    fieldValue && EMAIL_RULE.pattern && !EMAIL_RULE.pattern.value.test(fieldValue),
   )
   const isExternalIdInvalid = Boolean(
     idFieldValue && externalIdRule.pattern && !externalIdRule.pattern.value.test(idFieldValue),
@@ -155,7 +154,7 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
             fullWidth
             placeholder="tom@example.com"
             error={isEmailInvalid}
-            helperText={isEmailInvalid ? (emailRule.pattern?.message as string) : ''}
+            helperText={isEmailInvalid ? (EMAIL_RULE.pattern?.message as string) : ''}
             onKeyUp={(event) => {
               if (event.key == 'Enter') {
                 handleAdd()

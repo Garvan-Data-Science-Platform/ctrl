@@ -14,7 +14,7 @@ import { useStudyStore } from '../../studyStore'
 import { useGetIdentity, useInvalidate, useNotification, useParsed, useShow } from '@refinedev/core'
 import { Controller } from 'react-hook-form'
 import { axiosInstance } from '../../providers/dataProvider'
-import { emailRules, NAME_RULES } from '@common/src/validation'
+import { EMAIL_RULE, NAME_RULES } from '@common/src/validation'
 
 export const UserEdit = () => {
   type FieldValues = UpdateUserRequest
@@ -109,7 +109,7 @@ export const UserEdit = () => {
             disabled={editingDisabled}
           />
           <TextField
-            {...register('email', emailRules())}
+            {...register('email', EMAIL_RULE)}
             error={!!(errors as any)?.email}
             helperText={(errors as any)?.email?.message}
             margin="normal"

@@ -26,7 +26,7 @@ import { useSearchParams } from 'react-router'
 import { LogoUploader } from '../../components/LogoUploader'
 import { RESOURCES } from '../../constants'
 import {
-  emailRules,
+  EMAIL_RULE,
   urlRules,
   studyNameRules,
   studyDescriptionRules,
@@ -120,9 +120,8 @@ const StudyCard = ({
     redcapURL && urlRule.pattern && !urlRule.pattern.value.test(redcapURL),
   )
 
-  const emailRule = emailRules(false)
   const isEmailInvalid = Boolean(
-    contactUsEmail && emailRule.pattern && !emailRule.pattern.value.test(contactUsEmail),
+    contactUsEmail && EMAIL_RULE.pattern && !EMAIL_RULE.pattern.value.test(contactUsEmail),
   )
 
   const studyNameRule = studyNameRules(false)
@@ -151,7 +150,7 @@ const StudyCard = ({
     if (isEmailInvalid) {
       open?.({
         type: 'error',
-        message: emailRule.pattern.message as string,
+        message: EMAIL_RULE.pattern.message as string,
       })
       return
     }
@@ -323,7 +322,7 @@ const StudyCard = ({
               name="contactUsEmail"
               data-cy="contactUsEmail"
               error={isEmailInvalid}
-              helperText={isEmailInvalid ? (emailRule.pattern?.message as string) : ''}
+              helperText={isEmailInvalid ? (EMAIL_RULE.pattern?.message as string) : ''}
               value={contactUsEmail}
               onChange={(e) => {
                 setContactUsEmail(e.target.value)

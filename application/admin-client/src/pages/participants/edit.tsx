@@ -15,7 +15,7 @@ import { ContactMethod, StateTerritory } from '@common/types/api/users/Participa
 import { GetParticipantResponse, UpdateParticipantRequest } from '@common/types/api/participants'
 import {
   addressRules,
-  emailRules,
+  EMAIL_RULE,
   externalIdRules,
   mobileRules,
   NAME_RULES,
@@ -79,7 +79,7 @@ export const ParticipantEdit = () => {
           label={'Last Name'}
         />
         <TextField
-          {...register('profile.email', emailRules())}
+          {...register('profile.email', EMAIL_RULE)}
           error={!!errors.profile?.email}
           helperText={errors.profile?.email?.message}
           margin="normal"
@@ -239,7 +239,7 @@ export const ParticipantEdit = () => {
           label={'Last Name'}
         />
         <TextField
-          {...register('profile.nextOfKin.email', emailRules())}
+          {...register('profile.nextOfKin.email', EMAIL_RULE)}
           error={!!errors.profile?.nextOfKin?.email}
           helperText={errors.profile?.nextOfKin?.email?.message}
           margin="normal"

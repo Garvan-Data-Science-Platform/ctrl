@@ -32,13 +32,13 @@ export const NAME_RULES = {
   },
 }
 
-export const emailRules = (required = true) => ({
-  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
+export const EMAIL_RULE = {
+  required: VALIDATION_MESSAGES.REQUIRED,
   pattern: {
     value: REGEX.EMAIL,
     message: VALIDATION_MESSAGES.EMAIL_INVALID,
   },
-})
+}
 
 export const addressRules = (required = true) => ({
   required: required ? VALIDATION_MESSAGES.REQUIRED : false,

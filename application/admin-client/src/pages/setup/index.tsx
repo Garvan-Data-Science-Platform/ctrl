@@ -3,7 +3,7 @@ import { Alert, Box, Button, Card, Container, TextField, Typography } from '@mui
 import { useLogin } from '../../hooks/useLogin'
 import { useForm } from 'react-hook-form'
 import { checkPasswordStrength } from '@common/src/PasswordStrength'
-import { emailRules } from '@common/src/validation'
+import { EMAIL_RULE } from '@common/src/validation'
 
 export const SetupPage = () => {
   const {
@@ -69,7 +69,7 @@ export const SetupPage = () => {
               data-cy="setup-email"
               error={Boolean(errors.email)}
               helperText={errors.email?.message as any}
-              {...register('email', emailRules())}
+              {...register('email', EMAIL_RULE)}
             />
             <TextField
               type="password"

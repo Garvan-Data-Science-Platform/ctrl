@@ -23,7 +23,7 @@ import { apiClient } from '../apiClient'
 import { ContactMethod, StateTerritory } from '@common/types/api/users/ParticipantProfile'
 import {
   addressRules,
-  emailRules,
+  EMAIL_RULE,
   mobileRules,
   NAME_RULES,
   postcodeRules,
@@ -282,7 +282,7 @@ export default function ProfileEdit() {
                   disabled={isPending}
                   key="nok_email"
                   {...register('nok_email', {
-                    ...emailRules(),
+                    ...EMAIL_RULE,
                     value: data?.nextOfKin?.email,
                   })}
                 />

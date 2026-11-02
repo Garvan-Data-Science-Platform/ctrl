@@ -3,7 +3,7 @@ import { useGetIdentity } from '@refinedev/core'
 import { Create } from '@refinedev/mui'
 import { useForm } from '@refinedev/react-hook-form'
 import { Controller } from 'react-hook-form'
-import { emailRules, NAME_RULES } from '@common/src/validation'
+import { EMAIL_RULE, NAME_RULES } from '@common/src/validation'
 
 export const UserCreate = () => {
   const {
@@ -43,7 +43,7 @@ export const UserCreate = () => {
           name="lastName"
         />
         <TextField
-          {...register('email', emailRules())}
+          {...register('email', EMAIL_RULE)}
           error={!!(errors as any)?.email}
           helperText={(errors as any)?.email?.message}
           margin="normal"

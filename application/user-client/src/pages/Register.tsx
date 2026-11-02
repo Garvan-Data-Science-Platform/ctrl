@@ -31,7 +31,7 @@ import { AddCircle, Close } from '@mui/icons-material'
 import { useEffect, useState } from 'react'
 import {
   addressRules,
-  emailRules,
+  EMAIL_RULE,
   mobileRules,
   NAME_RULES,
   postcodeRules,
@@ -219,7 +219,7 @@ export default function Register() {
                 helperText={errors.email?.message}
                 data-cy="reg-email"
                 slotProps={{ inputLabel: { shrink: Boolean(watch('email')) } }}
-                {...register('email', emailRules())}
+                {...register('email', EMAIL_RULE)}
               />
               <TextField
                 sx={{ m: 1, flexGrow: 1 }}
@@ -395,7 +395,7 @@ export default function Register() {
                   helperText={errors.nok_email?.message}
                   data-cy="nok-email"
                   slotProps={{ inputLabel: { shrink: Boolean(watch('nok_email')) } }}
-                  {...register('nok_email', emailRules())}
+                  {...register('nok_email', EMAIL_RULE)}
                 />
               </>
               <>
