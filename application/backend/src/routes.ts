@@ -274,6 +274,11 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "SurveyChoiceValue": {
+        "dataType": "refAlias",
+        "type": {"dataType":"string","validators":{"maxLength":{"value":2048},"pattern":{"value":"^[\\u0300-\\u036Fa-zA-Z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u024F\\u1E00-\\u1EFF0-9\\s.,!?:;()'\"\\-/#@&%$\\u00A3\\u20AC+_\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026\\u2022\\u2265\\u2264\\u00B0=]*$"}}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "SurveyQuestionChoices": {
         "dataType": "refObject",
         "properties": {
@@ -282,7 +287,7 @@ const models: TsoaRoute.Models = {
             "required": {"dataType":"boolean"},
             "choices": {"dataType":"array","array":{"dataType":"refAlias","ref":"SurveyQuestionText"},"required":true},
             "duoCodes": {"dataType":"array","array":{"dataType":"refObject","ref":"DuoCode"}},
-            "value": {"dataType":"union","subSchemas":[{"ref":"SurveyQuestionText"},{"dataType":"enum","enums":[null]}]},
+            "value": {"dataType":"union","subSchemas":[{"ref":"SurveyChoiceValue"},{"dataType":"enum","enums":[null]}]},
         },
         "additionalProperties": false,
     },

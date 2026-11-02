@@ -251,6 +251,15 @@ export type SurveyQuestionText = string
  */
 export type SurveyQuestionTooltip = string
 
+// NOTE: * at the end of the REGEX below to allow optional Tooltip
+
+/**
+ * @maxLength 2048
+ * @pattern ^[\u0300-\u036Fa-zA-Z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u024F\u1E00-\u1EFF0-9\s.,!?:;()'"\-/#@&%$\u00A3\u20AC+_\u2018\u2019\u201C\u201D\u2013\u2014\u2026\u2022\u2265\u2264\u00B0=]*$
+ * @example "Muscoloskeletal diseases only"
+ */
+export type SurveyChoiceValue = string
+
 /**
  * @maxLength 2048
  * @pattern ^[\u0300-\u036Fa-zA-Z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u024F\u1E00-\u1EFF0-9\s.,!?:;()'"\-/#@&%$\u00A3\u20AC+_\u2018\u2019\u201C\u201D\u2013\u2014\u2026\u2022\u2265\u2264\u00B0=]+$

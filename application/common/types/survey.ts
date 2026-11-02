@@ -5,6 +5,7 @@ import {
   SurveyStepTitle,
   SurveySubHeadingText,
   OptionalUrl,
+  SurveyChoiceValue,
 } from './commonTypes'
 
 export interface DuoCode {
@@ -26,7 +27,7 @@ export interface SurveyQuestionChoices {
   required?: boolean
   choices: SurveyQuestionText[]
   duoCodes?: DuoCode[]
-  value?: SurveyQuestionText | null
+  value?: SurveyChoiceValue | null
 }
 
 export interface SurveySubHeading {
