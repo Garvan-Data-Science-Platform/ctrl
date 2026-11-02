@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router'
 import { axiosInstance } from '../../providers/dataProvider'
 import { Info } from '@mui/icons-material'
 import { LogoUploader } from '../../components/LogoUploader'
-import { cssColourRules, urlRules } from '@common/src/validation'
+import { cssColourRules, URL_OPTIONAL_RULE, URL_REQUIRED_RULE } from '@common/src/validation'
 import { RESOURCES } from '../../constants'
 
 const SettingsPage = () => {
@@ -86,7 +86,7 @@ const SettingsPage = () => {
           </Box>
         </Box>
         <TextField
-          {...register('tcLink', urlRules())}
+          {...register('tcLink', URL_REQUIRED_RULE)}
           error={!!(errors as any)?.tcLink}
           helperText={(errors as any)?.tcLink?.message}
           margin="normal"
@@ -97,7 +97,7 @@ const SettingsPage = () => {
           data-cy="tcLink"
         />
         <TextField
-          {...register('newsLink', urlRules())}
+          {...register('newsLink', URL_OPTIONAL_RULE)}
           error={!!(errors as any)?.newsLink}
           helperText={(errors as any)?.newsLink?.message}
           margin="normal"

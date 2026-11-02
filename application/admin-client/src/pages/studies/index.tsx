@@ -27,7 +27,7 @@ import { LogoUploader } from '../../components/LogoUploader'
 import { RESOURCES } from '../../constants'
 import {
   EMAIL_RULE,
-  urlRules,
+  URL_OPTIONAL_RULE,
   studyNameRules,
   studyDescriptionRules,
   redcapTokenRules,
@@ -115,9 +115,8 @@ const StudyCard = ({
     setDeleteDialogOpen(false)
   }
 
-  const urlRule = urlRules(false)
   const isUrlInvalid = Boolean(
-    redcapURL && urlRule.pattern && !urlRule.pattern.value.test(redcapURL),
+    redcapURL && URL_OPTIONAL_RULE.pattern && !URL_OPTIONAL_RULE.pattern.value.test(redcapURL),
   )
 
   const isEmailInvalid = Boolean(
@@ -143,7 +142,7 @@ const StudyCard = ({
     if (isUrlInvalid) {
       open?.({
         type: 'error',
-        message: urlRule.pattern.message as string,
+        message: URL_OPTIONAL_RULE.pattern.message as string,
       })
       return
     }
@@ -339,7 +338,7 @@ const StudyCard = ({
                 name="redcapURL"
                 data-cy="redcapURL"
                 error={isUrlInvalid}
-                helperText={isUrlInvalid ? (urlRule.pattern?.message as string) : ''}
+                helperText={isUrlInvalid ? (URL_OPTIONAL_RULE.pattern?.message as string) : ''}
                 value={redcapURL}
                 onChange={(e) => {
                   setRedcapURL(e.target.value)

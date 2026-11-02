@@ -8,7 +8,8 @@ export const VALIDATION_MESSAGES = {
   POSTCODE_INVALID: 'Invalid postcode',
   MOBILE_INVALID: 'Mobile number contains invalid characters (no spaces or country code allowed)',
   EXTERNALID_INVALID: 'External ID can only consist of alpha numeric characters and -_=.:',
-  URL_INVALID: 'Invalid URL, must include http(s)://...',
+  URL_REQUIRED_INVALID: 'URL is empty or contains invalid characters (must include "http(s)://")',
+  URL_OPTIONAL_INVALID: 'Invalid URL, must include http(s)://...',
   STUDY_NAME_INVALID: 'Study name contains invalid characters',
   STUDY_DESCRIPTION_INVALID: 'Study description contains invalid characters',
   REDCAP_TOKEN_INVALID: 'REDCap token contains invalid characters or is incorrect length',
@@ -75,13 +76,23 @@ export const EXTERNALID_RULE = {
   },
 }
 
-export const urlRules = (required = true) => ({
-  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
+// For example: cannot have a video URL survey element with empty URL
+export const URL_REQUIRED_RULE = {
+  required: VALIDATION_MESSAGES.REQUIRED,
   pattern: {
     value: REGEX.URL,
-    message: VALIDATION_MESSAGES.URL_INVALID,
+    message: VALIDATION_MESSAGES.URL_REQUIRED_INVALID,
   },
-})
+}
+
+// Note: no `required` as this is optional
+// e.g. a study can have an empty REDCap URL field
+export const URL_OPTIONAL_RULE = {
+  pattern: {
+    value: REGEX.URL,
+    message: VALIDATION_MESSAGES.URL_OPTIONAL_INVALID,
+  },
+}
 
 export const studyNameRules = (required = true) => ({
   required: required ? VALIDATION_MESSAGES.REQUIRED : false,

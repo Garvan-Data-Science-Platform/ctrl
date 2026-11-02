@@ -26,7 +26,7 @@ import { DUOEntry, DUOModal } from './DUOModal'
 import { useState } from 'react'
 import duoJson from './duo.json'
 import { useNotification } from '@refinedev/core'
-import { surveyElementRules, urlRules } from '@common/src/validation'
+import { surveyElementRules, URL_OPTIONAL_RULE } from '@common/src/validation'
 
 const duoEntries = duoJson as DUOEntry[]
 
@@ -368,10 +368,8 @@ export function SurveyElementCard({
   }
 
   function renderVideo(data: SurveyVideo) {
-    const urlRule = urlRules(false)
-
     const isUrlInvalid = Boolean(
-      data.link && urlRule.pattern && !urlRule.pattern.value.test(data.link),
+      data.link && URL_OPTIONAL_RULE.pattern && !URL_OPTIONAL_RULE.pattern.value.test(data.link),
     )
 
     return (
@@ -384,7 +382,7 @@ export function SurveyElementCard({
           label="URL"
           value={data.link}
           error={isUrlInvalid}
-          helperText={isUrlInvalid ? (urlRule.pattern?.message as string) : ''}
+          helperText={isUrlInvalid ? (URL_OPTIONAL_RULE.pattern?.message as string) : ''}
           data-cy="video-url"
           disabled={disabled}
           onChange={(e) => {

@@ -180,7 +180,7 @@ describe('Survey Editor', () => {
         parseSpecialCharSequences: false,
       },
     )
-    cy.contains(VALIDATION_MESSAGES.URL_INVALID).should('exist')
+    cy.contains(VALIDATION_MESSAGES.URL_REQUIRED_INVALID).should('exist')
   })
 
   it('Invalid xss in subheading-text shows appropriate error messages', () => {

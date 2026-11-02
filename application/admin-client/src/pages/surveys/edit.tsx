@@ -32,7 +32,7 @@ import {
   stepDescriptionRules,
   stepTitleRules,
   surveyElementRules,
-  urlRules,
+  URL_REQUIRED_RULE,
   VALIDATION_MESSAGES,
 } from '@common/src/validation'
 
@@ -92,7 +92,6 @@ export const SurveyEditor = () => {
   const stepDescriptionRule = stepDescriptionRules(true)
   const surveyElementRequiredRule = surveyElementRules(true)
   const surveyElementOptionalRule = surveyElementRules(false)
-  const urlRule = urlRules(true)
 
   const currentStep = surveyData[activeStep]
   const isStepTitleInvalid = Boolean(
@@ -132,7 +131,7 @@ export const SurveyEditor = () => {
             return checkInvalid(data.text, surveyElementRequiredRule)
 
           case 'video':
-            return checkInvalid(data.link, urlRule)
+            return checkInvalid(data.link, URL_REQUIRED_RULE)
 
           case 'question-checkbox':
             return (
@@ -165,7 +164,7 @@ export const SurveyEditor = () => {
     stepDescriptionRule,
     surveyElementRequiredRule,
     surveyElementOptionalRule,
-    urlRule,
+    URL_REQUIRED_RULE,
   ])
 
   const isSurveyInvalid = invalidSteps.length > 0

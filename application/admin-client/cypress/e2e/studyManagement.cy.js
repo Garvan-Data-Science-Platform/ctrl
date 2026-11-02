@@ -52,7 +52,7 @@ describe('Study management page', () => {
     cy.get('[data-cy="redcapURL"] input').eq(1).type('abc')
     cy.get('[data-cy="redcapToken"] input').eq(1).type(TestRedcapToken)
     cy.get('[data-cy="settings-apply"]').eq(1).should('be.disabled')
-    cy.contains(VALIDATION_MESSAGES.URL_INVALID).should('exist')
+    cy.contains(VALIDATION_MESSAGES.URL_OPTIONAL_INVALID).should('exist')
     cy.get('[data-cy="redcapURL"] input').eq(1).clear().type('https://abc.com')
     cy.get('[data-cy="contactUsEmail"] input').eq(1).clear().type('a')
     cy.get('[data-cy="settings-apply"]').eq(1).should('be.disabled')
@@ -242,7 +242,7 @@ describe('Study management page', () => {
     cy.get('[data-cy="redcapURL"] input').eq(1).type("{{7*7}}<script>alert('xss-url')</script>", {
       parseSpecialCharSequences: false,
     })
-    cy.contains(VALIDATION_MESSAGES.URL_INVALID).should('exist')
+    cy.contains(VALIDATION_MESSAGES.URL_OPTIONAL_INVALID).should('exist')
     cy.get('[data-cy="settings-apply"]').eq(1).should('be.disabled')
   })
 

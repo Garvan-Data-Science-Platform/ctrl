@@ -146,7 +146,7 @@ describe('Settings page', () => {
 
     cy.get('[data-cy="save-button"]').click()
 
-    cy.contains(VALIDATION_MESSAGES.URL_INVALID).should('exist')
+    cy.contains(VALIDATION_MESSAGES.URL_REQUIRED_INVALID).should('exist')
   })
 
   it('Invalid newsLink url prevent saving and show appropriate error messages', () => {
@@ -160,7 +160,7 @@ describe('Settings page', () => {
 
     cy.get('[data-cy="save-button"]').click()
 
-    cy.contains(VALIDATION_MESSAGES.URL_INVALID).should('exist')
+    cy.contains(VALIDATION_MESSAGES.URL_OPTIONAL_INVALID).should('exist')
   })
 
   it('Invalid primary colour prevent saving and show appropriate error messages', () => {
