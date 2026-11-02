@@ -40,13 +40,13 @@ export const EMAIL_RULE = {
   },
 }
 
-export const addressRules = (required = true) => ({
-  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
+export const ADDRESS_RULE = {
+  required: VALIDATION_MESSAGES.REQUIRED,
   pattern: {
     value: REGEX.ADDRESS,
     message: VALIDATION_MESSAGES.ADDRESS_INVALID,
   },
-})
+}
 
 // DOB is handled by date picker
 // State is handled by drop down

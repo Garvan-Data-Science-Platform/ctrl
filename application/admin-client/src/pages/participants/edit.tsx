@@ -14,7 +14,7 @@ import { Controller } from 'react-hook-form'
 import { ContactMethod, StateTerritory } from '@common/types/api/users/ParticipantProfile'
 import { GetParticipantResponse, UpdateParticipantRequest } from '@common/types/api/participants'
 import {
-  addressRules,
+  ADDRESS_RULE,
   EMAIL_RULE,
   externalIdRules,
   mobileRules,
@@ -126,7 +126,7 @@ export const ParticipantEdit = () => {
           )}
         />
         <TextField
-          {...register('profile.addressLine', addressRules())}
+          {...register('profile.addressLine', ADDRESS_RULE)}
           error={!!errors.profile?.addressLine}
           helperText={errors.profile?.addressLine?.message}
           margin="normal"
@@ -136,7 +136,7 @@ export const ParticipantEdit = () => {
           label={'Address Line'}
         />
         <TextField
-          {...register('profile.suburb', addressRules())}
+          {...register('profile.suburb', ADDRESS_RULE)}
           error={!!errors.profile?.suburb}
           helperText={errors.profile?.suburb?.message}
           margin="normal"

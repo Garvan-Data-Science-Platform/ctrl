@@ -22,7 +22,7 @@ import NavBar from '../components/NavBar'
 import { apiClient } from '../apiClient'
 import { ContactMethod, StateTerritory } from '@common/types/api/users/ParticipantProfile'
 import {
-  addressRules,
+  ADDRESS_RULE,
   EMAIL_RULE,
   mobileRules,
   NAME_RULE,
@@ -166,7 +166,7 @@ export default function ProfileEdit() {
                   helperText={errors.addressLine?.message}
                   data-cy="update-address"
                   disabled={isPending}
-                  {...register('addressLine', { ...addressRules(), value: data?.addressLine })}
+                  {...register('addressLine', { ...ADDRESS_RULE, value: data?.addressLine })}
                 />
                 <TextField
                   sx={{ m: 1 }}
@@ -176,7 +176,7 @@ export default function ProfileEdit() {
                   helperText={errors.suburb?.message}
                   data-cy="update-suburb"
                   disabled={isPending}
-                  {...register('suburb', { ...addressRules(), value: data?.suburb })}
+                  {...register('suburb', { ...ADDRESS_RULE, value: data?.suburb })}
                 />
                 <FormControl sx={{ m: 1, flexGrow: 1 }}>
                   <InputLabel id="state-select-label">State</InputLabel>

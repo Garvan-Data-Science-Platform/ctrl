@@ -30,7 +30,7 @@ import {
 import { AddCircle, Close } from '@mui/icons-material'
 import { useEffect, useState } from 'react'
 import {
-  addressRules,
+  ADDRESS_RULE,
   EMAIL_RULE,
   mobileRules,
   NAME_RULE,
@@ -276,7 +276,7 @@ export default function Register() {
                 helperText={errors.addressLine?.message}
                 data-cy="reg-address-line"
                 slotProps={{ inputLabel: { shrink: Boolean(watch('addressLine')) } }}
-                {...register('addressLine', addressRules())}
+                {...register('addressLine', ADDRESS_RULE)}
               />
               <TextField
                 sx={{ m: 1 }}
@@ -286,7 +286,7 @@ export default function Register() {
                 error={Boolean(errors.suburb)}
                 helperText={errors.suburb?.message}
                 slotProps={{ inputLabel: { shrink: Boolean(watch('suburb')) } }}
-                {...register('suburb', addressRules())}
+                {...register('suburb', ADDRESS_RULE)}
               />
               <FormControl sx={{ m: 1, flexGrow: 1 }}>
                 <InputLabel id="state-select-label">State</InputLabel>
