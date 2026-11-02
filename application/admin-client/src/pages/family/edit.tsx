@@ -35,7 +35,7 @@ import { GetFamilyResponse } from '@common/types/api/families'
 import { axiosInstance } from '../../providers/dataProvider'
 import { useCurrentStudyId } from '../../studyStore'
 import { useQueryClient } from '@tanstack/react-query'
-import { NAME_RULES } from '@common/src/validation'
+import { NAME_RULE } from '@common/src/validation'
 
 export const FamilyEdit = () => {
   const studyId = useCurrentStudyId()
@@ -341,7 +341,7 @@ export const FamilyEdit = () => {
                       required
                       error={!!errors.firstName}
                       helperText={errors.firstName?.message as string}
-                      {...register(`firstName`, NAME_RULES)}
+                      {...register(`firstName`, NAME_RULE)}
                     />
                     <TextField
                       sx={{ m: 1, flexGrow: 1 }}
@@ -350,7 +350,7 @@ export const FamilyEdit = () => {
                       error={!!errors.lastName}
                       helperText={errors.lastName?.message as string}
                       data-cy="dep-surname"
-                      {...register(`lastName`, NAME_RULES)}
+                      {...register(`lastName`, NAME_RULE)}
                     />
                     <TextField
                       type="date"

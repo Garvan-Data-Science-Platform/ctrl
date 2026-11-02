@@ -18,7 +18,7 @@ import {
   EMAIL_RULE,
   externalIdRules,
   mobileRules,
-  NAME_RULES,
+  NAME_RULE,
   postcodeRules,
 } from '@common/src/validation'
 
@@ -59,7 +59,7 @@ export const ParticipantEdit = () => {
     >
       <Box component="form" sx={{ display: 'flex', flexDirection: 'column' }} autoComplete="off">
         <TextField
-          {...register('profile.firstName', NAME_RULES)}
+          {...register('profile.firstName', NAME_RULE)}
           error={!!errors.profile?.firstName}
           helperText={errors.profile?.firstName?.message}
           margin="normal"
@@ -69,7 +69,7 @@ export const ParticipantEdit = () => {
           label={'First Name'}
         />
         <TextField
-          {...register('profile.lastName', NAME_RULES)}
+          {...register('profile.lastName', NAME_RULE)}
           error={!!errors.profile?.lastName}
           helperText={errors.profile?.lastName?.message}
           margin="normal"
@@ -219,7 +219,7 @@ export const ParticipantEdit = () => {
           Alternative Contact
         </Typography>
         <TextField
-          {...register('profile.nextOfKin.firstName', NAME_RULES)}
+          {...register('profile.nextOfKin.firstName', NAME_RULE)}
           error={!!errors.profile?.nextOfKin?.firstName}
           helperText={errors.profile?.nextOfKin?.firstName?.message}
           margin="normal"
@@ -229,7 +229,7 @@ export const ParticipantEdit = () => {
           label={'First Name'}
         />
         <TextField
-          {...register('profile.nextOfKin.lastName', NAME_RULES)}
+          {...register('profile.nextOfKin.lastName', NAME_RULE)}
           error={!!errors.profile?.nextOfKin?.lastName}
           helperText={errors.profile?.nextOfKin?.lastName?.message}
           margin="normal"

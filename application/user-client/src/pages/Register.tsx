@@ -33,7 +33,7 @@ import {
   addressRules,
   EMAIL_RULE,
   mobileRules,
-  NAME_RULES,
+  NAME_RULE,
   postcodeRules,
 } from '@common/src/validation'
 
@@ -197,7 +197,7 @@ export default function Register() {
                 helperText={errors.firstName?.message}
                 data-cy="reg-first"
                 slotProps={{ inputLabel: { shrink: Boolean(watch('firstName')) } }}
-                {...register('firstName', NAME_RULES)}
+                {...register('firstName', NAME_RULE)}
               />
               <TextField
                 sx={{ m: 1, flexGrow: 1 }}
@@ -207,7 +207,7 @@ export default function Register() {
                 helperText={errors.lastName?.message}
                 data-cy="reg-last"
                 slotProps={{ inputLabel: { shrink: Boolean(watch('lastName')) } }}
-                {...register('lastName', NAME_RULES)}
+                {...register('lastName', NAME_RULE)}
               />
               <TextField
                 type="email"
@@ -375,7 +375,7 @@ export default function Register() {
                   helperText={errors.nok_first?.message}
                   data-cy="nok-first"
                   slotProps={{ inputLabel: { shrink: Boolean(watch('nok_first')) } }}
-                  {...register('nok_first', NAME_RULES)}
+                  {...register('nok_first', NAME_RULE)}
                 />
                 <TextField
                   sx={{ m: 1, flexGrow: 1 }}
@@ -384,7 +384,7 @@ export default function Register() {
                   helperText={errors.nok_surname?.message}
                   data-cy="nok-surname"
                   slotProps={{ inputLabel: { shrink: Boolean(watch('nok_surname')) } }}
-                  {...register('nok_surname', NAME_RULES)}
+                  {...register('nok_surname', NAME_RULE)}
                 />
                 <TextField
                   type="email"
@@ -436,7 +436,7 @@ export default function Register() {
                       slotProps={{
                         inputLabel: { shrink: Boolean(watch(`dependents.${idx}.firstName`)) },
                       }}
-                      {...register(`dependents.${idx}.firstName`, NAME_RULES)}
+                      {...register(`dependents.${idx}.firstName`, NAME_RULE)}
                     />
                     <TextField
                       sx={{ m: 1, flexGrow: 1 }}
@@ -447,7 +447,7 @@ export default function Register() {
                       slotProps={{
                         inputLabel: { shrink: Boolean(watch(`dependents.${idx}.lastName`)) },
                       }}
-                      {...register(`dependents.${idx}.lastName`, NAME_RULES)}
+                      {...register(`dependents.${idx}.lastName`, NAME_RULE)}
                     />
                     <TextField
                       type="date"

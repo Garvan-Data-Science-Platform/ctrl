@@ -24,7 +24,7 @@ export const VALIDATION_MESSAGES = {
   SURVEY_STEP_CONTAINS_INVALID_ELEMENT: 'This step contains invalid or empty fields',
   DOB_INVALID: 'Must be a valid date and format (YYYY-MM-DD or DD/MM/YYYY)',
 }
-export const NAME_RULES = {
+export const NAME_RULE = {
   required: VALIDATION_MESSAGES.REQUIRED,
   pattern: {
     value: REGEX.NAME,

@@ -25,7 +25,7 @@ import {
   addressRules,
   EMAIL_RULE,
   mobileRules,
-  NAME_RULES,
+  NAME_RULE,
   postcodeRules,
 } from '@common/src/validation'
 
@@ -133,7 +133,7 @@ export default function ProfileEdit() {
                   helperText={errors.firstName?.message}
                   data-cy="update-first"
                   disabled={isPending}
-                  {...register('firstName', { ...NAME_RULES, value: data?.firstName })}
+                  {...register('firstName', { ...NAME_RULE, value: data?.firstName })}
                 />
                 <TextField
                   sx={{ m: 1, flexGrow: 1 }}
@@ -143,7 +143,7 @@ export default function ProfileEdit() {
                   helperText={errors.lastName?.message}
                   data-cy="update-last"
                   disabled={isPending}
-                  {...register('lastName', { ...NAME_RULES, value: data?.lastName })}
+                  {...register('lastName', { ...NAME_RULE, value: data?.lastName })}
                 />
 
                 <TextField
@@ -252,7 +252,7 @@ export default function ProfileEdit() {
                   data-cy="update-nok-first"
                   disabled={isPending}
                   {...register('nok_first', {
-                    ...NAME_RULES,
+                    ...NAME_RULE,
                     value: data?.nextOfKin?.firstName,
                   })}
                 />
@@ -266,7 +266,7 @@ export default function ProfileEdit() {
                   disabled={isPending}
                   key="nok_surname"
                   {...register('nok_surname', {
-                    ...NAME_RULES,
+                    ...NAME_RULE,
                     value: data?.nextOfKin?.lastName,
                   })}
                 />
