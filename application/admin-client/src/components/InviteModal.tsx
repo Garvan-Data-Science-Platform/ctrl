@@ -17,7 +17,7 @@ import { GetInviteTextResponse } from '@common/types/api/participants'
 import { useCurrentStudyId } from '../studyStore'
 import {
   EMAIL_RULE,
-  externalIdRules,
+  EXTERNALID_RULE,
   inviteEmailSubjectRules,
   inviteEmailTextRules,
 } from '@common/src/validation'
@@ -30,7 +30,6 @@ interface InviteModalProps {
 }
 
 export function InviteModal({ onSend, onCancel, initialRecipients = [] }: InviteModalProps) {
-  const externalIdRule = externalIdRules(false)
   const inviteEmailSubjectRule = inviteEmailSubjectRules(true)
   const inviteEmailTextRule = inviteEmailTextRules(true)
 
@@ -54,7 +53,7 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
     fieldValue && EMAIL_RULE.pattern && !EMAIL_RULE.pattern.value.test(fieldValue),
   )
   const isExternalIdInvalid = Boolean(
-    idFieldValue && externalIdRule.pattern && !externalIdRule.pattern.value.test(idFieldValue),
+    idFieldValue && EXTERNALID_RULE.pattern && !EXTERNALID_RULE.pattern.value.test(idFieldValue),
   )
   const isInviteEmailSubjectInvalid = Boolean(
     inviteEmailSubjectRule.pattern && !inviteEmailSubjectRule.pattern.value.test(emailTitle),
@@ -112,8 +111,8 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
 
         const isPastedEmailValid = isEmailValidHelper(email)
         const isPastedIdValid = id
-          ? externalIdRule.pattern
-            ? externalIdRule.pattern.value.test(id)
+          ? EXTERNALID_RULE.pattern
+            ? EXTERNALID_RULE.pattern.value.test(id)
             : true
           : true
 
@@ -171,7 +170,7 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
             label="ID (optional)"
             value={idFieldValue}
             error={isExternalIdInvalid}
-            helperText={isExternalIdInvalid ? (externalIdRule.pattern?.message as string) : ''}
+            helperText={isExternalIdInvalid ? (EXTERNALID_RULE.pattern?.message as string) : ''}
             onChange={(e) => setIdFieldValue(e.target.value)}
             onKeyUp={(event) => {
               if (event.key == 'Enter') {

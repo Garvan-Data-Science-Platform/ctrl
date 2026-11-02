@@ -67,13 +67,13 @@ export const MOBILE_RULE = {
   },
 }
 
-export const externalIdRules = (required = true) => ({
-  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
+// Note: no `required` as this is optional
+export const EXTERNALID_RULE = {
   pattern: {
     value: REGEX.EXTERNALID,
     message: VALIDATION_MESSAGES.EXTERNALID_INVALID,
   },
-})
+}
 
 export const urlRules = (required = true) => ({
   required: required ? VALIDATION_MESSAGES.REQUIRED : false,

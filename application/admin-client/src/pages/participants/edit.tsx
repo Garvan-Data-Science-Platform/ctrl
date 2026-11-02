@@ -16,7 +16,7 @@ import { GetParticipantResponse, UpdateParticipantRequest } from '@common/types/
 import {
   ADDRESS_RULE,
   EMAIL_RULE,
-  externalIdRules,
+  EXTERNALID_RULE,
   MOBILE_RULE,
   NAME_RULE,
   POSTCODE_RULE,
@@ -89,7 +89,7 @@ export const ParticipantEdit = () => {
           label={'Email'}
         />
         <TextField
-          {...register('externalId', externalIdRules(false))} // False so that External ID is not required
+          {...register('externalId', EXTERNALID_RULE)} // False so that External ID is not required
           error={!!errors.externalId}
           helperText={errors.externalId?.message}
           margin="normal"
