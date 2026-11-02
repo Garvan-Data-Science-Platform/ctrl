@@ -34,7 +34,7 @@ import {
   EMAIL_RULE,
   mobileRules,
   NAME_RULE,
-  postcodeRules,
+  POSTCODE_RULE,
 } from '@common/src/validation'
 
 interface FormValues {
@@ -321,7 +321,7 @@ export default function Register() {
                 helperText={errors.postcode?.message}
                 data-cy="reg-postcode"
                 slotProps={{ inputLabel: { shrink: Boolean(watch('postcode')) } }}
-                {...register('postcode', postcodeRules())}
+                {...register('postcode', POSTCODE_RULE)}
               />
               <TextField
                 sx={{ m: 1, flexGrow: 1 }}

@@ -19,7 +19,7 @@ import {
   externalIdRules,
   mobileRules,
   NAME_RULE,
-  postcodeRules,
+  POSTCODE_RULE,
 } from '@common/src/validation'
 
 export const ParticipantEdit = () => {
@@ -171,7 +171,7 @@ export const ParticipantEdit = () => {
           )}
         />
         <TextField
-          {...register('profile.postcode', postcodeRules())}
+          {...register('profile.postcode', POSTCODE_RULE)}
           error={!!errors.profile?.postcode}
           helperText={errors.profile?.postcode?.message}
           margin="normal"

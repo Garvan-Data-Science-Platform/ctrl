@@ -26,7 +26,7 @@ import {
   EMAIL_RULE,
   mobileRules,
   NAME_RULE,
-  postcodeRules,
+  POSTCODE_RULE,
 } from '@common/src/validation'
 
 interface FormValues {
@@ -205,7 +205,7 @@ export default function ProfileEdit() {
                   helperText={errors.postcode?.message}
                   data-cy="update-postcode"
                   disabled={isPending}
-                  {...register('postcode', { ...postcodeRules(), value: data?.postcode })}
+                  {...register('postcode', { ...POSTCODE_RULE, value: data?.postcode })}
                 />
                 <TextField
                   sx={{ m: 1, flexGrow: 1 }}

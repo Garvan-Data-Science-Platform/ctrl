@@ -51,13 +51,13 @@ export const ADDRESS_RULE = {
 // DOB is handled by date picker
 // State is handled by drop down
 
-export const postcodeRules = (required = true) => ({
-  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
+export const POSTCODE_RULE = {
+  required: VALIDATION_MESSAGES.REQUIRED,
   pattern: {
     value: REGEX.POSTCODE,
     message: VALIDATION_MESSAGES.POSTCODE_INVALID,
   },
-})
+}
 
 export const mobileRules = (required = true) => ({
   required: required ? VALIDATION_MESSAGES.REQUIRED : false,
