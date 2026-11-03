@@ -31,7 +31,8 @@ import { useParams } from 'react-router'
 import {
   STEP_TITLE_RULE,
   STEP_DESCRIPTION_RULE,
-  surveyElementRules,
+  SURVEY_ELEMENT_REQUIRED_RULE,
+  SURVEY_ELEMENT_OPTIONAL_RULE,
   URL_REQUIRED_RULE,
   VALIDATION_MESSAGES,
 } from '@common/src/validation'
@@ -88,9 +89,6 @@ export const SurveyEditor = () => {
 
   const disabled = queryData?.data.status != 'DRAFT'
 
-  const surveyElementRequiredRule = surveyElementRules(true)
-  const surveyElementOptionalRule = surveyElementRules(false)
-
   const currentStep = surveyData[activeStep]
   const isStepTitleInvalid = Boolean(
     currentStep?.title &&
@@ -126,23 +124,23 @@ export const SurveyEditor = () => {
       const hasInvalidElement = step.elements.some(({ type, data }) => {
         switch (type) {
           case 'subheading':
-            return checkInvalid(data.text, surveyElementRequiredRule)
+            return checkInvalid(data.text, SURVEY_ELEMENT_REQUIRED_RULE)
 
           case 'video':
             return checkInvalid(data.link, URL_REQUIRED_RULE)
 
           case 'question-checkbox':
             return (
-              checkInvalid(data.text, surveyElementRequiredRule) ||
-              checkInvalid(data.tooltip, surveyElementOptionalRule)
+              checkInvalid(data.text, SURVEY_ELEMENT_REQUIRED_RULE) ||
+              checkInvalid(data.tooltip, SURVEY_ELEMENT_OPTIONAL_RULE)
             )
 
           case 'question-choices':
             return (
-              checkInvalid(data.text, surveyElementRequiredRule) ||
-              checkInvalid(data.tooltip, surveyElementOptionalRule) ||
+              checkInvalid(data.text, SURVEY_ELEMENT_REQUIRED_RULE) ||
+              checkInvalid(data.tooltip, SURVEY_ELEMENT_OPTIONAL_RULE) ||
               data.choices?.some((choice: string) =>
-                checkInvalid(choice, surveyElementRequiredRule),
+                checkInvalid(choice, SURVEY_ELEMENT_REQUIRED_RULE),
               )
             )
 
@@ -160,8 +158,8 @@ export const SurveyEditor = () => {
     surveyData,
     STEP_TITLE_RULE,
     STEP_DESCRIPTION_RULE,
-    surveyElementRequiredRule,
-    surveyElementOptionalRule,
+    SURVEY_ELEMENT_REQUIRED_RULE,
+    SURVEY_ELEMENT_OPTIONAL_RULE,
     URL_REQUIRED_RULE,
   ])
 

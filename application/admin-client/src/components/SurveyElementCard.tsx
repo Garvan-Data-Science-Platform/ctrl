@@ -26,7 +26,11 @@ import { DUOEntry, DUOModal } from './DUOModal'
 import { useState } from 'react'
 import duoJson from './duo.json'
 import { useNotification } from '@refinedev/core'
-import { surveyElementRules, URL_OPTIONAL_RULE } from '@common/src/validation'
+import {
+  SURVEY_ELEMENT_OPTIONAL_RULE,
+  SURVEY_ELEMENT_REQUIRED_RULE,
+  URL_REQUIRED_RULE,
+} from '@common/src/validation'
 
 const duoEntries = duoJson as DUOEntry[]
 
@@ -64,7 +68,7 @@ export function SurveyElementCard({
   const [{ opacity }, dragRef] = useDrag(
     () => ({
       type: 'CARD',
-      end: (item, monitor) => {
+      end: (_, monitor) => {
         if (monitor.didDrop()) {
           const result = monitor.getDropResult() as DropResult
           handleMove(result.dropIndex)
@@ -161,10 +165,11 @@ export function SurveyElementCard({
   }
 
   function renderSubHeading(data: SurveySubHeading) {
-    const subHeadingRule = surveyElementRules(true)
+    const subHeadingRule = SURVEY_ELEMENT_REQUIRED_RULE
 
     const isSubHeadingInvalid = Boolean(
-      data.text && subHeadingRule.pattern && !subHeadingRule.pattern.value.test(data.text),
+      (subHeadingRule.required && !data.text) ||
+        (data.text && subHeadingRule.pattern && !subHeadingRule.pattern.value.test(data.text)),
     )
 
     const charLimit = 200
@@ -195,13 +200,14 @@ export function SurveyElementCard({
   }
 
   function renderQuestionCheckbox(data: SurveyQuestionCheckbox) {
-    const checkboxQuestionRule = surveyElementRules(false)
-    const checkboxTooltipRule = surveyElementRules(false)
+    const checkboxQuestionRule = SURVEY_ELEMENT_REQUIRED_RULE
+    const checkboxTooltipRule = SURVEY_ELEMENT_OPTIONAL_RULE
 
     const isCheckboxQuestionInvalid = Boolean(
-      data.text &&
-        checkboxQuestionRule.pattern &&
-        !checkboxQuestionRule.pattern.value.test(data.text),
+      (checkboxQuestionRule.required && !data.text) ||
+        (data.text &&
+          checkboxQuestionRule.pattern &&
+          !checkboxQuestionRule.pattern.value.test(data.text)),
     )
 
     const isCheckboxTooltipInvalid = Boolean(
@@ -251,12 +257,15 @@ export function SurveyElementCard({
   }
 
   function renderQuestionChoices(data: SurveyQuestionChoices) {
-    const choiceQuestionRule = surveyElementRules(false)
-    const choiceTooltipRule = surveyElementRules(false)
-    const choiceTextRule = surveyElementRules(false)
+    const choiceQuestionRule = SURVEY_ELEMENT_REQUIRED_RULE
+    const choiceTooltipRule = SURVEY_ELEMENT_OPTIONAL_RULE
+    const choiceTextRule = SURVEY_ELEMENT_REQUIRED_RULE
 
     const isChoiceQuestionInvalid = Boolean(
-      data.text && choiceQuestionRule.pattern && !choiceQuestionRule.pattern.value.test(data.text),
+      (choiceQuestionRule.required && !data.text) ||
+        (data.text &&
+          choiceQuestionRule.pattern &&
+          !choiceQuestionRule.pattern.value.test(data.text)),
     )
 
     const isChoiceTooltipInvalid = Boolean(
@@ -317,7 +326,8 @@ export function SurveyElementCard({
         >
           {data.choices.map((val, idx) => {
             const isChoiceTextInvalid = Boolean(
-              val && choiceTextRule.pattern && !choiceTextRule.pattern.value.test(val),
+              (choiceTextRule.required && !val) ||
+                (val && choiceTextRule.pattern && !choiceTextRule.pattern.value.test(val)),
             )
             return (
               <Box key={`choice_${idx}`}>
@@ -369,7 +379,10 @@ export function SurveyElementCard({
 
   function renderVideo(data: SurveyVideo) {
     const isUrlInvalid = Boolean(
-      data.link && URL_OPTIONAL_RULE.pattern && !URL_OPTIONAL_RULE.pattern.value.test(data.link),
+      (URL_REQUIRED_RULE.required && !data.link) ||
+        (data.link &&
+          URL_REQUIRED_RULE.pattern &&
+          !URL_REQUIRED_RULE.pattern.value.test(data.link)),
     )
 
     return (
@@ -382,7 +395,7 @@ export function SurveyElementCard({
           label="URL"
           value={data.link}
           error={isUrlInvalid}
-          helperText={isUrlInvalid ? (URL_OPTIONAL_RULE.pattern?.message as string) : ''}
+          helperText={isUrlInvalid ? (URL_REQUIRED_RULE.pattern?.message as string) : ''}
           data-cy="video-url"
           disabled={disabled}
           onChange={(e) => {
