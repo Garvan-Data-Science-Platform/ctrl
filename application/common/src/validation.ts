@@ -94,13 +94,13 @@ export const URL_OPTIONAL_RULE = {
   },
 }
 
-export const studyNameRules = (required = true) => ({
-  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
+export const STUDYNAME_RULE = {
+  required: VALIDATION_MESSAGES.REQUIRED,
   pattern: {
     value: REGEX.STUDY_NAME,
     message: VALIDATION_MESSAGES.STUDY_NAME_INVALID,
   },
-})
+}
 
 export const studyDescriptionRules = (required = true) => ({
   required: required ? VALIDATION_MESSAGES.REQUIRED : false,

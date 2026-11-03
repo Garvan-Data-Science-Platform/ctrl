@@ -28,7 +28,7 @@ import { RESOURCES } from '../../constants'
 import {
   EMAIL_RULE,
   URL_OPTIONAL_RULE,
-  studyNameRules,
+  STUDYNAME_RULE,
   studyDescriptionRules,
   redcapTokenRules,
 } from '@common/src/validation'
@@ -123,9 +123,8 @@ const StudyCard = ({
     contactUsEmail && EMAIL_RULE.pattern && !EMAIL_RULE.pattern.value.test(contactUsEmail),
   )
 
-  const studyNameRule = studyNameRules(false)
   const isStudyNameInvalid = Boolean(
-    newName && studyNameRule.pattern && !studyNameRule.pattern.value.test(newName),
+    newName && STUDYNAME_RULE.pattern && !STUDYNAME_RULE.pattern.value.test(newName),
   )
 
   const studyDescriptionRule = studyDescriptionRules(false)
@@ -221,7 +220,7 @@ const StudyCard = ({
               }}
               data-cy="edit-name-field"
               error={isStudyNameInvalid}
-              helperText={isStudyNameInvalid ? (studyNameRule.pattern?.message as string) : ''}
+              helperText={isStudyNameInvalid ? (STUDYNAME_RULE.pattern?.message as string) : ''}
             ></TextField>
             <Button
               disabled={isStudyNameInvalid}
@@ -415,9 +414,8 @@ const StudiesPage = () => {
   const [newStudyDialogOpen, setNewStudyDialogOpen] = useState(false)
   const [newStudyName, setNewStudyName] = useState('')
 
-  const studyNameRule = studyNameRules(true)
   const isNewStudyNameInvalid = Boolean(
-    newStudyName && studyNameRule.pattern && !studyNameRule.pattern.value.test(newStudyName),
+    newStudyName && STUDYNAME_RULE.pattern && !STUDYNAME_RULE.pattern.value.test(newStudyName),
   )
   const queryClient = useQueryClient()
 
@@ -456,7 +454,7 @@ const StudiesPage = () => {
               onChange={(e) => setNewStudyName(e.target.value)}
               data-cy="study-name"
               error={isNewStudyNameInvalid}
-              helperText={isNewStudyNameInvalid ? (studyNameRule.pattern?.message as string) : ''}
+              helperText={isNewStudyNameInvalid ? (STUDYNAME_RULE.pattern?.message as string) : ''}
             />
             <Stack direction="row" justifyContent="space-between">
               <Button
