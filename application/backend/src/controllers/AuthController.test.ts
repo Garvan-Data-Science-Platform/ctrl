@@ -1,4 +1,5 @@
 import request from 'supertest'
+import { inspect } from 'node:util'
 import { Api } from '../Api'
 import type {
   LoginRequest,
@@ -45,6 +46,8 @@ describe('AuthController', () => {
   beforeEach(async () => {
     await resetDB()
   })
+
+  afterEach(() => jest.restoreAllMocks())
 
   afterAll(async () => {
     api.stop()
@@ -335,6 +338,45 @@ describe('AuthController', () => {
         Number: { message: 'Invalid value provided' },
         CommonBase: { message: 'Invalid value provided' },
       })
+    })
+
+    it('should not log the weak word matched in a rejected password', async () => {
+      const logSpy = jest.spyOn(console, 'log')
+      const participantInviteId = await prisma.invite.findFirstOrThrow({
+        where: {
+          email: registerParticipantRequestBase.email,
+          studyId: 1,
+        },
+      })
+
+      const response = await request(app)
+        .post(`/auth/register/participants/${participantInviteId.id}`)
+        .send({ ...registerParticipantRequestBase, password: 'Monkeybusiness2026' })
+      expect(response.status).toEqual(422)
+      expect(response.body.details).toEqual({ CommonBase: { message: 'Invalid value provided' } })
+
+      const logged = logSpy.mock.calls.flat().map((arg) => inspect(arg, { depth: null }))
+      expect(logged.join('\n').toLowerCase()).not.toContain('monkey')
+      expect(logged.join('\n')).toContain('Password does not meet strength requirements')
+    })
+
+    it('should not log a password rejected by request validation', async () => {
+      const logSpy = jest.spyOn(console, 'log')
+      const participantInviteId = await prisma.invite.findFirstOrThrow({
+        where: {
+          email: registerParticipantRequestBase.email,
+          studyId: 1,
+        },
+      })
+
+      // Under 14 characters, so the generated route rejects it before the controller runs
+      const response = await request(app)
+        .post(`/auth/register/participants/${participantInviteId.id}`)
+        .send({ ...registerParticipantRequestBase, password: 'Mk9Zebra' })
+      expect(response.status).toEqual(422)
+
+      const logged = logSpy.mock.calls.flat().map((arg) => inspect(arg, { depth: null }))
+      expect(logged.join('\n').toLowerCase()).not.toContain('zebra')
     })
 
     it('should fail validation if provided with empty values', async () => {

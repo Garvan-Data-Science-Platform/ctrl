@@ -1,4 +1,5 @@
 import request from 'supertest'
+import { inspect } from 'node:util'
 import { Api } from '../Api'
 import prisma from '../PrismaClient'
 import { resetDB } from 'common/testing/TestHelpers'
@@ -37,6 +38,8 @@ describe('UsersController', () => {
     await resetDB()
     mockNodeMailer.mock.reset()
   })
+
+  afterEach(() => jest.restoreAllMocks())
 
   afterAll(async () => {
     api.stop()
@@ -662,6 +665,20 @@ describe('UsersController', () => {
 
       expect(response.status).toBe(422)
       expect(response.body.message).toBe('Validation Failed')
+    })
+
+    it('should not log the weak word matched in a rejected new password', async () => {
+      const logSpy = jest.spyOn(console, 'log')
+      const requestBody: ResetPasswordRequest = {
+        token: resetToken,
+        newPassword: 'Monkeybusiness2026',
+      }
+
+      const response = await request(app).post('/users/password/reset').send(requestBody)
+      expect(response.status).toBe(422)
+
+      const logged = logSpy.mock.calls.flat().map((arg) => inspect(arg, { depth: null }))
+      expect(logged.join('\n').toLowerCase()).not.toContain('monkey')
     })
   })
   describe('GET /users/admin/deleted', () => {

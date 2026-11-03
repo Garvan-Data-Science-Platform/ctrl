@@ -1,4 +1,4 @@
-import { commonPasswordBaseWords } from '../testing/constants'
+import { commonPasswordBaseWords } from './commonPasswordBaseWords'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface FieldErrors {
@@ -15,14 +15,17 @@ interface PasswordStrengthResult {
 
 export function checkPasswordStrength(password: string): PasswordStrengthResult {
   const fields: FieldErrors = {}
-  const baseWordRegex = new RegExp(commonPasswordBaseWords.join('|'), 'i')
+  // Escape regex characters so each entry matches as plain text
+  const escapedWords = commonPasswordBaseWords.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+  const baseWordRegex = new RegExp(escapedWords.join('|'), 'i')
 
   if (password.length < 14) {
     fields.Length = { message: 'Password must be at least 14 characters' }
   }
-  if (baseWordRegex.test(password)) {
+  const commonMatch = password.match(baseWordRegex)
+  if (commonMatch) {
     fields.CommonBase = {
-      message: `Password must not contain easily guessable words (i.e. ${commonPasswordBaseWords.join(', ')})`,
+      message: `Password contains a commonly used weak pattern: "${commonMatch[0]}". Please choose something less predictable.`,
     }
   }
   if (!/[A-Z]/.test(password)) {

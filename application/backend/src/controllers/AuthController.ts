@@ -46,6 +46,7 @@ import {
   IncorrectPermissionsError,
   InvalidCredentialsError,
   NotFoundError,
+  sanitiseFieldErrors,
   UnprocessableError,
 } from '../middlewares/ErrorHandler'
 import { ParticipantType } from 'common/types/api/users/ParticipantProfile'
@@ -86,7 +87,10 @@ export class AuthController extends Controller {
     const { isValid, fields } = await checkPasswordStrength(password)
 
     if (!isValid) {
-      throw new ValidateError(fields, 'Password does not meet strength requirements')
+      throw new ValidateError(
+        sanitiseFieldErrors(fields),
+        'Password does not meet strength requirements',
+      )
     }
 
     const hashedPassword = await hashPassword(password)
@@ -148,7 +152,10 @@ export class AuthController extends Controller {
     const { isValid, fields } = await checkPasswordStrength(password)
 
     if (!isValid) {
-      throw new ValidateError(fields, 'Password does not meet strength requirements')
+      throw new ValidateError(
+        sanitiseFieldErrors(fields),
+        'Password does not meet strength requirements',
+      )
     }
 
     const existingUsers = await this.userRepo.count()
@@ -216,7 +223,10 @@ export class AuthController extends Controller {
     // Check and hash Password
     const { isValid, fields } = await checkPasswordStrength(password)
     if (!isValid) {
-      throw new ValidateError(fields, 'Password does not meet strength requirements')
+      throw new ValidateError(
+        sanitiseFieldErrors(fields),
+        'Password does not meet strength requirements',
+      )
     }
     const hashedPassword = await hashPassword(password)
 
