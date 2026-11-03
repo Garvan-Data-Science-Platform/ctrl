@@ -118,13 +118,13 @@ export const REDCAPTOKEN_RULE = {
   },
 }
 
-export const redcapFormRules = (required = true) => ({
-  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
+export const REDCAPFORM_RULE = {
+  required: VALIDATION_MESSAGES.REQUIRED,
   pattern: {
     value: REGEX.REDCAP_FORM,
     message: VALIDATION_MESSAGES.REDCAP_FORM_INVALID,
   },
-})
+}
 
 export const inviteEmailSubjectRules = (required = true) => ({
   required: required ? VALIDATION_MESSAGES.REQUIRED : false,

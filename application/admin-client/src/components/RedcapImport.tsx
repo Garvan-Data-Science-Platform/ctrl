@@ -19,7 +19,7 @@ import { useNotification, useBack } from '@refinedev/core'
 import { Link } from 'react-router'
 import { useCurrentStudyId, useStudyStore } from '../studyStore'
 import { RedcapLogo } from './RedcapLogo'
-import { redcapFormRules } from '@common/src/validation'
+import { REDCAPFORM_RULE } from '@common/src/validation'
 
 interface RedcapImportProps {
   type: 'survey' | 'participant'
@@ -95,9 +95,8 @@ export const RedcapImport = ({
     }
   }, [studies, studyId])
 
-  const redcapFormRule = redcapFormRules(true)
   const isRedcapFormInvalid = Boolean(
-    formName && redcapFormRule.pattern && !redcapFormRule.pattern.value.test(formName),
+    formName && REDCAPFORM_RULE.pattern && !REDCAPFORM_RULE.pattern.value.test(formName),
   )
 
   return (
@@ -258,7 +257,7 @@ export const RedcapImport = ({
                     data-cy="formName"
                     error={isRedcapFormInvalid}
                     helperText={
-                      isRedcapFormInvalid ? (redcapFormRule.pattern?.message as string) : ''
+                      isRedcapFormInvalid ? (REDCAPFORM_RULE.pattern?.message as string) : ''
                     }
                   />
                 )}
