@@ -30,7 +30,7 @@ import {
   URL_OPTIONAL_RULE,
   STUDYNAME_RULE,
   STUDYDESCRIPTION_RULE,
-  redcapTokenRules,
+  REDCAPTOKEN_RULE,
 } from '@common/src/validation'
 
 const StudyCard = ({
@@ -131,9 +131,8 @@ const StudyCard = ({
     newDesc && STUDYDESCRIPTION_RULE.pattern && !STUDYDESCRIPTION_RULE.pattern.value.test(newDesc),
   )
 
-  const redcapTokenRule = redcapTokenRules(false)
   const isRedcapTokenInvalid = Boolean(
-    redcapToken && redcapTokenRule.pattern && !redcapTokenRule.pattern.value.test(redcapToken),
+    redcapToken && REDCAPTOKEN_RULE.pattern && !REDCAPTOKEN_RULE.pattern.value.test(redcapToken),
   )
 
   const handleSettingsApply = () => {
@@ -355,7 +354,7 @@ const StudyCard = ({
                 error={isRedcapTokenInvalid}
                 helperText={
                   isRedcapTokenInvalid
-                    ? (redcapTokenRule.pattern?.message as string)
+                    ? (REDCAPTOKEN_RULE.pattern?.message as string)
                     : study.hasRedcapToken
                       ? 'A token has been saved. Enter a new value to overwrite it.'
                       : 'No token has been saved.'

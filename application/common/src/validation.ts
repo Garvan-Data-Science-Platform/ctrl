@@ -110,13 +110,13 @@ export const STUDYDESCRIPTION_RULE = {
   },
 }
 
-export const redcapTokenRules = (required = true) => ({
-  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
+export const REDCAPTOKEN_RULE = {
+  required: VALIDATION_MESSAGES.REQUIRED,
   pattern: {
     value: REGEX.REDCAP_TOKEN,
     message: VALIDATION_MESSAGES.REDCAP_TOKEN_INVALID,
   },
-})
+}
 
 export const redcapFormRules = (required = true) => ({
   required: required ? VALIDATION_MESSAGES.REQUIRED : false,
