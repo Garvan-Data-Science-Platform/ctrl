@@ -39,6 +39,8 @@ describe('UsersController', () => {
     mockNodeMailer.mock.reset()
   })
 
+  afterEach(() => jest.restoreAllMocks())
+
   afterAll(async () => {
     api.stop()
   })
@@ -677,7 +679,6 @@ describe('UsersController', () => {
 
       const logged = logSpy.mock.calls.flat().map((arg) => inspect(arg, { depth: null }))
       expect(logged.join('\n').toLowerCase()).not.toContain('monkey')
-      logSpy.mockRestore()
     })
   })
   describe('GET /users/admin/deleted', () => {

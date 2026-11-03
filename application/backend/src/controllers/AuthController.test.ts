@@ -47,6 +47,8 @@ describe('AuthController', () => {
     await resetDB()
   })
 
+  afterEach(() => jest.restoreAllMocks())
+
   afterAll(async () => {
     api.stop()
   })
@@ -356,7 +358,6 @@ describe('AuthController', () => {
       const logged = logSpy.mock.calls.flat().map((arg) => inspect(arg, { depth: null }))
       expect(logged.join('\n').toLowerCase()).not.toContain('monkey')
       expect(logged.join('\n')).toContain('Password does not meet strength requirements')
-      logSpy.mockRestore()
     })
 
     it('should not log a password rejected by request validation', async () => {
@@ -376,7 +377,6 @@ describe('AuthController', () => {
 
       const logged = logSpy.mock.calls.flat().map((arg) => inspect(arg, { depth: null }))
       expect(logged.join('\n').toLowerCase()).not.toContain('zebra')
-      logSpy.mockRestore()
     })
 
     it('should fail validation if provided with empty values', async () => {
