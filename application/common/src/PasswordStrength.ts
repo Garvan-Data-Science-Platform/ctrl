@@ -15,7 +15,9 @@ interface PasswordStrengthResult {
 
 export function checkPasswordStrength(password: string): PasswordStrengthResult {
   const fields: FieldErrors = {}
-  const baseWordRegex = new RegExp(commonPasswordBaseWords.join('|'), 'i')
+  // Escape regex characters so each entry matches as plain text
+  const escapedWords = commonPasswordBaseWords.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+  const baseWordRegex = new RegExp(escapedWords.join('|'), 'i')
 
   if (password.length < 14) {
     fields.Length = { message: 'Password must be at least 14 characters' }
