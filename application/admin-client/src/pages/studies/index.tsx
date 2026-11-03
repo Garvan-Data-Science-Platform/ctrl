@@ -29,7 +29,7 @@ import {
   EMAIL_RULE,
   URL_OPTIONAL_RULE,
   STUDYNAME_RULE,
-  studyDescriptionRules,
+  STUDYDESCRIPTION_RULE,
   redcapTokenRules,
 } from '@common/src/validation'
 
@@ -127,9 +127,8 @@ const StudyCard = ({
     newName && STUDYNAME_RULE.pattern && !STUDYNAME_RULE.pattern.value.test(newName),
   )
 
-  const studyDescriptionRule = studyDescriptionRules(false)
   const isStudyDescriptionInvalid = Boolean(
-    newDesc && studyDescriptionRule.pattern && !studyDescriptionRule.pattern.value.test(newDesc),
+    newDesc && STUDYDESCRIPTION_RULE.pattern && !STUDYDESCRIPTION_RULE.pattern.value.test(newDesc),
   )
 
   const redcapTokenRule = redcapTokenRules(false)
@@ -260,7 +259,7 @@ const StudyCard = ({
               data-cy="edit-description-field"
               error={isStudyDescriptionInvalid}
               helperText={
-                isStudyDescriptionInvalid ? (studyDescriptionRule.pattern?.message as string) : ''
+                isStudyDescriptionInvalid ? (STUDYDESCRIPTION_RULE.pattern?.message as string) : ''
               }
             ></TextField>
             <Button
