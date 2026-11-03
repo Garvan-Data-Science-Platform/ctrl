@@ -19,7 +19,7 @@ import {
   EMAIL_RULE,
   EXTERNALID_RULE,
   INVITE_EMAIL_SUBJECT_RULE,
-  inviteEmailTextRules,
+  INVITE_EMAIL_TEXT_RULE,
 } from '@common/src/validation'
 import { useNotification } from '@refinedev/core'
 
@@ -30,8 +30,6 @@ interface InviteModalProps {
 }
 
 export function InviteModal({ onSend, onCancel, initialRecipients = [] }: InviteModalProps) {
-  const inviteEmailTextRule = inviteEmailTextRules(true)
-
   // helper for filtering arrays and pasting
   const isEmailValidHelper = (email: string) =>
     EMAIL_RULE.pattern ? EMAIL_RULE.pattern.value.test(email) : false
@@ -58,7 +56,7 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
     INVITE_EMAIL_SUBJECT_RULE.pattern && !INVITE_EMAIL_SUBJECT_RULE.pattern.value.test(emailTitle),
   )
   const isInviteEmailTextInvalid = Boolean(
-    inviteEmailTextRule.pattern && !inviteEmailTextRule.pattern.value.test(emailText),
+    INVITE_EMAIL_TEXT_RULE.pattern && !INVITE_EMAIL_TEXT_RULE.pattern.value.test(emailText),
   )
 
   const handleAdd = () => {
@@ -259,7 +257,7 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
           data-cy="email-text"
           error={isInviteEmailTextInvalid}
           helperText={
-            isInviteEmailTextInvalid ? (inviteEmailTextRule.pattern?.message as string) : ''
+            isInviteEmailTextInvalid ? (INVITE_EMAIL_TEXT_RULE.pattern?.message as string) : ''
           }
         />
         <Box sx={{ mt: 2, justifyContent: 'space-between', display: 'flex', flexDirection: 'row' }}>

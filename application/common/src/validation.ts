@@ -134,13 +134,13 @@ export const INVITE_EMAIL_SUBJECT_RULE = {
   },
 }
 
-export const inviteEmailTextRules = (required = true) => ({
-  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
+export const INVITE_EMAIL_TEXT_RULE = {
+  required: VALIDATION_MESSAGES.REQUIRED,
   pattern: {
     value: REGEX.INVITE_EMAIL,
     message: VALIDATION_MESSAGES.INVITE_EMAIL_TEXT_INVALID,
   },
-})
+}
 
 // default not required
 export const cssColourRules = (required = false) => ({
