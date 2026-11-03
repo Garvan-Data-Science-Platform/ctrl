@@ -29,8 +29,8 @@ import { useShow, useUpdate, useNavigation, useNotification } from '@refinedev/c
 import { useCurrentStudyId } from '../../studyStore'
 import { useParams } from 'react-router'
 import {
-  stepDescriptionRules,
   STEP_TITLE_RULE,
+  STEP_DESCRIPTION_RULE,
   surveyElementRules,
   URL_REQUIRED_RULE,
   VALIDATION_MESSAGES,
@@ -88,7 +88,6 @@ export const SurveyEditor = () => {
 
   const disabled = queryData?.data.status != 'DRAFT'
 
-  const stepDescriptionRule = stepDescriptionRules(true)
   const surveyElementRequiredRule = surveyElementRules(true)
   const surveyElementOptionalRule = surveyElementRules(false)
 
@@ -101,8 +100,8 @@ export const SurveyEditor = () => {
 
   const isStepDescriptionInvalid = Boolean(
     currentStep?.text &&
-      stepDescriptionRule.pattern &&
-      !stepDescriptionRule.pattern.value.test(currentStep?.text),
+      STEP_DESCRIPTION_RULE.pattern &&
+      !STEP_DESCRIPTION_RULE.pattern.value.test(currentStep?.text),
   )
 
   const invalidSteps = useMemo(() => {
@@ -116,7 +115,7 @@ export const SurveyEditor = () => {
 
     return surveyData.reduce((invalidIndicies: number[], step, index) => {
       const stepLevelInvalid =
-        checkInvalid(step.title, STEP_TITLE_RULE) || checkInvalid(step.text, stepDescriptionRule)
+        checkInvalid(step.title, STEP_TITLE_RULE) || checkInvalid(step.text, STEP_DESCRIPTION_RULE)
 
       if (stepLevelInvalid) {
         invalidIndicies.push(index)
@@ -160,7 +159,7 @@ export const SurveyEditor = () => {
   }, [
     surveyData,
     STEP_TITLE_RULE,
-    stepDescriptionRule,
+    STEP_DESCRIPTION_RULE,
     surveyElementRequiredRule,
     surveyElementOptionalRule,
     URL_REQUIRED_RULE,
@@ -370,7 +369,7 @@ export const SurveyEditor = () => {
               data-cy="step-description"
               error={isStepDescriptionInvalid}
               helperText={
-                isStepDescriptionInvalid ? (stepDescriptionRule.pattern?.message as string) : ''
+                isStepDescriptionInvalid ? (STEP_DESCRIPTION_RULE.pattern?.message as string) : ''
               }
               onChange={(e) => updateStepField(activeStep, 'text', e.target.value)}
               value={surveyData[activeStep].text}

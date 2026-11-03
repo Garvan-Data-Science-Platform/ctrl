@@ -159,7 +159,7 @@ export const STEP_TITLE_RULE = {
   },
 }
 
-export const stepDescriptionRules = {
+export const STEP_DESCRIPTION_RULE = {
   required: VALIDATION_MESSAGES.REQUIRED,
   pattern: {
     value: REGEX.SURVEY_ELEMENT_REQUIRED,
@@ -175,6 +175,7 @@ export const surveyElementRequiredRules = {
   },
 }
 
+// Note: no `required` as this is optional
 export const surveyElementOptionalRules = {
   pattern: {
     value: REGEX.SURVEY_ELEMENT_OPTIONAL,
