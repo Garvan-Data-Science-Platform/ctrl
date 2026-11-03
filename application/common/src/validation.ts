@@ -94,7 +94,7 @@ export const URL_OPTIONAL_RULE = {
   },
 }
 
-export const STUDYNAME_RULE = {
+export const STUDY_NAME_RULE = {
   required: VALIDATION_MESSAGES.REQUIRED,
   pattern: {
     value: REGEX.STUDY_NAME,
@@ -102,7 +102,7 @@ export const STUDYNAME_RULE = {
   },
 }
 
-export const STUDYDESCRIPTION_RULE = {
+export const STUDY_DESCRIPTION_RULE = {
   required: VALIDATION_MESSAGES.REQUIRED,
   pattern: {
     value: REGEX.STUDY_DESCRIPTION,
@@ -110,7 +110,7 @@ export const STUDYDESCRIPTION_RULE = {
   },
 }
 
-export const REDCAPTOKEN_RULE = {
+export const REDCAP_TOKEN_RULE = {
   required: VALIDATION_MESSAGES.REQUIRED,
   pattern: {
     value: REGEX.REDCAP_TOKEN,
@@ -118,7 +118,7 @@ export const REDCAPTOKEN_RULE = {
   },
 }
 
-export const REDCAPFORM_RULE = {
+export const REDCAP_FORM_RULE = {
   required: VALIDATION_MESSAGES.REQUIRED,
   pattern: {
     value: REGEX.REDCAP_FORM,
@@ -126,13 +126,13 @@ export const REDCAPFORM_RULE = {
   },
 }
 
-export const inviteEmailSubjectRules = (required = true) => ({
-  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
+export const INVITE_EMAIL_SUBJECT_RULE = {
+  required: VALIDATION_MESSAGES.REQUIRED,
   pattern: {
     value: REGEX.INVITE_EMAIL,
     message: VALIDATION_MESSAGES.INVITE_EMAIL_SUBJECT_INVALID,
   },
-})
+}
 
 export const inviteEmailTextRules = (required = true) => ({
   required: required ? VALIDATION_MESSAGES.REQUIRED : false,

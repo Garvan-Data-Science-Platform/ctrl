@@ -18,7 +18,7 @@ import { useCurrentStudyId } from '../studyStore'
 import {
   EMAIL_RULE,
   EXTERNALID_RULE,
-  inviteEmailSubjectRules,
+  INVITE_EMAIL_SUBJECT_RULE,
   inviteEmailTextRules,
 } from '@common/src/validation'
 import { useNotification } from '@refinedev/core'
@@ -30,7 +30,6 @@ interface InviteModalProps {
 }
 
 export function InviteModal({ onSend, onCancel, initialRecipients = [] }: InviteModalProps) {
-  const inviteEmailSubjectRule = inviteEmailSubjectRules(true)
   const inviteEmailTextRule = inviteEmailTextRules(true)
 
   // helper for filtering arrays and pasting
@@ -56,7 +55,7 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
     idFieldValue && EXTERNALID_RULE.pattern && !EXTERNALID_RULE.pattern.value.test(idFieldValue),
   )
   const isInviteEmailSubjectInvalid = Boolean(
-    inviteEmailSubjectRule.pattern && !inviteEmailSubjectRule.pattern.value.test(emailTitle),
+    INVITE_EMAIL_SUBJECT_RULE.pattern && !INVITE_EMAIL_SUBJECT_RULE.pattern.value.test(emailTitle),
   )
   const isInviteEmailTextInvalid = Boolean(
     inviteEmailTextRule.pattern && !inviteEmailTextRule.pattern.value.test(emailText),
@@ -243,7 +242,9 @@ export function InviteModal({ onSend, onCancel, initialRecipients = [] }: Invite
           data-cy="email-subject"
           error={isInviteEmailSubjectInvalid}
           helperText={
-            isInviteEmailSubjectInvalid ? (inviteEmailSubjectRule.pattern?.message as string) : ''
+            isInviteEmailSubjectInvalid
+              ? (INVITE_EMAIL_SUBJECT_RULE.pattern?.message as string)
+              : ''
           }
         />
         <TextField

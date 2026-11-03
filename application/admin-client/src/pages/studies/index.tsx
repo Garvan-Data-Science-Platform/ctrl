@@ -28,9 +28,9 @@ import { RESOURCES } from '../../constants'
 import {
   EMAIL_RULE,
   URL_OPTIONAL_RULE,
-  STUDYNAME_RULE,
-  STUDYDESCRIPTION_RULE,
-  REDCAPTOKEN_RULE,
+  STUDY_NAME_RULE,
+  STUDY_DESCRIPTION_RULE,
+  REDCAP_TOKEN_RULE,
 } from '@common/src/validation'
 
 const StudyCard = ({
@@ -124,15 +124,17 @@ const StudyCard = ({
   )
 
   const isStudyNameInvalid = Boolean(
-    newName && STUDYNAME_RULE.pattern && !STUDYNAME_RULE.pattern.value.test(newName),
+    newName && STUDY_NAME_RULE.pattern && !STUDY_NAME_RULE.pattern.value.test(newName),
   )
 
   const isStudyDescriptionInvalid = Boolean(
-    newDesc && STUDYDESCRIPTION_RULE.pattern && !STUDYDESCRIPTION_RULE.pattern.value.test(newDesc),
+    newDesc &&
+      STUDY_DESCRIPTION_RULE.pattern &&
+      !STUDY_DESCRIPTION_RULE.pattern.value.test(newDesc),
   )
 
   const isRedcapTokenInvalid = Boolean(
-    redcapToken && REDCAPTOKEN_RULE.pattern && !REDCAPTOKEN_RULE.pattern.value.test(redcapToken),
+    redcapToken && REDCAP_TOKEN_RULE.pattern && !REDCAP_TOKEN_RULE.pattern.value.test(redcapToken),
   )
 
   const handleSettingsApply = () => {
@@ -218,7 +220,7 @@ const StudyCard = ({
               }}
               data-cy="edit-name-field"
               error={isStudyNameInvalid}
-              helperText={isStudyNameInvalid ? (STUDYNAME_RULE.pattern?.message as string) : ''}
+              helperText={isStudyNameInvalid ? (STUDY_NAME_RULE.pattern?.message as string) : ''}
             ></TextField>
             <Button
               disabled={isStudyNameInvalid}
@@ -258,7 +260,7 @@ const StudyCard = ({
               data-cy="edit-description-field"
               error={isStudyDescriptionInvalid}
               helperText={
-                isStudyDescriptionInvalid ? (STUDYDESCRIPTION_RULE.pattern?.message as string) : ''
+                isStudyDescriptionInvalid ? (STUDY_DESCRIPTION_RULE.pattern?.message as string) : ''
               }
             ></TextField>
             <Button
@@ -354,7 +356,7 @@ const StudyCard = ({
                 error={isRedcapTokenInvalid}
                 helperText={
                   isRedcapTokenInvalid
-                    ? (REDCAPTOKEN_RULE.pattern?.message as string)
+                    ? (REDCAP_TOKEN_RULE.pattern?.message as string)
                     : study.hasRedcapToken
                       ? 'A token has been saved. Enter a new value to overwrite it.'
                       : 'No token has been saved.'
@@ -413,7 +415,7 @@ const StudiesPage = () => {
   const [newStudyName, setNewStudyName] = useState('')
 
   const isNewStudyNameInvalid = Boolean(
-    newStudyName && STUDYNAME_RULE.pattern && !STUDYNAME_RULE.pattern.value.test(newStudyName),
+    newStudyName && STUDY_NAME_RULE.pattern && !STUDY_NAME_RULE.pattern.value.test(newStudyName),
   )
   const queryClient = useQueryClient()
 
@@ -452,7 +454,7 @@ const StudiesPage = () => {
               onChange={(e) => setNewStudyName(e.target.value)}
               data-cy="study-name"
               error={isNewStudyNameInvalid}
-              helperText={isNewStudyNameInvalid ? (STUDYNAME_RULE.pattern?.message as string) : ''}
+              helperText={isNewStudyNameInvalid ? (STUDY_NAME_RULE.pattern?.message as string) : ''}
             />
             <Stack direction="row" justifyContent="space-between">
               <Button
