@@ -30,7 +30,7 @@ import { useCurrentStudyId } from '../../studyStore'
 import { useParams } from 'react-router'
 import {
   stepDescriptionRules,
-  stepTitleRules,
+  STEP_TITLE_RULE,
   surveyElementRules,
   URL_REQUIRED_RULE,
   VALIDATION_MESSAGES,
@@ -88,7 +88,6 @@ export const SurveyEditor = () => {
 
   const disabled = queryData?.data.status != 'DRAFT'
 
-  const stepTitleRule = stepTitleRules(true)
   const stepDescriptionRule = stepDescriptionRules(true)
   const surveyElementRequiredRule = surveyElementRules(true)
   const surveyElementOptionalRule = surveyElementRules(false)
@@ -96,8 +95,8 @@ export const SurveyEditor = () => {
   const currentStep = surveyData[activeStep]
   const isStepTitleInvalid = Boolean(
     currentStep?.title &&
-      stepTitleRule.pattern &&
-      !stepTitleRule.pattern.value.test(currentStep?.title),
+      STEP_TITLE_RULE.pattern &&
+      !STEP_TITLE_RULE.pattern.value.test(currentStep?.title),
   )
 
   const isStepDescriptionInvalid = Boolean(
@@ -117,7 +116,7 @@ export const SurveyEditor = () => {
 
     return surveyData.reduce((invalidIndicies: number[], step, index) => {
       const stepLevelInvalid =
-        checkInvalid(step.title, stepTitleRule) || checkInvalid(step.text, stepDescriptionRule)
+        checkInvalid(step.title, STEP_TITLE_RULE) || checkInvalid(step.text, stepDescriptionRule)
 
       if (stepLevelInvalid) {
         invalidIndicies.push(index)
@@ -160,7 +159,7 @@ export const SurveyEditor = () => {
     }, [])
   }, [
     surveyData,
-    stepTitleRule,
+    STEP_TITLE_RULE,
     stepDescriptionRule,
     surveyElementRequiredRule,
     surveyElementOptionalRule,
@@ -358,7 +357,7 @@ export const SurveyEditor = () => {
               label="Title"
               data-cy="step-title"
               error={isStepTitleInvalid}
-              helperText={isStepTitleInvalid ? (stepTitleRule.pattern?.message as string) : ''}
+              helperText={isStepTitleInvalid ? (STEP_TITLE_RULE.pattern?.message as string) : ''}
               onChange={(e) => updateStepField(activeStep, 'title', e.target.value)}
               value={surveyData[activeStep].title}
               disabled={disabled}

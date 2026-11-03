@@ -151,7 +151,7 @@ export const CSS_COLOUR_RULE = {
   },
 }
 
-export const stepTitleRules = {
+export const STEP_TITLE_RULE = {
   required: VALIDATION_MESSAGES.REQUIRED,
   pattern: {
     value: REGEX.SURVEY_ELEMENT_REQUIRED,
