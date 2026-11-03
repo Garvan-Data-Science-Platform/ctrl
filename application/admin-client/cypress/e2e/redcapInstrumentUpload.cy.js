@@ -209,7 +209,7 @@ describe('REDCap Survey Upload', () => {
       cy.contains('button', 'Yes, Overwrite').click()
 
       // Invalid content is flagged in UI
-      cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_INVALID).should('be.visible')
+      cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_REQUIRED_INVALID).should('be.visible')
     })
   })
 })

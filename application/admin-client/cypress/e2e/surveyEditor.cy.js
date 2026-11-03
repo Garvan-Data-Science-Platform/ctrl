@@ -31,9 +31,9 @@ describe('Survey Editor', () => {
     cy.contains('Mandatory').should('not.exist')
     cy.contains('Multi-choice').click()
     cy.get('[data-cy="choices-box"]').children('button').click().click()
-    cy.get('[data-cy="choices-box"]').children('div').should('have.length', 2)
+    cy.get('[data-cy="choices-box"]').children('div').should('have.length', 3) // Updated to 3 as Multichoice button now starts with an empty choice by default
     cy.get('[data-cy="choices-box"]').children('div').first().find('button').click()
-    cy.get('[data-cy="choices-box"]').children('div').should('have.length', 1)
+    cy.get('[data-cy="choices-box"]').children('div').should('have.length', 2)
     cy.contains('Subheading').click()
     //Move last element to start
     cy.get('[data-cy="drag-handle"]').last().trigger('dragstart')
@@ -154,7 +154,7 @@ describe('Survey Editor', () => {
         parseSpecialCharSequences: false,
       },
     )
-    cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_INVALID).should('exist')
+    cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_REQUIRED_INVALID).should('exist')
   })
 
   it('Invalid xss in checkbox-question-tooltip shows appropriate error messages', () => {
@@ -168,7 +168,7 @@ describe('Survey Editor', () => {
         parseSpecialCharSequences: false,
       },
     )
-    cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_INVALID).should('exist')
+    cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_OPTIONAL_INVALID).should('exist')
   })
 
   it('Invalid xss in video-url shows appropriate error messages', () => {
@@ -193,7 +193,7 @@ describe('Survey Editor', () => {
         parseSpecialCharSequences: false,
       },
     )
-    cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_INVALID).should('exist')
+    cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_REQUIRED_INVALID).should('exist')
   })
 
   it('Invalid xss in choice-question-text shows appropriate error messages', () => {
@@ -206,7 +206,7 @@ describe('Survey Editor', () => {
         parseSpecialCharSequences: false,
       },
     )
-    cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_INVALID).should('exist')
+    cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_REQUIRED_INVALID).should('exist')
   })
 
   it('Invalid xss in choice-question-tooltip shows appropriate error messages', () => {
@@ -220,18 +220,20 @@ describe('Survey Editor', () => {
         parseSpecialCharSequences: false,
       },
     )
-    cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_INVALID).should('exist')
+    cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_OPTIONAL_INVALID).should('exist')
   })
 
   it('Invalid xss in choice-text shows appropriate error messages', () => {
     cy.visit('/surveys')
     cy.visit('/surveys/edit/2')
     cy.contains('Multi-choice').click()
-    cy.get('[data-cy="choices-box"]').children('button').first().click()
-    cy.get('[data-cy="choice-text"]').type("{{7*7}}<script>alert('xss-choice-text')</script>", {
-      parseSpecialCharSequences: false,
-    })
-    cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_INVALID).should('exist')
+    cy.get('[data-cy="choice-text"]')
+      .first()
+      .find('input')
+      .type("{{7*7}}<script>alert('xss-choice-text')</script>", {
+        parseSpecialCharSequences: false,
+      })
+    cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_REQUIRED_INVALID).should('exist')
   })
 
   it('Invalid text disables publish button, blocks autosave, and shows error with tooltip in Survey Step pane', () => {
