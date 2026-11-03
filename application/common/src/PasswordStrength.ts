@@ -1,4 +1,4 @@
-import { commonPasswordBaseWords } from '../testing/constants'
+import { commonPasswordBaseWords } from './commonPasswordBaseWords'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface FieldErrors {
