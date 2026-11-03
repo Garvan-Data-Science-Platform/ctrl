@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router'
 import { axiosInstance } from '../../providers/dataProvider'
 import { Info } from '@mui/icons-material'
 import { LogoUploader } from '../../components/LogoUploader'
-import { cssColourRules, URL_OPTIONAL_RULE, URL_REQUIRED_RULE } from '@common/src/validation'
+import { CSS_COLOUR_RULE, URL_OPTIONAL_RULE, URL_REQUIRED_RULE } from '@common/src/validation'
 import { RESOURCES } from '../../constants'
 
 const SettingsPage = () => {
@@ -118,7 +118,7 @@ const SettingsPage = () => {
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <TextField
             {...register('primaryColour', {
-              ...cssColourRules(), // validate via REGEX
+              ...CSS_COLOUR_RULE, // validate via REGEX
               validate: (val) => {
                 // validate via DOM
                 if (!isCssColourOrEmpty(val)) {
@@ -143,7 +143,7 @@ const SettingsPage = () => {
           />
           <TextField
             {...register('secondaryColour', {
-              ...cssColourRules(), // validate via regex
+              ...CSS_COLOUR_RULE, // validate via regex
               validate: (val) => {
                 // validate via DOM
                 if (!isCssColourOrEmpty(val)) {

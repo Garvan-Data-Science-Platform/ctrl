@@ -143,13 +143,13 @@ export const INVITE_EMAIL_TEXT_RULE = {
 }
 
 // default not required
-export const cssColourRules = (required = false) => ({
-  required: required ? VALIDATION_MESSAGES.REQUIRED : false,
+export const CSS_COLOUR_RULE = {
+  required: VALIDATION_MESSAGES.REQUIRED,
   pattern: {
     value: REGEX.CSS_COLOUR,
     message: VALIDATION_MESSAGES.CSS_COLOUR_INVALID,
   },
-})
+}
 
 export const stepTitleRules = {
   required: VALIDATION_MESSAGES.REQUIRED,
