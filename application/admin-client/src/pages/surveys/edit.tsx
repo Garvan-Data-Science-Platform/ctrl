@@ -91,15 +91,17 @@ export const SurveyEditor = () => {
 
   const currentStep = surveyData[activeStep]
   const isStepTitleInvalid = Boolean(
-    currentStep?.title &&
-      STEP_TITLE_RULE.pattern &&
-      !STEP_TITLE_RULE.pattern.value.test(currentStep?.title),
+    (STEP_TITLE_RULE.required && !currentStep?.title) ||
+      (currentStep?.title &&
+        STEP_TITLE_RULE.pattern &&
+        !STEP_TITLE_RULE.pattern.value.test(currentStep?.title)),
   )
 
   const isStepDescriptionInvalid = Boolean(
-    currentStep?.text &&
-      STEP_DESCRIPTION_RULE.pattern &&
-      !STEP_DESCRIPTION_RULE.pattern.value.test(currentStep?.text),
+    (STEP_DESCRIPTION_RULE.required && !currentStep?.text) ||
+      (currentStep?.text &&
+        STEP_DESCRIPTION_RULE.pattern &&
+        !STEP_DESCRIPTION_RULE.pattern.value.test(currentStep?.text)),
   )
 
   const invalidSteps = useMemo(() => {
