@@ -121,7 +121,7 @@ describe('Survey Editor', () => {
     cy.contains('non-commercial').should('not.exist')
   })
 
-  it('Invalid xss in step-title shows appropriate error messages', () => {
+  it('Invalid xss or empty text in step-title shows appropriate error messages', () => {
     cy.visit('/surveys')
     cy.get('[data-rowindex="0"] [data-cy="edit-button"]').first().click()
     cy.wait(50)
@@ -129,9 +129,14 @@ describe('Survey Editor', () => {
       parseSpecialCharSequences: false,
     })
     cy.contains(VALIDATION_MESSAGES.STEP_TITLE_INVALID).should('exist')
+    // Empty text test
+    cy.get('[data-cy="step-title"] input').clear()
+    cy.contains(VALIDATION_MESSAGES.STEP_TITLE_INVALID).should('exist')
+    cy.get('[data-cy="step-title"] input').type('abc')
+    cy.contains(VALIDATION_MESSAGES.STEP_TITLE_INVALID).should('not.exist')
   })
 
-  it('Invalid xss in step-description shows appropriate error messages', () => {
+  it('Invalid xss or empty text in step-description shows appropriate error messages', () => {
     cy.visit('/surveys')
     cy.get('[data-rowindex="0"] [data-cy="edit-button"]').first().click()
     cy.wait(50)
@@ -142,9 +147,14 @@ describe('Survey Editor', () => {
       },
     )
     cy.contains(VALIDATION_MESSAGES.STEP_DESCRIPTION_INVALID).should('exist')
+    // Empty text test
+    cy.get('[data-cy="step-description"] textarea').first().clear()
+    cy.contains(VALIDATION_MESSAGES.STEP_DESCRIPTION_INVALID).should('exist')
+    cy.get('[data-cy="step-description"] textarea').first().type('abc')
+    cy.contains(VALIDATION_MESSAGES.STEP_DESCRIPTION_INVALID).should('not.exist')
   })
 
-  it('Invalid xss in checkbox-question-text shows appropriate error messages', () => {
+  it('Invalid xss or empty text in checkbox-question-text shows appropriate error messages', () => {
     cy.visit('/surveys')
     cy.visit('/surveys/edit/2')
     cy.contains('Checkbox').click()
@@ -155,6 +165,11 @@ describe('Survey Editor', () => {
       },
     )
     cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_REQUIRED_INVALID).should('exist')
+    // Empty text test
+    cy.get('[data-cy="checkbox-question-text"] textarea').first().clear()
+    cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_REQUIRED_INVALID).should('exist')
+    cy.get('[data-cy="checkbox-question-text"] textarea').first().type('abc')
+    cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_REQUIRED_INVALID).should('not.exist')
   })
 
   it('Invalid xss in checkbox-question-tooltip shows appropriate error messages', () => {
@@ -169,9 +184,12 @@ describe('Survey Editor', () => {
       },
     )
     cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_OPTIONAL_INVALID).should('exist')
+    // Empty text should not cause warning
+    cy.get('[data-cy="checkbox-question-tooltip"] textarea').first().clear()
+    cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_OPTIONAL_INVALID).should('not.exist')
   })
 
-  it('Invalid xss in video-url shows appropriate error messages', () => {
+  it('Invalid xss or empty text in video-url shows appropriate error messages', () => {
     cy.visit('/surveys')
     cy.visit('/surveys/edit/2')
     cy.get('[data-cy="video-url"]').type(
@@ -181,9 +199,14 @@ describe('Survey Editor', () => {
       },
     )
     cy.contains(VALIDATION_MESSAGES.URL_REQUIRED_INVALID).should('exist')
+    // Empty text test
+    cy.get('[data-cy="video-url"] textarea').first().clear()
+    cy.contains(VALIDATION_MESSAGES.URL_REQUIRED_INVALID).should('exist')
+    cy.get('[data-cy="video-url"] textarea').first().type('https://wiki.org')
+    cy.contains(VALIDATION_MESSAGES.URL_REQUIRED_INVALID).should('not.exist')
   })
 
-  it('Invalid xss in subheading-text shows appropriate error messages', () => {
+  it('Invalid xss or empty text in subheading-text shows appropriate error messages', () => {
     cy.visit('/surveys')
     cy.visit('/surveys/edit/2')
     cy.contains('Subheading').click()
@@ -194,9 +217,14 @@ describe('Survey Editor', () => {
       },
     )
     cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_REQUIRED_INVALID).should('exist')
+    // Empty text test
+    cy.get('[data-cy="subheading-text"] textarea').first().clear()
+    cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_REQUIRED_INVALID).should('exist')
+    cy.get('[data-cy="subheading-text"] textarea').first().type('abc')
+    cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_REQUIRED_INVALID).should('not.exist')
   })
 
-  it('Invalid xss in choice-question-text shows appropriate error messages', () => {
+  it('Invalid xss or empty text in choice-question-text shows appropriate error messages', () => {
     cy.visit('/surveys')
     cy.visit('/surveys/edit/2')
     cy.contains('Multi-choice').click()
@@ -207,6 +235,12 @@ describe('Survey Editor', () => {
       },
     )
     cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_REQUIRED_INVALID).should('exist')
+    // Empty text test
+    cy.get('[data-cy="choice-question-text"] textarea').first().clear()
+    cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_REQUIRED_INVALID).should('exist')
+    cy.get('[data-cy="choice-question-text"] textarea').first().type('abc')
+    cy.get('[data-cy="choice-text"]').first().find('input').type('question text')
+    cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_REQUIRED_INVALID).should('not.exist')
   })
 
   it('Invalid xss in choice-question-tooltip shows appropriate error messages', () => {
@@ -223,10 +257,11 @@ describe('Survey Editor', () => {
     cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_OPTIONAL_INVALID).should('exist')
   })
 
-  it('Invalid xss in choice-text shows appropriate error messages', () => {
+  it('Invalid xss or empty text in choice-text shows appropriate error messages', () => {
     cy.visit('/surveys')
     cy.visit('/surveys/edit/2')
     cy.contains('Multi-choice').click()
+    cy.get('[data-cy="choice-question-text"]').type('Consent question')
     cy.get('[data-cy="choice-text"]')
       .first()
       .find('input')
@@ -234,6 +269,11 @@ describe('Survey Editor', () => {
         parseSpecialCharSequences: false,
       })
     cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_REQUIRED_INVALID).should('exist')
+    // Empty text test
+    cy.get('[data-cy="choice-text"]').first().find('input').clear()
+    cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_REQUIRED_INVALID).should('exist')
+    cy.get('[data-cy="choice-text"]').first().find('input').type('abc')
+    cy.contains(VALIDATION_MESSAGES.SURVEY_ELEMENT_REQUIRED_INVALID).should('not.exist')
   })
 
   it('Invalid text disables publish button, blocks autosave, and shows error with tooltip in Survey Step pane', () => {
