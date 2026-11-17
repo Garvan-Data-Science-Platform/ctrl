@@ -1,13 +1,7 @@
+import type { OIDCProvider } from '../../oidc'
+
 export interface SetupResponse {
   isSetup: boolean
-  oidc: {
-    name: string
-    host: string
-    clientId: string
-    icon: string
-    displayInAdminPortal: boolean
-    displayInUserPortal: boolean
-    authorizeUrlParams: string
-  }[]
+  oidc: OIDCProvider[]
   disableAdminPasswordLogin: boolean
 }

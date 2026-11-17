@@ -45,6 +45,10 @@ export const TestUsers = {
     email: 'test-reset-password@example.com',
     password: 'Oldloginforuser1',
   },
+  // No account in the seeded data
+  UNREGISTERED: {
+    email: 'unregistered@example.com',
+  },
 }
 
 export const TestStudies = {
@@ -80,6 +84,30 @@ export const TestInvites = {
   },
   INVITE_EXPIRED: {
     email: 'invite@expired.com',
+  },
+}
+
+// OIDC login values. PROVIDER is the provider in application/backend/src/__mocks__/config.ts.
+export const TestOIDC = {
+  PROVIDER: {
+    name: 'test',
+    providerUrl: 'http://testurl',
+    clientId: 'testid',
+  },
+  ACR: {
+    REFEDS_MFA: 'https://refeds.org/profile/mfa',
+    REFEDS_SFA: 'https://refeds.org/profile/sfa',
+    PASSWORD_ONLY: 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport',
+  },
+  INSTITUTIONS: {
+    WITH_MFA: {
+      idp: 'https://idp.example.edu/idp/shibboleth',
+      idp_name: 'Example University',
+    },
+    WITHOUT_MFA: {
+      idp: 'https://idp.another.edu/idp/shibboleth',
+      idp_name: 'Another University',
+    },
   },
 }
 

@@ -42,6 +42,23 @@ const schema = {
           displayInAdminPortal: { type: 'boolean', default: true },
           displayInUserPortal: { type: 'boolean', default: true },
           authorizeUrlParams: { type: 'string', default: '' },
+          additionalScopes: {
+            type: 'array',
+            items: { type: 'string', minLength: 1 },
+          },
+          auditLogClaims: { type: 'boolean', default: true },
+          auditLogMfaWarning: {
+            type: 'object',
+            properties: {
+              acrValues: { type: 'array', items: { type: 'string', minLength: 1 }, minItems: 1 },
+              amrValues: { type: 'array', items: { type: 'string', minLength: 1 }, minItems: 1 },
+            },
+            anyOf: [
+              { type: 'object', required: ['acrValues'] },
+              { type: 'object', required: ['amrValues'] },
+            ],
+            additionalProperties: false,
+          },
         },
         required: ['name', 'providerUrl', 'icon', 'clientId', 'clientSecret'],
         additionalProperties: false,
@@ -79,6 +96,7 @@ const schema = {
 } as const
 
 export type Config = FromSchema<typeof schema>
+export type OIDCProviderConfig = NonNullable<Config['oidc']>[number]
 
 const dir = process.env['CONFIG_DIR']
 let config = {}

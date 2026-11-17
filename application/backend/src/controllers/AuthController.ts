@@ -50,13 +50,17 @@ import {
 } from '../middlewares/ErrorHandler'
 import { ParticipantType } from 'common/types/api/users/ParticipantProfile'
 import { createDefaultAnswers } from '../utils/answers'
-import { auditLog } from '../middlewares/AuditLog'
+import { auditLog, getAuditDetails } from '../middlewares/AuditLog'
 import config from '../config'
 import { randomInt } from 'node:crypto'
 import { SendMailOptions } from 'nodemailer'
 import { createMailerTransporter, fromAddress } from '../utils/mailer'
 import { genId, genIndId } from '../utils/genId'
 import { Prefill } from 'common/types/invite'
+import { hasMFASignal, readIdTokenClaims } from '../utils/oidcAudit'
+import type { OIDCAuditMeta } from 'common/types/oidc'
+
+const BASE_OIDC_SCOPES = ['openid', 'email', 'profile']
 
 @Route('auth')
 @Tags('Auth')
@@ -127,6 +131,7 @@ export class AuthController extends Controller {
         displayInAdminPortal: val.displayInAdminPortal,
         displayInUserPortal: val.displayInUserPortal,
         authorizeUrlParams: val.authorizeUrlParams,
+        scope: [...BASE_OIDC_SCOPES, ...(val.additionalScopes ?? [])].join(' '),
       })),
       disableAdminPasswordLogin: config.disableAdminPasswordLogin || false,
     }
@@ -278,6 +283,7 @@ export class AuthController extends Controller {
   @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
   public async loginOIDC(
     @Body() bodyRequest: OIDCLoginRequest,
+    @Request() request: express.Request,
     @Header('x-client-type') clientType?: string,
   ): Promise<LoginSuccessResponse> {
     if (!config.oidc) {
@@ -289,6 +295,11 @@ export class AuthController extends Controller {
     if (!oidc) {
       throw new Error('OIDC Provider not found')
     }
+
+    // Filled in as the login goes, so a failed login still records what was learnt
+    const audit = getAuditDetails(request)
+    const oidcAudit: OIDCAuditMeta = { provider: oidc.name }
+    audit.meta = { oidc: oidcAudit }
 
     const { clientId, clientSecret, providerUrl } = oidc
 
@@ -305,14 +316,35 @@ export class AuthController extends Controller {
     try {
       const oidc_data = await fetch(`${providerUrl}/.well-known/openid-configuration`)
 
-      const { token_endpoint, userinfo_endpoint } = await oidc_data.json()
+      const { issuer, token_endpoint, userinfo_endpoint } = await oidc_data.json()
 
       const token_res = await fetch(token_endpoint, {
         body,
         method: 'POST',
       })
 
-      const { access_token } = await token_res.json()
+      const { access_token, id_token } = await token_res.json()
+
+      const idTokenResult = readIdTokenClaims(id_token, {
+        issuer,
+        clientId,
+        nowSeconds: Math.floor(Date.now() / 1000),
+      })
+      let claims
+      if ('claims' in idTokenResult) {
+        claims = idTokenResult.claims
+        if (oidc.auditLogClaims !== false) {
+          oidcAudit.claims = claims
+        }
+      } else {
+        oidcAudit.claimsError = idTokenResult.claimsError
+        logger.warn(
+          `OIDC login via ${oidc.name} has no readable claims: ${idTokenResult.claimsError}`,
+        )
+      }
+      if (oidc.auditLogMfaWarning) {
+        oidcAudit.mfaSignal = hasMFASignal(claims, oidc.auditLogMfaWarning)
+      }
 
       const userinfo_res = await fetch(userinfo_endpoint, {
         body: new URLSearchParams({ access_token }),
@@ -328,6 +360,7 @@ export class AuthController extends Controller {
     if (!user) {
       throw new IncorrectPermissionsError('This email is not registered with CTRL.')
     }
+    audit.userId = user.id
 
     if (clientType === 'admin-client' && user.role === 'Participant') {
       throw new IncorrectPermissionsError('User does not have admin privileges')
@@ -351,6 +384,7 @@ export class AuthController extends Controller {
   @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
   public async login(
     @Body() bodyRequest: LoginRequest,
+    @Request() request: express.Request,
     @Header('x-client-type') clientType?: string,
   ): Promise<LoginResponse> {
     // Check if user exists and password matches
@@ -359,6 +393,8 @@ export class AuthController extends Controller {
     if (!user) {
       throw new InvalidCredentialsError('User not found')
     }
+    // Set before the checks below so failed attempts on an account are recorded against it too
+    getAuditDetails(request).userId = user.id
 
     if (user.lockedUntil && user.lockedUntil > new Date()) {
       throw new InvalidCredentialsError(
@@ -438,6 +474,7 @@ export class AuthController extends Controller {
   @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
   public async loginOtp(
     @Body() bodyRequest: OTPLoginRequest,
+    @Request() request: express.Request,
     @Header('x-client-type') clientType?: string,
   ): Promise<LoginSuccessResponse> {
     const otp = await prisma.oTPToken.findUnique({
@@ -449,6 +486,7 @@ export class AuthController extends Controller {
     }
 
     const user = await this.userRepo.findFirstOrThrow({ where: { id: otp.userId } })
+    getAuditDetails(request).userId = user.id
 
     if (user.lockedUntil && user.lockedUntil > new Date()) {
       throw new InvalidCredentialsError(
