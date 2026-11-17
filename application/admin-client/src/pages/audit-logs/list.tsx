@@ -1,9 +1,40 @@
 import React, { useState } from 'react'
 import { defaultAuditLogsPageSize } from '@common/src/config'
-import { Box, Button, Chip, Collapse, Typography } from '@mui/material'
+import { Box, Button, Chip, Collapse, Tooltip, Typography } from '@mui/material'
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import { DateField, List, useDataGrid } from '@refinedev/mui'
 import { AUDIT_LOG_SORTABLE_FIELDS } from '@common/types/api/audit-logs/getAuditLogs'
+import type { OIDCAuditMeta } from '@common/types/oidc'
+
+const isOIDCAuditMeta = (value: unknown): value is OIDCAuditMeta =>
+  typeof value === 'object' &&
+  value !== null &&
+  typeof (value as { provider?: unknown }).provider === 'string'
+
+// Provider, institution and MFA result recorded for an OIDC login
+const OIDCLoginDetails = ({ oidc }: { oidc: OIDCAuditMeta }) => (
+  <Box
+    sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}
+    data-cy="oidc-login-details"
+  >
+    <Chip label={oidc.provider} size="small" variant="outlined" />
+    {oidc.claims?.idp_name && <Typography variant="body2">{oidc.claims.idp_name}</Typography>}
+    {oidc.mfaSignal === true && (
+      <Chip label="MFA signal" size="small" color="success" data-cy="mfa-signal" />
+    )}
+    {oidc.mfaSignal === false && (
+      <Tooltip
+        title={
+          oidc.claimsError
+            ? `No MFA signal: ${oidc.claimsError}`
+            : "The provider didn't send an MFA signal for this login"
+        }
+      >
+        <Chip label="No MFA signal" size="small" color="warning" data-cy="no-mfa-signal" />
+      </Tooltip>
+    )}
+  </Box>
+)
 
 const ExpandableJsonCell = ({ value }: { value: any }) => {
   const [expanded, setExpanded] = useState(false)
@@ -110,22 +141,25 @@ export const AuditLogList = () => {
           if (!value || !value.method) return '-'
 
           return (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Chip
-                label={value.method}
-                size="small"
-                color={
-                  value.method === 'DELETE'
-                    ? 'error'
-                    : value.method === 'POST'
-                      ? 'success'
-                      : 'default'
-                }
-                sx={{ fontWeight: 'bold', fontSize: '0.7rem' }}
-              />
-              <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                {value.url}
-              </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, py: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Chip
+                  label={value.method}
+                  size="small"
+                  color={
+                    value.method === 'DELETE'
+                      ? 'error'
+                      : value.method === 'POST'
+                        ? 'success'
+                        : 'default'
+                  }
+                  sx={{ fontWeight: 'bold', fontSize: '0.7rem' }}
+                />
+                <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                  {value.url}
+                </Typography>
+              </Box>
+              {isOIDCAuditMeta(value.oidc) && <OIDCLoginDetails oidc={value.oidc} />}
             </Box>
           )
         },

@@ -37,11 +37,11 @@ export const authProvider: AuthProvider = {
       const match = providers.find((val) => val.name == params.providerName)
 
       if (match) {
-        const { host, clientId, authorizeUrlParams } = match
+        const { host, clientId, authorizeUrlParams, scope } = match
         const redirectUri = `${window.location.href.split('/login').at(0)}/login/callback`
         const additionalParams = authorizeUrlParams ? '&' + authorizeUrlParams : ''
         window.location.replace(
-          `${host}/authorize?state=${params.providerName}&client_id=${clientId}&scope=openid%20email%20profile&response_type=code&redirect_uri=${redirectUri}${additionalParams}`,
+          `${host}/authorize?state=${params.providerName}&client_id=${clientId}&scope=${encodeURIComponent(scope)}&response_type=code&redirect_uri=${redirectUri}${additionalParams}`,
         )
       }
       return {

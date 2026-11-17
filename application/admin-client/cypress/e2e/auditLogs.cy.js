@@ -1,8 +1,9 @@
-const { TestUsers } = require('../../../common/testing/constants')
+const { TestUsers, TestOIDC } = require('../../../common/testing/constants')
 
 before(() => {
   cy.task('reset')
   cy.task('seedAuditLogs', 55)
+  cy.task('seedOIDCLoginAuditLogs')
 })
 
 // Note: I've decided against testing the sorting and pagination as this comes from the library
@@ -18,6 +19,23 @@ describe('Audit Logs', () => {
     cy.login(TestUsers.STUDY_ADMIN.email)
     cy.visit('/audit-logs')
     cy.contains('Audit Logs').should('exist')
+  })
+
+  it('should show the provider, institution and MFA result for OIDC logins', () => {
+    cy.login(TestUsers.ORG_ADMIN.email)
+    cy.visit('/audit-logs')
+
+    const { INSTITUTIONS, PROVIDER } = TestOIDC
+
+    cy.contains('[data-cy="oidc-login-details"]', INSTITUTIONS.WITH_MFA.idp_name)
+      .should('contain.text', PROVIDER.name)
+      .find('[data-cy="mfa-signal"]')
+      .should('contain.text', 'MFA signal')
+
+    cy.contains('[data-cy="oidc-login-details"]', INSTITUTIONS.WITHOUT_MFA.idp_name)
+      .should('contain.text', PROVIDER.name)
+      .find('[data-cy="no-mfa-signal"]')
+      .should('contain.text', 'No MFA signal')
   })
 
   it('should toggle the View Payload cell and display JSON', () => {
