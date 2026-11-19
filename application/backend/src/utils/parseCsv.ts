@@ -20,9 +20,7 @@ export async function validateFile(
   file: Express.Multer.File,
   requiredHeaders: string[],
 ): Promise<void> {
-  if (!file) {
-    throw new FileUploadError('No file uploaded')
-  } else if (!file.buffer || file.buffer.length === 0) {
+  if (!file.buffer || file.buffer.length === 0) {
     throw new FileUploadError('File is empty')
   } else if (file.mimetype !== 'text/csv') {
     throw new FileUploadError('Invalid file type. Please upload a CSV file.')

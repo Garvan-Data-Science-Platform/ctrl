@@ -33,6 +33,7 @@ import prisma from '../PrismaClient'
 import {
   InternalErrorResponse,
   NotFoundErrorResponse,
+  PrismaErrorResponse,
   UnauthorizedErrorResponse,
   ValidateErrorResponse,
 } from 'common/types/api/errors'
@@ -229,6 +230,7 @@ export class UsersController extends Controller {
   @Response<NotFoundErrorResponse>('404', 'Not Found')
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
   @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
+  @Response<PrismaErrorResponse>('409', 'Conflict')
   public async updateUser(
     @Request() request: RequestWithAuthentication,
     @Path() userId: number,

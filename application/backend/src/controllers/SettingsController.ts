@@ -1,5 +1,6 @@
 import prisma from '../PrismaClient'
 import {
+  BadRequestErrorResponse,
   UnauthorizedErrorResponse,
   InternalErrorResponse,
   ValidateErrorResponse,
@@ -30,6 +31,7 @@ import type {
 import { NotFoundErrorResponse } from 'common/types/api/errors'
 import { NotFoundError } from '../middlewares/ErrorHandler'
 import { auditLog } from '../middlewares/AuditLog'
+import { requireFile } from '../middlewares/RequireFile'
 import { processLogoImage } from 'common/src/imageHelpers'
 import { urlRegex } from 'common/src/regex'
 import { sanitizeUrl } from '@braintree/sanitize-url'
@@ -118,6 +120,8 @@ export class SettingsController extends Controller {
   @Post('/logo')
   @Security('jwt', ['OrganisationAdmin'])
   @Response<ValidateErrorResponse>('422', 'Validation Failed')
+  @Response<BadRequestErrorResponse>('400', 'Bad Request')
+  @Middlewares(requireFile)
   public async uploadLogo(@UploadedFile() file: Express.Multer.File) {
     const buffer = await processLogoImage(file.buffer)
     await prisma.organisation.update({ where: { id: 1 }, data: { logo: buffer } })

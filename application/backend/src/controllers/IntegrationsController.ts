@@ -31,6 +31,7 @@ import {
   UnprocessableError,
 } from '../middlewares/ErrorHandler'
 import {
+  BadRequestErrorResponse,
   UnauthorizedErrorResponse,
   InternalErrorResponse,
   UnprocessableErrorResponse,
@@ -42,6 +43,7 @@ import { parseCSV, validateFile } from '../utils/parseCsv'
 import { FileUploadError } from '../middlewares/ErrorHandler'
 import logger from 'common/src/logger'
 import { auditLog } from '../middlewares/AuditLog'
+import { requireFile } from '../middlewares/RequireFile'
 import { SurveyVersionAnswers } from '@prisma/client'
 import { randomBytes } from 'crypto'
 import { Prefill, Recipient } from 'common/types/invite'
@@ -68,6 +70,8 @@ export class IntegrationsController extends Controller {
 
   @Post('studies/{studyId}/integrations/redcap/participant/upload/csv')
   @SuccessResponse('201', 'Created Participants from CSV')
+  @Response<BadRequestErrorResponse>('400', 'Bad Request')
+  @Middlewares(requireFile)
   public async uploadRedcapParticipantCSV(
     @Path() studyId: number,
     @UploadedFile() file: Express.Multer.File,
@@ -148,6 +152,8 @@ export class IntegrationsController extends Controller {
 
   @Post('studies/{studyId}/integrations/redcap/instrument/upload/csv')
   @SuccessResponse('201', 'Upserted Survey from Instrument CSV')
+  @Response<BadRequestErrorResponse>('400', 'Bad Request')
+  @Middlewares(requireFile)
   public async uploadRedcapInstrumentCSV(
     @Path() studyId: number,
     @UploadedFile() file: Express.Multer.File,

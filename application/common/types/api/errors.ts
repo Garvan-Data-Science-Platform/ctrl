@@ -1,12 +1,10 @@
 /**
  * @example {
- *  "message": "Internal Server Error",
- *  "details": { "message": "Some error happened D:" }
+ *  "message": "Internal Server Error"
  * }
  */
 export interface InternalErrorResponse {
   message: 'Internal Server Error'
-  details?: unknown
 }
 
 /**
@@ -46,20 +44,15 @@ export interface ValidateErrorResponse {
 
 /**
  * @example {
- *  "message": "email already in use",
+ *  "message": "Email already exists",
  *  "code": "P2002",
- *  "details": {
- *    "modelName": "User",
- *    "target": [
- *      "email"
- *    ]
- *  }
+ *  "details": "Email already exists"
  * }
  */
 export interface PrismaErrorResponse {
   message: string
   code: string
-  details?: unknown
+  details?: string
 }
 
 /**
@@ -75,8 +68,8 @@ export interface NotFoundErrorResponse {
 
 /**
  * @example {
- *  "message": "Bad Request",
- *  "details": { "message": "File is of incorrect type" }
+ *  "message": "File upload failed",
+ *  "details": "File too large"
  * }
  */
 export interface BadRequestErrorResponse {

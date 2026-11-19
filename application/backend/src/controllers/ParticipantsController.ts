@@ -3,6 +3,8 @@ import {
   UnauthorizedErrorResponse,
   InternalErrorResponse,
   NotFoundErrorResponse,
+  PrismaErrorResponse,
+  UnprocessableErrorResponse,
   ValidateErrorResponse,
 } from 'common/types/api/errors'
 import type {
@@ -59,7 +61,7 @@ import type { RequestWithAuthentication } from '../authentication'
 @Security('jwt', ['OrganisationAdmin', 'StudyAdmin'])
 @Response<UnauthorizedErrorResponse>('401', 'Unauthorized')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
-@Response<InternalErrorResponse>('422', 'Unprocessable Content')
+@Response<ValidateErrorResponse | UnprocessableErrorResponse>('422', 'Unprocessable Content')
 @Middlewares(auditLog)
 export class ParticipantsController extends Controller {
   svaRepo = prisma.surveyVersionAnswers
@@ -270,7 +272,8 @@ export class ParticipantsController extends Controller {
   }
 
   @Patch('studies/{studyId}/participants/{profileId}')
-  @Response<ValidateErrorResponse>('422', 'Validation Failed')
+  @Response<ValidateErrorResponse | UnprocessableErrorResponse>('422', 'Unprocessable Content')
+  @Response<PrismaErrorResponse>('409', 'Conflict')
   @Security('jwt', ['OrganisationAdmin'])
   public async updateProfileById(
     @Request() request: RequestWithAuthentication,
@@ -341,6 +344,7 @@ export class ParticipantsController extends Controller {
    */
   @Post('studies/{studyId}/participants/{profileId}')
   @Response<NotFoundErrorResponse>('404', 'Not Found')
+  @Response<PrismaErrorResponse>('409', 'Conflict')
   public async addParticipantById(
     @Path() studyId: number,
     @Path() profileId: number,
@@ -530,6 +534,7 @@ export class InvitesController extends Controller {
   @Post('/invites/{inviteId}/accept')
   @Security('jwt', ['Participant'])
   @SuccessResponse('201', 'Invite Accepted')
+  @Response<PrismaErrorResponse>('409', 'Conflict')
   public async acceptInvite(@Request() request: any, @Path() inviteId: string) {
     // check inviteId exists and is not yet accepted
     const invite = await this.invitesRepo.findFirst({

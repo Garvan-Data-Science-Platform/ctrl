@@ -244,7 +244,8 @@ describe('SurveysController', () => {
         .patch(`/studies/${TestStudies.TEST_STUDY.id}/surveys/1`)
         .set({ Authorization: `Bearer ${tokenAdmin}` })
         .send({ data: [] })
-      expect(response.status).toBe(500)
+      expect(response.status).toBe(422)
+      expect(response.body.details).toBe('Cannot edit a published survey')
     })
   })
 
@@ -284,7 +285,8 @@ describe('SurveysController', () => {
       const response = await request(app)
         .post(`/studies/${TestStudies.TEST_STUDY.id}/surveys/1/publish`)
         .set({ Authorization: `Bearer ${tokenAdmin}` })
-      expect(response.status).toBe(500)
+      expect(response.status).toBe(422)
+      expect(response.body.details).toBe('Can only publish a draft survey')
     })
 
     it('should fail to publish an invalid survey', async () => {

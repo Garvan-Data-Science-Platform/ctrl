@@ -153,7 +153,7 @@ describe('IntegrationsController', () => {
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(400)
       const body = response.body
-      expect(body.message).toBe("Cannot read properties of undefined (reading 'file')")
+      expect(body.message).toBe('No file uploaded')
     })
 
     it('should throw a 400 error if given an empty file', async () => {
@@ -227,7 +227,7 @@ describe('IntegrationsController', () => {
         .post('/studies/1/integrations/redcap/instrument/upload/csv')
         .set({ Authorization: `Bearer ${token}` })
       expect(response.status).toBe(400)
-      expect(response.body.message).toBe("Cannot read properties of undefined (reading 'file')")
+      expect(response.body.message).toBe('No file uploaded')
     })
 
     it('should throw a 404 error if given an empty file', async () => {
