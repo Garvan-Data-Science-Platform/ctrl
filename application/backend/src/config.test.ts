@@ -21,8 +21,9 @@ const validateProvider = (overrides: Record<string, unknown> = {}) => {
 }
 
 describe('OIDC config schema', () => {
-  it('compiles with the options the backend uses', () => {
-    expect(validator).not.toThrow()
+  // The whole schema, as the backend compiles it at startup. Compiling needs no config values.
+  it('compiles the full config schema with the options the backend uses', () => {
+    expect(() => new Ajv({ useDefaults: true }).compile(schema)).not.toThrow()
   })
 
   it('fills in the defaults for a provider with only the required fields', () => {
