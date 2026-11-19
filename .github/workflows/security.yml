@@ -27,35 +27,6 @@ jobs:
           path: ${{ env.SNYK_OUTPUT_FILE }}
       - name: Generate Snyk Report Summary
         if: always()
-        run: |
-          # Input file
-          input_file=${{ env.SNYK_OUTPUT_FILE }}
-
-          # Check if file exists
-          if [ ! -f "$input_file" ]; then
-            echo "File not found! Cannot generate SNYK report!"
-            exit 1
-          fi
-
-          {
-            # Print the title and table headers
-            echo "# Vulnerabilities Report"
-            echo ""
-            echo "| ID                            | CVE              | Severity | CVSS Score | Package Name    |"
-            echo "|-------------------------------|------------------|----------|------------|-----------------|"
-
-            # Use jq to extract ID, CVE(s), Severity, CVSSScore, and Package name from vulnerabilities,
-            # then make sure the vulnerabilities are unique based on the ID.
-            # Multiple CVEs are joined into one cell; empty fields become "-" so read doesn't collapse tabs
-            jq -r '
-              (if type == "array" then .[] else . end) | .vulnerabilities[] |
-              select(.id != null) |    # Ensure ID exists
-              [.id, ((.identifiers.CVE // []) | join(", ")), .severity, .cvssScore, .packageName] |
-              map(if . == null or . == "" then "-" else . end) |
-              @tsv
-            ' "$input_file" | awk '!seen[$1]++' | while IFS=$'\t' read -r id cve severity cvssScore packageName; do
-              printf "| %-30s | %-16s | %-8s | %-10s | %-15s |\n" "$id" "$cve" "$severity" "$cvssScore" "$packageName"
-            done
-          } >> $GITHUB_STEP_SUMMARY
+        run: bash .github/scripts/snyk-report.sh "${{ env.SNYK_OUTPUT_FILE }}" >> "$GITHUB_STEP_SUMMARY"
         env:
           GITHUB_ACTION_PATH: ${{ github.action_path }}
