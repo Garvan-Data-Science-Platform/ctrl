@@ -38,8 +38,8 @@ describe('AuditLog Middleware', () => {
   it('should only obscure sensitive fields', async () => {
     const testPayload = {
       email: 'notsecret@example.com',
-      password: 'Supersecret123!',
-      newPassword: 'Supersecret321!',
+      password: 'Consentdemo123!',
+      newPassword: 'Consentdemo321!',
       redcapURL: 'https://notsecret.com/123',
       redcapToken: 'SuperSecretToken123',
       otp_code: '321123',
@@ -61,7 +61,7 @@ describe('AuditLog Middleware', () => {
     const savedBody = JSON.parse(prismaCallArgs.data.requestBody)
 
     // Test that sensitive fields are obscured
-    expect(savedBody.password).not.toBe('Supersecret123!')
+    expect(savedBody.password).not.toBe('Consentdemo123!')
     expect(savedBody.password).toBe('***')
     expect(savedBody.newPassword).toBe('***')
     expect(savedBody.redcapToken).toBe('***')
