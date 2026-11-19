@@ -1,7 +1,7 @@
 import request from 'supertest'
 import { generateToken } from '../../src/authentication'
 import { Api } from '../../src/Api'
-import { resetDB } from 'common/testing/TestHelpers'
+import { resetDB, waitForAuditLog } from 'common/testing/TestHelpers'
 import { UpdateSurveyAnswersRequest } from 'common/types/api/surveys'
 import { CreateStudyRequest } from 'common/types/api/studies'
 import { TestUsers } from 'common/testing/constants'
@@ -46,9 +46,7 @@ describe('Soft Deletion', () => {
   })
 
   it('Audit log of submitted answer remains', async () => {
-    const aLog = await prisma.auditLog.findFirstOrThrow({
-      where: { userId: TestUsers.PARTICIPANT_UNANSWERED.id },
-    })
+    const aLog = await waitForAuditLog({ userId: TestUsers.PARTICIPANT_UNANSWERED.id })
     expect(aLog.resource).toBe('studies/survey-answers')
     expect(aLog.operation).toBe('CREATE')
   })
@@ -79,9 +77,7 @@ describe('Soft Deletion', () => {
   })
 
   it('Audit log of associated draft survey remains', async () => {
-    const aLog = await prisma.auditLog.findFirstOrThrow({
-      where: { userId: TestUsers.ORG_ADMIN.id },
-    })
+    const aLog = await waitForAuditLog({ userId: TestUsers.ORG_ADMIN.id })
     expect(aLog.resource).toBe('studies')
     expect(aLog.operation).toBe('CREATE')
     expect(JSON.parse(aLog.requestBody as any).name).toBe(`${STUDY_NAME}`)

@@ -1,7 +1,7 @@
 import request from 'supertest'
 import { Api } from '../Api'
 import prisma from '../PrismaClient'
-import { resetDB } from 'common/testing/TestHelpers'
+import { resetDB, waitForAuditLog } from 'common/testing/TestHelpers'
 import { generateToken } from '../authentication'
 
 import {
@@ -123,9 +123,7 @@ describe('SurveysController', () => {
         },
       })
       expect(participant?.answers[1].answers).toEqual([true, 'Choice 1'])
-      const aLog = await prisma.auditLog.findFirstOrThrow({
-        where: { userId: TestUsers.PARTICIPANT_COMPLETED.id },
-      })
+      const aLog = await waitForAuditLog({ userId: TestUsers.PARTICIPANT_COMPLETED.id })
       expect(aLog.resource).toBe('studies/survey-answers')
       expect(aLog.operation).toBe('CREATE')
       expect(JSON.parse(aLog.requestBody as string)).toStrictEqual(reqBody)
@@ -230,9 +228,7 @@ describe('SurveysController', () => {
       })
       expect(survey?.data[0].elements[1].data.text).toBe('Question 1')
 
-      const aLog = await prisma.auditLog.findFirstOrThrow({
-        where: { userId: TestUsers.ORG_ADMIN.id },
-      })
+      const aLog = await waitForAuditLog({ userId: TestUsers.ORG_ADMIN.id })
       expect(aLog.resource).toBe('studies/surveys')
       expect(aLog.operation).toBe('UPDATE')
       expect(JSON.parse(aLog.requestBody as string)).toStrictEqual(reqBody)
