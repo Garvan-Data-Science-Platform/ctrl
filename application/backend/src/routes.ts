@@ -871,11 +871,26 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "OIDCProvider": {
+        "dataType": "refObject",
+        "properties": {
+            "name": {"dataType":"string","required":true},
+            "host": {"dataType":"string","required":true},
+            "clientId": {"dataType":"string","required":true},
+            "icon": {"dataType":"string","required":true},
+            "displayInAdminPortal": {"dataType":"boolean","required":true},
+            "displayInUserPortal": {"dataType":"boolean","required":true},
+            "authorizeUrlParams": {"dataType":"string","required":true},
+            "scope": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "SetupResponse": {
         "dataType": "refObject",
         "properties": {
             "isSetup": {"dataType":"boolean","required":true},
-            "oidc": {"dataType":"array","array":{"dataType":"nestedObjectLiteral","nestedProperties":{"authorizeUrlParams":{"dataType":"string","required":true},"displayInUserPortal":{"dataType":"boolean","required":true},"displayInAdminPortal":{"dataType":"boolean","required":true},"icon":{"dataType":"string","required":true},"clientId":{"dataType":"string","required":true},"host":{"dataType":"string","required":true},"name":{"dataType":"string","required":true}}},"required":true},
+            "oidc": {"dataType":"array","array":{"dataType":"refObject","ref":"OIDCProvider"},"required":true},
             "disableAdminPasswordLogin": {"dataType":"boolean","required":true},
         },
         "additionalProperties": false,
@@ -3782,6 +3797,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsAuthController_loginOIDC: Record<string, TsoaRoute.ParameterSchema> = {
                 bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"OIDCLoginRequest"},
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
                 clientType: {"in":"header","name":"x-client-type","dataType":"string"},
         };
         app.post('/auth/login/oidc',
@@ -3813,6 +3829,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsAuthController_login: Record<string, TsoaRoute.ParameterSchema> = {
                 bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"LoginRequest"},
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
                 clientType: {"in":"header","name":"x-client-type","dataType":"string"},
         };
         app.post('/auth/login',
@@ -3844,6 +3861,7 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsAuthController_loginOtp: Record<string, TsoaRoute.ParameterSchema> = {
                 bodyRequest: {"in":"body","name":"bodyRequest","required":true,"ref":"OTPLoginRequest"},
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
                 clientType: {"in":"header","name":"x-client-type","dataType":"string"},
         };
         app.post('/auth/login/otp',

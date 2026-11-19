@@ -1,10 +1,10 @@
+import { TestOIDC } from 'common/testing/constants'
+
 const config = {
   oidc: [
     {
-      name: 'test',
-      providerUrl: 'http://testurl',
+      ...TestOIDC.PROVIDER,
       icon: 'https://aaf.edu.au/wp-content/uploads/AAF_LGO_small-website.png',
-      clientId: 'testid',
       clientSecret: 'testsecret',
     },
   ],

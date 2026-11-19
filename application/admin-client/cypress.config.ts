@@ -9,6 +9,7 @@ import {
   calculateHash,
   readCommonFile,
   seedAuditLogs,
+  seedOIDCLoginAuditLogs,
 } from 'common/testing/TestHelpers'
 import { defineConfig } from 'cypress'
 
@@ -52,6 +53,10 @@ export default defineConfig({
         },
         async seedAuditLogs(count: number) {
           await seedAuditLogs(count)
+          return null
+        },
+        async seedOIDCLoginAuditLogs() {
+          await seedOIDCLoginAuditLogs()
           return null
         },
       })

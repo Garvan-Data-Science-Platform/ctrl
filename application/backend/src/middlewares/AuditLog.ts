@@ -10,7 +10,17 @@ const SENSITIVE_FIELDS = [
   'otp_token',
   'token',
   'newPassword',
+  'code', // the one-time OIDC authorization code
 ]
+
+// Lets a route add its user and details to its own audit log row, e.g. the login routes, which
+// have no login token yet
+export function getAuditDetails(req: Request): NonNullable<Express.Locals['audit']> {
+  // Express always sets req.res. The check is only there because its type is optional.
+  if (!req.res) return {}
+  req.res.locals.audit ??= {}
+  return req.res.locals.audit
+}
 
 export async function auditLog(req: Request, res: Response, next: NextFunction) {
   const userId = req.user?.userId || undefined
@@ -60,12 +70,14 @@ export async function auditLog(req: Request, res: Response, next: NextFunction) 
         }
       })
     }
-    const meta = { resourceId: id, url: req.url, method: req.method }
+    const meta = { resourceId: id, url: req.url, method: req.method, ...res.locals.audit?.meta }
 
     try {
       await prisma.auditLog.create({
         data: {
-          userId: userId,
+          // The logged-in user comes first. A route's own user only fills in when nobody is logged
+          // in yet, as on the login routes.
+          userId: userId ?? res.locals.audit?.userId,
           operation,
           resource,
           meta,

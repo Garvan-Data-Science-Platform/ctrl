@@ -2523,6 +2523,46 @@
           "role": "OrganisationAdmin"
         }
       },
+      "OIDCProvider": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "host": {
+            "type": "string"
+          },
+          "clientId": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "displayInAdminPortal": {
+            "type": "boolean"
+          },
+          "displayInUserPortal": {
+            "type": "boolean"
+          },
+          "authorizeUrlParams": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "host",
+          "clientId",
+          "icon",
+          "displayInAdminPortal",
+          "displayInUserPortal",
+          "authorizeUrlParams",
+          "scope"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
       "SetupResponse": {
         "properties": {
           "isSetup": {
@@ -2530,39 +2570,7 @@
           },
           "oidc": {
             "items": {
-              "properties": {
-                "authorizeUrlParams": {
-                  "type": "string"
-                },
-                "displayInUserPortal": {
-                  "type": "boolean"
-                },
-                "displayInAdminPortal": {
-                  "type": "boolean"
-                },
-                "icon": {
-                  "type": "string"
-                },
-                "clientId": {
-                  "type": "string"
-                },
-                "host": {
-                  "type": "string"
-                },
-                "name": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "authorizeUrlParams",
-                "displayInUserPortal",
-                "displayInAdminPortal",
-                "icon",
-                "clientId",
-                "host",
-                "name"
-              ],
-              "type": "object"
+              "$ref": "#/components/schemas/OIDCProvider"
             },
             "type": "array"
           },

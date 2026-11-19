@@ -1,6 +1,6 @@
 import request from 'supertest'
 import express, { Request, Response } from 'express'
-import { auditLog } from './AuditLog'
+import { auditLog, getAuditDetails } from './AuditLog'
 import prisma from '../PrismaClient'
 
 jest.mock('../PrismaClient', () => ({
@@ -19,7 +19,8 @@ describe('AuditLog Middleware', () => {
     app = express() // Isolateed Express app just for this test
     app.use(express.json())
     app.use((req: any, _res, next) => {
-      req.user = { userId: 123 } // Dummy test user
+      // Dummy test user, logged in everywhere except the dummy login route
+      if (req.path !== '/dummy-login') req.user = { userId: 123 }
       next()
     })
 
@@ -29,6 +30,16 @@ describe('AuditLog Middleware', () => {
     app.post('/dummy-endpoint', (req: Request, res: Response) => {
       res.status(200).json({ receivedBody: req.body })
     })
+
+    // Dummy endpoints that add their own details to the audit log row, like the login routes do
+    const addAuditDetails = (req: Request, res: Response) => {
+      const audit = getAuditDetails(req)
+      audit.userId = 456
+      audit.meta = { oidc: { provider: 'test', claims: { acr: 'x' }, mfaSignal: false } }
+      res.status(200).json({})
+    }
+    app.post('/dummy-with-audit', addAuditDetails)
+    app.post('/dummy-login', addAuditDetails)
   })
 
   afterEach(() => {
@@ -46,6 +57,7 @@ describe('AuditLog Middleware', () => {
       otp_token: '1234-1234-1234-1234',
       contactUsEmail: 'not@secret.com',
       token: '1234-1234-1234-1234',
+      code: 'one-time-oidc-code',
     }
 
     const response = await request(app).post('/dummy-endpoint').send(testPayload)
@@ -68,10 +80,40 @@ describe('AuditLog Middleware', () => {
     expect(savedBody.otp_code).toBe('***')
     expect(savedBody.otp_token).toBe('***')
     expect(savedBody.token).toBe('***')
+    expect(savedBody.code).toBe('***')
 
     // Test that non-sensitive fields are visible
     expect(savedBody.email).toBe('notsecret@example.com')
     expect(savedBody.redcapURL).toBe('https://notsecret.com/123')
     expect(savedBody.contactUsEmail).toBe('not@secret.com')
+  })
+
+  it('should record only the request details when the route adds nothing', async () => {
+    await request(app).post('/dummy-endpoint').send({})
+
+    const { data } = (prisma.auditLog.create as jest.Mock).mock.calls[0][0]
+    expect(data.userId).toBe(123)
+    expect(data.meta).toEqual({ resourceId: '', url: '/dummy-endpoint', method: 'POST' })
+  })
+
+  it("should add the route's own user and details when nobody is logged in", async () => {
+    await request(app).post('/dummy-login').send({})
+
+    const { data } = (prisma.auditLog.create as jest.Mock).mock.calls[0][0]
+    expect(data.userId).toBe(456)
+    expect(data.meta).toEqual({
+      resourceId: '',
+      url: '/dummy-login',
+      method: 'POST',
+      oidc: { provider: 'test', claims: { acr: 'x' }, mfaSignal: false },
+    })
+  })
+
+  it("should keep the logged-in user over the route's own user", async () => {
+    await request(app).post('/dummy-with-audit').send({})
+
+    const { data } = (prisma.auditLog.create as jest.Mock).mock.calls[0][0]
+    expect(data.userId).toBe(123)
+    expect(data.meta).toHaveProperty('oidc')
   })
 })

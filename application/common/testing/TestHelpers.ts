@@ -3,8 +3,10 @@ import { Prisma, AuditLogOperation } from '@prisma/client'
 import { SurveysController } from '../../backend/src/controllers/SurveysController'
 import logger from 'common/src/logger'
 import { seedTests } from './seed'
-import { TestUsers } from './constants'
+import { TestOIDC, TestUsers } from './constants'
 import { Prefill } from 'common/types/invite'
+import type { OIDCAuditMeta } from 'common/types/oidc'
+import type { OIDCProviderConfig } from '../../backend/src/config'
 import { createHash } from 'crypto'
 import { processLogoImage } from '../src/imageHelpers'
 import fs from 'fs'
@@ -264,4 +266,76 @@ export async function seedAuditLogs(count: number) {
   await prisma.auditLog.createMany({
     data: logsToCreate,
   })
+}
+
+// OIDC login rows for the audit page tests: one with the MFA signal, one without, and one whose
+// ID token couldn't be read
+export async function seedOIDCLoginAuditLogs() {
+  const { ACR, INSTITUTIONS, PROVIDER } = TestOIDC
+  const oidcLogin = (oidc: OIDCAuditMeta): Prisma.AuditLogCreateManyInput => ({
+    resource: 'auth/login/oidc',
+    operation: AuditLogOperation.CREATE,
+    success: true,
+    timestamp: new Date(),
+    userId: TestUsers.ORG_ADMIN.id,
+    meta: { resourceId: '', url: '/auth/login/oidc', method: 'POST', oidc },
+  })
+
+  await prisma.auditLog.createMany({
+    data: [
+      oidcLogin({
+        provider: PROVIDER.name,
+        claims: { acr: ACR.REFEDS_MFA, ...INSTITUTIONS.WITH_MFA },
+        mfaSignal: true,
+      }),
+      oidcLogin({
+        provider: PROVIDER.name,
+        claims: { ...INSTITUTIONS.WITHOUT_MFA },
+        mfaSignal: false,
+      }),
+      oidcLogin({
+        provider: PROVIDER.name,
+        claimsError: 'ID token audience does not include this client',
+      }),
+    ],
+  })
+}
+
+// An OIDC provider entry as it appears in the config, for tests that replace config.oidc
+export function createOIDCProviderConfig(
+  overrides: Partial<OIDCProviderConfig> = {},
+): OIDCProviderConfig {
+  return {
+    ...TestOIDC.PROVIDER,
+    clientSecret: 'testsecret',
+    icon: 'https://example.org/icon.png',
+    displayInAdminPortal: true,
+    displayInUserPortal: true,
+    authorizeUrlParams: '',
+    auditLogClaims: true,
+    ...overrides,
+  }
+}
+
+// A JWT with a valid header and `payloadText` as its payload. CTRL doesn't check the signature of
+// the ID token (it comes straight from the token endpoint), so a placeholder is enough.
+export function createJwt(payloadText: string) {
+  const encode = (text: string) => Buffer.from(text).toString('base64url')
+  return [
+    encode(JSON.stringify({ alg: 'RS256', typ: 'JWT' })),
+    encode(payloadText),
+    'signature',
+  ].join('.')
+}
+
+// An ID token from the test provider, valid for 5 minutes unless `claims` overrides it
+export function createIdToken(claims: Record<string, unknown> = {}) {
+  return createJwt(
+    JSON.stringify({
+      iss: TestOIDC.PROVIDER.providerUrl,
+      aud: TestOIDC.PROVIDER.clientId,
+      exp: Math.floor(Date.now() / 1000) + 300,
+      ...claims,
+    }),
+  )
 }

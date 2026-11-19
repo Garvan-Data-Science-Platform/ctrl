@@ -2,13 +2,27 @@ import request from 'supertest'
 import { Api } from '../Api'
 import prisma from '../PrismaClient'
 import { Role } from '@prisma/client'
-import { resetDB, seedAuditLogs } from 'common/testing/TestHelpers'
+import {
+  createIdToken,
+  createJwt,
+  createOIDCProviderConfig,
+  resetDB,
+  seedAuditLogs,
+} from 'common/testing/TestHelpers'
 import { defaultAuditLogsPageSize } from 'common/src/config'
 import { generateToken } from '../authentication'
 import type { GetAuditLogsResponse } from 'common/types/api/audit-logs'
-import { TestUsers, TestStudies } from 'common/testing/constants'
+import { TestUsers, TestStudies, TestOIDC } from 'common/testing/constants'
 import { UpdateStudyRequest } from 'common/types/api/studies'
-import type { OTPLoginRequest, RegisterRequest } from 'common/types/api/auth'
+import type {
+  LoginRequest,
+  OIDCLoginRequest,
+  OTPLoginRequest,
+  RegisterRequest,
+} from 'common/types/api/auth'
+import fetchMock from 'fetch-mock'
+jest.mock('../config')
+import config from '../config'
 const api = new Api()
 const app = api.app
 
@@ -37,6 +51,28 @@ describe('AuditLogsController', () => {
   })
 
   describe('GET /audit-logs', () => {
+    // The newest audit log row, checked to be for the request the test just made
+    const latestAuditLog = async (resource: string) => {
+      const response = await request(app)
+        .get('/audit-logs?sortBy=id&sortDirection=desc')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+      expect(response.status).toBe(200)
+      const body: GetAuditLogsResponse = response.body
+      expect(body.data[0].resource).toBe(resource)
+      return body.data[0]
+    }
+
+    // An OTP for the unanswered participant, valid for a minute, with code 1223
+    const createOTPToken = () =>
+      prisma.oTPToken.create({
+        data: {
+          code: '1223',
+          expiresAt: new Date(new Date().getTime() + 1000 * 60),
+          id: 'abc123',
+          userId: TestUsers.PARTICIPANT_UNANSWERED.id,
+        },
+      })
+
     describe('Authentication and authorisation', () => {
       it('should not allow unauthorised access', async () => {
         const response = await request(app).get('/audit-logs')
@@ -298,14 +334,7 @@ describe('AuditLogsController', () => {
       })
 
       it('should obscure sensitive otp information in payloads', async () => {
-        await prisma.oTPToken.create({
-          data: {
-            code: '1223',
-            expiresAt: new Date(new Date().getTime() + 1000 * 60),
-            id: 'abc123',
-            userId: TestUsers.PARTICIPANT_UNANSWERED.id,
-          },
-        })
+        await createOTPToken()
         const loginRequest: OTPLoginRequest = {
           otp_code: '1223',
           otp_token: 'abc123',
@@ -325,6 +354,289 @@ describe('AuditLogsController', () => {
         expect(body).toHaveProperty('data')
         expect(body.data[0].requestBody).toContain(obscuredCode)
         expect(body.data[0].requestBody).toContain(obscuredToken)
+      })
+    })
+
+    describe('OIDC logins', () => {
+      const { ACR, INSTITUTIONS, PROVIDER } = TestOIDC
+      const loginRequest: OIDCLoginRequest = {
+        code: '123',
+        provider: PROVIDER.name,
+        redirect_uri: 'redirect',
+      }
+      const mfaWarning = { auditLogMfaWarning: { acrValues: [ACR.REFEDS_MFA] } }
+
+      // Logs in through a mocked provider. The token response carries `idToken` when given, and
+      // userinfo returns `email`.
+      const loginViaOIDC = ({
+        providerConfig = {},
+        idToken,
+        email = TestUsers.ORG_ADMIN.email,
+        clientType,
+      }: {
+        providerConfig?: Parameters<typeof createOIDCProviderConfig>[0]
+        idToken?: string
+        email?: string
+        clientType?: string
+      }) => {
+        jest.replaceProperty(config, 'oidc', [createOIDCProviderConfig(providerConfig)])
+        const tokenResponse =
+          idToken === undefined
+            ? { access_token: '123' }
+            : { access_token: '123', id_token: idToken }
+        fetchMock.removeRoutes()
+        fetchMock
+          .mockGlobal()
+          .route(`${PROVIDER.providerUrl}/.well-known/openid-configuration`, {
+            issuer: PROVIDER.providerUrl,
+            token_endpoint: 'http://token',
+            userinfo_endpoint: 'http://userinfo',
+          })
+          .route('http://token', tokenResponse)
+          .route('http://userinfo', { email })
+
+        const login = request(app).post('/auth/login/oidc')
+        return clientType
+          ? login.set({ 'x-client-type': clientType }).send(loginRequest)
+          : login.send(loginRequest)
+      }
+
+      afterEach(() => {
+        jest.restoreAllMocks()
+      })
+
+      it('should record the provider, user, institution and MFA signal', async () => {
+        const claims = { acr: ACR.REFEDS_MFA, auth_time: 1800000000, ...INSTITUTIONS.WITH_MFA }
+        const loginResponse = await loginViaOIDC({
+          providerConfig: mfaWarning,
+          idToken: createIdToken(claims),
+        })
+        expect(loginResponse.status).toBe(200)
+
+        const auditLog = await latestAuditLog('auth/login/oidc')
+        expect(auditLog.success).toBe(true)
+        expect(auditLog.userId).toBe(TestUsers.ORG_ADMIN.id)
+        expect(auditLog.meta).toHaveProperty('oidc', {
+          provider: PROVIDER.name,
+          claims,
+          mfaSignal: true,
+        })
+      })
+
+      it('should flag a login without the MFA signal and still log the user in', async () => {
+        const loginResponse = await loginViaOIDC({
+          providerConfig: mfaWarning,
+          idToken: createIdToken({ acr: ACR.PASSWORD_ONLY }),
+        })
+        expect(loginResponse.status).toBe(200)
+
+        const auditLog = await latestAuditLog('auth/login/oidc')
+        expect(auditLog.meta).toHaveProperty('oidc', {
+          provider: PROVIDER.name,
+          claims: { acr: ACR.PASSWORD_ONLY },
+          mfaSignal: false,
+        })
+      })
+
+      it('should record claims without an MFA result when the provider has no MFA warning', async () => {
+        const loginResponse = await loginViaOIDC({ idToken: createIdToken({ amr: ['mfa'] }) })
+        expect(loginResponse.status).toBe(200)
+
+        const auditLog = await latestAuditLog('auth/login/oidc')
+        expect(auditLog.meta).toHaveProperty('oidc', {
+          provider: PROVIDER.name,
+          claims: { amr: ['mfa'] },
+        })
+      })
+
+      it('should leave the claims out when the provider turns them off', async () => {
+        const loginResponse = await loginViaOIDC({
+          providerConfig: { ...mfaWarning, auditLogClaims: false },
+          idToken: createIdToken({ acr: ACR.REFEDS_MFA, ...INSTITUTIONS.WITH_MFA }),
+        })
+        expect(loginResponse.status).toBe(200)
+
+        const auditLog = await latestAuditLog('auth/login/oidc')
+        expect(auditLog.userId).toBe(TestUsers.ORG_ADMIN.id)
+        expect(auditLog.meta).toHaveProperty('oidc', { provider: PROVIDER.name, mfaSignal: true })
+      })
+
+      it('should record why there are no claims, and no MFA result, when the ID token is missing', async () => {
+        const loginResponse = await loginViaOIDC({ providerConfig: mfaWarning })
+        expect(loginResponse.status).toBe(200)
+
+        const auditLog = await latestAuditLog('auth/login/oidc')
+        expect(auditLog.meta).toHaveProperty('oidc', {
+          provider: PROVIDER.name,
+          claimsError: 'no ID token in the token response',
+        })
+      })
+
+      it('should still log the user in when the ID token cannot be read', async () => {
+        const loginResponse = await loginViaOIDC({
+          providerConfig: mfaWarning,
+          idToken: createJwt('not json'),
+        })
+        expect(loginResponse.status).toBe(200)
+
+        const auditLog = await latestAuditLog('auth/login/oidc')
+        expect(auditLog.meta).toHaveProperty('oidc', {
+          provider: PROVIDER.name,
+          claimsError: 'ID token is not a valid JWT',
+        })
+      })
+
+      it('should not record claims from an ID token issued to another client', async () => {
+        const loginResponse = await loginViaOIDC({
+          idToken: createIdToken({ aud: 'other-client', acr: ACR.REFEDS_MFA }),
+        })
+        expect(loginResponse.status).toBe(200)
+
+        const auditLog = await latestAuditLog('auth/login/oidc')
+        expect(auditLog.meta).toHaveProperty('oidc', {
+          provider: PROVIDER.name,
+          claimsError: 'ID token audience does not include this client',
+        })
+      })
+
+      it('should record the provider of a failed login from an unregistered email', async () => {
+        const loginResponse = await loginViaOIDC({
+          idToken: createIdToken({ acr: ACR.REFEDS_MFA }),
+          email: TestUsers.UNREGISTERED.email,
+        })
+        expect(loginResponse.status).toBe(401)
+
+        const auditLog = await latestAuditLog('auth/login/oidc')
+        expect(auditLog.success).toBe(false)
+        expect(auditLog.userId).toBeNull()
+        expect(auditLog.meta).toHaveProperty('oidc', {
+          provider: PROVIDER.name,
+          claims: { acr: ACR.REFEDS_MFA },
+        })
+      })
+
+      it('should record the user of a participant rejected by the admin portal', async () => {
+        const loginResponse = await loginViaOIDC({
+          idToken: createIdToken(),
+          email: TestUsers.PARTICIPANT_UNANSWERED.email,
+          clientType: 'admin-client',
+        })
+        expect(loginResponse.status).toBe(401)
+
+        const auditLog = await latestAuditLog('auth/login/oidc')
+        expect(auditLog.success).toBe(false)
+        expect(auditLog.userId).toBe(TestUsers.PARTICIPANT_UNANSWERED.id)
+      })
+
+      it('should keep personal claims from the ID token out of the audit log', async () => {
+        const loginResponse = await loginViaOIDC({
+          idToken: createIdToken({
+            email: TestUsers.ORG_ADMIN.email,
+            name: 'Jane Citizen',
+            'https://example.org/upstream': 'upstream profile',
+          }),
+        })
+        expect(loginResponse.status).toBe(200)
+
+        const auditLog = await latestAuditLog('auth/login/oidc')
+        expect(auditLog.meta).toEqual({
+          resourceId: '',
+          url: '/auth/login/oidc',
+          method: 'POST',
+          oidc: { provider: PROVIDER.name, claims: {} },
+        })
+      })
+
+      it('should obscure the one-time login code in payloads', async () => {
+        const loginResponse = await loginViaOIDC({ idToken: createIdToken() })
+        expect(loginResponse.status).toBe(200)
+
+        const auditLog = await latestAuditLog('auth/login/oidc')
+        expect(auditLog.requestBody).toContain('"code":"***"')
+        expect(auditLog.requestBody).toContain(`"provider":"${PROVIDER.name}"`)
+      })
+    })
+
+    describe('Password and OTP logins', () => {
+      it('should record the user of a password login', async () => {
+        const loginRequest: LoginRequest = {
+          email: TestUsers.ORG_ADMIN.email,
+          password: TestUsers.ORG_ADMIN.password,
+        }
+
+        const loginResponse = await request(app)
+          .post('/auth/login')
+          .set({ 'x-client-type': 'admin-client' })
+          .send(loginRequest)
+        expect(loginResponse.status).toBe(200)
+
+        const auditLog = await latestAuditLog('auth/login')
+        expect(auditLog.success).toBe(true)
+        expect(auditLog.userId).toBe(TestUsers.ORG_ADMIN.id)
+      })
+
+      it('should record the user of a failed password login', async () => {
+        const loginRequest: LoginRequest = {
+          email: TestUsers.ORG_ADMIN.email,
+          password: 'Wrongpassword1',
+        }
+
+        const loginResponse = await request(app)
+          .post('/auth/login')
+          .set({ 'x-client-type': 'admin-client' })
+          .send(loginRequest)
+        expect(loginResponse.status).toBe(401)
+
+        const auditLog = await latestAuditLog('auth/login')
+        expect(auditLog.success).toBe(false)
+        expect(auditLog.userId).toBe(TestUsers.ORG_ADMIN.id)
+      })
+
+      it('should not record a user for a login with an unregistered email', async () => {
+        const loginRequest: LoginRequest = {
+          email: TestUsers.UNREGISTERED.email,
+          password: TestUsers.ORG_ADMIN.password,
+        }
+
+        const loginResponse = await request(app)
+          .post('/auth/login')
+          .set({ 'x-client-type': 'admin-client' })
+          .send(loginRequest)
+        expect(loginResponse.status).toBe(401)
+
+        const auditLog = await latestAuditLog('auth/login')
+        expect(auditLog.success).toBe(false)
+        expect(auditLog.userId).toBeNull()
+      })
+
+      it('should record the user of an OTP login', async () => {
+        await createOTPToken()
+        const loginRequest: OTPLoginRequest = {
+          otp_code: '1223',
+          otp_token: 'abc123',
+        }
+
+        const loginResponse = await request(app).post('/auth/login/otp').send(loginRequest)
+        expect(loginResponse.ok).toBe(true)
+
+        const auditLog = await latestAuditLog('auth/login/otp')
+        expect(auditLog.success).toBe(true)
+        expect(auditLog.userId).toBe(TestUsers.PARTICIPANT_UNANSWERED.id)
+      })
+
+      it('should record the user of a failed OTP login', async () => {
+        await createOTPToken()
+        const loginRequest: OTPLoginRequest = {
+          otp_code: '9999',
+          otp_token: 'abc123',
+        }
+
+        const loginResponse = await request(app).post('/auth/login/otp').send(loginRequest)
+        expect(loginResponse.status).toBe(401)
+
+        const auditLog = await latestAuditLog('auth/login/otp')
+        expect(auditLog.success).toBe(false)
+        expect(auditLog.userId).toBe(TestUsers.PARTICIPANT_UNANSWERED.id)
       })
     })
   })

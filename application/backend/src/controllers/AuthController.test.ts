@@ -9,10 +9,11 @@ import type {
   RegisterParticipantResponse,
   RegisterRequest,
   RegisterResponse,
+  SetupResponse,
 } from 'common/types/api/auth'
 import prisma from '../PrismaClient'
 import { Role } from '@prisma/client'
-import { resetDB, wipeDB } from 'common/testing/TestHelpers'
+import { createOIDCProviderConfig, resetDB, wipeDB } from 'common/testing/TestHelpers'
 import { TestUsers, TestStudies, TestInvites } from 'common/testing/constants'
 import {
   ContactMethod,
@@ -805,6 +806,29 @@ describe('AuthController', () => {
       expect(response.status).toBe(401)
     })
   })
+
+  describe('GET /auth/setup', () => {
+    afterEach(() => {
+      jest.restoreAllMocks()
+    })
+
+    it("should add each provider's additional scopes to the base scopes", async () => {
+      jest.replaceProperty(config, 'oidc', [
+        createOIDCProviderConfig({ name: 'aaf', additionalScopes: ['org.cilogon.userinfo'] }),
+        createOIDCProviderConfig({ name: 'auth0' }),
+      ])
+
+      const response = await request(app).get('/auth/setup')
+
+      expect(response.status).toBe(200)
+      const body: SetupResponse = response.body
+      expect(body.oidc.map(({ name, scope }) => [name, scope])).toEqual([
+        ['aaf', 'openid email profile org.cilogon.userinfo'],
+        ['auth0', 'openid email profile'],
+      ])
+    })
+  })
+
   describe('GET /auth/tcs', () => {
     it('redirects to tcs', async () => {
       const response = await request(app).get('/auth/tcs')
