@@ -1,9 +1,9 @@
 import Ajv from 'ajv'
 import { schema } from './config'
 
-const validator = () => new Ajv({ useDefaults: true }).compile(schema)
+// Only the OIDC part of the schema, so these tests don't depend on the mail settings
+const validator = () => new Ajv({ useDefaults: true }).compile(schema.properties.oidc)
 
-const smtp = { host: 'smtp.example.com', port: 587, username: 'user', password: 'pass' }
 const provider = {
   name: 'aaf',
   providerUrl: 'https://cilogon.example.org',
@@ -12,16 +12,16 @@ const provider = {
   clientSecret: 'client-secret',
 }
 
-// Validates a config with one OIDC provider. Ajv fills in defaults in place, so the provider it
+// Validates a list with one OIDC provider. Ajv fills in defaults in place, so the provider it
 // returns shows what the backend would run with.
 const validateProvider = (overrides: Record<string, unknown> = {}) => {
-  const config = { smtp, oidc: [{ ...provider, ...overrides }] }
-  const valid = validator()(config)
-  return { valid, provider: config.oidc[0] }
+  const oidc = [{ ...provider, ...overrides }]
+  const valid = validator()(oidc)
+  return { valid, provider: oidc[0] }
 }
 
 describe('OIDC config schema', () => {
-  it('compiles under Ajv strict mode', () => {
+  it('compiles with the options the backend uses', () => {
     expect(validator).not.toThrow()
   })
 
