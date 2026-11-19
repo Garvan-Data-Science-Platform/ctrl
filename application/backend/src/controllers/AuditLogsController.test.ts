@@ -366,7 +366,24 @@ describe('AuditLogsController', () => {
       }
       const mfaWarning = { auditLogMfaWarning: { acrValues: [ACR.REFEDS_MFA] } }
 
-      const mockOIDCProvider = (tokenResponse: Record<string, unknown>, email: string) => {
+      // Logs in through a mocked provider. The token response carries `idToken` when given, and
+      // userinfo returns `email`.
+      const loginViaOIDC = ({
+        providerConfig = {},
+        idToken,
+        email = TestUsers.ORG_ADMIN.email,
+        clientType,
+      }: {
+        providerConfig?: Parameters<typeof createOIDCProviderConfig>[0]
+        idToken?: string
+        email?: string
+        clientType?: string
+      }) => {
+        jest.replaceProperty(config, 'oidc', [createOIDCProviderConfig(providerConfig)])
+        const tokenResponse =
+          idToken === undefined
+            ? { access_token: '123' }
+            : { access_token: '123', id_token: idToken }
         fetchMock.removeRoutes()
         fetchMock
           .mockGlobal()
@@ -377,6 +394,11 @@ describe('AuditLogsController', () => {
           })
           .route('http://token', tokenResponse)
           .route('http://userinfo', { email })
+
+        const login = request(app).post('/auth/login/oidc')
+        return clientType
+          ? login.set({ 'x-client-type': clientType }).send(loginRequest)
+          : login.send(loginRequest)
       }
 
       afterEach(() => {
@@ -384,14 +406,11 @@ describe('AuditLogsController', () => {
       })
 
       it('should record the provider, user, institution and MFA signal', async () => {
-        jest.replaceProperty(config, 'oidc', [createOIDCProviderConfig(mfaWarning)])
         const claims = { acr: ACR.REFEDS_MFA, auth_time: 1800000000, ...INSTITUTIONS.WITH_MFA }
-        mockOIDCProvider(
-          { access_token: '123', id_token: createIdToken(claims) },
-          TestUsers.ORG_ADMIN.email,
-        )
-
-        const loginResponse = await request(app).post('/auth/login/oidc').send(loginRequest)
+        const loginResponse = await loginViaOIDC({
+          providerConfig: mfaWarning,
+          idToken: createIdToken(claims),
+        })
         expect(loginResponse.status).toBe(200)
 
         const auditLog = await latestAuditLog('auth/login/oidc')
@@ -405,13 +424,10 @@ describe('AuditLogsController', () => {
       })
 
       it('should flag a login without the MFA signal and still log the user in', async () => {
-        jest.replaceProperty(config, 'oidc', [createOIDCProviderConfig(mfaWarning)])
-        mockOIDCProvider(
-          { access_token: '123', id_token: createIdToken({ acr: ACR.PASSWORD_ONLY }) },
-          TestUsers.ORG_ADMIN.email,
-        )
-
-        const loginResponse = await request(app).post('/auth/login/oidc').send(loginRequest)
+        const loginResponse = await loginViaOIDC({
+          providerConfig: mfaWarning,
+          idToken: createIdToken({ acr: ACR.PASSWORD_ONLY }),
+        })
         expect(loginResponse.status).toBe(200)
 
         const auditLog = await latestAuditLog('auth/login/oidc')
@@ -423,13 +439,7 @@ describe('AuditLogsController', () => {
       })
 
       it('should record claims without an MFA result when the provider has no MFA warning', async () => {
-        jest.replaceProperty(config, 'oidc', [createOIDCProviderConfig()])
-        mockOIDCProvider(
-          { access_token: '123', id_token: createIdToken({ amr: ['mfa'] }) },
-          TestUsers.ORG_ADMIN.email,
-        )
-
-        const loginResponse = await request(app).post('/auth/login/oidc').send(loginRequest)
+        const loginResponse = await loginViaOIDC({ idToken: createIdToken({ amr: ['mfa'] }) })
         expect(loginResponse.status).toBe(200)
 
         const auditLog = await latestAuditLog('auth/login/oidc')
@@ -440,18 +450,10 @@ describe('AuditLogsController', () => {
       })
 
       it('should leave the claims out when the provider turns them off', async () => {
-        jest.replaceProperty(config, 'oidc', [
-          createOIDCProviderConfig({ ...mfaWarning, auditLogClaims: false }),
-        ])
-        mockOIDCProvider(
-          {
-            access_token: '123',
-            id_token: createIdToken({ acr: ACR.REFEDS_MFA, ...INSTITUTIONS.WITH_MFA }),
-          },
-          TestUsers.ORG_ADMIN.email,
-        )
-
-        const loginResponse = await request(app).post('/auth/login/oidc').send(loginRequest)
+        const loginResponse = await loginViaOIDC({
+          providerConfig: { ...mfaWarning, auditLogClaims: false },
+          idToken: createIdToken({ acr: ACR.REFEDS_MFA, ...INSTITUTIONS.WITH_MFA }),
+        })
         expect(loginResponse.status).toBe(200)
 
         const auditLog = await latestAuditLog('auth/login/oidc')
@@ -460,10 +462,7 @@ describe('AuditLogsController', () => {
       })
 
       it('should record why there are no claims, and no MFA result, when the ID token is missing', async () => {
-        jest.replaceProperty(config, 'oidc', [createOIDCProviderConfig(mfaWarning)])
-        mockOIDCProvider({ access_token: '123' }, TestUsers.ORG_ADMIN.email)
-
-        const loginResponse = await request(app).post('/auth/login/oidc').send(loginRequest)
+        const loginResponse = await loginViaOIDC({ providerConfig: mfaWarning })
         expect(loginResponse.status).toBe(200)
 
         const auditLog = await latestAuditLog('auth/login/oidc')
@@ -474,13 +473,10 @@ describe('AuditLogsController', () => {
       })
 
       it('should still log the user in when the ID token cannot be read', async () => {
-        jest.replaceProperty(config, 'oidc', [createOIDCProviderConfig(mfaWarning)])
-        mockOIDCProvider(
-          { access_token: '123', id_token: createJwt('not json') },
-          TestUsers.ORG_ADMIN.email,
-        )
-
-        const loginResponse = await request(app).post('/auth/login/oidc').send(loginRequest)
+        const loginResponse = await loginViaOIDC({
+          providerConfig: mfaWarning,
+          idToken: createJwt('not json'),
+        })
         expect(loginResponse.status).toBe(200)
 
         const auditLog = await latestAuditLog('auth/login/oidc')
@@ -491,16 +487,9 @@ describe('AuditLogsController', () => {
       })
 
       it('should not record claims from an ID token issued to another client', async () => {
-        jest.replaceProperty(config, 'oidc', [createOIDCProviderConfig()])
-        mockOIDCProvider(
-          {
-            access_token: '123',
-            id_token: createIdToken({ aud: 'other-client', acr: ACR.REFEDS_MFA }),
-          },
-          TestUsers.ORG_ADMIN.email,
-        )
-
-        const loginResponse = await request(app).post('/auth/login/oidc').send(loginRequest)
+        const loginResponse = await loginViaOIDC({
+          idToken: createIdToken({ aud: 'other-client', acr: ACR.REFEDS_MFA }),
+        })
         expect(loginResponse.status).toBe(200)
 
         const auditLog = await latestAuditLog('auth/login/oidc')
@@ -511,13 +500,10 @@ describe('AuditLogsController', () => {
       })
 
       it('should record the provider of a failed login from an unregistered email', async () => {
-        jest.replaceProperty(config, 'oidc', [createOIDCProviderConfig()])
-        mockOIDCProvider(
-          { access_token: '123', id_token: createIdToken({ acr: ACR.REFEDS_MFA }) },
-          TestUsers.UNREGISTERED.email,
-        )
-
-        const loginResponse = await request(app).post('/auth/login/oidc').send(loginRequest)
+        const loginResponse = await loginViaOIDC({
+          idToken: createIdToken({ acr: ACR.REFEDS_MFA }),
+          email: TestUsers.UNREGISTERED.email,
+        })
         expect(loginResponse.status).toBe(401)
 
         const auditLog = await latestAuditLog('auth/login/oidc')
@@ -530,16 +516,11 @@ describe('AuditLogsController', () => {
       })
 
       it('should record the user of a participant rejected by the admin portal', async () => {
-        jest.replaceProperty(config, 'oidc', [createOIDCProviderConfig()])
-        mockOIDCProvider(
-          { access_token: '123', id_token: createIdToken() },
-          TestUsers.PARTICIPANT_UNANSWERED.email,
-        )
-
-        const loginResponse = await request(app)
-          .post('/auth/login/oidc')
-          .set({ 'x-client-type': 'admin-client' })
-          .send(loginRequest)
+        const loginResponse = await loginViaOIDC({
+          idToken: createIdToken(),
+          email: TestUsers.PARTICIPANT_UNANSWERED.email,
+          clientType: 'admin-client',
+        })
         expect(loginResponse.status).toBe(401)
 
         const auditLog = await latestAuditLog('auth/login/oidc')
@@ -548,20 +529,13 @@ describe('AuditLogsController', () => {
       })
 
       it('should keep personal claims from the ID token out of the audit log', async () => {
-        jest.replaceProperty(config, 'oidc', [createOIDCProviderConfig()])
-        mockOIDCProvider(
-          {
-            access_token: '123',
-            id_token: createIdToken({
-              email: TestUsers.ORG_ADMIN.email,
-              name: 'Jane Citizen',
-              'https://example.org/upstream': 'upstream profile',
-            }),
-          },
-          TestUsers.ORG_ADMIN.email,
-        )
-
-        const loginResponse = await request(app).post('/auth/login/oidc').send(loginRequest)
+        const loginResponse = await loginViaOIDC({
+          idToken: createIdToken({
+            email: TestUsers.ORG_ADMIN.email,
+            name: 'Jane Citizen',
+            'https://example.org/upstream': 'upstream profile',
+          }),
+        })
         expect(loginResponse.status).toBe(200)
 
         const auditLog = await latestAuditLog('auth/login/oidc')
@@ -574,13 +548,7 @@ describe('AuditLogsController', () => {
       })
 
       it('should obscure the one-time login code in payloads', async () => {
-        jest.replaceProperty(config, 'oidc', [createOIDCProviderConfig()])
-        mockOIDCProvider(
-          { access_token: '123', id_token: createIdToken() },
-          TestUsers.ORG_ADMIN.email,
-        )
-
-        const loginResponse = await request(app).post('/auth/login/oidc').send(loginRequest)
+        const loginResponse = await loginViaOIDC({ idToken: createIdToken() })
         expect(loginResponse.status).toBe(200)
 
         const auditLog = await latestAuditLog('auth/login/oidc')
