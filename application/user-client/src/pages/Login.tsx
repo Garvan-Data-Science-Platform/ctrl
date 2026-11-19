@@ -17,6 +17,7 @@ import { useEffect, useState } from 'react'
 import { useAppStore } from '../store'
 import { useQueryClient } from '@tanstack/react-query'
 import { OIDCProvider } from '@common/types/oidc'
+import { baseOIDCScopes } from '@common/src/config'
 
 export default function Login() {
   const {
@@ -106,7 +107,9 @@ export default function Login() {
                             const additionalParams = val.authorizeUrlParams
                               ? '&' + val.authorizeUrlParams
                               : ''
-                            window.location.href = `${val.host}/authorize?state=${val.name}&client_id=${val.clientId}&scope=${encodeURIComponent(val.scope)}&response_type=code&redirect_uri=${window.location.origin}/login/callback${additionalParams}`
+                            // An older backend sends no scope, for example while a deploy is rolling out
+                            const scope = val.scope ?? baseOIDCScopes.join(' ')
+                            window.location.href = `${val.host}/authorize?state=${val.name}&client_id=${val.clientId}&scope=${encodeURIComponent(scope)}&response_type=code&redirect_uri=${window.location.origin}/login/callback${additionalParams}`
                           }}
                           sx={{
                             border: '1px solid lightgrey',

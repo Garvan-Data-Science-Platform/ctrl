@@ -2,6 +2,7 @@ import type { AuthProvider } from '@refinedev/core'
 import { useAuthStore } from '../authStore'
 import { axiosInstance } from './dataProvider'
 import { GeneratePasswordResetLinkRequest, ResetPasswordRequest } from '@common/types/api/users'
+import { baseOIDCScopes } from '@common/src/config'
 
 export const TOKEN_KEY = 'refine-auth'
 export const ID_KEY = 'userid'
@@ -37,7 +38,9 @@ export const authProvider: AuthProvider = {
       const match = providers.find((val) => val.name == params.providerName)
 
       if (match) {
-        const { host, clientId, authorizeUrlParams, scope } = match
+        const { host, clientId, authorizeUrlParams } = match
+        // An older backend sends no scope, for example while a deploy is rolling out
+        const scope = match.scope ?? baseOIDCScopes.join(' ')
         const redirectUri = `${window.location.href.split('/login').at(0)}/login/callback`
         const additionalParams = authorizeUrlParams ? '&' + authorizeUrlParams : ''
         window.location.replace(

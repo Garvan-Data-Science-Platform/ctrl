@@ -19,7 +19,8 @@ describe('AuditLog Middleware', () => {
     app = express() // Isolateed Express app just for this test
     app.use(express.json())
     app.use((req: any, _res, next) => {
-      req.user = { userId: 123 } // Dummy test user
+      // Dummy test user, logged in everywhere except the dummy login route
+      if (req.path !== '/dummy-login') req.user = { userId: 123 }
       next()
     })
 
@@ -30,13 +31,15 @@ describe('AuditLog Middleware', () => {
       res.status(200).json({ receivedBody: req.body })
     })
 
-    // Dummy endpoint that adds its own details to the audit log row, like the login routes do
-    app.post('/dummy-with-audit', (req: Request, res: Response) => {
+    // Dummy endpoints that add their own details to the audit log row, like the login routes do
+    const addAuditDetails = (req: Request, res: Response) => {
       const audit = getAuditDetails(req)
       audit.userId = 456
       audit.meta = { oidc: { provider: 'test', claims: { acr: 'x' }, mfaSignal: false } }
       res.status(200).json({})
-    })
+    }
+    app.post('/dummy-with-audit', addAuditDetails)
+    app.post('/dummy-login', addAuditDetails)
   })
 
   afterEach(() => {
@@ -93,16 +96,24 @@ describe('AuditLog Middleware', () => {
     expect(data.meta).toEqual({ resourceId: '', url: '/dummy-endpoint', method: 'POST' })
   })
 
-  it("should add the route's own user and details from res.locals.audit", async () => {
-    await request(app).post('/dummy-with-audit').send({})
+  it("should add the route's own user and details when nobody is logged in", async () => {
+    await request(app).post('/dummy-login').send({})
 
     const { data } = (prisma.auditLog.create as jest.Mock).mock.calls[0][0]
     expect(data.userId).toBe(456)
     expect(data.meta).toEqual({
       resourceId: '',
-      url: '/dummy-with-audit',
+      url: '/dummy-login',
       method: 'POST',
       oidc: { provider: 'test', claims: { acr: 'x' }, mfaSignal: false },
     })
+  })
+
+  it("should keep the logged-in user over the route's own user", async () => {
+    await request(app).post('/dummy-with-audit').send({})
+
+    const { data } = (prisma.auditLog.create as jest.Mock).mock.calls[0][0]
+    expect(data.userId).toBe(123)
+    expect(data.meta).toHaveProperty('oidc')
   })
 })

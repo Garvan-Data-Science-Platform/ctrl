@@ -268,7 +268,8 @@ export async function seedAuditLogs(count: number) {
   })
 }
 
-// Two OIDC login rows for the audit page tests, one with the MFA signal and one without
+// OIDC login rows for the audit page tests: one with the MFA signal, one without, and one whose
+// ID token couldn't be read
 export async function seedOIDCLoginAuditLogs() {
   const { ACR, INSTITUTIONS, PROVIDER } = TestOIDC
   const oidcLogin = (oidc: OIDCAuditMeta): Prisma.AuditLogCreateManyInput => ({
@@ -291,6 +292,10 @@ export async function seedOIDCLoginAuditLogs() {
         provider: PROVIDER.name,
         claims: { ...INSTITUTIONS.WITHOUT_MFA },
         mfaSignal: false,
+      }),
+      oidcLogin({
+        provider: PROVIDER.name,
+        claimsError: 'ID token audience does not include this client',
       }),
     ],
   })

@@ -100,4 +100,54 @@ describe('auth', () => {
       expect(window.localStorage.getItem('userid')).to.eq(ID)
     })
   })
+
+  describe('OIDC authorize URL scope', () => {
+    // The provider is served from this origin so the redirect to it can be intercepted
+    const setupWithProvider = (provider) => ({
+      isSetup: true,
+      oidc: [
+        {
+          name: 'aaf',
+          host: `${Cypress.config('baseUrl')}/fake-idp`,
+          clientId: 'test-client',
+          icon: 'https://aaf.edu.au/wp-content/uploads/AAF_LGO_small-website.png',
+          displayInAdminPortal: true,
+          displayInUserPortal: true,
+          authorizeUrlParams: '',
+          ...provider,
+        },
+      ],
+      disableAdminPasswordLogin: true,
+    })
+
+    const authorizeScope = () => {
+      // Matched by path, because a glob can't cross the slashes in the redirect_uri query
+      cy.intercept(
+        { pathname: '/fake-idp/authorize' },
+        {
+          statusCode: 200,
+          headers: { 'content-type': 'text/html' },
+          body: '<html><body>Provider login</body></html>',
+        },
+      ).as('authorize')
+      cy.visit('/')
+      cy.get('[data-cy="oidc-img"]').click()
+      return cy
+        .wait('@authorize')
+        .then((interception) => new URL(interception.request.url).searchParams.get('scope'))
+    }
+
+    it('should ask for the scope that /auth/setup sends', () => {
+      cy.intercept(
+        '*/setup',
+        setupWithProvider({ scope: 'openid email profile org.cilogon.userinfo' }),
+      )
+      authorizeScope().should('eq', 'openid email profile org.cilogon.userinfo')
+    })
+
+    it('should fall back to the base scopes when /auth/setup sends none', () => {
+      cy.intercept('*/setup', setupWithProvider({}))
+      authorizeScope().should('eq', 'openid email profile')
+    })
+  })
 })

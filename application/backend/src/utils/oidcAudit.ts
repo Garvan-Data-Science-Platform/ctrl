@@ -54,14 +54,9 @@ export function readIdTokenClaims(
   return { claims }
 }
 
-export function hasMFASignal(
-  claims: OIDCAuditClaims | undefined,
-  mfaValues: MFASignalValues,
-): boolean {
-  const acr = claims?.acr
+export function hasMFASignal(claims: OIDCAuditClaims, mfaValues: MFASignalValues): boolean {
+  const { acr, amr = [] } = claims
   const acrMatches = acr !== undefined && (mfaValues.acrValues ?? []).includes(acr)
-  const amrMatches = (claims?.amr ?? []).some((method) =>
-    (mfaValues.amrValues ?? []).includes(method),
-  )
+  const amrMatches = amr.some((method) => (mfaValues.amrValues ?? []).includes(method))
   return acrMatches || amrMatches
 }

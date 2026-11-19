@@ -93,12 +93,16 @@ describe('OIDC audit functions', () => {
       expect(readIdTokenClaims(token, expected)).toStrictEqual({ claimsError: reason })
     })
 
-    it.each([null, 123, {}, 'a.b.c', '...', '%%%.%%%.%%%'])(
-      'Returns a reason without throwing for malformed input %p',
-      (input) => {
-        expect(readIdTokenClaims(input, expected)).toHaveProperty('claimsError')
-      },
-    )
+    it.each([
+      [null, 'no ID token in the token response'],
+      [123, 'no ID token in the token response'],
+      [{}, 'no ID token in the token response'],
+      ['a.b.c', 'ID token is not a valid JWT'],
+      ['...', 'ID token is not a valid JWT'],
+      ['%%%.%%%.%%%', 'ID token is not a valid JWT'],
+    ])('Returns a reason without throwing for malformed input %p', (input, reason) => {
+      expect(readIdTokenClaims(input, expected)).toStrictEqual({ claimsError: reason })
+    })
   })
 
   describe('hasMFASignal()', () => {
@@ -125,7 +129,6 @@ describe('OIDC audit functions', () => {
         result: false,
       },
       { name: 'no acr', claims: {}, values: acrValues, result: false },
-      { name: 'no claims', claims: undefined, values: acrValues, result: false },
       { name: 'an amr with mfa', claims: { amr: ['pwd', 'mfa'] }, values: amrValues, result: true },
       { name: 'an amr without mfa', claims: { amr: ['pwd'] }, values: amrValues, result: false },
       {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { defaultAuditLogsPageSize } from '@common/src/config'
-import { Box, Button, Chip, Collapse, Tooltip, Typography } from '@mui/material'
+import { Box, Button, Chip, Collapse, Typography } from '@mui/material'
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import { DateField, List, useDataGrid } from '@refinedev/mui'
 import { AUDIT_LOG_SORTABLE_FIELDS } from '@common/types/api/audit-logs/getAuditLogs'
@@ -11,7 +11,8 @@ const isOIDCAuditMeta = (value: unknown): value is OIDCAuditMeta =>
   value !== null &&
   typeof (value as { provider?: unknown }).provider === 'string'
 
-// Provider, institution and MFA result recorded for an OIDC login
+// Provider, institution and MFA result recorded for an OIDC login. When the ID token couldn't be
+// read there's no MFA result, and the reason is shown as text instead.
 const OIDCLoginDetails = ({ oidc }: { oidc: OIDCAuditMeta }) => (
   <Box
     sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}
@@ -23,15 +24,21 @@ const OIDCLoginDetails = ({ oidc }: { oidc: OIDCAuditMeta }) => (
       <Chip label="MFA signal" size="small" color="success" data-cy="mfa-signal" />
     )}
     {oidc.mfaSignal === false && (
-      <Tooltip
-        title={
-          oidc.claimsError
-            ? `No MFA signal: ${oidc.claimsError}`
-            : "The provider didn't send an MFA signal for this login"
-        }
-      >
-        <Chip label="No MFA signal" size="small" color="warning" data-cy="no-mfa-signal" />
-      </Tooltip>
+      <Chip label="No MFA signal" size="small" color="warning" data-cy="no-mfa-signal" />
+    )}
+    {oidc.claimsError && (
+      <>
+        <Chip
+          label="Claims unavailable"
+          size="small"
+          color="warning"
+          variant="outlined"
+          data-cy="claims-unavailable"
+        />
+        <Typography variant="caption" color="text.secondary" data-cy="claims-error">
+          {oidc.claimsError}
+        </Typography>
+      </>
     )}
   </Box>
 )

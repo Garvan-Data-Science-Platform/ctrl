@@ -75,7 +75,9 @@ export async function auditLog(req: Request, res: Response, next: NextFunction) 
     try {
       await prisma.auditLog.create({
         data: {
-          userId: res.locals.audit?.userId ?? userId,
+          // The logged-in user comes first. A route's own user only fills in when nobody is logged
+          // in yet, as on the login routes.
+          userId: userId ?? res.locals.audit?.userId,
           operation,
           resource,
           meta,

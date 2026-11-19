@@ -59,8 +59,7 @@ import { genId, genIndId } from '../utils/genId'
 import { Prefill } from 'common/types/invite'
 import { hasMFASignal, readIdTokenClaims } from '../utils/oidcAudit'
 import type { OIDCAuditMeta } from 'common/types/oidc'
-
-const BASE_OIDC_SCOPES = ['openid', 'email', 'profile']
+import { baseOIDCScopes } from 'common/src/config'
 
 @Route('auth')
 @Tags('Auth')
@@ -131,7 +130,7 @@ export class AuthController extends Controller {
         displayInAdminPortal: val.displayInAdminPortal,
         displayInUserPortal: val.displayInUserPortal,
         authorizeUrlParams: val.authorizeUrlParams,
-        scope: [...BASE_OIDC_SCOPES, ...(val.additionalScopes ?? [])].join(' '),
+        scope: [...baseOIDCScopes, ...(val.additionalScopes ?? [])].join(' '),
       })),
       disableAdminPasswordLogin: config.disableAdminPasswordLogin || false,
     }
@@ -342,7 +341,8 @@ export class AuthController extends Controller {
           `OIDC login via ${oidc.name} has no readable claims: ${idTokenResult.claimsError}`,
         )
       }
-      if (oidc.auditLogMfaWarning) {
+      // Without readable claims there is nothing to judge, and claimsError already says why
+      if (oidc.auditLogMfaWarning && claims) {
         oidcAudit.mfaSignal = hasMFASignal(claims, oidc.auditLogMfaWarning)
       }
 

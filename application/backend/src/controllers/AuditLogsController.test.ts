@@ -62,6 +62,17 @@ describe('AuditLogsController', () => {
       return body.data[0]
     }
 
+    // An OTP for the unanswered participant, valid for a minute, with code 1223
+    const createOTPToken = () =>
+      prisma.oTPToken.create({
+        data: {
+          code: '1223',
+          expiresAt: new Date(new Date().getTime() + 1000 * 60),
+          id: 'abc123',
+          userId: TestUsers.PARTICIPANT_UNANSWERED.id,
+        },
+      })
+
     describe('Authentication and authorisation', () => {
       it('should not allow unauthorised access', async () => {
         const response = await request(app).get('/audit-logs')
@@ -323,14 +334,7 @@ describe('AuditLogsController', () => {
       })
 
       it('should obscure sensitive otp information in payloads', async () => {
-        await prisma.oTPToken.create({
-          data: {
-            code: '1223',
-            expiresAt: new Date(new Date().getTime() + 1000 * 60),
-            id: 'abc123',
-            userId: TestUsers.PARTICIPANT_UNANSWERED.id,
-          },
-        })
+        await createOTPToken()
         const loginRequest: OTPLoginRequest = {
           otp_code: '1223',
           otp_token: 'abc123',
@@ -455,7 +459,7 @@ describe('AuditLogsController', () => {
         expect(auditLog.meta).toHaveProperty('oidc', { provider: PROVIDER.name, mfaSignal: true })
       })
 
-      it('should record why there are no claims when the ID token is missing', async () => {
+      it('should record why there are no claims, and no MFA result, when the ID token is missing', async () => {
         jest.replaceProperty(config, 'oidc', [createOIDCProviderConfig(mfaWarning)])
         mockOIDCProvider({ access_token: '123' }, TestUsers.ORG_ADMIN.email)
 
@@ -466,7 +470,6 @@ describe('AuditLogsController', () => {
         expect(auditLog.meta).toHaveProperty('oidc', {
           provider: PROVIDER.name,
           claimsError: 'no ID token in the token response',
-          mfaSignal: false,
         })
       })
 
@@ -484,7 +487,6 @@ describe('AuditLogsController', () => {
         expect(auditLog.meta).toHaveProperty('oidc', {
           provider: PROVIDER.name,
           claimsError: 'ID token is not a valid JWT',
-          mfaSignal: false,
         })
       })
 
@@ -588,16 +590,6 @@ describe('AuditLogsController', () => {
     })
 
     describe('Password and OTP logins', () => {
-      const createOTPToken = () =>
-        prisma.oTPToken.create({
-          data: {
-            code: '1223',
-            expiresAt: new Date(new Date().getTime() + 1000 * 60),
-            id: 'abc123',
-            userId: TestUsers.PARTICIPANT_UNANSWERED.id,
-          },
-        })
-
       it('should record the user of a password login', async () => {
         const loginRequest: LoginRequest = {
           email: TestUsers.ORG_ADMIN.email,

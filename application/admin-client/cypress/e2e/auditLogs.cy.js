@@ -38,6 +38,19 @@ describe('Audit Logs', () => {
       .should('contain.text', 'No MFA signal')
   })
 
+  it('should show why there are no claims instead of an MFA result', () => {
+    cy.login(TestUsers.ORG_ADMIN.email)
+    cy.visit('/audit-logs')
+
+    cy.contains('[data-cy="oidc-login-details"]', 'Claims unavailable')
+      .should('contain.text', TestOIDC.PROVIDER.name)
+      .and('contain.text', 'ID token audience does not include this client')
+      .within(() => {
+        cy.get('[data-cy="mfa-signal"]').should('not.exist')
+        cy.get('[data-cy="no-mfa-signal"]').should('not.exist')
+      })
+  })
+
   it('should toggle the View Payload cell and display JSON', () => {
     cy.login(TestUsers.STUDY_ADMIN.email)
     cy.visit('/audit-logs')
