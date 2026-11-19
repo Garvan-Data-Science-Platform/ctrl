@@ -265,3 +265,14 @@ export async function seedAuditLogs(count: number) {
     data: logsToCreate,
   })
 }
+
+// Check audit log for a specific entry. Timeout if not found.
+export async function waitForAuditLog(where: Prisma.AuditLogWhereInput, timeoutMs = 2000) {
+  const deadline = Date.now() + timeoutMs
+  while (Date.now() < deadline) {
+    const log = await prisma.auditLog.findFirst({ where, orderBy: { id: 'desc' } })
+    if (log) return log
+    await new Promise((r) => setTimeout(r, 20))
+  }
+  throw new Error(`Timed out waiting for audit log matching ${JSON.stringify(where)}`)
+}
