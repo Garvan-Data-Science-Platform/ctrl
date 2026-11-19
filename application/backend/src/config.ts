@@ -18,7 +18,7 @@ for (const name of [
 }
 
 //Validate
-const schema = {
+export const schema = {
   type: 'object',
   properties: {
     oidc: {
