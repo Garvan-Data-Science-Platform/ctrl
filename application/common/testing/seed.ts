@@ -23,6 +23,7 @@ export async function seedTests(prisma: PrismaClient) {
   await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"Organisation"', 'id'), 2, false) FROM "Organisation";`
 
   // Create four studies
+  // Test Study - nested ACCEPTED invites for the three participants below (UNANSWERED, COMPLETED, GUARDIAN_2), plus fixture invites in various states for testing invite lifecycle
   const testStudy = await prisma.study.create({
     data: {
       name: TestStudies.TEST_STUDY.name,
@@ -30,6 +31,53 @@ export async function seedTests(prisma: PrismaClient) {
       redcapToken: 'ABC',
       redcapURL: 'http://redcaptest.com',
       contactUsEmail: 'test@contactus.com',
+      invites: {
+        create: [
+          {
+            email: TestUsers.PARTICIPANT_UNANSWERED.email,
+            status: InviteStatus.ACCEPTED,
+            expiresAt: new Date('2026-01-01'),
+            sentAt: new Date('2025-12-15'),
+          },
+          {
+            email: TestUsers.PARTICIPANT_COMPLETED.email,
+            status: InviteStatus.ACCEPTED,
+            expiresAt: new Date('2026-01-01'),
+            sentAt: new Date('2025-12-15'),
+          },
+          {
+            email: TestUsers.GUARDIAN_2.email,
+            status: InviteStatus.ACCEPTED,
+            expiresAt: new Date('2026-01-01'),
+            sentAt: new Date('2025-12-15'),
+          },
+          {
+            email: TestInvites.INVITE_PENDING.email,
+            status: InviteStatus.PENDING,
+            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
+          },
+          {
+            email: TestInvites.INVITE_ACCEPTED.email,
+            status: InviteStatus.ACCEPTED,
+            expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day in the past
+          },
+          {
+            email: TestInvites.INVITE_REVOKED.email,
+            status: InviteStatus.REVOKED,
+            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
+          },
+          {
+            email: TestInvites.INVITE_EXPIRED.email,
+            status: InviteStatus.EXPIRED,
+            expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day in the past
+          },
+          {
+            email: TestInvites.INVITE_2_PENDING.email,
+            status: InviteStatus.PENDING,
+            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
+          },
+        ],
+      },
     },
   })
 
@@ -43,10 +91,27 @@ export async function seedTests(prisma: PrismaClient) {
   })
 
   // This study will have a survey, a participant user and draft answers (mostly for frontend multistudy testing)
+  // Nested ACCEPTED invites for GUARDIAN_2 and PARTICIPANT_UNANSWERED (both linked to this study below)
   const frontendTestStudy = await prisma.study.create({
     data: {
       name: TestStudies.FE_TEST_STUDY.name,
       id: TestStudies.FE_TEST_STUDY.id,
+      invites: {
+        create: [
+          {
+            email: TestUsers.GUARDIAN_2.email,
+            status: InviteStatus.ACCEPTED,
+            expiresAt: new Date('2026-01-01'),
+            sentAt: new Date('2025-12-15'),
+          },
+          {
+            email: TestUsers.PARTICIPANT_UNANSWERED.email,
+            status: InviteStatus.ACCEPTED,
+            expiresAt: new Date('2026-01-01'),
+            sentAt: new Date('2025-12-15'),
+          },
+        ],
+      },
     },
   })
 
@@ -128,168 +193,7 @@ export async function seedTests(prisma: PrismaClient) {
     },
   })
 
-  //User with unanswered survey
-  await prisma.user.create({
-    data: {
-      id: TestUsers.PARTICIPANT_UNANSWERED.id,
-      email: TestUsers.PARTICIPANT_UNANSWERED.email,
-      firstName: 'Test',
-      lastName: 'User',
-      password: hashPassword(TestUsers.PARTICIPANT_UNANSWERED.password),
-      role: Role.Participant,
-      organisations: {
-        connect: {
-          id: 1,
-        },
-      },
-    },
-  })
-
-  //Second guardian user
-  await prisma.user.create({
-    data: {
-      id: TestUsers.GUARDIAN_2.id,
-      email: TestUsers.GUARDIAN_2.email,
-      firstName: 'Second',
-      lastName: 'Guardian',
-      password: hashPassword(TestUsers.GUARDIAN_2.password),
-      role: Role.Participant,
-    },
-  })
-  //User with completed survey
-  await prisma.user.create({
-    data: {
-      id: TestUsers.PARTICIPANT_COMPLETED.id,
-      email: TestUsers.PARTICIPANT_COMPLETED.email,
-      firstName: 'Test',
-      lastName: 'User',
-      password: hashPassword(TestUsers.PARTICIPANT_COMPLETED.password),
-      role: Role.Participant,
-    },
-  })
-
-  const participantUnansweredProfile = await prisma.participantProfile.create({
-    data: {
-      id: TestUsers.PARTICIPANT_UNANSWERED.id,
-      firstName: 'Unanswered',
-      lastName: 'User',
-      addressLine: '123 smith st',
-      dob: '1980-01-24',
-      mobile: '0412345678',
-      postcode: '1234',
-      preferredContact: 'EMAIL',
-      state: 'VIC',
-      suburb: 'M',
-      studies: {
-        create: {
-          participantId: `PID-TEST1-${TestUsers.PARTICIPANT_UNANSWERED.id}`,
-          study: {
-            connect: {
-              id: testStudy.id,
-            },
-          },
-        },
-      },
-      userId: TestUsers.PARTICIPANT_UNANSWERED.id,
-      participantType: 'STANDARD',
-    },
-  })
-
-  await prisma.alternativeContact.create({
-    data: {
-      participantProfileId: TestUsers.PARTICIPANT_UNANSWERED.id,
-      email: 'alt@email.com',
-      firstName: 'Alt',
-      lastName: 'Cont',
-    },
-  })
-
-  await prisma.participantProfile.create({
-    data: {
-      id: TestUsers.PARTICIPANT_COMPLETED.id,
-      firstName: 'Completed',
-      lastName: 'User',
-      addressLine: '123 smith st',
-      dob: '1980-01-23',
-      mobile: '0412345678',
-      postcode: '1234',
-      preferredContact: 'EMAIL',
-      state: 'VIC',
-      suburb: 'Melbourne',
-      studies: {
-        create: {
-          participantId: `PID-TEST1-${TestUsers.PARTICIPANT_COMPLETED.id}`,
-          study: {
-            connect: {
-              id: testStudy.id,
-            },
-          },
-        },
-      },
-      userId: TestUsers.PARTICIPANT_COMPLETED.id,
-      familyId: 100,
-      participantType: 'GUARDIAN',
-    },
-  })
-
-  //Dependent Profile (no user)
-  await prisma.participantProfile.create({
-    data: {
-      id: TestUsers.DEPENDENT.id,
-      firstName: 'Test',
-      lastName: 'Dependent',
-      addressLine: '123 smith st',
-      dob: '1990-01-23',
-      mobile: '0412345678',
-      postcode: '1234',
-      preferredContact: 'EMAIL',
-      state: 'VIC',
-      suburb: 'Melbourne',
-      studies: {
-        create: {
-          participantId: `PID-TEST1-${TestUsers.DEPENDENT.id}`,
-          study: {
-            connect: {
-              id: testStudy.id,
-            },
-          },
-        },
-      },
-      familyId: 100,
-      userId: null,
-      participantType: 'DEPENDENT_AGE',
-    },
-  })
-
-  //Second guardian
-  await prisma.participantProfile.create({
-    data: {
-      id: TestUsers.GUARDIAN_2.id,
-      firstName: 'Second',
-      lastName: 'Guardian',
-      addressLine: '123 smith st',
-      dob: '1990-01-23',
-      mobile: '0412345678',
-      postcode: '1234',
-      preferredContact: 'EMAIL',
-      state: 'VIC',
-      suburb: 'Melbourne',
-      studies: {
-        create: {
-          participantId: `PID-TEST1-${TestUsers.GUARDIAN_2.id}`,
-          study: {
-            connect: {
-              id: testStudy.id,
-            },
-          },
-        },
-      },
-      familyId: 100,
-      userId: TestUsers.GUARDIAN_2.id,
-      participantType: 'GUARDIAN',
-    },
-  })
-
+  // Survey versions - created before participants so they can be nested inside profile creation
   const testSurveyVersion = await prisma.surveyVersion.create({
     data: {
       id: 800,
@@ -308,7 +212,8 @@ export async function seedTests(prisma: PrismaClient) {
       studyId: testStudy.id,
     },
   })
-  // publish a survey for study 2
+
+  // Published survey for study 2
   const study2survey = await prisma.surveyVersion.create({
     data: {
       status: 'PUBLISHED',
@@ -332,69 +237,203 @@ export async function seedTests(prisma: PrismaClient) {
     },
   })
 
-  await prisma.surveyVersionAnswers.create({
-    data: {
-      versionId: testSurveyVersion.id,
-      profileId: TestUsers.PARTICIPANT_UNANSWERED.id,
-      answers: [
-        { status: 'review_required', answers: [] },
-        { status: 'review_required', answers: [null, null] },
-      ],
+  // User with unanswered survey - nested writes for user + profile + study + nextOfKin + surveys
+  await prisma.user.upsert({
+    where: { email: TestUsers.PARTICIPANT_UNANSWERED.email },
+    update: {},
+    create: {
+      id: TestUsers.PARTICIPANT_UNANSWERED.id,
+      email: TestUsers.PARTICIPANT_UNANSWERED.email,
+      firstName: 'Test',
+      lastName: 'User',
+      password: hashPassword(TestUsers.PARTICIPANT_UNANSWERED.password),
+      role: Role.Participant,
+      organisations: { connect: { id: 1 } },
+      profiles: {
+        create: [
+          {
+            id: TestUsers.PARTICIPANT_UNANSWERED.id,
+            firstName: 'Unanswered',
+            lastName: 'User',
+            addressLine: '123 smith st',
+            dob: '1980-01-24',
+            mobile: '0412345678',
+            postcode: '1234',
+            preferredContact: 'EMAIL',
+            state: 'VIC',
+            suburb: 'M',
+            participantType: 'STANDARD',
+            studies: {
+              create: {
+                participantId: `PID-TEST1-${TestUsers.PARTICIPANT_UNANSWERED.id}`,
+                study: { connect: { id: testStudy.id } },
+              },
+            },
+            nextOfKin: {
+              create: {
+                email: 'alt@email.com',
+                firstName: 'Alt',
+                lastName: 'Cont',
+              },
+            },
+            surveys: {
+              create: [
+                {
+                  versionId: testSurveyVersion.id,
+                  answers: [
+                    { status: 'review_required', answers: [] },
+                    { status: 'review_required', answers: [null, null] },
+                  ],
+                },
+                {
+                  versionId: study2survey.id,
+                  answers: [{ status: 'review_required', answers: [null] }],
+                },
+              ],
+            },
+          },
+        ],
+      },
     },
   })
-  await prisma.surveyVersionAnswers.create({
-    data: {
-      versionId: study2survey.id,
-      profileId: TestUsers.PARTICIPANT_UNANSWERED.id,
-      answers: [{ status: 'review_required', answers: [null] }],
+  // User with completed survey
+  await prisma.user.upsert({
+    where: { email: TestUsers.PARTICIPANT_COMPLETED.email },
+    update: {},
+    create: {
+      id: TestUsers.PARTICIPANT_COMPLETED.id,
+      email: TestUsers.PARTICIPANT_COMPLETED.email,
+      firstName: 'Test',
+      lastName: 'User',
+      password: hashPassword(TestUsers.PARTICIPANT_COMPLETED.password),
+      role: Role.Participant,
+      profiles: {
+        create: [
+          {
+            id: TestUsers.PARTICIPANT_COMPLETED.id,
+            firstName: 'Completed',
+            lastName: 'User',
+            addressLine: '123 smith st',
+            dob: '1980-01-23',
+            mobile: '0412345678',
+            postcode: '1234',
+            preferredContact: 'EMAIL',
+            state: 'VIC',
+            suburb: 'Melbourne',
+            familyId: 100,
+            participantType: 'GUARDIAN',
+            studies: {
+              create: {
+                participantId: `PID-TEST1-${TestUsers.PARTICIPANT_COMPLETED.id}`,
+                study: { connect: { id: testStudy.id } },
+              },
+            },
+            surveys: {
+              create: {
+                versionId: testSurveyVersion.id,
+                answers: [
+                  { status: 'viewed', answers: [] },
+                  {
+                    status: 'completed',
+                    answers: [false, 'Choice 2'],
+                    last_updated: '2024-12-02T23:45:27.815Z',
+                  },
+                ],
+              },
+            },
+          },
+        ],
+      },
     },
   })
-
-  await prisma.surveyVersionAnswers.create({
+  // Dependent Profile (no user - so profile.create with nested studies + surveys)
+  await prisma.participantProfile.create({
     data: {
-      versionId: testSurveyVersion.id,
-      profileId: TestUsers.PARTICIPANT_COMPLETED.id,
-      answers: [
-        { status: 'viewed', answers: [] },
-        {
-          status: 'completed',
-          answers: [false, 'Choice 2'],
-          last_updated: '2024-12-02T23:45:27.815Z',
+      id: TestUsers.DEPENDENT.id,
+      firstName: 'Test',
+      lastName: 'Dependent',
+      addressLine: '123 smith st',
+      dob: '1990-01-23',
+      mobile: '0412345678',
+      postcode: '1234',
+      preferredContact: 'EMAIL',
+      state: 'VIC',
+      suburb: 'Melbourne',
+      familyId: 100,
+      userId: null,
+      participantType: 'DEPENDENT_AGE',
+      studies: {
+        create: {
+          participantId: `PID-TEST1-${TestUsers.DEPENDENT.id}`,
+          study: { connect: { id: testStudy.id } },
         },
-      ],
-    },
-  })
-
-  await prisma.surveyVersionAnswers.create({
-    data: {
-      versionId: testSurveyVersion.id,
-      profileId: TestUsers.DEPENDENT.id,
-      answers: [
-        { status: 'viewed', answers: [] },
-        {
-          status: 'review_required',
-          answers: [null, null],
-          last_updated: '2024-12-02T23:45:27.815Z',
+      },
+      surveys: {
+        create: {
+          versionId: testSurveyVersion.id,
+          answers: [
+            { status: 'viewed', answers: [] },
+            {
+              status: 'review_required',
+              answers: [null, null],
+              last_updated: '2024-12-02T23:45:27.815Z',
+            },
+          ],
         },
-      ],
+      },
     },
   })
 
-  await prisma.surveyVersionAnswers.create({
-    data: {
-      versionId: testSurveyVersion.id,
-      profileId: TestUsers.GUARDIAN_2.id,
-      answers: [
-        { status: 'viewed', answers: [] },
-        {
-          status: 'review_required',
-          answers: [null, null],
-          last_updated: '2024-12-02T23:45:27.815Z',
-        },
-      ],
+  // Second guardian user
+  await prisma.user.upsert({
+    where: { email: TestUsers.GUARDIAN_2.email },
+    update: {},
+    create: {
+      id: TestUsers.GUARDIAN_2.id,
+      email: TestUsers.GUARDIAN_2.email,
+      firstName: 'Second',
+      lastName: 'Guardian',
+      password: hashPassword(TestUsers.GUARDIAN_2.password),
+      role: Role.Participant,
+      profiles: {
+        create: [
+          {
+            id: TestUsers.GUARDIAN_2.id,
+            firstName: 'Second',
+            lastName: 'Guardian',
+            addressLine: '123 smith st',
+            dob: '1990-01-23',
+            mobile: '0412345678',
+            postcode: '1234',
+            preferredContact: 'EMAIL',
+            state: 'VIC',
+            suburb: 'Melbourne',
+            familyId: 100,
+            participantType: 'GUARDIAN',
+            studies: {
+              create: {
+                participantId: `PID-TEST1-${TestUsers.GUARDIAN_2.id}`,
+                study: { connect: { id: testStudy.id } },
+              },
+            },
+            surveys: {
+              create: {
+                versionId: testSurveyVersion.id,
+                answers: [
+                  { status: 'viewed', answers: [] },
+                  {
+                    status: 'review_required',
+                    answers: [null, null],
+                    last_updated: '2024-12-02T23:45:27.815Z',
+                  },
+                ],
+              },
+            },
+          },
+        ],
+      },
     },
   })
-
   // Seed a user and password reset token
   await prisma.user.create({
     data: {
@@ -414,43 +453,6 @@ export async function seedTests(prisma: PrismaClient) {
       expiresAt: new Date(Date.now() + 2 * 60 * 1000), // 2 minutes in the future
       used: false,
     },
-  })
-
-  // Setup invites
-  await prisma.invite.createMany({
-    data: [
-      {
-        email: TestInvites.INVITE_PENDING.email,
-        status: InviteStatus.PENDING,
-        studyId: testStudy.id,
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
-      },
-      {
-        email: TestInvites.INVITE_ACCEPTED.email,
-        status: InviteStatus.ACCEPTED,
-        studyId: testStudy.id,
-        expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day in the past
-      },
-      {
-        email: TestInvites.INVITE_REVOKED.email,
-        status: InviteStatus.REVOKED,
-        studyId: testStudy.id,
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
-      },
-      {
-        email: TestInvites.INVITE_EXPIRED.email,
-        status: InviteStatus.EXPIRED,
-        studyId: testStudy.id,
-        expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day in the past
-      },
-      // Pending invites for testing
-      {
-        email: TestInvites.INVITE_2_PENDING.email,
-        status: InviteStatus.PENDING,
-        studyId: testStudy.id,
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day in the future
-      },
-    ],
   })
 
   // Frontend multistudy test seed data
@@ -497,7 +499,7 @@ export async function seedTests(prisma: PrismaClient) {
 
   await prisma.participantProfile.update({
     where: {
-      id: participantUnansweredProfile.id,
+      id: TestUsers.PARTICIPANT_UNANSWERED.id,
     },
     data: {
       studies: {
