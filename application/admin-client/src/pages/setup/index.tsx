@@ -10,6 +10,7 @@ export const SetupPage = () => {
     register,
     handleSubmit,
     setError,
+    getValues,
     formState: { errors },
   } = useForm()
 
@@ -87,7 +88,9 @@ export const SetupPage = () => {
               {...register('password', {
                 required: true,
                 validate: (val) => {
-                  const { isValid, fields } = checkPasswordStrength(val)
+                  const { isValid, fields } = checkPasswordStrength(val, {
+                    email: getValues('email'),
+                  })
                   if (!isValid) {
                     return `Invalid password. ${Object.values(fields).map((f) => ' ' + f.message)}`
                   }

@@ -6,7 +6,9 @@ const createAdmin = async () => {
   const admin = await prisma.user.findFirst({ where: { email: process.env['ORG_ADMIN_EMAIL'] } })
 
   if (!admin && process.env['ORG_ADMIN_PASSWORD'] && process.env['ORG_ADMIN_EMAIL']) {
-    const { isValid, fields } = checkPasswordStrength(process.env['ORG_ADMIN_PASSWORD'] as string)
+    const { isValid, fields } = checkPasswordStrength(process.env['ORG_ADMIN_PASSWORD'] as string, {
+      email: process.env['ORG_ADMIN_EMAIL'],
+    })
     if (!isValid) {
       const reasons = Object.values(fields)
         .map((f) => f.message)

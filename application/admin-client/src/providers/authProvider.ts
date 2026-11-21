@@ -2,6 +2,7 @@ import type { AuthProvider } from '@refinedev/core'
 import { useAuthStore } from '../authStore'
 import { axiosInstance } from './dataProvider'
 import { GeneratePasswordResetLinkRequest, ResetPasswordRequest } from '@common/types/api/users'
+import { PERSONAL_INFO_REJECTED_MESSAGE } from '@common/src/PasswordStrength'
 
 export const TOKEN_KEY = 'refine-auth'
 export const ID_KEY = 'userid'
@@ -183,7 +184,10 @@ export const authProvider: AuthProvider = {
     try {
       await axiosInstance.post('/users/password/reset', reqData)
     } catch (e: any) {
-      const errorMessage = e.response?.data?.message || 'An unknown error occurred'
+      // The reset page can't check personal info in the browser, so explain the server's rejection
+      const errorMessage = e.response?.data?.details?.PersonalInfo
+        ? PERSONAL_INFO_REJECTED_MESSAGE
+        : e.response?.data?.message || 'An unknown error occurred'
       return {
         success: false,
         error: {

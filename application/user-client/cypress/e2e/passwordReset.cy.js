@@ -1,5 +1,6 @@
 /// <reference types="cypress" />
 const { TestUsers, TestStudies } = require('../../../common/testing/constants')
+const { PERSONAL_INFO_REJECTED_MESSAGE } = require('../../../common/src/PasswordStrength')
 
 beforeEach(() => {
   cy.task('reset')
@@ -129,5 +130,16 @@ describe('Password Reset', () => {
     cy.get('[data-cy="login-password"]').type(newPassword)
     cy.get('[data-cy="login"]').click()
     cy.get('[data-cy="log-out"]').should('exist')
+  })
+
+  it('explains a new password rejected for containing personal info', () => {
+    const piiPassword = `${TestUsers.PASSWORD_RESET_USER.firstName}Corduroy2026`
+    cy.visit('/reset-password?token=valid-reset-token')
+    cy.get('[data-cy="new-password"]').type(piiPassword)
+    cy.get('[data-cy="confirm-password"]').type(piiPassword)
+    cy.get('[data-cy="reset-password"]').click()
+    cy.contains(PERSONAL_INFO_REJECTED_MESSAGE).should('exist')
+    // The token is still valid, so the form stays for another attempt
+    cy.get('[data-cy="new-password"]').should('exist')
   })
 })
