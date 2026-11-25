@@ -2,7 +2,7 @@ import request from 'supertest'
 import { Api } from '../Api'
 import prisma from '../PrismaClient'
 import { Role } from '@prisma/client'
-import { resetDB, seedAuditLogs } from 'common/testing/TestHelpers'
+import { resetDB, seedAuditLogs, waitForAuditLog } from 'common/testing/TestHelpers'
 import { defaultAuditLogsPageSize } from 'common/src/config'
 import { generateToken } from '../authentication'
 import type { GetAuditLogsResponse } from 'common/types/api/audit-logs'
@@ -229,6 +229,7 @@ describe('AuditLogsController', () => {
           .set({ Authorization: `Bearer ${orgAdminToken}` })
           .send({ redcapToken: updatedRedcapToken } as UpdateStudyRequest)
         expect(patchResponse.status).toBe(204)
+        await waitForAuditLog({ resource: 'studies' })
 
         // Check Audit Logs
         const response = await request(app)
@@ -256,6 +257,7 @@ describe('AuditLogsController', () => {
           .set({ Authorization: `Bearer ${orgAdminToken}` })
           .send({ redcapToken: updatedRedcapToken } as UpdateStudyRequest)
         expect(patchResponse.status).toBe(204)
+        await waitForAuditLog({ resource: 'studies' })
 
         // Check Audit Logs
         const response = await request(app)
@@ -282,6 +284,7 @@ describe('AuditLogsController', () => {
           .set({ Authorization: `Bearer ${orgAdminToken}` })
           .send(registerRequest)
         expect(postResponse.status).toEqual(201)
+        await waitForAuditLog({ resource: 'auth/register' })
 
         const obscuredPassword = '\"password\":\"***\"' // eslint-disable-line no-useless-escape
         const safeEmail = '\"email\":\"johndoe@example.com\"' // eslint-disable-line no-useless-escape
@@ -312,6 +315,7 @@ describe('AuditLogsController', () => {
         }
         const loginResponse = await request(app).post('/auth/login/otp').send(loginRequest)
         expect(loginResponse.ok).toBe(true)
+        await waitForAuditLog({ resource: 'auth/login/otp' })
 
         const obscuredCode = '\"otp_code\":\"***\"' // eslint-disable-line no-useless-escape
         const obscuredToken = '\"otp_token\":\"***\"' // eslint-disable-line no-useless-escape

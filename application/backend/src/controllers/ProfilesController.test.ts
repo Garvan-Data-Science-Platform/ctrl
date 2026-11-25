@@ -2,7 +2,7 @@ import request from 'supertest'
 import { GetParticipantProfileResponse, UpdateProfileRequest } from 'common/types/api/users'
 import { generateToken } from '../authentication'
 import { Api } from '../Api'
-import { resetDB } from 'common/testing/TestHelpers'
+import { resetDB, waitForAuditLog } from 'common/testing/TestHelpers'
 import { TestUsers } from 'common/testing/constants'
 import { StateTerritory } from 'common/types/api/users/ParticipantProfile'
 import prisma from '../PrismaClient'
@@ -150,7 +150,7 @@ describe('ProfilesController', () => {
       expect(profile.dob).toEqual('2010-12-12')
       expect(profile.state).toBe('QLD')
 
-      const aLog = await prisma.auditLog.findFirstOrThrow({ where: { userId: user.id } })
+      const aLog = await waitForAuditLog({ userId: user.id })
       expect(aLog.resource).toBe('profiles')
       expect(aLog.operation).toBe('UPDATE')
       expect((aLog.meta as any).resourceId).toBe('current')
