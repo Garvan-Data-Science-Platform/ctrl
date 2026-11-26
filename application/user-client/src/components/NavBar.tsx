@@ -88,7 +88,7 @@ export default function NavBar({ disabled }: { disabled?: boolean }) {
                 onClose={handleCloseNavMenu}
                 sx={{ display: { xs: 'block', md: 'none' } }}
               >
-                {pages.map((page) => (
+                {activePages.map((page) => (
                   <MenuItem key={page.name} onClick={() => nav(page.route)}>
                     <Typography sx={{ textAlign: 'center' }}>{page.name}</Typography>
                   </MenuItem>
