@@ -39,7 +39,9 @@ import { Role, User } from '@prisma/client'
 import { generateToken, hashPassword, verifyPassword } from '../authentication'
 import type {
   InternalErrorResponse,
+  PrismaErrorResponse,
   UnauthorizedErrorResponse,
+  UnprocessableErrorResponse,
   ValidateErrorResponse,
 } from 'common/types/api/errors'
 import {
@@ -61,8 +63,7 @@ import { Prefill } from 'common/types/invite'
 @Route('auth')
 @Tags('Auth')
 @Response<InternalErrorResponse>('500', 'Internal Server Error')
-@Response<ValidateErrorResponse>('422', 'Validation Failed')
-@Response<UnprocessableError>('422', 'Unprocessable Content')
+@Response<ValidateErrorResponse | UnprocessableErrorResponse>('422', 'Unprocessable Content')
 @Middlewares(auditLog)
 export class AuthController extends Controller {
   userRepo = prisma.user
@@ -80,6 +81,7 @@ export class AuthController extends Controller {
   @Post('/register')
   @Security('jwt', ['OrganisationAdmin'])
   @SuccessResponse('201', 'User Created')
+  @Response<PrismaErrorResponse>('409', 'Conflict')
   public async registerUser(@Body() bodyRequest: RegisterRequest): Promise<RegisterResponse> {
     const { password, ...userDetails } = bodyRequest
 
@@ -200,6 +202,7 @@ export class AuthController extends Controller {
   @Post('/register/participants/{inviteId}')
   @NoSecurity()
   @SuccessResponse('201', 'Participant Created')
+  @Response<PrismaErrorResponse>('409', 'Conflict')
   public async registerParticipant(
     @Path() inviteId: string,
     @Body() bodyRequest: RegisterParticipantRequest,
@@ -281,13 +284,13 @@ export class AuthController extends Controller {
     @Header('x-client-type') clientType?: string,
   ): Promise<LoginSuccessResponse> {
     if (!config.oidc) {
-      throw new Error('OIDC Not Configured')
+      throw new UnprocessableError('OIDC Not Configured')
     }
 
     const oidc = config.oidc.find((val) => val.name === bodyRequest.provider)
 
     if (!oidc) {
-      throw new Error('OIDC Provider not found')
+      throw new UnprocessableError('OIDC Provider not found')
     }
 
     const { clientId, clientSecret, providerUrl } = oidc
@@ -300,7 +303,7 @@ export class AuthController extends Controller {
       code: bodyRequest.code,
     })
 
-    let user
+    let email: string
 
     try {
       const oidc_data = await fetch(`${providerUrl}/.well-known/openid-configuration`)
@@ -319,11 +322,17 @@ export class AuthController extends Controller {
         method: 'POST',
       })
 
-      const { email } = await userinfo_res.json()
-      user = await this.userRepo.findFirst({ where: { email } })
-    } catch {
-      throw new Error('Error authenticating with OIDC')
+      email = (await userinfo_res.json()).email
+    } catch (err) {
+      // Only the provider calls are in the try, so a database error below still becomes a 500
+      logger.error({
+        message: 'OIDC provider request failed',
+        error: err instanceof Error ? { name: err.name, message: err.message } : String(err),
+      })
+      throw new UnprocessableError('Error authenticating with OIDC')
     }
+
+    const user = await this.userRepo.findFirst({ where: { email } })
 
     if (!user) {
       throw new IncorrectPermissionsError('This email is not registered with CTRL.')
@@ -445,7 +454,7 @@ export class AuthController extends Controller {
     })
 
     if (!otp) {
-      throw new Error('Bad request')
+      throw new UnprocessableError('Bad request')
     }
 
     const user = await this.userRepo.findFirstOrThrow({ where: { id: otp.userId } })

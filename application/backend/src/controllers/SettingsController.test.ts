@@ -149,6 +149,15 @@ describe('SettingsController', () => {
       expect(response.status).toBe(422)
     })
 
+    it('should return a 400 if the request has no file', async () => {
+      const response = await request(app)
+        .post('/settings/logo')
+        .set({ Authorization: `Bearer ${orgAdminToken}` })
+
+      expect(response.status).toBe(400)
+      expect(response.body.message).toBe('No file uploaded')
+    })
+
     it('should change logo if a logo gets updated', async () => {
       // Post logo
       const originalLogoPostResponse = await request(app)
